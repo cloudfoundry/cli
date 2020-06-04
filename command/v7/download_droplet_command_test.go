@@ -116,7 +116,7 @@ var _ = Describe("download-droplet Command", func() {
 		})
 	})
 
-	When("the path is passed in", func() {
+	When("the droplet guid is passed in", func() {
 		var pathToDropletFile string
 
 		BeforeEach(func() {
@@ -153,6 +153,75 @@ var _ = Describe("download-droplet Command", func() {
 		})
 	})
 
+	When("a path to a file is passed in", func() {
+		BeforeEach(func() {
+			cmd.Path = "some-file.tgz"
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
+		})
+
+		AfterEach(func() {
+			Expect(os.Remove(cmd.Path)).ToNot(HaveOccurred())
+		})
+
+		It("creates a droplet tarball at the specified path", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			fileContents, err := ioutil.ReadFile(cmd.Path)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(fileContents)).To(Equal("some-droplet"))
+		})
+
+		It("displays the file it created and returns no errors", func() {
+			Expect(testUI.Out).To(Say("Downloading current droplet for app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Err).To(Say("some-warning"))
+			Expect(testUI.Out).To(Say(`Droplet downloaded successfully at %s`, cmd.Path))
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+	})
+
+	When("a path to an existing directory is passed in", func() {
+		BeforeEach(func() {
+			tmpDir, err := ioutil.TempDir("", "droplets")
+			Expect(err).NotTo(HaveOccurred())
+			cmd.Path = tmpDir
+
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(cmd.Path)).ToNot(HaveOccurred())
+		})
+
+		It("creates a droplet tarball at the specified path", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			fileContents, err := ioutil.ReadFile(filepath.Join(cmd.Path, "droplet_some-droplet-guid.tgz"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(fileContents)).To(Equal("some-droplet"))
+		})
+
+		It("displays the file it created and returns no errors", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("Downloading current droplet for app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Err).To(Say("some-warning"))
+			Expect(testUI.Out).To(Say(`Droplet downloaded successfully at %s`, filepath.Join(cmd.Path, "droplet_some-droplet-guid.tgz")))
+			Expect(testUI.Out).To(Say("OK"))
+		})
+	})
+
+	When("a path to a file in an invalid directory is passed in", func() {
+		BeforeEach(func() {
+			cmd.Path = "not/exist/some-file.tgz"
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
+		})
+
+		It("returns an appropriate error", func() {
+			_, ok := executeErr.(translatableerror.DropletFileError)
+			Expect(ok).To(BeTrue())
+		})
+	})
+
 	When("there is an error downloading the droplet", func() {
 		BeforeEach(func() {
 			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte{}, "", v7action.Warnings{"some-warning"}, errors.New("something went wrong"))
@@ -172,18 +241,6 @@ var _ = Describe("download-droplet Command", func() {
 		It("displays warnings and returns an error", func() {
 			Expect(testUI.Err).To(Say("some-warning"))
 			Expect(executeErr).To(MatchError(translatableerror.NoDropletForAppError{AppName: "some-app"}))
-		})
-	})
-
-	When("writing the droplet file fails", func() {
-		BeforeEach(func() {
-			cmd.CWD = filepath.Join("should", "be", "unwritable")
-			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
-		})
-
-		It("returns a 'DropletFileError' error", func() {
-			Expect(testUI.Err).To(Say("some-warning"))
-			Expect(executeErr.Error()).To(ContainSubstring("Error creating droplet file:"))
 		})
 	})
 })

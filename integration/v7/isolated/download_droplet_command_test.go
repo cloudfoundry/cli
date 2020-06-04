@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -27,9 +28,10 @@ var _ = Describe("download-droplet command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("download-droplet - Download an application droplet"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf download-droplet APP_NAME [--droplet DROPLET_GUID]"))
+			Eventually(session).Should(Say(`cf download-droplet APP_NAME \[--droplet DROPLET_GUID\] \[--path /path/to/droplet.tgz\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--droplet\s+The guid of the droplet to download \(default: app's current droplet\).`))
+			Eventually(session).Should(Say(`--path, -p\s+File path to download droplet to \(default: current working directory\).`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("apps, droplets, push, set-droplet"))
 		}
@@ -87,7 +89,10 @@ var _ = Describe("download-droplet command", func() {
 		})
 
 		When("the app has a current droplet", func() {
-			var dropletPath string
+			var (
+				dropletPath string
+				dropletGUID string
+			)
 
 			BeforeEach(func() {
 				helpers.CreateApp(appName)
@@ -100,7 +105,7 @@ var _ = Describe("download-droplet command", func() {
 				regex := regexp.MustCompile(`(.+)\s+\(current\)`)
 				matches := regex.FindStringSubmatch(string(dropletSession.Out.Contents()))
 				Expect(matches).To(HaveLen(2))
-				dropletGUID := matches[1]
+				dropletGUID = matches[1]
 
 				dir, err := os.Getwd()
 				Expect(err).ToNot(HaveOccurred())
@@ -116,9 +121,48 @@ var _ = Describe("download-droplet command", func() {
 				Eventually(session).Should(Say(`Downloading current droplet for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(helpers.SayPath(`Droplet downloaded successfully at %s`, dropletPath))
 				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 
 				_, err := os.Stat(dropletPath)
 				Expect(err).ToNot(HaveOccurred())
+			})
+
+			When("a path to a directory is provided", func() {
+				BeforeEach(func() {
+					tmpDir, err := ioutil.TempDir("", "droplets")
+					Expect(err).NotTo(HaveOccurred())
+					dropletPath = tmpDir
+				})
+
+				It("downloads the droplet to the given path successfully", func() {
+					session := helpers.CF("download-droplet", appName, "--path", dropletPath)
+					Eventually(session).Should(Say(`Downloading current droplet for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(helpers.SayPath(`Droplet downloaded successfully at %s`, dropletPath))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					_, err := os.Stat(filepath.Join(dropletPath, "droplet_"+dropletGUID+".tgz"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			When("a path to a file is provided", func() {
+				BeforeEach(func() {
+					tmpDir, err := ioutil.TempDir("", "droplets")
+					Expect(err).NotTo(HaveOccurred())
+					dropletPath = filepath.Join(tmpDir, "my-droplet.tgz")
+				})
+
+				It("downloads the droplet to the given path successfully", func() {
+					session := helpers.CF("download-droplet", appName, "--path", dropletPath)
+					Eventually(session).Should(Say(`Downloading current droplet for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(helpers.SayPath(`Droplet downloaded successfully at %s`, dropletPath))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					_, err := os.Stat(dropletPath)
+					Expect(err).ToNot(HaveOccurred())
+				})
 			})
 		})
 
