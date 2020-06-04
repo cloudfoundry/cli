@@ -147,6 +147,7 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route
 	if err != nil {
 		return resources.Route{}, allWarnings, err
 	}
+
 	filters = append(filters, ccv3.Query{
 		Key:    ccv3.DomainGUIDFilter,
 		Values: []string{domainGUID},
@@ -157,9 +158,13 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route
 	filters = append(filters, ccv3.Query{Key: ccv3.PathsFilter,
 		Values: []string{path},
 	})
-	filters = append(filters, ccv3.Query{Key: ccv3.PortsFilter,
-		Values: []string{port},
-	})
+
+	if port != "" {
+		filters = append(filters, ccv3.Query{Key: ccv3.PortsFilter,
+			Values: []string{port},
+		})
+	}
+
 	routes, warnings, err := actor.CloudControllerClient.GetRoutes(filters...)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -329,13 +334,17 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 		err        error
 	)
 
-	routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
-		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
-		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-		ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-		ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(port)}},
-	)
+	queries := []ccv3.Query{
+		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
+		{Key: ccv3.HostsFilter, Values: []string{hostname}},
+		{Key: ccv3.PathsFilter, Values: []string{path}},
+	}
 
+	if port != 0 {
+		queries = append(queries, ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(port)}})
+	}
+
+	routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(queries...)
 	if err != nil {
 		return resources.Route{}, Warnings(ccWarnings), err
 	}

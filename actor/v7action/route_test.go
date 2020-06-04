@@ -3,7 +3,6 @@ package v7action_test
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
@@ -323,7 +322,7 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query).To(HaveLen(5))
+				Expect(query).To(HaveLen(4))
 				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space-guid"))
 				Expect(query[1].Key).To(Equal(ccv3.DomainGUIDFilter))
@@ -876,7 +875,6 @@ var _ = Describe("Route Actions", func() {
 						{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 						{Key: ccv3.HostsFilter, Values: []string{"hostname"}},
 						{Key: ccv3.PathsFilter, Values: []string{"/path"}},
-						{Key: ccv3.PortsFilter, Values: []string{"0"}},
 					}))
 
 					// Delete the route asynchronously
@@ -1085,7 +1083,6 @@ var _ = Describe("Route Actions", func() {
 						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(0)}},
 					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
