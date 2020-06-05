@@ -172,19 +172,19 @@ var _ = Describe("set-org-role command", func() {
 
 			When("there are multiple users with the same username but different origins", func() {
 				BeforeEach(func() {
-					session := helpers.CF("create-user", username, "--origin", "ldap")
+					session := helpers.CF("create-user", username, "--origin", helpers.NonUAAOrigin)
 					Eventually(session).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					session := helpers.CF("delete-user", username, "--origin", "ldap", "-f")
+					session := helpers.CF("delete-user", username, "--origin", helpers.NonUAAOrigin, "-f")
 					Eventually(session).Should(Exit(0))
 				})
 
 				It("returns an error and asks the user to use the --origin flag", func() {
 					session := helpers.CF("set-org-role", username, orgName, "OrgManager")
 					Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as %s...", username, orgName, currentUsername))
-					Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: ldap, uaa. Specify an origin to disambiguate.", username))
+					Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: cli-oidc-provider, uaa. Specify an origin to disambiguate.", username))
 					Eventually(session).Should(Exit(1))
 				})
 			})

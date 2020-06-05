@@ -188,12 +188,12 @@ var _ = Describe("unset-space-role command", func() {
 
 			When("there are multiple users with the same username but different origins", func() {
 				BeforeEach(func() {
-					session := helpers.CF("create-user", username, "--origin", "cli-oidc-provider")
+					session := helpers.CF("create-user", username, "--origin", helpers.NonUAAOrigin)
 					Eventually(session).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					session := helpers.CF("delete-user", username, "--origin", "cli-oidc-provider", "-f")
+					session := helpers.CF("delete-user", username, "--origin", helpers.NonUAAOrigin, "-f")
 					Eventually(session).Should(Exit(0))
 				})
 

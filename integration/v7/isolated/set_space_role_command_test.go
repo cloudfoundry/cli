@@ -181,19 +181,19 @@ var _ = Describe("set-space-role command", func() {
 
 				When("there are multiple users with the same username but different origins", func() {
 					BeforeEach(func() {
-						session := helpers.CF("create-user", username, "--origin", "ldap")
+						session := helpers.CF("create-user", username, "--origin", helpers.NonUAAOrigin)
 						Eventually(session).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						session := helpers.CF("delete-user", username, "--origin", "ldap", "-f")
+						session := helpers.CF("delete-user", username, "--origin", helpers.NonUAAOrigin, "-f")
 						Eventually(session).Should(Exit(0))
 					})
 
 					It("returns an error and asks the user to use the --origin flag", func() {
 						session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
 						Eventually(session).Should(Say("Assigning role SpaceManager to user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
-						Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: ldap, uaa. Specify an origin to disambiguate.", username))
+						Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: cli-oidc-provider, uaa. Specify an origin to disambiguate.", username))
 						Eventually(session).Should(Exit(1))
 					})
 				})

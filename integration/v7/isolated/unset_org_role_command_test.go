@@ -154,14 +154,14 @@ var _ = Describe("unset-org-role command", func() {
 
 			When("there are multiple users with the same username but different origins", func() {
 				BeforeEach(func() {
-					session := helpers.CF("create-user", username, "--origin", "cli-oidc-provider", "-v")
+					session := helpers.CF("create-user", username, "--origin", helpers.NonUAAOrigin, "-v")
 					Eventually(session).Should(Exit(0))
-					session = helpers.CF("set-org-role", username, orgName, "orgauditor", "--origin", "cli-oidc-provider")
+					session = helpers.CF("set-org-role", username, orgName, "orgauditor", "--origin", helpers.NonUAAOrigin)
 					Eventually(session).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					session := helpers.CF("delete-user", username, "--origin", "cli-oidc-provider", "-f")
+					session := helpers.CF("delete-user", username, "--origin", helpers.NonUAAOrigin, "-f")
 					Eventually(session).Should(Exit(0))
 				})
 

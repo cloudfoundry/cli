@@ -69,12 +69,12 @@ var _ = Describe("delete-user command", func() {
 
 			When("multiple users exist with the same username", func() {
 				BeforeEach(func() {
-					session := helpers.CF("create-user", someUser, "--origin", "ldap")
+					session := helpers.CF("create-user", someUser, "--origin", helpers.NonUAAOrigin)
 					Eventually(session).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					session := helpers.CF("delete-user", "-f", someUser, "--origin", "ldap")
+					session := helpers.CF("delete-user", "-f", someUser, "--origin", helpers.NonUAAOrigin)
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -83,21 +83,21 @@ var _ = Describe("delete-user command", func() {
 						session := helpers.CF("delete-user", someUser, "-f")
 						Eventually(session).Should(Say("Deleting user %s...", someUser))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("The username '%s' is found in multiple origins: (uaa|ldap), (uaa|ldap).", someUser))
+						Eventually(session.Err).Should(Say("The username '%s' is found in multiple origins: (uaa|cli-oidc-provider), (uaa|cli-oidc-provider).", someUser))
 						Eventually(session).Should(Exit(1))
 					})
 				})
 
 				When("the origin flag is passed in", func() {
 					It("deletes the correct user", func() {
-						session := helpers.CF("delete-user", someUser, "-f", "--origin", "ldap")
+						session := helpers.CF("delete-user", someUser, "-f", "--origin", helpers.NonUAAOrigin)
 						Eventually(session).Should(Say("Deleting user %s...", someUser))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
 						Expect(helpers.GetUsersV3()).ToNot(ContainElement(helpers.User{
 							Username: someUser,
-							Origin:   "ldap",
+							Origin:   helpers.NonUAAOrigin,
 						}))
 					})
 				})
