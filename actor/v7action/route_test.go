@@ -370,6 +370,16 @@ var _ = Describe("Route Actions", func() {
 
 		When("the route has a port", func() {
 			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{
+						Name:      "domain-name",
+						GUID:      "domain-guid",
+						Protocols: []string{"tcp"},
+					}},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+
 				fakeCloudControllerClient.GetRoutesReturns(
 					[]resources.Route{
 						{
@@ -419,6 +429,16 @@ var _ = Describe("Route Actions", func() {
 
 		When("the route does not exist", func() {
 			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{
+						Name:      "domain-name",
+						GUID:      "domain-guid",
+						Protocols: []string{"http"},
+					}},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+
 				fakeCloudControllerClient.GetRoutesReturns(
 					[]resources.Route{},
 					ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
@@ -429,7 +449,7 @@ var _ = Describe("Route Actions", func() {
 			It("returns the error and any warnings", func() {
 				_, warnings, executeErr := actor.GetRoute("unsplittabledomain/the-path", "space-guid")
 				Expect(warnings).To(ConsistOf("get-domains-warning", "get-route-warning-1", "get-route-warning-2"))
-				Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{Host: "", DomainName: "unsplittabledomain", Path: "/the-path"}))
+				Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{Host: "", DomainName: "domain-name", Path: "/the-path"}))
 			})
 		})
 
@@ -890,8 +910,19 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			When("in the TCP case", func() {
-
 				BeforeEach(func() {
+					fakeCloudControllerClient.GetDomainsReturns(
+						[]resources.Domain{
+							{
+								GUID:      "domain-guid",
+								Name:      "domain.com",
+								Protocols: []string{"tcp"},
+							},
+						},
+						ccv3.Warnings{"get-domains-warning"},
+						nil,
+					)
+
 					warnings, executeErr = actor.DeleteRoute("domain.com", "", "", 1026)
 				})
 

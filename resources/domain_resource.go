@@ -58,11 +58,12 @@ func (d Domain) Shared() bool {
 	return d.OrganizationGUID == ""
 }
 
-func (d *Domain) HasProtocolType(protocolType string) bool {
+func (d *Domain) IsTCP() bool {
 	for _, p := range d.Protocols {
-		if p == protocolType {
+		if p == "tcp" {
 			return true
 		}
 	}
+
 	return false
 }

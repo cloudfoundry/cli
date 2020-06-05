@@ -162,7 +162,6 @@ var _ = Describe("map-route command", func() {
 					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s:%d'\.`, appName, domainName, route.Port))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
-
 				})
 			})
 
@@ -171,6 +170,18 @@ var _ = Describe("map-route command", func() {
 					session := helpers.CF("map-route", appName, domainName, "--port", fmt.Sprintf("%d", route.Port))
 
 					Eventually(session).Should(Say(`Mapping route %s:%d to app %s in org %s / space %s as %s\.\.\.`, domainName, route.Port, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("port is not specified", func() {
+				It("creates a new route with a random port and maps it to the app", func() {
+					session := helpers.CF("map-route", appName, domainName)
+
+					Eventually(session).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Say(`Mapping route %s:[0-9]+ to app %s in org %s / space %s as %s\.\.\.`, domainName, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -215,6 +226,7 @@ var _ = Describe("map-route command", func() {
 					domain.DeleteShared()
 					routerGroup.Delete()
 				})
+
 				When("a port is provided", func() {
 					It("creates the route and maps it to an app", func() {
 						session := helpers.CF("map-route", appName, domainName, "--port", "1052")

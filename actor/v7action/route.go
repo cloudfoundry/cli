@@ -93,7 +93,7 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string, labelSelector string) ([]r
 	return routes, allWarnings, nil
 }
 
-func (actor Actor) parseRoutePath(routePath string) (string, string, string, string, string, Warnings, error) {
+func (actor Actor) parseRoutePath(routePath string) (string, string, string, resources.Domain, Warnings, error) {
 	var (
 		warnings Warnings
 		host     string
@@ -121,7 +121,7 @@ func (actor Actor) parseRoutePath(routePath string) (string, string, string, str
 		needToCheckForHost := domainNotFound && len(domainParts) > 1
 
 		if !needToCheckForHost {
-			return "", "", "", "", "", allWarnings, err
+			return "", "", "", resources.Domain{}, allWarnings, err
 		}
 
 		host = domainParts[0]
@@ -129,11 +129,11 @@ func (actor Actor) parseRoutePath(routePath string) (string, string, string, str
 		domain, warnings, err = actor.GetDomainByName(domainName)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
-			return "", "", "", "", "", allWarnings, err
+			return "", "", "", resources.Domain{}, allWarnings, err
 		}
 	}
 
-	return host, path, domainName, domain.GUID, port, allWarnings, err
+	return host, path, port, domain, allWarnings, err
 }
 
 func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route, Warnings, error) {
@@ -143,14 +143,14 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route
 			Values: []string{spaceGUID},
 		},
 	}
-	host, path, domainName, domainGUID, port, allWarnings, err := actor.parseRoutePath(routePath)
+
+	host, path, port, domain, allWarnings, err := actor.parseRoutePath(routePath)
 	if err != nil {
 		return resources.Route{}, allWarnings, err
 	}
 
-	filters = append(filters, ccv3.Query{
-		Key:    ccv3.DomainGUIDFilter,
-		Values: []string{domainGUID},
+	filters = append(filters, ccv3.Query{Key: ccv3.DomainGUIDFilter,
+		Values: []string{domain.GUID},
 	})
 	filters = append(filters, ccv3.Query{Key: ccv3.HostsFilter,
 		Values: []string{host},
@@ -159,7 +159,7 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route
 		Values: []string{path},
 	})
 
-	if port != "" {
+	if domain.IsTCP() {
 		filters = append(filters, ccv3.Query{Key: ccv3.PortsFilter,
 			Values: []string{port},
 		})
@@ -173,7 +173,7 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route
 	if len(routes) == 0 {
 		return resources.Route{}, allWarnings, actionerror.RouteNotFoundError{
 			Host:       host,
-			DomainName: domainName,
+			DomainName: domain.Name,
 			Path:       path,
 		}
 	}
@@ -340,7 +340,7 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 		{Key: ccv3.PathsFilter, Values: []string{path}},
 	}
 
-	if port != 0 {
+	if domain.IsTCP() {
 		queries = append(queries, ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(port)}})
 	}
 
