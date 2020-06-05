@@ -83,7 +83,7 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
 			Expect(givenOrgGUID).To(Equal("some-org-guid"))
 			Expect(givenUserName).To(Equal("target-user-name"))
-			Expect(givenOrigin).To(Equal("uaa"))
+			Expect(givenOrigin).To(Equal(""))
 			Expect(givenIsClient).To(BeFalse())
 		})
 
@@ -137,7 +137,7 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
 			Expect(givenOrgGUID).To(Equal("some-org-guid"))
 			Expect(givenUserGUID).To(Equal("target-user-name"))
-			Expect(givenOrigin).To(Equal("uaa"))
+			Expect(givenOrigin).To(Equal(""))
 			Expect(givenIsClient).To(BeTrue())
 		})
 

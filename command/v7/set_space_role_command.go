@@ -59,12 +59,7 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		return err
 	}
 
-	origin := cmd.Origin
-	if cmd.Origin == "" {
-		origin = constant.DefaultOriginUaa
-	}
-
-	warnings, err = cmd.Actor.CreateSpaceRole(roleType, org.GUID, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
+	warnings, err = cmd.Actor.CreateSpaceRole(roleType, org.GUID, space.GUID, cmd.Args.Username, cmd.Origin, cmd.IsClient)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.RoleAlreadyExistsError); ok {
