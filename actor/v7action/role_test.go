@@ -997,19 +997,6 @@ var _ = Describe("Role Actions", func() {
 				})
 				It("returns a user not found error and warnings", func() {
 					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(1))
-					passedQuery := fakeCloudControllerClient.GetUsersArgsForCall(0)
-					Expect(passedQuery).To(Equal(
-						[]ccv3.Query{
-							{
-								Key:    ccv3.UsernamesFilter,
-								Values: []string{userNameOrGUID},
-							},
-							{
-								Key:    ccv3.OriginsFilter,
-								Values: []string{userOrigin},
-							},
-						},
-					))
 					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
