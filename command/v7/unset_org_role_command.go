@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
@@ -50,12 +49,7 @@ func (cmd *UnsetOrgRoleCommand) Execute(args []string) error {
 		return err
 	}
 
-	origin := cmd.Origin
-	if origin == "" {
-		origin = constant.DefaultOriginUaa
-	}
-
-	warnings, err = cmd.Actor.DeleteOrgRole(roleType, org.GUID, cmd.Args.Username, origin, cmd.IsClient)
+	warnings, err = cmd.Actor.DeleteOrgRole(roleType, org.GUID, cmd.Args.Username, cmd.Origin, cmd.IsClient)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

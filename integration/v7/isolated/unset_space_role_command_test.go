@@ -185,6 +185,25 @@ var _ = Describe("unset-space-role command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 			})
+
+			When("there are multiple users with the same username but different origins", func() {
+				BeforeEach(func() {
+					session := helpers.CF("create-user", username, "--origin", "cli-oidc-provider")
+					Eventually(session).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					session := helpers.CF("delete-user", username, "--origin", "cli-oidc-provider", "-f")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("returns an error and asks the user to use the --origin flag", func() {
+					session := helpers.CF("unset-space-role", username, orgName, spaceName, "SpaceAuditor")
+					Eventually(session).Should(Say("Removing role SpaceAuditor from user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
+					Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: cli-oidc-provider, uaa. Specify an origin to disambiguate.", username))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 
 		When("the user does not exist", func() {

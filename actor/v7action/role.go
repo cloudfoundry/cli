@@ -134,22 +134,31 @@ func (actor Actor) getUserGuidForDeleteRole(isClient bool, userNameOrGUID string
 		}
 		userGUID = user.GUID
 	} else {
-		ccv3Users, warnings, err := actor.CloudControllerClient.GetUsers(
-			ccv3.Query{
-				Key:    ccv3.UsernamesFilter,
-				Values: []string{userNameOrGUID},
-			},
-			ccv3.Query{
+		queries := []ccv3.Query{{
+			Key:    ccv3.UsernamesFilter,
+			Values: []string{userNameOrGUID},
+		}}
+		if userOrigin != "" {
+			queries = append(queries, ccv3.Query{
 				Key:    ccv3.OriginsFilter,
 				Values: []string{userOrigin},
-			},
-		)
+			})
+		}
+
+		ccv3Users, warnings, err := actor.CloudControllerClient.GetUsers(queries...)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return "", allWarnings, err
 		}
 		if len(ccv3Users) == 0 {
 			return "", allWarnings, actionerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}
+		}
+		if len(ccv3Users) > 1 {
+			origins := []string{}
+			for _, user := range ccv3Users {
+				origins = append(origins, user.Origin)
+			}
+			return "", allWarnings, actionerror.AmbiguousUserError{Username: userNameOrGUID, Origins: origins}
 		}
 		userGUID = ccv3Users[0].GUID
 	}

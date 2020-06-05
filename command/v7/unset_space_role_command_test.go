@@ -88,7 +88,7 @@ var _ = Describe("unset-space-role Command", func() {
 			Expect(givenRoleType).To(Equal(constant.SpaceDeveloperRole))
 			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
 			Expect(givenUserName).To(Equal("target-user-name"))
-			Expect(givenOrigin).To(Equal("uaa"))
+			Expect(givenOrigin).To(Equal(""))
 			Expect(givenIsClient).To(BeFalse())
 		})
 
@@ -143,7 +143,7 @@ var _ = Describe("unset-space-role Command", func() {
 			Expect(givenRoleType).To(Equal(constant.SpaceAuditorRole))
 			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
 			Expect(givenUserName).To(Equal("target-user-name"))
-			Expect(givenOrigin).To(Equal("uaa"))
+			Expect(givenOrigin).To(Equal(""))
 			Expect(givenIsClient).To(BeTrue())
 		})
 
