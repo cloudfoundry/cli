@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -205,7 +206,8 @@ var _ = Describe("download-droplet Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(testUI.Out).To(Say("Downloading current droplet for app some-app in org some-org / space some-space as some-user..."))
 			Expect(testUI.Err).To(Say("some-warning"))
-			Expect(testUI.Out).To(Say(`Droplet downloaded successfully at %s`, filepath.Join(cmd.Path, "droplet_some-droplet-guid.tgz")))
+			pathRegExp := regexp.QuoteMeta(filepath.Join(cmd.Path, "droplet_some-droplet-guid.tgz"))
+			Expect(testUI.Out).To(Say(`Droplet downloaded successfully at %s`, pathRegExp))
 			Expect(testUI.Out).To(Say("OK"))
 		})
 	})
