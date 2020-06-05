@@ -8,6 +8,8 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+const NonUAAOrigin = "cli-oidc-provider"
+
 type User struct {
 	GUID      string
 	Username  string

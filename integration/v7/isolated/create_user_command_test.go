@@ -134,7 +134,7 @@ var _ = Describe("create-user command", func() {
 				When("the origin is not UAA or empty", func() {
 					It("creates the new user in the specified origin", func() {
 						newUser := helpers.NewUsername()
-						session := helpers.CF("create-user", newUser, "--origin", "ldap")
+						session := helpers.CF("create-user", newUser, "--origin", helpers.NonUAAOrigin)
 						Eventually(session).Should(Say("Creating user %s...", newUser))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))

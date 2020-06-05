@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
@@ -57,12 +56,7 @@ func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {
 		return err
 	}
 
-	origin := cmd.Origin
-	if origin == "" {
-		origin = constant.DefaultOriginUaa
-	}
-
-	warnings, err = cmd.Actor.DeleteSpaceRole(roleType, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
+	warnings, err = cmd.Actor.DeleteSpaceRole(roleType, space.GUID, cmd.Args.Username, cmd.Origin, cmd.IsClient)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -528,6 +528,7 @@ var _ = Describe("Role Actions", func() {
 						ccv3.Warnings{"get-users-warning"},
 						nil,
 					)
+					userOrigin = "uaa"
 				})
 				It("returns a user not found error and warnings", func() {
 					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(1))
@@ -574,6 +575,37 @@ var _ = Describe("Role Actions", func() {
 
 					Expect(executeErr).To(MatchError(actionerror.UserNotFoundError{Username: userNameOrGUID}))
 				})
+			})
+		})
+
+		When("the multiple users are found with different origins", func() {
+			BeforeEach(func() {
+				userOrigin = ""
+				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
+					[]resources.User{
+						{Username: userNameOrGUID, GUID: "user-guid1", Origin: "uaa"},
+						{Username: userNameOrGUID, GUID: "user-guid2", Origin: "ldap"},
+					},
+					ccv3.Warnings{"get-users-warning"},
+					nil,
+				)
+			})
+
+			It("it does not use the origin filter", func() {
+				Expect(executeErr).To(MatchError(actionerror.AmbiguousUserError{
+					Username: userNameOrGUID,
+					Origins:  []string{"uaa", "ldap"},
+				}))
+
+				passedQuery := fakeCloudControllerClient.GetUsersArgsForCall(0)
+				Expect(passedQuery).To(Equal(
+					[]ccv3.Query{
+						{
+							Key:    ccv3.UsernamesFilter,
+							Values: []string{userNameOrGUID},
+						},
+					},
+				))
 			})
 		})
 

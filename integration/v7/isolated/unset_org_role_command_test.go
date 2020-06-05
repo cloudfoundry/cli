@@ -151,6 +151,27 @@ var _ = Describe("unset-org-role command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 			})
+
+			When("there are multiple users with the same username but different origins", func() {
+				BeforeEach(func() {
+					session := helpers.CF("create-user", username, "--origin", helpers.NonUAAOrigin, "-v")
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("set-org-role", username, orgName, "orgauditor", "--origin", helpers.NonUAAOrigin)
+					Eventually(session).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					session := helpers.CF("delete-user", username, "--origin", helpers.NonUAAOrigin, "-f")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("returns an error and asks the user to use the --origin flag", func() {
+					session := helpers.CF("unset-org-role", username, orgName, "OrgAuditor")
+					Eventually(session).Should(Say("Removing role OrgAuditor from user %s in org %s as %s...", username, orgName, privilegedUsername))
+					Eventually(session.Err).Should(Say("Ambiguous user. User with username '%s' exists in the following origins: cli-oidc-provider, uaa. Specify an origin to disambiguate.", username))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 
 		When("the user does not exist", func() {
