@@ -27,4 +27,5 @@ if [[ "$input" == "y" || "$input" == "Y" ]]; then
   git push
 
   git checkout $branch_name
+  git reset origin/$branch_name --hard
 fi
