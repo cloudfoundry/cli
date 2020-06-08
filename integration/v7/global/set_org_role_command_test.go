@@ -29,7 +29,7 @@ var _ = Describe("set-org-role command", func() {
 			It("prints the error from UAA and exits 1", func() {
 				session := helpers.CF("set-org-role", "not-exists", orgName, "OrgAuditor")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists' and origin 'uaa'."))
+				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists'."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
