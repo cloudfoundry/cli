@@ -32,7 +32,7 @@ var _ = Describe("set-space-role command", func() {
 			It("prints the error from UAA and exits 1", func() {
 				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceDeveloper")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists' and origin 'uaa'."))
+				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists'."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
