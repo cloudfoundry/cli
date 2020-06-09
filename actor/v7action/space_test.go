@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -766,7 +767,7 @@ var _ = Describe("Space", func() {
 		Describe("service instance information", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
-					[]ccv3.ServiceInstance{{Name: "instance-1"}, {Name: "instance-2"}},
+					[]resources.ServiceInstance{{Name: "instance-1"}, {Name: "instance-2"}},
 					ccv3.Warnings{"get-services-warning"},
 					nil,
 				)
@@ -780,7 +781,7 @@ var _ = Describe("Space", func() {
 			When("getting service instance info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstancesReturns(
-						[]ccv3.ServiceInstance{},
+						[]resources.ServiceInstance{},
 						ccv3.Warnings{"get-services-warning"},
 						errors.New("service-instance-error"),
 					)

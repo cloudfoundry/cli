@@ -7,7 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +28,7 @@ var _ = Describe("Service Instance Actions", func() {
 			serviceInstanceName string
 			sourceSpaceGUID     string
 
-			serviceInstance ServiceInstance
+			serviceInstance resources.ServiceInstance
 			warnings        Warnings
 			executionError  error
 		)
@@ -45,7 +45,7 @@ var _ = Describe("Service Instance Actions", func() {
 		When("the cloud controller request is successful", func() {
 			When("the cloud controller returns one service instance", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceInstancesReturns([]ccv3.ServiceInstance{
+					fakeCloudControllerClient.GetServiceInstancesReturns([]resources.ServiceInstance{
 						{
 							Name: "some-service-instance",
 							GUID: "some-service-instance-guid",
@@ -56,7 +56,7 @@ var _ = Describe("Service Instance Actions", func() {
 				It("returns a service instance and warnings", func() {
 					Expect(executionError).NotTo(HaveOccurred())
 
-					Expect(serviceInstance).To(Equal(ServiceInstance{Name: "some-service-instance", GUID: "some-service-instance-guid"}))
+					Expect(serviceInstance).To(Equal(resources.ServiceInstance{Name: "some-service-instance", GUID: "some-service-instance-guid"}))
 					Expect(warnings).To(ConsistOf("some-service-instance-warning"))
 					Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf(

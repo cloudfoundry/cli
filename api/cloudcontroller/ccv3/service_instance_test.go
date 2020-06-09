@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
@@ -23,7 +25,7 @@ var _ = Describe("Service Instance", func() {
 		var (
 			query Query
 
-			instances  []ServiceInstance
+			instances  []resources.ServiceInstance
 			warnings   Warnings
 			executeErr error
 		)
@@ -89,15 +91,15 @@ var _ = Describe("Service Instance", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(instances).To(ConsistOf(
-					ServiceInstance{
+					resources.ServiceInstance{
 						GUID: "service-instance-1-guid",
 						Name: "service-instance-1-name",
 					},
-					ServiceInstance{
+					resources.ServiceInstance{
 						GUID: "service-instance-2-guid",
 						Name: "service-instance-2-name",
 					},
-					ServiceInstance{
+					resources.ServiceInstance{
 						GUID: "service-instance-3-guid",
 						Name: "service-instance-3-name",
 					},
