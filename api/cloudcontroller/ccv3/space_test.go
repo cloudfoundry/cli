@@ -24,14 +24,14 @@ var _ = Describe("Spaces", func() {
 
 	Describe("CreateSpace", func() {
 		var (
-			space         Space
-			spaceToCreate Space
+			space         resources.Space
+			spaceToCreate resources.Space
 			warnings      Warnings
 			executeErr    error
 		)
 
 		JustBeforeEach(func() {
-			spaceToCreate = Space{Name: "some-space", Relationships: resources.Relationships{constant.RelationshipTypeOrganization: resources.Relationship{GUID: "some-org-guid"}}}
+			spaceToCreate = resources.Space{Name: "some-space", Relationships: resources.Relationships{constant.RelationshipTypeOrganization: resources.Relationship{GUID: "some-org-guid"}}}
 			space, warnings, executeErr = client.CreateSpace(spaceToCreate)
 		})
 
@@ -372,8 +372,8 @@ var _ = Describe("Spaces", func() {
 
 	Describe("UpdateSpace", func() {
 		var (
-			spaceToUpdate Space
-			updatedSpace  Space
+			spaceToUpdate resources.Space
+			updatedSpace  resources.Space
 			warnings      Warnings
 			executeErr    error
 		)
@@ -413,7 +413,7 @@ var _ = Describe("Spaces", func() {
 					),
 				)
 
-				spaceToUpdate = Space{
+				spaceToUpdate = resources.Space{
 					Name: "some-space-name",
 					GUID: "some-guid",
 					Metadata: &Metadata{

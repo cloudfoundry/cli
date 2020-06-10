@@ -11,8 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-type Space ccv3.Space
-
 type SpaceSummary struct {
 	Space
 	Name                  string
@@ -28,7 +26,7 @@ type SpaceSummary struct {
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
 	allWarnings := Warnings{}
 
-	space, apiWarnings, err := actor.CloudControllerClient.CreateSpace(ccv3.Space{
+	space, apiWarnings, err := actor.CloudControllerClient.CreateSpace(resources.Space{
 		Name: spaceName,
 		Relationships: resources.Relationships{
 			constant.RelationshipTypeOrganization: resources.Relationship{GUID: orgGUID},
@@ -278,7 +276,7 @@ func (actor Actor) RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceNa
 		return Space{}, allWarnings, err
 	}
 
-	ccSpace, updateWarnings, err := actor.CloudControllerClient.UpdateSpace(ccv3.Space{GUID: space.GUID, Name: newSpaceName})
+	ccSpace, updateWarnings, err := actor.CloudControllerClient.UpdateSpace(resources.Space{GUID: space.GUID, Name: newSpaceName})
 	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
 
 	return Space(ccSpace), allWarnings, err

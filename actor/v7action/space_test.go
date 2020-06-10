@@ -40,7 +40,7 @@ var _ = Describe("Space", func() {
 		When("the API layer calls are successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateSpaceReturns(
-					ccv3.Space{GUID: "space-guid", Name: "space-name"},
+					resources.Space{GUID: "space-guid", Name: "space-name"},
 					ccv3.Warnings{"not-fatal-warning"},
 					nil)
 			})
@@ -56,7 +56,7 @@ var _ = Describe("Space", func() {
 		When("the cc client returns an NameNotUniqueInOrgError", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateSpaceReturns(
-					ccv3.Space{},
+					resources.Space{},
 					ccv3.Warnings{"create-space-warning"},
 					ccerror.NameNotUniqueInOrgError{},
 				)
@@ -73,7 +73,7 @@ var _ = Describe("Space", func() {
 		When("the cc client returns a different error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateSpaceReturns(
-					ccv3.Space{},
+					resources.Space{},
 					ccv3.Warnings{"warning"},
 					errors.New("api-error"),
 				)
@@ -235,7 +235,7 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns back one space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{
+						[]resources.Space{
 							{
 								GUID: "some-space-guid",
 								Name: spaceName,
@@ -265,7 +265,7 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns a space with a quota relationship", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName,
+						[]resources.Space{{GUID: "some-space-guid", Name: spaceName,
 							Relationships: Relationships{
 								constant.RelationshipTypeQuota: Relationship{GUID: "some-space-quota-guid"},
 							}}},
@@ -326,7 +326,7 @@ var _ = Describe("Space", func() {
 		When("there are spaces in the org", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{
+					[]resources.Space{
 						{
 							GUID: "space-1-guid",
 							Name: "space-1",
@@ -392,7 +392,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				returnedErr = errors.New("cc-get-spaces-error")
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{},
+					[]resources.Space{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					returnedErr,
@@ -448,7 +448,7 @@ var _ = Describe("Space", func() {
 			When("the space is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{},
+						[]resources.Space{},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"warning-3", "warning-4"},
 						nil,
@@ -464,7 +464,7 @@ var _ = Describe("Space", func() {
 			When("the space is found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{{GUID: "some-space-guid"}},
+						[]resources.Space{{GUID: "some-space-guid"}},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"warning-3", "warning-4"},
 						nil,
@@ -593,7 +593,7 @@ var _ = Describe("Space", func() {
 		When("getting the space succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{{Name: oldSpaceName, GUID: "space-guid"}},
+					[]resources.Space{{Name: oldSpaceName, GUID: "space-guid"}},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-space-warning"},
 					nil,
@@ -603,7 +603,7 @@ var _ = Describe("Space", func() {
 			It("delegates to the client to update the space", func() {
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UpdateSpaceCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateSpaceArgsForCall(0)).To(Equal(ccv3.Space{
+				Expect(fakeCloudControllerClient.UpdateSpaceArgsForCall(0)).To(Equal(resources.Space{
 					GUID: "space-guid",
 					Name: newSpaceName,
 				}))
@@ -612,7 +612,7 @@ var _ = Describe("Space", func() {
 			When("updating the space fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateSpaceReturns(
-						ccv3.Space{},
+						resources.Space{},
 						ccv3.Warnings{"update-space-warning"},
 						errors.New("update-space-error"),
 					)
@@ -628,7 +628,7 @@ var _ = Describe("Space", func() {
 			When("updating the space succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateSpaceReturns(
-						ccv3.Space{Name: newSpaceName, GUID: "space-guid"},
+						resources.Space{Name: newSpaceName, GUID: "space-guid"},
 						ccv3.Warnings{"update-space-warning"},
 						nil,
 					)
@@ -650,7 +650,7 @@ var _ = Describe("Space", func() {
 			err          error
 
 			org        Organization
-			ccv3Spaces []ccv3.Space
+			ccv3Spaces []resources.Space
 			apps       []Application
 		)
 
@@ -661,7 +661,7 @@ var _ = Describe("Space", func() {
 		BeforeEach(func() {
 			org = Organization{GUID: "some-org-guid", Name: "some-org-name"}
 
-			ccv3Spaces = []ccv3.Space{
+			ccv3Spaces = []resources.Space{
 				{
 					GUID: "some-space-guid",
 					Name: "some-space-name",
@@ -710,7 +710,7 @@ var _ = Describe("Space", func() {
 		Describe("space information", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{{GUID: "some-space-guid", Name: "some-space"}},
+					[]resources.Space{{GUID: "some-space-guid", Name: "some-space"}},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-space-warning"},
 					nil,
@@ -725,7 +725,7 @@ var _ = Describe("Space", func() {
 			When("getting space info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{},
+						[]resources.Space{},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"get-space-warning"},
 						errors.New("get-space-error"),
@@ -829,7 +829,7 @@ var _ = Describe("Space", func() {
 
 		Describe("quota information", func() {
 			BeforeEach(func() {
-				ccv3Spaces = []ccv3.Space{
+				ccv3Spaces = []resources.Space{
 					{
 						GUID: "some-space-guid",
 						Name: "some-space-name",
@@ -856,7 +856,7 @@ var _ = Describe("Space", func() {
 
 			When("the space does not have a quota applied", func() {
 				BeforeEach(func() {
-					ccv3Spaces = []ccv3.Space{
+					ccv3Spaces = []resources.Space{
 						{
 							GUID: "some-space-guid",
 							Name: "some-space-name",

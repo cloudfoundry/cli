@@ -40,8 +40,8 @@ var _ = Describe("space features", func() {
 			featureName = "ssh"
 
 			fakeCloudControllerClient.GetSpacesReturns(
-				[]ccv3.Space{
-					ccv3.Space{
+				[]resources.Space{
+					resources.Space{
 						Name: spaceName,
 						GUID: "some-space-guid",
 					},
@@ -83,7 +83,7 @@ var _ = Describe("space features", func() {
 		Context("when the space does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{},
+					[]resources.Space{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-space-warning"},
 					nil,
@@ -133,8 +133,8 @@ var _ = Describe("space features", func() {
 			feature = "ssh"
 			orgGUID = "some-org-guid"
 			fakeCloudControllerClient.GetSpacesReturns(
-				[]ccv3.Space{
-					ccv3.Space{
+				[]resources.Space{
+					resources.Space{
 						Name: spaceName,
 						GUID: spaceGUID,
 					},

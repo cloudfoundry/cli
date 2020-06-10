@@ -65,7 +65,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					ccv3.Warnings{"get-quota-warning-1"}, nil)
 
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{
+					[]resources.Space{
 						{
 							GUID: "space-2-guid",
 							Name: "space-2",
@@ -190,7 +190,7 @@ var _ = Describe("Organization Summary Actions", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("cc-get-spaces-error")
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{},
+						[]resources.Space{},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"spaces warning"},
 						expectedErr,
