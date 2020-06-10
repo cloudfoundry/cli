@@ -3,22 +3,53 @@ package resources_test
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/resources"
+	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("service instance resource", func() {
-	Describe("MarshalJSON", func() {
-		It("marshals all fields", func() {
-			si := resources.ServiceInstance{
-				Type:      resources.UserProvidedServiceInstance,
+	DescribeTable(
+		"Marshaling and Unmarshaling",
+		func(serviceInstance ServiceInstance, serialized string) {
+			By("marshaling", func() {
+				Expect(json.Marshal(serviceInstance)).To(MatchJSON(serialized))
+			})
+
+			By("unmarshaling", func() {
+				var parsed ServiceInstance
+				Expect(json.Unmarshal([]byte(serialized), &parsed)).NotTo(HaveOccurred())
+				Expect(parsed).To(Equal(serviceInstance))
+			})
+		},
+		Entry("type", ServiceInstance{Type: "fake-type"}, `{"type": "fake-type"}`),
+		Entry("name", ServiceInstance{Name: "fake-name"}, `{"name": "fake-name"}`),
+		Entry("guid", ServiceInstance{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
+		Entry(
+			"space guid",
+			ServiceInstance{SpaceGUID: "fake-space-guid"},
+			`{
+				"relationships": {
+					"space": {
+						"data": {
+							"guid": "fake-space-guid"
+						}
+					}
+				}
+            }`,
+		),
+		Entry(
+			"everything",
+			ServiceInstance{
+				Type:      UserProvidedServiceInstance,
+				GUID:      "fake-guid",
 				Name:      "fake-space-guid",
 				SpaceGUID: "fake-space-guid",
-			}
-			Expect(json.Marshal(si)).To(MatchJSON(`
-			{
+			},
+			`{
 				"type": "user-provided",
+				"guid": "fake-guid",
 				"name": "fake-space-guid",
 				"relationships": {
 					"space": {
@@ -27,16 +58,7 @@ var _ = Describe("service instance resource", func() {
 						}
 					}
 				}
-            }`))
-		})
-	})
-
-	Describe("UnmarshalJSON", func() {
-		It("unmarshals the guid", func() {
-			const input = `{"guid": "fake-service-instance-guid"}`
-			var si resources.ServiceInstance
-			Expect(json.Unmarshal([]byte(input), &si)).NotTo(HaveOccurred())
-			Expect(si).To(Equal(resources.ServiceInstance{GUID: "fake-service-instance-guid"}))
-		})
-	})
+            }`,
+		),
+	)
 })
