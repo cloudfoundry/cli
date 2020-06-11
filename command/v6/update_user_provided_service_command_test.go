@@ -301,8 +301,8 @@ var _ = Describe("update-user-provided-service Command", func() {
 					bytes, err := json.Marshal(instanceChanges)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(MatchJSON(`
-          {
-					  "tags": [],
+					{
+						"tags": [],
 						"syslog_drain_url": "",
 						"route_service_url": "",
 						"credentials": {}

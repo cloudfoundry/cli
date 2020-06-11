@@ -125,7 +125,7 @@ var _ = Describe("update-user-provided-service command", func() {
 					Eventually(session).Should(Say(`route service url:\s+https://example.com`))
 				})
 
-				It("can unset previous values provideding empty strings as flag values", func() {
+				It("can unset previous values by providing empty strings as flag values", func() {
 					session := helpers.CF(
 						`update-user-provided-service`, serviceName,
 						`-l`, `""`,

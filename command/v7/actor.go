@@ -50,6 +50,7 @@ type Actor interface {
 	CreateSpaceQuota(spaceQuotaName string, orgGuid string, limits v7action.QuotaLimits) (v7action.Warnings, error)
 	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	CreateUser(username string, password string, origin string) (resources.User, v7action.Warnings, error)
+	CreateUserProvidedServiceInstance(name, spaceGUID string) (v7action.Warnings, error)
 	DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (v7action.Warnings, error)
 	DeleteBuildpackByNameAndStack(buildpackName string, buildpackStack string) (v7action.Warnings, error)
 	DeleteDomain(domain resources.Domain) (v7action.Warnings, error)

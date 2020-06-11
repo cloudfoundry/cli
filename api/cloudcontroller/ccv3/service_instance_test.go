@@ -1,34 +1,34 @@
 package ccv3_test
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Service Instance", func() {
-	var client *Client
-
-	BeforeEach(func() {
-		client, _ = NewTestClient()
-	})
-
 	Describe("GetServiceInstances", func() {
 		var (
-			query Query
-
+			client     *Client
+			query      Query
 			instances  []resources.ServiceInstance
 			warnings   Warnings
 			executeErr error
 		)
+
+		BeforeEach(func() {
+			client, _ = NewTestClient()
+		})
 
 		JustBeforeEach(func() {
 			instances, warnings, executeErr = client.GetServiceInstances(query)
@@ -149,6 +149,62 @@ var _ = Describe("Service Instance", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("CreateServiceInstance", func() {
+		var (
+			requester *ccv3fakes.FakeRequester
+			client    *Client
+		)
+
+		BeforeEach(func() {
+			requester = new(ccv3fakes.FakeRequester)
+			client, _ = NewFakeRequesterTestClient(requester)
+		})
+
+		Context("synchronous response", func() {
+			When("the request succeeds", func() {
+				It("returns warnings and no errors", func() {
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, nil)
+
+					si := resources.ServiceInstance{
+						Type:      resources.UserProvidedServiceInstance,
+						Name:      "fake-user-provided-service-instance",
+						SpaceGUID: "fake-space-guid",
+					}
+
+					jobURL, warnings, err := client.CreateServiceInstance(si)
+
+					Expect(jobURL).To(BeEmpty())
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(requester.MakeRequestCallCount()).To(Equal(1))
+					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+						RequestName: internal.PostServiceInstanceRequest,
+						RequestBody: si,
+					}))
+				})
+			})
+
+			When("the request fails", func() {
+				It("returns errors and warnings", func() {
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
+
+					si := resources.ServiceInstance{
+						Type:      resources.UserProvidedServiceInstance,
+						Name:      "fake-user-provided-service-instance",
+						SpaceGUID: "fake-space-guid",
+					}
+
+					jobURL, warnings, err := client.CreateServiceInstance(si)
+
+					Expect(jobURL).To(BeEmpty())
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).To(MatchError("bang"))
+				})
 			})
 		})
 	})

@@ -21,3 +21,10 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 
 	return result, warnings, err
 }
+
+func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {
+	return client.MakeRequest(RequestParams{
+		RequestName: internal.PostServiceInstanceRequest,
+		RequestBody: serviceInstance,
+	})
+}
