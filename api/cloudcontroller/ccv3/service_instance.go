@@ -2,29 +2,22 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// ServiceInstance represents a Cloud Controller V3 Service Instance.
-type ServiceInstance struct {
-	// GUID is a unique service instance identifier.
-	GUID string `json:"guid"`
-	// Name is the name of the service instance.
-	Name string `json:"name"`
-}
-
 // GetServiceInstances lists service instances with optional filters.
-func (client *Client) GetServiceInstances(query ...Query) ([]ServiceInstance, Warnings, error) {
-	var resources []ServiceInstance
+func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, Warnings, error) {
+	var result []resources.ServiceInstance
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceInstancesRequest,
 		Query:        query,
-		ResponseBody: ServiceInstance{},
+		ResponseBody: resources.ServiceInstance{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(ServiceInstance))
+			result = append(result, item.(resources.ServiceInstance))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return result, warnings, err
 }
