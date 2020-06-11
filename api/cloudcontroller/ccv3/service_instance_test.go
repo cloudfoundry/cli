@@ -170,9 +170,16 @@ var _ = Describe("Service Instance", func() {
 					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, nil)
 
 					si := resources.ServiceInstance{
-						Type:      resources.UserProvidedServiceInstance,
-						Name:      "fake-user-provided-service-instance",
-						SpaceGUID: "fake-space-guid",
+						Type:            resources.UserProvidedServiceInstance,
+						Name:            "fake-user-provided-service-instance",
+						SpaceGUID:       "fake-space-guid",
+						Tags:            []string{"foo", "bar"},
+						RouteServiceURL: "https://fake-route.com",
+						SyslogDrainURL:  "https://fake-sylogg.com",
+						Credentials: map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						},
 					}
 
 					jobURL, warnings, err := client.CreateServiceInstance(si)
@@ -194,9 +201,16 @@ var _ = Describe("Service Instance", func() {
 					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
 
 					si := resources.ServiceInstance{
-						Type:      resources.UserProvidedServiceInstance,
-						Name:      "fake-user-provided-service-instance",
-						SpaceGUID: "fake-space-guid",
+						Type:            resources.UserProvidedServiceInstance,
+						Name:            "fake-user-provided-service-instance",
+						SpaceGUID:       "fake-space-guid",
+						Tags:            []string{"foo", "bar"},
+						RouteServiceURL: "https://fake-route.com",
+						SyslogDrainURL:  "https://fake-sylogg.com",
+						Credentials: map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						},
 					}
 
 					jobURL, warnings, err := client.CreateServiceInstance(si)

@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -8,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("create-user-provided-service command", func() {
+var _ = Describe("create-user-provided-service command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
@@ -70,13 +72,11 @@ var _ = FDescribe("create-user-provided-service command", func() {
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
 			serviceName = helpers.PrefixedRandomName("ups")
-
 		})
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
 			deleteUserProvidedService(serviceName)
-
 		})
 
 		When("a name is provided", func() {
@@ -87,7 +87,76 @@ var _ = FDescribe("create-user-provided-service command", func() {
 				expectOKMessage(session, serviceName, orgName, spaceName, userName)
 
 				session = helpers.CF("service", serviceName)
-				Eventually(session).Should(Say(`name:\s+%s`, serviceName))
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`name:\s+%s`, serviceName))
+			})
+		})
+
+		When("all parameters are provided", func() {
+			It("displays success message, exits 0, and creates the service", func() {
+				session := helpers.CF(
+					`create-user-provided-service`, serviceName,
+					`-p`, `'{"username":"password"}'`,
+					`-t`, `"list, of, tags"`,
+					`-l`, `syslog://example-syslog.com`,
+					`-r`, `https://example-route.com`,
+				)
+
+				Eventually(session).Should(Exit(0))
+				expectOKMessage(session, serviceName, orgName, spaceName, userName)
+
+				session = helpers.CF("service", serviceName)
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(SatisfyAll(
+					Say(`name:\s+%s`, serviceName),
+					Say(`tags:\s+list,\s*of,\s*tags`),
+					Say(`route service url:\s+https://example-route.com`),
+				))
+			})
+		})
+
+		When("requesting interactive credentials", func() {
+			var buffer *Buffer
+
+			BeforeEach(func() {
+				buffer = NewBuffer()
+				_, err := buffer.Write([]byte("fake-username\nfake-password\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("requests the credentials at a prompt", func() {
+				session := helpers.CFWithStdin(buffer, "create-user-provided-service", serviceName, "-p", `"username,password"`)
+
+				Eventually(session).Should(Say("username: "))
+				Eventually(session).Should(Say("password: "))
+				Consistently(session).ShouldNot(Say("fake-username"), "credentials should not be echoed to the user")
+				Consistently(session).ShouldNot(Say("fake-password"), "credentials should not be echoed to the user")
+				Eventually(session).Should(Exit(0))
+
+				expectOKMessage(session, serviceName, orgName, spaceName, userName)
+			})
+		})
+
+		When("reading JSON credentials from a file", func() {
+			var path string
+
+			BeforeEach(func() {
+				path = helpers.TempFileWithContent(`{"some": "credentials"}`)
+			})
+
+			AfterEach(func() {
+				Expect(os.Remove(path)).To(Succeed())
+			})
+
+			It("accepts a file path", func() {
+				session := helpers.CF("create-user-provided-service", serviceName, "-p", path)
+
+				By("checking that it does not interpret the file name as request for an interactive credential prompt")
+				Consistently(session.Out.Contents()).ShouldNot(ContainSubstring(path))
+
+				By("succeeding")
+				Eventually(session).Should(Exit(0))
+				expectOKMessage(session, serviceName, orgName, spaceName, userName)
 			})
 		})
 	})

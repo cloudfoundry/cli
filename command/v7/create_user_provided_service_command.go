@@ -1,7 +1,9 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreateUserProvidedServiceCommand struct {
@@ -21,11 +23,24 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 		return err
 	}
 
+	if err := PromptUserForCredentialsIfRequired(&cmd.Credentials, cmd.UI); err != nil {
+		return err
+	}
+
 	if err := cmd.displayMessage(); err != nil {
 		return err
 	}
 
-	warnings, err := cmd.Actor.CreateUserProvidedServiceInstance(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	serviceInstance := resources.ServiceInstance{
+		Name:            cmd.RequiredArgs.ServiceInstance,
+		SpaceGUID:       cmd.Config.TargetedSpace().GUID,
+		Tags:            cmd.Tags.Value,
+		SyslogDrainURL:  cmd.SyslogDrainURL.Value,
+		RouteServiceURL: cmd.RouteServiceURL.Value,
+		Credentials:     cmd.Credentials.Value,
+	}
+
+	warnings, err := cmd.Actor.CreateUserProvidedServiceInstance(serviceInstance)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -49,6 +64,22 @@ func (cmd CreateUserProvidedServiceCommand) displayMessage() error {
 			"User":            user.Name,
 		},
 	)
+
+	return nil
+}
+
+func PromptUserForCredentialsIfRequired(flag *flag.CredentialsOrJSON, ui command.UI) error {
+	if len(flag.UserPromptCredentials) > 0 {
+		flag.Value = make(map[string]interface{})
+
+		for _, key := range flag.UserPromptCredentials {
+			var err error
+			flag.Value[key], err = ui.DisplayPasswordPrompt(key)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }

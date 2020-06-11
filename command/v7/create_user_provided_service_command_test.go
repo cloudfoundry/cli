@@ -5,8 +5,10 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -107,9 +109,74 @@ var _ = Describe("create-user-provided-service Command", func() {
 
 		It("calls the actor with the service instance name and space GUID", func() {
 			Expect(fakeActor.CreateUserProvidedServiceInstanceCallCount()).To(Equal(1))
-			name, spaceGUID := fakeActor.CreateUserProvidedServiceInstanceArgsForCall(0)
-			Expect(name).To(Equal(fakeServiceInstanceName))
-			Expect(spaceGUID).To(Equal(fakeSpaceGUID))
+			serviceInstance := fakeActor.CreateUserProvidedServiceInstanceArgsForCall(0)
+			Expect(serviceInstance).To(Equal(resources.ServiceInstance{
+				Name:      fakeServiceInstanceName,
+				SpaceGUID: fakeSpaceGUID,
+			}))
+		})
+
+		When("all optional arguments are provided", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "-t", flag.Tags{IsSet: true, Value: []string{"list", "of", "tags"}})
+				setFlag(&cmd, "-l", flag.OptionalString{IsSet: true, Value: "https://fake-sylogg.com"})
+				setFlag(&cmd, "-r", flag.OptionalString{IsSet: true, Value: "https://fake-route.com"})
+				setFlag(&cmd, "-p", flag.CredentialsOrJSON{IsSet: true, Value: map[string]interface{}{
+					"foo": "bar",
+					"baz": 42,
+				}})
+			})
+
+			It("calls the actor with all the flag values", func() {
+				Expect(fakeActor.CreateUserProvidedServiceInstanceCallCount()).To(Equal(1))
+				serviceInstance := fakeActor.CreateUserProvidedServiceInstanceArgsForCall(0)
+				Expect(serviceInstance).To(Equal(resources.ServiceInstance{
+					Name:            fakeServiceInstanceName,
+					SpaceGUID:       fakeSpaceGUID,
+					Tags:            []string{"list", "of", "tags"},
+					SyslogDrainURL:  "https://fake-sylogg.com",
+					RouteServiceURL: "https://fake-route.com",
+					Credentials: map[string]interface{}{
+						"foo": "bar",
+						"baz": 42,
+					},
+				}))
+			})
+		})
+
+		When("setting credentials interactively", func() {
+			BeforeEach(func() {
+				cmd.Credentials.IsSet = true
+				cmd.Credentials.UserPromptCredentials = []string{"pass phrase", "cred"}
+
+				_, err := input.Write([]byte("very secret passphrase\nsecret cred\n"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("prompts the user for credentials", func() {
+				Expect(testUI.Out).To(Say("pass phrase: "))
+				Expect(testUI.Out).To(Say("cred: "))
+			})
+
+			It("does not echo the credentials", func() {
+				Expect(testUI.Out).NotTo(Say("secret"))
+				Expect(testUI.Err).NotTo(Say("secret"))
+			})
+
+			It("succeeds", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeActor.CreateUserProvidedServiceInstanceCallCount()).To(Equal(1))
+				serviceInstance := fakeActor.CreateUserProvidedServiceInstanceArgsForCall(0)
+				Expect(serviceInstance).To(Equal(resources.ServiceInstance{
+					Name:      fakeServiceInstanceName,
+					SpaceGUID: fakeSpaceGUID,
+					Credentials: map[string]interface{}{
+						"pass phrase": "very secret passphrase",
+						"cred":        "secret cred",
+					},
+				}))
+			})
 		})
 
 		When("getting the user fails", func() {

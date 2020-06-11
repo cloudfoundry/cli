@@ -29,12 +29,8 @@ func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstan
 	return Warnings(warnings), err
 }
 
-func (actor Actor) CreateUserProvidedServiceInstance(name, spaceGUID string) (Warnings, error) {
-	_, warnings, err := actor.CloudControllerClient.CreateServiceInstance(resources.ServiceInstance{
-		Type:      resources.UserProvidedServiceInstance,
-		Name:      name,
-		SpaceGUID: spaceGUID,
-	})
-
+func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.ServiceInstance) (Warnings, error) {
+	serviceInstance.Type = resources.UserProvidedServiceInstance
+	_, warnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
 	return Warnings(warnings), err
 }
