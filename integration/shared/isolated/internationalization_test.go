@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("internationalization", func() {
+var _ = XDescribe("internationalization", func() {
 	DescribeTable("outputs help in different languages",
 		func(setup func() *Session) {
 			session := setup()
