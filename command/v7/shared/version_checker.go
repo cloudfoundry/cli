@@ -6,7 +6,7 @@ import (
 	"github.com/blang/semver"
 )
 
-const minimumCCAPIVersionForV7 = "3.84.0"
+const minimumCCAPIVersionForV7 = "3.85.0"
 
 func CheckCCAPIVersion(currentAPIVersion string) (string, error) {
 	currentSemver, err := semver.Make(currentAPIVersion)

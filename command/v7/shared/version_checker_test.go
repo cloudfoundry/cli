@@ -15,7 +15,7 @@ var _ = Describe("version checker", func() {
 
 	Context("CheckCCAPIVersion", func() {
 		BeforeEach(func() {
-			currentCCVersion = "3.84.0"
+			currentCCVersion = "3.85.0"
 		})
 
 		JustBeforeEach(func() {
@@ -34,7 +34,7 @@ var _ = Describe("version checker", func() {
 
 			It("does return a warning", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warning).To(Equal("\nWarning: Your targeted API's version (3.83.0) is less than the minimum supported API version (3.84.0). Some commands may not function correctly."))
+				Expect(warning).To(Equal("\nWarning: Your targeted API's version (3.83.0) is less than the minimum supported API version (3.85.0). Some commands may not function correctly."))
 			})
 		})
 
