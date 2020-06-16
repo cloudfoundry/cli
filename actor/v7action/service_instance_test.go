@@ -149,4 +149,53 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 	})
+
+	Describe("CreateUserProvidedServiceInstance", func() {
+		When("the service instance is created successfully", func() {
+			It("returns warnings", func() {
+				fakeCloudControllerClient.CreateServiceInstanceReturns("", ccv3.Warnings{"fake-warning"}, nil)
+
+				warnings, err := actor.CreateUserProvidedServiceInstance(resources.ServiceInstance{
+					Name:            "fake-upsi-name",
+					SpaceGUID:       "fake-space-guid",
+					Tags:            []string{"foo", "bar"},
+					RouteServiceURL: "https://fake-route.com",
+					SyslogDrainURL:  "https://fake-sylogg.com",
+					Credentials: map[string]interface{}{
+						"foo": "bar",
+						"baz": 42,
+					},
+				})
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateServiceInstanceArgsForCall(0)).To(Equal(resources.ServiceInstance{
+					Type:            "user-provided",
+					Name:            "fake-upsi-name",
+					SpaceGUID:       "fake-space-guid",
+					Tags:            []string{"foo", "bar"},
+					RouteServiceURL: "https://fake-route.com",
+					SyslogDrainURL:  "https://fake-sylogg.com",
+					Credentials: map[string]interface{}{
+						"foo": "bar",
+						"baz": 42,
+					},
+				}))
+			})
+		})
+
+		When("there is an error creating the service instance", func() {
+			It("returns warnings and an error", func() {
+				fakeCloudControllerClient.CreateServiceInstanceReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
+
+				warnings, err := actor.CreateUserProvidedServiceInstance(resources.ServiceInstance{
+					Name:      "fake-upsi-name",
+					SpaceGUID: "fake-space-guid",
+				})
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
+	})
 })

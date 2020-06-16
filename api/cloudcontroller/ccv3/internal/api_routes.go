@@ -145,6 +145,7 @@ const (
 	PostSecurityGroupStagingSpaceRequest                        = "PostSecurityGroupStagingSpace"
 	PostSecurityGroupRunningSpaceRequest                        = "PostSecurityGroupRunningSpace"
 	PostServiceBrokerRequest                                    = "PostServiceBroker"
+	PostServiceInstanceRequest                                  = "PostServiceInstance"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostServicePlanVisibilityRequest                            = "PostServicePlanVisibility"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
@@ -269,6 +270,7 @@ var APIRoutes = []Route{
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodDelete, Name: DeleteServiceBrokerRequest},
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodPatch, Name: PatchServiceBrokerRequest},
 	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodGet, Name: GetServiceInstancesRequest},
+	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodPost, Name: PostServiceInstanceRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: ServiceOfferingsResource, Path: "/", Method: http.MethodGet, Name: GetServiceOfferingsRequest},

@@ -35,6 +35,7 @@ type CloudControllerClient interface {
 	CreateRole(role resources.Role) (resources.Role, ccv3.Warnings, error)
 	CreateRoute(route resources.Route) (resources.Route, ccv3.Warnings, error)
 	CreateServiceBroker(serviceBroker ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
+	CreateServiceInstance(serviceInstance resources.ServiceInstance) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
 	CreateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	CreateSpaceQuota(spaceQuota resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)

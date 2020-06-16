@@ -479,6 +479,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	CreateUserProvidedServiceInstanceStub        func(resources.ServiceInstance) (v7action.Warnings, error)
+	createUserProvidedServiceInstanceMutex       sync.RWMutex
+	createUserProvidedServiceInstanceArgsForCall []struct {
+		arg1 resources.ServiceInstance
+	}
+	createUserProvidedServiceInstanceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	createUserProvidedServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	DeleteApplicationByNameAndSpaceStub        func(string, string, bool) (v7action.Warnings, error)
 	deleteApplicationByNameAndSpaceMutex       sync.RWMutex
 	deleteApplicationByNameAndSpaceArgsForCall []struct {
@@ -5028,6 +5041,69 @@ func (fake *FakeActor) CreateUserReturnsOnCall(i int, result1 resources.User, re
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstance(arg1 resources.ServiceInstance) (v7action.Warnings, error) {
+	fake.createUserProvidedServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.createUserProvidedServiceInstanceReturnsOnCall[len(fake.createUserProvidedServiceInstanceArgsForCall)]
+	fake.createUserProvidedServiceInstanceArgsForCall = append(fake.createUserProvidedServiceInstanceArgsForCall, struct {
+		arg1 resources.ServiceInstance
+	}{arg1})
+	fake.recordInvocation("CreateUserProvidedServiceInstance", []interface{}{arg1})
+	fake.createUserProvidedServiceInstanceMutex.Unlock()
+	if fake.CreateUserProvidedServiceInstanceStub != nil {
+		return fake.CreateUserProvidedServiceInstanceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createUserProvidedServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstanceCallCount() int {
+	fake.createUserProvidedServiceInstanceMutex.RLock()
+	defer fake.createUserProvidedServiceInstanceMutex.RUnlock()
+	return len(fake.createUserProvidedServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstanceCalls(stub func(resources.ServiceInstance) (v7action.Warnings, error)) {
+	fake.createUserProvidedServiceInstanceMutex.Lock()
+	defer fake.createUserProvidedServiceInstanceMutex.Unlock()
+	fake.CreateUserProvidedServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstanceArgsForCall(i int) resources.ServiceInstance {
+	fake.createUserProvidedServiceInstanceMutex.RLock()
+	defer fake.createUserProvidedServiceInstanceMutex.RUnlock()
+	argsForCall := fake.createUserProvidedServiceInstanceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.createUserProvidedServiceInstanceMutex.Lock()
+	defer fake.createUserProvidedServiceInstanceMutex.Unlock()
+	fake.CreateUserProvidedServiceInstanceStub = nil
+	fake.createUserProvidedServiceInstanceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) CreateUserProvidedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createUserProvidedServiceInstanceMutex.Lock()
+	defer fake.createUserProvidedServiceInstanceMutex.Unlock()
+	fake.CreateUserProvidedServiceInstanceStub = nil
+	if fake.createUserProvidedServiceInstanceReturnsOnCall == nil {
+		fake.createUserProvidedServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.createUserProvidedServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
@@ -16189,6 +16265,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createSpaceRoleMutex.RUnlock()
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
+	fake.createUserProvidedServiceInstanceMutex.RLock()
+	defer fake.createUserProvidedServiceInstanceMutex.RUnlock()
 	fake.deleteApplicationByNameAndSpaceMutex.RLock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.RUnlock()
 	fake.deleteBuildpackByNameAndStackMutex.RLock()
