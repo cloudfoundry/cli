@@ -88,11 +88,12 @@ var _ = Describe("download-droplet Command", func() {
 		BeforeEach(func() {
 			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
 
-			pathToDropletFile = filepath.Join("droplet_some-droplet-guid.tgz")
+			currentDir, _ := os.Getwd()
+			pathToDropletFile = filepath.Join(currentDir, "droplet_some-droplet-guid.tgz")
 		})
 
 		AfterEach(func() {
-			Expect(os.Remove("droplet_some-droplet-guid.tgz")).ToNot(HaveOccurred())
+			Expect(os.Remove(pathToDropletFile)).ToNot(HaveOccurred())
 		})
 
 		It("creates a droplet tarball in the current directory", func() {
