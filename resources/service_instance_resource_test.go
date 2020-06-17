@@ -3,6 +3,8 @@ package resources_test
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/types"
+
 	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -26,22 +28,34 @@ var _ = Describe("service instance resource", func() {
 		Entry("type", ServiceInstance{Type: "fake-type"}, `{"type": "fake-type"}`),
 		Entry("name", ServiceInstance{Name: "fake-name"}, `{"name": "fake-name"}`),
 		Entry("guid", ServiceInstance{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
-		Entry("tags", ServiceInstance{Tags: []string{"foo", "bar"}}, `{"tags": ["foo", "bar"]}`),
-		Entry("syslog", ServiceInstance{SyslogDrainURL: "https://fake-sylogg.com"}, `{"syslog_drain_url": "https://fake-sylogg.com"}`),
-		Entry("route", ServiceInstance{RouteServiceURL: "https://fake-route.com"}, `{"route_service_url": "https://fake-route.com"}`),
+		Entry("tags", ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}, `{"tags": ["foo", "bar"]}`),
+		Entry("tags empty", ServiceInstance{Tags: types.NewOptionalStringSlice()}, `{"tags": []}`),
+		Entry("syslog", ServiceInstance{SyslogDrainURL: types.NewOptionalString("https://fake-syslog.com")}, `{"syslog_drain_url": "https://fake-syslog.com"}`),
+		Entry("syslog empty", ServiceInstance{SyslogDrainURL: types.NewOptionalString("")}, `{"syslog_drain_url": ""}`),
+		Entry("route", ServiceInstance{RouteServiceURL: types.NewOptionalString("https://fake-route.com")}, `{"route_service_url": "https://fake-route.com"}`),
+		Entry("route empty", ServiceInstance{RouteServiceURL: types.NewOptionalString("https://fake-route.com")}, `{"route_service_url": "https://fake-route.com"}`),
 		Entry(
 			"credentials",
 			ServiceInstance{
-				Credentials: map[string]interface{}{
+				Credentials: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
-					"baz": 42,
-				},
+					"baz": false,
+				}),
 			},
 			`{
 				"credentials": {
 					"foo": "bar",
-					"baz": 42
+					"baz": false
 				}
+			}`,
+		),
+		Entry(
+			"credentials empty",
+			ServiceInstance{
+				Credentials: types.NewOptionalObject(map[string]interface{}{}),
+			},
+			`{
+				"credentials": {}
 			}`,
 		),
 		Entry(
@@ -64,24 +78,24 @@ var _ = Describe("service instance resource", func() {
 				GUID:            "fake-guid",
 				Name:            "fake-space-guid",
 				SpaceGUID:       "fake-space-guid",
-				Tags:            []string{"foo", "bar"},
-				SyslogDrainURL:  "https://fake-sylogg.com",
-				RouteServiceURL: "https://fake-route.com",
-				Credentials: map[string]interface{}{
+				Tags:            types.NewOptionalStringSlice("foo", "bar"),
+				SyslogDrainURL:  types.NewOptionalString("https://fake-syslog.com"),
+				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+				Credentials: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
-					"baz": 42,
-				},
+					"baz": false,
+				}),
 			},
 			`{
 				"type": "user-provided",
 				"guid": "fake-guid",
 				"name": "fake-space-guid",
 				"tags": ["foo", "bar"],
-				"syslog_drain_url": "https://fake-sylogg.com",
+				"syslog_drain_url": "https://fake-syslog.com",
 				"route_service_url": "https://fake-route.com",
 				"credentials": {
 					"foo": "bar",
-					"baz": 42
+					"baz": false
 				},
 				"relationships": {
 					"space": {

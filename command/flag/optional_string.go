@@ -1,13 +1,12 @@
 package flag
 
-type OptionalString struct {
-	IsSet bool
-	Value string
-}
+import "code.cloudfoundry.org/cli/types"
 
-func (h *OptionalString) UnmarshalFlag(val string) error {
-	h.IsSet = true
-	h.Value = val
+type OptionalString types.OptionalString
+
+func (o *OptionalString) UnmarshalFlag(val string) error {
+	o.IsSet = true
+	o.Value = val
 
 	return nil
 }
