@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"code.cloudfoundry.org/cli/types"
 	flags "github.com/jessevdk/go-flags"
 )
 
 type CredentialsOrJSON struct {
-	IsSet                 bool
+	types.OptionalObject
 	UserPromptCredentials []string
-	Value                 map[string]interface{}
 }
 
 func (c *CredentialsOrJSON) UnmarshalFlag(input string) error {
@@ -42,7 +42,7 @@ func (c *CredentialsOrJSON) UnmarshalFlag(input string) error {
 	return nil
 }
 
-func (c *CredentialsOrJSON) Complete(prefix string) []flags.Completion {
+func (c CredentialsOrJSON) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
 

@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/types"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -121,10 +123,15 @@ var _ = Describe("create-user-provided-service Command", func() {
 				setFlag(&cmd, "-t", flag.Tags{IsSet: true, Value: []string{"list", "of", "tags"}})
 				setFlag(&cmd, "-l", flag.OptionalString{IsSet: true, Value: "https://fake-sylogg.com"})
 				setFlag(&cmd, "-r", flag.OptionalString{IsSet: true, Value: "https://fake-route.com"})
-				setFlag(&cmd, "-p", flag.CredentialsOrJSON{IsSet: true, Value: map[string]interface{}{
-					"foo": "bar",
-					"baz": 42,
-				}})
+				setFlag(&cmd, "-p", flag.CredentialsOrJSON{
+					OptionalObject: types.OptionalObject{
+						IsSet: true,
+						Value: map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						},
+					},
+				})
 			})
 
 			It("calls the actor with all the flag values", func() {
@@ -133,13 +140,13 @@ var _ = Describe("create-user-provided-service Command", func() {
 				Expect(serviceInstance).To(Equal(resources.ServiceInstance{
 					Name:            fakeServiceInstanceName,
 					SpaceGUID:       fakeSpaceGUID,
-					Tags:            []string{"list", "of", "tags"},
-					SyslogDrainURL:  "https://fake-sylogg.com",
-					RouteServiceURL: "https://fake-route.com",
-					Credentials: map[string]interface{}{
+					Tags:            types.NewOptionalStringSlice("list", "of", "tags"),
+					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+					Credentials: types.NewOptionalObject(map[string]interface{}{
 						"foo": "bar",
 						"baz": 42,
-					},
+					}),
 				}))
 			})
 		})
@@ -171,10 +178,10 @@ var _ = Describe("create-user-provided-service Command", func() {
 				Expect(serviceInstance).To(Equal(resources.ServiceInstance{
 					Name:      fakeServiceInstanceName,
 					SpaceGUID: fakeSpaceGUID,
-					Credentials: map[string]interface{}{
+					Credentials: types.NewOptionalObject(map[string]interface{}{
 						"pass phrase": "very secret passphrase",
 						"cred":        "secret cred",
-					},
+					}),
 				}))
 			})
 		})

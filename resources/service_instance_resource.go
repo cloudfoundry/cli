@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/jsonry"
 )
 
@@ -20,13 +21,13 @@ type ServiceInstance struct {
 	// SpaceGUID is the space that this service instance relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
 	// Tags are used by apps to identify service instances.
-	Tags []string `jsonry:"tags,omitempty"`
+	Tags types.OptionalStringSlice `jsonry:"tags"`
 	// SyslogDrainURL is where logs are streamed
-	SyslogDrainURL string `jsonry:"syslog_drain_url,omitempty"`
+	SyslogDrainURL types.OptionalString `jsonry:"syslog_drain_url"`
 	// RouteServiceURL is where requests for bound routes will be forwarded
-	RouteServiceURL string `jsonry:"route_service_url,omitempty"`
+	RouteServiceURL types.OptionalString `jsonry:"route_service_url"`
 	// Credentials are passed to the app
-	Credentials map[string]interface{} `jsonry:"credentials,omitempty"`
+	Credentials types.OptionalObject `jsonry:"credentials"`
 }
 
 func (s ServiceInstance) MarshalJSON() ([]byte, error) {

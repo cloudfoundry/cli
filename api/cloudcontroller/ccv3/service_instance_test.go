@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/types"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -173,13 +175,13 @@ var _ = Describe("Service Instance", func() {
 						Type:            resources.UserProvidedServiceInstance,
 						Name:            "fake-user-provided-service-instance",
 						SpaceGUID:       "fake-space-guid",
-						Tags:            []string{"foo", "bar"},
-						RouteServiceURL: "https://fake-route.com",
-						SyslogDrainURL:  "https://fake-sylogg.com",
-						Credentials: map[string]interface{}{
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
 							"foo": "bar",
 							"baz": 42,
-						},
+						}),
 					}
 
 					jobURL, warnings, err := client.CreateServiceInstance(si)
@@ -204,13 +206,13 @@ var _ = Describe("Service Instance", func() {
 						Type:            resources.UserProvidedServiceInstance,
 						Name:            "fake-user-provided-service-instance",
 						SpaceGUID:       "fake-space-guid",
-						Tags:            []string{"foo", "bar"},
-						RouteServiceURL: "https://fake-route.com",
-						SyslogDrainURL:  "https://fake-sylogg.com",
-						Credentials: map[string]interface{}{
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
 							"foo": "bar",
 							"baz": 42,
-						},
+						}),
 					}
 
 					jobURL, warnings, err := client.CreateServiceInstance(si)

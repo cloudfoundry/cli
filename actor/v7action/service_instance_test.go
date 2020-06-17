@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/types"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -158,13 +160,13 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.CreateUserProvidedServiceInstance(resources.ServiceInstance{
 					Name:            "fake-upsi-name",
 					SpaceGUID:       "fake-space-guid",
-					Tags:            []string{"foo", "bar"},
-					RouteServiceURL: "https://fake-route.com",
-					SyslogDrainURL:  "https://fake-sylogg.com",
-					Credentials: map[string]interface{}{
+					Tags:            types.NewOptionalStringSlice("foo", "bar"),
+					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+					Credentials: types.NewOptionalObject(map[string]interface{}{
 						"foo": "bar",
 						"baz": 42,
-					},
+					}),
 				})
 				Expect(warnings).To(ConsistOf("fake-warning"))
 				Expect(err).NotTo(HaveOccurred())
@@ -174,13 +176,13 @@ var _ = Describe("Service Instance Actions", func() {
 					Type:            "user-provided",
 					Name:            "fake-upsi-name",
 					SpaceGUID:       "fake-space-guid",
-					Tags:            []string{"foo", "bar"},
-					RouteServiceURL: "https://fake-route.com",
-					SyslogDrainURL:  "https://fake-sylogg.com",
-					Credentials: map[string]interface{}{
+					Tags:            types.NewOptionalStringSlice("foo", "bar"),
+					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+					Credentials: types.NewOptionalObject(map[string]interface{}{
 						"foo": "bar",
 						"baz": 42,
-					},
+					}),
 				}))
 			})
 		})

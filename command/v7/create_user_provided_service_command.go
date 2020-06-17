@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type CreateUserProvidedServiceCommand struct {
@@ -34,10 +35,10 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 	serviceInstance := resources.ServiceInstance{
 		Name:            cmd.RequiredArgs.ServiceInstance,
 		SpaceGUID:       cmd.Config.TargetedSpace().GUID,
-		Tags:            cmd.Tags.Value,
-		SyslogDrainURL:  cmd.SyslogDrainURL.Value,
-		RouteServiceURL: cmd.RouteServiceURL.Value,
-		Credentials:     cmd.Credentials.Value,
+		Tags:            types.OptionalStringSlice(cmd.Tags),
+		SyslogDrainURL:  types.OptionalString(cmd.SyslogDrainURL),
+		RouteServiceURL: types.OptionalString(cmd.RouteServiceURL),
+		Credentials:     cmd.Credentials.OptionalObject,
 	}
 
 	warnings, err := cmd.Actor.CreateUserProvidedServiceInstance(serviceInstance)
