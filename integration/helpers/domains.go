@@ -42,18 +42,31 @@ func DefaultSharedDomain() string {
 		session := CF("domains")
 		Eventually(session).Should(Exit(0))
 
-		regex := regexp.MustCompile(`(.+?)\s+shared.*`)
-
 		output := strings.Split(string(session.Out.Contents()), "\n")
 		for _, line := range output {
-			if line != "" && !strings.HasPrefix(line, "integration-") {
-				matches := regex.FindStringSubmatch(line)
-				if len(matches) == 2 && !strings.Contains(matches[0], "true") && !strings.Contains(matches[0], "internal") {
-					foundDefaultDomain = matches[1]
-					break
-				}
+			if line == "" {
+				// Skip empty lines
+				continue
+			}
+
+			if strings.HasPrefix(line, "integration-") {
+				// Skip domains created as part of integration tests
+				continue
+			}
+
+			if strings.HasSuffix(line, "tcp") {
+				// Skip domains with protocol "tcp"
+				continue
+			}
+
+			regex := regexp.MustCompile(`(.+?)\s+shared.*`)
+			matches := regex.FindStringSubmatch(line)
+			if len(matches) == 2 && !strings.Contains(matches[0], "true") && !strings.Contains(matches[0], "internal") {
+				foundDefaultDomain = matches[1]
+				break
 			}
 		}
+
 		Expect(foundDefaultDomain).ToNot(BeEmpty())
 	}
 	return foundDefaultDomain
