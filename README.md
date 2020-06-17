@@ -1,4 +1,18 @@
-<p align="center">
+
+
+<img src="https://raw.githubusercontent.com/cloudfoundry/logos/master/CF_Icon_4-colour.png" alt="CF logo" height="100" align="left"/>
+
+# Cloud Foundry CLI
+
+[![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases/latest)
+[![Documentation](https://img.shields.io/badge/docs-online-ff69b4.svg)](https://docs.cloudfoundry.org/cf-cli)
+[![Command help pages](https://img.shields.io/badge/command-help-lightgrey.svg)](https://cli.cloudfoundry.org)
+[![Slack](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
+
+***
+<p align="left">
+<b>Sections: </b>
 <b><a href="#getting-started">Getting Started</a></b>
 |
 <b><a href="#downloads">Download</a></b>
@@ -12,15 +26,7 @@
 <b><a href="#contributing--build-instructions">Contributing</a></b>
 </p>
 
-<img src="https://raw.githubusercontent.com/cloudfoundry/logos/master/CF_Icon_4-colour.png" alt="CF logo" height="100" align="left"/>
-
-# Cloud Foundry CLI
-
-[![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases/latest)
-[![Documentation](https://img.shields.io/badge/docs-online-ff69b4.svg)](https://docs.cloudfoundry.org/cf-cli)
-[![Command help pages](https://img.shields.io/badge/command-help-lightgrey.svg)](https://cli.cloudfoundry.org)
-[![Slack](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
+***
 
 ***Cloud Foundry CLI*** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
