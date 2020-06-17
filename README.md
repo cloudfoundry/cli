@@ -27,7 +27,7 @@ Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf 
 
 Currently, there are two versions of the cf CLI in development: 
 - the supported v6 cf CLI. See [here](https://docs.cloudfoundry.org/cf-cli) for more information. 
-- v7 beta cf CLI which is currently in development and will be in beta mode until it is completely backed by the [v3 API](http://v3-apidocs.cloudfoundry.org/version/3.75.0/index.html). See [here](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information. 
+- v7 is stable and will be generally available very soon. With the exception of plugins, it is completely backed by the [v3 API](http://v3-apidocs.cloudfoundry.org/version/3.75.0/index.html). See [here](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information. 
 
 
 **Important Note**: The v7 CF CLI is pending GA. 
