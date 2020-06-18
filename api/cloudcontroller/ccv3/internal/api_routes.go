@@ -109,6 +109,7 @@ const (
 	PatchRouteRequest                                           = "PatchRoute"
 	PatchSecurityGroupRequest                                   = "PatchSecurityGroup"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
+	PatchServiceInstanceRequest                                 = "PatchServiceInstance"
 	PatchServiceOfferingRequest                                 = "PatchServiceOfferingRequest"
 	PatchServicePlanRequest                                     = "PatchServicePlanRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
@@ -271,6 +272,7 @@ var APIRoutes = []Route{
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodPatch, Name: PatchServiceBrokerRequest},
 	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodPost, Name: PostServiceInstanceRequest},
+	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid", Method: http.MethodPatch, Name: PatchServiceInstanceRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: ServiceOfferingsResource, Path: "/", Method: http.MethodGet, Name: GetServiceOfferingsRequest},

@@ -15,8 +15,9 @@ var _ = Describe("update-user-provided-service command", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("update-user-provided-service", "--help")
-				eventuallyExpectHelpMessage(session)
 				Eventually(session).Should(Exit(0))
+
+				expectHelpMessage(session)
 			})
 		})
 	})
@@ -48,25 +49,28 @@ var _ = Describe("update-user-provided-service command", func() {
 		When("the user-provided service instance name is not provided", func() {
 			It("displays the help message and exits 1", func() {
 				session := helpers.CF("update-user-provided-service")
-				eventuallyExpectHelpMessage(session)
 				Eventually(session).Should(Exit(1))
+
+				expectHelpMessage(session)
 			})
 		})
 
 		When("there are unknown additional arguments", func() {
 			It("displays the help message and exits 1", func() {
 				session := helpers.CF("update-user-provided-service", "service-name", "additional", "invalid", "arguments")
-				eventuallyExpectHelpMessage(session)
 				Eventually(session).Should(Exit(1))
+
+				expectHelpMessage(session)
 			})
 		})
 
 		When("the user-provided service instance does not exist", func() {
 			It("displays an informative error and exits 1", func() {
-				session := helpers.CF("update-user-provided-service", "non-existent-service")
-				Eventually(session.Err).Should(Say("Service instance non-existent-service not found"))
-				Eventually(session.Out).Should(Say("FAILED"))
+				session := helpers.CF("update-user-provided-service", "non-existent-service", "-l", "syslog://example.com")
 				Eventually(session).Should(Exit(1))
+
+				Expect(session.Err).To(Say("Service instance non-existent-service not found"))
+				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
 
@@ -85,8 +89,9 @@ var _ = Describe("update-user-provided-service command", func() {
 			When("no flags are provided", func() {
 				It("displays an informative message and exits 0", func() {
 					session := helpers.CF("update-user-provided-service", serviceName)
-					Eventually(session.Out).Should(Say("No flags specified. No changes were made."))
 					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(Say("No flags specified. No changes were made."))
 				})
 			})
 
@@ -100,12 +105,14 @@ var _ = Describe("update-user-provided-service command", func() {
 						`-t`, `"tag1,tag2"`,
 					)
 
-					eventuallyExpectOKMessage(session, serviceName, orgName, spaceName, userName)
 					Eventually(session).Should(Exit(0))
+					expectOKMessage(session, serviceName, orgName, spaceName, userName)
 
 					session = helpers.CF("service", serviceName)
-					Eventually(session).Should(Say(`tags:\s+tag1,\s*tag2`))
-					Eventually(session).Should(Say(`route service url:\s+https://example.com`))
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say(`tags:\s+tag1,\s*tag2`))
+					Expect(session).To(Say(`route service url:\s+https://example.com`))
 				})
 			})
 
@@ -121,6 +128,8 @@ var _ = Describe("update-user-provided-service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("service", serviceName)
+					Eventually(session).Should(Exit(0))
+
 					Eventually(session).Should(Say(`tags:\s+tag1,\s*tag2`))
 					Eventually(session).Should(Say(`route service url:\s+https://example.com`))
 				})
@@ -136,8 +145,10 @@ var _ = Describe("update-user-provided-service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("service", serviceName)
-					Consistently(session).ShouldNot(Say(`tags:\s+tag1,\s*tag2`))
-					Consistently(session).ShouldNot(Say(`route service url:\s+https://example.com`))
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).NotTo(Say(`tags:\s+tag1,\s*tag2`))
+					Expect(session).NotTo(Say(`route service url:\s+https://example.com`))
 				})
 
 				It("does not unset previous values for flags that are not provided", func() {
@@ -149,8 +160,10 @@ var _ = Describe("update-user-provided-service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("service", serviceName)
-					Eventually(session).Should(Say(`tags:\s+tag1,\s*tag2`))
-					Eventually(session).Should(Say(`route service url:\s+https://example.com`))
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say(`tags:\s+tag1,\s*tag2`))
+					Expect(session).To(Say(`route service url:\s+https://example.com`))
 				})
 			})
 
@@ -165,13 +178,13 @@ var _ = Describe("update-user-provided-service command", func() {
 
 				It("requests the credentials at a prompt", func() {
 					session := helpers.CFWithStdin(buffer, "update-user-provided-service", serviceName, "-p", `"username,password"`)
-
-					Eventually(session).Should(Say("username: "))
-					Eventually(session).Should(Say("password: "))
-					Consistently(session).ShouldNot(Say("fake-username"), "credentials should not be echoed to the user")
-					Consistently(session).ShouldNot(Say("fake-password"), "credentials should not be echoed to the user")
-					eventuallyExpectOKMessage(session, serviceName, orgName, spaceName, userName)
 					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say("username: "))
+					Expect(session).To(Say("password: "))
+					Expect(session).NotTo(Say("fake-username"), "credentials should not be echoed to the user")
+					Expect(session).NotTo(Say("fake-password"), "credentials should not be echoed to the user")
+					expectOKMessage(session, serviceName, orgName, spaceName, userName)
 				})
 			})
 
@@ -193,46 +206,46 @@ var _ = Describe("update-user-provided-service command", func() {
 					Consistently(session.Out.Contents()).ShouldNot(ContainSubstring(path))
 
 					By("succeeding")
-					eventuallyExpectOKMessage(session, serviceName, orgName, spaceName, userName)
 					Eventually(session).Should(Exit(0))
+					expectOKMessage(session, serviceName, orgName, spaceName, userName)
 				})
 			})
 		})
 	})
 })
 
-func eventuallyExpectHelpMessage(session *Session) {
-	Eventually(session).Should(Say(`NAME:`))
-	Eventually(session).Should(Say(`\s+update-user-provided-service - Update user-provided service instance`))
-	Eventually(session).Should(Say(`USAGE:`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`))
-	Eventually(session).Should(Say(`\s+Pass comma separated credential parameter names to enable interactive mode:`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`))
-	Eventually(session).Should(Say(`\s+Pass credential parameters as JSON to create a service non-interactively:`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'`))
-	Eventually(session).Should(Say(`\s+Specify a path to a file containing JSON:`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`))
-	Eventually(session).Should(Say(`EXAMPLES:`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service my-db-mine -p /path/to/credentials.json`))
-	Eventually(session).Should(Say(`\s+cf create-user-provided-service my-db-mine -t "list, of, tags"`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service my-drain-service -l syslog://example.com`))
-	Eventually(session).Should(Say(`\s+cf update-user-provided-service my-route-service -r https://example.com`))
-	Eventually(session).Should(Say(`ALIAS:`))
-	Eventually(session).Should(Say(`\s+uups`))
-	Eventually(session).Should(Say(`OPTIONS:`))
-	Eventually(session).Should(Say(`\s+-l\s+URL to which logs for bound applications will be streamed`))
-	Eventually(session).Should(Say(`\s+-p\s+Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications. Provided credentials will override existing credentials.`))
-	Eventually(session).Should(Say(`\s+-r\s+URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`))
-	Eventually(session).Should(Say(`\s+-t\s+User provided tags`))
-	Eventually(session).Should(Say(`SEE ALSO:`))
-	Eventually(session).Should(Say(`\s+rename-service, services, update-service`))
+func expectHelpMessage(session *Session) {
+	Expect(session).To(Say(`NAME:`))
+	Expect(session).To(Say(`\s+update-user-provided-service - Update user-provided service instance`))
+	Expect(session).To(Say(`USAGE:`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`))
+	Expect(session).To(Say(`\s+Pass comma separated credential parameter names to enable interactive mode:`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`))
+	Expect(session).To(Say(`\s+Pass credential parameters as JSON to create a service non-interactively:`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'`))
+	Expect(session).To(Say(`\s+Specify a path to a file containing JSON:`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`))
+	Expect(session).To(Say(`EXAMPLES:`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p /path/to/credentials.json`))
+	Expect(session).To(Say(`\s+cf create-user-provided-service my-db-mine -t "list, of, tags"`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service my-drain-service -l syslog://example.com`))
+	Expect(session).To(Say(`\s+cf update-user-provided-service my-route-service -r https://example.com`))
+	Expect(session).To(Say(`ALIAS:`))
+	Expect(session).To(Say(`\s+uups`))
+	Expect(session).To(Say(`OPTIONS:`))
+	Expect(session).To(Say(`\s+-l\s+URL to which logs for bound applications will be streamed`))
+	Expect(session).To(Say(`\s+-p\s+Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications. Provided credentials will override existing credentials.`))
+	Expect(session).To(Say(`\s+-r\s+URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`))
+	Expect(session).To(Say(`\s+-t\s+User provided tags`))
+	Expect(session).To(Say(`SEE ALSO:`))
+	Expect(session).To(Say(`\s+rename-service, services, update-service`))
 }
 
-func eventuallyExpectOKMessage(session *Session, serviceName, orgName, spaceName, userName string) {
-	Eventually(session.Out).Should(Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName))
-	Eventually(session.Out).Should(Say("OK"))
-	Eventually(session.Out).Should(Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"))
+func expectOKMessage(session *Session, serviceName, orgName, spaceName, userName string) {
+	Expect(session.Out).To(Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName))
+	Expect(session.Out).To(Say("OK"))
+	Expect(session.Out).To(Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"))
 }
 
 func randomUserProvidedServiceName() string {
