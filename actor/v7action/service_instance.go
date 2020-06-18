@@ -34,3 +34,25 @@ func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.S
 	_, warnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
 	return Warnings(warnings), err
 }
+
+func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates resources.ServiceInstance) (Warnings, error) {
+	original, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpaceGUID(serviceInstanceName, spaceGUID)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	if original.Type != resources.UserProvidedServiceInstance {
+		return Warnings(warnings), actionerror.ServiceInstanceTypeError{
+			Name:         serviceInstanceName,
+			RequiredType: resources.UserProvidedServiceInstance,
+		}
+	}
+
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
+	warnings = append(warnings, updateWarnings...)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	return Warnings(warnings), nil
+}

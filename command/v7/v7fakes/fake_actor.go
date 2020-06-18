@@ -3000,6 +3000,21 @@ type FakeActor struct {
 	updateUserPasswordReturnsOnCall map[int]struct {
 		result1 error
 	}
+	UpdateUserProvidedServiceInstanceStub        func(string, string, resources.ServiceInstance) (v7action.Warnings, error)
+	updateUserProvidedServiceInstanceMutex       sync.RWMutex
+	updateUserProvidedServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 resources.ServiceInstance
+	}
+	updateUserProvidedServiceInstanceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateUserProvidedServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UploadBitsPackageStub        func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
@@ -15992,6 +16007,71 @@ func (fake *FakeActor) UpdateUserPasswordReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeActor) UpdateUserProvidedServiceInstance(arg1 string, arg2 string, arg3 resources.ServiceInstance) (v7action.Warnings, error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.updateUserProvidedServiceInstanceReturnsOnCall[len(fake.updateUserProvidedServiceInstanceArgsForCall)]
+	fake.updateUserProvidedServiceInstanceArgsForCall = append(fake.updateUserProvidedServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 resources.ServiceInstance
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateUserProvidedServiceInstance", []interface{}{arg1, arg2, arg3})
+	fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	if fake.UpdateUserProvidedServiceInstanceStub != nil {
+		return fake.UpdateUserProvidedServiceInstanceStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UpdateUserProvidedServiceInstanceCallCount() int {
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
+	return len(fake.updateUserProvidedServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) UpdateUserProvidedServiceInstanceCalls(stub func(string, string, resources.ServiceInstance) (v7action.Warnings, error)) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) UpdateUserProvidedServiceInstanceArgsForCall(i int) (string, string, resources.ServiceInstance) {
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
+	argsForCall := fake.updateUserProvidedServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = nil
+	fake.updateUserProvidedServiceInstanceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = nil
+	if fake.updateUserProvidedServiceInstanceReturnsOnCall == nil {
+		fake.updateUserProvidedServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateUserProvidedServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
 	var arg2Copy []sharedaction.V3Resource
 	if arg2 != nil {
@@ -16601,6 +16681,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
 	fake.updateUserPasswordMutex.RLock()
 	defer fake.updateUserPasswordMutex.RUnlock()
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()

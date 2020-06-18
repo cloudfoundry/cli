@@ -9,6 +9,7 @@ type ServiceInstanceType string
 
 const (
 	UserProvidedServiceInstance ServiceInstanceType = "user-provided"
+	ManagedServiceInstance      ServiceInstanceType = "managed"
 )
 
 type ServiceInstance struct {

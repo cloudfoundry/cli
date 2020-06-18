@@ -200,4 +200,170 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 	})
+
+	Describe("UpdateUserProvidedServiceInstance", func() {
+		const (
+			originalName = "fake-service-instance-name"
+			guid         = "fake-service-instance-guid"
+			spaceGUID    = "fake-space-guid"
+		)
+
+		When("the service instance is updated successfully", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDReturns(
+					resources.ServiceInstance{
+						Type: resources.UserProvidedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"warning from update"},
+					nil,
+				)
+			})
+
+			It("returns all warnings", func() {
+				warnings, err := actor.UpdateUserProvidedServiceInstance(
+					originalName,
+					spaceGUID,
+					resources.ServiceInstance{
+						SpaceGUID:       "fake-space-guid",
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						}),
+					},
+				)
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDArgsForCall(0)
+				Expect(actualName).To(Equal(originalName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+				Expect(actualGUID).To(Equal(guid))
+				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
+					SpaceGUID:       "fake-space-guid",
+					Tags:            types.NewOptionalStringSlice("foo", "bar"),
+					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+					Credentials: types.NewOptionalObject(map[string]interface{}{
+						"foo": "bar",
+						"baz": 42,
+					}),
+				}))
+			})
+		})
+
+		When("the service instance is not user-provided", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDReturns(
+					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+			})
+
+			It("fails with warnings", func() {
+				warnings, err := actor.UpdateUserProvidedServiceInstance(
+					originalName,
+					spaceGUID,
+					resources.ServiceInstance{
+						SpaceGUID:       "fake-space-guid",
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						}),
+					},
+				)
+				Expect(warnings).To(ConsistOf("warning from get"))
+
+				Expect(err).To(MatchError(actionerror.ServiceInstanceTypeError{
+					Name:         originalName,
+					RequiredType: resources.UserProvidedServiceInstance,
+				}))
+			})
+		})
+
+		When("there is an error getting the service instance", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDReturns(
+					resources.ServiceInstance{},
+					ccv3.Warnings{"warning from get"},
+					errors.New("bang"),
+				)
+			})
+
+			It("returns warnings and an error", func() {
+				warnings, err := actor.UpdateUserProvidedServiceInstance(
+					originalName,
+					spaceGUID,
+					resources.ServiceInstance{
+						SpaceGUID:       "fake-space-guid",
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						}),
+					},
+				)
+				Expect(warnings).To(ConsistOf("warning from get"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
+
+		When("there is an error updating the service instance", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceGUIDReturns(
+					resources.ServiceInstance{
+						Type: resources.UserProvidedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"warning from update"},
+					errors.New("boom"),
+				)
+			})
+
+			It("returns warnings and an error", func() {
+				warnings, err := actor.UpdateUserProvidedServiceInstance(
+					originalName,
+					spaceGUID,
+					resources.ServiceInstance{
+						SpaceGUID:       "fake-space-guid",
+						Tags:            types.NewOptionalStringSlice("foo", "bar"),
+						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+						Credentials: types.NewOptionalObject(map[string]interface{}{
+							"foo": "bar",
+							"baz": 42,
+						}),
+					},
+				)
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				Expect(err).To(MatchError("boom"))
+			})
+		})
+	})
 })
