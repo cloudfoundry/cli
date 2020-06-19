@@ -273,7 +273,7 @@ For those who use the raw binaries downloaded from GitHub or via CLAW, you must 
   - `brew install cf-cli@7`
 - Currently on v6, want to switch to v7:
   - `brew link cf-cli@7 --overwrite`
-Currently on v7, want to switch to v6:
+- Currently on v7, want to switch to v6:
   - `brew link cf-cli --overwrite`
 
 #### Switching CLI versions Using Yum or Apt
@@ -281,7 +281,7 @@ We're working on a robust soluiton that will faciliate more seamless switching v
 - Currently on v6, want to switch to v7:
   - `sudo yum remove cf-cli` **-OR-** `sudo apt-get remove cf-cli`
   - `yum install cf7-cli` **-OR-** `sudo apt-get cf7-cli`
-Currently on v7, want to switch to v6:
+- Currently on v7, want to switch to v6:
   - `sudo yum remove cf7-cli` **-OR-** `sudo apt-get remove cf7-cli`
   - `sudo yum install cf-cli` **-OR-** `sudo apt-get cf-cli` 
 
