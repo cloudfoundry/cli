@@ -285,11 +285,11 @@ Currently on v7, want to switch to v6:
   - `sudo yum remove cf7-cli` **-OR-** `sudo apt-get remove cf7-cli`
   - `sudo yum install cf-cli` **-OR-** `sudo apt-get cf-cli` 
 
-#### Switching CLI versions Pulled via GitHub or CLAW
+#### Switching CLI Versions Pulled via GitHub or CLAW
 There's more than one solution available for doing this. We'll describe one that's been proven to work.
-- Download the v6 and v7 binaries into separate directories (for example `~/workspace/V6` and `~/workspace/v7`)
-- Write a script that can be invoked to switch the `PATH` and `CF_HOME` environment variables
-
+- Download the v6 and v7 binaries into separate directories
+- Write a scipt that updates your `PATH` so it points to the binary for the version of the CLI you need to run:
+  - `export PATH=/path/to/your/v6-or-v7/binary/:$PATH`
 
 ## Known Issues
 
