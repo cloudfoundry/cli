@@ -36,9 +36,15 @@ Currently, there are two versions of the cf CLI in development:
 - v7 is stable and will be generally available very soon. With the exception of plugins, it is completely backed by the [v3 API](http://v3-apidocs.cloudfoundry.org/version/3.75.0/index.html). See [here](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information. 
 
 
-**Important Note**: The v7 CF CLI is pending GA. 
-From the point of GA onward, new features, enhancements, and fixes will only be made on the v7 line.
-The v6 line will only be updated to resolve  the most severe defects and/or security issues. 
+## The v7 CF CLI is pending GA and when it does:
+- It will be opt-in.
+- Using our supported package managers to pull down the latest v6 CF CLI will continue to work. 
+- If you've been pulling down the v7 CF CLI, you **will** be impacted because the v7 binary name will change from `cf7` to `cf` (so `cf7` prefixed commands will no longer work; `cf` prefixed commands will invoke the v7 CLI).
+- If you must switch back and forth between CLI versions on the same client, see the [Version Switching](#version-switching) section for instructions.
+ 
+**A Note About v7 Support**:
+From the point of v7 GA onward, new features, enhancements, and fixes will only be made on the v7 line.
+The v6 line will only be updated to resolve the most severe defects and/or security issues. 
 Additionally, when v7 GA's the v7 CLI's minimum supported version of the CC API will be established at v3.85.0 (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)), and the maximum supported version of the CC API for the v6 CLI will be capped at v2.149.0 and v3.84.0 (published in [CAPI release v1.94.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.94.0)).
 
 **A Note About v6 Support**: The v6 CF CLI supports as far back as CF Deployment v7.0.0, CAPI Release: 1.74.0 (APIs 2.128.0 and 3.63.0). See our [Versioning Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Deployment, we recommend you upgrade to a supported version.
@@ -54,6 +60,9 @@ on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/89293
 Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v6 cf CLI](https://github.com/cloudfoundry/cli/blob/master/README.md#downloading-the-v6-cli) or the [v7 beta cf CLI](https://github.com/cloudfoundry/cli/blob/master/README.md#downloading-the-v7-beta-cli). 
 
 Once installed, you can log in and push an app.
+
+**Need to switch back and forth between CLI versions?**
+See the [Version Switching](#version-switching) section for instructions.
 
 ![Example](.github/cf_example.gif)
 
@@ -188,10 +197,12 @@ Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.
 
 ### Downloading the latest V7 CF CLI (BETA)
 
-**Important Note**: The v7 CF CLI beta under rapid development and as such is tested only against CC API v3 Release Candidate. Use at your own risk. See [releases](https://github.com/cloudfoundry/cli/releases) for more information.
+**Important Note**: The v7 CF CLI is pending GA. When it GA's, the binary will be renamed from `cf7` to `cf`. If you're already using the v7 CLI in parallel to the v6 CLI, you may need to change your workflow to accomodate the binary name change. See the [Version Switching](#version-switching) section for instructions. For more information and general status on the v7 CLI, please check [releases](https://github.com/cloudfoundry/cli/releases). 
 
 #### Compatibility
-The V7 CLI is developed and tested against CAPI release candidates. See the [releases](https://github.com/cloudfoundry/cli/releases) page for the minimum CAPI RC version required for each V7 beta version.
+When v7 GA's the v7 CLI's minimum supported version of the CC API will be established at `v3.85.0` (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)).
+All pre-GA betas have been tested against CAPI release candidate available at the time the betas were published. See the [releases](https://github.com/cloudfoundry/cli/releases) page for the minimum CAPI RC version required for each V7 beta version.
+
 
 #### Installing using a package manager
 
@@ -250,6 +261,34 @@ cf7 --version
 Edge binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are 'pushed' and passed through the CI.
 Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.org/edge?arch=macosx64&version=v7&source=github), [Windows 64 bit](https://packages.cloudfoundry.org/edge?arch=windows64&version=v7&source=github) and [Linux 64 bit](https://packages.cloudfoundry.org/edge?arch=linux64&version=v7&source=github).
 
+### Version Switching
+When the v7 CLI GA's, the binary will be renamed from `cf7` to `cf`. Existing workflows that switch back and forth between the v7 and v6 CLIs will need to be updated to accomodate this change.
+
+Below you'll find instructions for each of the package managers we support.
+For those who use the raw binaries downloaded from GitHub or via CLAW, you must set up for your own infrastructure/scripts for swapping back and forth. 
+
+#### Switching CLI versions Using Brew
+- Assuming you've installed both the v6 and v7 CLIs...
+  - `brew install cf-cli`
+  - `brew install cf-cli@7`
+- Currently on v6, want to switch to v7:
+  - `brew link cf-cli@7 --overwrite`
+Currently on v7, want to switch to v6:
+  - `brew link cf-cli --overwrite`
+
+#### Switching CLI versions Using Yum or Apt
+We're working on a robust soluiton that will faciliate more seamless switching via these package managers, but for now you must uninstall one version of the CLI and install the other version of the CLI to switch between them. 
+- Currently on v6, want to switch to v7:
+  - `sudo yum remove cf-cli` **-OR-** `sudo apt-get remove cf-cli`
+  - `yum install cf7-cli` **-OR-** `sudo apt-get cf7-cli`
+Currently on v7, want to switch to v6:
+  - `sudo yum remove cf7-cli` **-OR-** `sudo apt-get remove cf7-cli`
+  - `sudo yum install cf-cli` **-OR-** `sudo apt-get cf-cli` 
+
+#### Switching CLI versions Pulled via GitHub or CLAW
+There's more than one solution available for doing this. We'll describe one that's been proven to work.
+- Download the v6 and v7 binaries into separate directories (for example `~/workspace/V6` and `~/workspace/v7`)
+- Write a script that can be invoked to switch the `PATH` and `CF_HOME` environment variables
 
 
 ## Known Issues
