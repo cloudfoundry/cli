@@ -122,7 +122,7 @@ var _ = Describe("Isolation Segments", func() {
 		JustBeforeEach(func() {
 			queries = []Query{
 				{Key: OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
-				{Key: NameFilter, Values: []string{"iso1,iso2,iso3"}},
+				{Key: NameFilter, Values: []string{"iso1", "iso2", "iso3"}},
 			}
 			segments, warnings, executeErr = client.GetIsolationSegments(queries...)
 		})

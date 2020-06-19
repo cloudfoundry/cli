@@ -116,6 +116,14 @@ type Query struct {
 func FormatQueryParameters(queries []Query) url.Values {
 	params := url.Values{}
 	for _, query := range queries {
+		if query.Key == NameFilter {
+			encodedParamValues := []string{}
+			for _, valString := range query.Values {
+				encodedParamValues = append(encodedParamValues, url.QueryEscape(valString))
+			}
+			query.Values = encodedParamValues
+		}
+
 		params.Add(string(query.Key), strings.Join(query.Values, ","))
 	}
 
