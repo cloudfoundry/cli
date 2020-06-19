@@ -55,6 +55,10 @@ type EnvironmentVariable struct {
 	DefaultValue string
 }
 
+type HasUsage interface {
+	Usage() string
+}
+
 // CommandInfoByName returns the help information for a particular commandName in
 // the commandList.
 func (Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
@@ -78,6 +82,11 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 		Environment: []EnvironmentVariable{},
 	}
 
+	fieldValue := reflect.ValueOf(commandList).FieldByIndex(field.Index)
+	if commandWithUsage, hasUsage := fieldValue.Interface().(HasUsage); hasUsage {
+		cmd.Usage = commandWithUsage.Usage()
+	}
+
 	command := field.Type
 	for i := 0; i < command.NumField(); i++ {
 		fieldTag := command.Field(i).Tag
@@ -86,7 +95,7 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 			continue
 		}
 
-		if fieldTag.Get("usage") != "" {
+		if cmd.Usage == "" && fieldTag.Get("usage") != "" {
 			cmd.Usage = fieldTag.Get("usage")
 			continue
 		}

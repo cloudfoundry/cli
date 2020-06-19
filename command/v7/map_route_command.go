@@ -3,17 +3,33 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
+	"strings"
 )
 
 type MapRouteCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
-	usage           interface{}      `usage:"Map an HTTP route:\n      CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Map a TCP route:\n      CF_NAME map-route APP_NAME DOMAIN [--port PORT]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\n   CF_NAME map-route my-app example.com --port 5000                  # example.com:5000"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
 	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
 	relatedCommands interface{}      `related_commands:"create-route, routes, unmap-route"`
+}
+
+func (cmd MapRouteCommand) Usage() string {
+	return strings.TrimSpace(`
+Map an HTTP route:
+      CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
+
+   Map a TCP route:
+      CF_NAME map-route APP_NAME DOMAIN [--port PORT]
+
+EXAMPLES:
+   CF_NAME map-route my-app example.com                              # example.com
+   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com
+   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo
+   CF_NAME map-route my-app example.com --port 5000                  # example.com:5000
+`)
 }
 
 func (cmd MapRouteCommand) Execute(args []string) error {
