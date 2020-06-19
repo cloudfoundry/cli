@@ -286,7 +286,7 @@ We're working on a robust soluiton that will faciliate more seamless switching v
   - `sudo yum install cf-cli` **-OR-** `sudo apt-get cf-cli` 
 
 #### Switching CLI Versions Pulled via GitHub or CLAW
-There's more than one solution available for doing this. We'll describe one that's been proven to work.
+The following is a simple approach:
 - Download the v6 and v7 binaries into separate directories
 - Write a scipt that updates your `PATH` so it points to the binary for the version of the CLI you need to run:
   - `export PATH=/path/to/your/v6-or-v7/binary/:$PATH`
