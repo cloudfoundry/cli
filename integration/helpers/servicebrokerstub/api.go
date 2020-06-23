@@ -8,10 +8,15 @@ import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 )
 
+type ServiceAccessConfig struct {
+	OfferingName, PlanName, OrgName string
+}
+
 type ServiceBrokerStub struct {
 	Name, URL, GUID     string
 	Username, Password  string
 	Services            []config.Service
+	ServiceAccessConfig []ServiceAccessConfig
 	created             bool
 	registered          bool
 	catalogResponse     int
@@ -34,6 +39,20 @@ func Register() *ServiceBrokerStub {
 
 func EnableServiceAccess() *ServiceBrokerStub {
 	return New().EnableServiceAccess()
+}
+
+func ConcurrentlyEnableServiceAccess(stubs ...*ServiceBrokerStub) {
+	concurrently(
+		func(stub *ServiceBrokerStub) { stub.EnableServiceAccess() },
+		stubs,
+	)
+}
+
+func ConcurrentlyForget(stubs ...*ServiceBrokerStub) {
+	concurrently(
+		func(stub *ServiceBrokerStub) { stub.Forget() },
+		stubs,
+	)
 }
 
 func (s *ServiceBrokerStub) Create() *ServiceBrokerStub {
