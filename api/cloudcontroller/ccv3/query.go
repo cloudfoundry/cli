@@ -11,6 +11,8 @@ type QueryKey string
 const (
 	// AppGUIDFilter is a query parameter for listing objects by app GUID.
 	AppGUIDFilter QueryKey = "app_guids"
+	// AvailableFilter is a query parameter for listing available resources
+	AvailableFilter QueryKey = "available"
 	// GUIDFilter is a query parameter for listing objects by GUID.
 	GUIDFilter QueryKey = "guids"
 	// LabelSelectorFilter is a query parameter for listing objects by label

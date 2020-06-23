@@ -8,6 +8,7 @@ type ServiceOfferingWithPlans ccv3.ServiceOfferingWithPlans
 
 type MarketplaceFilter struct {
 	SpaceGUID, ServiceOfferingName, ServiceBrokerName string
+	ShowUnavailable                                   bool
 }
 
 func (actor Actor) Marketplace(filter MarketplaceFilter) ([]ServiceOfferingWithPlans, Warnings, error) {
@@ -31,6 +32,13 @@ func (actor Actor) Marketplace(filter MarketplaceFilter) ([]ServiceOfferingWithP
 		query = append(query, ccv3.Query{
 			Key:    ccv3.ServiceBrokerNamesFilter,
 			Values: []string{filter.ServiceBrokerName},
+		})
+	}
+
+	if !filter.ShowUnavailable {
+		query = append(query, ccv3.Query{
+			Key:    ccv3.AvailableFilter,
+			Values: []string{"true"},
 		})
 	}
 

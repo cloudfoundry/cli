@@ -18,6 +18,7 @@ type MarketplaceCommand struct {
 	ServiceOfferingName string      `short:"e" description:"Show plan details for a particular service offering"`
 	ServiceBrokerName   string      `short:"b" description:"Only show details for a particular service broker"`
 	NoPlans             bool        `long:"no-plans" description:"Hide plan information for service offerings"`
+	ShowUnavailable     bool        `long:"show-unavailable" description:"Show plans that are not available for use"`
 	usage               interface{} `usage:"CF_NAME marketplace [-e SERVICE_OFFERING] [-b SERVICE_BROKER] [--no-plans]"`
 	relatedCommands     interface{} `related_commands:"create-service, services"`
 }
@@ -69,6 +70,7 @@ func (cmd MarketplaceCommand) processFlags() (v7action.MarketplaceFilter, error)
 	return v7action.MarketplaceFilter{
 		ServiceOfferingName: cmd.ServiceOfferingName,
 		ServiceBrokerName:   cmd.ServiceBrokerName,
+		ShowUnavailable:     cmd.ShowUnavailable,
 	}, nil
 }
 
@@ -119,9 +121,9 @@ func (cmd MarketplaceCommand) displayMessage(username string) {
 
 func (cmd MarketplaceCommand) displayPlansTable(offerings []v7action.ServiceOfferingWithPlans) error {
 	for _, o := range offerings {
-		data := [][]string{{"plan", "description", "free or paid", "costs", "available"}}
+		data := cmd.plansTableHeadings()
 		for _, p := range o.Plans {
-			data = append(data, []string{p.Name, p.Description, freeOrPaid(p.Free), costsList(p.Costs), available(p.Available)})
+			data = append(data, cmd.plansTableRow(p))
 		}
 
 		cmd.UI.DisplayNewline()
@@ -132,6 +134,25 @@ func (cmd MarketplaceCommand) displayPlansTable(offerings []v7action.ServiceOffe
 	}
 
 	return nil
+}
+
+func (cmd MarketplaceCommand) plansTableHeadings() [][]string {
+	switch cmd.ShowUnavailable {
+	case true:
+		return [][]string{{"plan", "description", "free or paid", "costs", "available"}}
+	default:
+		return [][]string{{"plan", "description", "free or paid", "costs"}}
+	}
+}
+
+func (cmd MarketplaceCommand) plansTableRow(p ccv3.ServicePlan) []string {
+	result := []string{p.Name, p.Description, freeOrPaid(p.Free), costsList(p.Costs)}
+
+	if cmd.ShowUnavailable {
+		result = append(result, available(p.Available))
+	}
+
+	return result
 }
 
 func (cmd MarketplaceCommand) displayOfferingsTable(offerings []v7action.ServiceOfferingWithPlans) error {

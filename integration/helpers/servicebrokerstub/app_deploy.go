@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/onsi/ginkgo"
@@ -21,6 +22,8 @@ const (
 	defaultMemoryLimit = "32M"
 	pathToApp          = "../../assets/hydrabroker"
 )
+
+var mutex sync.Mutex
 
 func ensureAppIsDeployed() {
 	if !appResponds() {
@@ -55,8 +58,7 @@ func ensureAppIsPushed() {
 	}
 
 	cleanupAppsFromPreviousRuns := func() {
-		session := helpers.CF("apps")
-		session.Wait()
+		session := helpers.CF("apps").Wait()
 
 		if session.ExitCode() == 0 {
 			matchingApps := regexp.MustCompile(fmt.Sprintf(`%s-\d+`, appNamePrefix)).
@@ -70,6 +72,10 @@ func ensureAppIsPushed() {
 			}
 		}
 	}
+
+	// mutex protects from goroutines, and we retry later to protect from other test processes
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	helpers.CreateOrgAndSpaceUnlessExists(appOrg, appSpace)
 	helpers.WithRandomHomeDir(func() {
