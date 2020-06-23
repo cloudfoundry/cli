@@ -125,14 +125,16 @@ type ServiceOfferingWithPlans struct {
 }
 
 func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOfferingWithPlans, Warnings, error) {
-	query = append(query, Query{
-		Key:    Include,
-		Values: []string{"service_offering"},
-	})
-	query = append(query, Query{
-		Key:    FieldsServiceOfferingServiceBroker,
-		Values: []string{"name,guid"},
-	})
+	query = append(query,
+		Query{
+			Key:    Include,
+			Values: []string{"service_offering"},
+		},
+		Query{
+			Key:    FieldsServiceOfferingServiceBroker,
+			Values: []string{"name,guid"},
+		},
+	)
 
 	plans, included, warnings, err := client.getServicePlans(query...)
 	if err != nil {

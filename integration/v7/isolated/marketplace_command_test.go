@@ -15,16 +15,19 @@ import (
 var _ = Describe("marketplace command", func() {
 	Describe("help", func() {
 		expectMarketplaceHelpMessage := func(session *Session) {
-			Expect(session).To(Say(`NAME:`))
-			Expect(session).To(Say(`marketplace - List available offerings in the marketplace`))
-			Expect(session).To(Say(`USAGE:`))
-			Expect(session).To(Say(`cf marketplace \[-e SERVICE_OFFERING\] \[-b SERVICE_BROKER\] \[--no-plans\]`))
-			Expect(session).To(Say(`ALIAS:`))
-			Expect(session).To(Say(`m`))
-			Expect(session).To(Say(`OPTIONS:`))
-			Expect(session).To(Say(`-e\s+Show plan details for a particular service offering`))
-			Expect(session).To(Say(`--no-plans\s+Hide plan information for service offerings`))
-			Expect(session).To(Say(`create-service, services`))
+			Expect(session).To(SatisfyAll(
+				Say(`NAME:`),
+				Say(`marketplace - List available offerings in the marketplace`),
+				Say(`USAGE:`),
+				Say(`cf marketplace \[-e SERVICE_OFFERING\] \[-b SERVICE_BROKER\] \[--no-plans\]`),
+				Say(`ALIAS:`),
+				Say(`m`),
+				Say(`OPTIONS:`),
+				Say(`-e\s+Show plan details for a particular service offering`),
+				Say(`--no-plans\s+Hide plan information for service offerings`),
+				Say(`--show-unavailable\s+Show plans that are not available for use`),
+				Say(`create-service, services`),
+			))
 		}
 
 		When("the --help flag is set", func() {
@@ -63,9 +66,12 @@ var _ = Describe("marketplace command", func() {
 		var (
 			session                            *Session
 			org1, org2, space1, space2         string
+			serviceInstanceName                string
+			unavailablePlanName                string
 			brokerWithPublicPlans              *servicebrokerstub.ServiceBrokerStub
 			brokerWithSomePrivatePlans         *servicebrokerstub.ServiceBrokerStub
 			brokerWithSameOfferingNameAndCosts *servicebrokerstub.ServiceBrokerStub
+			brokerWithUnavailablePlan          *servicebrokerstub.ServiceBrokerStub
 		)
 
 		BeforeEach(func() {
@@ -121,15 +127,37 @@ var _ = Describe("marketplace command", func() {
 			}
 			brokerWithSameOfferingNameAndCosts.Services[0].Plans[1].Free = false
 
+			unavailablePlanName = helpers.PrefixedRandomName("UNAVAILABLE-PLAN")
+			brokerWithUnavailablePlan = servicebrokerstub.New().WithServiceOfferings(1).WithPlans(1)
+			brokerWithUnavailablePlan.Services[0].Plans[0].Name = unavailablePlanName
+
 			servicebrokerstub.ConcurrentlyEnableServiceAccess(
 				brokerWithPublicPlans,
 				brokerWithSomePrivatePlans,
 				brokerWithSameOfferingNameAndCosts,
+				brokerWithUnavailablePlan,
 			)
+
+			serviceInstanceName = helpers.NewServiceInstanceName()
+			helpers.TargetOrgAndSpace(org1, space1)
+			Eventually(helpers.CF("create-service", brokerWithUnavailablePlan.Services[0].Name, brokerWithUnavailablePlan.Services[0].Plans[0].Name, serviceInstanceName)).Should(Exit(0))
+
+			brokerWithUnavailablePlan.Services[0].Plans[0].Name = helpers.NewPlanName()
+			brokerWithUnavailablePlan.Services[0].Plans[0].ID = helpers.RandomName()
+			brokerWithUnavailablePlan.Services[0].Plans[0].Free = false
+			brokerWithUnavailablePlan.Services[0].Plans[0].Costs = []config.Cost{{
+				Amount: map[string]float64{"gbp": 600.00},
+				Unit:   "MONTHLY",
+			}}
+			brokerWithUnavailablePlan.Configure().Register().EnableServiceAccess()
 		})
 
 		AfterEach(func() {
 			helpers.LoginCF()
+
+			helpers.TargetOrgAndSpace(org1, space1)
+			Eventually(helpers.CF("delete-service", "-f", serviceInstanceName)).Should(Exit(0))
+
 			helpers.QuickDeleteOrg(org1)
 			helpers.QuickDeleteOrg(org2)
 
@@ -137,6 +165,7 @@ var _ = Describe("marketplace command", func() {
 				brokerWithPublicPlans,
 				brokerWithSomePrivatePlans,
 				brokerWithSameOfferingNameAndCosts,
+				brokerWithUnavailablePlan,
 			)
 		})
 
@@ -172,6 +201,8 @@ var _ = Describe("marketplace command", func() {
 					expectEntry(brokerWithSomePrivatePlans.FirstServiceOfferingName(), brokerWithSomePrivatePlans.Services[0].Plans[2].Name, brokerWithSomePrivatePlans.FirstServiceOfferingDescription(), brokerWithSomePrivatePlans.Name)
 					expectEntry(brokerWithSomePrivatePlans.Services[1].Name, brokerWithSomePrivatePlans.Services[1].Plans[0].Name, brokerWithSomePrivatePlans.Services[1].Description, brokerWithSomePrivatePlans.Name)
 					expectEntry(brokerWithSameOfferingNameAndCosts.FirstServiceOfferingName(), planNamesOf(brokerWithSameOfferingNameAndCosts), brokerWithSameOfferingNameAndCosts.FirstServiceOfferingDescription(), brokerWithSameOfferingNameAndCosts.Name)
+
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(unavailablePlanName))
 				})
 
 				It("can filter by service broker name", func() {
@@ -187,6 +218,20 @@ var _ = Describe("marketplace command", func() {
 						ContainSubstring(brokerWithPublicPlans.Name),
 						ContainSubstring(brokerWithSameOfferingNameAndCosts.Name),
 					))
+				})
+
+				It("can show unavailable plans", func() {
+					session = helpers.CF("marketplace", "--show-unavailable")
+					Eventually(session).Should(Exit(0))
+
+					plans := strings.Join([]string{
+						unavailablePlanName,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Name},
+						", ",
+					)
+
+					expectHeaders(`Getting all service offerings from marketplace\.\.\.`)
+					expectEntry(brokerWithUnavailablePlan.FirstServiceOfferingName(), plans, brokerWithUnavailablePlan.FirstServiceOfferingDescription(), brokerWithUnavailablePlan.Name)
 				})
 			})
 
@@ -213,6 +258,8 @@ var _ = Describe("marketplace command", func() {
 					expectEntry(brokerWithSomePrivatePlans.FirstServiceOfferingName(), broker2Plans, brokerWithSomePrivatePlans.FirstServiceOfferingDescription(), brokerWithSomePrivatePlans.Name)
 					expectEntry(brokerWithSomePrivatePlans.Services[1].Name, brokerWithSomePrivatePlans.Services[1].Plans[0].Name, brokerWithSomePrivatePlans.Services[1].Description, brokerWithSomePrivatePlans.Name)
 					expectEntry(brokerWithSameOfferingNameAndCosts.FirstServiceOfferingName(), planNamesOf(brokerWithSameOfferingNameAndCosts), brokerWithSameOfferingNameAndCosts.FirstServiceOfferingDescription(), brokerWithSameOfferingNameAndCosts.Name)
+
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(unavailablePlanName))
 				})
 
 				It("can filter by service broker name", func() {
@@ -234,11 +281,35 @@ var _ = Describe("marketplace command", func() {
 						ContainSubstring(brokerWithSameOfferingNameAndCosts.Name),
 					))
 				})
+
+				It("can show unavailable plans", func() {
+					session = helpers.CF("marketplace", "--show-unavailable")
+					Eventually(session).Should(Exit(0))
+
+					plans := strings.Join([]string{
+						unavailablePlanName,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Name},
+						", ",
+					)
+
+					expectHeaders(`Getting all service offerings from marketplace in org %s / space %s as %s\.\.\.`, org1, space1, username)
+					expectEntry(brokerWithUnavailablePlan.FirstServiceOfferingName(), plans, brokerWithUnavailablePlan.FirstServiceOfferingDescription(), brokerWithUnavailablePlan.Name)
+				})
 			})
 		})
 
 		Context("filtering by service offering name", func() {
-			expectEntry := func(broker, plan, description, free, costs, available string) {
+			expectEntry := func(broker, plan, description, free, costs string) {
+				ExpectWithOffset(1, BufferWithBytes(session.Out.Contents())).To(SatisfyAll(
+					Say(`\n\n`),
+					Say(`broker: %s`, broker),
+					Say(`plan\s+description\s+free or paid\s+costs`),
+					Not(Say(`available`)),
+					Say(`%s\s+%s\s+%s\s+%s`, plan, description, free, costs),
+				))
+			}
+
+			expectEntryWithAvailability := func(broker, plan, description, free, costs, available string) {
 				ExpectWithOffset(1, BufferWithBytes(session.Out.Contents())).To(SatisfyAll(
 					Say(`\n\n`),
 					Say(`broker: %s`, broker),
@@ -264,7 +335,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[2].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					expectEntry(
@@ -273,7 +343,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSameOfferingNameAndCosts.Services[0].Plans[0].Description,
 						"paid",
 						"GBP 600.00/MONTHLY, USD 649.00/MONTHLY, USD 1.00/1GB of messages over 20GB",
-						"yes",
 					)
 
 					expectEntry(
@@ -282,12 +351,12 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSameOfferingNameAndCosts.Services[0].Plans[1].Description,
 						"paid",
 						"",
-						"yes",
 					)
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
 						ContainSubstring(brokerWithPublicPlans.Name),
 						ContainSubstring(brokerWithSomePrivatePlans.Services[1].Name),
+						ContainSubstring(brokerWithUnavailablePlan.Name),
 					))
 				})
 
@@ -303,7 +372,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[2].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
@@ -312,6 +380,31 @@ var _ = Describe("marketplace command", func() {
 						ContainSubstring(brokerWithSomePrivatePlans.Services[1].Plans[0].Name),
 						ContainSubstring(brokerWithSameOfferingNameAndCosts.Name),
 					))
+				})
+
+				It("can show unavailable plans", func() {
+					session = helpers.CF("marketplace", "-e", brokerWithUnavailablePlan.Services[0].Name, "--show-unavailable")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say(`Getting service plan information for service offering %s\.\.\.`, brokerWithUnavailablePlan.Services[0].Name))
+
+					expectEntryWithAvailability(
+						brokerWithUnavailablePlan.Name,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Name,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Description,
+						"paid",
+						"GBP 600.00/MONTHLY",
+						"yes",
+					)
+
+					expectEntryWithAvailability(
+						brokerWithUnavailablePlan.Name,
+						unavailablePlanName,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Description,
+						"free",
+						"",
+						"no",
+					)
 				})
 			})
 
@@ -335,7 +428,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[0].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					expectEntry(
@@ -344,7 +436,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[2].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					expectEntry(
@@ -353,7 +444,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSameOfferingNameAndCosts.Services[0].Plans[0].Description,
 						"paid",
 						"GBP 600.00/MONTHLY, USD 649.00/MONTHLY, USD 1.00/1GB of messages over 20GB",
-						"yes",
 					)
 
 					expectEntry(
@@ -362,8 +452,9 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSameOfferingNameAndCosts.Services[0].Plans[1].Description,
 						"paid",
 						"",
-						"yes",
 					)
+
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(brokerWithUnavailablePlan.Name))
 				})
 
 				It("can also filter by service broker name", func() {
@@ -378,7 +469,6 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[0].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					expectEntry(
@@ -387,13 +477,37 @@ var _ = Describe("marketplace command", func() {
 						brokerWithSomePrivatePlans.Services[0].Plans[2].Description,
 						"free",
 						"",
-						"yes",
 					)
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
 						ContainSubstring(brokerWithPublicPlans.Name),
 						ContainSubstring(brokerWithSameOfferingNameAndCosts.Name),
 					))
+				})
+
+				It("can show unavailable plans", func() {
+					session = helpers.CF("marketplace", "-e", brokerWithUnavailablePlan.Services[0].Name, "--show-unavailable")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say(`Getting service plan information for service offering %s in org %s / space %s as %s\.\.\.`, brokerWithUnavailablePlan.Services[0].Name, org1, space1, username))
+
+					expectEntryWithAvailability(
+						brokerWithUnavailablePlan.Name,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Name,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Description,
+						"paid",
+						"GBP 600.00/MONTHLY",
+						"yes",
+					)
+
+					expectEntryWithAvailability(
+						brokerWithUnavailablePlan.Name,
+						unavailablePlanName,
+						brokerWithUnavailablePlan.Services[0].Plans[0].Description,
+						"free",
+						"",
+						"no",
+					)
 				})
 			})
 		})

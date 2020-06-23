@@ -64,7 +64,10 @@ var _ = Describe("marketplace", func() {
 
 			Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 			queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
-			Expect(queries).To(BeEmpty())
+			Expect(queries).To(ConsistOf(ccv3.Query{
+				Key:    ccv3.AvailableFilter,
+				Values: []string{"true"},
+			}))
 		})
 
 		It("returns a list of service offerings and plans", func() {
@@ -109,7 +112,7 @@ var _ = Describe("marketplace", func() {
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
-				Expect(queries).To(ConsistOf(ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}}))
+				Expect(queries).To(ContainElement(ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}}))
 			})
 		})
 
@@ -119,7 +122,7 @@ var _ = Describe("marketplace", func() {
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
-				Expect(queries).To(ConsistOf(ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{"my-service-offering"}}))
+				Expect(queries).To(ContainElement(ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{"my-service-offering"}}))
 			})
 		})
 
@@ -129,7 +132,17 @@ var _ = Describe("marketplace", func() {
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
-				Expect(queries).To(ConsistOf(ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{"my-service-broker"}}))
+				Expect(queries).To(ContainElement(ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{"my-service-broker"}}))
+			})
+		})
+
+		When("the show unavailable filter is specified", func() {
+			It("does not add the `available` query parameter", func() {
+				_, _, _ = actor.Marketplace(MarketplaceFilter{ShowUnavailable: true})
+
+				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
+				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
+				Expect(queries).NotTo(ContainElement(ccv3.Query{Key: ccv3.AvailableFilter, Values: []string{"true"}}))
 			})
 		})
 
@@ -147,6 +160,7 @@ var _ = Describe("marketplace", func() {
 					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{"my-service-broker"}},
 					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
 					ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{"my-service-offering"}},
+					ccv3.Query{Key: ccv3.AvailableFilter, Values: []string{"true"}},
 				))
 			})
 		})
