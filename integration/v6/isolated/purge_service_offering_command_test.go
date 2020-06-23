@@ -244,15 +244,10 @@ var _ = Describe("purge-service-offering command", func() {
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)
 
-						broker1 = servicebrokerstub.Register()
+						broker1 = servicebrokerstub.EnableServiceAccess()
 						broker2 = servicebrokerstub.New()
 						broker2.Services[0].Name = broker1.FirstServiceOfferingName()
-						broker2.Create().Register()
-
-						session := helpers.CF("enable-service-access", broker1.FirstServiceOfferingName(), "-b", broker1.Name)
-						Eventually(session).Should(Exit(0))
-						session = helpers.CF("enable-service-access", broker1.FirstServiceOfferingName(), "-b", broker2.Name)
-						Eventually(session).Should(Exit(0))
+						broker2.EnableServiceAccess()
 					})
 
 					AfterEach(func() {

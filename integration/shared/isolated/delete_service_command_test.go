@@ -64,8 +64,6 @@ var _ = Describe("delete-service command", func() {
 					service = broker.FirstServiceOfferingName()
 					servicePlan = broker.FirstServicePlanName()
 
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-
 					serviceInstanceName = helpers.PrefixedRandomName("SI")
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 

@@ -46,9 +46,31 @@ func (s *ServiceBrokerStub) registerViaV2() {
 }
 
 func (s *ServiceBrokerStub) enableServiceAccess() {
-	for _, offering := range s.Services {
-		session := helpers.CF("enable-service-access", offering.Name, "-b", s.Name)
-		Eventually(session).Should(Exit(0))
+	config := s.ServiceAccessConfig
+
+	if len(config) == 0 {
+		for _, offering := range s.Services {
+			config = append(config, ServiceAccessConfig{OfferingName: offering.Name})
+		}
+	}
+
+	var sessions []*Session
+	for _, c := range config {
+		args := []string{"enable-service-access", c.OfferingName, "-b", s.Name}
+
+		if c.PlanName != "" {
+			args = append(args, "-p", c.PlanName)
+		}
+
+		if c.OrgName != "" {
+			args = append(args, "-o", c.OrgName)
+		}
+
+		sessions = append(sessions, helpers.CF(args...))
+	}
+
+	for _, s := range sessions {
+		Eventually(s).Should(Exit(0))
 	}
 }
 

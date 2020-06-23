@@ -335,7 +335,6 @@ var _ = Describe("unshare-service command", func() {
 				password = helpers.NewPassword()
 
 				helpers.SetupCF(sourceOrgName, sourceSpaceName)
-				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 				Eventually(helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
 

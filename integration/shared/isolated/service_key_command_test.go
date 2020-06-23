@@ -41,7 +41,6 @@ var _ = Describe("service-key command", func() {
 			service = broker.FirstServiceOfferingName()
 			servicePlan = broker.FirstServicePlanName()
 
-			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 		})
 
