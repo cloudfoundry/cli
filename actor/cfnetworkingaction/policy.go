@@ -161,7 +161,7 @@ func uniqueSpaceGUIDs(applications []resources.Application) []string {
 	return spaceGUIDs
 }
 
-func uniqueOrgGUIDs(spaces []ccv3.Space) []string {
+func uniqueOrgGUIDs(spaces []resources.Space) []string {
 	var orgGUIDs []string
 	occurrences := map[string]struct{}{}
 	for _, space := range spaces {
@@ -187,7 +187,7 @@ func uniqueDestGUIDs(policies []cfnetv1.Policy) []string {
 	return destAppGUIDs
 }
 
-func (actor Actor) orgNamesBySpaceGUID(spaces []ccv3.Space) (map[string]string, ccv3.Warnings, error) {
+func (actor Actor) orgNamesBySpaceGUID(spaces []resources.Space) (map[string]string, ccv3.Warnings, error) {
 	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(ccv3.Query{
 		Key:    ccv3.GUIDFilter,
 		Values: uniqueOrgGUIDs(spaces),

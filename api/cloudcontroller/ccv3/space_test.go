@@ -461,7 +461,7 @@ var _ = Describe("Spaces", func() {
 					))
 			})
 
-			It("deletes the Space and returns all warnings", func() {
+			It("deletes the resources.Space and returns all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(jobURL).To(Equal(JobURL("job-url")))

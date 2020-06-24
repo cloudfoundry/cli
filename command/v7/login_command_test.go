@@ -880,11 +880,11 @@ var _ = Describe("login Command", func() {
 					v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
 					nil,
 				)
-				fakeActor.GetSpaceByNameAndOrganizationCalls(func(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error) {
+				fakeActor.GetSpaceByNameAndOrganizationCalls(func(spaceName string, orgGUID string) (resources.Space, v7action.Warnings, error) {
 					if orgGUID != "some-org-guid1" {
-						return v7action.Space{Name: spaceName}, v7action.Warnings{}, nil
+						return resources.Space{Name: spaceName}, v7action.Warnings{}, nil
 					}
-					return v7action.Space{}, v7action.Warnings{}, actionerror.SpaceNotFoundError{}
+					return resources.Space{}, v7action.Warnings{}, actionerror.SpaceNotFoundError{}
 				})
 			})
 
@@ -982,7 +982,7 @@ var _ = Describe("login Command", func() {
 						v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
 						nil,
 					)
-					fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, v7action.Warnings{}, errors.New("oh noooooooo"))
+					fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{}, v7action.Warnings{}, errors.New("oh noooooooo"))
 				})
 
 				It("returns the error", func() {
@@ -1296,7 +1296,7 @@ var _ = Describe("login Command", func() {
 				When("the specified space exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetSpaceByNameAndOrganizationReturns(
-							v7action.Space{
+							resources.Space{
 								Name: "some-space",
 								GUID: "some-space-guid",
 							},
@@ -1332,7 +1332,7 @@ var _ = Describe("login Command", func() {
 				When("the specified space does not exist or does not belong to the targeted org", func() {
 					BeforeEach(func() {
 						fakeActor.GetSpaceByNameAndOrganizationReturns(
-							v7action.Space{},
+							resources.Space{},
 							v7action.Warnings{"some-warning-1", "some-warning-2"},
 							actionerror.SpaceNotFoundError{Name: "some-space"},
 						)
@@ -1358,7 +1358,7 @@ var _ = Describe("login Command", func() {
 					When("no space exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationSpacesReturns(
-								[]v7action.Space{},
+								[]resources.Space{},
 								v7action.Warnings{},
 								nil,
 							)
@@ -1381,7 +1381,7 @@ var _ = Describe("login Command", func() {
 
 					When("only one space is available", func() {
 						BeforeEach(func() {
-							spaces := []v7action.Space{
+							spaces := []resources.Space{
 								{
 									GUID: "some-space-guid",
 									Name: "some-space-name",
@@ -1420,7 +1420,7 @@ var _ = Describe("login Command", func() {
 
 					When("more than one space is available", func() {
 						BeforeEach(func() {
-							spaces := []v7action.Space{
+							spaces := []resources.Space{
 								{
 									GUID: "some-space-guid",
 									Name: "some-space-name",
@@ -1605,7 +1605,7 @@ var _ = Describe("login Command", func() {
 
 					When("more than 50 spaces exist", func() {
 						BeforeEach(func() {
-							spaces := make([]v7action.Space, 51)
+							spaces := make([]resources.Space, 51)
 							for i := range spaces {
 								spaces[i].Name = fmt.Sprintf("space-%d", i+1)
 								spaces[i].GUID = fmt.Sprintf("space-guid-%d", i+1)
@@ -1678,7 +1678,7 @@ var _ = Describe("login Command", func() {
 				When("fetching the spaces for an organization fails", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationSpacesReturns(
-							[]v7action.Space{},
+							[]resources.Space{},
 							v7action.Warnings{"some-warning-1", "some-warning-2"},
 							errors.New("fetching spaces failed"),
 						)

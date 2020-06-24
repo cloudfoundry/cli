@@ -59,7 +59,7 @@ var _ = Describe("create-space Command", func() {
 			Name:   userName,
 			Origin: "some-user-origin",
 		}, nil)
-		fakeActor.CreateSpaceReturns(v7action.Space{
+		fakeActor.CreateSpaceReturns(resources.Space{
 			Name: spaceName,
 			GUID: spaceGUID,
 		}, v7action.Warnings{}, nil)
@@ -169,7 +169,7 @@ var _ = Describe("create-space Command", func() {
 	When("creating the space returns warnings", func() {
 		BeforeEach(func() {
 			fakeActor.CreateSpaceReturns(
-				v7action.Space{},
+				resources.Space{},
 				v7action.Warnings{"warnings-1", "warnings-2"},
 				nil,
 			)
@@ -182,7 +182,7 @@ var _ = Describe("create-space Command", func() {
 
 	When("the space already exists", func() {
 		BeforeEach(func() {
-			fakeActor.CreateSpaceReturns(v7action.Space{}, v7action.Warnings{}, actionerror.SpaceAlreadyExistsError{Space: spaceName})
+			fakeActor.CreateSpaceReturns(resources.Space{}, v7action.Warnings{}, actionerror.SpaceAlreadyExistsError{Space: spaceName})
 		})
 
 		It("displays that the space already exists, and does not error", func() {
@@ -196,7 +196,7 @@ var _ = Describe("create-space Command", func() {
 	When("creating the space errors", func() {
 		BeforeEach(func() {
 			fakeActor.CreateSpaceReturns(
-				v7action.Space{},
+				resources.Space{},
 				v7action.Warnings{},
 				errors.New("err-create-space"),
 			)

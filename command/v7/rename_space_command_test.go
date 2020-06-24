@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -90,7 +91,7 @@ var _ = Describe("rename-space Command", func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-targeted-org", GUID: "org-guid"})
 				fakeActor.RenameSpaceByNameAndOrganizationGUIDReturns(
-					v7action.Space{GUID: "old-space-guid", Name: "new-space-name"},
+					resources.Space{GUID: "old-space-guid", Name: "new-space-name"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)

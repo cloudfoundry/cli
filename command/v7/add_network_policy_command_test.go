@@ -213,7 +213,7 @@ var _ = Describe("add-network-policy Command", func() {
 				cmd.DestinationSpace = "hamdinger"
 				warnings := v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}
 				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "bananarama"})
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "bananarama"})
 			})
 
 			It("returns an error", func() {
@@ -234,7 +234,7 @@ var _ = Describe("add-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationSpace = "hamdinger"
 				warnings := v7action.Warnings{"some-warning-1", "some-warning-2"}
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-other-space-guid"}, warnings, nil)
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{GUID: "some-other-space-guid"}, warnings, nil)
 			})
 
 			It("displays OK", func() {
@@ -260,7 +260,7 @@ var _ = Describe("add-network-policy Command", func() {
 				cmd.DestinationOrg = "bananarama"
 				cmd.DestinationSpace = "hamdinger"
 				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-org-warning-1", "some-org-warning-2"}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-other-space-guid"}, v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}, nil)
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{GUID: "some-other-space-guid"}, v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}, nil)
 				fakeNetworkingActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-add-warning-1", "some-add-warning-2"}, nil)
 			})
 

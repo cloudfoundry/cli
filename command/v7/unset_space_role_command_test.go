@@ -68,7 +68,7 @@ var _ = Describe("unset-space-role Command", func() {
 		)
 
 		fakeActor.GetSpaceByNameAndOrganizationReturns(
-			v7action.Space{GUID: "some-space-guid", Name: "some-space-name"},
+			resources.Space{GUID: "some-space-guid", Name: "some-space-name"},
 			v7action.Warnings{"get-space-warning"},
 			nil,
 		)
@@ -223,7 +223,7 @@ var _ = Describe("unset-space-role Command", func() {
 			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 
 			fakeActor.GetSpaceByNameAndOrganizationReturns(
-				v7action.Space{},
+				resources.Space{},
 				v7action.Warnings{"get-space-warning"},
 				errors.New("get-space-error"),
 			)

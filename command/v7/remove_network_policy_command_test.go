@@ -124,7 +124,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				cmd.DestinationOrg = "dest-org"
 				cmd.DestinationSpace = "dest-space"
 				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-warning-1"}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-dest-guid"}, v7action.Warnings{"some-warning-2"}, nil)
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{GUID: "some-dest-guid"}, v7action.Warnings{"some-warning-2"}, nil)
 			})
 
 			It("displays OK", func() {
@@ -149,7 +149,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		When("a destination space but no destination org is specified", func() {
 			BeforeEach(func() {
 				cmd.DestinationSpace = "dest-space"
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-dest-guid"}, v7action.Warnings{}, nil)
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{GUID: "some-dest-guid"}, v7action.Warnings{}, nil)
 			})
 
 			It("displays OK when no error occurs", func() {
@@ -206,7 +206,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				cmd.DestinationSpace = "coolspace"
 				warnings := v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}
 				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "coolspace"})
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "coolspace"})
 			})
 
 			It("responds with an error", func() {

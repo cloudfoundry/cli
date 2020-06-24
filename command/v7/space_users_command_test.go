@@ -118,7 +118,7 @@ var _ = Describe("space-users Command", func() {
 				When("getting the space guid fails", func() {
 					BeforeEach(func() {
 						fakeActor.GetSpaceByNameAndOrganizationReturns(
-							v7action.Space{},
+							resources.Space{},
 							v7action.Warnings{"get-space-by-name-and-org-warning"},
 							errors.New("get-space-by-name-and-org-error"))
 					})

@@ -98,7 +98,7 @@ var _ = Describe("space command", func() {
 		When("getting the space succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceByNameAndOrganizationReturns(
-					v7action.Space{GUID: "some-space-guid"},
+					resources.Space{GUID: "some-space-guid"},
 					v7action.Warnings{"some-warning"},
 					nil,
 				)
@@ -114,7 +114,7 @@ var _ = Describe("space command", func() {
 		When("getting the space fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceByNameAndOrganizationReturns(
-					v7action.Space{},
+					resources.Space{},
 					v7action.Warnings{"some-warning"},
 					errors.New("space-error"),
 				)
@@ -167,7 +167,7 @@ var _ = Describe("space command", func() {
 				cmd.SecurityGroupRules = true
 
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{
+					resources.SpaceSummary{
 						Name:                  "some-space",
 						OrgName:               "some-org",
 						AppNames:              []string{"app1", "app2", "app3"},
@@ -212,7 +212,7 @@ var _ = Describe("space command", func() {
 			When("there are no security groups to show", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-						v7action.SpaceSummary{},
+						resources.SpaceSummary{},
 						v7action.Warnings{"some-warning"},
 						nil,
 					)
@@ -229,7 +229,7 @@ var _ = Describe("space command", func() {
 		When("fetching the space summary succeeds with an isolation segment", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{
+					resources.SpaceSummary{
 						Name:                  "some-space",
 						OrgName:               "some-org",
 						AppNames:              []string{"app1", "app2", "app3"},
@@ -265,7 +265,7 @@ var _ = Describe("space command", func() {
 		When("fetching the space summary succeeds without an isolation segment", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{
+					resources.SpaceSummary{
 						Name:                  "some-space",
 						OrgName:               "some-org",
 						AppNames:              []string{"app1", "app2", "app3"},
@@ -300,7 +300,7 @@ var _ = Describe("space command", func() {
 		When("fetching a space with an applied quota", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{
+					resources.SpaceSummary{
 						Name:                 "some-space",
 						OrgName:              "some-org",
 						AppNames:             []string{"app1", "app2", "app3"},
@@ -321,7 +321,7 @@ var _ = Describe("space command", func() {
 		When("fetching a space that has no quota applied", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{
+					resources.SpaceSummary{
 						Name:                 "some-space",
 						OrgName:              "some-org",
 						AppNames:             []string{"app1", "app2", "app3"},
@@ -340,7 +340,7 @@ var _ = Describe("space command", func() {
 		When("fetching the space summary fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
-					v7action.SpaceSummary{},
+					resources.SpaceSummary{},
 					v7action.Warnings{"some-warning"},
 					errors.New("get-summary-error"),
 				)

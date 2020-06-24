@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Space struct {
@@ -90,8 +91,8 @@ func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) 
 		return []Space{}, Warnings(warnings), err
 	}
 
-	var filteredSpaces []ccv3.Space
-	guidToSpaces := map[string]ccv3.Space{}
+	var filteredSpaces []resources.Space
+	guidToSpaces := map[string]resources.Space{}
 	for _, space := range spaces {
 		guidToSpaces[space.GUID] = space
 	}
@@ -109,7 +110,7 @@ func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) 
 	return v3Spaces, Warnings(warnings), nil
 }
 
-func (actor Actor) convertCCToActorSpace(space ccv3.Space) Space {
+func (actor Actor) convertCCToActorSpace(space resources.Space) Space {
 	return Space{
 		GUID:             space.GUID,
 		Name:             space.Name,

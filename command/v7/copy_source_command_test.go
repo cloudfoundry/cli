@@ -77,7 +77,7 @@ var _ = Describe("copy-source Command", func() {
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 
-		fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{Name: "destination-space", GUID: "destination-space-guid"},
+		fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{Name: "destination-space", GUID: "destination-space-guid"},
 			v7action.Warnings{"get-space-by-name-warning"},
 			nil,
 		)
@@ -205,7 +205,7 @@ var _ = Describe("copy-source Command", func() {
 		When("retrieving the space fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceByNameAndOrganizationReturns(
-					v7action.Space{},
+					resources.Space{},
 					v7action.Warnings{},
 					errors.New("get-space-by-name-err"),
 				)

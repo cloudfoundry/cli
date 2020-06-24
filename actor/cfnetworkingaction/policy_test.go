@@ -171,7 +171,7 @@ var _ = Describe("Policy", func() {
 				},
 			}, []string{"GetApplicationsWarning"}, nil)
 
-			fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{
+			fakeCloudControllerClient.GetSpacesReturns([]resources.Space{
 				{
 					Name: "spaceA",
 					GUID: "spaceAGUID",
@@ -298,7 +298,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the spaces by guids fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetSpacesReturns([]resources.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -384,7 +384,7 @@ var _ = Describe("Policy", func() {
 				},
 			}, []string{"filter-apps-by-guid-warning"}, nil)
 
-			fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{
+			fakeCloudControllerClient.GetSpacesReturns([]resources.Space{
 				{
 					GUID: "spaceAGUID",
 					Name: "spaceA",
@@ -535,7 +535,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the spaces by guids fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetSpacesReturns([]resources.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {

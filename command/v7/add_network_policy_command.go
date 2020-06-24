@@ -87,7 +87,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destSpaceGUID := cmd.Config.TargetedSpace().GUID
 
 	if cmd.DestinationSpace != "" {
-		var destSpace v7action.Space
+		var destSpace resources.Space
 		var warnings v7action.Warnings
 		destSpace, warnings, err = cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
 		cmd.UI.DisplayWarnings(warnings)

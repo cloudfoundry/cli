@@ -35,13 +35,13 @@ var _ = Describe("Security Group Actions", func() {
 	Describe("BindSecurityGroupToSpaces", func() {
 		var (
 			lifecycle constant.SecurityGroupLifecycle
-			spaces    []Space
+			spaces    []resources.Space
 			err       error
 			warnings  []string
 		)
 
 		BeforeEach(func() {
-			spaces = []Space{{GUID: "some-space-guid"}, {GUID: "other-space-guid"}}
+			spaces = []resources.Space{{GUID: "some-space-guid"}, {GUID: "other-space-guid"}}
 		})
 
 		JustBeforeEach(func() {
@@ -304,7 +304,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{},
+						[]resources.Space{},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"warning-2"},
 						nil,
@@ -352,7 +352,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{{
+						[]resources.Space{{
 							Name: "my-space",
 							GUID: "space-guid-1",
 							Relationships: resources.Relationships{
@@ -512,7 +512,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{{
+					[]resources.Space{{
 						Name: "my-space",
 						GUID: "space-guid-1",
 						Relationships: resources.Relationships{
@@ -924,7 +924,7 @@ var _ = Describe("Security Group Actions", func() {
 			)
 
 			fakeCloudControllerClient.GetSpacesReturns(
-				[]ccv3.Space{{GUID: "some-space-guid"}},
+				[]resources.Space{{GUID: "some-space-guid"}},
 				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-space-warning"},
 				nil,
@@ -1006,7 +1006,7 @@ var _ = Describe("Security Group Actions", func() {
 		When("getting the space fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{{}},
+					[]resources.Space{{}},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-space-warning"},
 					errors.New("space error"),

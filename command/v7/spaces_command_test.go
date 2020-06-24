@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -92,7 +93,7 @@ var _ = Describe("spaces Command", func() {
 			When("there are no spaces", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesWithLabelSelectorReturns(
-						[]v7action.Space{},
+						[]resources.Space{},
 						v7action.Warnings{"get-spaces-warning"},
 						nil,
 					)
@@ -118,7 +119,7 @@ var _ = Describe("spaces Command", func() {
 			When("there are multiple spaces", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesWithLabelSelectorReturns(
-						[]v7action.Space{
+						[]resources.Space{
 							{Name: "space-1"},
 							{Name: "space-2"},
 						},

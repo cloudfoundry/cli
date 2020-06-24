@@ -5,20 +5,8 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-// Space represents a Cloud Controller V3 Space.
-type Space struct {
-	// GUID is a unique space identifier.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the space.
-	Name string `json:"name"`
-	// Relationships list the relationships to the space.
-	Relationships resources.Relationships `json:"relationships,omitempty"`
-	// Metadata is used for custom tagging of API resources
-	Metadata *resources.Metadata `json:"metadata,omitempty"`
-}
-
-func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
-	var responseBody Space
+func (client *Client) CreateSpace(space resources.Space) (resources.Space, Warnings, error) {
+	var responseBody resources.Space
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostSpaceRequest,
@@ -39,28 +27,28 @@ func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 }
 
 // GetSpaces lists spaces with optional filters.
-func (client *Client) GetSpaces(query ...Query) ([]Space, IncludedResources, Warnings, error) {
-	var resources []Space
+func (client *Client) GetSpaces(query ...Query) ([]resources.Space, IncludedResources, Warnings, error) {
+	var returnedResources []resources.Space
 
 	includedResources, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetSpacesRequest,
 		Query:        query,
-		ResponseBody: Space{},
+		ResponseBody: resources.Space{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Space))
+			returnedResources = append(returnedResources, item.(resources.Space))
 			return nil
 		},
 	})
 
-	return resources, includedResources, warnings, err
+	return returnedResources, includedResources, warnings, err
 }
 
-func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
+func (client *Client) UpdateSpace(space resources.Space) (resources.Space, Warnings, error) {
 	spaceGUID := space.GUID
 	space.GUID = ""
 	space.Relationships = nil
 
-	var responseBody Space
+	var responseBody resources.Space
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchSpaceRequest,

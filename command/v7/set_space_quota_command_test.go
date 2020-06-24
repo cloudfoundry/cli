@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -77,7 +78,7 @@ var _ = Describe("set-space-quota Command", func() {
 		fakeConfig.TargetedOrganizationReturns(org)
 
 		fakeActor.GetSpaceByNameAndOrganizationReturns(
-			v7action.Space{GUID: "some-space-guid"},
+			resources.Space{GUID: "some-space-guid"},
 			v7action.Warnings{getSpaceWarning},
 			nil,
 		)
@@ -116,7 +117,7 @@ var _ = Describe("set-space-quota Command", func() {
 	When("it can't get the space information", func() {
 		BeforeEach(func() {
 			fakeActor.GetSpaceByNameAndOrganizationReturns(
-				v7action.Space{},
+				resources.Space{},
 				v7action.Warnings{getSpaceWarning},
 				actionerror.SpaceNotFoundError{Name: spaceName},
 			)

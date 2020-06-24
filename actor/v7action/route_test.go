@@ -128,7 +128,7 @@ var _ = Describe("Route Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{
+						[]resources.Space{
 							{Name: "space-name", GUID: "space-guid"},
 						},
 						ccv3.IncludedResources{},

@@ -76,11 +76,11 @@ type FakeActor struct {
 	authenticateReturnsOnCall map[int]struct {
 		result1 error
 	}
-	BindSecurityGroupToSpacesStub        func(string, []v7action.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
+	BindSecurityGroupToSpacesStub        func(string, []resources.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
 	bindSecurityGroupToSpacesMutex       sync.RWMutex
 	bindSecurityGroupToSpacesArgsForCall []struct {
 		arg1 string
-		arg2 []v7action.Space
+		arg2 []resources.Space
 		arg3 constanta.SecurityGroupLifecycle
 	}
 	bindSecurityGroupToSpacesReturns struct {
@@ -413,19 +413,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateSpaceStub        func(string, string) (v7action.Space, v7action.Warnings, error)
+	CreateSpaceStub        func(string, string) (resources.Space, v7action.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	createSpaceReturns struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
 	createSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1403,34 +1403,34 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetOrganizationSpacesStub        func(string) ([]v7action.Space, v7action.Warnings, error)
+	GetOrganizationSpacesStub        func(string) ([]resources.Space, v7action.Warnings, error)
 	getOrganizationSpacesMutex       sync.RWMutex
 	getOrganizationSpacesArgsForCall []struct {
 		arg1 string
 	}
 	getOrganizationSpacesReturns struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationSpacesReturnsOnCall map[int]struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetOrganizationSpacesWithLabelSelectorStub        func(string, string) ([]v7action.Space, v7action.Warnings, error)
+	GetOrganizationSpacesWithLabelSelectorStub        func(string, string) ([]resources.Space, v7action.Warnings, error)
 	getOrganizationSpacesWithLabelSelectorMutex       sync.RWMutex
 	getOrganizationSpacesWithLabelSelectorArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getOrganizationSpacesWithLabelSelectorReturns struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationSpacesWithLabelSelectorReturnsOnCall map[int]struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1851,19 +1851,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceByNameAndOrganizationStub        func(string, string) (v7action.Space, v7action.Warnings, error)
+	GetSpaceByNameAndOrganizationStub        func(string, string) (resources.Space, v7action.Warnings, error)
 	getSpaceByNameAndOrganizationMutex       sync.RWMutex
 	getSpaceByNameAndOrganizationArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceByNameAndOrganizationReturns struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceByNameAndOrganizationReturnsOnCall map[int]struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1931,19 +1931,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceSummaryByNameAndOrganizationStub        func(string, string) (v7action.SpaceSummary, v7action.Warnings, error)
+	GetSpaceSummaryByNameAndOrganizationStub        func(string, string) (resources.SpaceSummary, v7action.Warnings, error)
 	getSpaceSummaryByNameAndOrganizationMutex       sync.RWMutex
 	getSpaceSummaryByNameAndOrganizationArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceSummaryByNameAndOrganizationReturns struct {
-		result1 v7action.SpaceSummary
+		result1 resources.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceSummaryByNameAndOrganizationReturnsOnCall map[int]struct {
-		result1 v7action.SpaceSummary
+		result1 resources.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2264,7 +2264,7 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	RenameSpaceByNameAndOrganizationGUIDStub        func(string, string, string) (v7action.Space, v7action.Warnings, error)
+	RenameSpaceByNameAndOrganizationGUIDStub        func(string, string, string) (resources.Space, v7action.Warnings, error)
 	renameSpaceByNameAndOrganizationGUIDMutex       sync.RWMutex
 	renameSpaceByNameAndOrganizationGUIDArgsForCall []struct {
 		arg1 string
@@ -2272,12 +2272,12 @@ type FakeActor struct {
 		arg3 string
 	}
 	renameSpaceByNameAndOrganizationGUIDReturns struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
 	renameSpaceByNameAndOrganizationGUIDReturnsOnCall map[int]struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -3325,17 +3325,17 @@ func (fake *FakeActor) AuthenticateReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpaces(arg1 string, arg2 []v7action.Space, arg3 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
-	var arg2Copy []v7action.Space
+func (fake *FakeActor) BindSecurityGroupToSpaces(arg1 string, arg2 []resources.Space, arg3 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
+	var arg2Copy []resources.Space
 	if arg2 != nil {
-		arg2Copy = make([]v7action.Space, len(arg2))
+		arg2Copy = make([]resources.Space, len(arg2))
 		copy(arg2Copy, arg2)
 	}
 	fake.bindSecurityGroupToSpacesMutex.Lock()
 	ret, specificReturn := fake.bindSecurityGroupToSpacesReturnsOnCall[len(fake.bindSecurityGroupToSpacesArgsForCall)]
 	fake.bindSecurityGroupToSpacesArgsForCall = append(fake.bindSecurityGroupToSpacesArgsForCall, struct {
 		arg1 string
-		arg2 []v7action.Space
+		arg2 []resources.Space
 		arg3 constanta.SecurityGroupLifecycle
 	}{arg1, arg2Copy, arg3})
 	fake.recordInvocation("BindSecurityGroupToSpaces", []interface{}{arg1, arg2Copy, arg3})
@@ -3356,13 +3356,13 @@ func (fake *FakeActor) BindSecurityGroupToSpacesCallCount() int {
 	return len(fake.bindSecurityGroupToSpacesArgsForCall)
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpacesCalls(stub func(string, []v7action.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)) {
+func (fake *FakeActor) BindSecurityGroupToSpacesCalls(stub func(string, []resources.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)) {
 	fake.bindSecurityGroupToSpacesMutex.Lock()
 	defer fake.bindSecurityGroupToSpacesMutex.Unlock()
 	fake.BindSecurityGroupToSpacesStub = stub
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpacesArgsForCall(i int) (string, []v7action.Space, constanta.SecurityGroupLifecycle) {
+func (fake *FakeActor) BindSecurityGroupToSpacesArgsForCall(i int) (string, []resources.Space, constanta.SecurityGroupLifecycle) {
 	fake.bindSecurityGroupToSpacesMutex.RLock()
 	defer fake.bindSecurityGroupToSpacesMutex.RUnlock()
 	argsForCall := fake.bindSecurityGroupToSpacesArgsForCall[i]
@@ -4790,7 +4790,7 @@ func (fake *FakeActor) CreateSharedDomainReturnsOnCall(i int, result1 v7action.W
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateSpace(arg1 string, arg2 string) (v7action.Space, v7action.Warnings, error) {
+func (fake *FakeActor) CreateSpace(arg1 string, arg2 string) (resources.Space, v7action.Warnings, error) {
 	fake.createSpaceMutex.Lock()
 	ret, specificReturn := fake.createSpaceReturnsOnCall[len(fake.createSpaceArgsForCall)]
 	fake.createSpaceArgsForCall = append(fake.createSpaceArgsForCall, struct {
@@ -4815,7 +4815,7 @@ func (fake *FakeActor) CreateSpaceCallCount() int {
 	return len(fake.createSpaceArgsForCall)
 }
 
-func (fake *FakeActor) CreateSpaceCalls(stub func(string, string) (v7action.Space, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateSpaceCalls(stub func(string, string) (resources.Space, v7action.Warnings, error)) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = stub
@@ -4828,30 +4828,30 @@ func (fake *FakeActor) CreateSpaceArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) CreateSpaceReturns(result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) CreateSpaceReturns(result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	fake.createSpaceReturns = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateSpaceReturnsOnCall(i int, result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) CreateSpaceReturnsOnCall(i int, result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	if fake.createSpaceReturnsOnCall == nil {
 		fake.createSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Space
+			result1 resources.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9078,7 +9078,7 @@ func (fake *FakeActor) GetOrganizationQuotasReturnsOnCall(i int, result1 []resou
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationSpaces(arg1 string) ([]v7action.Space, v7action.Warnings, error) {
+func (fake *FakeActor) GetOrganizationSpaces(arg1 string) ([]resources.Space, v7action.Warnings, error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
 	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
@@ -9102,7 +9102,7 @@ func (fake *FakeActor) GetOrganizationSpacesCallCount() int {
 	return len(fake.getOrganizationSpacesArgsForCall)
 }
 
-func (fake *FakeActor) GetOrganizationSpacesCalls(stub func(string) ([]v7action.Space, v7action.Warnings, error)) {
+func (fake *FakeActor) GetOrganizationSpacesCalls(stub func(string) ([]resources.Space, v7action.Warnings, error)) {
 	fake.getOrganizationSpacesMutex.Lock()
 	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = stub
@@ -9115,36 +9115,36 @@ func (fake *FakeActor) GetOrganizationSpacesArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetOrganizationSpacesReturns(result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationSpacesReturns(result1 []resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	fake.getOrganizationSpacesReturns = struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	if fake.getOrganizationSpacesReturnsOnCall == nil {
 		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Space
+			result1 []resources.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationSpacesReturnsOnCall[i] = struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationSpacesWithLabelSelector(arg1 string, arg2 string) ([]v7action.Space, v7action.Warnings, error) {
+func (fake *FakeActor) GetOrganizationSpacesWithLabelSelector(arg1 string, arg2 string) ([]resources.Space, v7action.Warnings, error) {
 	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall[len(fake.getOrganizationSpacesWithLabelSelectorArgsForCall)]
 	fake.getOrganizationSpacesWithLabelSelectorArgsForCall = append(fake.getOrganizationSpacesWithLabelSelectorArgsForCall, struct {
@@ -9169,7 +9169,7 @@ func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorCallCount() int {
 	return len(fake.getOrganizationSpacesWithLabelSelectorArgsForCall)
 }
 
-func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorCalls(stub func(string, string) ([]v7action.Space, v7action.Warnings, error)) {
+func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorCalls(stub func(string, string) ([]resources.Space, v7action.Warnings, error)) {
 	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
 	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
 	fake.GetOrganizationSpacesWithLabelSelectorStub = stub
@@ -9182,30 +9182,30 @@ func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorArgsForCall(i int) 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorReturns(result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorReturns(result1 []resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
 	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
 	fake.GetOrganizationSpacesWithLabelSelectorStub = nil
 	fake.getOrganizationSpacesWithLabelSelectorReturns = struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorReturnsOnCall(i int, result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationSpacesWithLabelSelectorReturnsOnCall(i int, result1 []resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
 	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
 	fake.GetOrganizationSpacesWithLabelSelectorStub = nil
 	if fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall == nil {
 		fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Space
+			result1 []resources.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall[i] = struct {
-		result1 []v7action.Space
+		result1 []resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -10979,7 +10979,7 @@ func (fake *FakeActor) GetServicePlanLabelsReturnsOnCall(i int, result1 map[stri
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceByNameAndOrganization(arg1 string, arg2 string) (v7action.Space, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceByNameAndOrganization(arg1 string, arg2 string) (resources.Space, v7action.Warnings, error) {
 	fake.getSpaceByNameAndOrganizationMutex.Lock()
 	ret, specificReturn := fake.getSpaceByNameAndOrganizationReturnsOnCall[len(fake.getSpaceByNameAndOrganizationArgsForCall)]
 	fake.getSpaceByNameAndOrganizationArgsForCall = append(fake.getSpaceByNameAndOrganizationArgsForCall, struct {
@@ -11004,7 +11004,7 @@ func (fake *FakeActor) GetSpaceByNameAndOrganizationCallCount() int {
 	return len(fake.getSpaceByNameAndOrganizationArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceByNameAndOrganizationCalls(stub func(string, string) (v7action.Space, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceByNameAndOrganizationCalls(stub func(string, string) (resources.Space, v7action.Warnings, error)) {
 	fake.getSpaceByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceByNameAndOrganizationStub = stub
@@ -11017,30 +11017,30 @@ func (fake *FakeActor) GetSpaceByNameAndOrganizationArgsForCall(i int) (string, 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetSpaceByNameAndOrganizationReturns(result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceByNameAndOrganizationReturns(result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceByNameAndOrganizationStub = nil
 	fake.getSpaceByNameAndOrganizationReturns = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceByNameAndOrganizationReturnsOnCall(i int, result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceByNameAndOrganizationReturnsOnCall(i int, result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceByNameAndOrganizationStub = nil
 	if fake.getSpaceByNameAndOrganizationReturnsOnCall == nil {
 		fake.getSpaceByNameAndOrganizationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Space
+			result1 resources.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceByNameAndOrganizationReturnsOnCall[i] = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11314,7 +11314,7 @@ func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganization(arg1 string, arg2 string) (v7action.SpaceSummary, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganization(arg1 string, arg2 string) (resources.SpaceSummary, v7action.Warnings, error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	ret, specificReturn := fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall[len(fake.getSpaceSummaryByNameAndOrganizationArgsForCall)]
 	fake.getSpaceSummaryByNameAndOrganizationArgsForCall = append(fake.getSpaceSummaryByNameAndOrganizationArgsForCall, struct {
@@ -11339,7 +11339,7 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCallCount() int {
 	return len(fake.getSpaceSummaryByNameAndOrganizationArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCalls(stub func(string, string) (v7action.SpaceSummary, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCalls(stub func(string, string) (resources.SpaceSummary, v7action.Warnings, error)) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = stub
@@ -11352,30 +11352,30 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationArgsForCall(i int) (s
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturns(result1 v7action.SpaceSummary, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturns(result1 resources.SpaceSummary, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = nil
 	fake.getSpaceSummaryByNameAndOrganizationReturns = struct {
-		result1 v7action.SpaceSummary
+		result1 resources.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturnsOnCall(i int, result1 v7action.SpaceSummary, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturnsOnCall(i int, result1 resources.SpaceSummary, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = nil
 	if fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall == nil {
 		fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall = make(map[int]struct {
-			result1 v7action.SpaceSummary
+			result1 resources.SpaceSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall[i] = struct {
-		result1 v7action.SpaceSummary
+		result1 resources.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -12755,7 +12755,7 @@ func (fake *FakeActor) RenameOrganizationReturnsOnCall(i int, result1 resources.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUID(arg1 string, arg2 string, arg3 string) (v7action.Space, v7action.Warnings, error) {
+func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUID(arg1 string, arg2 string, arg3 string) (resources.Space, v7action.Warnings, error) {
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Lock()
 	ret, specificReturn := fake.renameSpaceByNameAndOrganizationGUIDReturnsOnCall[len(fake.renameSpaceByNameAndOrganizationGUIDArgsForCall)]
 	fake.renameSpaceByNameAndOrganizationGUIDArgsForCall = append(fake.renameSpaceByNameAndOrganizationGUIDArgsForCall, struct {
@@ -12781,7 +12781,7 @@ func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDCallCount() int {
 	return len(fake.renameSpaceByNameAndOrganizationGUIDArgsForCall)
 }
 
-func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDCalls(stub func(string, string, string) (v7action.Space, v7action.Warnings, error)) {
+func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDCalls(stub func(string, string, string) (resources.Space, v7action.Warnings, error)) {
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Lock()
 	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.Unlock()
 	fake.RenameSpaceByNameAndOrganizationGUIDStub = stub
@@ -12794,30 +12794,30 @@ func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDArgsForCall(i int) (s
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDReturns(result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDReturns(result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Lock()
 	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.Unlock()
 	fake.RenameSpaceByNameAndOrganizationGUIDStub = nil
 	fake.renameSpaceByNameAndOrganizationGUIDReturns = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDReturnsOnCall(i int, result1 v7action.Space, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDReturnsOnCall(i int, result1 resources.Space, result2 v7action.Warnings, result3 error) {
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Lock()
 	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.Unlock()
 	fake.RenameSpaceByNameAndOrganizationGUIDStub = nil
 	if fake.renameSpaceByNameAndOrganizationGUIDReturnsOnCall == nil {
 		fake.renameSpaceByNameAndOrganizationGUIDReturnsOnCall = make(map[int]struct {
-			result1 v7action.Space
+			result1 resources.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.renameSpaceByNameAndOrganizationGUIDReturnsOnCall[i] = struct {
-		result1 v7action.Space
+		result1 resources.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
