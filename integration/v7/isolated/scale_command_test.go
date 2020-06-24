@@ -210,11 +210,11 @@ var _ = Describe("scale command", func() {
 				})
 
 				When("Scaling the disk space", func() {
-					It("scales disk to 92M", func() {
+					It("scales disk to 512M", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
-						session := helpers.CFWithStdin(buffer, "scale", appName, "-k", "92M")
+						session := helpers.CFWithStdin(buffer, "scale", appName, "-k", "512M")
 						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
 						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -230,12 +230,12 @@ var _ = Describe("scale command", func() {
 						Expect(processSummary.Type).To(Equal("web"))
 						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
 						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
+						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 512M`))
 					})
 
 					When("-f flag provided", func() {
 						It("scales without prompt", func() {
-							session := helpers.CF("scale", appName, "-k", "92M", "-f")
+							session := helpers.CF("scale", appName, "-k", "512M", "-f")
 							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 							Eventually(session).Should(Exit(0))
 
@@ -247,7 +247,7 @@ var _ = Describe("scale command", func() {
 							Expect(processSummary.Type).To(Equal("web"))
 							Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
 							Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-							Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
+							Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 512M`))
 						})
 					})
 				})
@@ -289,7 +289,7 @@ var _ = Describe("scale command", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
-						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "120M", "-m", "60M")
+						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "512M", "-m", "60M")
 						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
 						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -305,7 +305,7 @@ var _ = Describe("scale command", func() {
 						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
 						Expect(instanceSummary.State).To(MatchRegexp(`running|starting`))
 						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 60M`))
-						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 512M`))
 					})
 				})
 
