@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -45,7 +45,7 @@ func (cmd SpacesCommand) Execute([]string) error {
 	return nil
 }
 
-func (cmd SpacesCommand) displaySpaces(spaces []v7action.Space) {
+func (cmd SpacesCommand) displaySpaces(spaces []resources.Space) {
 	table := [][]string{{cmd.UI.TranslateText("name")}}
 
 	for _, space := range spaces {

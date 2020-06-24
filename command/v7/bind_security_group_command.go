@@ -3,9 +3,9 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
@@ -62,9 +62,9 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		return err
 	}
 
-	spacesToBind := []v7action.Space{}
+	spacesToBind := []resources.Space{}
 	if cmd.Space != "" {
-		var space v7action.Space
+		var space resources.Space
 		space, warnings, err = cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -72,7 +72,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		}
 		spacesToBind = append(spacesToBind, space)
 	} else {
-		var spaces []v7action.Space
+		var spaces []resources.Space
 		spaces, warnings, err = cmd.Actor.GetOrganizationSpaces(org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -105,7 +105,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd BindSecurityGroupCommand) announceBinding(spaces []v7action.Space, user configv3.User) {
+func (cmd BindSecurityGroupCommand) announceBinding(spaces []resources.Space, user configv3.User) {
 
 	var spacenames []string
 

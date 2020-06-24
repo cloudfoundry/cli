@@ -364,18 +364,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
+	CreateSpaceStub        func(resources.Space) (resources.Space, ccv3.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
-		arg1 ccv3.Space
+		arg1 resources.Space
 	}
 	createSpaceReturns struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createSpaceReturnsOnCall map[int]struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1617,19 +1617,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetSpacesStub        func(...ccv3.Query) ([]ccv3.Space, ccv3.IncludedResources, ccv3.Warnings, error)
+	GetSpacesStub        func(...ccv3.Query) ([]resources.Space, ccv3.IncludedResources, ccv3.Warnings, error)
 	getSpacesMutex       sync.RWMutex
 	getSpacesArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getSpacesReturns struct {
-		result1 []ccv3.Space
+		result1 []resources.Space
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
 	}
 	getSpacesReturnsOnCall map[int]struct {
-		result1 []ccv3.Space
+		result1 []resources.Space
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
@@ -2201,18 +2201,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
+	UpdateSpaceStub        func(resources.Space) (resources.Space, ccv3.Warnings, error)
 	updateSpaceMutex       sync.RWMutex
 	updateSpaceArgsForCall []struct {
-		arg1 ccv3.Space
+		arg1 resources.Space
 	}
 	updateSpaceReturns struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateSpaceReturnsOnCall map[int]struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3915,11 +3915,11 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateSpace(arg1 resources.Space) (resources.Space, ccv3.Warnings, error) {
 	fake.createSpaceMutex.Lock()
 	ret, specificReturn := fake.createSpaceReturnsOnCall[len(fake.createSpaceArgsForCall)]
 	fake.createSpaceArgsForCall = append(fake.createSpaceArgsForCall, struct {
-		arg1 ccv3.Space
+		arg1 resources.Space
 	}{arg1})
 	fake.recordInvocation("CreateSpace", []interface{}{arg1})
 	fake.createSpaceMutex.Unlock()
@@ -3939,43 +3939,43 @@ func (fake *FakeCloudControllerClient) CreateSpaceCallCount() int {
 	return len(fake.createSpaceArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceCalls(stub func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateSpaceCalls(stub func(resources.Space) (resources.Space, ccv3.Warnings, error)) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceArgsForCall(i int) ccv3.Space {
+func (fake *FakeCloudControllerClient) CreateSpaceArgsForCall(i int) resources.Space {
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
 	argsForCall := fake.createSpaceArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceReturns(result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateSpaceReturns(result1 resources.Space, result2 ccv3.Warnings, result3 error) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	fake.createSpaceReturns = struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 resources.Space, result2 ccv3.Warnings, result3 error) {
 	fake.createSpaceMutex.Lock()
 	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	if fake.createSpaceReturnsOnCall == nil {
 		fake.createSpaceReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Space
+			result1 resources.Space
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createSpaceReturnsOnCall[i] = struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9389,7 +9389,7 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotasReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaces(arg1 ...ccv3.Query) ([]ccv3.Space, ccv3.IncludedResources, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetSpaces(arg1 ...ccv3.Query) ([]resources.Space, ccv3.IncludedResources, ccv3.Warnings, error) {
 	fake.getSpacesMutex.Lock()
 	ret, specificReturn := fake.getSpacesReturnsOnCall[len(fake.getSpacesArgsForCall)]
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
@@ -9413,7 +9413,7 @@ func (fake *FakeCloudControllerClient) GetSpacesCallCount() int {
 	return len(fake.getSpacesArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetSpacesCalls(stub func(...ccv3.Query) ([]ccv3.Space, ccv3.IncludedResources, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetSpacesCalls(stub func(...ccv3.Query) ([]resources.Space, ccv3.IncludedResources, ccv3.Warnings, error)) {
 	fake.getSpacesMutex.Lock()
 	defer fake.getSpacesMutex.Unlock()
 	fake.GetSpacesStub = stub
@@ -9426,32 +9426,32 @@ func (fake *FakeCloudControllerClient) GetSpacesArgsForCall(i int) []ccv3.Query 
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetSpacesReturns(result1 []ccv3.Space, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+func (fake *FakeCloudControllerClient) GetSpacesReturns(result1 []resources.Space, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
 	fake.getSpacesMutex.Lock()
 	defer fake.getSpacesMutex.Unlock()
 	fake.GetSpacesStub = nil
 	fake.getSpacesReturns = struct {
-		result1 []ccv3.Space
+		result1 []resources.Space
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []ccv3.Space, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []resources.Space, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
 	fake.getSpacesMutex.Lock()
 	defer fake.getSpacesMutex.Unlock()
 	fake.GetSpacesStub = nil
 	if fake.getSpacesReturnsOnCall == nil {
 		fake.getSpacesReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Space
+			result1 []resources.Space
 			result2 ccv3.IncludedResources
 			result3 ccv3.Warnings
 			result4 error
 		})
 	}
 	fake.getSpacesReturnsOnCall[i] = struct {
-		result1 []ccv3.Space
+		result1 []resources.Space
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
@@ -11969,11 +11969,11 @@ func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityReturnsOnCall(
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSpace(arg1 resources.Space) (resources.Space, ccv3.Warnings, error) {
 	fake.updateSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSpaceReturnsOnCall[len(fake.updateSpaceArgsForCall)]
 	fake.updateSpaceArgsForCall = append(fake.updateSpaceArgsForCall, struct {
-		arg1 ccv3.Space
+		arg1 resources.Space
 	}{arg1})
 	fake.recordInvocation("UpdateSpace", []interface{}{arg1})
 	fake.updateSpaceMutex.Unlock()
@@ -11993,43 +11993,43 @@ func (fake *FakeCloudControllerClient) UpdateSpaceCallCount() int {
 	return len(fake.updateSpaceArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceCalls(stub func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSpaceCalls(stub func(resources.Space) (resources.Space, ccv3.Warnings, error)) {
 	fake.updateSpaceMutex.Lock()
 	defer fake.updateSpaceMutex.Unlock()
 	fake.UpdateSpaceStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceArgsForCall(i int) ccv3.Space {
+func (fake *FakeCloudControllerClient) UpdateSpaceArgsForCall(i int) resources.Space {
 	fake.updateSpaceMutex.RLock()
 	defer fake.updateSpaceMutex.RUnlock()
 	argsForCall := fake.updateSpaceArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceReturns(result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceReturns(result1 resources.Space, result2 ccv3.Warnings, result3 error) {
 	fake.updateSpaceMutex.Lock()
 	defer fake.updateSpaceMutex.Unlock()
 	fake.UpdateSpaceStub = nil
 	fake.updateSpaceReturns = struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceReturnsOnCall(i int, result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceReturnsOnCall(i int, result1 resources.Space, result2 ccv3.Warnings, result3 error) {
 	fake.updateSpaceMutex.Lock()
 	defer fake.updateSpaceMutex.Unlock()
 	fake.UpdateSpaceStub = nil
 	if fake.updateSpaceReturnsOnCall == nil {
 		fake.updateSpaceReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Space
+			result1 resources.Space
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateSpaceReturnsOnCall[i] = struct {
-		result1 ccv3.Space
+		result1 resources.Space
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

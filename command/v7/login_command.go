@@ -478,7 +478,7 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []resources.Organization) (resourc
 	return resources.Organization{}, nil
 }
 
-func (cmd *LoginCommand) promptChosenSpace(spaces []v7action.Space) (v7action.Space, error) {
+func (cmd *LoginCommand) promptChosenSpace(spaces []resources.Space) (resources.Space, error) {
 	spaceNames := make([]string, len(spaces))
 	for i, space := range spaces {
 		spaceNames[i] = space.Name
@@ -487,14 +487,14 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v7action.Space) (v7action.Sp
 	chosenSpaceName, err := cmd.promptMenu(spaceNames, "Select a space:", "Space")
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
-			return v7action.Space{}, translatableerror.SpaceNotFoundError{Name: invalidChoice.Choice}
+			return resources.Space{}, translatableerror.SpaceNotFoundError{Name: invalidChoice.Choice}
 		}
 
 		if err == io.EOF {
-			return v7action.Space{}, nil
+			return resources.Space{}, nil
 		}
 
-		return v7action.Space{}, err
+		return resources.Space{}, err
 	}
 
 	for _, space := range spaces {
@@ -502,7 +502,7 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v7action.Space) (v7action.Sp
 			return space, nil
 		}
 	}
-	return v7action.Space{}, nil
+	return resources.Space{}, nil
 }
 
 func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {
@@ -535,7 +535,7 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 	return choice, err
 }
 
-func (cmd *LoginCommand) targetSpace(space v7action.Space) {
+func (cmd *LoginCommand) targetSpace(space resources.Space) {
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
 
 	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}.", map[string]interface{}{

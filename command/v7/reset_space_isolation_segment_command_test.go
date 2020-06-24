@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -81,7 +82,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 		When("the space lookup is unsuccessful", func() {
 			BeforeEach(func() {
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: space})
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{}, v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: space})
 			})
 
 			It("returns the warnings and error", func() {
@@ -93,7 +94,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 		When("the space lookup is successful", func() {
 			BeforeEach(func() {
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{
+				fakeActor.GetSpaceByNameAndOrganizationReturns(resources.Space{
 					Name: space,
 					GUID: "some-space-guid",
 				}, v7action.Warnings{"warning-1", "warning-2"}, nil)

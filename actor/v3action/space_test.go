@@ -153,7 +153,7 @@ var _ = Describe("Space", func() {
 		When("there are spaces in the org", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{
+					[]resources.Space{
 						{
 							GUID: "space-1-guid",
 							Name: "space-1",
@@ -202,7 +202,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				returnedErr = errors.New("cc-get-spaces-error")
 				fakeCloudControllerClient.GetSpacesReturns(
-					[]ccv3.Space{},
+					[]resources.Space{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					returnedErr,
@@ -241,7 +241,7 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns back one space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName}},
+						[]resources.Space{{GUID: "some-space-guid", Name: spaceName}},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"some-space-warning"}, nil)
 				})
@@ -299,7 +299,7 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns back multiple spaces", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{
+						[]resources.Space{
 							{
 								GUID: "space-guid-1",
 								Name: "space-1",

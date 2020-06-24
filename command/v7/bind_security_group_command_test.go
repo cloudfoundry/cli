@@ -172,7 +172,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("the space does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByNameAndOrganizationReturns(
-						v7action.Space{},
+						resources.Space{},
 						v7action.Warnings{"get space warning"},
 						actionerror.SpaceNotFoundError{Name: "some-space"})
 				})
@@ -189,7 +189,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("the space exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByNameAndOrganizationReturns(
-						v7action.Space{
+						resources.Space{
 							GUID: "some-space-guid",
 							Name: "some-space",
 						},
@@ -267,7 +267,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("there are no spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
-						[]v7action.Space{},
+						[]resources.Space{},
 						v7action.Warnings{"get org spaces warning"},
 						nil)
 				})
@@ -289,7 +289,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
-						[]v7action.Space{
+						[]resources.Space{
 							{
 								GUID: "some-space-guid-1",
 								Name: "some-space-1",
@@ -392,7 +392,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("the space exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByNameAndOrganizationReturns(
-						v7action.Space{
+						resources.Space{
 							GUID: "some-space-guid",
 							Name: "some-space",
 						},
@@ -443,7 +443,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("the space does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByNameAndOrganizationReturns(
-						v7action.Space{},
+						resources.Space{},
 						v7action.Warnings{},
 						actionerror.SpaceNotFoundError{Name: "some-space"},
 					)
@@ -460,7 +460,7 @@ var _ = Describe("bind-security-group Command", func() {
 			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
-						[]v7action.Space{
+						[]resources.Space{
 							{
 								GUID: "some-space-guid-1",
 								Name: "some-space-1",

@@ -24,7 +24,7 @@ type SecurityGroupSpace struct {
 	Lifecycle string
 }
 
-func (actor Actor) BindSecurityGroupToSpaces(securityGroupGUID string, spaces []Space, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+func (actor Actor) BindSecurityGroupToSpaces(securityGroupGUID string, spaces []resources.Space, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
 	var (
 		warnings   ccv3.Warnings
 		err        error
@@ -341,7 +341,7 @@ func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpac
 			orgsByGuid[org.GUID] = org
 		}
 
-		spacesByGuid := make(map[string]ccv3.Space)
+		spacesByGuid := make(map[string]resources.Space)
 		for _, space := range spaces {
 			spacesByGuid[space.GUID] = space
 		}
