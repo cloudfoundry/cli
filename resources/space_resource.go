@@ -11,15 +11,3 @@ type Space struct {
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
-
-type SpaceSummary struct {
-	Space                 Space
-	Name                  string
-	OrgName               string
-	AppNames              []string
-	ServiceInstanceNames  []string
-	IsolationSegmentName  string
-	QuotaName             string
-	RunningSecurityGroups []SecurityGroup
-	StagingSecurityGroups []SecurityGroup
-}

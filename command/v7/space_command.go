@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -90,7 +91,7 @@ func formatSecurityGroupNames(groups []resources.SecurityGroup) string {
 	return strings.Join(names, ", ")
 }
 
-func (cmd SpaceCommand) displaySecurityGroupRulesTable(spaceSummary resources.SpaceSummary) {
+func (cmd SpaceCommand) displaySecurityGroupRulesTable(spaceSummary v7action.SpaceSummary) {
 	tableHeaders := []string{"security group", "destination", "ports", "protocol", "lifecycle", "description"}
 	table := [][]string{tableHeaders}
 
@@ -113,7 +114,7 @@ func (cmd SpaceCommand) displaySecurityGroupRulesTable(spaceSummary resources.Sp
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 }
 
-func collectSecurityGroupRuleRows(spaceSummary resources.SpaceSummary) [][]string {
+func collectSecurityGroupRuleRows(spaceSummary v7action.SpaceSummary) [][]string {
 	var rows [][]string
 
 	for _, securityGroup := range spaceSummary.RunningSecurityGroups {

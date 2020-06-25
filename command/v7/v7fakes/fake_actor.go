@@ -1918,19 +1918,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceSummaryByNameAndOrganizationStub        func(string, string) (resources.SpaceSummary, v7action.Warnings, error)
+	GetSpaceSummaryByNameAndOrganizationStub        func(string, string) (v7action.SpaceSummary, v7action.Warnings, error)
 	getSpaceSummaryByNameAndOrganizationMutex       sync.RWMutex
 	getSpaceSummaryByNameAndOrganizationArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceSummaryByNameAndOrganizationReturns struct {
-		result1 resources.SpaceSummary
+		result1 v7action.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceSummaryByNameAndOrganizationReturnsOnCall map[int]struct {
-		result1 resources.SpaceSummary
+		result1 v7action.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -11223,7 +11223,7 @@ func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganization(arg1 string, arg2 string) (resources.SpaceSummary, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganization(arg1 string, arg2 string) (v7action.SpaceSummary, v7action.Warnings, error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	ret, specificReturn := fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall[len(fake.getSpaceSummaryByNameAndOrganizationArgsForCall)]
 	fake.getSpaceSummaryByNameAndOrganizationArgsForCall = append(fake.getSpaceSummaryByNameAndOrganizationArgsForCall, struct {
@@ -11248,7 +11248,7 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCallCount() int {
 	return len(fake.getSpaceSummaryByNameAndOrganizationArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCalls(stub func(string, string) (resources.SpaceSummary, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationCalls(stub func(string, string) (v7action.SpaceSummary, v7action.Warnings, error)) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = stub
@@ -11261,30 +11261,30 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationArgsForCall(i int) (s
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturns(result1 resources.SpaceSummary, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturns(result1 v7action.SpaceSummary, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = nil
 	fake.getSpaceSummaryByNameAndOrganizationReturns = struct {
-		result1 resources.SpaceSummary
+		result1 v7action.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturnsOnCall(i int, result1 resources.SpaceSummary, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturnsOnCall(i int, result1 v7action.SpaceSummary, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Lock()
 	defer fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
 	fake.GetSpaceSummaryByNameAndOrganizationStub = nil
 	if fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall == nil {
 		fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall = make(map[int]struct {
-			result1 resources.SpaceSummary
+			result1 v7action.SpaceSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceSummaryByNameAndOrganizationReturnsOnCall[i] = struct {
-		result1 resources.SpaceSummary
+		result1 v7action.SpaceSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
