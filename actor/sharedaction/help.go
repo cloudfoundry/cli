@@ -9,6 +9,12 @@ import (
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
+const (
+	CommonCommandsIndent string = "  "
+	AllCommandsIndent    string = "   "
+	CommandIndent        string = "   "
+)
+
 // CommandInfo contains the help details of a command
 type CommandInfo struct {
 	// Name is the command name
@@ -20,8 +26,11 @@ type CommandInfo struct {
 	// Alias is the command alias
 	Alias string
 
-	// Usage is the command usage string, may contain examples and flavor text
+	// Usage is the command usage string
 	Usage string
+
+	// Examples is the command examples string
+	Examples string
 
 	// RelatedCommands is a list of commands related to the command
 	RelatedCommands []string
@@ -55,6 +64,18 @@ type EnvironmentVariable struct {
 	DefaultValue string
 }
 
+// HasUsage is an interface that commands may implement if they want to define their usage
+// text in a Usage() method, which gives them more flexibility than a struct tag.
+type HasUsage interface {
+	Usage() string
+}
+
+// HasExamples is an interface that commands may implement if they want to define their examples
+// text in a Examples() method, which gives them more flexibility than a struct tag.
+type HasExamples interface {
+	Examples() string
+}
+
 // CommandInfoByName returns the help information for a particular commandName in
 // the commandList.
 func (Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
@@ -78,6 +99,24 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 		Environment: []EnvironmentVariable{},
 	}
 
+	fieldValue := reflect.ValueOf(commandList).FieldByIndex(field.Index)
+
+	if commandWithUsage, hasUsage := fieldValue.Interface().(HasUsage); hasUsage {
+		cmd.Usage = strings.ReplaceAll(
+			strings.TrimSpace(commandWithUsage.Usage()),
+			"\n",
+			"\n"+CommandIndent,
+		)
+	}
+
+	if commandWithExamples, hasExamples := fieldValue.Interface().(HasExamples); hasExamples {
+		cmd.Examples = strings.ReplaceAll(
+			strings.TrimSpace(commandWithExamples.Examples()),
+			"\n",
+			"\n"+CommandIndent,
+		)
+	}
+
 	command := field.Type
 	for i := 0; i < command.NumField(); i++ {
 		fieldTag := command.Field(i).Tag
@@ -86,8 +125,13 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 			continue
 		}
 
-		if fieldTag.Get("usage") != "" {
+		if cmd.Usage == "" && fieldTag.Get("usage") != "" {
 			cmd.Usage = fieldTag.Get("usage")
+			continue
+		}
+
+		if cmd.Examples == "" && fieldTag.Get("examples") != "" {
+			cmd.Examples = fieldTag.Get("examples")
 			continue
 		}
 
