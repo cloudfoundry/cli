@@ -50,7 +50,7 @@ var _ = Describe("Service Instance Actions", func() {
 							Name: "some-service-instance",
 							GUID: "some-service-instance-guid",
 						},
-					}, ccv3.Warnings{"some-service-instance-warning"}, nil)
+					}, ccv3.IncludedResources{}, ccv3.Warnings{"some-service-instance-warning"}, nil)
 				})
 
 				It("returns a service instance and warnings", func() {
@@ -70,6 +70,7 @@ var _ = Describe("Service Instance Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstancesReturns(
 						nil,
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"some-service-instance-warning"},
 						nil)
 				})
@@ -86,6 +87,7 @@ var _ = Describe("Service Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-service-instance-warning"},
 					errors.New("no service instance"))
 			})

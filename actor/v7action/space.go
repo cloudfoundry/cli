@@ -109,7 +109,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 	}
 	sort.Strings(appNames)
 
-	serviceInstances, ccv3Warnings, err := actor.CloudControllerClient.GetServiceInstances(
+	serviceInstances, _, ccv3Warnings, err := actor.CloudControllerClient.GetServiceInstances(
 		ccv3.Query{
 			Key:    ccv3.SpaceGUIDFilter,
 			Values: []string{space.GUID},

@@ -2,12 +2,13 @@ package isolated
 
 import (
 	"strings"
-
-	. "github.com/onsi/gomega/gbytes"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
@@ -132,6 +133,85 @@ var _ = Describe("service command", func() {
 					Say(`route service url:\s+%s\n`, routeServiceURL),
 					Say(`syslog drain url:\s+%s\n`, syslogURL),
 				))
+			})
+		})
+
+		When("the service instance is managed by a broker", func() {
+			const (
+				tags                = "foo, bar"
+				brokerAsyncDelay    = time.Second
+				testPollingInterval = time.Second
+				testTimeout         = time.Minute
+			)
+
+			var broker *servicebrokerstub.ServiceBrokerStub
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithAsyncDelay(brokerAsyncDelay).EnableServiceAccess()
+				command := []string{
+					"create-service",
+					broker.FirstServiceOfferingName(),
+					broker.FirstServicePlanName(),
+					serviceInstanceName,
+					"-t", tags,
+				}
+				Eventually(helpers.CF(command...)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-service", "-f", serviceInstanceName)).Should(Exit(0))
+				broker.Forget()
+			})
+
+			It("can show the GUID", func() {
+				session := helpers.CF("service", serviceInstanceName, "--guid")
+				Eventually(session).Should(Exit(0))
+				Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+			})
+
+			It("can show the service instance details", func() {
+				By("reporting that create is in progress", func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					username, _ := helpers.GetCredentials()
+					Expect(session).To(SatisfyAll(
+						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`name:\s+%s\n`, serviceInstanceName),
+						Say(`guid:\s+\S+\n`),
+						Say(`type:\s+managed`),
+						Say(`broker:\s+%s`, broker.Name),
+						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+						Say(`tags:\s+%s\n`, tags),
+						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`\n`),
+						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`status:\s+create in progress\n`),
+						Say(`message:\s*\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+					))
+				})
+
+				By("reporting that create has succeeded", func() {
+					output := func() *Buffer {
+						session := helpers.CF("service", serviceInstanceName)
+						session.Wait()
+						return session.Out
+					}
+
+					Eventually(output, testTimeout, testPollingInterval).Should(SatisfyAll(
+						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`status:\s+create succeeded\n`),
+						Say(`message:\s+very happy service\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+					))
+				})
 			})
 		})
 	})

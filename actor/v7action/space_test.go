@@ -768,6 +768,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
 					[]resources.ServiceInstance{{Name: "instance-1"}, {Name: "instance-2"}},
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-services-warning"},
 					nil,
 				)
@@ -782,6 +783,7 @@ var _ = Describe("Space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstancesReturns(
 						[]resources.ServiceInstance{},
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"get-services-warning"},
 						errors.New("service-instance-error"),
 					)
