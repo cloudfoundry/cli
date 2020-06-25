@@ -73,7 +73,7 @@ func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Cl
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.UAA())
+	err = uaaClient.SetupResources(ccClient.Login())
 	if err != nil {
 		return nil, err
 	}

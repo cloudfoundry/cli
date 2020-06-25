@@ -18,7 +18,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
 		Api:               settings.URL,
 		ApiVersion:        rootInfo.CloudControllerAPIVersion(),
-		Auth:              rootInfo.UAA(),
+		Auth:              rootInfo.Login(),
 		MinCLIVersion:     "", // Oldest supported V3 version should be OK
 		Doppler:           rootInfo.Logging(),
 		LogCache:          rootInfo.LogCache(),

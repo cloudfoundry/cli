@@ -30,7 +30,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
 		Api:               settings.URL,
 		ApiVersion:        info.CloudControllerAPIVersion(),
-		Auth:              info.UAA(),
+		Auth:              info.Login(),
 		MinCLIVersion:     "", // Oldest supported V3 version should be OK
 		Doppler:           info.Logging(),
 		LogCache:          logCacheUrl,
