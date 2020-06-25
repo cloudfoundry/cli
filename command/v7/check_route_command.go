@@ -11,8 +11,24 @@ type CheckRouteCommand struct {
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
 	Port            int              `long:"port" description:"Port used to identify the TCP route"`
-	usage           interface{}      `usage:"Check an HTTP route:\n      CF_NAME check-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Check a TCP route:\n      cf check-route DOMAIN --port PORT\n\nEXAMPLES:\n   CF_NAME check-route example.com                      # example.com\n   CF_NAME check-route example.com -n myhost --path foo # myhost.example.com/foo\n   CF_NAME check-route example.com --path foo           # example.com/foo\n   CF_NAME check-route example.com --port 5000          # example.com:5000"`
 	relatedCommands interface{}      `related_commands:"create-route, delete-route, routes"`
+}
+
+func (cmd CheckRouteCommand) Usage() string {
+	return `
+Check an HTTP route:
+   CF_NAME check-route DOMAIN [--hostname HOSTNAME] [--path PATH]
+
+Check a TCP route:
+   CF_NAME check-route DOMAIN --port PORT`
+}
+
+func (cmd CheckRouteCommand) Examples() string {
+	return `
+CF_NAME check-route example.com                      # example.com
+CF_NAME check-route example.com -n myhost --path foo # myhost.example.com/foo
+CF_NAME check-route example.com --path foo           # example.com/foo
+CF_NAME check-route example.com --port 5000          # example.com:5000`
 }
 
 func (cmd CheckRouteCommand) Execute(args []string) error {
