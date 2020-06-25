@@ -71,7 +71,7 @@ var _ = Describe("Targeting", func() {
 					Routing: ccv3.APILink{
 						HREF: expectedRouting,
 					},
-					UAA: ccv3.APILink{
+					Login: ccv3.APILink{
 						HREF: expectedAuth,
 					},
 				},

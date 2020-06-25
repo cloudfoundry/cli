@@ -181,12 +181,15 @@ type TargetInformationArgs struct {
 func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.Target = args.Api
 	config.ConfigFile.APIVersion = args.ApiVersion
-	config.ConfigFile.AuthorizationEndpoint = args.Auth
 	config.SetMinCLIVersion(args.MinCLIVersion)
 	config.ConfigFile.DopplerEndpoint = args.Doppler
 	config.ConfigFile.LogCacheEndpoint = args.LogCache
 	config.ConfigFile.RoutingEndpoint = args.Routing
 	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
+
+	// NOTE: This gets written to the config file, but I do not believe it is currently
+	// ever read from there.
+	config.ConfigFile.AuthorizationEndpoint = args.Auth
 
 	config.UnsetOrganizationAndSpaceInformation()
 }

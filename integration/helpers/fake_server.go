@@ -71,6 +71,9 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
          "href": "%[1]s/networking/v1/external"
       },
       "uaa": {
+         "href": "SHOULD-NOT-BE-USED-FOR-LOGGING-IN.com"
+      },
+      "login": {
          "href": "%[1]s"
       },
       "logging": {
