@@ -11,6 +11,18 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
+type SpaceSummary struct {
+	Space                 resources.Space
+	Name                  string
+	OrgName               string
+	AppNames              []string
+	ServiceInstanceNames  []string
+	IsolationSegmentName  string
+	QuotaName             string
+	RunningSecurityGroups []resources.SecurityGroup
+	StagingSecurityGroups []resources.SecurityGroup
+}
+
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (resources.Space, Warnings, error) {
 	allWarnings := Warnings{}
 
@@ -82,25 +94,25 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 	return resources.Space(ccv3Spaces[0]), Warnings(warnings), nil
 }
 
-func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUID string) (resources.SpaceSummary, Warnings, error) {
+func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUID string) (SpaceSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	org, warnings, err := actor.GetOrganizationByGUID(orgGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	apps, warnings, err := actor.GetApplicationsBySpace(space.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	appNames := make([]string, len(apps))
@@ -116,7 +128,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		})
 	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	serviceInstanceNames := make([]string, len(serviceInstances))
@@ -128,7 +140,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 	isoSegRelationship, ccv3Warnings, err := actor.CloudControllerClient.GetSpaceIsolationSegment(space.GUID)
 	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	isoSegName := ""
@@ -139,7 +151,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		defaultIsoSeg, ccv3Warnings, err := actor.CloudControllerClient.GetOrganizationDefaultIsolationSegment(org.GUID)
 		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 		if err != nil {
-			return resources.SpaceSummary{}, allWarnings, err
+			return SpaceSummary{}, allWarnings, err
 		}
 		isoSegGUID = defaultIsoSeg.GUID
 		if isoSegGUID != "" {
@@ -151,7 +163,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		isoSeg, ccv3warnings, err := actor.CloudControllerClient.GetIsolationSegment(isoSegGUID)
 		allWarnings = append(allWarnings, Warnings(ccv3warnings)...)
 		if err != nil {
-			return resources.SpaceSummary{}, allWarnings, err
+			return SpaceSummary{}, allWarnings, err
 		}
 		if isDefaultIsoSeg {
 			isoSegName = fmt.Sprintf("%s (org default)", isoSeg.Name)
@@ -168,23 +180,23 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 
 		if err != nil {
-			return resources.SpaceSummary{}, allWarnings, err
+			return SpaceSummary{}, allWarnings, err
 		}
 	}
 
 	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
 	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
 	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
 	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
-		return resources.SpaceSummary{}, allWarnings, err
+		return SpaceSummary{}, allWarnings, err
 	}
 
-	spaceSummary := resources.SpaceSummary{
+	spaceSummary := SpaceSummary{
 		OrgName:               org.Name,
 		Name:                  space.Name,
 		Space:                 space,

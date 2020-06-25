@@ -146,7 +146,7 @@ type Actor interface {
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (resources.SpaceQuota, v7action.Warnings, error)
 	GetSpaceQuotasByOrgGUID(orgGUID string) ([]resources.SpaceQuota, v7action.Warnings, error)
-	GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUID string) (resources.SpaceSummary, v7action.Warnings, error)
+	GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUID string) (v7action.SpaceSummary, v7action.Warnings, error)
 	GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]resources.User, v7action.Warnings, error)
 	GetStackByName(stackName string) (v7action.Stack, v7action.Warnings, error)
 	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
