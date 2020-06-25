@@ -16,6 +16,23 @@ type MapRouteCommand struct {
 	relatedCommands interface{}      `related_commands:"create-route, routes, unmap-route"`
 }
 
+func (cmd MapRouteCommand) Usage() string {
+	return `
+Map an HTTP route:
+   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
+
+Map a TCP route:
+   CF_NAME map-route APP_NAME DOMAIN [--port PORT]`
+}
+
+func (cmd MapRouteCommand) Examples() string {
+	return `
+CF_NAME map-route my-app example.com                              # example.com
+CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com
+CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo
+CF_NAME map-route my-app example.com --port 5000                  # example.com:5000`
+}
+
 func (cmd MapRouteCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {

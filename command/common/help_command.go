@@ -13,12 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-const (
-	commonCommandsIndent string = "  "
-	allCommandsIndent    string = "   "
-	commandIndent        string = "   "
-)
-
 //go:generate counterfeiter . HelpActor
 
 // HelpActor handles the business logic of the help command
@@ -76,7 +70,7 @@ func (cmd HelpCommand) displayFullHelp() {
 
 func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayHeader("NAME:")
-	cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}} - {{.CommandDescription}}",
+	cmd.UI.DisplayText(sharedaction.AllCommandsIndent+"{{.CommandName}} - {{.CommandDescription}}",
 		map[string]interface{}{
 			"CommandName":        cmd.Config.BinaryName(),
 			"CommandDescription": cmd.UI.TranslateText("A command line tool to interact with Cloud Foundry"),
@@ -84,7 +78,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("USAGE:")
-	cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}} {{.CommandUsage}}",
+	cmd.UI.DisplayText(sharedaction.AllCommandsIndent+"{{.CommandName}} {{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandName":  cmd.Config.BinaryName(),
 			"CommandUsage": cmd.UI.TranslateText("[global options] command [arguments...] [command options]"),
@@ -92,7 +86,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("VERSION:")
-	cmd.UI.DisplayText(allCommandsIndent + cmd.Config.BinaryVersion())
+	cmd.UI.DisplayText(sharedaction.AllCommandsIndent + cmd.Config.BinaryVersion())
 	cmd.UI.DisplayNewline()
 }
 
@@ -102,7 +96,7 @@ func (cmd HelpCommand) displayAllCommands(pluginCommands []configv3.PluginComman
 
 	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
 	for _, pluginCommand := range pluginCommands {
-		cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
+		cmd.UI.DisplayText(sharedaction.AllCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
 			"CommandName":        pluginCommand.Name,
 			"CommandDescription": pluginCommand.HelpText,
 			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
@@ -117,7 +111,7 @@ func (cmd HelpCommand) displayCommandGroups(commandGroupList []internal.HelpCate
 
 		for j, row := range category.CommandList {
 			for _, command := range row {
-				cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}",
+				cmd.UI.DisplayText(sharedaction.AllCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}",
 					map[string]interface{}{
 						"CommandName":        cmdInfo[command].Name,
 						"CommandDescription": cmd.UI.TranslateText(cmdInfo[command].Description),
@@ -134,12 +128,12 @@ func (cmd HelpCommand) displayCommandGroups(commandGroupList []internal.HelpCate
 
 func (cmd HelpCommand) displayHelpFooter(cmdInfo map[string]sharedaction.CommandInfo) {
 	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
-	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.environmentalVariablesTableData(), 1)
+	cmd.UI.DisplayNonWrappingTable(sharedaction.AllCommandsIndent, cmd.environmentalVariablesTableData(), 1)
 
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
-	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.globalOptionsTableData(), 25)
+	cmd.UI.DisplayNonWrappingTable(sharedaction.AllCommandsIndent, cmd.globalOptionsTableData(), 25)
 
 	cmd.UI.DisplayNewline()
 
@@ -184,7 +178,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, table, 4)
+		cmd.UI.DisplayNonWrappingTable(sharedaction.CommonCommandsIndent, table, 4)
 		cmd.UI.DisplayNewline()
 	}
 
@@ -207,11 +201,11 @@ func (cmd HelpCommand) displayCommonCommands() {
 	}
 
 	cmd.UI.DisplayHeader("Commands offered by installed plugins:")
-	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, table, 4)
+	cmd.UI.DisplayNonWrappingTable(sharedaction.CommonCommandsIndent, table, 4)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("Global options:")
-	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
+	cmd.UI.DisplayNonWrappingTable(sharedaction.CommonCommandsIndent, cmd.globalOptionsTableData(), 25)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("TIP: Use '{{.FullHelpCommand}}' to see all commands.", map[string]interface{}{"FullHelpCommand": "cf help -a"})
@@ -231,24 +225,35 @@ func (cmd HelpCommand) displayCommand() error {
 	}
 
 	cmd.UI.DisplayText("NAME:")
-	cmd.UI.DisplayText(commandIndent+"{{.CommandName}} - {{.CommandDescription}}",
+	cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.CommandName}} - {{.CommandDescription}}",
 		map[string]interface{}{
 			"CommandName":        cmdInfo.Name,
 			"CommandDescription": cmd.UI.TranslateText(cmdInfo.Description),
 		})
 
 	cmd.UI.DisplayNewline()
+
 	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", cmd.Config.BinaryName(), -1)
 	cmd.UI.DisplayText("USAGE:")
-	cmd.UI.DisplayText(commandIndent+"{{.CommandUsage}}",
+	cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandUsage": cmd.UI.TranslateText(usageString),
 		})
 
+	if cmdInfo.Examples != "" {
+		examplesString := strings.Replace(cmdInfo.Examples, "CF_NAME", cmd.Config.BinaryName(), -1)
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("EXAMPLES:")
+		cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.Examples}}",
+			map[string]interface{}{
+				"Examples": examplesString,
+			})
+	}
+
 	if cmdInfo.Alias != "" {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("ALIAS:")
-		cmd.UI.DisplayText(commandIndent+"{{.Alias}}",
+		cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.Alias}}",
 			map[string]interface{}{
 				"Alias": cmdInfo.Alias,
 			})
@@ -267,7 +272,7 @@ func (cmd HelpCommand) displayCommand() error {
 				})
 			}
 
-			cmd.UI.DisplayText(commandIndent+"{{.Flags}}{{.Spaces}}{{.Description}}{{.Default}}",
+			cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.Flags}}{{.Spaces}}{{.Description}}{{.Default}}",
 				map[string]interface{}{
 					"Flags":       name,
 					"Spaces":      strings.Repeat(" ", nameWidth-len(name)),
@@ -281,7 +286,7 @@ func (cmd HelpCommand) displayCommand() error {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("ENVIRONMENT:")
 		for _, envVar := range cmdInfo.Environment {
-			cmd.UI.DisplayText(commandIndent+"{{.EnvVar}}{{.Description}}",
+			cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.EnvVar}}{{.Description}}",
 				map[string]interface{}{
 					"EnvVar":      fmt.Sprintf("%-29s", fmt.Sprintf("%s=%s", envVar.Name, envVar.DefaultValue)),
 					"Description": cmd.UI.TranslateText(envVar.Description),
@@ -292,7 +297,7 @@ func (cmd HelpCommand) displayCommand() error {
 	if len(cmdInfo.RelatedCommands) > 0 {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("SEE ALSO:")
-		cmd.UI.DisplayText(commandIndent + strings.Join(cmdInfo.RelatedCommands, ", "))
+		cmd.UI.DisplayText(sharedaction.CommandIndent + strings.Join(cmdInfo.RelatedCommands, ", "))
 	}
 
 	return nil
