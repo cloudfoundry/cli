@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
@@ -49,7 +49,7 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 	}
 
 	warnings, err := cmd.Actor.CreateServiceBroker(
-		v7action.ServiceBrokerModel{
+		resources.ServiceBroker{
 			Name:      cmd.RequiredArgs.ServiceBroker,
 			Username:  cmd.RequiredArgs.Username,
 			Password:  cmd.RequiredArgs.Password,

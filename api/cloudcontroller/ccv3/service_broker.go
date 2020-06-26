@@ -3,62 +3,13 @@ package ccv3
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/jsonry"
 )
 
-// ServiceBroker represents Service Broker data
-type ServiceBroker struct {
-	// GUID is a unique service broker identifier.
-	GUID string `json:"guid"`
-	// Name is the name of the service broker.
-	Name string `json:"name"`
-	// URL is the url of the service broker.
-	URL string `json:"url"`
-
-	Metadata *resources.Metadata `json:"metadata"`
-}
-
-func (s *ServiceBroker) UnmarshalJSON(data []byte) error {
-	return jsonry.Unmarshal(data, s)
-}
-
-type ServiceBrokerModel struct {
-	// Name is the name of the service broker.
-	Name string `jsonry:"name,omitempty"`
-	// URL is the url of the service broker.
-	URL string `jsonry:"url,omitempty"`
-	// CredentialsType is always "basic"
-	CredentialsType constant.ServiceBrokerCredentialsType `jsonry:"authentication.type,omitempty"`
-	// Username is the Basic Auth username for the service broker.
-	Username string `jsonry:"authentication.credentials.username,omitempty"`
-	// Password is the Basic Auth password for the service broker.
-	Password string `jsonry:"authentication.credentials.password,omitempty"`
-	// Space GUID for the space that the broker is in. Empty when not a space-scoped service broker.
-	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
-}
-
-func (s ServiceBrokerModel) MarshalJSON() ([]byte, error) {
-	return jsonry.Marshal(s)
-}
-
-func (s ServiceBrokerModel) check() (ServiceBrokerModel, error) {
-	if (s.Username == "" && s.Password != "") || (s.Username != "" && s.Password == "") {
-		return s, errors.New("Incorrect usage: both username and password must be defined in order to do an update")
-	}
-
-	if s.Username != "" && s.Password != "" {
-		s.CredentialsType = constant.BasicCredentials
-	}
-
-	return s, nil
-}
-
 // CreateServiceBroker registers a new service broker.
-func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-	serviceBroker.CredentialsType = constant.BasicCredentials
+func (client *Client) CreateServiceBroker(serviceBroker resources.ServiceBroker) (JobURL, Warnings, error) {
+	serviceBroker.CredentialsType = resources.ServiceBrokerBasicCredentials
 
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostServiceBrokerRequest,
@@ -79,33 +30,36 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 }
 
 // GetServiceBrokers lists service brokers.
-func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnings, error) {
-	var resources []ServiceBroker
+func (client *Client) GetServiceBrokers(query ...Query) ([]resources.ServiceBroker, Warnings, error) {
+	var result []resources.ServiceBroker
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceBrokersRequest,
 		Query:        query,
-		ResponseBody: ServiceBroker{},
+		ResponseBody: resources.ServiceBroker{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(ServiceBroker))
+			result = append(result, item.(resources.ServiceBroker))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return result, warnings, err
 }
 
 // UpdateServiceBroker updates an existing service broker.
-func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-	brokerUpdateRequest, err := serviceBroker.check()
-	if err != nil {
-		return "", nil, err
+func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroker resources.ServiceBroker) (JobURL, Warnings, error) {
+	if (serviceBroker.Username == "" && serviceBroker.Password != "") || (serviceBroker.Username != "" && serviceBroker.Password == "") {
+		return "", nil, errors.New("Incorrect usage: both username and password must be defined in order to do an update")
+	}
+
+	if serviceBroker.Username != "" && serviceBroker.Password != "" {
+		serviceBroker.CredentialsType = resources.ServiceBrokerBasicCredentials
 	}
 
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PatchServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
-		RequestBody: brokerUpdateRequest,
+		RequestBody: serviceBroker,
 	})
 
 	return jobURL, warnings, err

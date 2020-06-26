@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type UpdateServiceBrokerCommand struct {
@@ -39,7 +39,7 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 
 	warnings, err = cmd.Actor.UpdateServiceBroker(
 		serviceBroker.GUID,
-		v7action.ServiceBrokerModel{
+		resources.ServiceBroker{
 			Username: cmd.RequiredArgs.Username,
 			Password: cmd.RequiredArgs.Password,
 			URL:      cmd.RequiredArgs.URL,
