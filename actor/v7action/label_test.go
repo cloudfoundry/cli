@@ -3,13 +3,12 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/resources"
-	. "code.cloudfoundry.org/cli/resources"
-
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
+	. "code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -672,7 +671,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{GUID: "some-service-offering-guid", Name: resourceName},
+					resources.ServiceOffering{GUID: "some-service-offering-guid", Name: resourceName},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -711,7 +710,7 @@ var _ = Describe("labels", func() {
 			When("fetching the service offering fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-						ccv3.ServiceOffering{},
+						resources.ServiceOffering{},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-service-offerings-error"),
 					)
@@ -726,7 +725,7 @@ var _ = Describe("labels", func() {
 			When("updating the service offering fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-						ccv3.ServiceOffering{GUID: "some-guid"},
+						resources.ServiceOffering{GUID: "some-guid"},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -1140,7 +1139,7 @@ var _ = Describe("labels", func() {
 		When("service offering does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{},
+					resources.ServiceOffering{},
 					[]string{"warning-1", "warning-2"},
 					ccerror.ServiceOfferingNotFoundError{
 						ServiceOfferingName: resourceName,
@@ -1163,7 +1162,7 @@ var _ = Describe("labels", func() {
 		When("client returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{},
+					resources.ServiceOffering{},
 					[]string{"warning"},
 					errors.New("some random error"),
 				)
@@ -1186,7 +1185,7 @@ var _ = Describe("labels", func() {
 			BeforeEach(func() {
 				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{
+					resources.ServiceOffering{
 						GUID: "some-guid",
 						Name: resourceName,
 						Metadata: &Metadata{
