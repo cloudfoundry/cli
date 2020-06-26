@@ -385,10 +385,10 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateServiceBrokerStub        func(ccv3.ServiceBrokerModel) (v7action.Warnings, error)
+	CreateServiceBrokerStub        func(resources.ServiceBroker) (v7action.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
-		arg1 ccv3.ServiceBrokerModel
+		arg1 resources.ServiceBroker
 	}
 	createServiceBrokerReturns struct {
 		result1 v7action.Warnings
@@ -1761,18 +1761,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceBrokerByNameStub        func(string) (ccv3.ServiceBroker, v7action.Warnings, error)
+	GetServiceBrokerByNameStub        func(string) (resources.ServiceBroker, v7action.Warnings, error)
 	getServiceBrokerByNameMutex       sync.RWMutex
 	getServiceBrokerByNameArgsForCall []struct {
 		arg1 string
 	}
 	getServiceBrokerByNameReturns struct {
-		result1 ccv3.ServiceBroker
+		result1 resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
 	getServiceBrokerByNameReturnsOnCall map[int]struct {
-		result1 ccv3.ServiceBroker
+		result1 resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1791,17 +1791,17 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceBrokersStub        func() ([]ccv3.ServiceBroker, v7action.Warnings, error)
+	GetServiceBrokersStub        func() ([]resources.ServiceBroker, v7action.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
 	}
 	getServiceBrokersReturns struct {
-		result1 []ccv3.ServiceBroker
+		result1 []resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
 	getServiceBrokersReturnsOnCall map[int]struct {
-		result1 []ccv3.ServiceBroker
+		result1 []resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2854,11 +2854,11 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateServiceBrokerStub        func(string, ccv3.ServiceBrokerModel) (v7action.Warnings, error)
+	UpdateServiceBrokerStub        func(string, resources.ServiceBroker) (v7action.Warnings, error)
 	updateServiceBrokerMutex       sync.RWMutex
 	updateServiceBrokerArgsForCall []struct {
 		arg1 string
-		arg2 ccv3.ServiceBrokerModel
+		arg2 resources.ServiceBroker
 	}
 	updateServiceBrokerReturns struct {
 		result1 v7action.Warnings
@@ -4634,11 +4634,11 @@ func (fake *FakeActor) CreateSecurityGroupReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateServiceBroker(arg1 ccv3.ServiceBrokerModel) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateServiceBroker(arg1 resources.ServiceBroker) (v7action.Warnings, error) {
 	fake.createServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
-		arg1 ccv3.ServiceBrokerModel
+		arg1 resources.ServiceBroker
 	}{arg1})
 	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
 	fake.createServiceBrokerMutex.Unlock()
@@ -4658,13 +4658,13 @@ func (fake *FakeActor) CreateServiceBrokerCallCount() int {
 	return len(fake.createServiceBrokerArgsForCall)
 }
 
-func (fake *FakeActor) CreateServiceBrokerCalls(stub func(ccv3.ServiceBrokerModel) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateServiceBrokerCalls(stub func(resources.ServiceBroker) (v7action.Warnings, error)) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = stub
 }
 
-func (fake *FakeActor) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBrokerModel {
+func (fake *FakeActor) CreateServiceBrokerArgsForCall(i int) resources.ServiceBroker {
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	argsForCall := fake.createServiceBrokerArgsForCall[i]
@@ -10563,7 +10563,7 @@ func (fake *FakeActor) GetServiceAccessReturnsOnCall(i int, result1 []v7action.S
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceBrokerByName(arg1 string) (ccv3.ServiceBroker, v7action.Warnings, error) {
+func (fake *FakeActor) GetServiceBrokerByName(arg1 string) (resources.ServiceBroker, v7action.Warnings, error) {
 	fake.getServiceBrokerByNameMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokerByNameReturnsOnCall[len(fake.getServiceBrokerByNameArgsForCall)]
 	fake.getServiceBrokerByNameArgsForCall = append(fake.getServiceBrokerByNameArgsForCall, struct {
@@ -10587,7 +10587,7 @@ func (fake *FakeActor) GetServiceBrokerByNameCallCount() int {
 	return len(fake.getServiceBrokerByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetServiceBrokerByNameCalls(stub func(string) (ccv3.ServiceBroker, v7action.Warnings, error)) {
+func (fake *FakeActor) GetServiceBrokerByNameCalls(stub func(string) (resources.ServiceBroker, v7action.Warnings, error)) {
 	fake.getServiceBrokerByNameMutex.Lock()
 	defer fake.getServiceBrokerByNameMutex.Unlock()
 	fake.GetServiceBrokerByNameStub = stub
@@ -10600,30 +10600,30 @@ func (fake *FakeActor) GetServiceBrokerByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetServiceBrokerByNameReturns(result1 ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceBrokerByNameReturns(result1 resources.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokerByNameMutex.Lock()
 	defer fake.getServiceBrokerByNameMutex.Unlock()
 	fake.GetServiceBrokerByNameStub = nil
 	fake.getServiceBrokerByNameReturns = struct {
-		result1 ccv3.ServiceBroker
+		result1 resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceBrokerByNameReturnsOnCall(i int, result1 ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceBrokerByNameReturnsOnCall(i int, result1 resources.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokerByNameMutex.Lock()
 	defer fake.getServiceBrokerByNameMutex.Unlock()
 	fake.GetServiceBrokerByNameStub = nil
 	if fake.getServiceBrokerByNameReturnsOnCall == nil {
 		fake.getServiceBrokerByNameReturnsOnCall = make(map[int]struct {
-			result1 ccv3.ServiceBroker
+			result1 resources.ServiceBroker
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceBrokerByNameReturnsOnCall[i] = struct {
-		result1 ccv3.ServiceBroker
+		result1 resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -10695,7 +10695,7 @@ func (fake *FakeActor) GetServiceBrokerLabelsReturnsOnCall(i int, result1 map[st
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceBrokers() ([]ccv3.ServiceBroker, v7action.Warnings, error) {
+func (fake *FakeActor) GetServiceBrokers() ([]resources.ServiceBroker, v7action.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
 	fake.getServiceBrokersArgsForCall = append(fake.getServiceBrokersArgsForCall, struct {
@@ -10718,36 +10718,36 @@ func (fake *FakeActor) GetServiceBrokersCallCount() int {
 	return len(fake.getServiceBrokersArgsForCall)
 }
 
-func (fake *FakeActor) GetServiceBrokersCalls(stub func() ([]ccv3.ServiceBroker, v7action.Warnings, error)) {
+func (fake *FakeActor) GetServiceBrokersCalls(stub func() ([]resources.ServiceBroker, v7action.Warnings, error)) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = stub
 }
 
-func (fake *FakeActor) GetServiceBrokersReturns(result1 []ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceBrokersReturns(result1 []resources.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = nil
 	fake.getServiceBrokersReturns = struct {
-		result1 []ccv3.ServiceBroker
+		result1 []resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceBrokersReturnsOnCall(i int, result1 []ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceBrokersReturnsOnCall(i int, result1 []resources.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = nil
 	if fake.getServiceBrokersReturnsOnCall == nil {
 		fake.getServiceBrokersReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.ServiceBroker
+			result1 []resources.ServiceBroker
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceBrokersReturnsOnCall[i] = struct {
-		result1 []ccv3.ServiceBroker
+		result1 []resources.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -15334,12 +15334,12 @@ func (fake *FakeActor) UpdateSecurityGroupGloballyEnabledReturnsOnCall(i int, re
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateServiceBroker(arg1 string, arg2 ccv3.ServiceBrokerModel) (v7action.Warnings, error) {
+func (fake *FakeActor) UpdateServiceBroker(arg1 string, arg2 resources.ServiceBroker) (v7action.Warnings, error) {
 	fake.updateServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.updateServiceBrokerReturnsOnCall[len(fake.updateServiceBrokerArgsForCall)]
 	fake.updateServiceBrokerArgsForCall = append(fake.updateServiceBrokerArgsForCall, struct {
 		arg1 string
-		arg2 ccv3.ServiceBrokerModel
+		arg2 resources.ServiceBroker
 	}{arg1, arg2})
 	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerMutex.Unlock()
@@ -15359,13 +15359,13 @@ func (fake *FakeActor) UpdateServiceBrokerCallCount() int {
 	return len(fake.updateServiceBrokerArgsForCall)
 }
 
-func (fake *FakeActor) UpdateServiceBrokerCalls(stub func(string, ccv3.ServiceBrokerModel) (v7action.Warnings, error)) {
+func (fake *FakeActor) UpdateServiceBrokerCalls(stub func(string, resources.ServiceBroker) (v7action.Warnings, error)) {
 	fake.updateServiceBrokerMutex.Lock()
 	defer fake.updateServiceBrokerMutex.Unlock()
 	fake.UpdateServiceBrokerStub = stub
 }
 
-func (fake *FakeActor) UpdateServiceBrokerArgsForCall(i int) (string, ccv3.ServiceBrokerModel) {
+func (fake *FakeActor) UpdateServiceBrokerArgsForCall(i int) (string, resources.ServiceBroker) {
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
 	argsForCall := fake.updateServiceBrokerArgsForCall[i]

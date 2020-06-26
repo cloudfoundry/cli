@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type RenameServiceBrokerCommand struct {
@@ -40,7 +40,7 @@ func (cmd *RenameServiceBrokerCommand) Execute(args []string) error {
 
 	warnings, err = cmd.Actor.UpdateServiceBroker(
 		serviceBroker.GUID,
-		v7action.ServiceBrokerModel{
+		resources.ServiceBroker{
 			Name: cmd.RequiredArgs.NewServiceBrokerName,
 		},
 	)

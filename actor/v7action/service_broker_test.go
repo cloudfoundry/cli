@@ -4,11 +4,10 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -26,7 +25,7 @@ var _ = Describe("Service Broker Actions", func() {
 
 	Describe("GetServiceBrokers", func() {
 		var (
-			serviceBrokers []ServiceBroker
+			serviceBrokers []resources.ServiceBroker
 			warnings       Warnings
 			executionError error
 		)
@@ -38,7 +37,7 @@ var _ = Describe("Service Broker Actions", func() {
 		When("the cloud controller request is successful", func() {
 			When("the cloud controller returns service brokers", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceBrokersReturns([]ccv3.ServiceBroker{
+					fakeCloudControllerClient.GetServiceBrokersReturns([]resources.ServiceBroker{
 						{
 							GUID: "service-broker-guid-1",
 							Name: "service-broker-1",
@@ -56,8 +55,8 @@ var _ = Describe("Service Broker Actions", func() {
 					Expect(executionError).NotTo(HaveOccurred())
 
 					Expect(serviceBrokers).To(ConsistOf(
-						ServiceBroker{Name: "service-broker-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
-						ServiceBroker{Name: "service-broker-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
+						resources.ServiceBroker{Name: "service-broker-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
+						resources.ServiceBroker{Name: "service-broker-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
 					))
 					Expect(warnings).To(ConsistOf("some-service-broker-warning"))
 					Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
@@ -87,14 +86,14 @@ var _ = Describe("Service Broker Actions", func() {
 		)
 
 		var (
-			ccv3ServiceBrokers []ccv3.ServiceBroker
-			serviceBroker      ServiceBroker
+			ccv3ServiceBrokers []resources.ServiceBroker
+			serviceBroker      resources.ServiceBroker
 			warnings           Warnings
 			executeErr         error
 		)
 
 		BeforeEach(func() {
-			ccv3ServiceBrokers = []ccv3.ServiceBroker{
+			ccv3ServiceBrokers = []resources.ServiceBroker{
 				{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
 			}
 		})
@@ -122,7 +121,7 @@ var _ = Describe("Service Broker Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
 				Expect(serviceBroker).To(Equal(
-					ServiceBroker{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
+					resources.ServiceBroker{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
 				))
 			})
 		})
@@ -130,7 +129,7 @@ var _ = Describe("Service Broker Actions", func() {
 		When("the service broker is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ServiceBroker{},
+					[]resources.ServiceBroker{},
 					ccv3.Warnings{"some-other-service-broker-warning"},
 					nil,
 				)
@@ -139,14 +138,14 @@ var _ = Describe("Service Broker Actions", func() {
 			It("returns an error and warnings", func() {
 				Expect(executeErr).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: serviceBroker1Name}))
 				Expect(warnings).To(ConsistOf("some-other-service-broker-warning"))
-				Expect(serviceBroker).To(Equal(ServiceBroker{}))
+				Expect(serviceBroker).To(Equal(resources.ServiceBroker{}))
 			})
 		})
 
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv3.ServiceBroker{},
+					[]resources.ServiceBroker{},
 					ccv3.Warnings{"some-service-broker-warning"},
 					errors.New("list-error"),
 				)
@@ -155,7 +154,7 @@ var _ = Describe("Service Broker Actions", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(MatchError("list-error"))
 				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
-				Expect(serviceBroker).To(Equal(ServiceBroker{}))
+				Expect(serviceBroker).To(Equal(resources.ServiceBroker{}))
 
 				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
 			})
@@ -178,7 +177,7 @@ var _ = Describe("Service Broker Actions", func() {
 
 		JustBeforeEach(func() {
 			warnings, executionError = actor.CreateServiceBroker(
-				ServiceBrokerModel{
+				resources.ServiceBroker{
 					Name:      name,
 					URL:       url,
 					Username:  username,
@@ -274,7 +273,7 @@ var _ = Describe("Service Broker Actions", func() {
 		It("passes the service broker creds and url to the client", func() {
 			_, executionError := actor.UpdateServiceBroker(
 				guid,
-				ServiceBrokerModel{
+				resources.ServiceBroker{
 					Username: username,
 					Password: password,
 					URL:      url,
@@ -298,7 +297,7 @@ var _ = Describe("Service Broker Actions", func() {
 
 			_, executionError := actor.UpdateServiceBroker(
 				guid,
-				ServiceBrokerModel{
+				resources.ServiceBroker{
 					Username: username,
 					Password: password,
 					URL:      url,
@@ -325,7 +324,7 @@ var _ = Describe("Service Broker Actions", func() {
 			It("succeeds and returns warnings", func() {
 				warnings, executionError := actor.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Username: username,
 						Password: password,
 						URL:      url,
@@ -348,7 +347,7 @@ var _ = Describe("Service Broker Actions", func() {
 			It("succeeds and returns warnings", func() {
 				warnings, executionError := actor.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Username: username,
 						Password: password,
 						URL:      url,
@@ -370,7 +369,7 @@ var _ = Describe("Service Broker Actions", func() {
 			It("fails and returns warnings", func() {
 				warnings, executionError := actor.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Username: username,
 						Password: password,
 						URL:      url,

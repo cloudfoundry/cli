@@ -8,9 +8,9 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -86,7 +86,7 @@ var _ = Describe("delete-service-broker Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.GetServiceBrokerByNameReturns(v7action.ServiceBroker{Name: serviceBrokerName, GUID: serviceBrokerGUID}, v7action.Warnings{"get-broker-by-name-warning"}, nil)
+				fakeActor.GetServiceBrokerByNameReturns(resources.ServiceBroker{Name: serviceBrokerName, GUID: serviceBrokerGUID}, v7action.Warnings{"get-broker-by-name-warning"}, nil)
 				fakeActor.DeleteServiceBrokerReturns(v7action.Warnings{"delete-broker-warning"}, nil)
 			})
 
@@ -174,7 +174,7 @@ var _ = Describe("delete-service-broker Command", func() {
 		When("the service broker doesn't exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceBrokerByNameReturns(
-					v7action.ServiceBroker{},
+					resources.ServiceBroker{},
 					v7action.Warnings{"some-warning"},
 					actionerror.ServiceBrokerNotFoundError{
 						Name: serviceBrokerName},

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -104,7 +105,7 @@ var _ = Describe("service-brokers Command", func() {
 
 		When("there are no service brokers", func() {
 			BeforeEach(func() {
-				fakeActor.GetServiceBrokersReturns([]v7action.ServiceBroker{}, v7action.Warnings{"service-broker-warnings"}, nil)
+				fakeActor.GetServiceBrokersReturns([]resources.ServiceBroker{}, v7action.Warnings{"service-broker-warnings"}, nil)
 			})
 
 			It("says there are no service brokers", func() {
@@ -117,7 +118,7 @@ var _ = Describe("service-brokers Command", func() {
 
 		When("there is one service broker", func() {
 			BeforeEach(func() {
-				serviceBrokers := []v7action.ServiceBroker{
+				serviceBrokers := []resources.ServiceBroker{
 					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo"},
 				}
 				fakeActor.GetServiceBrokersReturns(serviceBrokers, v7action.Warnings{"service-broker-warnings"}, nil)
@@ -133,7 +134,7 @@ var _ = Describe("service-brokers Command", func() {
 
 		When("there are many service brokers", func() {
 			BeforeEach(func() {
-				serviceBrokers := []v7action.ServiceBroker{
+				serviceBrokers := []resources.ServiceBroker{
 					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo"},
 					{Name: "bar", URL: "https://bar.com", GUID: "guid-bar"},
 				}
@@ -151,7 +152,7 @@ var _ = Describe("service-brokers Command", func() {
 
 		When("calling the GetServiceBrokersActor returns an error", func() {
 			BeforeEach(func() {
-				fakeActor.GetServiceBrokersReturns([]v7action.ServiceBroker{}, v7action.Warnings{"service-broker-warnings"}, errors.New("fake service-brokers error"))
+				fakeActor.GetServiceBrokersReturns([]resources.ServiceBroker{}, v7action.Warnings{"service-broker-warnings"}, errors.New("fake service-brokers error"))
 			})
 
 			It("prints the error and warnings", func() {

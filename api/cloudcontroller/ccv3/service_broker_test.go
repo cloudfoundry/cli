@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	. "code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +23,7 @@ var _ = Describe("ServiceBroker", func() {
 	Describe("GetServiceBrokers", func() {
 		var (
 			query          []Query
-			serviceBrokers []ServiceBroker
+			serviceBrokers []resources.ServiceBroker
 			warnings       Warnings
 			executeErr     error
 		)
@@ -83,7 +83,7 @@ var _ = Describe("ServiceBroker", func() {
 
 			It("returns the service broker", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
+				Expect(serviceBrokers).To(ConsistOf(resources.ServiceBroker{
 					Name:     "service-broker-name-1",
 					GUID:     "service-broker-guid-1",
 					URL:      "service-broker-url-1",
@@ -125,11 +125,11 @@ var _ = Describe("ServiceBroker", func() {
 
 			It("returns the service broker with the labels in Metadata", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
+				Expect(serviceBrokers).To(ConsistOf(resources.ServiceBroker{
 					Name: "service-broker-name-1",
 					GUID: "service-broker-guid-1",
 					URL:  "service-broker-url-1",
-					Metadata: &Metadata{
+					Metadata: &resources.Metadata{
 						Labels: map[string]types.NullString{
 							"some-key":  types.NewNullString("some-value"),
 							"other-key": types.NewNullString("other-value"),
@@ -197,9 +197,9 @@ var _ = Describe("ServiceBroker", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(serviceBrokers).To(ConsistOf(
-					ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
-					ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
-					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3"},
+					resources.ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
+					resources.ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
+					resources.ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -418,7 +418,7 @@ var _ = Describe("ServiceBroker", func() {
 		})
 
 		JustBeforeEach(func() {
-			serviceBrokerRequest := ServiceBrokerModel{
+			serviceBrokerRequest := resources.ServiceBroker{
 				Name:      name,
 				URL:       url,
 				Username:  username,
@@ -565,7 +565,7 @@ var _ = Describe("ServiceBroker", func() {
 			It("succeeds, returns warnings and job URL", func() {
 				jobURL, warnings, executeErr = client.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Name:     name,
 						URL:      url,
 						Username: username,
@@ -606,7 +606,7 @@ var _ = Describe("ServiceBroker", func() {
 
 			It("returns parsed errors and warnings", func() {
 				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Name:     name,
 						URL:      url,
 						Username: username,
@@ -658,7 +658,7 @@ var _ = Describe("ServiceBroker", func() {
 			It("includes only the name in the request body", func() {
 				jobURL, warnings, executeErr = client.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{
+					resources.ServiceBroker{
 						Name: name,
 					})
 				Expect(executeErr).NotTo(HaveOccurred())
@@ -669,13 +669,13 @@ var _ = Describe("ServiceBroker", func() {
 			It("errors without sending any request", func() {
 				_, _, executeErr = client.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{Password: password},
+					resources.ServiceBroker{Password: password},
 				)
 				Expect(executeErr).To(HaveOccurred())
 
 				_, _, executeErr = client.UpdateServiceBroker(
 					guid,
-					ServiceBrokerModel{Username: username},
+					resources.ServiceBroker{Username: username},
 				)
 				Expect(executeErr).To(HaveOccurred())
 				Expect(executeErr).To(MatchError("Incorrect usage: both username and password must be defined in order to do an update"))

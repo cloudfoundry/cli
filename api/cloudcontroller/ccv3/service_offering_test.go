@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -293,7 +292,7 @@ var _ = Describe("Service Offering", func() {
 					})
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{
-							ServiceBrokers: []ServiceBroker{
+							ServiceBrokers: []resources.ServiceBroker{
 								{GUID: "broker-1-guid", Name: "broker-1"},
 								{GUID: "broker-2-guid", Name: "broker-2"},
 							}},
