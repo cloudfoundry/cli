@@ -22,7 +22,7 @@ var _ = Describe("Service Offering", func() {
 			client *Client
 			query  []Query
 
-			offerings  []ServiceOffering
+			offerings  []resources.ServiceOffering
 			warnings   Warnings
 			executeErr error
 		)
@@ -136,19 +136,19 @@ var _ = Describe("Service Offering", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(offerings).To(ConsistOf(
-					ServiceOffering{
+					resources.ServiceOffering{
 						GUID:              "service-offering-1-guid",
 						Name:              "service-offering-1-name",
 						ServiceBrokerName: "overview-broker",
 						ServiceBrokerGUID: "overview-broker-guid",
 					},
-					ServiceOffering{
+					resources.ServiceOffering{
 						GUID:              "service-offering-2-guid",
 						Name:              "service-offering-2-name",
 						ServiceBrokerName: "overview-broker",
 						ServiceBrokerGUID: "overview-broker-guid",
 					},
-					ServiceOffering{
+					resources.ServiceOffering{
 						GUID:              "service-offering-3-guid",
 						Name:              "service-offering-3-name",
 						ServiceBrokerName: "other-broker",
@@ -214,7 +214,7 @@ var _ = Describe("Service Offering", func() {
 			client            *Client
 			requester         *ccv3fakes.FakeRequester
 			serviceBrokerName string
-			offering          ServiceOffering
+			offering          resources.ServiceOffering
 			warnings          Warnings
 			executeErr        error
 		)
@@ -233,7 +233,7 @@ var _ = Describe("Service Offering", func() {
 		When("there is a single match", func() {
 			BeforeEach(func() {
 				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-					err := requestParams.AppendToList(ServiceOffering{GUID: "service-offering-guid-1"})
+					err := requestParams.AppendToList(resources.ServiceOffering{GUID: "service-offering-guid-1"})
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{}, Warnings{"this is a warning"}, nil
 				})
@@ -247,12 +247,12 @@ var _ = Describe("Service Offering", func() {
 						{Key: NameFilter, Values: []string{serviceOfferingName}},
 						{Key: FieldsServiceBroker, Values: []string{"name", "guid"}},
 					}),
-					"ResponseBody": Equal(ServiceOffering{}),
+					"ResponseBody": Equal(resources.ServiceOffering{}),
 				}))
 			})
 
 			It("returns the service offering and warnings", func() {
-				Expect(offering).To(Equal(ServiceOffering{GUID: "service-offering-guid-1"}))
+				Expect(offering).To(Equal(resources.ServiceOffering{GUID: "service-offering-guid-1"}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
@@ -279,13 +279,13 @@ var _ = Describe("Service Offering", func() {
 		When("there is more than one match", func() {
 			BeforeEach(func() {
 				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-					err := requestParams.AppendToList(ServiceOffering{
+					err := requestParams.AppendToList(resources.ServiceOffering{
 						GUID:              "service-offering-guid-1",
 						Name:              serviceOfferingName,
 						ServiceBrokerGUID: "broker-1-guid",
 					})
 					Expect(err).NotTo(HaveOccurred())
-					err = requestParams.AppendToList(ServiceOffering{
+					err = requestParams.AppendToList(resources.ServiceOffering{
 						GUID:              "service-offering-guid-2",
 						Name:              serviceOfferingName,
 						ServiceBrokerGUID: "broker-2-guid",

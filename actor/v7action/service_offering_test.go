@@ -3,12 +3,12 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -35,7 +35,7 @@ var _ = Describe("Service Offering Actions", func() {
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{GUID: fakeServiceOfferingGUID},
+					resources.ServiceOffering{GUID: fakeServiceOfferingGUID},
 					ccv3.Warnings{"a warning"},
 					nil,
 				)
@@ -70,7 +70,7 @@ var _ = Describe("Service Offering Actions", func() {
 		DescribeTable(
 			"when getting the service offering fails ",
 			func(clientError, expectedError error) {
-				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(ccv3.ServiceOffering{}, ccv3.Warnings{"a warning"}, clientError)
+				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(resources.ServiceOffering{}, ccv3.Warnings{"a warning"}, clientError)
 
 				warnings, err := actor.PurgeServiceOfferingByNameAndBroker("fake-service-offering", "fake-service-broker")
 				Expect(err).To(MatchError(expectedError))
@@ -99,7 +99,7 @@ var _ = Describe("Service Offering Actions", func() {
 		When("purging the service offering fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
-					ccv3.ServiceOffering{GUID: "fake-service-offering-guid"},
+					resources.ServiceOffering{GUID: "fake-service-offering-guid"},
 					ccv3.Warnings{"a warning"},
 					nil,
 				)
