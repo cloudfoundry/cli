@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -53,7 +54,7 @@ var _ = Describe("rename-service-broker command", func() {
 
 		BeforeEach(func() {
 			fakeUpdateServiceBrokerActor.GetServiceBrokerByNameReturns(
-				v7action.ServiceBroker{GUID: guid},
+				resources.ServiceBroker{GUID: guid},
 				v7action.Warnings{"get broker by name warning"},
 				nil,
 			)
@@ -76,7 +77,7 @@ var _ = Describe("rename-service-broker command", func() {
 				serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
 				Expect(serviceBrokerGUID).To(Equal(guid))
 				Expect(model).To(Equal(
-					v7action.ServiceBrokerModel{
+					resources.ServiceBroker{
 						Name: newBrokerName,
 					},
 				))
@@ -96,7 +97,7 @@ var _ = Describe("rename-service-broker command", func() {
 		When("the UpdateServiceBroker actor fails to get the broker name", func() {
 			BeforeEach(func() {
 				fakeUpdateServiceBrokerActor.GetServiceBrokerByNameReturns(
-					v7action.ServiceBroker{},
+					resources.ServiceBroker{},
 					v7action.Warnings{"some-warning"},
 					actionerror.ServiceBrokerNotFoundError{
 						Name: oldBrokerName,

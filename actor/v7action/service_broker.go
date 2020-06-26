@@ -3,12 +3,10 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-type ServiceBroker = ccv3.ServiceBroker
-type ServiceBrokerModel = ccv3.ServiceBrokerModel
-
-func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
+func (actor Actor) GetServiceBrokers() ([]resources.ServiceBroker, Warnings, error) {
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers()
 	if err != nil {
 		return nil, Warnings(warnings), err
@@ -17,7 +15,7 @@ func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return serviceBrokers, Warnings(warnings), nil
 }
 
-func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (ServiceBroker, Warnings, error) {
+func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (resources.ServiceBroker, Warnings, error) {
 	query := []ccv3.Query{
 		{
 			Key:    ccv3.NameFilter,
@@ -26,17 +24,17 @@ func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (ServiceBrok
 	}
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(query...)
 	if err != nil {
-		return ServiceBroker{}, Warnings(warnings), err
+		return resources.ServiceBroker{}, Warnings(warnings), err
 	}
 
 	if len(serviceBrokers) == 0 {
-		return ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
+		return resources.ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
 	}
 
 	return serviceBrokers[0], Warnings(warnings), nil
 }
 
-func (actor Actor) CreateServiceBroker(model ServiceBrokerModel) (Warnings, error) {
+func (actor Actor) CreateServiceBroker(model resources.ServiceBroker) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(model)
@@ -50,7 +48,7 @@ func (actor Actor) CreateServiceBroker(model ServiceBrokerModel) (Warnings, erro
 	return allWarnings, err
 }
 
-func (actor Actor) UpdateServiceBroker(serviceBrokerGUID string, model ServiceBrokerModel) (Warnings, error) {
+func (actor Actor) UpdateServiceBroker(serviceBrokerGUID string, model resources.ServiceBroker) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, model)

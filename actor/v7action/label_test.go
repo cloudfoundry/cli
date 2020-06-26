@@ -559,7 +559,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv3.ServiceBroker{{GUID: "some-broker-guid", Name: resourceName}},
+					[]resources.ServiceBroker{{GUID: "some-broker-guid", Name: resourceName}},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -603,7 +603,7 @@ var _ = Describe("labels", func() {
 			When("fetching the service-broker fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv3.ServiceBroker{},
+						[]resources.ServiceBroker{},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-service-broker-error"),
 					)
@@ -618,7 +618,7 @@ var _ = Describe("labels", func() {
 			When("updating the service-broker fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv3.ServiceBroker{ccv3.ServiceBroker{GUID: "some-guid", Name: resourceName}},
+						[]resources.ServiceBroker{{GUID: "some-guid", Name: resourceName}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -638,7 +638,7 @@ var _ = Describe("labels", func() {
 			When("polling the job fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv3.ServiceBroker{ccv3.ServiceBroker{GUID: "some-guid", Name: resourceName}},
+						[]resources.ServiceBroker{{GUID: "some-guid", Name: resourceName}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -1068,7 +1068,7 @@ var _ = Describe("labels", func() {
 		When("service broker does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv3.ServiceBroker{},
+					[]resources.ServiceBroker{},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -1088,7 +1088,7 @@ var _ = Describe("labels", func() {
 		When("client returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv3.ServiceBroker{},
+					[]resources.ServiceBroker{},
 					[]string{"warning"},
 					errors.New("some random error"),
 				)
@@ -1110,7 +1110,7 @@ var _ = Describe("labels", func() {
 			BeforeEach(func() {
 				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv3.ServiceBroker{ccv3.ServiceBroker{
+					[]resources.ServiceBroker{resources.ServiceBroker{
 						GUID: "some-guid",
 						Name: resourceName,
 						Metadata: &Metadata{
