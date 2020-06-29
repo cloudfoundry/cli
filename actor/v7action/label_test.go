@@ -755,7 +755,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{{GUID: "some-service-plan-guid", Name: resourceName}},
+					[]resources.ServicePlan{{GUID: "some-service-plan-guid", Name: resourceName}},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -796,7 +796,7 @@ var _ = Describe("labels", func() {
 			When("fetching the service plan fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
-						[]ccv3.ServicePlan{},
+						[]resources.ServicePlan{},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-service-plan-error"),
 					)
@@ -811,7 +811,7 @@ var _ = Describe("labels", func() {
 			When("updating the service plan fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
-						[]ccv3.ServicePlan{{GUID: "some-guid"}},
+						[]resources.ServicePlan{{GUID: "some-guid"}},
 						[]string{"warning-1", "warning-2"},
 						nil,
 					)
@@ -1220,7 +1220,7 @@ var _ = Describe("labels", func() {
 		When("service plan does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{},
+					[]resources.ServicePlan{},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -1240,7 +1240,7 @@ var _ = Describe("labels", func() {
 		When("client returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{},
+					[]resources.ServicePlan{},
 					[]string{"warning"},
 					errors.New("some random error"),
 				)
@@ -1263,7 +1263,7 @@ var _ = Describe("labels", func() {
 			BeforeEach(func() {
 				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{{
+					[]resources.ServicePlan{{
 						GUID: "some-guid",
 						Name: resourceName,
 						Metadata: &Metadata{

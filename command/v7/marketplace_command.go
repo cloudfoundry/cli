@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/command/translatableerror"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -166,7 +164,7 @@ func computeOfferingsTableWithoutPlanNames(offerings []v7action.ServiceOfferingW
 	return data
 }
 
-func planNames(plans []ccv3.ServicePlan) string {
+func planNames(plans []resources.ServicePlan) string {
 	var names []string
 	for _, p := range plans {
 		names = append(names, p.Name)
@@ -188,7 +186,7 @@ func available(available bool) string {
 	return "no"
 }
 
-func costsList(costs []ccv3.Cost) string {
+func costsList(costs []resources.ServicePlanCost) string {
 	var costsOutput []string
 	for _, cost := range costs {
 		costsOutput = append(costsOutput, fmt.Sprintf("%s %.2f/%s", cost.Currency, cost.Amount, cost.Unit))

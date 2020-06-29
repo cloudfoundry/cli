@@ -184,7 +184,7 @@ func (actor *Actor) DisableServiceAccess(offeringName, brokerName, orgName, plan
 	return skipped, allWarnings, err
 }
 
-func (actor *Actor) disableAllServiceAccess(plans []ccv3.ServicePlan) (SkippedPlans, Warnings, error) {
+func (actor *Actor) disableAllServiceAccess(plans []resources.ServicePlan) (SkippedPlans, Warnings, error) {
 	var (
 		allWarnings Warnings
 		skipped     SkippedPlans
@@ -209,7 +209,7 @@ func (actor *Actor) disableAllServiceAccess(plans []ccv3.ServicePlan) (SkippedPl
 	return skipped, allWarnings, nil
 }
 
-func (actor *Actor) disableOrganizationServiceAccess(plans []ccv3.ServicePlan, orgName string) (SkippedPlans, Warnings, error) {
+func (actor *Actor) disableOrganizationServiceAccess(plans []resources.ServicePlan, orgName string) (SkippedPlans, Warnings, error) {
 	var allWarnings Warnings
 
 	org, orgWarnings, err := actor.GetOrganizationByName(orgName)
@@ -337,7 +337,7 @@ func buildPlansFilterForUpdate(offeringGUID, planName string) []ccv3.Query {
 	return plansQuery
 }
 
-func offeringIsSpaceScoped(plans []ccv3.ServicePlan) bool {
+func offeringIsSpaceScoped(plans []resources.ServicePlan) bool {
 	// All plans from a space scoped offering will have the same visibility type
 	return plans[0].VisibilityType == resources.ServicePlanVisibilitySpace
 }

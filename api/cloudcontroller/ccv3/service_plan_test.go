@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
@@ -23,7 +25,7 @@ var _ = Describe("Service Plan", func() {
 
 	Describe("GetServicePlans", func() {
 		var (
-			plans      []ServicePlan
+			plans      []resources.ServicePlan
 			warnings   Warnings
 			executeErr error
 		)
@@ -133,7 +135,7 @@ var _ = Describe("Service Plan", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(plans).To(ConsistOf(
-					ServicePlan{
+					resources.ServicePlan{
 						GUID:                "service-plan-1-guid",
 						Name:                "service-plan-1-name",
 						Description:         "service-plan-1-description",
@@ -142,7 +144,7 @@ var _ = Describe("Service Plan", func() {
 						VisibilityType:      "public",
 						ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
 					},
-					ServicePlan{
+					resources.ServicePlan{
 						GUID:                "service-plan-2-guid",
 						Name:                "service-plan-2-name",
 						Description:         "service-plan-2-description",
@@ -151,7 +153,7 @@ var _ = Describe("Service Plan", func() {
 						VisibilityType:      "admin",
 						ServiceOfferingGUID: "69d428b9-75b4-44db-addf-19c85c7f0f1e",
 					},
-					ServicePlan{
+					resources.ServicePlan{
 						GUID:                "service-plan-3-guid",
 						Name:                "service-plan-3-name",
 						Description:         "service-plan-3-description",
@@ -613,7 +615,7 @@ var _ = Describe("Service Plan", func() {
 						Name:              "service-offering-1",
 						Description:       "something about service offering 1",
 						ServiceBrokerName: "service-broker-1",
-						Plans: []ServicePlan{
+						Plans: []resources.ServicePlan{
 							{
 								GUID:                "service-plan-1-guid",
 								Name:                "service-plan-1-name",
@@ -637,14 +639,14 @@ var _ = Describe("Service Plan", func() {
 						Name:              "service-offering-2",
 						Description:       "something about service offering 2",
 						ServiceBrokerName: "service-broker-2",
-						Plans: []ServicePlan{
+						Plans: []resources.ServicePlan{
 							{
 								GUID:        "service-plan-2-guid",
 								Name:        "service-plan-2-name",
 								Available:   false,
 								Description: "service-plan-2-description",
 								Free:        false,
-								Costs: []Cost{
+								Costs: []resources.ServicePlanCost{
 									{
 										Amount:   649.00,
 										Currency: "USD",
