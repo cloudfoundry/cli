@@ -27,12 +27,8 @@ type ServiceInstance struct {
 	SyslogDrainURL types.OptionalString `jsonry:"syslog_drain_url"`
 	// RouteServiceURL is where requests for bound routes will be forwarded
 	RouteServiceURL types.OptionalString `jsonry:"route_service_url"`
-	// DashboardURL is where the service can be monitored
-	DashboardURL types.OptionalString `jsonry:"dashboard_url"`
 	// Credentials are passed to the app
 	Credentials types.OptionalObject `jsonry:"credentials"`
-	// LastOperation is the last operation on the service instance
-	LastOperation LastOperation `jsonry:"last_operation"`
 }
 
 func (s ServiceInstance) MarshalJSON() ([]byte, error) {

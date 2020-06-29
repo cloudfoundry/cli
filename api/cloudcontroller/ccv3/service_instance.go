@@ -7,10 +7,10 @@ import (
 )
 
 // GetServiceInstances lists service instances with optional filters.
-func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, IncludedResources, Warnings, error) {
+func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, Warnings, error) {
 	var result []resources.ServiceInstance
 
-	included, warnings, err := client.MakeListRequest(RequestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceInstancesRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceInstance{},
@@ -20,11 +20,11 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 		},
 	})
 
-	return result, included, warnings, err
+	return result, warnings, err
 }
 
-func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...Query) (resources.ServiceInstance, IncludedResources, Warnings, error) {
-	query = append(query,
+func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
+	instances, warnings, err := client.GetServiceInstances(
 		Query{
 			Key:    NameFilter,
 			Values: []string{name},
@@ -35,15 +35,12 @@ func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, q
 		},
 	)
 
-	instances, included, warnings, err := client.GetServiceInstances(query...)
-
 	if err != nil {
-		return resources.ServiceInstance{}, IncludedResources{}, warnings, err
+		return resources.ServiceInstance{}, warnings, err
 	}
 
 	if len(instances) == 0 {
 		return resources.ServiceInstance{},
-			IncludedResources{},
 			warnings,
 			ccerror.ServiceInstanceNotFoundError{
 				Name:      name,
@@ -51,7 +48,7 @@ func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, q
 			}
 	}
 
-	return instances[0], included, warnings, nil
+	return instances[0], warnings, nil
 }
 
 func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {

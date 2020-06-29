@@ -576,24 +576,6 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "org-guid-1",
 									"name": "org-name-1"
 							  	}
-							],
-							"service_brokers": [
-								{
-									"guid": "broker-guid-1",
-									"name": "broker-name-1"
-								}
-							],
-							"service_offerings": [
-								{
-									"guid": "offering-guid-1",
-									"name": "offering-name-1"
-								}
-							],
-							"service_plans": [
-								{
-									"guid": "plan-guid-1",
-									"name": "plan-name-1"
-								}
 							]
 						}
 					}`, server.URL())
@@ -632,24 +614,6 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "org-guid-2",
 									"name": "org-name-2"
 							  	}
-							],
-							"service_brokers": [
-								{
-									"guid": "broker-guid-2",
-									"name": "broker-name-2"
-								}
-							],
-							"service_offerings": [
-								{
-									"guid": "offering-guid-2",
-									"name": "offering-name-2"
-								}
-							],
-							"service_plans": [
-								{
-									"guid": "plan-guid-2",
-									"name": "plan-name-2"
-								}
 							]
 						  }
 						}`
@@ -694,18 +658,6 @@ var _ = Describe("shared request helpers", func() {
 						Organizations: []Organization{
 							{GUID: "org-guid-1", Name: "org-name-1"},
 							{GUID: "org-guid-2", Name: "org-name-2"},
-						},
-						ServiceBrokers: []ServiceBroker{
-							{Name: "broker-name-1", GUID: "broker-guid-1"},
-							{Name: "broker-name-2", GUID: "broker-guid-2"},
-						},
-						ServiceOfferings: []ServiceOffering{
-							{Name: "offering-name-1", GUID: "offering-guid-1"},
-							{Name: "offering-name-2", GUID: "offering-guid-2"},
-						},
-						ServicePlans: []ServicePlan{
-							{Name: "plan-name-1", GUID: "plan-guid-1"},
-							{Name: "plan-name-2", GUID: "plan-guid-2"},
 						},
 					}))
 				})

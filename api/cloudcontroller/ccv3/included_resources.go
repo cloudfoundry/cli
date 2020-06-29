@@ -8,5 +8,4 @@ type IncludedResources struct {
 	Spaces           []resources.Space        `json:"spaces,omitempty"`
 	ServiceOfferings []ServiceOffering        `json:"service_offerings,omitempty"`
 	ServiceBrokers   []ServiceBroker          `json:"service_brokers,omitempty"`
-	ServicePlans     []ServicePlan            `json:"service_plans,omitempty"`
 }

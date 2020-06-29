@@ -140,7 +140,6 @@ type Actor interface {
 	GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetServiceBrokers() ([]v7action.ServiceBroker, v7action.Warnings, error)
 	GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID string) (resources.ServiceInstance, v7action.Warnings, error)
-	GetServiceInstanceByNameAndSpaceWithRelationships(serviceInstanceName, spaceGUID string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error)
 	GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (resources.Space, v7action.Warnings, error)

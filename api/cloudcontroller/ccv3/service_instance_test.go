@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -30,13 +31,12 @@ var _ = Describe("Service Instance", func() {
 		var (
 			query      Query
 			instances  []resources.ServiceInstance
-			included   IncludedResources
 			warnings   Warnings
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			instances, included, warnings, executeErr = client.GetServiceInstances(query)
+			instances, warnings, executeErr = client.GetServiceInstances(query)
 		})
 
 		When("service instances exist", func() {
@@ -48,7 +48,7 @@ var _ = Describe("Service Instance", func() {
 							Name: fmt.Sprintf("service-instance-%d-name", i),
 						})).NotTo(HaveOccurred())
 					}
-					return IncludedResources{ServiceOfferings: []ServiceOffering{{GUID: "fake-service-offering"}}}, Warnings{"warning-1", "warning-2"}, nil
+					return IncludedResources{}, Warnings{"warning-1", "warning-2"}, nil
 				})
 
 				query = Query{
@@ -57,7 +57,7 @@ var _ = Describe("Service Instance", func() {
 				}
 			})
 
-			It("returns a list of service instances with warnings and included resources", func() {
+			It("returns a list of service instances with their associated warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(instances).To(ConsistOf(
@@ -75,7 +75,6 @@ var _ = Describe("Service Instance", func() {
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(included).To(Equal(IncludedResources{ServiceOfferings: []ServiceOffering{{GUID: "fake-service-offering"}}}))
 
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
@@ -135,18 +134,12 @@ var _ = Describe("Service Instance", func() {
 		)
 		var (
 			instance   resources.ServiceInstance
-			included   IncludedResources
 			warnings   Warnings
 			executeErr error
-			query      []Query
 		)
 
-		BeforeEach(func() {
-			query = []Query{{Key: Include, Values: []string{"unicorns"}}}
-		})
-
 		JustBeforeEach(func() {
-			instance, included, warnings, executeErr = client.GetServiceInstanceByNameAndSpace(name, spaceGUID, query...)
+			instance, warnings, executeErr = client.GetServiceInstanceByNameAndSpace(name, spaceGUID)
 		})
 
 		It("makes the correct API request", func() {
@@ -154,17 +147,13 @@ var _ = Describe("Service Instance", func() {
 			actualParams := requester.MakeListRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.GetServiceInstancesRequest))
 			Expect(actualParams.Query).To(ConsistOf(
-				Query{
-					Key:    NameFilter,
+				ccv3.Query{
+					Key:    ccv3.NameFilter,
 					Values: []string{name},
 				},
-				Query{
-					Key:    SpaceGUIDFilter,
+				ccv3.Query{
+					Key:    ccv3.SpaceGUIDFilter,
 					Values: []string{spaceGUID},
-				},
-				Query{
-					Key:    Include,
-					Values: []string{"unicorns"},
 				},
 			))
 			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceInstance{}))
@@ -197,18 +186,17 @@ var _ = Describe("Service Instance", func() {
 						GUID: "service-instance-guid",
 					})).NotTo(HaveOccurred())
 
-					return IncludedResources{ServiceOfferings: []ServiceOffering{{GUID: "fake-offering-guid"}}},
+					return IncludedResources{},
 						Warnings{"warning-1", "warning-2"},
 						nil
 				})
 			})
 
-			It("returns the resource, included resources, and warnings", func() {
+			It("returns the resource and warnings", func() {
 				Expect(instance).To(Equal(resources.ServiceInstance{
 					Name: name,
 					GUID: "service-instance-guid",
 				}))
-				Expect(included).To(Equal(IncludedResources{ServiceOfferings: []ServiceOffering{{GUID: "fake-offering-guid"}}}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
@@ -289,7 +277,7 @@ var _ = Describe("Service Instance", func() {
 		Context("synchronous response", func() {
 			When("the request succeeds", func() {
 				It("returns warnings and no errors", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, nil)
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, nil)
 
 					si := resources.ServiceInstance{
 						Type:            resources.UserProvidedServiceInstance,
@@ -320,7 +308,7 @@ var _ = Describe("Service Instance", func() {
 
 			When("the request fails", func() {
 				It("returns errors and warnings", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
 
 					si := resources.ServiceInstance{
 						Type:            resources.UserProvidedServiceInstance,
@@ -351,7 +339,7 @@ var _ = Describe("Service Instance", func() {
 
 			When("the request succeeds", func() {
 				It("returns warnings and no errors", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, nil)
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, nil)
 
 					si := resources.ServiceInstance{
 						Name:            "fake-new-user-provided-service-instance",
@@ -381,7 +369,7 @@ var _ = Describe("Service Instance", func() {
 
 			When("the request fails", func() {
 				It("returns errors and warnings", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+					requester.MakeRequestReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
 
 					si := resources.ServiceInstance{
 						Name:            "fake-new-user-provided-service-instance",

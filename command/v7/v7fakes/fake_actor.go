@@ -1834,22 +1834,6 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceInstanceByNameAndSpaceWithRelationshipsStub        func(string, string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error)
-	getServiceInstanceByNameAndSpaceWithRelationshipsMutex       sync.RWMutex
-	getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	getServiceInstanceByNameAndSpaceWithRelationshipsReturns struct {
-		result1 v7action.ServiceInstanceWithRelationships
-		result2 v7action.Warnings
-		result3 error
-	}
-	getServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall map[int]struct {
-		result1 v7action.ServiceInstanceWithRelationships
-		result2 v7action.Warnings
-		result3 error
-	}
 	GetServiceOfferingLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getServiceOfferingLabelsMutex       sync.RWMutex
 	getServiceOfferingLabelsArgsForCall []struct {
@@ -10943,73 +10927,6 @@ func (fake *FakeActor) GetServiceInstanceByNameAndSpaceReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationships(arg1 string, arg2 string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error) {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Lock()
-	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall)]
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall = append(fake.getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("GetServiceInstanceByNameAndSpaceWithRelationships", []interface{}{arg1, arg2})
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Unlock()
-	if fake.GetServiceInstanceByNameAndSpaceWithRelationshipsStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceWithRelationshipsStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount() int {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RLock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RUnlock()
-	return len(fake.getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall)
-}
-
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationshipsCalls(stub func(string, string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error)) {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Lock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Unlock()
-	fake.GetServiceInstanceByNameAndSpaceWithRelationshipsStub = stub
-}
-
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(i int) (string, string) {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RLock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RUnlock()
-	argsForCall := fake.getServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(result1 v7action.ServiceInstanceWithRelationships, result2 v7action.Warnings, result3 error) {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Lock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Unlock()
-	fake.GetServiceInstanceByNameAndSpaceWithRelationshipsStub = nil
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturns = struct {
-		result1 v7action.ServiceInstanceWithRelationships
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) GetServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall(i int, result1 v7action.ServiceInstanceWithRelationships, result2 v7action.Warnings, result3 error) {
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Lock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.Unlock()
-	fake.GetServiceInstanceByNameAndSpaceWithRelationshipsStub = nil
-	if fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall == nil {
-		fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall = make(map[int]struct {
-			result1 v7action.ServiceInstanceWithRelationships
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsReturnsOnCall[i] = struct {
-		result1 v7action.ServiceInstanceWithRelationships
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeActor) GetServiceOfferingLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getServiceOfferingLabelsMutex.Lock()
 	ret, specificReturn := fake.getServiceOfferingLabelsReturnsOnCall[len(fake.getServiceOfferingLabelsArgsForCall)]
@@ -16691,8 +16608,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getServiceBrokersMutex.RUnlock()
 	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
 	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
-	fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RLock()
-	defer fake.getServiceInstanceByNameAndSpaceWithRelationshipsMutex.RUnlock()
 	fake.getServiceOfferingLabelsMutex.RLock()
 	defer fake.getServiceOfferingLabelsMutex.RUnlock()
 	fake.getServicePlanLabelsMutex.RLock()

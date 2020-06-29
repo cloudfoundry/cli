@@ -71,12 +71,6 @@ const (
 	FieldsServiceOfferingServiceBroker QueryKey = "fields[service_offering.service_broker]"
 	// FieldsServiceBroker is a query parameter to include specific fields from a service broker in an offering response
 	FieldsServiceBroker QueryKey = "fields[service_broker]"
-	// FieldsServicePlan is a query parameter to include specific fields from a service plan
-	FieldsServicePlan QueryKey = "fields[service_plan]"
-	// FieldsServicePlanServiceOffering is a query parameter to include specific fields from a service offering
-	FieldsServicePlanServiceOffering QueryKey = "fields[service_plan.service_offering]"
-	// FieldsServicePlanServiceOfferingServiceBroker is a query parameter to include specific fields from a service broker
-	FieldsServicePlanServiceOfferingServiceBroker QueryKey = "fields[service_plan.service_offering.service_broker]"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

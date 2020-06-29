@@ -7,7 +7,7 @@ import (
 )
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
-	serviceInstances, _, warnings, err := actor.CloudControllerClient.GetServiceInstances(
+	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 	)

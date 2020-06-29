@@ -46,7 +46,7 @@ var _ = Describe("Service Instance Actions", func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(resources.ServiceInstance{
 					Name: "some-service-instance",
 					GUID: "some-service-instance-guid",
-				}, ccv3.IncludedResources{}, ccv3.Warnings{"some-service-instance-warning"}, nil)
+				}, ccv3.Warnings{"some-service-instance-warning"}, nil)
 			})
 
 			It("returns a service instance and warnings", func() {
@@ -55,10 +55,9 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(serviceInstance).To(Equal(resources.ServiceInstance{Name: "some-service-instance", GUID: "some-service-instance-guid"}))
 				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				actualName, actualSpaceGUID := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
 				Expect(actualName).To(Equal(serviceInstanceName))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
-				Expect(actualQuery).To(BeEmpty())
 			})
 		})
 
@@ -66,96 +65,6 @@ var _ = Describe("Service Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-service-instance-warning"},
-					errors.New("no service instance"))
-			})
-
-			It("returns an error and warnings", func() {
-				Expect(executionError).To(MatchError("no service instance"))
-				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
-			})
-		})
-	})
-
-	Describe("GetServiceInstanceByNameAndSpaceWithRelationships", func() {
-		const (
-			serviceInstanceName = "some-service-instance"
-			spaceGUID           = "some-source-space-guid"
-			servicePlanName     = "fake-service-plan-name"
-			serviceOfferingName = "fake-service-offering-name"
-			serviceBrokerName   = "fake-service-broker-name"
-		)
-
-		var (
-			serviceInstance ServiceInstanceWithRelationships
-			warnings        Warnings
-			executionError  error
-		)
-
-		JustBeforeEach(func() {
-			serviceInstance, warnings, executionError = actor.GetServiceInstanceByNameAndSpaceWithRelationships(serviceInstanceName, spaceGUID)
-		})
-
-		When("the cloud controller request is successful", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Name: "some-service-instance",
-						GUID: "some-service-instance-guid",
-					},
-					ccv3.IncludedResources{
-						ServicePlans:     []ccv3.ServicePlan{{Name: servicePlanName}},
-						ServiceOfferings: []ccv3.ServiceOffering{{Name: serviceOfferingName}},
-						ServiceBrokers:   []ccv3.ServiceBroker{{Name: serviceBrokerName}},
-					},
-					ccv3.Warnings{"some-service-instance-warning"},
-					nil,
-				)
-			})
-
-			It("returns a service instance with relationships and warnings", func() {
-				Expect(executionError).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
-
-				Expect(serviceInstance).To(Equal(
-					ServiceInstanceWithRelationships{
-						ServiceInstance: resources.ServiceInstance{
-							Name: "some-service-instance",
-							GUID: "some-service-instance-guid",
-						},
-						ServicePlanName:     servicePlanName,
-						ServiceOfferingName: serviceOfferingName,
-						ServiceBrokerName:   serviceBrokerName,
-					},
-				))
-
-				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-				Expect(actualName).To(Equal(serviceInstanceName))
-				Expect(actualSpaceGUID).To(Equal(spaceGUID))
-				Expect(actualQuery).To(ConsistOf(
-					ccv3.Query{
-						Key:    ccv3.FieldsServicePlan,
-						Values: []string{"name", "guid"},
-					},
-					ccv3.Query{
-						Key:    ccv3.FieldsServicePlanServiceOffering,
-						Values: []string{"name", "guid"},
-					},
-					ccv3.Query{
-						Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
-						Values: []string{"name", "guid"},
-					},
-				))
-			})
-		})
-
-		When("the cloud controller returns an error", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-service-instance-warning"},
 					errors.New("no service instance"))
 			})
@@ -283,7 +192,6 @@ var _ = Describe("Service Instance Actions", func() {
 						Type: resources.UserProvidedServiceInstance,
 						GUID: guid,
 					},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
 					nil,
 				)
@@ -313,10 +221,9 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				actualName, actualSpaceGUID := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
 				Expect(actualName).To(Equal(originalName))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
-				Expect(actualQuery).To(BeEmpty())
 
 				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
 				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
@@ -341,7 +248,6 @@ var _ = Describe("Service Instance Actions", func() {
 						Type: resources.ManagedServiceInstance,
 						GUID: guid,
 					},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
 					nil,
 				)
@@ -375,7 +281,6 @@ var _ = Describe("Service Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
 					errors.New("bang"),
 				)
@@ -408,7 +313,6 @@ var _ = Describe("Service Instance Actions", func() {
 						Type: resources.UserProvidedServiceInstance,
 						GUID: guid,
 					},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
 					nil,
 				)
