@@ -6,22 +6,54 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
+type ServiceInstanceWithRelationships struct {
+	resources.ServiceInstance
+	ServicePlanName, ServiceOfferingName, ServiceBrokerName string
+}
+
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
-	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(
-		ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
-		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
-	)
+	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+	return serviceInstance, Warnings(warnings), err
+}
 
+func (actor Actor) GetServiceInstanceByNameAndSpaceWithRelationships(serviceInstanceName string, spaceGUID string) (ServiceInstanceWithRelationships, Warnings, error) {
+	query := []ccv3.Query{
+		{
+			Key:    ccv3.FieldsServicePlan,
+			Values: []string{"name", "guid"},
+		},
+		{
+			Key:    ccv3.FieldsServicePlanServiceOffering,
+			Values: []string{"name", "guid"},
+		},
+		{
+			Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
+			Values: []string{"name", "guid"},
+		},
+	}
+
+	serviceInstance, included, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
 	if err != nil {
-		return resources.ServiceInstance{}, Warnings(warnings), err
+		return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 	}
 
-	if len(serviceInstances) == 0 {
-		return resources.ServiceInstance{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
+	result := ServiceInstanceWithRelationships{
+		ServiceInstance: serviceInstance,
 	}
 
-	//Handle multiple serviceInstances being returned as GetServiceInstances arnt filtered by space
-	return serviceInstances[0], Warnings(warnings), nil
+	if len(included.ServicePlans) == 1 {
+		result.ServicePlanName = included.ServicePlans[0].Name
+	}
+
+	if len(included.ServiceOfferings) == 1 {
+		result.ServiceOfferingName = included.ServiceOfferings[0].Name
+	}
+
+	if len(included.ServiceBrokers) == 1 {
+		result.ServiceBrokerName = included.ServiceBrokers[0].Name
+	}
+
+	return result, Warnings(warnings), nil
 }
 
 func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
@@ -36,7 +68,7 @@ func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.S
 }
 
 func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates resources.ServiceInstance) (Warnings, error) {
-	original, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpaceGUID(serviceInstanceName, spaceGUID)
+	original, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	if err != nil {
 		return Warnings(warnings), err
 	}

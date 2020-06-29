@@ -1,6 +1,9 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 type OptionalStringSlice struct {
 	IsSet bool
@@ -42,4 +45,8 @@ func (o OptionalStringSlice) MarshalJSON() ([]byte, error) {
 
 func (o OptionalStringSlice) OmitJSONry() bool {
 	return !o.IsSet
+}
+
+func (o OptionalStringSlice) String() string {
+	return strings.Join(o.Value, ", ")
 }

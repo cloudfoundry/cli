@@ -7,10 +7,10 @@ import (
 )
 
 // GetServiceInstances lists service instances with optional filters.
-func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, Warnings, error) {
+func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, IncludedResources, Warnings, error) {
 	var result []resources.ServiceInstance
 
-	_, warnings, err := client.MakeListRequest(RequestParams{
+	included, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceInstancesRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceInstance{},
@@ -20,11 +20,11 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 		},
 	})
 
-	return result, warnings, err
+	return result, included, warnings, err
 }
 
-func (client *Client) GetServiceInstanceByNameAndSpaceGUID(name, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
-	instances, warnings, err := client.GetServiceInstances(
+func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...Query) (resources.ServiceInstance, IncludedResources, Warnings, error) {
+	query = append(query,
 		Query{
 			Key:    NameFilter,
 			Values: []string{name},
@@ -35,12 +35,15 @@ func (client *Client) GetServiceInstanceByNameAndSpaceGUID(name, spaceGUID strin
 		},
 	)
 
+	instances, included, warnings, err := client.GetServiceInstances(query...)
+
 	if err != nil {
-		return resources.ServiceInstance{}, warnings, err
+		return resources.ServiceInstance{}, IncludedResources{}, warnings, err
 	}
 
 	if len(instances) == 0 {
 		return resources.ServiceInstance{},
+			IncludedResources{},
 			warnings,
 			ccerror.ServiceInstanceNotFoundError{
 				Name:      name,
@@ -48,7 +51,7 @@ func (client *Client) GetServiceInstanceByNameAndSpaceGUID(name, spaceGUID strin
 			}
 	}
 
-	return instances[0], warnings, nil
+	return instances[0], included, warnings, nil
 }
 
 func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {

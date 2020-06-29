@@ -248,7 +248,9 @@ func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseW
 		return err
 	}
 
-	var result apiresponses.LastOperationResponse
+	result := apiresponses.LastOperationResponse{
+		Description: "very happy service",
+	}
 	switch time.Now().After(when) {
 	case true:
 		result.State = domain.Succeeded
