@@ -18,7 +18,7 @@ type ServicePlan struct {
 	// Whether the Service Plan is available
 	Available bool `json:"available"`
 	// VisibilityType can be "public", "admin", "organization" or "space"
-	VisibilityType VisibilityType `json:"visibility_type"`
+	VisibilityType resources.ServicePlanVisibilityType `json:"visibility_type"`
 	// Free shows whether or not the Service Plan is free of charge.
 	Free bool `json:"free"`
 	// Cost shows the cost of a paid service plan
@@ -69,7 +69,7 @@ type ServicePlanWithSpaceAndOrganization struct {
 	// Name is the name of the service plan.
 	Name string
 	// VisibilityType can be "public", "admin", "organization" or "space"
-	VisibilityType VisibilityType
+	VisibilityType resources.ServicePlanVisibilityType
 	// ServicePlanGUID is the GUID of the service offering
 	ServiceOfferingGUID string
 

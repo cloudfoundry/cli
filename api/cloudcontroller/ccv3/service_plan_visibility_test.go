@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -48,7 +48,7 @@ var _ = Describe("Service Plan Visibility", func() {
 
 		DescribeTable(
 			"getting a service plan visibility",
-			func(response string, expected ServicePlanVisibility) {
+			func(response string, expected resources.ServicePlanVisibility) {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/service_plans/%s/visibility", planGUID)),
@@ -61,18 +61,18 @@ var _ = Describe("Service Plan Visibility", func() {
 				Expect(warnings).To(ConsistOf("warning-1"))
 				Expect(result).To(Equal(expected))
 			},
-			Entry("admin", `{"type":"admin"}`, ServicePlanVisibility{Type: "admin"}),
-			Entry("public", `{"type":"public"}`, ServicePlanVisibility{Type: "public"}),
-			Entry("orgs", withOrganizations, ServicePlanVisibility{
+			Entry("admin", `{"type":"admin"}`, resources.ServicePlanVisibility{Type: "admin"}),
+			Entry("public", `{"type":"public"}`, resources.ServicePlanVisibility{Type: "public"}),
+			Entry("orgs", withOrganizations, resources.ServicePlanVisibility{
 				Type: "organization",
-				Organizations: []VisibilityDetail{
+				Organizations: []resources.ServicePlanVisibilityDetail{
 					{Name: "org-1", GUID: "org-1-guid"},
 					{Name: "org-2", GUID: "org-2-guid"},
 				},
 			}),
-			Entry("space", withSpace, ServicePlanVisibility{
+			Entry("space", withSpace, resources.ServicePlanVisibility{
 				Type:  "space",
-				Space: &VisibilityDetail{Name: "space-1", GUID: "space-1-guid"},
+				Space: resources.ServicePlanVisibilityDetail{Name: "space-1", GUID: "space-1-guid"},
 			}),
 		)
 
@@ -129,13 +129,13 @@ var _ = Describe("Service Plan Visibility", func() {
 
 			result, warnings, err := client.UpdateServicePlanVisibility(
 				planGUID,
-				ServicePlanVisibility{
+				resources.ServicePlanVisibility{
 					Type: "public",
 				},
 			)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("warning-1"))
-			Expect(result).To(Equal(ServicePlanVisibility{
+			Expect(result).To(Equal(resources.ServicePlanVisibility{
 				Type: "public",
 			}))
 		})
@@ -162,7 +162,7 @@ var _ = Describe("Service Plan Visibility", func() {
 
 				_, warnings, err := client.UpdateServicePlanVisibility(
 					planGUID,
-					ServicePlanVisibility{
+					resources.ServicePlanVisibility{
 						Type: "public",
 					},
 				)
