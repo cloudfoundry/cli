@@ -306,7 +306,7 @@ var _ = Describe("Integration Test", func() {
 			guid = create(toJSON(cfg))
 		})
 
-		getLastOperation := func(cfg config.BrokerConfiguration, op, urlPath string) string {
+		getLastOperation := func(cfg config.BrokerConfiguration, op, urlPath string) (string, string) {
 			response := httpRequest(
 				cfg,
 				"GET",
@@ -318,14 +318,14 @@ var _ = Describe("Integration Test", func() {
 			var lastOperationResponse apiresponses.LastOperationResponse
 			fromJSON(response.Body, &lastOperationResponse)
 
-			return string(lastOperationResponse.State)
+			return string(lastOperationResponse.State), string(lastOperationResponse.Description)
 		}
 
-		getInstanceLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, op string) string {
+		getInstanceLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, op string) (string, string) {
 			return getLastOperation(cfg, op, server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/last_operation")
 		}
 
-		getBindingLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, bindingGUID, op string) string {
+		getBindingLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, bindingGUID, op string) (string, string) {
 			return getLastOperation(cfg, op, server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"/last_operation")
 		}
 
@@ -345,13 +345,17 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 
@@ -369,13 +373,17 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 
@@ -394,13 +402,17 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("in progress"))
+				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("succeeded"))
+				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 
@@ -419,13 +431,17 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("in progress"))
+				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("succeeded"))
+				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 	})

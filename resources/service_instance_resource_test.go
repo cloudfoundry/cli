@@ -34,6 +34,8 @@ var _ = Describe("service instance resource", func() {
 		Entry("syslog empty", ServiceInstance{SyslogDrainURL: types.NewOptionalString("")}, `{"syslog_drain_url": ""}`),
 		Entry("route", ServiceInstance{RouteServiceURL: types.NewOptionalString("https://fake-route.com")}, `{"route_service_url": "https://fake-route.com"}`),
 		Entry("route empty", ServiceInstance{RouteServiceURL: types.NewOptionalString("https://fake-route.com")}, `{"route_service_url": "https://fake-route.com"}`),
+		Entry("dashboard", ServiceInstance{DashboardURL: types.NewOptionalString("https://fake-dashboard.com")}, `{"dashboard_url": "https://fake-dashboard.com"}`),
+		Entry("dashboard empty", ServiceInstance{DashboardURL: types.NewOptionalString("https://fake-dashboard.com")}, `{"dashboard_url": "https://fake-dashboard.com"}`),
 		Entry(
 			"credentials",
 			ServiceInstance{
@@ -59,6 +61,19 @@ var _ = Describe("service instance resource", func() {
 			}`,
 		),
 		Entry(
+			"last operation",
+			ServiceInstance{
+				LastOperation: LastOperation{Type: CreateOperation, State: OperationInProgress},
+			},
+			`{
+				"last_operation": {
+					"type": "create",
+					"state": "in progress"
+				}
+			}`,
+		),
+		Entry("last operation empty", ServiceInstance{}, `{}`),
+		Entry(
 			"space guid",
 			ServiceInstance{SpaceGUID: "fake-space-guid"},
 			`{
@@ -81,6 +96,7 @@ var _ = Describe("service instance resource", func() {
 				Tags:            types.NewOptionalStringSlice("foo", "bar"),
 				SyslogDrainURL:  types.NewOptionalString("https://fake-syslog.com"),
 				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+				DashboardURL:    types.NewOptionalString("https://fake-dashboard.com"),
 				Credentials: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 					"baz": false,
@@ -93,6 +109,7 @@ var _ = Describe("service instance resource", func() {
 				"tags": ["foo", "bar"],
 				"syslog_drain_url": "https://fake-syslog.com",
 				"route_service_url": "https://fake-route.com",
+				"dashboard_url": "https://fake-dashboard.com",
 				"credentials": {
 					"foo": "bar",
 					"baz": false

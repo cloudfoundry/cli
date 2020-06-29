@@ -65,10 +65,12 @@ var _ = Describe("service command", func() {
 			Name: orgName,
 		})
 
-		fakeActor.GetServiceInstanceByNameAndSpaceReturns(
-			resources.ServiceInstance{
-				GUID: serviceInstanceGUID,
-				Name: serviceInstanceName,
+		fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+			v7action.ServiceInstanceWithRelationships{
+				ServiceInstance: resources.ServiceInstance{
+					GUID: serviceInstanceGUID,
+					Name: serviceInstanceName,
+				},
 			},
 			v7action.Warnings{"warning one", "warning two"},
 			nil,
@@ -92,8 +94,8 @@ var _ = Describe("service command", func() {
 		It("looks up the service instance and prints the GUID and warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
@@ -113,14 +115,16 @@ var _ = Describe("service command", func() {
 		)
 
 		BeforeEach(func() {
-			fakeActor.GetServiceInstanceByNameAndSpaceReturns(
-				resources.ServiceInstance{
-					GUID:            serviceInstanceGUID,
-					Name:            serviceInstanceName,
-					Type:            resources.UserProvidedServiceInstance,
-					SyslogDrainURL:  types.NewOptionalString(syslogURL),
-					RouteServiceURL: types.NewOptionalString(routeServiceURL),
-					Tags:            types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+				v7action.ServiceInstanceWithRelationships{
+					ServiceInstance: resources.ServiceInstance{
+						GUID:            serviceInstanceGUID,
+						Name:            serviceInstanceName,
+						Type:            resources.UserProvidedServiceInstance,
+						SyslogDrainURL:  types.NewOptionalString(syslogURL),
+						RouteServiceURL: types.NewOptionalString(routeServiceURL),
+						Tags:            types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+					},
 				},
 				v7action.Warnings{"warning one", "warning two"},
 				nil,
@@ -130,8 +134,8 @@ var _ = Describe("service command", func() {
 		It("looks up the service instance and prints the details and warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
@@ -153,10 +157,85 @@ var _ = Describe("service command", func() {
 		})
 	})
 
+	When("it is a managed service instance", func() {
+		const (
+			dashboardURL             = "https://dashboard.com"
+			tags                     = "foo, bar"
+			servicePlanName          = "fake-service-plan-name"
+			serviceOfferingName      = "fake-service-offering-name"
+			serviceBrokerName        = "fake-service-broker-name"
+			lastOperationType        = "create"
+			lastOperationState       = "in progress"
+			lastOperationDescription = "doing amazing work"
+			lastOperationStartTime   = "a second ago"
+			lastOperationUpdatedTime = "just now"
+		)
+
+		BeforeEach(func() {
+			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+				v7action.ServiceInstanceWithRelationships{
+					ServiceInstance: resources.ServiceInstance{
+						GUID:         serviceInstanceGUID,
+						Name:         serviceInstanceName,
+						Type:         resources.ManagedServiceInstance,
+						DashboardURL: types.NewOptionalString(dashboardURL),
+						Tags:         types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+						LastOperation: resources.LastOperation{
+							Type:        lastOperationType,
+							State:       lastOperationState,
+							Description: lastOperationDescription,
+							CreatedAt:   lastOperationStartTime,
+							UpdatedAt:   lastOperationUpdatedTime,
+						},
+					},
+					ServicePlanName:     servicePlanName,
+					ServiceOfferingName: serviceOfferingName,
+					ServiceBrokerName:   serviceBrokerName,
+				},
+				v7action.Warnings{"warning one", "warning two"},
+				nil,
+			)
+		})
+
+		It("looks up the service instance and prints the details and warnings", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+
+			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
+			Expect(actualName).To(Equal(serviceInstanceName))
+			Expect(actualSpaceGUID).To(Equal(spaceGUID))
+
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+				Say(`\n`),
+				Say(`name:\s+%s\n`, serviceInstanceName),
+				Say(`guid:\s+\S+\n`),
+				Say(`type:\s+managed`),
+				Say(`broker:\s+%s`, serviceBrokerName),
+				Say(`offering:\s+%s`, serviceOfferingName),
+				Say(`plan:\s+%s`, servicePlanName),
+				Say(`tags:\s+%s\n`, tags),
+				Say(`dashboard url:\s+%s\n`, dashboardURL),
+				Say(`\n`),
+				Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+				Say(`\n`),
+				Say(`status:\s+%s %s\n`, lastOperationType, lastOperationState),
+				Say(`message:\s+%s\n`, lastOperationDescription),
+				Say(`started:\s+%s\n`, lastOperationStartTime),
+				Say(`updated:\s+%s\n`, lastOperationUpdatedTime),
+			))
+
+			Expect(testUI.Err).To(SatisfyAll(
+				Say("warning one"),
+				Say("warning two"),
+			))
+		})
+	})
+
 	When("there is a problem looking up the service instance", func() {
 		BeforeEach(func() {
-			fakeActor.GetServiceInstanceByNameAndSpaceReturns(
-				resources.ServiceInstance{},
+			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+				v7action.ServiceInstanceWithRelationships{},
 				v7action.Warnings{"warning one", "warning two"},
 				errors.New("boom"),
 			)
