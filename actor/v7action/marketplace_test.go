@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -30,7 +31,7 @@ var _ = Describe("marketplace", func() {
 						Name:              "offering-1",
 						Description:       "about offering 1",
 						ServiceBrokerName: "service-broker-1",
-						Plans: []ccv3.ServicePlan{
+						Plans: []resources.ServicePlan{
 							{
 								GUID: "plan-guid-1",
 								Name: "plan-1",
@@ -42,7 +43,7 @@ var _ = Describe("marketplace", func() {
 						Name:              "offering-2",
 						Description:       "about offering 2",
 						ServiceBrokerName: "service-broker-2",
-						Plans: []ccv3.ServicePlan{
+						Plans: []resources.ServicePlan{
 							{
 								GUID: "plan-guid-2",
 								Name: "plan-2",
@@ -77,7 +78,7 @@ var _ = Describe("marketplace", func() {
 					Name:              "offering-1",
 					Description:       "about offering 1",
 					ServiceBrokerName: "service-broker-1",
-					Plans: []ccv3.ServicePlan{
+					Plans: []resources.ServicePlan{
 						{
 							GUID: "plan-guid-1",
 							Name: "plan-1",
@@ -89,7 +90,7 @@ var _ = Describe("marketplace", func() {
 					Name:              "offering-2",
 					Description:       "about offering 2",
 					ServiceBrokerName: "service-broker-2",
-					Plans: []ccv3.ServicePlan{
+					Plans: []resources.ServicePlan{
 						{
 							GUID: "plan-guid-2",
 							Name: "plan-2",

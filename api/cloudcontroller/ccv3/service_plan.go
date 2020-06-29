@@ -4,58 +4,23 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/jsonry"
 )
 
-// ServicePlan represents a Cloud Controller V3 Service Plan.
-type ServicePlan struct {
-	// GUID is a unique service plan identifier.
-	GUID string `json:"guid"`
-	// Name is the name of the service plan.
-	Name string `json:"name"`
-	// Description of the Service Plan.
-	Description string `json:"description"`
-	// Whether the Service Plan is available
-	Available bool `json:"available"`
-	// VisibilityType can be "public", "admin", "organization" or "space"
-	VisibilityType resources.ServicePlanVisibilityType `json:"visibility_type"`
-	// Free shows whether or not the Service Plan is free of charge.
-	Free bool `json:"free"`
-	// Cost shows the cost of a paid service plan
-	Costs []Cost `json:"costs"`
-	// ServicePlanGUID is the GUID of the service offering
-	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid"`
-	// SpaceGUID is the space that a plan from a space-scoped broker relates to
-	SpaceGUID string `jsonry:"relationships.space.data.guid"`
-
-	Metadata *resources.Metadata `json:"metadata"`
-}
-
-func (sp *ServicePlan) UnmarshalJSON(data []byte) error {
-	return jsonry.Unmarshal(data, sp)
-}
-
-type Cost struct {
-	Amount   float64 `json:"amount"`
-	Currency string  `json:"currency"`
-	Unit     string  `json:"unit"`
-}
-
 // GetServicePlans lists service plan with optional filters.
-func (client *Client) GetServicePlans(query ...Query) ([]ServicePlan, Warnings, error) {
+func (client *Client) GetServicePlans(query ...Query) ([]resources.ServicePlan, Warnings, error) {
 	plans, _, warnings, err := client.getServicePlans(query...)
 	return plans, warnings, err
 }
 
-func (client *Client) getServicePlans(query ...Query) ([]ServicePlan, IncludedResources, Warnings, error) {
-	var plans []ServicePlan
+func (client *Client) getServicePlans(query ...Query) ([]resources.ServicePlan, IncludedResources, Warnings, error) {
+	var plans []resources.ServicePlan
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServicePlansRequest,
 		Query:        query,
-		ResponseBody: ServicePlan{},
+		ResponseBody: resources.ServicePlan{},
 		AppendToList: func(item interface{}) error {
-			plans = append(plans, item.(ServicePlan))
+			plans = append(plans, item.(resources.ServicePlan))
 			return nil
 		},
 	})
@@ -121,7 +86,7 @@ type ServiceOfferingWithPlans struct {
 	ServiceBrokerName string
 
 	// List of service plans that this service offering provides
-	Plans []ServicePlan
+	Plans []resources.ServicePlan
 }
 
 func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOfferingWithPlans, Warnings, error) {
