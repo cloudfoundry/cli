@@ -306,6 +306,8 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is blocking", func() {
 					BeforeEach(func() {
+						helpers.SkipIfV7() // V8 implementation of `cf service` does not show bindings yet
+
 						broker = servicebrokerstub.EnableServiceAccess()
 
 						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
@@ -327,6 +329,8 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is asynchronous", func() {
 					BeforeEach(func() {
+						helpers.SkipIfV7() // V8 implementation of `cf service` does not show bindings yet
+
 						broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
 
 						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
