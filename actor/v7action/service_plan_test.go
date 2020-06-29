@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -26,7 +27,7 @@ var _ = Describe("Service Plan Actions", func() {
 		const servicePlanName = "myServicePlan"
 
 		var (
-			servicePlan         ServicePlan
+			servicePlan         resources.ServicePlan
 			warnings            Warnings
 			executionError      error
 			serviceBrokerName   string
@@ -49,7 +50,7 @@ var _ = Describe("Service Plan Actions", func() {
 		When("the cloud controller request is successful", func() {
 			When("the cloud controller returns one service plan", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{
 						{
 							Name: "some-service-plan",
 							GUID: "some-service-plan-guid",
@@ -60,7 +61,7 @@ var _ = Describe("Service Plan Actions", func() {
 				It("returns a service plan and warnings", func() {
 					Expect(executionError).NotTo(HaveOccurred())
 
-					Expect(servicePlan).To(Equal(ServicePlan{Name: "some-service-plan", GUID: "some-service-plan-guid"}))
+					Expect(servicePlan).To(Equal(resources.ServicePlan{Name: "some-service-plan", GUID: "some-service-plan-guid"}))
 					Expect(warnings).To(ConsistOf("some-service-plan-warning"))
 					Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
@@ -88,7 +89,7 @@ var _ = Describe("Service Plan Actions", func() {
 
 			When("the cloud controller returns more than one service plan", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{
 						{
 							Name: "some-service-plan-1",
 							GUID: "some-service-plan-guid-1",
@@ -125,7 +126,7 @@ var _ = Describe("Service Plan Actions", func() {
 		When("the offering name is provided", func() {
 			BeforeEach(func() {
 				serviceOfferingName = "some-offering-name"
-				fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+				fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{
 					{
 						Name: "some-service-plan",
 						GUID: "some-service-plan-guid",
@@ -159,7 +160,7 @@ var _ = Describe("Service Plan Actions", func() {
 		When("the broker name is provided", func() {
 			BeforeEach(func() {
 				serviceBrokerName = "some-broker-name"
-				fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+				fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{
 					{
 						Name: "some-service-plan",
 						GUID: "some-service-plan-guid",
@@ -194,7 +195,7 @@ var _ = Describe("Service Plan Actions", func() {
 			BeforeEach(func() {
 				serviceOfferingName = "some-offering-name"
 				serviceBrokerName = "some-broker-name"
-				fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+				fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{
 					{
 						Name: "some-service-plan",
 						GUID: "some-service-plan-guid",

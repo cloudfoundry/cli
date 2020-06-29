@@ -2,11 +2,11 @@ package v7_test
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -390,7 +390,7 @@ var _ = Describe("marketplace command", func() {
 							Name:              "offering-1",
 							Description:       "about offering 1",
 							ServiceBrokerName: "service-broker-1",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID: "plan-guid-1",
 									Name: "plan-1",
@@ -402,7 +402,7 @@ var _ = Describe("marketplace command", func() {
 							Name:              "offering-2",
 							Description:       "about offering 2",
 							ServiceBrokerName: "service-broker-2",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID: "plan-guid-2",
 									Name: "plan-2",
@@ -465,7 +465,7 @@ var _ = Describe("marketplace command", func() {
 							Name:              "interesting-name",
 							Description:       "about offering 1",
 							ServiceBrokerName: "service-broker-1",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID:        "plan-guid-1",
 									Name:        "plan-1",
@@ -480,14 +480,14 @@ var _ = Describe("marketplace command", func() {
 							Name:              "interesting-name",
 							Description:       "about offering 2",
 							ServiceBrokerName: "service-broker-2",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID:        "plan-guid-2",
 									Name:        "plan-2",
 									Description: "just another plan",
 									Available:   true,
 									Free:        false,
-									Costs: []ccv3.Cost{
+									Costs: []resources.ServicePlanCost{
 										{
 											Currency: "USD",
 											Amount:   100,
@@ -557,7 +557,7 @@ var _ = Describe("marketplace command", func() {
 							Name:              "interesting-name",
 							Description:       "about offering 1",
 							ServiceBrokerName: "service-broker-1",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID:        "plan-guid-1",
 									Name:        "plan-1",
@@ -572,14 +572,14 @@ var _ = Describe("marketplace command", func() {
 							Name:              "interesting-name",
 							Description:       "about offering 2",
 							ServiceBrokerName: "service-broker-2",
-							Plans: []ccv3.ServicePlan{
+							Plans: []resources.ServicePlan{
 								{
 									GUID:        "plan-guid-2",
 									Name:        "plan-2",
 									Description: "just another plan",
 									Available:   true,
 									Free:        false,
-									Costs: []ccv3.Cost{
+									Costs: []resources.ServicePlanCost{
 										{
 											Currency: "USD",
 											Amount:   100,

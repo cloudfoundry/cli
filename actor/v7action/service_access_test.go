@@ -353,7 +353,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			fakeCloudControllerClient.GetServicePlansReturns(
-				[]ccv3.ServicePlan{
+				[]resources.ServicePlan{
 					{GUID: "fake-plan-guid-1"},
 					{GUID: "fake-plan-guid-2"},
 				},
@@ -465,7 +465,7 @@ var _ = Describe("service access actions", func() {
 
 			When("no plans were found", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, nil)
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"other warning"}, nil)
 				})
 
 				It("fails", func() {
@@ -480,7 +480,7 @@ var _ = Describe("service access actions", func() {
 
 			When("fetching the plans fail", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, errors.New("fetch plans error"))
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"other warning"}, errors.New("fetch plans error"))
 				})
 
 				It("fails", func() {
@@ -516,7 +516,7 @@ var _ = Describe("service access actions", func() {
 			When("the plan is public", func() {
 				It("skips the plan", func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
-						[]ccv3.ServicePlan{
+						[]resources.ServicePlan{
 							{Name: "fake-plan-1", GUID: "fake-plan-guid-1", VisibilityType: "public"},
 							{Name: "fake-plan-2", GUID: "fake-plan-guid-2", VisibilityType: "public"},
 							{Name: "fake-plan-3", GUID: "fake-plan-guid-3", VisibilityType: "organization"},
@@ -571,7 +571,7 @@ var _ = Describe("service access actions", func() {
 		When("the plan has visibility type 'space'", func() {
 			It("returns the appropriate error", func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{
+					[]resources.ServicePlan{
 						{GUID: "fake-plan-guid-1", VisibilityType: "space"},
 					},
 					ccv3.Warnings{"other warning"},
@@ -599,7 +599,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			fakeCloudControllerClient.GetServicePlansReturns(
-				[]ccv3.ServicePlan{
+				[]resources.ServicePlan{
 					{GUID: "fake-plan-guid-1"},
 					{GUID: "fake-plan-guid-2"},
 				},
@@ -712,7 +712,7 @@ var _ = Describe("service access actions", func() {
 
 			When("no plans were found", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, nil)
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"other warning"}, nil)
 				})
 
 				It("fails", func() {
@@ -727,7 +727,7 @@ var _ = Describe("service access actions", func() {
 
 			When("fetching the plans fail", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, errors.New("fetch plans error"))
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"other warning"}, errors.New("fetch plans error"))
 				})
 
 				It("fails", func() {
@@ -767,7 +767,7 @@ var _ = Describe("service access actions", func() {
 			When("one of the plans is public", func() {
 				It("fails and does not update other plans", func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
-						[]ccv3.ServicePlan{
+						[]resources.ServicePlan{
 							{Name: "fake-plan-1", GUID: "fake-plan-guid-1", VisibilityType: "organization"},
 							{Name: "fake-plan-2", GUID: "fake-plan-guid-2", VisibilityType: "organization"},
 							{Name: "fake-plan-3", GUID: "fake-plan-guid-3", VisibilityType: "public"},
@@ -787,7 +787,7 @@ var _ = Describe("service access actions", func() {
 			When("there are admin access plans", func() {
 				It("reports that they were skipped", func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
-						[]ccv3.ServicePlan{
+						[]resources.ServicePlan{
 							{Name: "fake-plan-1", GUID: "fake-plan-guid-1", VisibilityType: "admin"},
 							{Name: "fake-plan-2", GUID: "fake-plan-guid-2", VisibilityType: "organization"},
 							{Name: "fake-plan-3", GUID: "fake-plan-guid-3", VisibilityType: "organization"},
@@ -837,7 +837,7 @@ var _ = Describe("service access actions", func() {
 		When("there are admin access plans", func() {
 			It("reports that they were skipped", func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{
+					[]resources.ServicePlan{
 						{Name: "fake-plan-1", GUID: "fake-plan-guid-1", VisibilityType: "admin"},
 						{Name: "fake-plan-2", GUID: "fake-plan-guid-2", VisibilityType: "organization"},
 						{Name: "fake-plan-3", GUID: "fake-plan-guid-3", VisibilityType: "organization"},
@@ -880,7 +880,7 @@ var _ = Describe("service access actions", func() {
 		When("the plan has visibility type 'space'", func() {
 			It("returns the appropriate error", func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
-					[]ccv3.ServicePlan{
+					[]resources.ServicePlan{
 						{GUID: "fake-plan-guid-1", VisibilityType: "space"},
 					},
 					ccv3.Warnings{"other warning"},
