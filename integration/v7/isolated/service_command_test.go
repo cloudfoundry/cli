@@ -88,17 +88,51 @@ var _ = Describe("service command", func() {
 			helpers.SetupCF(orgName, spaceName)
 
 			serviceInstanceName = helpers.NewServiceInstanceName()
-			Eventually(helpers.CF("create-user-provided-service", serviceInstanceName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		It("can show the GUID", func() {
-			session := helpers.CF("service", serviceInstanceName, "--guid")
-			Eventually(session).Should(Exit(0))
-			Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+		When("the service instance is user-provided", func() {
+			const (
+				routeServiceURL = "https://route.com"
+				syslogURL       = "https://syslog.com"
+				tags            = "foo, bar"
+			)
+
+			BeforeEach(func() {
+				command := []string{
+					"create-user-provided-service", serviceInstanceName,
+					"-r", routeServiceURL,
+					"-l", syslogURL,
+					"-t", tags,
+				}
+				Eventually(helpers.CF(command...)).Should(Exit(0))
+			})
+
+			It("can show the GUID", func() {
+				session := helpers.CF("service", serviceInstanceName, "--guid")
+				Eventually(session).Should(Exit(0))
+				Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+			})
+
+			It("can show the service instance details", func() {
+				session := helpers.CF("service", serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				username, _ := helpers.GetCredentials()
+				Expect(session).To(SatisfyAll(
+					Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`name:\s+%s\n`, serviceInstanceName),
+					Say(`guid:\s+\S{36}\n`),
+					Say(`type:\s+user-provided`),
+					Say(`tags:\s+%s\n`, tags),
+					Say(`route service url:\s+%s\n`, routeServiceURL),
+					Say(`syslog drain url:\s+%s\n`, syslogURL),
+				))
+			})
 		})
 	})
 })
