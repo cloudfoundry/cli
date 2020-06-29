@@ -23,7 +23,7 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 	return result, warnings, err
 }
 
-func (client *Client) GetServiceInstanceByNameAndSpaceGUID(name, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
+func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
 	instances, warnings, err := client.GetServiceInstances(
 		Query{
 			Key:    NameFilter,

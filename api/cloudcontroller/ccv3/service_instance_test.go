@@ -127,7 +127,7 @@ var _ = Describe("Service Instance", func() {
 		})
 	})
 
-	Describe("GetServiceInstanceByNameAndSpaceGUID", func() {
+	Describe("GetServiceInstanceByNameAndSpace", func() {
 		const (
 			name      = "fake-service-instance-name"
 			spaceGUID = "fake-space-guid"
@@ -139,7 +139,7 @@ var _ = Describe("Service Instance", func() {
 		)
 
 		JustBeforeEach(func() {
-			instance, warnings, executeErr = client.GetServiceInstanceByNameAndSpaceGUID(name, spaceGUID)
+			instance, warnings, executeErr = client.GetServiceInstanceByNameAndSpace(name, spaceGUID)
 		})
 
 		It("makes the correct API request", func() {
