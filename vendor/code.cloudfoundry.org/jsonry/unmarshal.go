@@ -167,6 +167,10 @@ func unmarshalIntoSlice(ctx context.Context, target reflect.Value, found bool, s
 		return nil
 	}
 
+	if source == nil {
+		return nil
+	}
+
 	src, ok := source.([]interface{})
 	if !ok {
 		return newConversionError(ctx, source)
@@ -193,6 +197,10 @@ func unmarshalIntoMap(ctx context.Context, target reflect.Value, found bool, sou
 	}
 
 	if !found {
+		return nil
+	}
+
+	if source == nil {
 		return nil
 	}
 

@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type ServicePlanWithSpaceAndOrganization ccv3.ServicePlanWithSpaceAndOrganization
@@ -15,18 +16,11 @@ type ServicePlanAccess struct {
 	BrokerName          string
 	ServiceOfferingName string
 	ServicePlanName     string
-	VisibilityType      ccv3.VisibilityType
+	VisibilityType      resources.ServicePlanVisibilityType
 	VisibilityDetails   []string
 }
 
 type SkippedPlans []string
-
-const (
-	visibleAdmin        = ccv3.VisibilityType("admin")
-	visiblePublic       = ccv3.VisibilityType("public")
-	visibleOrganization = ccv3.VisibilityType("organization")
-	visibleSpace        = ccv3.VisibilityType("space")
-)
 
 type offeringDetails struct{ offeringName, brokerName string }
 
@@ -116,7 +110,7 @@ func (actor *Actor) EnableServiceAccess(offeringName, brokerName, orgName, planN
 		return nil, allWarnings, actionerror.ServicePlanVisibilityTypeError{}
 	}
 
-	visibility := ccv3.ServicePlanVisibility{Type: visiblePublic}
+	visibility := resources.ServicePlanVisibility{Type: resources.ServicePlanVisibilityPublic}
 	if orgName != "" {
 		org, orgWarnings, err := actor.GetOrganizationByName(orgName)
 		allWarnings = append(allWarnings, orgWarnings...)
@@ -124,13 +118,13 @@ func (actor *Actor) EnableServiceAccess(offeringName, brokerName, orgName, planN
 			return nil, allWarnings, err
 		}
 
-		visibility.Type = visibleOrganization
-		visibility.Organizations = []ccv3.VisibilityDetail{{GUID: org.GUID}}
+		visibility.Type = resources.ServicePlanVisibilityOrganization
+		visibility.Organizations = []resources.ServicePlanVisibilityDetail{{GUID: org.GUID}}
 	}
 
 	var skipped SkippedPlans
 	for _, plan := range plans {
-		if plan.VisibilityType == visiblePublic && visibility.Type == visibleOrganization {
+		if plan.VisibilityType == resources.ServicePlanVisibilityPublic && visibility.Type == resources.ServicePlanVisibilityOrganization {
 			skipped = append(skipped, plan.Name)
 			continue
 		}
@@ -196,9 +190,9 @@ func (actor *Actor) disableAllServiceAccess(plans []ccv3.ServicePlan) (SkippedPl
 		skipped     SkippedPlans
 	)
 
-	visibility := ccv3.ServicePlanVisibility{Type: visibleAdmin}
+	visibility := resources.ServicePlanVisibility{Type: resources.ServicePlanVisibilityAdmin}
 	for _, plan := range plans {
-		if plan.VisibilityType == visibleAdmin {
+		if plan.VisibilityType == resources.ServicePlanVisibilityAdmin {
 			skipped = append(skipped, plan.Name)
 			continue
 		}
@@ -225,14 +219,14 @@ func (actor *Actor) disableOrganizationServiceAccess(plans []ccv3.ServicePlan, o
 	}
 
 	for _, plan := range plans {
-		if plan.VisibilityType == visiblePublic {
+		if plan.VisibilityType == resources.ServicePlanVisibilityPublic {
 			return nil, allWarnings, errors.New("Cannot remove organization level access for public plans.")
 		}
 	}
 
 	var skipped SkippedPlans
 	for _, plan := range plans {
-		if plan.VisibilityType == visibleAdmin {
+		if plan.VisibilityType == resources.ServicePlanVisibilityAdmin {
 			skipped = append(skipped, plan.Name)
 			continue
 		}
@@ -283,7 +277,7 @@ func (actor *Actor) getServiceOfferings(service, broker string) (map[string]offe
 }
 
 func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlanWithSpaceAndOrganization) (names []string, warnings Warnings, err error) {
-	if plan.VisibilityType == visibleOrganization {
+	if plan.VisibilityType == resources.ServicePlanVisibilityOrganization {
 		result, vwarn, err := actor.CloudControllerClient.GetServicePlanVisibility(plan.GUID)
 		warnings = Warnings(vwarn)
 		if err != nil {
@@ -295,7 +289,7 @@ func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlanWithSpaceAnd
 		}
 	}
 
-	if plan.VisibilityType == visibleSpace {
+	if plan.VisibilityType == resources.ServicePlanVisibilitySpace {
 		names = []string{fmt.Sprintf("%s (org: %s)", plan.SpaceName, plan.OrganizationName)}
 	}
 
@@ -345,5 +339,5 @@ func buildPlansFilterForUpdate(offeringGUID, planName string) []ccv3.Query {
 
 func offeringIsSpaceScoped(plans []ccv3.ServicePlan) bool {
 	// All plans from a space scoped offering will have the same visibility type
-	return plans[0].VisibilityType == visibleSpace
+	return plans[0].VisibilityType == resources.ServicePlanVisibilitySpace
 }
