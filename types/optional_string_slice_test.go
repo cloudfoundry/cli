@@ -14,12 +14,6 @@ var _ = Describe("optional string slice", func() {
 		Expect(s.Value).To(SatisfyAll(BeEmpty(), BeNil()))
 	})
 
-	It("can be converted to a string", func() {
-		Expect(types.OptionalStringSlice{}.String()).To(Equal(""))
-		Expect(types.NewOptionalStringSlice().String()).To(Equal(""))
-		Expect(types.NewOptionalStringSlice("foo", "bar", "baz").String()).To(Equal("foo, bar, baz"))
-	})
-
 	When("marshaling", func() {
 		It("can marshal to a slice", func() {
 			s := struct {

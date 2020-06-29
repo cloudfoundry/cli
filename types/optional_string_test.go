@@ -14,12 +14,6 @@ var _ = Describe("optional string", func() {
 		Expect(s.Value).To(BeEmpty())
 	})
 
-	It("can be converted to a string", func() {
-		Expect(types.OptionalString{}.String()).To(Equal(""))
-		Expect(types.NewOptionalString("").String()).To(Equal(""))
-		Expect(types.NewOptionalString("foo").String()).To(Equal("foo"))
-	})
-
 	When("marshaling", func() {
 		It("can marshal to a string", func() {
 			s := struct {
