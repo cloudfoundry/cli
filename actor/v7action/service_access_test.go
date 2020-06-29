@@ -28,11 +28,11 @@ var _ = Describe("service access actions", func() {
 			fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationReturns(fakeServicePlans(), ccv3.Warnings{"plans warning"}, nil)
 			fakeCloudControllerClient.GetServiceOfferingsReturns(fakeServiceOfferings(), ccv3.Warnings{"offerings warning"}, nil)
 
-			visibility1 := ccv3.ServicePlanVisibility{
-				Organizations: []ccv3.VisibilityDetail{{Name: "org-3"}},
+			visibility1 := resources.ServicePlanVisibility{
+				Organizations: []resources.ServicePlanVisibilityDetail{{Name: "org-3"}},
 			}
-			visibility2 := ccv3.ServicePlanVisibility{
-				Organizations: []ccv3.VisibilityDetail{{Name: "org-1"}, {Name: "org-2"}},
+			visibility2 := resources.ServicePlanVisibility{
+				Organizations: []resources.ServicePlanVisibilityDetail{{Name: "org-1"}, {Name: "org-2"}},
 			}
 			fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(0, visibility1, ccv3.Warnings{"visibility1 1 warning"}, nil)
 			fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(1, visibility2, ccv3.Warnings{"visibility1 2 warning"}, nil)
@@ -323,7 +323,7 @@ var _ = Describe("service access actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(
 						0,
-						ccv3.ServicePlanVisibility{},
+						resources.ServicePlanVisibility{},
 						ccv3.Warnings{"visibility warning"},
 						errors.New("fake visibility error"),
 					)
@@ -362,7 +362,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
-				ccv3.ServicePlanVisibility{},
+				resources.ServicePlanVisibility{},
 				ccv3.Warnings{"post warning"},
 				nil,
 			)
@@ -378,11 +378,11 @@ var _ = Describe("service access actions", func() {
 
 			planGUID, actualVisibility := fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(0)
 			Expect(planGUID).To(Equal("fake-plan-guid-1"))
-			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "public"}))
+			Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{Type: "public"}))
 
 			planGUID, actualVisibility = fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(1)
 			Expect(planGUID).To(Equal("fake-plan-guid-2"))
-			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "public"}))
+			Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{Type: "public"}))
 		})
 
 		Describe("fetching service offering", func() {
@@ -502,15 +502,15 @@ var _ = Describe("service access actions", func() {
 
 				planGUID, actualVisibility := fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(0)
 				Expect(planGUID).To(Equal("fake-plan-guid-1"))
-				Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{
+				Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{
 					Type:          "organization",
-					Organizations: []ccv3.VisibilityDetail{{GUID: "org-guid"}}}))
+					Organizations: []resources.ServicePlanVisibilityDetail{{GUID: "org-guid"}}}))
 
 				planGUID, actualVisibility = fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(1)
 				Expect(planGUID).To(Equal("fake-plan-guid-2"))
-				Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{
+				Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{
 					Type:          "organization",
-					Organizations: []ccv3.VisibilityDetail{{GUID: "org-guid"}}}))
+					Organizations: []resources.ServicePlanVisibilityDetail{{GUID: "org-guid"}}}))
 			})
 
 			When("the plan is public", func() {
@@ -551,7 +551,7 @@ var _ = Describe("service access actions", func() {
 		When("setting visibility fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
-					ccv3.ServicePlanVisibility{},
+					resources.ServicePlanVisibility{},
 					ccv3.Warnings{"post warning"},
 					errors.New("post error"),
 				)
@@ -608,7 +608,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
-				ccv3.ServicePlanVisibility{},
+				resources.ServicePlanVisibility{},
 				ccv3.Warnings{"post warning"},
 				nil,
 			)
@@ -625,11 +625,11 @@ var _ = Describe("service access actions", func() {
 
 			planGUID, actualVisibility := fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(0)
 			Expect(planGUID).To(Equal("fake-plan-guid-1"))
-			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "admin"}))
+			Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{Type: "admin"}))
 
 			planGUID, actualVisibility = fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(1)
 			Expect(planGUID).To(Equal("fake-plan-guid-2"))
-			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "admin"}))
+			Expect(actualVisibility).To(Equal(resources.ServicePlanVisibility{Type: "admin"}))
 		})
 
 		Describe("fetching service offering", func() {
@@ -860,7 +860,7 @@ var _ = Describe("service access actions", func() {
 		When("setting visibility fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
-					ccv3.ServicePlanVisibility{},
+					resources.ServicePlanVisibility{},
 					ccv3.Warnings{"post warning"},
 					errors.New("post error"),
 				)

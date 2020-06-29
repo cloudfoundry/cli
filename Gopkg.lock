@@ -85,7 +85,7 @@
   revision = "4d0c80011a0f37da1711c184028bc40137cd45af"
 
 [[projects]]
-  digest = "1:48bab8e85efd1bb42e59770451a4c6162f019782380e0fee5a127a51e2783d9c"
+  digest = "1:32e4d06566487cbc3842226768bc83d5ff8343af0bcb53a40e2606100dd31ae2"
   name = "code.cloudfoundry.org/jsonry"
   packages = [
     ".",
@@ -94,8 +94,8 @@
     "internal/tree",
   ]
   pruneopts = "NUT"
-  revision = "71749cb9ffe007906f39e0144529393de652f06f"
-  version = "v1.0.2"
+  revision = "a75a883932d50a6c7241a3e37b31d65418920572"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
