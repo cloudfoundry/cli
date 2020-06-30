@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 )
@@ -16,7 +17,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 	return serviceInstance, Warnings(warnings), err
 }
 
-func (actor Actor) GetServiceInstanceByNameAndSpaceWithRelationships(serviceInstanceName string, spaceGUID string) (ServiceInstanceWithRelationships, Warnings, error) {
+func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceWithRelationships, Warnings, error) {
 	query := []ccv3.Query{
 		{
 			Key:    ccv3.FieldsServicePlan,
@@ -33,7 +34,11 @@ func (actor Actor) GetServiceInstanceByNameAndSpaceWithRelationships(serviceInst
 	}
 
 	serviceInstance, included, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceNotFoundError:
+		return ServiceInstanceWithRelationships{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
+	default:
 		return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 	}
 

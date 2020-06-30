@@ -29,7 +29,7 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceByNameAndSpaceWithRelationships(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

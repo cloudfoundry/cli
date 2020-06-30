@@ -3,13 +3,13 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -78,7 +78,7 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 	})
 
-	Describe("GetServiceInstanceByNameAndSpaceWithRelationships", func() {
+	Describe("GetServiceInstanceDetails", func() {
 		const (
 			serviceInstanceName = "some-service-instance"
 			spaceGUID           = "some-source-space-guid"
@@ -94,7 +94,7 @@ var _ = Describe("Service Instance Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			serviceInstance, warnings, executionError = actor.GetServiceInstanceByNameAndSpaceWithRelationships(serviceInstanceName, spaceGUID)
+			serviceInstance, warnings, executionError = actor.GetServiceInstanceDetails(serviceInstanceName, spaceGUID)
 		})
 
 		When("the cloud controller request is successful", func() {
@@ -148,6 +148,21 @@ var _ = Describe("Service Instance Actions", func() {
 						Values: []string{"name", "guid"},
 					},
 				))
+			})
+		})
+
+		When("the service instance cannot be found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					ccerror.ServiceInstanceNotFoundError{},
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executionError).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}))
 			})
 		})
 
