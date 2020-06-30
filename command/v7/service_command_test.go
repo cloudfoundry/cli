@@ -65,7 +65,7 @@ var _ = Describe("service command", func() {
 			Name: orgName,
 		})
 
-		fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+		fakeActor.GetServiceInstanceDetailsReturns(
 			v7action.ServiceInstanceWithRelationships{
 				ServiceInstance: resources.ServiceInstance{
 					GUID: serviceInstanceGUID,
@@ -94,8 +94,8 @@ var _ = Describe("service command", func() {
 		It("looks up the service instance and prints the GUID and warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceDetailsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceDetailsArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
@@ -115,7 +115,7 @@ var _ = Describe("service command", func() {
 		)
 
 		BeforeEach(func() {
-			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+			fakeActor.GetServiceInstanceDetailsReturns(
 				v7action.ServiceInstanceWithRelationships{
 					ServiceInstance: resources.ServiceInstance{
 						GUID:            serviceInstanceGUID,
@@ -134,8 +134,8 @@ var _ = Describe("service command", func() {
 		It("looks up the service instance and prints the details and warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceDetailsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceDetailsArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
@@ -172,7 +172,7 @@ var _ = Describe("service command", func() {
 		)
 
 		BeforeEach(func() {
-			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+			fakeActor.GetServiceInstanceDetailsReturns(
 				v7action.ServiceInstanceWithRelationships{
 					ServiceInstance: resources.ServiceInstance{
 						GUID:         serviceInstanceGUID,
@@ -200,8 +200,8 @@ var _ = Describe("service command", func() {
 		It("looks up the service instance and prints the details and warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceDetailsCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceDetailsArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
@@ -234,7 +234,7 @@ var _ = Describe("service command", func() {
 
 	When("there is a problem looking up the service instance", func() {
 		BeforeEach(func() {
-			fakeActor.GetServiceInstanceByNameAndSpaceWithRelationshipsReturns(
+			fakeActor.GetServiceInstanceDetailsReturns(
 				v7action.ServiceInstanceWithRelationships{},
 				v7action.Warnings{"warning one", "warning two"},
 				errors.New("boom"),
