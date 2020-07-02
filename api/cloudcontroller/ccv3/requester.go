@@ -15,13 +15,13 @@ import (
 //go:generate counterfeiter . Requester
 
 type RequestParams struct {
-	RequestName    string
-	URIParams      internal.Params
-	Query          []Query
-	RequestBody    interface{}
-	ResponseBody   interface{}
-	URL            string
-	AppendToList   func(item interface{}) error
+	RequestName  string
+	URIParams    internal.Params
+	Query        []Query
+	RequestBody  interface{}
+	ResponseBody interface{}
+	URL          string
+	AppendToList func(item interface{}) error
 }
 
 type Requester interface {
@@ -52,7 +52,7 @@ type Requester interface {
 		URL string,
 		headers http.Header,
 		requestBody []byte,
-	) ([]byte, Warnings, error)
+	) ([]byte, *http.Response, error)
 
 	MakeRequestUploadAsync(
 		requestName string,
@@ -141,7 +141,7 @@ func (requester *RealRequester) MakeRequestSendReceiveRaw(
 	URL string,
 	headers http.Header,
 	requestBody []byte,
-) ([]byte, Warnings, error) {
+) ([]byte, *http.Response, error) {
 	request, err := requester.newHTTPRequest(requestOptions{
 		URL:    URL,
 		Method: Method,
@@ -156,7 +156,9 @@ func (requester *RealRequester) MakeRequestSendReceiveRaw(
 
 	err = requester.connection.Make(request, &response)
 	// for some flag cases (-i) we will need to get more data off the response (headers etc) consider returning full response
-	return response.RawResponse, response.Warnings, err
+	// headerBytes, _ := httputil.DumpResponse(response.HTTPResponse, false)
+	fmt.Printf("request: %v", request)
+	return response.RawResponse, response.HTTPResponse, err
 }
 
 func (requester *RealRequester) MakeRequestSendRaw(

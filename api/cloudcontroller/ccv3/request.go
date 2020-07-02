@@ -35,8 +35,6 @@ type requestOptions struct {
 func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
 	var request *http.Request
 	var err error
-	//fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	//fmt.Println(passedRequest)
 	if passedRequest.URL != "" {
 		request, err = http.NewRequest(
 			passedRequest.Method,
@@ -57,15 +55,15 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 		request.URL.RawQuery = FormatQueryParameters(passedRequest.Query).Encode()
 	}
 
-	if passedRequest.Header != nil {
-		request.Header = passedRequest.Header
-	} else {
-		request.Header = http.Header{}
-	}
+	request.Header = http.Header{}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("User-Agent", requester.userAgent)
 
-	if passedRequest.Body != nil {
+	if passedRequest.Header != nil {
+		request.Header = passedRequest.Header
+	}
+
+	if passedRequest.Body != nil && request.Header.Get("Content-Type") == "" {
 		request.Header.Set("Content-Type", "application/json")
 	}
 

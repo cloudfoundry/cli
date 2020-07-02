@@ -2,20 +2,23 @@ package v7
 
 import (
 	"bufio"
+	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/textproto"
 	"strings"
 
 	"fmt"
 
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 type CurlCommand struct {
 	BaseCommand
 
 	RequiredArgs          flag.APIPath    `positional-args:"yes"`
-	CustomHeaders         []string          `short:"H" description:"Custom headers to include in the request, flag can be specified multiple times"`
+	CustomHeaders         []string        `short:"H" description:"Custom headers to include in the request, flag can be specified multiple times"`
 	HTTPMethod            string          `short:"X" description:"HTTP method (GET,POST,PUT,DELETE,etc)"`
 	HTTPData              flag.PathWithAt `short:"d" description:"HTTP data to include in the request body, or '@' followed by a file name to read the data from"`
 	FailOnHTTPError       bool            `short:"f" long:"fail" description:"Server errors return exit code 22"`
@@ -27,10 +30,9 @@ type CurlCommand struct {
 func (cmd CurlCommand) Execute(args []string) error {
 	url := fmt.Sprintf("%s/%s", cmd.Config.Target(), strings.TrimLeft(cmd.RequiredArgs.Path, "/"))
 	header := http.Header{}
-	err := mergeHeaders(header, strings.Join(cmd.CustomHeaders, "\n"))
+	err := mergeHeaders(&header, cmd.CustomHeaders)
 	if err != nil {
-		// err = fmt.Errorf("%s: %s", T("Error parsing headers"), err.Error())
-		return err
+		return translatableerror.RequestCreationError{Err: err}
 	}
 
 	method := cmd.HTTPMethod
@@ -38,23 +40,53 @@ func (cmd CurlCommand) Execute(args []string) error {
 		method = "POST"
 	}
 
-	responseBytes, warnings, err := cmd.cloudControllerClient.MakeRequestSendReceiveRaw(
+	byteString := []byte(cmd.HTTPData)
+	trimmedInput := strings.Trim(string(cmd.HTTPData), `"'`)
+	if strings.HasPrefix(trimmedInput, `@`) {
+		trimmedInput = strings.Trim(trimmedInput[1:], `"'`)
+		byteString, err = ioutil.ReadFile(trimmedInput)
+		if err != nil {
+			return translatableerror.RequestCreationError{Err: err}
+		}
+	}
+
+	responseBodyBytes, httpResponse, err := cmd.cloudControllerClient.MakeRequestSendReceiveRaw(
 		method,
 		url,
 		header,
-		[]byte(cmd.HTTPData),
+		byteString,
 	)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
+
+	if err != nil && cmd.FailOnHTTPError {
+		return translatableerror.CurlExit22Error{StatusCode: httpResponse.StatusCode}
 	}
 
-	cmd.UI.DisplayText(string(responseBytes))
+	var bytesToWrite []byte
+
+	if cmd.IncludeReponseHeaders {
+		headerBytes, _ := httputil.DumpResponse(httpResponse, false)
+		bytesToWrite = append(bytesToWrite, headerBytes...)
+	}
+
+	bytesToWrite = append(bytesToWrite, responseBodyBytes...)
+
+	if cmd.OutputFile != "" {
+		err = ioutil.WriteFile(cmd.OutputFile.String(), bytesToWrite, 0666)
+		if err != nil {
+			// Todo: change this error type
+			return translatableerror.ManifestCreationError{Err: err}
+		}
+
+		cmd.UI.DisplayOK()
+	} else {
+		cmd.UI.DisplayText(string(bytesToWrite))
+	}
 
 	return nil
 }
 
-func mergeHeaders(destination http.Header, headerString string) (err error) {
+func mergeHeaders(destination *http.Header, customHeaders []string) (err error) {
+	headerString := strings.Join(customHeaders, "\n")
 	headerString = strings.TrimSpace(headerString)
 	headerString += "\n\n"
 	headerReader := bufio.NewReader(strings.NewReader(headerString))
@@ -66,7 +98,6 @@ func mergeHeaders(destination http.Header, headerString string) (err error) {
 	for key, values := range headers {
 		destination.Del(key)
 		for _, value := range values {
-			fmt.Printf("adding key %v and value %v\n\n", key, value)
 			destination.Add(key, value)
 		}
 	}

@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("shared request helpers", func() {
+var _ = Describe("shared request helpers", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -451,11 +451,11 @@ var _ = FDescribe("shared request helpers", func() {
 			headers       http.Header
 			requestBody   []byte
 			responseBytes []byte
-			warnings      Warnings
+			httpResponse  *http.Response
 			executeErr    error
 		)
 		JustBeforeEach(func() {
-			responseBytes, warnings, executeErr = client.MakeRequestSendReceiveRaw(method, url, headers, requestBody)
+			responseBytes, httpResponse, executeErr = client.MakeRequestSendReceiveRaw(method, url, headers, requestBody)
 		})
 
 		Context("PATCH request with body", func() {
@@ -520,8 +520,6 @@ var _ = FDescribe("shared request helpers", func() {
 
 			It("successfully makes the request", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-
 				actualResponse := `{
 					"guid": "some-app-guid",
 					"name": "some-app-name",
@@ -534,6 +532,7 @@ var _ = FDescribe("shared request helpers", func() {
 					}
 				}`
 				Expect(string(responseBytes)).To(Equal(actualResponse))
+				Expect(httpResponse.Header["X-Cf-Warnings"][0]).To(Equal("this is a warning"))
 			})
 		})
 	})
