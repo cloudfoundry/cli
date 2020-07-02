@@ -13,6 +13,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	uuid2 "github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +21,7 @@ import (
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
-var _ = Describe("Integration Test", func() {
+var _ = Describe("Integration Test For Hydrabroker", func() {
 	var (
 		server      *httptest.Server
 		client      *http.Client
@@ -126,7 +127,12 @@ var _ = Describe("Integration Test", func() {
 
 		It("allows a service instance to be created", func() {
 			instanceGUID := randomString()
-			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
+
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
 			expectStatusCode(response, http.StatusCreated)
 
 			var r map[string]interface{}
@@ -134,6 +140,36 @@ var _ = Describe("Integration Test", func() {
 			Expect(r).To(Equal(map[string]interface{}{
 				"dashboard_url": "http://example.com",
 			}))
+		})
+
+		When("a service instance exists", func() {
+			var (
+				instanceGUID string
+				parameters   map[string]interface{}
+			)
+
+			BeforeEach(func() {
+				instanceGUID = randomString()
+				parameters = map[string]interface{}{"foo": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					PlanID:     cfg.Services[0].Plans[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+				expectStatusCode(response, http.StatusCreated)
+			})
+
+			It("allows a service instance to be retrieved", func() {
+				response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var instance apiresponses.GetInstanceResponse
+				fromJSON(response.Body, &instance)
+				Expect(instance.Parameters).To(Equal(parameters))
+			})
 		})
 
 		It("allows a service instance to be deleted", func() {
@@ -332,9 +368,13 @@ var _ = Describe("Integration Test", func() {
 		It("does async provision", func() {
 			var operation string
 			instanceGUID := randomString()
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", nil)
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", toJSON(request))
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse

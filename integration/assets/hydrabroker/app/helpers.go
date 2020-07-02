@@ -5,9 +5,8 @@ import (
 	"errors"
 	"net/http"
 
-	uuid "github.com/nu7hatch/gouuid"
-
 	"github.com/gorilla/mux"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 func respondWithJSON(w http.ResponseWriter, data interface{}) error {
@@ -21,14 +20,16 @@ func respondWithJSON(w http.ResponseWriter, data interface{}) error {
 	return err
 }
 
-func readGUID(r *http.Request) (string, error) {
+func readGUIDs(r *http.Request) (requestGUIDs, error) {
 	vars := mux.Vars(r)
-	guid, ok := vars["guid"]
+	brokerGUID, ok := vars["broker_guid"]
 	if !ok {
-		return "", errors.New("no guid in request")
+		return requestGUIDs{}, errors.New("no brokerGUID in request")
 	}
 
-	return guid, nil
+	instanceGUID := vars["instance_guid"]
+
+	return requestGUIDs{brokerGUID: brokerGUID, serviceInstanceGUID: instanceGUID}, nil
 }
 
 func mustGUID() string {

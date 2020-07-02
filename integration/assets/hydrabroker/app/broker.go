@@ -2,44 +2,51 @@ package app
 
 import (
 	"crypto/subtle"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
 	"github.com/pivotal-cf/brokerapi/v7/domain"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
-func brokerCheckRequest(store *store.BrokerConfigurationStore, r *http.Request) (config.BrokerConfiguration, error) {
-	guid, err := readGUID(r)
+type requestGUIDs struct {
+	brokerGUID          string
+	serviceInstanceGUID string
+	bindingGUID         string
+}
+
+func brokerParseHeaders(store *store.BrokerConfigurationStore, r *http.Request) (config.BrokerConfiguration, requestGUIDs, error) {
+	guids, err := readGUIDs(r)
 	if err != nil {
-		return config.BrokerConfiguration{}, err
+		return config.BrokerConfiguration{}, requestGUIDs{}, err
 	}
 
-	cfg, ok := store.GetBrokerConfiguration(guid)
+	cfg, ok := store.GetBrokerConfiguration(guids.brokerGUID)
 	if !ok {
-		return config.BrokerConfiguration{}, notFoundError{}
+		return config.BrokerConfiguration{}, requestGUIDs{}, notFoundError{}
 	}
 
 	givenUsername, givenPassword, ok := r.BasicAuth()
 	if !ok {
-		return config.BrokerConfiguration{}, unauthorizedError{}
+		return config.BrokerConfiguration{}, requestGUIDs{}, unauthorizedError{}
 	}
 
 	// Compare everything every time to protect against timing attacks
 	if 2 != subtle.ConstantTimeCompare([]byte(cfg.Username), []byte(givenUsername))+
 		subtle.ConstantTimeCompare([]byte(cfg.Password), []byte(givenPassword)) {
-		return config.BrokerConfiguration{}, unauthorizedError{}
+		return config.BrokerConfiguration{}, requestGUIDs{}, unauthorizedError{}
 	}
 
-	return cfg, nil
+	return cfg, guids, nil
 }
 
 func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -105,7 +112,7 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 }
 
 func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -113,6 +120,15 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 	if config.ProvisionResponse != 0 {
 		w.WriteHeader(config.ProvisionResponse)
 		return nil
+	}
+
+	var details resources.ServiceInstanceDetails
+	if err := json.NewDecoder(r.Body).Decode(&details); err != nil {
+		return newBadRequestError("invalid JSON", err)
+	}
+
+	if err := store.CreateServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
+		return err
 	}
 
 	response := map[string]interface{}{
@@ -128,8 +144,27 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 	}
 }
 
+func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	_, guids, err := brokerParseHeaders(store, r)
+	if err != nil {
+		return err
+	}
+
+	details, err := store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	if err != nil {
+		return err
+	}
+
+	response := map[string]interface{}{
+		"parameters": details.Parameters,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return respondWithJSON(w, response)
+}
+
 func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -149,7 +184,7 @@ func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 }
 
 func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -169,7 +204,7 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 }
 
 func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -189,7 +224,7 @@ func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r 
 }
 
 func brokerGetBinding(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -203,7 +238,7 @@ func brokerGetBinding(store *store.BrokerConfigurationStore, w http.ResponseWrit
 }
 
 func brokerUnbind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, err := brokerCheckRequest(store, r)
+	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -238,7 +273,7 @@ func brokerAsyncResponse(w http.ResponseWriter, r *http.Request, duration time.D
 }
 
 func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	_, err := brokerCheckRequest(store, r)
+	_, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}

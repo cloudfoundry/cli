@@ -5,10 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
-
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"github.com/go-playground/validator/v10"
 )
 
 var validate = validator.New()
@@ -31,24 +30,24 @@ func configRecreateBroker(store *store.BrokerConfigurationStore, w http.Response
 		return err
 	}
 
-	guid, err := readGUID(r)
+	guid, err := readGUIDs(r)
 	if err != nil {
 		return err
 	}
 
-	store.UpdateBroker(guid, c)
+	store.UpdateBroker(guid.brokerGUID, c)
 
 	w.WriteHeader(http.StatusNoContent)
 	return nil
 }
 
 func configDeleteBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	guid, err := readGUID(r)
+	guid, err := readGUIDs(r)
 	if err != nil {
 		return err
 	}
 
-	store.DeleteBroker(guid)
+	store.DeleteBroker(guid.brokerGUID)
 
 	w.WriteHeader(http.StatusNoContent)
 	return nil
