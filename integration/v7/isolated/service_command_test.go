@@ -185,6 +185,8 @@ var _ = Describe("service command", func() {
 						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
 						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
 						Say(`tags:\s+%s\n`, tags),
+						Say(`description:\s+%s\n`, broker.Services[0].Description),
+						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),

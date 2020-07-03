@@ -21,6 +21,7 @@ var _ = Describe("service offering resource", func() {
 		Entry("name", ServiceOffering{Name: "fake-name"}, `{"name": "fake-name"}`),
 		Entry("guid", ServiceOffering{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
 		Entry("description", ServiceOffering{Description: "once upon a time"}, `{"description": "once upon a time"}`),
+		Entry("documentation_url", ServiceOffering{DocumentationURL: "https://docs.com"}, `{"documentation_url": "https://docs.com"}`),
 		Entry(
 			"service broker guid",
 			ServiceOffering{ServiceBrokerGUID: "fake-service-broker-guid"},
@@ -59,6 +60,7 @@ var _ = Describe("service offering resource", func() {
 				Name:              "fake-name",
 				GUID:              "fake-guid",
 				Description:       "once upon a time",
+				DocumentationURL:  "https://docs.com",
 				ServiceBrokerGUID: "fake-service-broker-guid",
 				Metadata: &Metadata{
 					Labels: map[string]types.NullString{
@@ -72,6 +74,7 @@ var _ = Describe("service offering resource", func() {
 				"guid": "fake-guid",
 				"url": "https://fake-url.com",
 				"description": "once upon a time",
+				"documentation_url": "https://docs.com",
 				"metadata": {
 					"labels": {
 						"foo": "bar",

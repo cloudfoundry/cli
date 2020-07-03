@@ -25,12 +25,13 @@ func newDefaultConfig() *ServiceBrokerStub {
 
 func newDefaultServiceOffering() config.Service {
 	return config.Service{
-		Name:        helpers.NewServiceOfferingName(),
-		ID:          helpers.RandomName(),
-		Description: helpers.PrefixedRandomName("SERVICE-OFFERING-DESCRIPTION"),
-		Shareable:   true,
-		Bindable:    true,
-		Plans:       []config.Plan{newDefaultPlan()},
+		Name:             helpers.NewServiceOfferingName(),
+		ID:               helpers.RandomName(),
+		Description:      helpers.PrefixedRandomName("SERVICE-OFFERING-DESCRIPTION"),
+		DocumentationURL: helpers.RandomURL(),
+		Shareable:        true,
+		Bindable:         true,
+		Plans:            []config.Plan{newDefaultPlan()},
 	}
 }
 

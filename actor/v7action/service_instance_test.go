@@ -80,11 +80,13 @@ var _ = Describe("Service Instance Actions", func() {
 
 	Describe("GetServiceInstanceDetails", func() {
 		const (
-			serviceInstanceName = "some-service-instance"
-			spaceGUID           = "some-source-space-guid"
-			servicePlanName     = "fake-service-plan-name"
-			serviceOfferingName = "fake-service-offering-name"
-			serviceBrokerName   = "fake-service-broker-name"
+			serviceInstanceName          = "some-service-instance"
+			spaceGUID                    = "some-source-space-guid"
+			servicePlanName              = "fake-service-plan-name"
+			serviceOfferingName          = "fake-service-offering-name"
+			serviceOfferingDescription   = "some-service-description"
+			serviceOfferingDocumentation = "some-service-documentation-url"
+			serviceBrokerName            = "fake-service-broker-name"
 		)
 
 		var (
@@ -105,9 +107,13 @@ var _ = Describe("Service Instance Actions", func() {
 						GUID: "some-service-instance-guid",
 					},
 					ccv3.IncludedResources{
-						ServicePlans:     []resources.ServicePlan{{Name: servicePlanName}},
-						ServiceOfferings: []resources.ServiceOffering{{Name: serviceOfferingName}},
-						ServiceBrokers:   []resources.ServiceBroker{{Name: serviceBrokerName}},
+						ServicePlans: []resources.ServicePlan{{Name: servicePlanName}},
+						ServiceOfferings: []resources.ServiceOffering{{
+							Name:             serviceOfferingName,
+							Description:      serviceOfferingDescription,
+							DocumentationURL: serviceOfferingDocumentation,
+						}},
+						ServiceBrokers: []resources.ServiceBroker{{Name: serviceBrokerName}},
 					},
 					ccv3.Warnings{"some-service-instance-warning"},
 					nil,
@@ -124,9 +130,13 @@ var _ = Describe("Service Instance Actions", func() {
 							Name: "some-service-instance",
 							GUID: "some-service-instance-guid",
 						},
-						ServicePlanName:     servicePlanName,
-						ServiceOfferingName: serviceOfferingName,
-						ServiceBrokerName:   serviceBrokerName,
+						ServiceOffering: resources.ServiceOffering{
+							Name:             serviceOfferingName,
+							Description:      serviceOfferingDescription,
+							DocumentationURL: serviceOfferingDocumentation,
+						},
+						ServicePlanName:   servicePlanName,
+						ServiceBrokerName: serviceBrokerName,
 					},
 				))
 
@@ -141,7 +151,7 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 					ccv3.Query{
 						Key:    ccv3.FieldsServicePlanServiceOffering,
-						Values: []string{"name", "guid"},
+						Values: []string{"name", "guid", "description", "documentation_url"},
 					},
 					ccv3.Query{
 						Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,

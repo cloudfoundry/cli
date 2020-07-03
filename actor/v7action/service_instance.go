@@ -9,7 +9,9 @@ import (
 
 type ServiceInstanceWithRelationships struct {
 	resources.ServiceInstance
-	ServicePlanName, ServiceOfferingName, ServiceBrokerName string
+	ServiceOffering   resources.ServiceOffering
+	ServicePlanName   string
+	ServiceBrokerName string
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -25,7 +27,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		},
 		{
 			Key:    ccv3.FieldsServicePlanServiceOffering,
-			Values: []string{"name", "guid"},
+			Values: []string{"name", "guid", "description", "documentation_url"},
 		},
 		{
 			Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
@@ -51,7 +53,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	}
 
 	if len(included.ServiceOfferings) == 1 {
-		result.ServiceOfferingName = included.ServiceOfferings[0].Name
+		result.ServiceOffering = included.ServiceOfferings[0]
 	}
 
 	if len(included.ServiceBrokers) == 1 {

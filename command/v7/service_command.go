@@ -78,10 +78,11 @@ func (cmd ServiceCommand) displayManaged() error {
 		{cmd.UI.TranslateText("guid:"), cmd.serviceInstance.GUID},
 		{cmd.UI.TranslateText("type:"), string(cmd.serviceInstance.Type)},
 		{cmd.UI.TranslateText("broker:"), cmd.serviceInstance.ServiceBrokerName},
-		{cmd.UI.TranslateText("offering:"), cmd.serviceInstance.ServiceOfferingName},
+		{cmd.UI.TranslateText("offering:"), cmd.serviceInstance.ServiceOffering.Name},
 		{cmd.UI.TranslateText("plan:"), cmd.serviceInstance.ServicePlanName},
-
 		{cmd.UI.TranslateText("tags:"), cmd.serviceInstance.Tags.String()},
+		{cmd.UI.TranslateText("description:"), cmd.serviceInstance.ServiceOffering.Description},
+		{cmd.UI.TranslateText("documentation:"), cmd.serviceInstance.ServiceOffering.DocumentationURL},
 		{cmd.UI.TranslateText("dashboard url:"), cmd.serviceInstance.DashboardURL.String()},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)

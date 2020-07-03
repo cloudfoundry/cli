@@ -103,7 +103,7 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 			Requires:            brokerCastRequires(s.Requires),
 			Metadata: &domain.ServiceMetadata{
 				Shareable:        &s.Shareable,
-				DocumentationUrl: `http://documentation.url`,
+				DocumentationUrl: s.DocumentationURL,
 			},
 		})
 	}

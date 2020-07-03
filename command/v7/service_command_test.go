@@ -159,16 +159,18 @@ var _ = Describe("service command", func() {
 
 	When("it is a managed service instance", func() {
 		const (
-			dashboardURL             = "https://dashboard.com"
-			tags                     = "foo, bar"
-			servicePlanName          = "fake-service-plan-name"
-			serviceOfferingName      = "fake-service-offering-name"
-			serviceBrokerName        = "fake-service-broker-name"
-			lastOperationType        = "create"
-			lastOperationState       = "in progress"
-			lastOperationDescription = "doing amazing work"
-			lastOperationStartTime   = "a second ago"
-			lastOperationUpdatedTime = "just now"
+			dashboardURL               = "https://dashboard.com"
+			tags                       = "foo, bar"
+			servicePlanName            = "fake-service-plan-name"
+			serviceOfferingName        = "fake-service-offering-name"
+			serviceOfferingDescription = "an amazing service"
+			serviceOfferingDocs        = "https://service.docs.com"
+			serviceBrokerName          = "fake-service-broker-name"
+			lastOperationType          = "create"
+			lastOperationState         = "in progress"
+			lastOperationDescription   = "doing amazing work"
+			lastOperationStartTime     = "a second ago"
+			lastOperationUpdatedTime   = "just now"
 		)
 
 		BeforeEach(func() {
@@ -188,9 +190,13 @@ var _ = Describe("service command", func() {
 							UpdatedAt:   lastOperationUpdatedTime,
 						},
 					},
-					ServicePlanName:     servicePlanName,
-					ServiceOfferingName: serviceOfferingName,
-					ServiceBrokerName:   serviceBrokerName,
+					ServiceOffering: resources.ServiceOffering{
+						Name:             serviceOfferingName,
+						Description:      serviceOfferingDescription,
+						DocumentationURL: serviceOfferingDocs,
+					},
+					ServicePlanName:   servicePlanName,
+					ServiceBrokerName: serviceBrokerName,
 				},
 				v7action.Warnings{"warning one", "warning two"},
 				nil,
@@ -215,6 +221,8 @@ var _ = Describe("service command", func() {
 				Say(`offering:\s+%s`, serviceOfferingName),
 				Say(`plan:\s+%s`, servicePlanName),
 				Say(`tags:\s+%s\n`, tags),
+				Say(`description:\s+%s\n`, serviceOfferingDescription),
+				Say(`documentation:\s+%s\n`, serviceOfferingDocs),
 				Say(`dashboard url:\s+%s\n`, dashboardURL),
 				Say(`\n`),
 				Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
