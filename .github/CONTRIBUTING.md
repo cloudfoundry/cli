@@ -27,7 +27,7 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
    that has signed [the corporate CLA](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf).
 1. Review the CF CLI [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide),
    [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide),
-   [Code Style Guide](https://github.com/cloudfoundry/cli/wiki/Code-Style-Guide),
+   [Product Style Guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide),
    [Testing Style Guide](https://github.com/cloudfoundry/cli/wiki/Testing-Style-Guide),
    or [Internationalization Guide](https://github.com/cloudfoundry/cli/wiki/Internationalization-Guide).
 1. Fork the project repository.
