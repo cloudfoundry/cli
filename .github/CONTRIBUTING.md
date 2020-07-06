@@ -3,30 +3,14 @@
 The Cloud Foundry team uses GitHub and accepts code contributions via [pull
 requests](https://help.github.com/articles/about-pull-requests/).
 
-## CLI v6.x & v7-beta
+## CLI Versions
+With the advent of the V7 GA, we've moved to a branching development model.
+- The [V7 cf CLI](https://github.com/cloudfoundry/cli/tree/v7) is the version of the CLI that is currently under active development.
+- The [V6 cf CLI](https://github.com/cloudfoundry/cli/tree/v6) is maintenance only and will only be updated to patch severe security issues and defects. 
+- The [main branch](https://github.com/cloudfoundry/cli/tree/master) is for breaking changes meant to ship in the next major revision.
 
-The code base is undergoing major work to support new Cloud Controller APIs.
-Most CLI users have a v6 CLI.
-Some users are trying out a beta version of v7.
-Both versions are in active development.
-You will find the entry point for v6 commands in the _cli/command/v6_ directory.
-v7 commands are found in the _cli/command/v7_ directory.
-More details are available in the [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide).
-
-**Note**: The CLI can currently be compiled to use V6 or V7 code paths.
-Depending on the nature of the intended changes, you may be contributing to V6
-code, V7 code, and/or shared code. The rest of this guide assumes that
-your changes are to V6 code or shared code. If your changes are in V7 code, refer to the
-[V7-specific contributing information](https://github.com/cloudfoundry/cli/wiki/Contributing-V7.md) for more information.
-If your changes are to shared code, please also run V7 tests before submitting a
-pull request.
-
-The `make` commands in this file can be used with V6 or V7 code. To run the V7
-version of tests or build the V7 version of the binary, set `TARGET_V7=1` in the
-environment. If `TARGET_V7` is unset, `make` commands will target V6.
 
 ## Prerequisites
-
 Before working on a PR to the CLI code base, please:
 
   - reach out to us first via a [GitHub issue](https://github.com/cloudfoundry/cli/issues),
@@ -47,7 +31,7 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
    [Testing Style Guide](https://github.com/cloudfoundry/cli/wiki/Testing-Style-Guide),
    or [Internationalization Guide](https://github.com/cloudfoundry/cli/wiki/Internationalization-Guide).
 1. Fork the project repository.
-1. Create a feature branch (e.g. `git checkout -b better_cli`) and make changes on this branch
+1. Create a feature branch from the branch that's [appropriate for your change](#cli-versions) (e.g. `git checkout v7 && git checkout -b better_cli`) and make changes on this branch
    * Follow the other sections on this page to [set up your development environment](#development-environment-setup), [build `cf`](#building-the-cf-binary) and [run the tests](#testing).
    * Tests are required for any changes.
 1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
@@ -73,7 +57,7 @@ The CF CLI requires the following development tools in order to run our test:
   fakes/mocks for testing. Currently using version `6.*`.
 - [dep](https://github.com/golang/dep) - `vendor` dependency management tool
 - [make](https://www.gnu.org/software/make/) - tool for building the CLI and
-  running it's tests.
+  running its tests.
 
 ## Git Checkout
 
@@ -122,7 +106,7 @@ make units # runs all non-cf directory unit tests
 ```
 
 **Note: `make units-full` is recommended over `make units` if you are unsure of
-how wide reaching the intended changes are.**
+how wide-reaching the intended changes are.**
 
 ## Running the Integration tests
 
@@ -142,8 +126,8 @@ make integration-tests # runs the isolated, push and global integration tests
 make integration-tests-full # runs all the integration suites
 ```
 
-If the number of parallel nodes for the non-global test suites would like to be
-adjusted, set the `NODES` environment variable:
+To adjust the number of parallel nodes for the non-global test suites, set the 
+`NODES` environment variable:
 
 ```bash
 NODES=10 make integration-tests
@@ -151,7 +135,7 @@ NODES=10 make integration-tests
 
 # Modifying the CLI codebase
 
-All changes to the CF CLI require updates to the unit/integration test. There
+All changes to the CF CLI require updates to the unit/integration tests. There
 are additional requirements around updating the CF CLI that will be listed
 below.
 
@@ -188,7 +172,7 @@ abide by third party licenses.
 
 ## API Versioning
 
-The CLI has a minimum version requirements for the APIs it interfaces with, the
+The CLI has a minimum version requirements for the APIs it interfaces with. The
 requirements for these APIs are listed in the [Version Policy
 guide](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version).
 
