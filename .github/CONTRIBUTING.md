@@ -28,7 +28,6 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
 1. Review the CF CLI [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide),
    [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide),
    [Product Style Guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide),
-   [Testing Style Guide](https://github.com/cloudfoundry/cli/wiki/Testing-Style-Guide),
    or [Internationalization Guide](https://github.com/cloudfoundry/cli/wiki/Internationalization-Guide).
 1. Fork the project repository.
 1. Create a feature branch from the branch that's [appropriate for your change](#cli-versions) (e.g. `git checkout v7 && git checkout -b better_cli`) and make changes on this branch
