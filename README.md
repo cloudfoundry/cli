@@ -287,11 +287,11 @@ Below you'll find instructions for each of the package managers we support.
 #### Switching CLI versions Using Yum or Apt
 We're working on a robust soluiton that will faciliate more seamless switching via these package managers, but for now you must uninstall one version of the CLI and install the other version of the CLI to switch between them.
 - Currently on v6, want to switch to v7:
-  - yum: `sudo yum remove cf6-cli && sudo yum install cf7-cli && cf version`
-  - apt: `sudo apt-get remove cf6-cli && sudo apt-get cf7-cli && cf version`
+  - yum: `sudo yum remove cf-cli && sudo yum install cf7-cli && cf version`
+  - apt: `sudo apt-get remove cf-cli && sudo apt-get cf7-cli && cf version`
 - Currently on v7, want to switch to v6:
-  - yum: `sudo yum remove cf7-cli && sudo yum install cf6-cli && cf version`
-  - apt: `sudo apt-get remove cf7-cli && sudo apt-get cf6-cli && cf version`
+  - yum: `sudo yum remove cf7-cli && sudo yum install cf-cli && cf version`
+  - apt: `sudo apt-get remove cf7-cli && sudo apt-get cf-cli && cf version`
 
 #### Switching CLI Versions Pulled via GitHub or CLAW
 The following is a simple approach:
