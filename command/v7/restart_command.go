@@ -29,7 +29,6 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
 	if err != nil {
-		ui.DisplayText("here3")
 		return err
 	}
 	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
