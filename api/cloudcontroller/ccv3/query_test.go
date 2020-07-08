@@ -36,15 +36,15 @@ var _ = Describe("Query Helpers", func() {
 				inputQueries = []Query{
 					{
 						Key:    NameFilter,
-						Values: []string{"name1", "name,2"},
+						Values: []string{"name1", "name,2", "name 3"},
 					},
 				}
 				outputParameters = FormatQueryParameters(inputQueries)
 			})
 
-			It("encodes the param values before formatting", func() {
+			It("encodes commas before formatting", func() {
 				Expect(outputParameters).To(Equal(url.Values{
-					"names": []string{"name1,name%2C2"},
+					"names": []string{"name1,name%2C2,name 3"},
 				}))
 			})
 		})
