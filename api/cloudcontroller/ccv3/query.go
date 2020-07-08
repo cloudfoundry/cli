@@ -127,7 +127,8 @@ func FormatQueryParameters(queries []Query) url.Values {
 		if query.Key == NameFilter {
 			encodedParamValues := []string{}
 			for _, valString := range query.Values {
-				encodedParamValues = append(encodedParamValues, url.QueryEscape(valString))
+				commaEncoded := strings.ReplaceAll(valString, ",", "%2C")
+				encodedParamValues = append(encodedParamValues, commaEncoded)
 			}
 			query.Values = encodedParamValues
 		}
