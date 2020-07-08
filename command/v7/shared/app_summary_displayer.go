@@ -30,12 +30,18 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 	}
 
 	var lifecycleInfo []string
+	var buildpackVersions []string
+	var buildpackUserProvidedNames []string
+
 	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
 		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
 	} else {
-		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
-	}
+		names, versions, userProvidedNames := display.buildpackInfo(summary.CurrentDroplet.Buildpacks)
+		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), names}
+		buildpackVersions = []string{display.UI.TranslateText("buildpack versions:"), versions}
+		buildpackUserProvidedNames = []string{display.UI.TranslateText("buildpack names:"), userProvidedNames}
 
+	}
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
@@ -44,6 +50,8 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		lifecycleInfo,
+		buildpackVersions,
+		buildpackUserProvidedNames,
 	}
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
@@ -138,17 +146,31 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	return ""
 }
 
-func (AppSummaryDisplayer) buildpackNames(buildpacks []resources.DropletBuildpack) string {
+func (AppSummaryDisplayer) buildpackInfo(buildpacks []resources.DropletBuildpack) (string, string, string) {
 	var names []string
+	var versions []string
+	var userProvidedNames []string
+
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {
 			names = append(names, buildpack.DetectOutput)
+			buildpackVersion := []string{buildpack.DetectOutput, buildpack.Version}
+			if buildpack.Version != "" {
+				versions = append(versions, strings.Join(buildpackVersion, " "))
+			} else {
+				versions = append(versions, buildpack.DetectOutput)
+			}
 		} else {
 			names = append(names, buildpack.Name)
+			versions = append(versions, buildpack.Name)
 		}
+		userProvidedNames = append(userProvidedNames, buildpack.Name)
 	}
 
-	return strings.Join(names, ", ")
+	detectedNamesString := strings.Join(names, ", ")
+	versionsString := strings.TrimSpace(strings.Join(versions, ", "))
+	userProvidedNamesString:= strings.TrimSpace(strings.Join(userProvidedNames, ", "))
+	return detectedNamesString, versionsString, userProvidedNamesString
 }
 
 func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
