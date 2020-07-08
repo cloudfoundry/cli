@@ -203,7 +203,7 @@ Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.
 
 ### Downloading the latest V7 CF CLI
 
-**Important Note**: The v7 CF CLI is pending GA. When it GA's, the binary will be renamed from `cf7` to `cf`. If you're already using the v7 CLI in parallel to the v6 CLI, you may need to change your workflow to accomodate the binary name change. See the [Version Switching](#version-switching) section for instructions. For more information and general status on the v7 CLI, please check [releases](https://github.com/cloudfoundry/cli/releases).
+**Important Note**: The v7 CF CLI is now GA and the binary has been renamed from `cf7` to `cf`. If you're already using the v7 CLI in parallel to the v6 CLI, you may need to change your workflow to accomodate the binary name change. See the [Version Switching](#version-switching) section for instructions. For more information and general status on the v7 CLI, please check [releases](https://github.com/cloudfoundry/cli/releases).
 
 #### Compatibility
 The v7 CLI's minimum supported version of the CC API is `v3.85.0` (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)).
