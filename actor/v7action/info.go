@@ -1,7 +1,7 @@
 package v7action
 
 func (actor Actor) GetLogCacheEndpoint() (string, Warnings, error) {
-	info, _, warnings, err := actor.CloudControllerClient.GetInfo()
+	info, warnings, err := actor.CloudControllerClient.GetInfo()
 	if err != nil {
 		return "", Warnings(warnings), err
 	}

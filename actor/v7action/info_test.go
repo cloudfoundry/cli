@@ -30,7 +30,6 @@ var _ = Describe("Info Actions", func() {
 							LogCache: ccv3.APILink{HREF: "some-log-cache-url"},
 						},
 					},
-					nil,
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -54,7 +53,6 @@ var _ = Describe("Info Actions", func() {
 				expectedErr = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetInfoReturns(
 					ccv3.Info{},
-					nil,
 					ccv3.Warnings{"warning-1", "warning-2"},
 					expectedErr,
 				)

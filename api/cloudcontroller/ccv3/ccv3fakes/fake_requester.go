@@ -15,10 +15,10 @@ type FakeRequester struct {
 	initializeConnectionArgsForCall []struct {
 		arg1 ccv3.TargetSettings
 	}
-	InitializeRouterStub        func(map[string]string)
+	InitializeRouterStub        func(string)
 	initializeRouterMutex       sync.RWMutex
 	initializeRouterArgsForCall []struct {
-		arg1 map[string]string
+		arg1 string
 	}
 	MakeListRequestStub        func(ccv3.RequestParams) (ccv3.IncludedResources, ccv3.Warnings, error)
 	makeListRequestMutex       sync.RWMutex
@@ -147,10 +147,10 @@ func (fake *FakeRequester) InitializeConnectionArgsForCall(i int) ccv3.TargetSet
 	return argsForCall.arg1
 }
 
-func (fake *FakeRequester) InitializeRouter(arg1 map[string]string) {
+func (fake *FakeRequester) InitializeRouter(arg1 string) {
 	fake.initializeRouterMutex.Lock()
 	fake.initializeRouterArgsForCall = append(fake.initializeRouterArgsForCall, struct {
-		arg1 map[string]string
+		arg1 string
 	}{arg1})
 	fake.recordInvocation("InitializeRouter", []interface{}{arg1})
 	fake.initializeRouterMutex.Unlock()
@@ -165,13 +165,13 @@ func (fake *FakeRequester) InitializeRouterCallCount() int {
 	return len(fake.initializeRouterArgsForCall)
 }
 
-func (fake *FakeRequester) InitializeRouterCalls(stub func(map[string]string)) {
+func (fake *FakeRequester) InitializeRouterCalls(stub func(string)) {
 	fake.initializeRouterMutex.Lock()
 	defer fake.initializeRouterMutex.Unlock()
 	fake.InitializeRouterStub = stub
 }
 
-func (fake *FakeRequester) InitializeRouterArgsForCall(i int) map[string]string {
+func (fake *FakeRequester) InitializeRouterArgsForCall(i int) string {
 	fake.initializeRouterMutex.RLock()
 	defer fake.initializeRouterMutex.RUnlock()
 	argsForCall := fake.initializeRouterArgsForCall[i]

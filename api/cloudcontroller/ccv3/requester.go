@@ -27,7 +27,7 @@ type RequestParams struct {
 type Requester interface {
 	InitializeConnection(settings TargetSettings)
 
-	InitializeRouter(resources map[string]string)
+	InitializeRouter(baseURL string)
 
 	MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error)
 
@@ -78,8 +78,8 @@ func (requester *RealRequester) InitializeConnection(settings TargetSettings) {
 	}
 }
 
-func (requester *RealRequester) InitializeRouter(resources map[string]string) {
-	requester.router = internal.NewRouter(internal.APIRoutes, resources)
+func (requester *RealRequester) InitializeRouter(baseURL string) {
+	requester.router = internal.NewRouter(internal.APIRoutes, baseURL)
 }
 
 func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {

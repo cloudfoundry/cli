@@ -16,7 +16,6 @@ var _ = Describe("Routing", func() {
 		Describe("CreatePath", func() {
 			BeforeEach(func() {
 				route = Route{
-					Name:   "whatevz",
 					Method: "GET",
 					Path:   "/a/path/:param/with/:many_things/:many/in/:it",
 				}
@@ -57,7 +56,6 @@ var _ = Describe("Routing", func() {
 			Context("with a trailing slash", func() {
 				It("should work", func() {
 					route = Route{
-						Name:   "whatevz",
 						Method: "GET",
 						Path:   "/a/path/:param/",
 					}
@@ -71,13 +69,13 @@ var _ = Describe("Routing", func() {
 
 	Describe("Router", func() {
 		var (
-			router    *Router
-			routes    []Route
-			resources map[string]string
+			router  *Router
+			routes  map[string]Route
+			baseURL string
 		)
 
 		JustBeforeEach(func() {
-			router = NewRouter(routes, resources)
+			router = NewRouter(routes, baseURL)
 		})
 
 		Describe("CreateRequest", func() {
@@ -86,36 +84,22 @@ var _ = Describe("Routing", func() {
 				BeforeEach(func() {
 					routeName = "banana"
 					badRouteName = "orange"
+					baseURL = "https://foo.bar.baz/this/is"
 
-					routes = []Route{
-						{Name: routeName, Resource: "exists", Path: "/very/good/:name", Method: http.MethodGet},
-						{Name: badRouteName, Resource: "fake-resource", Path: "/very/bad", Method: http.MethodGet},
+					routes = map[string]Route{
+						routeName: {Path: "/very/good/:name", Method: http.MethodGet},
+						badRouteName: {Path: "/very/bad", Method: http.MethodGet},
 					}
 				})
 
-				When("the resource exists exists", func() {
-					BeforeEach(func() {
-						resources = map[string]string{
-							"exists": "https://foo.bar.baz/this/is",
-						}
-					})
-
-					It("returns a request", func() {
-						request, err := router.CreateRequest(routeName, Params{"name": "Henry the 8th"}, nil)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(request.URL.String()).To(Equal("https://foo.bar.baz/this/is/very/good/Henry%2520the%25208th"))
-					})
-				})
-
-				When("the resource exists exists", func() {
-					It("returns an error", func() {
-						_, err := router.CreateRequest(badRouteName, nil, nil)
-						Expect(err).To(MatchError("no resource exists with the name fake-resource, did you add it to 'api/cloudcontroller/ccv3/internal/api_routes.go'? "))
-					})
+				It("returns a request", func() {
+					request, err := router.CreateRequest(routeName, Params{"name": "Henry the 8th"}, nil)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(request.URL.String()).To(Equal("https://foo.bar.baz/this/is/very/good/Henry%2520the%25208th"))
 				})
 			})
 
-			When("the route does not exists exist", func() {
+			When("the route does not exist", func() {
 				It("returns an error", func() {
 					_, err := router.CreateRequest("fake-route", nil, nil)
 					Expect(err).To(MatchError("no route exists with the name fake-route"))

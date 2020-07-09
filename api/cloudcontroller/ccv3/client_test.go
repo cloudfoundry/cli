@@ -60,20 +60,12 @@ var _ = Describe("Cloud Controller Client", func() {
 					RespondWith(http.StatusOK, rootResponse),
 				),
 			)
-
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v3"),
-					VerifyHeaderKV("User-Agent", expectedUserAgent),
-					RespondWith(http.StatusOK, "{}"),
-				),
-			)
 		})
 
 		It("adds a user agent header", func() {
-			_, _, _, err := client.GetInfo()
+			_, _, err := client.GetInfo()
 			Expect(err).ToNot(HaveOccurred())
-			Expect(server.ReceivedRequests()).To(HaveLen(4))
+			Expect(server.ReceivedRequests()).To(HaveLen(2))
 		})
 	})
 })

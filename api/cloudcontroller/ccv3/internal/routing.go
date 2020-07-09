@@ -56,16 +56,10 @@ type Params map[string]string
 //   /foo
 //   /foo/bar
 type Route struct {
-	// Name is a key specifying which HTTP route the router should associate with
-	// the endpoint at runtime.
-	Name string
 	// Method is any valid HTTP method
 	Method string
 	// Path contains a path pattern
 	Path string
-	// Resource is a key specifying which resource root the router should
-	// associate with the endpoint at runtime.
-	Resource string
 }
 
 // CreatePath combines the route's path pattern with a Params map
@@ -95,19 +89,15 @@ func (r Route) CreatePath(params Params) (string, error) {
 // Router combines route and resource information in order to generate HTTP
 // requests.
 type Router struct {
-	routes    map[string]Route
-	resources map[string]string
+	routes  map[string]Route
+	baseURL string
 }
 
 // NewRouter returns a pointer to a new Router.
-func NewRouter(routes []Route, resources map[string]string) *Router {
-	mappedRoutes := map[string]Route{}
-	for _, route := range routes {
-		mappedRoutes[route.Name] = route
-	}
+func NewRouter(routes map[string]Route, baseURL string) *Router {
 	return &Router{
-		routes:    mappedRoutes,
-		resources: resources,
+		routes:  routes,
+		baseURL: baseURL,
 	}
 }
 
@@ -124,12 +114,7 @@ func (router Router) CreateRequest(name string, params Params, body io.Reader) (
 		return &http.Request{}, err
 	}
 
-	resource, ok := router.resources[route.Resource]
-	if !ok {
-		return &http.Request{}, fmt.Errorf("no resource exists with the name %s, did you add it to 'api/cloudcontroller/ccv3/internal/api_routes.go'? ", route.Resource)
-	}
-
-	url, err := router.urlFrom(resource, uri)
+	url, err := router.urlFrom(router.baseURL, uri)
 	if err != nil {
 		return &http.Request{}, err
 	}

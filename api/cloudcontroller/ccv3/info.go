@@ -119,21 +119,13 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 }
 
 // GetInfo returns endpoint and API information from /v3.
-func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
+func (client *Client) GetInfo() (Info, Warnings, error) {
 	rootResponse, warnings, err := client.RootResponse()
 	if err != nil {
-		return Info{}, ResourceLinks{}, warnings, err
+		return Info{}, warnings, err
 	}
 
-	info := ResourceLinks{}
-
-	_, v3Warnings, err := client.MakeRequest(RequestParams{
-		URL:          rootResponse.ccV3Link(),
-		ResponseBody: &info,
-	})
-	warnings = append(warnings, v3Warnings...)
-
-	return rootResponse, info, warnings, err
+	return rootResponse, warnings, err
 }
 
 // rootResponse returns the CC API root document.

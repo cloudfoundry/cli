@@ -349,7 +349,7 @@ var _ = Describe("Relationship", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(server.ReceivedRequests()).To(HaveLen(3))
+				Expect(server.ReceivedRequests()).To(HaveLen(2))
 			})
 		})
 

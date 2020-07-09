@@ -84,7 +84,7 @@ var _ = Describe("Metadata", func() {
 					It("should include the labels in the JSON", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-						Expect(server.ReceivedRequests()).To(HaveLen(3))
+						Expect(server.ReceivedRequests()).To(HaveLen(2))
 						Expect(jobURL).To(Equal(JobURL("fake-job-url")))
 					})
 				})
