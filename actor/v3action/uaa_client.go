@@ -6,6 +6,6 @@ import "code.cloudfoundry.org/cli/api/uaa/constant"
 
 type UAAClient interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) (string, string, error)
+	GetLoginPrompts() (map[string][]string, error)
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)
-	LoginPrompts() map[string][]string
 }

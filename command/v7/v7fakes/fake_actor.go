@@ -1288,15 +1288,17 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetLoginPromptsStub        func() map[string]coreconfig.AuthPrompt
+	GetLoginPromptsStub        func() (map[string]coreconfig.AuthPrompt, error)
 	getLoginPromptsMutex       sync.RWMutex
 	getLoginPromptsArgsForCall []struct {
 	}
 	getLoginPromptsReturns struct {
 		result1 map[string]coreconfig.AuthPrompt
+		result2 error
 	}
 	getLoginPromptsReturnsOnCall map[int]struct {
 		result1 map[string]coreconfig.AuthPrompt
+		result2 error
 	}
 	GetNewestReadyPackageForApplicationStub        func(resources.Application) (v7action.Package, v7action.Warnings, error)
 	getNewestReadyPackageForApplicationMutex       sync.RWMutex
@@ -2076,6 +2078,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetUAAAPIVersionStub        func() (string, error)
+	getUAAAPIVersionMutex       sync.RWMutex
+	getUAAAPIVersionArgsForCall []struct {
+	}
+	getUAAAPIVersionReturns struct {
+		result1 string
+		result2 error
+	}
+	getUAAAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	GetUnstagedNewestPackageGUIDStub        func(string) (string, v7action.Warnings, error)
 	getUnstagedNewestPackageGUIDMutex       sync.RWMutex
 	getUnstagedNewestPackageGUIDArgsForCall []struct {
@@ -2635,16 +2649,6 @@ type FakeActor struct {
 		result1 v7action.Task
 		result2 v7action.Warnings
 		result3 error
-	}
-	UAAAPIVersionStub        func() string
-	uAAAPIVersionMutex       sync.RWMutex
-	uAAAPIVersionArgsForCall []struct {
-	}
-	uAAAPIVersionReturns struct {
-		result1 string
-	}
-	uAAAPIVersionReturnsOnCall map[int]struct {
-		result1 string
 	}
 	UnbindSecurityGroupStub        func(string, string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
 	unbindSecurityGroupMutex       sync.RWMutex
@@ -8603,7 +8607,7 @@ func (fake *FakeActor) GetLogCacheEndpointReturnsOnCall(i int, result1 string, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
+func (fake *FakeActor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
 	fake.getLoginPromptsMutex.Lock()
 	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
 	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
@@ -8614,10 +8618,10 @@ func (fake *FakeActor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
 		return fake.GetLoginPromptsStub()
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.getLoginPromptsReturns
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeActor) GetLoginPromptsCallCount() int {
@@ -8626,33 +8630,36 @@ func (fake *FakeActor) GetLoginPromptsCallCount() int {
 	return len(fake.getLoginPromptsArgsForCall)
 }
 
-func (fake *FakeActor) GetLoginPromptsCalls(stub func() map[string]coreconfig.AuthPrompt) {
+func (fake *FakeActor) GetLoginPromptsCalls(stub func() (map[string]coreconfig.AuthPrompt, error)) {
 	fake.getLoginPromptsMutex.Lock()
 	defer fake.getLoginPromptsMutex.Unlock()
 	fake.GetLoginPromptsStub = stub
 }
 
-func (fake *FakeActor) GetLoginPromptsReturns(result1 map[string]coreconfig.AuthPrompt) {
+func (fake *FakeActor) GetLoginPromptsReturns(result1 map[string]coreconfig.AuthPrompt, result2 error) {
 	fake.getLoginPromptsMutex.Lock()
 	defer fake.getLoginPromptsMutex.Unlock()
 	fake.GetLoginPromptsStub = nil
 	fake.getLoginPromptsReturns = struct {
 		result1 map[string]coreconfig.AuthPrompt
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeActor) GetLoginPromptsReturnsOnCall(i int, result1 map[string]coreconfig.AuthPrompt) {
+func (fake *FakeActor) GetLoginPromptsReturnsOnCall(i int, result1 map[string]coreconfig.AuthPrompt, result2 error) {
 	fake.getLoginPromptsMutex.Lock()
 	defer fake.getLoginPromptsMutex.Unlock()
 	fake.GetLoginPromptsStub = nil
 	if fake.getLoginPromptsReturnsOnCall == nil {
 		fake.getLoginPromptsReturnsOnCall = make(map[int]struct {
 			result1 map[string]coreconfig.AuthPrompt
+			result2 error
 		})
 	}
 	fake.getLoginPromptsReturnsOnCall[i] = struct {
 		result1 map[string]coreconfig.AuthPrompt
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) GetNewestReadyPackageForApplication(arg1 resources.Application) (v7action.Package, v7action.Warnings, error) {
@@ -11952,6 +11959,61 @@ func (fake *FakeActor) GetTaskBySequenceIDAndApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetUAAAPIVersion() (string, error) {
+	fake.getUAAAPIVersionMutex.Lock()
+	ret, specificReturn := fake.getUAAAPIVersionReturnsOnCall[len(fake.getUAAAPIVersionArgsForCall)]
+	fake.getUAAAPIVersionArgsForCall = append(fake.getUAAAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetUAAAPIVersion", []interface{}{})
+	fake.getUAAAPIVersionMutex.Unlock()
+	if fake.GetUAAAPIVersionStub != nil {
+		return fake.GetUAAAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getUAAAPIVersionReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) GetUAAAPIVersionCallCount() int {
+	fake.getUAAAPIVersionMutex.RLock()
+	defer fake.getUAAAPIVersionMutex.RUnlock()
+	return len(fake.getUAAAPIVersionArgsForCall)
+}
+
+func (fake *FakeActor) GetUAAAPIVersionCalls(stub func() (string, error)) {
+	fake.getUAAAPIVersionMutex.Lock()
+	defer fake.getUAAAPIVersionMutex.Unlock()
+	fake.GetUAAAPIVersionStub = stub
+}
+
+func (fake *FakeActor) GetUAAAPIVersionReturns(result1 string, result2 error) {
+	fake.getUAAAPIVersionMutex.Lock()
+	defer fake.getUAAAPIVersionMutex.Unlock()
+	fake.GetUAAAPIVersionStub = nil
+	fake.getUAAAPIVersionReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) GetUAAAPIVersionReturnsOnCall(i int, result1 string, result2 error) {
+	fake.getUAAAPIVersionMutex.Lock()
+	defer fake.getUAAAPIVersionMutex.Unlock()
+	fake.GetUAAAPIVersionStub = nil
+	if fake.getUAAAPIVersionReturnsOnCall == nil {
+		fake.getUAAAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.getUAAAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) GetUnstagedNewestPackageGUID(arg1 string) (string, v7action.Warnings, error) {
 	fake.getUnstagedNewestPackageGUIDMutex.Lock()
 	ret, specificReturn := fake.getUnstagedNewestPackageGUIDReturnsOnCall[len(fake.getUnstagedNewestPackageGUIDArgsForCall)]
@@ -14434,58 +14496,6 @@ func (fake *FakeActor) TerminateTaskReturnsOnCall(i int, result1 v7action.Task, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) UAAAPIVersion() string {
-	fake.uAAAPIVersionMutex.Lock()
-	ret, specificReturn := fake.uAAAPIVersionReturnsOnCall[len(fake.uAAAPIVersionArgsForCall)]
-	fake.uAAAPIVersionArgsForCall = append(fake.uAAAPIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UAAAPIVersion", []interface{}{})
-	fake.uAAAPIVersionMutex.Unlock()
-	if fake.UAAAPIVersionStub != nil {
-		return fake.UAAAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.uAAAPIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeActor) UAAAPIVersionCallCount() int {
-	fake.uAAAPIVersionMutex.RLock()
-	defer fake.uAAAPIVersionMutex.RUnlock()
-	return len(fake.uAAAPIVersionArgsForCall)
-}
-
-func (fake *FakeActor) UAAAPIVersionCalls(stub func() string) {
-	fake.uAAAPIVersionMutex.Lock()
-	defer fake.uAAAPIVersionMutex.Unlock()
-	fake.UAAAPIVersionStub = stub
-}
-
-func (fake *FakeActor) UAAAPIVersionReturns(result1 string) {
-	fake.uAAAPIVersionMutex.Lock()
-	defer fake.uAAAPIVersionMutex.Unlock()
-	fake.UAAAPIVersionStub = nil
-	fake.uAAAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeActor) UAAAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.uAAAPIVersionMutex.Lock()
-	defer fake.uAAAPIVersionMutex.Unlock()
-	fake.UAAAPIVersionStub = nil
-	if fake.uAAAPIVersionReturnsOnCall == nil {
-		fake.uAAAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uAAAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeActor) UnbindSecurityGroup(arg1 string, arg2 string, arg3 string, arg4 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
 	fake.unbindSecurityGroupMutex.Lock()
 	ret, specificReturn := fake.unbindSecurityGroupReturnsOnCall[len(fake.unbindSecurityGroupArgsForCall)]
@@ -16721,6 +16731,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getTaskBySequenceIDAndApplicationMutex.RLock()
 	defer fake.getTaskBySequenceIDAndApplicationMutex.RUnlock()
+	fake.getUAAAPIVersionMutex.RLock()
+	defer fake.getUAAAPIVersionMutex.RUnlock()
 	fake.getUnstagedNewestPackageGUIDMutex.RLock()
 	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
 	fake.getUserMutex.RLock()
@@ -16797,8 +16809,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.stopApplicationMutex.RUnlock()
 	fake.terminateTaskMutex.RLock()
 	defer fake.terminateTaskMutex.RUnlock()
-	fake.uAAAPIVersionMutex.RLock()
-	defer fake.uAAAPIVersionMutex.RUnlock()
 	fake.unbindSecurityGroupMutex.RLock()
 	defer fake.unbindSecurityGroupMutex.RUnlock()
 	fake.unmapRouteMutex.RLock()

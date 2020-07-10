@@ -65,6 +65,11 @@ func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion
 }
 
+// AuthorizationEndpoint returns the authorization endpoint
+func (config *Config) AuthorizationEndpoint() string {
+	return config.ConfigFile.AuthorizationEndpoint
+}
+
 // CurrentUser returns user information decoded from the JWT access token in
 // .cf/config.json.
 func (config *Config) CurrentUser() (User, error) {
@@ -174,6 +179,7 @@ type TargetInformationArgs struct {
 	MinCLIVersion     string
 	Routing           string
 	SkipSSLValidation bool
+	UAA               string
 }
 
 // SetTargetInformation sets the currently targeted CC API and related other
@@ -187,8 +193,7 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.RoutingEndpoint = args.Routing
 	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
 
-	// NOTE: This gets written to the config file, but I do not believe it is currently
-	// ever read from there.
+	config.ConfigFile.UAAEndpoint = args.UAA
 	config.ConfigFile.AuthorizationEndpoint = args.Auth
 
 	config.UnsetOrganizationAndSpaceInformation()
@@ -254,6 +259,11 @@ func (config *Config) TargetedOrganizationName() string {
 // TargetedSpace returns the currently targeted space.
 func (config *Config) TargetedSpace() Space {
 	return config.ConfigFile.TargetedSpace
+}
+
+// UAAEndpoint returns the UAA endpoint
+func (config *Config) UAAEndpoint() string {
+	return config.ConfigFile.UAAEndpoint
 }
 
 // UAAGrantType returns the grant type of the supplied UAA credentials.

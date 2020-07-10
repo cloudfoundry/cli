@@ -50,7 +50,7 @@ func CreateCCV2Client() (*ccv2.Client, error) {
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.AuthorizationEndpoint())
+	err = uaaClient.SetupResources(config.UAAEndpoint(), ccClient.AuthorizationEndpoint())
 	if err != nil {
 		return nil, err
 	}

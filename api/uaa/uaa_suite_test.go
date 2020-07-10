@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
@@ -67,31 +66,14 @@ func NewTestConfig() *uaafakes.FakeConfig {
 }
 
 func NewTestUAAClientAndStore(config Config) *Client {
-	SetupBootstrapResponse()
-
 	client := NewClient(config)
 
 	// the 'uaaServer' is discovered via the bootstrapping when we hit the /login
 	// endpoint on 'server'
-	err := client.SetupResources(server.URL())
+	err := client.SetupResources(uaaServer.URL(), server.URL())
 	Expect(err).ToNot(HaveOccurred())
 
 	return client
-}
-
-func SetupBootstrapResponse() {
-	response := strings.Replace(`{
-				"links": {
-					"uaa": "SERVER_URL"
-				}
-			}`, "SERVER_URL", uaaServer.URL(), -1)
-
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest(http.MethodGet, "/login"),
-			RespondWith(http.StatusOK, response),
-		),
-	)
 }
 
 func verifyRequestHost(host string) http.HandlerFunc {

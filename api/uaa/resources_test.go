@@ -1,13 +1,10 @@
 package uaa_test
 
 import (
-	"net/http"
-
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("SetupResources", func() {
@@ -24,87 +21,15 @@ var _ = Describe("SetupResources", func() {
 	})
 
 	JustBeforeEach(func() {
-		setupResourcesErr = client.SetupResources(server.URL())
+		setupResourcesErr = client.SetupResources(uaaServer.URL(), server.URL())
 	})
 
-	When("the authentication server returns an error", func() {
-		BeforeEach(func() {
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/login"),
-					RespondWith(http.StatusNotFound, `{"errors": [{}]}`, nil),
-				),
-			)
-		})
+	It("populates client.info", func() {
+		Expect(setupResourcesErr).ToNot(HaveOccurred())
+		Expect(client.Info.Links.UAA).To(Equal(uaaServer.URL()))
+		Expect(client.Info.Links.Login).To(Equal(server.URL()))
 
-		It("returns the error", func() {
-			Expect(setupResourcesErr).To(HaveOccurred())
-			Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(0))
-		})
-	})
-
-	When("the request succeeds", func() {
-		Context("and the UAA field is populated", func() {
-			BeforeEach(func() {
-				response := `{
-					"app": {
-						"version": "sem.var"
-					},
-					"links": {
-						"uaa": "https://uaa.bosh-lite.com"
-					},
-					"prompts": {
-						"username": [ "text", "Email" ],
-						"password": [ "password", "Password" ]
-					}
-				}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/login"),
-						RespondWith(http.StatusOK, response, nil),
-					),
-				)
-			})
-
-			It("sets the UAA endpoint to the UAA link and does not return an error", func() {
-				Expect(setupResourcesErr).ToNot(HaveOccurred())
-				Expect(client.UAALink()).To(Equal("https://uaa.bosh-lite.com"))
-				Expect(client.APIVersion()).To(Equal("sem.var"))
-
-				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal("https://uaa.bosh-lite.com"))
-			})
-
-			It("populates the client's info", func() {
-				Expect(client.Info.App.Version).To(Equal("sem.var"))
-				Expect(client.Info.Links.UAA).To(Equal("https://uaa.bosh-lite.com"))
-				Expect(client.Info.Prompts).To(Equal(map[string][]string{
-					"username": []string{"text", "Email"},
-					"password": []string{"password", "Password"},
-				}))
-			})
-		})
-
-		When("the UAA field is not populated", func() {
-			BeforeEach(func() {
-				response := `{
-				"links": {}
-			}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/login"),
-						RespondWith(http.StatusOK, response, nil),
-					),
-				)
-			})
-
-			It("sets the UAA endpoint to the bootstrap endpoint and does not return an error", func() {
-				Expect(setupResourcesErr).ToNot(HaveOccurred())
-				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal(server.URL()))
-			})
-		})
+		Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
+		Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal(uaaServer.URL()))
 	})
 })

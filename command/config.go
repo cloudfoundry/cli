@@ -13,6 +13,7 @@ type Config interface {
 	AccessToken() string
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(name string, url string)
+	AuthorizationEndpoint() string
 	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
@@ -67,6 +68,7 @@ type Config interface {
 	TargetedSpace() configv3.Space
 	TerminalWidth() int
 	UAADisableKeepAlives() bool
+	UAAEndpoint() string
 	UAAGrantType() string
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string

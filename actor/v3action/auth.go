@@ -37,8 +37,12 @@ func (actor Actor) Authenticate(credentials map[string]string, origin string, gr
 	return nil
 }
 
-func (actor Actor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
-	rawPrompts := actor.UAAClient.LoginPrompts()
+func (actor Actor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
+	rawPrompts, err := actor.UAAClient.GetLoginPrompts()
+	if err != nil {
+		return nil, err
+	}
+
 	prompts := make(map[string]coreconfig.AuthPrompt)
 	for key, val := range rawPrompts {
 		prompts[key] = coreconfig.AuthPrompt{
@@ -46,7 +50,8 @@ func (actor Actor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
 			DisplayName: val[1],
 		}
 	}
-	return prompts
+
+	return prompts, nil
 }
 
 var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{

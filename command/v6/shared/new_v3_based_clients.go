@@ -71,7 +71,7 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.Login())
+	err = uaaClient.SetupResources(config.UAAEndpoint(), ccClient.Login())
 	if err != nil {
 		return nil, nil, err
 	}

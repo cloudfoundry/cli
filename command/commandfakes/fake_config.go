@@ -41,6 +41,16 @@ type FakeConfig struct {
 		arg1 string
 		arg2 string
 	}
+	AuthorizationEndpointStub        func() string
+	authorizationEndpointMutex       sync.RWMutex
+	authorizationEndpointArgsForCall []struct {
+	}
+	authorizationEndpointReturns struct {
+		result1 string
+	}
+	authorizationEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct {
@@ -492,6 +502,16 @@ type FakeConfig struct {
 	uAADisableKeepAlivesReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	UAAEndpointStub        func() string
+	uAAEndpointMutex       sync.RWMutex
+	uAAEndpointArgsForCall []struct {
+	}
+	uAAEndpointReturns struct {
+		result1 string
+	}
+	uAAEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	UAAGrantTypeStub        func() string
 	uAAGrantTypeMutex       sync.RWMutex
 	uAAGrantTypeArgsForCall []struct {
@@ -741,6 +761,58 @@ func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	argsForCall := fake.addPluginRepositoryArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeConfig) AuthorizationEndpoint() string {
+	fake.authorizationEndpointMutex.Lock()
+	ret, specificReturn := fake.authorizationEndpointReturnsOnCall[len(fake.authorizationEndpointArgsForCall)]
+	fake.authorizationEndpointArgsForCall = append(fake.authorizationEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("AuthorizationEndpoint", []interface{}{})
+	fake.authorizationEndpointMutex.Unlock()
+	if fake.AuthorizationEndpointStub != nil {
+		return fake.AuthorizationEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.authorizationEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) AuthorizationEndpointCallCount() int {
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
+	return len(fake.authorizationEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) AuthorizationEndpointCalls(stub func() string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = stub
+}
+
+func (fake *FakeConfig) AuthorizationEndpointReturns(result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	fake.authorizationEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) AuthorizationEndpointReturnsOnCall(i int, result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	if fake.authorizationEndpointReturnsOnCall == nil {
+		fake.authorizationEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.authorizationEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) BinaryName() string {
@@ -3114,6 +3186,58 @@ func (fake *FakeConfig) UAADisableKeepAlivesReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAEndpoint() string {
+	fake.uAAEndpointMutex.Lock()
+	ret, specificReturn := fake.uAAEndpointReturnsOnCall[len(fake.uAAEndpointArgsForCall)]
+	fake.uAAEndpointArgsForCall = append(fake.uAAEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UAAEndpoint", []interface{}{})
+	fake.uAAEndpointMutex.Unlock()
+	if fake.UAAEndpointStub != nil {
+		return fake.UAAEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.uAAEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) UAAEndpointCallCount() int {
+	fake.uAAEndpointMutex.RLock()
+	defer fake.uAAEndpointMutex.RUnlock()
+	return len(fake.uAAEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) UAAEndpointCalls(stub func() string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = stub
+}
+
+func (fake *FakeConfig) UAAEndpointReturns(result1 string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = nil
+	fake.uAAEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAEndpointReturnsOnCall(i int, result1 string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = nil
+	if fake.uAAEndpointReturnsOnCall == nil {
+		fake.uAAEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) UAAGrantType() string {
 	fake.uAAGrantTypeMutex.Lock()
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
@@ -3541,6 +3665,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()
@@ -3643,6 +3769,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.terminalWidthMutex.RUnlock()
 	fake.uAADisableKeepAlivesMutex.RLock()
 	defer fake.uAADisableKeepAlivesMutex.RUnlock()
+	fake.uAAEndpointMutex.RLock()
+	defer fake.uAAEndpointMutex.RUnlock()
 	fake.uAAGrantTypeMutex.RLock()
 	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.uAAOAuthClientMutex.RLock()

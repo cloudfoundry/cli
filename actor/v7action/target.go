@@ -24,6 +24,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		LogCache:          rootInfo.LogCache(),
 		Routing:           rootInfo.Routing(),
 		SkipSSLValidation: settings.SkipSSLValidation,
+		UAA:               rootInfo.UAA(),
 	})
 	actor.Config.SetTokenInformation("", "", "")
 	return Warnings(warnings), nil

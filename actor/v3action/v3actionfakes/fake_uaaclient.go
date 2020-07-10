@@ -26,6 +26,18 @@ type FakeUAAClient struct {
 		result2 string
 		result3 error
 	}
+	GetLoginPromptsStub        func() (map[string][]string, error)
+	getLoginPromptsMutex       sync.RWMutex
+	getLoginPromptsArgsForCall []struct {
+	}
+	getLoginPromptsReturns struct {
+		result1 map[string][]string
+		result2 error
+	}
+	getLoginPromptsReturnsOnCall map[int]struct {
+		result1 map[string][]string
+		result2 error
+	}
 	GetSSHPasscodeStub        func(string, string) (string, error)
 	getSSHPasscodeMutex       sync.RWMutex
 	getSSHPasscodeArgsForCall []struct {
@@ -39,16 +51,6 @@ type FakeUAAClient struct {
 	getSSHPasscodeReturnsOnCall map[int]struct {
 		result1 string
 		result2 error
-	}
-	LoginPromptsStub        func() map[string][]string
-	loginPromptsMutex       sync.RWMutex
-	loginPromptsArgsForCall []struct {
-	}
-	loginPromptsReturns struct {
-		result1 map[string][]string
-	}
-	loginPromptsReturnsOnCall map[int]struct {
-		result1 map[string][]string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -122,6 +124,61 @@ func (fake *FakeUAAClient) AuthenticateReturnsOnCall(i int, result1 string, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeUAAClient) GetLoginPrompts() (map[string][]string, error) {
+	fake.getLoginPromptsMutex.Lock()
+	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
+	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetLoginPrompts", []interface{}{})
+	fake.getLoginPromptsMutex.Unlock()
+	if fake.GetLoginPromptsStub != nil {
+		return fake.GetLoginPromptsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getLoginPromptsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsCallCount() int {
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
+	return len(fake.getLoginPromptsArgsForCall)
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsCalls(stub func() (map[string][]string, error)) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = stub
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsReturns(result1 map[string][]string, result2 error) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	fake.getLoginPromptsReturns = struct {
+		result1 map[string][]string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsReturnsOnCall(i int, result1 map[string][]string, result2 error) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	if fake.getLoginPromptsReturnsOnCall == nil {
+		fake.getLoginPromptsReturnsOnCall = make(map[int]struct {
+			result1 map[string][]string
+			result2 error
+		})
+	}
+	fake.getLoginPromptsReturnsOnCall[i] = struct {
+		result1 map[string][]string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeUAAClient) GetSSHPasscode(arg1 string, arg2 string) (string, error) {
 	fake.getSSHPasscodeMutex.Lock()
 	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
@@ -186,67 +243,15 @@ func (fake *FakeUAAClient) GetSSHPasscodeReturnsOnCall(i int, result1 string, re
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) LoginPrompts() map[string][]string {
-	fake.loginPromptsMutex.Lock()
-	ret, specificReturn := fake.loginPromptsReturnsOnCall[len(fake.loginPromptsArgsForCall)]
-	fake.loginPromptsArgsForCall = append(fake.loginPromptsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("LoginPrompts", []interface{}{})
-	fake.loginPromptsMutex.Unlock()
-	if fake.LoginPromptsStub != nil {
-		return fake.LoginPromptsStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.loginPromptsReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeUAAClient) LoginPromptsCallCount() int {
-	fake.loginPromptsMutex.RLock()
-	defer fake.loginPromptsMutex.RUnlock()
-	return len(fake.loginPromptsArgsForCall)
-}
-
-func (fake *FakeUAAClient) LoginPromptsCalls(stub func() map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = stub
-}
-
-func (fake *FakeUAAClient) LoginPromptsReturns(result1 map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = nil
-	fake.loginPromptsReturns = struct {
-		result1 map[string][]string
-	}{result1}
-}
-
-func (fake *FakeUAAClient) LoginPromptsReturnsOnCall(i int, result1 map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = nil
-	if fake.loginPromptsReturnsOnCall == nil {
-		fake.loginPromptsReturnsOnCall = make(map[int]struct {
-			result1 map[string][]string
-		})
-	}
-	fake.loginPromptsReturnsOnCall[i] = struct {
-		result1 map[string][]string
-	}{result1}
-}
-
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
-	fake.loginPromptsMutex.RLock()
-	defer fake.loginPromptsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

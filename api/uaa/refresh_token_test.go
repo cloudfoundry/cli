@@ -66,7 +66,7 @@ var _ = Describe("UAA Client", func() {
 					Type:        "bearer",
 				}))
 
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 
@@ -107,7 +107,7 @@ var _ = Describe("UAA Client", func() {
 					Type:         "bearer",
 				}))
 
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 
@@ -148,7 +148,7 @@ var _ = Describe("UAA Client", func() {
 					Type:         "bearer",
 				}))
 
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 	})

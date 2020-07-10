@@ -153,17 +153,20 @@ var _ = Describe("Auth Actions", func() {
 		When("getting login prompts info from UAA", func() {
 			var (
 				prompts map[string]coreconfig.AuthPrompt
+				err     error
 			)
 
 			BeforeEach(func() {
-				fakeUAAClient.LoginPromptsReturns(map[string][]string{
+				fakeUAAClient.GetLoginPromptsReturns(map[string][]string{
 					"username": {"text", "Email"},
 					"pin":      {"password", "PIN Number"},
-				})
-				prompts = actor.GetLoginPrompts()
+				}, nil)
+				prompts, err = actor.GetLoginPrompts()
 			})
 
 			It("gets the login prompts", func() {
+				Expect(err).NotTo(HaveOccurred())
+
 				Expect(prompts).To(Equal(map[string]coreconfig.AuthPrompt{
 					"username": {
 						DisplayName: "Email",

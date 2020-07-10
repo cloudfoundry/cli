@@ -104,7 +104,7 @@ type Actor interface {
 	GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
 	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
 	GetLogCacheEndpoint() (string, v7action.Warnings, error)
-	GetLoginPrompts() map[string]coreconfig.AuthPrompt
+	GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error)
 	GetNewestReadyPackageForApplication(app resources.Application) (v7action.Package, v7action.Warnings, error)
 	GetOrgUsersByRoleType(orgGUID string) (map[constant.RoleType][]resources.User, v7action.Warnings, error)
 	GetOrganizationByName(orgName string) (resources.Organization, v7action.Warnings, error)
@@ -155,6 +155,7 @@ type Actor interface {
 	GetStacks(string) ([]v7action.Stack, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v7action.Task, v7action.Warnings, error)
+	GetUAAAPIVersion() (string, error)
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	GetUser(username, origin string) (resources.User, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
@@ -193,7 +194,6 @@ type Actor interface {
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	TerminateTask(taskGUID string) (v7action.Task, v7action.Warnings, error)
-	UAAAPIVersion() string
 	UnbindSecurityGroup(securityGroupName string, orgGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v7action.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 	UnsetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, EnvironmentVariableName string) (v7action.Warnings, error)

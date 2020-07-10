@@ -307,7 +307,7 @@ var _ = Describe("login Command", func() {
 							DisplayName: "Username",
 							Type:        coreconfig.AuthPromptTypeText,
 						},
-					})
+					}, nil)
 				})
 
 				When("the username flag is set", func() {
@@ -345,7 +345,7 @@ var _ = Describe("login Command", func() {
 							DisplayName: "Your Password",
 							Type:        coreconfig.AuthPromptTypePassword,
 						},
-					})
+					}, nil)
 				})
 
 				When("the password flag is set", func() {
@@ -406,7 +406,7 @@ var _ = Describe("login Command", func() {
 							DisplayName: "gimme your passcode",
 							Type:        coreconfig.AuthPromptTypePassword,
 						},
-					})
+					}, nil)
 				})
 
 				It("does not prompt for the passcode, only the password", func() {
@@ -441,7 +441,7 @@ var _ = Describe("login Command", func() {
 							DisplayName: "MFA Code",
 							Type:        coreconfig.AuthPromptTypePassword,
 						},
-					})
+					}, nil)
 				})
 
 				When("all authentication information is coming from prompts, not flags", func() {
@@ -641,7 +641,7 @@ var _ = Describe("login Command", func() {
 					DisplayName: "some-sso-prompt",
 					Type:        coreconfig.AuthPromptTypePassword,
 				},
-			})
+			}, nil)
 
 			fakeConfig.CurrentUserNameReturns("potatoface", nil)
 		})

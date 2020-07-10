@@ -5,7 +5,7 @@ func (actor Actor) CloudControllerAPIVersion() string {
 	return actor.CloudControllerClient.APIVersion()
 }
 
-// UAAAPIVersion returns the UAA API version.
-func (actor Actor) UAAAPIVersion() string {
-	return actor.UAAClient.APIVersion()
+// GetUAAAPIVersion returns the UAA API version.
+func (actor Actor) GetUAAAPIVersion() (string, error) {
+	return actor.UAAClient.GetAPIVersion()
 }

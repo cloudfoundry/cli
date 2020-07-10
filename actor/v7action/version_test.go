@@ -29,8 +29,10 @@ var _ = Describe("Version Check Actions", func() {
 	Describe("UAAAPIVersion", func() {
 		It("returns the UAA API version", func() {
 			expectedVersion := "1.96.0"
-			fakeUAAClient.APIVersionReturns(expectedVersion)
-			Expect(actor.UAAAPIVersion()).To(Equal(expectedVersion))
+			fakeUAAClient.GetAPIVersionReturns(expectedVersion, nil)
+			retrievedVersion, err := actor.GetUAAAPIVersion()
+			Expect(retrievedVersion).To(Equal(expectedVersion))
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 })

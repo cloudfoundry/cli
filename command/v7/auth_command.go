@@ -23,7 +23,12 @@ type AuthCommand struct {
 
 func (cmd AuthCommand) Execute(args []string) error {
 	if len(cmd.Origin) > 0 {
-		err := command.MinimumUAAAPIVersionCheck(cmd.Actor.UAAAPIVersion(), uaaversion.MinUAAClientVersion, "Option '--origin'")
+		uaaVersion, err := cmd.Actor.GetUAAAPIVersion()
+		if err != nil {
+			return err
+		}
+
+		err = command.MinimumUAAAPIVersionCheck(uaaVersion, uaaversion.MinUAAClientVersion, "Option '--origin'")
 		if err != nil {
 			return err
 		}

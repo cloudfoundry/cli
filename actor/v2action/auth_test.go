@@ -142,11 +142,11 @@ var _ = Describe("Auth Actions", func() {
 			)
 
 			BeforeEach(func() {
-				fakeUAAClient.LoginPromptsReturns(map[string][]string{
+				fakeUAAClient.GetLoginPromptsReturns(map[string][]string{
 					"username": {"text", "Email"},
 					"pin":      {"password", "PIN Number"},
-				})
-				prompts = actor.GetLoginPrompts()
+				}, nil)
+				prompts, _ = actor.GetLoginPrompts()
 			})
 
 			It("gets the login prompts", func() {

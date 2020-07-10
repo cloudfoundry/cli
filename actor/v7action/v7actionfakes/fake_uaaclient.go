@@ -10,16 +10,6 @@ import (
 )
 
 type FakeUAAClient struct {
-	APIVersionStub        func() string
-	aPIVersionMutex       sync.RWMutex
-	aPIVersionArgsForCall []struct {
-	}
-	aPIVersionReturns struct {
-		result1 string
-	}
-	aPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
 	AuthenticateStub        func(map[string]string, string, constant.GrantType) (string, string, error)
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
@@ -65,6 +55,30 @@ type FakeUAAClient struct {
 		result1 uaa.User
 		result2 error
 	}
+	GetAPIVersionStub        func() (string, error)
+	getAPIVersionMutex       sync.RWMutex
+	getAPIVersionArgsForCall []struct {
+	}
+	getAPIVersionReturns struct {
+		result1 string
+		result2 error
+	}
+	getAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
+	GetLoginPromptsStub        func() (map[string][]string, error)
+	getLoginPromptsMutex       sync.RWMutex
+	getLoginPromptsArgsForCall []struct {
+	}
+	getLoginPromptsReturns struct {
+		result1 map[string][]string
+		result2 error
+	}
+	getLoginPromptsReturnsOnCall map[int]struct {
+		result1 map[string][]string
+		result2 error
+	}
 	GetSSHPasscodeStub        func(string, string) (string, error)
 	getSSHPasscodeMutex       sync.RWMutex
 	getSSHPasscodeArgsForCall []struct {
@@ -92,16 +106,6 @@ type FakeUAAClient struct {
 	listUsersReturnsOnCall map[int]struct {
 		result1 []uaa.User
 		result2 error
-	}
-	LoginPromptsStub        func() map[string][]string
-	loginPromptsMutex       sync.RWMutex
-	loginPromptsArgsForCall []struct {
-	}
-	loginPromptsReturns struct {
-		result1 map[string][]string
-	}
-	loginPromptsReturnsOnCall map[int]struct {
-		result1 map[string][]string
 	}
 	RefreshAccessTokenStub        func(string) (uaa.RefreshedTokens, error)
 	refreshAccessTokenMutex       sync.RWMutex
@@ -142,58 +146,6 @@ type FakeUAAClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeUAAClient) APIVersion() string {
-	fake.aPIVersionMutex.Lock()
-	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
-	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("APIVersion", []interface{}{})
-	fake.aPIVersionMutex.Unlock()
-	if fake.APIVersionStub != nil {
-		return fake.APIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.aPIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeUAAClient) APIVersionCallCount() int {
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
-	return len(fake.aPIVersionArgsForCall)
-}
-
-func (fake *FakeUAAClient) APIVersionCalls(stub func() string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
-	fake.APIVersionStub = stub
-}
-
-func (fake *FakeUAAClient) APIVersionReturns(result1 string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
-	fake.APIVersionStub = nil
-	fake.aPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeUAAClient) APIVersionReturnsOnCall(i int, result1 string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
-	fake.APIVersionStub = nil
-	if fake.aPIVersionReturnsOnCall == nil {
-		fake.aPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.aPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeUAAClient) Authenticate(arg1 map[string]string, arg2 string, arg3 constant.GrantType) (string, string, error) {
@@ -392,6 +344,116 @@ func (fake *FakeUAAClient) DeleteUserReturnsOnCall(i int, result1 uaa.User, resu
 	}{result1, result2}
 }
 
+func (fake *FakeUAAClient) GetAPIVersion() (string, error) {
+	fake.getAPIVersionMutex.Lock()
+	ret, specificReturn := fake.getAPIVersionReturnsOnCall[len(fake.getAPIVersionArgsForCall)]
+	fake.getAPIVersionArgsForCall = append(fake.getAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetAPIVersion", []interface{}{})
+	fake.getAPIVersionMutex.Unlock()
+	if fake.GetAPIVersionStub != nil {
+		return fake.GetAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getAPIVersionReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUAAClient) GetAPIVersionCallCount() int {
+	fake.getAPIVersionMutex.RLock()
+	defer fake.getAPIVersionMutex.RUnlock()
+	return len(fake.getAPIVersionArgsForCall)
+}
+
+func (fake *FakeUAAClient) GetAPIVersionCalls(stub func() (string, error)) {
+	fake.getAPIVersionMutex.Lock()
+	defer fake.getAPIVersionMutex.Unlock()
+	fake.GetAPIVersionStub = stub
+}
+
+func (fake *FakeUAAClient) GetAPIVersionReturns(result1 string, result2 error) {
+	fake.getAPIVersionMutex.Lock()
+	defer fake.getAPIVersionMutex.Unlock()
+	fake.GetAPIVersionStub = nil
+	fake.getAPIVersionReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) GetAPIVersionReturnsOnCall(i int, result1 string, result2 error) {
+	fake.getAPIVersionMutex.Lock()
+	defer fake.getAPIVersionMutex.Unlock()
+	fake.GetAPIVersionStub = nil
+	if fake.getAPIVersionReturnsOnCall == nil {
+		fake.getAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.getAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) GetLoginPrompts() (map[string][]string, error) {
+	fake.getLoginPromptsMutex.Lock()
+	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
+	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetLoginPrompts", []interface{}{})
+	fake.getLoginPromptsMutex.Unlock()
+	if fake.GetLoginPromptsStub != nil {
+		return fake.GetLoginPromptsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getLoginPromptsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsCallCount() int {
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
+	return len(fake.getLoginPromptsArgsForCall)
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsCalls(stub func() (map[string][]string, error)) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = stub
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsReturns(result1 map[string][]string, result2 error) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	fake.getLoginPromptsReturns = struct {
+		result1 map[string][]string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) GetLoginPromptsReturnsOnCall(i int, result1 map[string][]string, result2 error) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	if fake.getLoginPromptsReturnsOnCall == nil {
+		fake.getLoginPromptsReturnsOnCall = make(map[int]struct {
+			result1 map[string][]string
+			result2 error
+		})
+	}
+	fake.getLoginPromptsReturnsOnCall[i] = struct {
+		result1 map[string][]string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeUAAClient) GetSSHPasscode(arg1 string, arg2 string) (string, error) {
 	fake.getSSHPasscodeMutex.Lock()
 	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
@@ -518,58 +580,6 @@ func (fake *FakeUAAClient) ListUsersReturnsOnCall(i int, result1 []uaa.User, res
 		result1 []uaa.User
 		result2 error
 	}{result1, result2}
-}
-
-func (fake *FakeUAAClient) LoginPrompts() map[string][]string {
-	fake.loginPromptsMutex.Lock()
-	ret, specificReturn := fake.loginPromptsReturnsOnCall[len(fake.loginPromptsArgsForCall)]
-	fake.loginPromptsArgsForCall = append(fake.loginPromptsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("LoginPrompts", []interface{}{})
-	fake.loginPromptsMutex.Unlock()
-	if fake.LoginPromptsStub != nil {
-		return fake.LoginPromptsStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.loginPromptsReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeUAAClient) LoginPromptsCallCount() int {
-	fake.loginPromptsMutex.RLock()
-	defer fake.loginPromptsMutex.RUnlock()
-	return len(fake.loginPromptsArgsForCall)
-}
-
-func (fake *FakeUAAClient) LoginPromptsCalls(stub func() map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = stub
-}
-
-func (fake *FakeUAAClient) LoginPromptsReturns(result1 map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = nil
-	fake.loginPromptsReturns = struct {
-		result1 map[string][]string
-	}{result1}
-}
-
-func (fake *FakeUAAClient) LoginPromptsReturnsOnCall(i int, result1 map[string][]string) {
-	fake.loginPromptsMutex.Lock()
-	defer fake.loginPromptsMutex.Unlock()
-	fake.LoginPromptsStub = nil
-	if fake.loginPromptsReturnsOnCall == nil {
-		fake.loginPromptsReturnsOnCall = make(map[int]struct {
-			result1 map[string][]string
-		})
-	}
-	fake.loginPromptsReturnsOnCall[i] = struct {
-		result1 map[string][]string
-	}{result1}
 }
 
 func (fake *FakeUAAClient) RefreshAccessToken(arg1 string) (uaa.RefreshedTokens, error) {
@@ -760,20 +770,20 @@ func (fake *FakeUAAClient) ValidateClientUserReturnsOnCall(i int, result1 error)
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
+	fake.getAPIVersionMutex.RLock()
+	defer fake.getAPIVersionMutex.RUnlock()
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
 	fake.listUsersMutex.RLock()
 	defer fake.listUsersMutex.RUnlock()
-	fake.loginPromptsMutex.RLock()
-	defer fake.loginPromptsMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
 	fake.updatePasswordMutex.RLock()

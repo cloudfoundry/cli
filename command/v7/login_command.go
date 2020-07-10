@@ -257,7 +257,11 @@ func (cmd *LoginCommand) authenticate() error {
 	var err error
 	var credentials = make(map[string]string)
 
-	prompts := cmd.Actor.GetLoginPrompts()
+	prompts, err := cmd.Actor.GetLoginPrompts()
+	if err != nil {
+		return err
+	}
+
 	nonPasswordPrompts, passwordPrompts := cmd.groupPrompts(prompts)
 
 	if value, ok := prompts["username"]; ok {
@@ -314,9 +318,11 @@ func (cmd *LoginCommand) authenticate() error {
 }
 
 func (cmd *LoginCommand) authenticateSSO() error {
-	prompts := cmd.Actor.GetLoginPrompts()
+	prompts, err := cmd.Actor.GetLoginPrompts()
+	if err != nil {
+		return err
+	}
 
-	var err error
 	for i := 0; i < maxLoginTries; i++ {
 		var passcode string
 

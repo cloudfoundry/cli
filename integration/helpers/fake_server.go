@@ -3,7 +3,6 @@ package helpers
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	. "github.com/onsi/gomega"
@@ -102,23 +101,6 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 		MinCLIVersion:         minimumCLIVersion}
 
 	server.RouteToHandler(http.MethodGet, "/v2/info", RespondWithJSONEncoded(http.StatusOK, v2InfoResponse))
-
-	v3Response := strings.Replace(`{"links": {
-			"apps": {
-				"href": "SERVER_URL/v3/apps"
-			},
-			"organizations": {
-				"href": "SERVER_URL/v3/organizations"
-			},
-			"spaces": {
-				"href": "SERVER_URL/v3/spaces"
-			}
-		}}`, "SERVER_URL", server.URL(), -1)
-
-	server.RouteToHandler(http.MethodGet, "/v3", func(res http.ResponseWriter, req *http.Request) {
-		res.WriteHeader(http.StatusOK)
-		res.Write([]byte(v3Response))
-	})
 
 	server.RouteToHandler(http.MethodGet, authorizationPath+"/login", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)

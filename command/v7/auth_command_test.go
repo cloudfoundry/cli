@@ -56,7 +56,7 @@ var _ = Describe("auth Command", func() {
 
 		When("the UAA is below the minimum API version", func() {
 			BeforeEach(func() {
-				fakeActor.UAAAPIVersionReturns(uaaversion.InvalidUAAClientVersion)
+				fakeActor.GetUAAAPIVersionReturns(uaaversion.InvalidUAAClientVersion, nil)
 			})
 
 			It("returns an API version error", func() {
@@ -70,7 +70,7 @@ var _ = Describe("auth Command", func() {
 		When("--client-credentials set", func() {
 			BeforeEach(func() {
 				cmd.ClientCredentials = true
-				fakeActor.UAAAPIVersionReturns(uaaversion.MinUAAClientVersion)
+				fakeActor.GetUAAAPIVersionReturns(uaaversion.MinUAAClientVersion, nil)
 			})
 
 			It("returns an ArgumentCombinationError", func() {
