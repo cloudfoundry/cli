@@ -88,7 +88,25 @@ func (cmd ServiceCommand) displayManaged() error {
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 	cmd.UI.DisplayNewline()
 
+	if err := cmd.displaySharingInfo(); err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayNewline()
+
 	return cmd.displayLastOperation()
+}
+
+func (cmd ServiceCommand) displaySharingInfo() error {
+    cmd.UI.DisplayText("Sharing:")
+
+    if cmd.serviceInstance.SharedStatus.IsShared() {
+		cmd.UI.DisplayText("This service instance is currently shared.")
+	} else {
+		cmd.UI.DisplayText("This service instance is not currently being shared.")
+	}
+
+	return nil
 }
 
 func (cmd ServiceCommand) displayLastOperation() error {

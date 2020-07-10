@@ -7,11 +7,32 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
+type SharedStatus interface {
+	IsShared() bool
+}
+
+type ServiceIsShared struct {
+
+}
+
+type ServiceIsNotShared struct {
+
+}
+
+func (_ ServiceIsShared) IsShared() bool {
+	return true
+}
+
+func (_ ServiceIsNotShared) IsShared() bool {
+	return false
+}
+
 type ServiceInstanceWithRelationships struct {
 	resources.ServiceInstance
 	ServiceOffering   resources.ServiceOffering
 	ServicePlanName   string
 	ServiceBrokerName string
+	SharedStatus      SharedStatus
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -58,6 +79,22 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 
 	if len(included.ServiceBrokers) == 1 {
 		result.ServiceBrokerName = included.ServiceBrokers[0].Name
+	}
+
+	if result.Type == resources.ManagedServiceInstance {
+		sharedSpaces, shareWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
+
+		warnings = append(warnings, shareWarnings...)
+
+		if err != nil {
+			return result, Warnings(warnings), err
+		}
+
+		if len(sharedSpaces) == 0 {
+			result.SharedStatus = ServiceIsNotShared{}
+		} else {
+			result.SharedStatus = ServiceIsShared{}
+		}
 	}
 
 	return result, Warnings(warnings), nil

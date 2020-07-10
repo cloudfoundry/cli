@@ -189,6 +189,9 @@ var _ = Describe("service command", func() {
 						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
+						Say(`Sharing:\n`),
+						Say(`This service instance is currently not being shared.`),
+						Say(`\n`),
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
 						Say(`status:\s+create in progress\n`),
@@ -212,6 +215,52 @@ var _ = Describe("service command", func() {
 						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+					))
+				})
+			})
+
+			When("the instance is shared with another space", func() {
+				var sharedToSpaceName string
+
+				BeforeEach(func() {
+					sharedToSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(sharedToSpaceName)
+
+					output := func() *Buffer {
+						session := helpers.CF("service", serviceInstanceName)
+						session.Wait()
+						return session.Out
+					}
+
+					Eventually(output, testTimeout, testPollingInterval).Should(Say(`status:\s+create succeeded\n`))
+
+					command := []string{
+						"share-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					command := []string{
+						"unshare-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+						"-f",
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.QuickDeleteSpace(sharedToSpaceName)
+				})
+
+				It("can show that the service is being shared", func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Sharing:\n`),
+						Say(`This service instance is currently shared.\n`),
 					))
 				})
 			})

@@ -34,3 +34,25 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 
 	return responseBody, warnings, err
 }
+
+// GetServiceInstanceSharedSpaces will fetch relationships between
+// a service instance and the shared-to spaces for that service.
+func (client *Client) GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]resources.Space, Warnings, error) {
+	var relationships resources.RelationshipList
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceInstanceRelationshipsSharedSpacesRequest,
+		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
+		ResponseBody: &relationships,
+	})
+
+	return mapRelationshipsToSpaces(relationships), warnings, err
+}
+
+func mapRelationshipsToSpaces(relationships resources.RelationshipList) []resources.Space {
+	spaces := make([]resources.Space, len(relationships.GUIDs))
+	for i, g := range relationships.GUIDs {
+		spaces[i] = resources.Space{GUID: g}
+	}
+	return spaces
+}

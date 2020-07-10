@@ -103,6 +103,7 @@ var _ = Describe("Service Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
 						Name: "some-service-instance",
 						GUID: "some-service-instance-guid",
 					},
@@ -127,6 +128,7 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(serviceInstance).To(Equal(
 					ServiceInstanceWithRelationships{
 						ServiceInstance: resources.ServiceInstance{
+							Type: resources.ManagedServiceInstance,
 							Name: "some-service-instance",
 							GUID: "some-service-instance-guid",
 						},
@@ -137,6 +139,7 @@ var _ = Describe("Service Instance Actions", func() {
 						},
 						ServicePlanName:   servicePlanName,
 						ServiceBrokerName: serviceBrokerName,
+						SharedStatus:      ServiceIsNotShared{},
 					},
 				))
 
@@ -158,6 +161,48 @@ var _ = Describe("Service Instance Actions", func() {
 						Values: []string{"name", "guid"},
 					},
 				))
+			})
+
+			When("the service instance is managed", func() {
+				When("the service instance has shared spaces", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
+							[]resources.Space{{GUID: "some-other-space-guid"}},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+					It("returns a service with a SharedStatus of IsShared: true", func() {
+						Expect(serviceInstance.SharedStatus.IsShared()).To(BeTrue())
+					})
+				})
+				When("the service instance does not have shared spaces", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
+							[]resources.Space{},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+
+					It("returns a service with a SharedStatus of IsShared: false", func() {
+						Expect(serviceInstance.SharedStatus.IsShared()).To(BeFalse())
+					})
+				})
+				When("the fetching spaces returns new warnings", func() {
+					const warningMessage = "some-shared-spaces-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
+							[]resources.Space{},
+							ccv3.Warnings{warningMessage},
+							nil,
+						)
+					})
+					It("forwards those warnings on", func() {
+						Expect(warnings).To(ContainElement(warningMessage))
+					})
+				})
 			})
 		})
 
