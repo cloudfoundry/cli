@@ -1158,32 +1158,32 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetFeatureFlagByNameStub        func(string) (v7action.FeatureFlag, v7action.Warnings, error)
+	GetFeatureFlagByNameStub        func(string) (resources.FeatureFlag, v7action.Warnings, error)
 	getFeatureFlagByNameMutex       sync.RWMutex
 	getFeatureFlagByNameArgsForCall []struct {
 		arg1 string
 	}
 	getFeatureFlagByNameReturns struct {
-		result1 v7action.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}
 	getFeatureFlagByNameReturnsOnCall map[int]struct {
-		result1 v7action.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetFeatureFlagsStub        func() ([]v7action.FeatureFlag, v7action.Warnings, error)
+	GetFeatureFlagsStub        func() ([]resources.FeatureFlag, v7action.Warnings, error)
 	getFeatureFlagsMutex       sync.RWMutex
 	getFeatureFlagsArgsForCall []struct {
 	}
 	getFeatureFlagsReturns struct {
-		result1 []v7action.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}
 	getFeatureFlagsReturnsOnCall map[int]struct {
-		result1 []v7action.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -8049,7 +8049,7 @@ func (fake *FakeActor) GetEnvironmentVariablesByApplicationNameAndSpaceReturnsOn
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetFeatureFlagByName(arg1 string) (v7action.FeatureFlag, v7action.Warnings, error) {
+func (fake *FakeActor) GetFeatureFlagByName(arg1 string) (resources.FeatureFlag, v7action.Warnings, error) {
 	fake.getFeatureFlagByNameMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagByNameReturnsOnCall[len(fake.getFeatureFlagByNameArgsForCall)]
 	fake.getFeatureFlagByNameArgsForCall = append(fake.getFeatureFlagByNameArgsForCall, struct {
@@ -8073,7 +8073,7 @@ func (fake *FakeActor) GetFeatureFlagByNameCallCount() int {
 	return len(fake.getFeatureFlagByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetFeatureFlagByNameCalls(stub func(string) (v7action.FeatureFlag, v7action.Warnings, error)) {
+func (fake *FakeActor) GetFeatureFlagByNameCalls(stub func(string) (resources.FeatureFlag, v7action.Warnings, error)) {
 	fake.getFeatureFlagByNameMutex.Lock()
 	defer fake.getFeatureFlagByNameMutex.Unlock()
 	fake.GetFeatureFlagByNameStub = stub
@@ -8086,36 +8086,36 @@ func (fake *FakeActor) GetFeatureFlagByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetFeatureFlagByNameReturns(result1 v7action.FeatureFlag, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetFeatureFlagByNameReturns(result1 resources.FeatureFlag, result2 v7action.Warnings, result3 error) {
 	fake.getFeatureFlagByNameMutex.Lock()
 	defer fake.getFeatureFlagByNameMutex.Unlock()
 	fake.GetFeatureFlagByNameStub = nil
 	fake.getFeatureFlagByNameReturns = struct {
-		result1 v7action.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetFeatureFlagByNameReturnsOnCall(i int, result1 v7action.FeatureFlag, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetFeatureFlagByNameReturnsOnCall(i int, result1 resources.FeatureFlag, result2 v7action.Warnings, result3 error) {
 	fake.getFeatureFlagByNameMutex.Lock()
 	defer fake.getFeatureFlagByNameMutex.Unlock()
 	fake.GetFeatureFlagByNameStub = nil
 	if fake.getFeatureFlagByNameReturnsOnCall == nil {
 		fake.getFeatureFlagByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.FeatureFlag
+			result1 resources.FeatureFlag
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getFeatureFlagByNameReturnsOnCall[i] = struct {
-		result1 v7action.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetFeatureFlags() ([]v7action.FeatureFlag, v7action.Warnings, error) {
+func (fake *FakeActor) GetFeatureFlags() ([]resources.FeatureFlag, v7action.Warnings, error) {
 	fake.getFeatureFlagsMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
 	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
@@ -8138,36 +8138,36 @@ func (fake *FakeActor) GetFeatureFlagsCallCount() int {
 	return len(fake.getFeatureFlagsArgsForCall)
 }
 
-func (fake *FakeActor) GetFeatureFlagsCalls(stub func() ([]v7action.FeatureFlag, v7action.Warnings, error)) {
+func (fake *FakeActor) GetFeatureFlagsCalls(stub func() ([]resources.FeatureFlag, v7action.Warnings, error)) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = stub
 }
 
-func (fake *FakeActor) GetFeatureFlagsReturns(result1 []v7action.FeatureFlag, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetFeatureFlagsReturns(result1 []resources.FeatureFlag, result2 v7action.Warnings, result3 error) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	fake.getFeatureFlagsReturns = struct {
-		result1 []v7action.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetFeatureFlagsReturnsOnCall(i int, result1 []v7action.FeatureFlag, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetFeatureFlagsReturnsOnCall(i int, result1 []resources.FeatureFlag, result2 v7action.Warnings, result3 error) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	if fake.getFeatureFlagsReturnsOnCall == nil {
 		fake.getFeatureFlagsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.FeatureFlag
+			result1 []resources.FeatureFlag
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getFeatureFlagsReturnsOnCall[i] = struct {
-		result1 []v7action.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

@@ -17,6 +17,8 @@ type ServiceOffering struct {
 	ServiceBrokerGUID string `jsonry:"relationships.service_broker.data.guid"`
 	// ServiceBrokerName is the name of the service broker
 	ServiceBrokerName string `json:"-"`
+	// Shareable if the offering support service instance sharing
+	AllowsInstanceSharing bool `json:"shareable"`
 
 	Metadata *Metadata `json:"metadata"`
 }

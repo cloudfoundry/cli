@@ -88,7 +88,46 @@ func (cmd ServiceCommand) displayManaged() error {
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 	cmd.UI.DisplayNewline()
 
+	if err := cmd.displaySharingInfo(); err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayNewline()
+
 	return cmd.displayLastOperation()
+}
+
+func (cmd ServiceCommand) displaySharingInfo() error {
+	sharedStatus := cmd.serviceInstance.SharedStatus
+
+	cmd.UI.DisplayText("Sharing:")
+	cmd.UI.DisplayNewline()
+
+	if sharedStatus.FeatureFlagIsDisabled {
+		cmd.displaySharingFeatureFlagMessage()
+	}
+
+	if sharedStatus.OfferingDisablesSharing {
+		cmd.displayOfferingSharingMessage()
+	}
+
+	if sharedStatus.IsShared {
+		cmd.UI.DisplayText("This service instance is currently shared.")
+	} else {
+		cmd.UI.DisplayText("This service instance is not currently being shared.")
+	}
+
+	return nil
+}
+
+func (cmd ServiceCommand) displaySharingFeatureFlagMessage() {
+	cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+	cmd.UI.DisplayNewline()
+}
+
+func (cmd ServiceCommand) displayOfferingSharingMessage() {
+	cmd.UI.DisplayText("Service instance sharing is disabled for this service offering.")
+	cmd.UI.DisplayNewline()
 }
 
 func (cmd ServiceCommand) displayLastOperation() error {

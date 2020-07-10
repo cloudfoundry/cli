@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Service Instance", func() {
@@ -400,6 +401,192 @@ var _ = Describe("Service Instance", func() {
 					Expect(jobURL).To(BeEmpty())
 					Expect(warnings).To(ConsistOf("fake-warning"))
 					Expect(err).To(MatchError("bang"))
+				})
+			})
+		})
+	})
+
+	Describe("shared service instances", func() {
+		BeforeEach(func() {
+			client, _ = NewTestClient()
+		})
+
+		Describe("ShareServiceInstanceToSpaces", func() {
+			var (
+				serviceInstanceGUID string
+				spaceGUIDs          []string
+
+				relationshipList resources.RelationshipList
+				warnings         Warnings
+				executeErr       error
+			)
+
+			BeforeEach(func() {
+				serviceInstanceGUID = "some-service-instance-guid"
+				spaceGUIDs = []string{"some-space-guid", "some-other-space-guid"}
+			})
+
+			JustBeforeEach(func() {
+				relationshipList, warnings, executeErr = client.ShareServiceInstanceToSpaces(serviceInstanceGUID, spaceGUIDs)
+			})
+
+			When("no errors are encountered", func() {
+				BeforeEach(func() {
+					response := `{
+					"data": [
+						{
+							"guid": "some-space-guid"
+						},
+						{
+							"guid": "some-other-space-guid"
+						}
+					]
+				}`
+
+					requestBody := map[string][]map[string]string{
+						"data": {{"guid": "some-space-guid"}, {"guid": "some-other-space-guid"}},
+					}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces"),
+							VerifyJSONRepresenting(requestBody),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns all relationships and warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+					Expect(relationshipList).To(Equal(resources.RelationshipList{
+						GUIDs: []string{"some-space-guid", "some-other-space-guid"},
+					}))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+						ResponseCode: http.StatusTeapot,
+						V3ErrorResponse: ccerror.V3ErrorResponse{
+							Errors: []ccerror.V3Error{
+								{
+									Code:   10008,
+									Detail: "The request is semantically invalid: command presence",
+									Title:  "CF-UnprocessableEntity",
+								},
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+
+		Describe("GetServiceInstanceSharedSpaces", func() {
+			const (
+				serviceInstanceGUID string = "some-service-instance-guid"
+			)
+
+			var (
+				spaces     []resources.Space
+				warnings   Warnings
+				executeErr error
+			)
+
+			JustBeforeEach(func() {
+				spaces, warnings, executeErr = client.GetServiceInstanceSharedSpaces(serviceInstanceGUID)
+			})
+
+			When("service instance has been shared with spaces", func() {
+				BeforeEach(func() {
+					response := `{
+					"data": [
+						{
+							"guid": "some-space-guid"
+						},
+						{
+							"guid": "some-other-space-guid"
+						}
+					]
+				}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces"),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns a list of shared spaces with warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(spaces).To(ConsistOf(
+						resources.Space{
+							GUID: "some-space-guid",
+						},
+						resources.Space{
+							GUID: "some-other-space-guid",
+						},
+					))
+
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+						ResponseCode: http.StatusTeapot,
+						V3ErrorResponse: ccerror.V3ErrorResponse{
+							Errors: []ccerror.V3Error{
+								{
+									Code:   10008,
+									Detail: "The request is semantically invalid: command presence",
+									Title:  "CF-UnprocessableEntity",
+								},
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 		})

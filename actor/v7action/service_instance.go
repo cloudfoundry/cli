@@ -7,11 +7,20 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
+const featureFlagServiceInstanceSharing string = "service_instance_sharing"
+
+type SharedStatus struct {
+	FeatureFlagIsDisabled   bool
+	OfferingDisablesSharing bool
+	IsShared                bool
+}
+
 type ServiceInstanceWithRelationships struct {
 	resources.ServiceInstance
 	ServiceOffering   resources.ServiceOffering
 	ServicePlanName   string
 	ServiceBrokerName string
+	SharedStatus      SharedStatus
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -60,6 +69,18 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		result.ServiceBrokerName = included.ServiceBrokers[0].Name
 	}
 
+	if result.Type == resources.ManagedServiceInstance {
+		sharedStatus, sharedWarnings, err := actor.getSharedStatus(result, serviceInstance)
+
+		warnings = append(warnings, sharedWarnings...)
+
+		if err != nil {
+			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
+		}
+
+		result.SharedStatus = sharedStatus
+	}
+
 	return result, Warnings(warnings), nil
 }
 
@@ -94,4 +115,48 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	}
 
 	return Warnings(warnings), nil
+}
+
+func (actor Actor) getSharedStatus(result ServiceInstanceWithRelationships, serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {
+	var warnings ccv3.Warnings
+
+	featureFlag, featureFlagWarning, err := actor.CloudControllerClient.GetFeatureFlag(featureFlagServiceInstanceSharing)
+	warnings = append(warnings, featureFlagWarning...)
+	if err != nil {
+		return SharedStatus{}, warnings, err
+	}
+
+	offeringDisablesSharing, serviceOfferingWarnings, err := actor.getOfferingSharingDetails(result.ServiceOffering.Name, result.ServiceBrokerName)
+	warnings = append(warnings, serviceOfferingWarnings...)
+	if err != nil {
+		return SharedStatus{}, warnings, err
+	}
+
+	sharedSpaces, shareWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
+	warnings = append(warnings, shareWarnings...)
+	if err != nil {
+		return SharedStatus{}, warnings, err
+	}
+
+	sharedStatus := SharedStatus{
+		IsShared:                len(sharedSpaces) > 0,
+		OfferingDisablesSharing: offeringDisablesSharing,
+		FeatureFlagIsDisabled:   !featureFlag.Enabled,
+	}
+
+	return sharedStatus, warnings, nil
+}
+
+func (actor Actor) getOfferingSharingDetails(serviceOfferingName string, brokerName string) (bool, ccv3.Warnings, error) {
+	serviceOffering, serviceOfferingWarning, err :=
+		actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, brokerName)
+
+	switch err := err.(type) {
+	case nil:
+		return !serviceOffering.AllowsInstanceSharing, serviceOfferingWarning, nil
+	case ccerror.ServiceOfferingNotFoundError:
+		return false, serviceOfferingWarning, nil
+	default:
+		return false, serviceOfferingWarning, err
+	}
 }

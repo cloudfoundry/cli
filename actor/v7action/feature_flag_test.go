@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -25,7 +27,7 @@ var _ = Describe("FeatureFlag", func() {
 	Describe("GetFeatureFlagByName", func() {
 		var (
 			featureFlagName = "flag1"
-			featureFlag     FeatureFlag
+			featureFlag     resources.FeatureFlag
 			warnings        Warnings
 			executeErr      error
 		)
@@ -37,7 +39,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("getting feature flag fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetFeatureFlagReturns(
-					ccv3.FeatureFlag{},
+					resources.FeatureFlag{},
 					ccv3.Warnings{"this is a warning"},
 					errors.New("some-error"))
 			})
@@ -53,7 +55,7 @@ var _ = Describe("FeatureFlag", func() {
 
 		When("no feature flag is returned", func() {
 			BeforeEach(func() {
-				var ccFeatureFlag ccv3.FeatureFlag
+				var ccFeatureFlag resources.FeatureFlag
 
 				fakeCloudControllerClient.GetFeatureFlagReturns(
 					ccFeatureFlag,
@@ -71,7 +73,7 @@ var _ = Describe("FeatureFlag", func() {
 
 			BeforeEach(func() {
 				featureFlagName = "flag1"
-				ccFeatureFlag := ccv3.FeatureFlag{Name: "flag1"}
+				ccFeatureFlag := resources.FeatureFlag{Name: "flag1"}
 				fakeCloudControllerClient.GetFeatureFlagReturns(
 					ccFeatureFlag,
 					ccv3.Warnings{"this is a warning"},
@@ -81,14 +83,14 @@ var _ = Describe("FeatureFlag", func() {
 			It("Returns the proper featureFlag", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(featureFlag).To(Equal(FeatureFlag{Name: "flag1"}))
+				Expect(featureFlag).To(Equal(resources.FeatureFlag{Name: "flag1"}))
 			})
 		})
 	})
 
 	Describe("GetFeatureFlags", func() {
 		var (
-			featureFlags []FeatureFlag
+			featureFlags []resources.FeatureFlag
 			warnings     Warnings
 			executeErr   error
 		)
@@ -100,7 +102,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("The client is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetFeatureFlagsReturns(
-					[]ccv3.FeatureFlag{
+					[]resources.FeatureFlag{
 						{
 							Name:    "flag1",
 							Enabled: false,
@@ -119,11 +121,11 @@ var _ = Describe("FeatureFlag", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"some-cc-warning"}))
 				Expect(featureFlags).To(ConsistOf(
-					FeatureFlag{
+					resources.FeatureFlag{
 						Name:    "flag1",
 						Enabled: false,
 					},
-					FeatureFlag{
+					resources.FeatureFlag{
 						Name:    "flag2",
 						Enabled: true,
 					},
@@ -146,16 +148,16 @@ var _ = Describe("FeatureFlag", func() {
 	Describe("EnableFeatureFlag", func() {
 		var (
 			flagName        string
-			ccFlag          ccv3.FeatureFlag
-			expectedArgFlag ccv3.FeatureFlag
+			ccFlag          resources.FeatureFlag
+			expectedArgFlag resources.FeatureFlag
 			warnings        Warnings
 			executeErr      error
 		)
 
 		BeforeEach(func() {
 			flagName = "flag1"
-			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
-			expectedArgFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
+			ccFlag = resources.FeatureFlag{Name: flagName, Enabled: true}
+			expectedArgFlag = resources.FeatureFlag{Name: flagName, Enabled: true}
 		})
 
 		JustBeforeEach(func() {
@@ -183,7 +185,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("the flag doesn't exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateFeatureFlagReturns(
-					ccv3.FeatureFlag{},
+					resources.FeatureFlag{},
 					ccv3.Warnings{"update-warning"},
 					ccerror.FeatureFlagNotFoundError{},
 				)
@@ -200,7 +202,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("the client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateFeatureFlagReturns(
-					ccv3.FeatureFlag{},
+					resources.FeatureFlag{},
 					ccv3.Warnings{"update-warning"},
 					errors.New("some-random-error"),
 				)
@@ -218,16 +220,16 @@ var _ = Describe("FeatureFlag", func() {
 	Describe("EnableFeatureFlag", func() {
 		var (
 			flagName        string
-			ccFlag          ccv3.FeatureFlag
-			expectedArgFlag ccv3.FeatureFlag
+			ccFlag          resources.FeatureFlag
+			expectedArgFlag resources.FeatureFlag
 			warnings        Warnings
 			executeErr      error
 		)
 
 		BeforeEach(func() {
 			flagName = "flag1"
-			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
-			expectedArgFlag = ccv3.FeatureFlag{Name: flagName, Enabled: false}
+			ccFlag = resources.FeatureFlag{Name: flagName, Enabled: true}
+			expectedArgFlag = resources.FeatureFlag{Name: flagName, Enabled: false}
 		})
 
 		JustBeforeEach(func() {
@@ -255,7 +257,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("the flag doesn't exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateFeatureFlagReturns(
-					ccv3.FeatureFlag{},
+					resources.FeatureFlag{},
 					ccv3.Warnings{"update-warning"},
 					ccerror.FeatureFlagNotFoundError{},
 				)
@@ -272,7 +274,7 @@ var _ = Describe("FeatureFlag", func() {
 		When("the client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateFeatureFlagReturns(
-					ccv3.FeatureFlag{},
+					resources.FeatureFlag{},
 					ccv3.Warnings{"update-warning"},
 					errors.New("some-random-error"),
 				)
