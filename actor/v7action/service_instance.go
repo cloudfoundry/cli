@@ -12,11 +12,9 @@ type SharedStatus interface {
 }
 
 type ServiceIsShared struct {
-
 }
 
 type ServiceIsNotShared struct {
-
 }
 
 func (_ ServiceIsShared) IsShared() bool {
@@ -87,7 +85,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		warnings = append(warnings, shareWarnings...)
 
 		if err != nil {
-			return result, Warnings(warnings), err
+			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 		}
 
 		if len(sharedSpaces) == 0 {

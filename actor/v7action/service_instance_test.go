@@ -203,6 +203,23 @@ var _ = Describe("Service Instance Actions", func() {
 						Expect(warnings).To(ContainElement(warningMessage))
 					})
 				})
+				When("fetching shared spaces throws an error", func() {
+					const warningMessage = "some-shared-spaces-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
+							nil,
+							ccv3.Warnings{warningMessage},
+							errors.New("no service instance"),
+						)
+					})
+
+					It("returns an empty service instance, warnings, and the error", func() {
+						Expect(serviceInstance).To(Equal(ServiceInstanceWithRelationships{}))
+						Expect(executionError).To(MatchError("no service instance"))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
+					})
+				})
 			})
 		})
 

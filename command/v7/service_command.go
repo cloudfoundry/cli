@@ -98,9 +98,9 @@ func (cmd ServiceCommand) displayManaged() error {
 }
 
 func (cmd ServiceCommand) displaySharingInfo() error {
-    cmd.UI.DisplayText("Sharing:")
+	cmd.UI.DisplayText("Sharing:")
 
-    if cmd.serviceInstance.SharedStatus.IsShared() {
+	if cmd.serviceInstance.SharedStatus.IsShared() {
 		cmd.UI.DisplayText("This service instance is currently shared.")
 	} else {
 		cmd.UI.DisplayText("This service instance is not currently being shared.")
