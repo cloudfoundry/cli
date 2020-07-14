@@ -71,7 +71,9 @@ var _ = Describe("service command", func() {
 					GUID: serviceInstanceGUID,
 					Name: serviceInstanceName,
 				},
-				SharedStatus: v7action.ServiceIsNotShared{},
+				SharedStatus: v7action.SharedStatus{
+					IsShared: false,
+				},
 			},
 			v7action.Warnings{"warning one", "warning two"},
 			nil,
@@ -198,7 +200,9 @@ var _ = Describe("service command", func() {
 					},
 					ServicePlanName:   servicePlanName,
 					ServiceBrokerName: serviceBrokerName,
-					SharedStatus:      v7action.ServiceIsShared{},
+					SharedStatus: v7action.SharedStatus{
+						IsShared: true,
+					},
 				},
 				v7action.Warnings{"warning one", "warning two"},
 				nil,
@@ -241,58 +245,84 @@ var _ = Describe("service command", func() {
 			))
 		})
 
-		When("service instance is shared", func() {
-			It("shows shared information", func() {
-				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Sharing:`),
-					Say(`This service instance is currently shared.`),
-				))
+		Context("service instances sharing", func() {
+			When("service instance is shared", func() {
+				It("shows shared information", func() {
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Sharing:`),
+						Say(`This service instance is currently shared.`),
+					))
+				})
 			})
-		})
 
-		When("service is not shared", func() {
-			BeforeEach(func() {
-				fakeActor.GetServiceInstanceDetailsReturns(
-					v7action.ServiceInstanceWithRelationships{
-						ServiceInstance: resources.ServiceInstance{},
-						SharedStatus: v7action.ServiceIsNotShared{
-							FeatureFlagIsDisabled: false,
+			When("service is not shared", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceWithRelationships{
+							ServiceInstance: resources.ServiceInstance{},
+							SharedStatus: v7action.SharedStatus{
+								IsShared: false,
+							},
 						},
-					},
-					v7action.Warnings{},
-					nil,
-				)
+						v7action.Warnings{},
+						nil,
+					)
+				})
+
+				It("displays that the service is not shared", func() {
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Sharing:`),
+						Say(`This service instance is not currently being shared.`),
+					))
+				})
 			})
 
-			It("displays that the service is not shared", func() {
-				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Sharing:`),
-					Say(`This service instance is not currently being shared.`),
-				))
-			})
-		})
-
-		When("the service instance sharing feature is disabled", func() {
-			BeforeEach(func() {
-				fakeActor.GetServiceInstanceDetailsReturns(
-					v7action.ServiceInstanceWithRelationships{
-						ServiceInstance: resources.ServiceInstance{},
-						SharedStatus: v7action.ServiceIsNotShared{
-							FeatureFlagIsDisabled: true,
+			When("the service instance sharing feature is disabled", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceWithRelationships{
+							ServiceInstance: resources.ServiceInstance{},
+							SharedStatus: v7action.SharedStatus{
+								FeatureFlagIsDisabled: true,
+							},
 						},
-					},
-					v7action.Warnings{},
-					nil,
-				)
+						v7action.Warnings{},
+						nil,
+					)
+				})
+
+				It("displays that the sharing feature is disabled", func() {
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Sharing:\n`),
+						Say(`\n`),
+						Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.\n`),
+						Say(`\n`),
+					))
+				})
 			})
 
-			It("displays that the sharing feature is disabled", func() {
-				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Sharing:`),
-					Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`),
-				))
+			When("the service instance sharing feature is enabled", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceWithRelationships{
+							ServiceInstance: resources.ServiceInstance{},
+							SharedStatus: v7action.SharedStatus{
+								FeatureFlagIsDisabled: false,
+							},
+						},
+						v7action.Warnings{},
+						nil,
+					)
+				})
+
+				It("displays that the sharing feature is disabled", func() {
+					Expect(testUI.Out).NotTo(
+						Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`),
+					)
+				})
 			})
 		})
+
 	})
 
 	When("there is a problem looking up the service instance", func() {

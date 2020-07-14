@@ -8,24 +8,9 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-type SharedStatus interface {
-	IsShared() bool
-}
-
-type ServiceIsShared struct {
+type SharedStatus struct {
 	FeatureFlagIsDisabled bool
-}
-
-type ServiceIsNotShared struct {
-	FeatureFlagIsDisabled bool
-}
-
-func (_ ServiceIsShared) IsShared() bool {
-	return true
-}
-
-func (_ ServiceIsNotShared) IsShared() bool {
-	return false
+	IsShared              bool
 }
 
 type ServiceInstanceWithRelationships struct {
@@ -97,10 +82,11 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 		}
 
-		if len(sharedSpaces) == 0 {
-			result.SharedStatus = ServiceIsNotShared{FeatureFlagIsDisabled: !featureFlag.Enabled}
-		} else {
-			result.SharedStatus = ServiceIsShared{FeatureFlagIsDisabled: !featureFlag.Enabled}
+		isShared := len(sharedSpaces) > 0
+
+		result.SharedStatus = SharedStatus{
+			IsShared:              isShared,
+			FeatureFlagIsDisabled: !featureFlag.Enabled,
 		}
 	}
 

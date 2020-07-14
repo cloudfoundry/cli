@@ -148,7 +148,7 @@ var _ = Describe("Service Instance Actions", func() {
 						},
 						ServicePlanName:   servicePlanName,
 						ServiceBrokerName: serviceBrokerName,
-						SharedStatus:      ServiceIsNotShared{},
+						SharedStatus:      SharedStatus{},
 					},
 				))
 
@@ -182,24 +182,7 @@ var _ = Describe("Service Instance Actions", func() {
 						)
 					})
 					It("returns a service with a SharedStatus of IsShared: true", func() {
-						Expect(serviceInstance.SharedStatus.IsShared()).To(BeTrue())
-					})
-
-					When("and the feature flag is disabled", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetFeatureFlagReturns(
-								ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
-								ccv3.Warnings{},
-								nil,
-							)
-						})
-
-						It("marks the feature flag as disabled", func() {
-							sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsShared)
-							Expect(ok).To(BeTrue())
-							Expect(sharedStatus.FeatureFlagIsDisabled).To(BeTrue())
-						})
-
+						Expect(serviceInstance.SharedStatus.IsShared).To(BeTrue())
 					})
 				})
 
@@ -213,9 +196,7 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 
 					It("returns a service with a SharedStatus of IsShared: false", func() {
-						sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsNotShared)
-						Expect(ok).To(BeTrue())
-						Expect(sharedStatus.FeatureFlagIsDisabled).To(BeFalse())
+						Expect(serviceInstance.SharedStatus.FeatureFlagIsDisabled).To(BeFalse())
 					})
 				})
 
@@ -229,9 +210,21 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 
 					It("returns service is not shared and feature flag info", func() {
-						sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsNotShared)
-						Expect(ok).To(BeTrue())
-						Expect(sharedStatus.FeatureFlagIsDisabled).To(BeTrue())
+						Expect(serviceInstance.SharedStatus.FeatureFlagIsDisabled).To(BeTrue())
+					})
+				})
+
+				When("the service sharing feature flag is enabled", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetFeatureFlagReturns(
+							ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+
+					It("returns service is not shared and feature flag info", func() {
+						Expect(serviceInstance.SharedStatus.FeatureFlagIsDisabled).To(BeFalse())
 					})
 				})
 
