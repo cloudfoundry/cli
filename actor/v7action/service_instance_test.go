@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
@@ -102,7 +101,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetFeatureFlagReturns(
-				resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+				resources.FeatureFlag{Name: "service_instance_sharing", Enabled: true},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -209,7 +208,7 @@ var _ = Describe("Service Instance Actions", func() {
 				When("the service sharing feature flag is disabled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetFeatureFlagReturns(
-							resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
+							resources.FeatureFlag{Name: "service_instance_sharing", Enabled: false},
 							ccv3.Warnings{},
 							nil,
 						)
@@ -223,7 +222,7 @@ var _ = Describe("Service Instance Actions", func() {
 				When("the service sharing feature flag is enabled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetFeatureFlagReturns(
-							resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+							resources.FeatureFlag{Name: "service_instance_sharing", Enabled: true},
 							ccv3.Warnings{},
 							nil,
 						)
