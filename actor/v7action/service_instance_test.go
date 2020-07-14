@@ -102,7 +102,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetFeatureFlagReturns(
-				ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+				resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -209,7 +209,7 @@ var _ = Describe("Service Instance Actions", func() {
 				When("the service sharing feature flag is disabled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetFeatureFlagReturns(
-							ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
+							resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
 							ccv3.Warnings{},
 							nil,
 						)
@@ -223,7 +223,7 @@ var _ = Describe("Service Instance Actions", func() {
 				When("the service sharing feature flag is enabled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetFeatureFlagReturns(
-							ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+							resources.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
 							ccv3.Warnings{},
 							nil,
 						)
@@ -275,7 +275,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetFeatureFlagReturns(
-							ccv3.FeatureFlag{},
+							resources.FeatureFlag{},
 							ccv3.Warnings{warningMessage},
 							errors.New("error getting feature flag"),
 						)

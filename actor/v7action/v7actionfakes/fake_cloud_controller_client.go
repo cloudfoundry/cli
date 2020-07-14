@@ -1054,32 +1054,32 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetFeatureFlagStub        func(string) (ccv3.FeatureFlag, ccv3.Warnings, error)
+	GetFeatureFlagStub        func(string) (resources.FeatureFlag, ccv3.Warnings, error)
 	getFeatureFlagMutex       sync.RWMutex
 	getFeatureFlagArgsForCall []struct {
 		arg1 string
 	}
 	getFeatureFlagReturns struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getFeatureFlagReturnsOnCall map[int]struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetFeatureFlagsStub        func() ([]ccv3.FeatureFlag, ccv3.Warnings, error)
+	GetFeatureFlagsStub        func() ([]resources.FeatureFlag, ccv3.Warnings, error)
 	getFeatureFlagsMutex       sync.RWMutex
 	getFeatureFlagsArgsForCall []struct {
 	}
 	getFeatureFlagsReturns struct {
-		result1 []ccv3.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getFeatureFlagsReturnsOnCall map[int]struct {
-		result1 []ccv3.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2084,18 +2084,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateFeatureFlagStub        func(ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error)
+	UpdateFeatureFlagStub        func(resources.FeatureFlag) (resources.FeatureFlag, ccv3.Warnings, error)
 	updateFeatureFlagMutex       sync.RWMutex
 	updateFeatureFlagArgsForCall []struct {
-		arg1 ccv3.FeatureFlag
+		arg1 resources.FeatureFlag
 	}
 	updateFeatureFlagReturns struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateFeatureFlagReturnsOnCall map[int]struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -7018,7 +7018,7 @@ func (fake *FakeCloudControllerClient) GetEventsReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlag(arg1 string) (ccv3.FeatureFlag, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlag(arg1 string) (resources.FeatureFlag, ccv3.Warnings, error) {
 	fake.getFeatureFlagMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagReturnsOnCall[len(fake.getFeatureFlagArgsForCall)]
 	fake.getFeatureFlagArgsForCall = append(fake.getFeatureFlagArgsForCall, struct {
@@ -7042,7 +7042,7 @@ func (fake *FakeCloudControllerClient) GetFeatureFlagCallCount() int {
 	return len(fake.getFeatureFlagArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagCalls(stub func(string) (ccv3.FeatureFlag, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagCalls(stub func(string) (resources.FeatureFlag, ccv3.Warnings, error)) {
 	fake.getFeatureFlagMutex.Lock()
 	defer fake.getFeatureFlagMutex.Unlock()
 	fake.GetFeatureFlagStub = stub
@@ -7055,36 +7055,36 @@ func (fake *FakeCloudControllerClient) GetFeatureFlagArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagReturns(result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagReturns(result1 resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.getFeatureFlagMutex.Lock()
 	defer fake.getFeatureFlagMutex.Unlock()
 	fake.GetFeatureFlagStub = nil
 	fake.getFeatureFlagReturns = struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagReturnsOnCall(i int, result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagReturnsOnCall(i int, result1 resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.getFeatureFlagMutex.Lock()
 	defer fake.getFeatureFlagMutex.Unlock()
 	fake.GetFeatureFlagStub = nil
 	if fake.getFeatureFlagReturnsOnCall == nil {
 		fake.getFeatureFlagReturnsOnCall = make(map[int]struct {
-			result1 ccv3.FeatureFlag
+			result1 resources.FeatureFlag
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getFeatureFlagReturnsOnCall[i] = struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlags() ([]ccv3.FeatureFlag, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlags() ([]resources.FeatureFlag, ccv3.Warnings, error) {
 	fake.getFeatureFlagsMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
 	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
@@ -7107,36 +7107,36 @@ func (fake *FakeCloudControllerClient) GetFeatureFlagsCallCount() int {
 	return len(fake.getFeatureFlagsArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagsCalls(stub func() ([]ccv3.FeatureFlag, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagsCalls(stub func() ([]resources.FeatureFlag, ccv3.Warnings, error)) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = stub
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagsReturns(result1 []ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagsReturns(result1 []resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	fake.getFeatureFlagsReturns = struct {
-		result1 []ccv3.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetFeatureFlagsReturnsOnCall(i int, result1 []ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetFeatureFlagsReturnsOnCall(i int, result1 []resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.getFeatureFlagsMutex.Lock()
 	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	if fake.getFeatureFlagsReturnsOnCall == nil {
 		fake.getFeatureFlagsReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.FeatureFlag
+			result1 []resources.FeatureFlag
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getFeatureFlagsReturnsOnCall[i] = struct {
-		result1 []ccv3.FeatureFlag
+		result1 []resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11505,11 +11505,11 @@ func (fake *FakeCloudControllerClient) UpdateEnvironmentVariableGroupReturnsOnCa
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateFeatureFlag(arg1 ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateFeatureFlag(arg1 resources.FeatureFlag) (resources.FeatureFlag, ccv3.Warnings, error) {
 	fake.updateFeatureFlagMutex.Lock()
 	ret, specificReturn := fake.updateFeatureFlagReturnsOnCall[len(fake.updateFeatureFlagArgsForCall)]
 	fake.updateFeatureFlagArgsForCall = append(fake.updateFeatureFlagArgsForCall, struct {
-		arg1 ccv3.FeatureFlag
+		arg1 resources.FeatureFlag
 	}{arg1})
 	fake.recordInvocation("UpdateFeatureFlag", []interface{}{arg1})
 	fake.updateFeatureFlagMutex.Unlock()
@@ -11529,43 +11529,43 @@ func (fake *FakeCloudControllerClient) UpdateFeatureFlagCallCount() int {
 	return len(fake.updateFeatureFlagArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateFeatureFlagCalls(stub func(ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateFeatureFlagCalls(stub func(resources.FeatureFlag) (resources.FeatureFlag, ccv3.Warnings, error)) {
 	fake.updateFeatureFlagMutex.Lock()
 	defer fake.updateFeatureFlagMutex.Unlock()
 	fake.UpdateFeatureFlagStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateFeatureFlagArgsForCall(i int) ccv3.FeatureFlag {
+func (fake *FakeCloudControllerClient) UpdateFeatureFlagArgsForCall(i int) resources.FeatureFlag {
 	fake.updateFeatureFlagMutex.RLock()
 	defer fake.updateFeatureFlagMutex.RUnlock()
 	argsForCall := fake.updateFeatureFlagArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) UpdateFeatureFlagReturns(result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateFeatureFlagReturns(result1 resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.updateFeatureFlagMutex.Lock()
 	defer fake.updateFeatureFlagMutex.Unlock()
 	fake.UpdateFeatureFlagStub = nil
 	fake.updateFeatureFlagReturns = struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateFeatureFlagReturnsOnCall(i int, result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateFeatureFlagReturnsOnCall(i int, result1 resources.FeatureFlag, result2 ccv3.Warnings, result3 error) {
 	fake.updateFeatureFlagMutex.Lock()
 	defer fake.updateFeatureFlagMutex.Unlock()
 	fake.UpdateFeatureFlagStub = nil
 	if fake.updateFeatureFlagReturnsOnCall == nil {
 		fake.updateFeatureFlagReturnsOnCall = make(map[int]struct {
-			result1 ccv3.FeatureFlag
+			result1 resources.FeatureFlag
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateFeatureFlagReturnsOnCall[i] = struct {
-		result1 ccv3.FeatureFlag
+		result1 resources.FeatureFlag
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

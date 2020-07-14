@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -15,7 +17,7 @@ var _ = Describe("Feature Flags", func() {
 	var client *Client
 	var executeErr error
 	var warnings Warnings
-	var featureFlags []FeatureFlag
+	var featureFlags []resources.FeatureFlag
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
@@ -95,15 +97,15 @@ var _ = Describe("Feature Flags", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("page1 warning", "page2 warning"))
 				Expect(featureFlags).To(ConsistOf(
-					FeatureFlag{
+					resources.FeatureFlag{
 						Name:    "flag1",
 						Enabled: true,
 					},
-					FeatureFlag{
+					resources.FeatureFlag{
 						Name:    "flag2",
 						Enabled: false,
 					},
-					FeatureFlag{
+					resources.FeatureFlag{
 						Name:    "flag3",
 						Enabled: true,
 					},
@@ -142,7 +144,7 @@ var _ = Describe("Feature Flags", func() {
 	Describe("GetFeatureFlag", func() {
 		var (
 			flagName     string
-			flag         FeatureFlag
+			flag         resources.FeatureFlag
 			warnings     Warnings
 			executeError error
 		)
@@ -246,16 +248,16 @@ var _ = Describe("Feature Flags", func() {
 
 	Describe("UpdateFeatureFlag", func() {
 		var (
-			argFlag      FeatureFlag
+			argFlag      resources.FeatureFlag
 			expectedBody string
-			ccFlag       FeatureFlag
+			ccFlag       resources.FeatureFlag
 			warnings     Warnings
 			executeError error
 		)
 
 		BeforeEach(func() {
 			expectedBody = `{"enabled":false}`
-			argFlag = FeatureFlag{
+			argFlag = resources.FeatureFlag{
 				Name:    "flag1",
 				Enabled: false,
 			}
