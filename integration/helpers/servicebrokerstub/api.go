@@ -41,20 +41,6 @@ func EnableServiceAccess() *ServiceBrokerStub {
 	return New().EnableServiceAccess()
 }
 
-func ConcurrentlyEnableServiceAccess(stubs ...*ServiceBrokerStub) {
-	concurrently(
-		func(stub *ServiceBrokerStub) { stub.EnableServiceAccess() },
-		stubs,
-	)
-}
-
-func ConcurrentlyForget(stubs ...*ServiceBrokerStub) {
-	concurrently(
-		func(stub *ServiceBrokerStub) { stub.Forget() },
-		stubs,
-	)
-}
-
 func (s *ServiceBrokerStub) Create() *ServiceBrokerStub {
 	ensureAppIsDeployed()
 	s.requestNewBrokerRoute()

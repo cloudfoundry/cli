@@ -54,7 +54,6 @@ func (s *ServiceBrokerStub) enableServiceAccess() {
 		}
 	}
 
-	var sessions []*Session
 	for _, c := range config {
 		args := []string{"enable-service-access", c.OfferingName, "-b", s.Name}
 
@@ -66,12 +65,9 @@ func (s *ServiceBrokerStub) enableServiceAccess() {
 			args = append(args, "-o", c.OrgName)
 		}
 
-		sessions = append(sessions, helpers.CF(args...))
+		Eventually(helpers.CF(args...)).Should(Exit(0))
 	}
 
-	for _, s := range sessions {
-		Eventually(s).Should(Exit(0))
-	}
 }
 
 func (s *ServiceBrokerStub) purgeServiceOfferings(ignoreFailures bool) {

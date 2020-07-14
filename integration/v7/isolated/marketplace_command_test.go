@@ -131,12 +131,10 @@ var _ = Describe("marketplace command", func() {
 			brokerWithUnavailablePlan = servicebrokerstub.New().WithServiceOfferings(1).WithPlans(1)
 			brokerWithUnavailablePlan.Services[0].Plans[0].Name = unavailablePlanName
 
-			servicebrokerstub.ConcurrentlyEnableServiceAccess(
-				brokerWithPublicPlans,
-				brokerWithSomePrivatePlans,
-				brokerWithSameOfferingNameAndCosts,
-				brokerWithUnavailablePlan,
-			)
+			brokerWithPublicPlans.EnableServiceAccess()
+			brokerWithSomePrivatePlans.EnableServiceAccess()
+			brokerWithSameOfferingNameAndCosts.EnableServiceAccess()
+			brokerWithUnavailablePlan.EnableServiceAccess()
 
 			serviceInstanceName = helpers.NewServiceInstanceName()
 			helpers.TargetOrgAndSpace(org1, space1)
@@ -161,12 +159,10 @@ var _ = Describe("marketplace command", func() {
 			helpers.QuickDeleteOrg(org1)
 			helpers.QuickDeleteOrg(org2)
 
-			servicebrokerstub.ConcurrentlyForget(
-				brokerWithPublicPlans,
-				brokerWithSomePrivatePlans,
-				brokerWithSameOfferingNameAndCosts,
-				brokerWithUnavailablePlan,
-			)
+			brokerWithPublicPlans.Forget()
+			brokerWithSomePrivatePlans.Forget()
+			brokerWithSameOfferingNameAndCosts.Forget()
+			brokerWithUnavailablePlan.Forget()
 		})
 
 		Context("no service name filter", func() {
