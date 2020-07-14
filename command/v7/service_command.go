@@ -100,13 +100,22 @@ func (cmd ServiceCommand) displayManaged() error {
 func (cmd ServiceCommand) displaySharingInfo() error {
 	cmd.UI.DisplayText("Sharing:")
 
-	if cmd.serviceInstance.SharedStatus.IsShared() {
+	switch sharedStatus := cmd.serviceInstance.SharedStatus.(type) {
+	case v7action.ServiceIsShared:
 		cmd.UI.DisplayText("This service instance is currently shared.")
-	} else {
-		cmd.UI.DisplayText("This service instance is not currently being shared.")
+	case v7action.ServiceIsNotShared:
+		cmd.displayNotSharedInfo(sharedStatus)
 	}
 
 	return nil
+}
+
+func (cmd ServiceCommand) displayNotSharedInfo(sharedStatus v7action.ServiceIsNotShared) {
+	if sharedStatus.FeatureFlagIsDisabled {
+		cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+	} else {
+		cmd.UI.DisplayText("This service instance is not currently being shared.")
+	}
 }
 
 func (cmd ServiceCommand) displayLastOperation() error {

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
@@ -99,6 +100,14 @@ var _ = Describe("Service Instance Actions", func() {
 			serviceInstance, warnings, executionError = actor.GetServiceInstanceDetails(serviceInstanceName, spaceGUID)
 		})
 
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetFeatureFlagReturns(
+				ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: true},
+				ccv3.Warnings{},
+				nil,
+			)
+		})
+
 		When("the cloud controller request is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
@@ -175,7 +184,25 @@ var _ = Describe("Service Instance Actions", func() {
 					It("returns a service with a SharedStatus of IsShared: true", func() {
 						Expect(serviceInstance.SharedStatus.IsShared()).To(BeTrue())
 					})
+
+					When("and the feature flag is disabled", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetFeatureFlagReturns(
+								ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
+								ccv3.Warnings{},
+								nil,
+							)
+						})
+
+						It("marks the feature flag as disabled", func() {
+							sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsShared)
+							Expect(ok).To(BeTrue())
+							Expect(sharedStatus.FeatureFlagIsDisabled).To(BeTrue())
+						})
+
+					})
 				})
+
 				When("the service instance does not have shared spaces", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
@@ -186,9 +213,46 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 
 					It("returns a service with a SharedStatus of IsShared: false", func() {
-						Expect(serviceInstance.SharedStatus.IsShared()).To(BeFalse())
+						sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsNotShared)
+						Expect(ok).To(BeTrue())
+						Expect(sharedStatus.FeatureFlagIsDisabled).To(BeFalse())
 					})
 				})
+
+				When("the service sharing feature flag is disabled", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetFeatureFlagReturns(
+							ccv3.FeatureFlag{Name: constant.FeatureFlagServiceInstanceSharing, Enabled: false},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+
+					It("returns service is not shared and feature flag info", func() {
+						sharedStatus, ok := serviceInstance.SharedStatus.(ServiceIsNotShared)
+						Expect(ok).To(BeTrue())
+						Expect(sharedStatus.FeatureFlagIsDisabled).To(BeTrue())
+					})
+				})
+
+				When("getting feature flags errors", func() {
+					const warningMessage = "some-feature-flag-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetFeatureFlagReturns(
+							ccv3.FeatureFlag{},
+							ccv3.Warnings{warningMessage},
+							errors.New("error getting feature flag"),
+						)
+					})
+
+					It("returns an empty service instance, warnings, and the error", func() {
+						Expect(serviceInstance).To(Equal(ServiceInstanceWithRelationships{}))
+						Expect(executionError).To(MatchError("error getting feature flag"))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
+					})
+				})
+
 				When("the fetching spaces returns new warnings", func() {
 					const warningMessage = "some-shared-spaces-warning"
 

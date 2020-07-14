@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -12,9 +13,11 @@ type SharedStatus interface {
 }
 
 type ServiceIsShared struct {
+	FeatureFlagIsDisabled bool
 }
 
 type ServiceIsNotShared struct {
+	FeatureFlagIsDisabled bool
 }
 
 func (_ ServiceIsShared) IsShared() bool {
@@ -80,6 +83,12 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	}
 
 	if result.Type == resources.ManagedServiceInstance {
+		featureFlag, featureFlagWarning, err := actor.CloudControllerClient.GetFeatureFlag(constant.FeatureFlagServiceInstanceSharing)
+		warnings = append(warnings, featureFlagWarning...)
+		if err != nil {
+			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
+		}
+
 		sharedSpaces, shareWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
 
 		warnings = append(warnings, shareWarnings...)
@@ -89,9 +98,9 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		}
 
 		if len(sharedSpaces) == 0 {
-			result.SharedStatus = ServiceIsNotShared{}
+			result.SharedStatus = ServiceIsNotShared{FeatureFlagIsDisabled: !featureFlag.Enabled}
 		} else {
-			result.SharedStatus = ServiceIsShared{}
+			result.SharedStatus = ServiceIsShared{FeatureFlagIsDisabled: !featureFlag.Enabled}
 		}
 	}
 
