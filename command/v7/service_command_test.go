@@ -315,9 +315,54 @@ var _ = Describe("service command", func() {
 					)
 				})
 
-				It("displays that the sharing feature is disabled", func() {
+				It("does not display a warning", func() {
 					Expect(testUI.Out).NotTo(
 						Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`),
+					)
+				})
+			})
+
+			When("the offering does not allow service instance sharing", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceWithRelationships{
+							ServiceInstance: resources.ServiceInstance{},
+							SharedStatus: v7action.SharedStatus{
+								OfferingDisablesSharing: true,
+							},
+						},
+						v7action.Warnings{},
+						nil,
+					)
+				})
+
+				It("displays that the sharing feature is disabled", func() {
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Sharing:\n`),
+						Say(`\n`),
+						Say(`Service instance sharing is disabled for this service offering.\n`),
+						Say(`\n`),
+					))
+				})
+			})
+
+			When("the offering does allow service instance sharing", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceWithRelationships{
+							ServiceInstance: resources.ServiceInstance{},
+							SharedStatus: v7action.SharedStatus{
+								OfferingDisablesSharing: false,
+							},
+						},
+						v7action.Warnings{},
+						nil,
+					)
+				})
+
+				It("does not display a warning", func() {
+					Expect(testUI.Out).NotTo(
+						Say(`Service instance sharing is disabled for this service offering.`),
 					)
 				})
 			})

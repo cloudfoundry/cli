@@ -107,6 +107,10 @@ func (cmd ServiceCommand) displaySharingInfo() error {
 		cmd.displaySharingFeatureFlagMessage()
 	}
 
+	if sharedStatus.OfferingDisablesSharing {
+		cmd.displayOfferingSharingMessage()
+	}
+
 	if sharedStatus.IsShared {
 		cmd.UI.DisplayText("This service instance is currently shared.")
 	} else {
@@ -118,6 +122,11 @@ func (cmd ServiceCommand) displaySharingInfo() error {
 
 func (cmd ServiceCommand) displaySharingFeatureFlagMessage() {
 	cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+	cmd.UI.DisplayNewline()
+}
+
+func (cmd ServiceCommand) displayOfferingSharingMessage() {
+	cmd.UI.DisplayText("Service instance sharing is disabled for this service offering.")
 	cmd.UI.DisplayNewline()
 }
 

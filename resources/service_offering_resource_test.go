@@ -20,6 +20,7 @@ var _ = Describe("service offering resource", func() {
 		},
 		Entry("name", ServiceOffering{Name: "fake-name"}, `{"name": "fake-name"}`),
 		Entry("guid", ServiceOffering{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
+		Entry("shareable", ServiceOffering{AllowsInstanceSharing: true}, `{"shareable": true}`),
 		Entry("description", ServiceOffering{Description: "once upon a time"}, `{"description": "once upon a time"}`),
 		Entry("documentation_url", ServiceOffering{DocumentationURL: "https://docs.com"}, `{"documentation_url": "https://docs.com"}`),
 		Entry(

@@ -9,8 +9,9 @@ import (
 )
 
 type SharedStatus struct {
-	FeatureFlagIsDisabled bool
-	IsShared              bool
+	FeatureFlagIsDisabled   bool
+	OfferingDisablesSharing bool
+	IsShared                bool
 }
 
 type ServiceInstanceWithRelationships struct {
@@ -74,10 +75,17 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 		}
 
+		serviceOffering, serviceOfferingWarning, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(
+			result.ServiceOffering.Name,
+			result.ServiceBrokerName,
+		)
+		warnings = append(warnings, serviceOfferingWarning...)
+		if err != nil {
+			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
+		}
+
 		sharedSpaces, shareWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
-
 		warnings = append(warnings, shareWarnings...)
-
 		if err != nil {
 			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
 		}
@@ -85,8 +93,9 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		isShared := len(sharedSpaces) > 0
 
 		result.SharedStatus = SharedStatus{
-			IsShared:              isShared,
-			FeatureFlagIsDisabled: !featureFlag.Enabled,
+			IsShared:                isShared,
+			OfferingDisablesSharing: !serviceOffering.AllowsInstanceSharing,
+			FeatureFlagIsDisabled:   !featureFlag.Enabled,
 		}
 	}
 

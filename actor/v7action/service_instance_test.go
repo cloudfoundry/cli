@@ -106,6 +106,12 @@ var _ = Describe("Service Instance Actions", func() {
 				ccv3.Warnings{},
 				nil,
 			)
+
+			fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+				resources.ServiceOffering{Name: "offering-name", AllowsInstanceSharing: true},
+				ccv3.Warnings{},
+				nil,
+			)
 		})
 
 		When("the cloud controller request is successful", func() {
@@ -228,6 +234,42 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 				})
 
+				When("the service offering does not allow sharing", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+							resources.ServiceOffering{Name: serviceOfferingName, AllowsInstanceSharing: false},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+
+					It("returns service is not shared and feature flag info", func() {
+						Expect(serviceInstance.SharedStatus.OfferingDisablesSharing).To(BeTrue())
+
+						actualOfferingName, actualBrokerName := fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerArgsForCall(0)
+						Expect(actualOfferingName).To(Equal(serviceOfferingName))
+						Expect(actualBrokerName).To(Equal(serviceBrokerName))
+					})
+				})
+
+				When("the service offering allows sharing", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+							resources.ServiceOffering{Name: serviceOfferingName, AllowsInstanceSharing: true},
+							ccv3.Warnings{},
+							nil,
+						)
+					})
+
+					It("returns service is not shared and feature flag info", func() {
+						Expect(serviceInstance.SharedStatus.OfferingDisablesSharing).To(BeFalse())
+
+						actualOfferingName, actualBrokerName := fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerArgsForCall(0)
+						Expect(actualOfferingName).To(Equal(serviceOfferingName))
+						Expect(actualBrokerName).To(Equal(serviceBrokerName))
+					})
+				})
+
 				When("getting feature flags errors", func() {
 					const warningMessage = "some-feature-flag-warning"
 
@@ -246,6 +288,24 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 				})
 
+				When("getting offering errors", func() {
+					const warningMessage = "some-offering-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+							resources.ServiceOffering{},
+							ccv3.Warnings{warningMessage},
+							errors.New("error getting offering"),
+						)
+					})
+
+					It("returns an empty service instance, warnings, and the error", func() {
+						Expect(serviceInstance).To(Equal(ServiceInstanceWithRelationships{}))
+						Expect(executionError).To(MatchError("error getting offering"))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
+					})
+				})
+
 				When("the fetching spaces returns new warnings", func() {
 					const warningMessage = "some-shared-spaces-warning"
 
@@ -260,6 +320,7 @@ var _ = Describe("Service Instance Actions", func() {
 						Expect(warnings).To(ContainElement(warningMessage))
 					})
 				})
+
 				When("fetching shared spaces throws an error", func() {
 					const warningMessage = "some-shared-spaces-warning"
 
