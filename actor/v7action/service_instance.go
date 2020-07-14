@@ -25,7 +25,12 @@ type ServiceInstanceWithRelationships struct {
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
 	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
-	return serviceInstance, Warnings(warnings), err
+	switch e := err.(type) {
+	case ccerror.ServiceInstanceNotFoundError:
+		return serviceInstance, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: e.Name}
+	default:
+		return serviceInstance, Warnings(warnings), err
+	}
 }
 
 func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceWithRelationships, Warnings, error) {
@@ -115,6 +120,32 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	}
 
 	return Warnings(warnings), nil
+}
+
+func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
+	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(currentServiceInstanceName, spaceGUID)
+	if err != nil {
+		return warnings, err
+	}
+
+	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateServiceInstance(
+		serviceInstance.GUID,
+		resources.ServiceInstance{Name: newServiceInstanceName},
+	)
+	warnings = append(warnings, updateWarnings...)
+	if err != nil {
+		return warnings, err
+	}
+
+	if jobURL != "" {
+		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+		warnings = append(warnings, pollWarnings...)
+		if err != nil {
+			return warnings, err
+		}
+	}
+
+	return warnings, nil
 }
 
 func (actor Actor) getSharedStatus(result ServiceInstanceWithRelationships, serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {

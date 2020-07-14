@@ -85,7 +85,7 @@ var _ = Describe("service command", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
 						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(helpers.UserProvidedServiceInstanceGUID(serviceInstanceName)))
+						Eventually(session).Should(Say(helpers.ServiceInstanceGUID(serviceInstanceName)))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -239,7 +239,7 @@ var _ = Describe("service command", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
 						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(helpers.ManagedServiceInstanceGUID(serviceInstanceName)))
+						Eventually(session).Should(Say(helpers.ServiceInstanceGUID(serviceInstanceName)))
 						Eventually(session).Should(Exit(0))
 					})
 				})
