@@ -59,5 +59,34 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
+	if err := cmd.displayMessage(); err != nil {
+		return err
+	}
+
+	_, warnings, err := cmd.Actor.GetServicePlanByNameOfferingAndBroker(cmd.RequiredArgs.ServicePlan, cmd.RequiredArgs.Service, cmd.ServiceBroker)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayOK()
+	return nil
+}
+
+func (cmd CreateServiceCommand) displayMessage() error {
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Creating service instance {{.ServiceInstance}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+		map[string]interface{}{
+			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+			"Org":             cmd.Config.TargetedOrganization().Name,
+			"Space":           cmd.Config.TargetedSpace().Name,
+			"User":            user.Name,
+		},
+	)
+
 	return nil
 }

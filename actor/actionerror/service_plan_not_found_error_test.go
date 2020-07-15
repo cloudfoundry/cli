@@ -16,7 +16,24 @@ var _ = Describe("ServicePlanNotFoundError", func() {
 			OfferingName: offeringName,
 			PlanName:     planName,
 		}
-		Expect(err.Error()).To(Equal(fmt.Sprintf("The plan %s could not be found for service %s.", planName, offeringName)))
+		Expect(err.Error()).To(Equal(fmt.Sprintf("The plan %s could not be found for service offering %s.", planName, offeringName)))
+	})
+
+	It("returns a message with the service offering name, the plan name and broker name", func() {
+		offeringName := "some-service-offering"
+		planName := "some-plan"
+		brokerName := "some-broker"
+		err := actionerror.ServicePlanNotFoundError{
+			OfferingName:      offeringName,
+			PlanName:          planName,
+			ServiceBrokerName: brokerName,
+		}
+		Expect(err.Error()).To(Equal(fmt.Sprintf(
+			"The plan %s could not be found for service offering %s and broker %s.",
+			planName,
+			offeringName,
+			brokerName,
+		)))
 	})
 
 	When("no service offering name", func() {
