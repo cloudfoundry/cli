@@ -115,6 +115,7 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 			Expect(catalog.Services[0].Description).To(Equal(cfg.Services[0].Description))
 			Expect(catalog.Services[0].Metadata.DocumentationUrl).To(Equal(cfg.Services[0].DocumentationURL))
 			Expect(catalog.Services[0].Metadata.Shareable).To(PointTo(Equal(cfg.Services[0].Shareable)))
+			Expect(catalog.Services[0].InstancesRetrievable).To(BeTrue())
 			Expect(catalog.Services[0].Plans).To(HaveLen(2))
 			Expect(catalog.Services[0].Plans[0].ID).To(Equal(cfg.Services[0].Plans[0].ID))
 			Expect(catalog.Services[0].Plans[0].Name).To(Equal(cfg.Services[0].Plans[0].Name))
@@ -532,10 +533,11 @@ func randomConfiguration() config.BrokerConfiguration {
 	return config.BrokerConfiguration{
 		Services: []config.Service{
 			{
-				Name:             randomString(),
-				ID:               randomString(),
-				Description:      randomString(),
-				DocumentationURL: fmt.Sprintf("https://%s.com", randomString()),
+				Name:                 randomString(),
+				ID:                   randomString(),
+				Description:          randomString(),
+				DocumentationURL:     fmt.Sprintf("https://%s.com", randomString()),
+				InstancesRetrievable: true,
 				Plans: []config.Plan{
 					{
 						Name:        randomString(),

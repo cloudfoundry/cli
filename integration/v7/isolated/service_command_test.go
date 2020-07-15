@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("service command", func() {
+var _ = FDescribe("service command", func() {
 	Describe("help", func() {
 		const serviceInstanceName = "fake-service-instance-name"
 
@@ -138,83 +139,123 @@ var _ = Describe("service command", func() {
 
 		When("the service instance is managed by a broker", func() {
 			const (
-				tags                = "foo, bar"
-				brokerAsyncDelay    = time.Second
 				testPollingInterval = time.Second
 				testTimeout         = time.Minute
 			)
 
 			var broker *servicebrokerstub.ServiceBrokerStub
 
-			BeforeEach(func() {
-				broker = servicebrokerstub.New().WithAsyncDelay(brokerAsyncDelay).EnableServiceAccess()
-				command := []string{
-					"create-service",
-					broker.FirstServiceOfferingName(),
-					broker.FirstServicePlanName(),
-					serviceInstanceName,
-					"-t", tags,
-				}
-				Eventually(helpers.CF(command...)).Should(Exit(0))
-			})
-
 			AfterEach(func() {
-				Eventually(helpers.CF("delete-service", "-f", serviceInstanceName)).Should(Exit(0))
 				broker.Forget()
 			})
 
-			It("can show the GUID", func() {
-				session := helpers.CF("service", serviceInstanceName, "--guid")
-				Eventually(session).Should(Exit(0))
-				Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+			When("the service instance takes time to be created", func() {
+				const (
+					tags             = "foo, bar"
+					brokerAsyncDelay = time.Second
+				)
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.New().WithAsyncDelay(brokerAsyncDelay).EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-t", tags,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+				})
+
+				It("can show the GUID immediately", func() {
+					session := helpers.CF("service", serviceInstanceName, "--guid")
+					Eventually(session).Should(Exit(0))
+					Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+				})
+
+				It("can show the service instance details", func() {
+					By("reporting that create is in progress", func() {
+						session := helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+
+						username, _ := helpers.GetCredentials()
+						Expect(session).To(SatisfyAll(
+							Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+							Say(`\n`),
+							Say(`name:\s+%s\n`, serviceInstanceName),
+							Say(`guid:\s+\S+\n`),
+							Say(`type:\s+managed`),
+							Say(`broker:\s+%s`, broker.Name),
+							Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+							Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+							Say(`tags:\s+%s\n`, tags),
+							Say(`description:\s+%s\n`, broker.Services[0].Description),
+							Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
+							Say(`dashboard url:\s+http://example.com\n`),
+							Say(`\n`),
+							Say(`Sharing:\n`),
+							Say(`This service instance is not currently being shared.`),
+							Say(`\n`),
+							Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+							Say(`\n`),
+							Say(`status:\s+create in progress\n`),
+							Say(`message:\s*\n`),
+							Say(`started:\s+%s\n`, helpers.TimestampRegex),
+							Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+							Say(`\n`),
+							Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
+							Say(`\n`),
+						))
+					})
+
+					By("reporting that create has succeeded", func() {
+						output := func() *Buffer {
+							session := helpers.CF("service", serviceInstanceName)
+							session.Wait()
+							return session.Out
+						}
+
+						Eventually(output, testTimeout, testPollingInterval).Should(SatisfyAll(
+							Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+							Say(`\n`),
+							Say(`status:\s+create succeeded\n`),
+							Say(`message:\s+very happy service\n`),
+							Say(`started:\s+%s\n`, helpers.TimestampRegex),
+							Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+							Say(`\n`),
+							Say(`No parameters are set for service instance %s...\n`, serviceInstanceName),
+							Say(`\n`),
+						))
+					})
+				})
 			})
 
-			It("can show the service instance details", func() {
-				By("reporting that create is in progress", func() {
+			When("service instance parameters have been set", func() {
+				var parameters string
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.EnableServiceAccess()
+					parameters = fmt.Sprintf(`{"foo":"%s"}`, helpers.RandomName())
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-c", parameters,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+					Eventually(helpers.CF("service", serviceInstanceName)).Should(Say(`status:\s+create succeeded`))
+				})
+
+				It("reports the service instance parameters", func() {
 					session := helpers.CF("service", serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
-					username, _ := helpers.GetCredentials()
 					Expect(session).To(SatisfyAll(
-						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
-						Say(`name:\s+%s\n`, serviceInstanceName),
-						Say(`guid:\s+\S+\n`),
-						Say(`type:\s+managed`),
-						Say(`broker:\s+%s`, broker.Name),
-						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
-						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
-						Say(`tags:\s+%s\n`, tags),
-						Say(`description:\s+%s\n`, broker.Services[0].Description),
-						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
-						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`%s\n`, parameters),
 						Say(`\n`),
-						Say(`Sharing:\n`),
-						Say(`This service instance is not currently being shared.`),
-						Say(`\n`),
-						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
-						Say(`status:\s+create in progress\n`),
-						Say(`message:\s*\n`),
-						Say(`started:\s+%s\n`, helpers.TimestampRegex),
-						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
-					))
-				})
-
-				By("reporting that create has succeeded", func() {
-					output := func() *Buffer {
-						session := helpers.CF("service", serviceInstanceName)
-						session.Wait()
-						return session.Out
-					}
-
-					Eventually(output, testTimeout, testPollingInterval).Should(SatisfyAll(
-						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
-						Say(`status:\s+create succeeded\n`),
-						Say(`message:\s+very happy service\n`),
-						Say(`started:\s+%s\n`, helpers.TimestampRegex),
-						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 					))
 				})
 			})
@@ -226,6 +267,15 @@ var _ = Describe("service command", func() {
 					sharedToSpaceName = helpers.NewSpaceName()
 					helpers.CreateSpace(sharedToSpaceName)
 
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
 					output := func() *Buffer {
 						session := helpers.CF("service", serviceInstanceName)
 						session.Wait()
@@ -234,7 +284,7 @@ var _ = Describe("service command", func() {
 
 					Eventually(output, testTimeout, testPollingInterval).Should(Say(`status:\s+create succeeded\n`))
 
-					command := []string{
+					command = []string{
 						"share-service",
 						serviceInstanceName,
 						"-s", sharedToSpaceName,

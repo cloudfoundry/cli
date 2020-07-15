@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 const featureFlagServiceInstanceSharing string = "service_instance_sharing"
@@ -15,12 +16,14 @@ type SharedStatus struct {
 	IsShared                bool
 }
 
-type ServiceInstanceWithRelationships struct {
+type ServiceInstanceDetails struct {
 	resources.ServiceInstance
-	ServiceOffering   resources.ServiceOffering
-	ServicePlanName   string
-	ServiceBrokerName string
-	SharedStatus      SharedStatus
+	ServiceOffering         resources.ServiceOffering
+	ServicePlanName         string
+	ServiceBrokerName       string
+	Parameters              types.OptionalObject
+	ParametersMissingReason string
+	SharedStatus            SharedStatus
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -33,7 +36,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 	}
 }
 
-func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceWithRelationships, Warnings, error) {
+func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, Warnings, error) {
 	query := []ccv3.Query{
 		{
 			Key:    ccv3.FieldsServicePlan,
@@ -53,13 +56,24 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	switch err.(type) {
 	case nil:
 	case ccerror.ServiceInstanceNotFoundError:
-		return ServiceInstanceWithRelationships{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
+		return ServiceInstanceDetails{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
-		return ServiceInstanceWithRelationships{}, Warnings(warnings), err
+		return ServiceInstanceDetails{}, Warnings(warnings), err
 	}
 
-	result := ServiceInstanceWithRelationships{
+	result := ServiceInstanceDetails{
 		ServiceInstance: serviceInstance,
+	}
+
+	params, paramsWarnings, err := actor.CloudControllerClient.GetServiceInstanceParameters(serviceInstance.GUID)
+	warnings = append(warnings, paramsWarnings...)
+	result.Parameters = params
+	if err != nil {
+		if e, ok := err.(ccerror.V3UnexpectedResponseError); ok && len(e.Errors) > 0 {
+			result.ParametersMissingReason = e.Errors[0].Detail
+		} else {
+			result.ParametersMissingReason = err.Error()
+		}
 	}
 
 	if len(included.ServicePlans) == 1 {
@@ -80,7 +94,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		warnings = append(warnings, sharedWarnings...)
 
 		if err != nil {
-			return ServiceInstanceWithRelationships{}, Warnings(warnings), err
+			return ServiceInstanceDetails{}, Warnings(warnings), err
 		}
 
 		result.SharedStatus = sharedStatus
@@ -148,7 +162,7 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 	return warnings, nil
 }
 
-func (actor Actor) getSharedStatus(result ServiceInstanceWithRelationships, serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {
+func (actor Actor) getSharedStatus(result ServiceInstanceDetails, serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {
 	var warnings ccv3.Warnings
 
 	featureFlag, featureFlagWarning, err := actor.CloudControllerClient.GetFeatureFlag(featureFlagServiceInstanceSharing)

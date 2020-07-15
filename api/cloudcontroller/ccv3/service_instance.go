@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // GetServiceInstances lists service instances with optional filters.
@@ -52,6 +53,22 @@ func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, q
 	}
 
 	return instances[0], included, warnings, nil
+}
+
+func (client Client) GetServiceInstanceParameters(serviceInstanceGUID string) (types.OptionalObject, Warnings, error) {
+	var receiver map[string]interface{}
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceInstanceParametersRequest,
+		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
+		ResponseBody: &receiver,
+	})
+
+	if err != nil {
+		return types.OptionalObject{}, warnings, err
+	}
+
+	return types.NewOptionalObject(receiver), warnings, nil
 }
 
 func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {

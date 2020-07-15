@@ -1841,19 +1841,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceInstanceDetailsStub        func(string, string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error)
+	GetServiceInstanceDetailsStub        func(string, string) (v7action.ServiceInstanceDetails, v7action.Warnings, error)
 	getServiceInstanceDetailsMutex       sync.RWMutex
 	getServiceInstanceDetailsArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getServiceInstanceDetailsReturns struct {
-		result1 v7action.ServiceInstanceWithRelationships
+		result1 v7action.ServiceInstanceDetails
 		result2 v7action.Warnings
 		result3 error
 	}
 	getServiceInstanceDetailsReturnsOnCall map[int]struct {
-		result1 v7action.ServiceInstanceWithRelationships
+		result1 v7action.ServiceInstanceDetails
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -10995,7 +10995,7 @@ func (fake *FakeActor) GetServiceInstanceByNameAndSpaceReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceInstanceDetails(arg1 string, arg2 string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error) {
+func (fake *FakeActor) GetServiceInstanceDetails(arg1 string, arg2 string) (v7action.ServiceInstanceDetails, v7action.Warnings, error) {
 	fake.getServiceInstanceDetailsMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceDetailsReturnsOnCall[len(fake.getServiceInstanceDetailsArgsForCall)]
 	fake.getServiceInstanceDetailsArgsForCall = append(fake.getServiceInstanceDetailsArgsForCall, struct {
@@ -11020,7 +11020,7 @@ func (fake *FakeActor) GetServiceInstanceDetailsCallCount() int {
 	return len(fake.getServiceInstanceDetailsArgsForCall)
 }
 
-func (fake *FakeActor) GetServiceInstanceDetailsCalls(stub func(string, string) (v7action.ServiceInstanceWithRelationships, v7action.Warnings, error)) {
+func (fake *FakeActor) GetServiceInstanceDetailsCalls(stub func(string, string) (v7action.ServiceInstanceDetails, v7action.Warnings, error)) {
 	fake.getServiceInstanceDetailsMutex.Lock()
 	defer fake.getServiceInstanceDetailsMutex.Unlock()
 	fake.GetServiceInstanceDetailsStub = stub
@@ -11033,30 +11033,30 @@ func (fake *FakeActor) GetServiceInstanceDetailsArgsForCall(i int) (string, stri
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetServiceInstanceDetailsReturns(result1 v7action.ServiceInstanceWithRelationships, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceInstanceDetailsReturns(result1 v7action.ServiceInstanceDetails, result2 v7action.Warnings, result3 error) {
 	fake.getServiceInstanceDetailsMutex.Lock()
 	defer fake.getServiceInstanceDetailsMutex.Unlock()
 	fake.GetServiceInstanceDetailsStub = nil
 	fake.getServiceInstanceDetailsReturns = struct {
-		result1 v7action.ServiceInstanceWithRelationships
+		result1 v7action.ServiceInstanceDetails
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceInstanceDetailsReturnsOnCall(i int, result1 v7action.ServiceInstanceWithRelationships, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceInstanceDetailsReturnsOnCall(i int, result1 v7action.ServiceInstanceDetails, result2 v7action.Warnings, result3 error) {
 	fake.getServiceInstanceDetailsMutex.Lock()
 	defer fake.getServiceInstanceDetailsMutex.Unlock()
 	fake.GetServiceInstanceDetailsStub = nil
 	if fake.getServiceInstanceDetailsReturnsOnCall == nil {
 		fake.getServiceInstanceDetailsReturnsOnCall = make(map[int]struct {
-			result1 v7action.ServiceInstanceWithRelationships
+			result1 v7action.ServiceInstanceDetails
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceInstanceDetailsReturnsOnCall[i] = struct {
-		result1 v7action.ServiceInstanceWithRelationships
+		result1 v7action.ServiceInstanceDetails
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
