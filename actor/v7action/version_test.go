@@ -9,24 +9,15 @@ import (
 
 var _ = Describe("Version Check Actions", func() {
 	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
-		fakeUAAClient             *v7actionfakes.FakeUAAClient
+		actor         *Actor
+		fakeUAAClient *v7actionfakes.FakeUAAClient
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _, _ = NewTestActor()
+		actor, _, _, _, fakeUAAClient, _, _ = NewTestActor()
 	})
 
-	Describe("CloudControllerAPIVersion", func() {
-		It("returns the CC API version", func() {
-			expectedVersion := "3.75.0"
-			fakeCloudControllerClient.CloudControllerAPIVersionReturns(expectedVersion)
-			Expect(actor.CloudControllerAPIVersion()).To(Equal(expectedVersion))
-		})
-	})
-
-	Describe("UAAAPIVersion", func() {
+	Describe("GetUAAAPIVersion", func() {
 		It("returns the UAA API version", func() {
 			expectedVersion := "1.96.0"
 			fakeUAAClient.GetAPIVersionReturns(expectedVersion, nil)

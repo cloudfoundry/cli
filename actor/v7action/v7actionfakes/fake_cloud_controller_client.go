@@ -12,26 +12,6 @@ import (
 )
 
 type FakeCloudControllerClient struct {
-	AppSSHEndpointStub        func() string
-	appSSHEndpointMutex       sync.RWMutex
-	appSSHEndpointArgsForCall []struct {
-	}
-	appSSHEndpointReturns struct {
-		result1 string
-	}
-	appSSHEndpointReturnsOnCall map[int]struct {
-		result1 string
-	}
-	AppSSHHostKeyFingerprintStub        func() string
-	appSSHHostKeyFingerprintMutex       sync.RWMutex
-	appSSHHostKeyFingerprintArgsForCall []struct {
-	}
-	appSSHHostKeyFingerprintReturns struct {
-		result1 string
-	}
-	appSSHHostKeyFingerprintReturnsOnCall map[int]struct {
-		result1 string
-	}
 	ApplyOrganizationQuotaStub        func(string, string) (resources.RelationshipList, ccv3.Warnings, error)
 	applyOrganizationQuotaMutex       sync.RWMutex
 	applyOrganizationQuotaArgsForCall []struct {
@@ -94,16 +74,6 @@ type FakeCloudControllerClient struct {
 		result1 bool
 		result2 ccv3.Warnings
 		result3 error
-	}
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct {
-	}
-	cloudControllerAPIVersionReturns struct {
-		result1 string
-	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
-		result1 string
 	}
 	CopyPackageStub        func(string, string) (ccv3.Package, ccv3.Warnings, error)
 	copyPackageMutex       sync.RWMutex
@@ -1859,20 +1829,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	TargetCFStub        func(ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)
+	TargetCFStub        func(ccv3.TargetSettings)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
 		arg1 ccv3.TargetSettings
-	}
-	targetCFReturns struct {
-		result1 ccv3.Info
-		result2 ccv3.Warnings
-		result3 error
-	}
-	targetCFReturnsOnCall map[int]struct {
-		result1 ccv3.Info
-		result2 ccv3.Warnings
-		result3 error
 	}
 	UnbindSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
 	unbindSecurityGroupRunningSpaceMutex       sync.RWMutex
@@ -2432,110 +2392,6 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) AppSSHEndpoint() string {
-	fake.appSSHEndpointMutex.Lock()
-	ret, specificReturn := fake.appSSHEndpointReturnsOnCall[len(fake.appSSHEndpointArgsForCall)]
-	fake.appSSHEndpointArgsForCall = append(fake.appSSHEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AppSSHEndpoint", []interface{}{})
-	fake.appSSHEndpointMutex.Unlock()
-	if fake.AppSSHEndpointStub != nil {
-		return fake.AppSSHEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.appSSHEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeCloudControllerClient) AppSSHEndpointCallCount() int {
-	fake.appSSHEndpointMutex.RLock()
-	defer fake.appSSHEndpointMutex.RUnlock()
-	return len(fake.appSSHEndpointArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) AppSSHEndpointCalls(stub func() string) {
-	fake.appSSHEndpointMutex.Lock()
-	defer fake.appSSHEndpointMutex.Unlock()
-	fake.AppSSHEndpointStub = stub
-}
-
-func (fake *FakeCloudControllerClient) AppSSHEndpointReturns(result1 string) {
-	fake.appSSHEndpointMutex.Lock()
-	defer fake.appSSHEndpointMutex.Unlock()
-	fake.AppSSHEndpointStub = nil
-	fake.appSSHEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) AppSSHEndpointReturnsOnCall(i int, result1 string) {
-	fake.appSSHEndpointMutex.Lock()
-	defer fake.appSSHEndpointMutex.Unlock()
-	fake.AppSSHEndpointStub = nil
-	if fake.appSSHEndpointReturnsOnCall == nil {
-		fake.appSSHEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.appSSHEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprint() string {
-	fake.appSSHHostKeyFingerprintMutex.Lock()
-	ret, specificReturn := fake.appSSHHostKeyFingerprintReturnsOnCall[len(fake.appSSHHostKeyFingerprintArgsForCall)]
-	fake.appSSHHostKeyFingerprintArgsForCall = append(fake.appSSHHostKeyFingerprintArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AppSSHHostKeyFingerprint", []interface{}{})
-	fake.appSSHHostKeyFingerprintMutex.Unlock()
-	if fake.AppSSHHostKeyFingerprintStub != nil {
-		return fake.AppSSHHostKeyFingerprintStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.appSSHHostKeyFingerprintReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintCallCount() int {
-	fake.appSSHHostKeyFingerprintMutex.RLock()
-	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
-	return len(fake.appSSHHostKeyFingerprintArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintCalls(stub func() string) {
-	fake.appSSHHostKeyFingerprintMutex.Lock()
-	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
-	fake.AppSSHHostKeyFingerprintStub = stub
-}
-
-func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturns(result1 string) {
-	fake.appSSHHostKeyFingerprintMutex.Lock()
-	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
-	fake.AppSSHHostKeyFingerprintStub = nil
-	fake.appSSHHostKeyFingerprintReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturnsOnCall(i int, result1 string) {
-	fake.appSSHHostKeyFingerprintMutex.Lock()
-	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
-	fake.AppSSHHostKeyFingerprintStub = nil
-	if fake.appSSHHostKeyFingerprintReturnsOnCall == nil {
-		fake.appSSHHostKeyFingerprintReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.appSSHHostKeyFingerprintReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeCloudControllerClient) ApplyOrganizationQuota(arg1 string, arg2 string) (resources.RelationshipList, ccv3.Warnings, error) {
 	fake.applyOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.applyOrganizationQuotaReturnsOnCall[len(fake.applyOrganizationQuotaArgsForCall)]
@@ -2800,58 +2656,6 @@ func (fake *FakeCloudControllerClient) CheckRouteReturnsOnCall(i int, result1 bo
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeCloudControllerClient) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) CloudControllerAPIVersionCalls(stub func() string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = stub
-}
-
-func (fake *FakeCloudControllerClient) CloudControllerAPIVersionReturns(result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeCloudControllerClient) CopyPackage(arg1 string, arg2 string) (ccv3.Package, ccv3.Warnings, error) {
@@ -10513,22 +10317,16 @@ func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) {
 	fake.targetCFMutex.Lock()
-	ret, specificReturn := fake.targetCFReturnsOnCall[len(fake.targetCFArgsForCall)]
 	fake.targetCFArgsForCall = append(fake.targetCFArgsForCall, struct {
 		arg1 ccv3.TargetSettings
 	}{arg1})
 	fake.recordInvocation("TargetCF", []interface{}{arg1})
 	fake.targetCFMutex.Unlock()
 	if fake.TargetCFStub != nil {
-		return fake.TargetCFStub(arg1)
+		fake.TargetCFStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.targetCFReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) TargetCFCallCount() int {
@@ -10537,7 +10335,7 @@ func (fake *FakeCloudControllerClient) TargetCFCallCount() int {
 	return len(fake.targetCFArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) TargetCFCalls(stub func(ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) TargetCFCalls(stub func(ccv3.TargetSettings)) {
 	fake.targetCFMutex.Lock()
 	defer fake.targetCFMutex.Unlock()
 	fake.TargetCFStub = stub
@@ -10548,35 +10346,6 @@ func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) ccv3.TargetSet
 	defer fake.targetCFMutex.RUnlock()
 	argsForCall := fake.targetCFArgsForCall[i]
 	return argsForCall.arg1
-}
-
-func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
-	fake.targetCFMutex.Lock()
-	defer fake.targetCFMutex.Unlock()
-	fake.TargetCFStub = nil
-	fake.targetCFReturns = struct {
-		result1 ccv3.Info
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) TargetCFReturnsOnCall(i int, result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
-	fake.targetCFMutex.Lock()
-	defer fake.targetCFMutex.Unlock()
-	fake.TargetCFStub = nil
-	if fake.targetCFReturnsOnCall == nil {
-		fake.targetCFReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Info
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.targetCFReturnsOnCall[i] = struct {
-		result1 ccv3.Info
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) UnbindSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
@@ -12988,10 +12757,6 @@ func (fake *FakeCloudControllerClient) UploadPackageReturnsOnCall(i int, result1
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.appSSHEndpointMutex.RLock()
-	defer fake.appSSHEndpointMutex.RUnlock()
-	fake.appSSHHostKeyFingerprintMutex.RLock()
-	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
 	fake.applyOrganizationQuotaMutex.RLock()
 	defer fake.applyOrganizationQuotaMutex.RUnlock()
 	fake.applySpaceQuotaMutex.RLock()
@@ -13000,8 +12765,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cancelDeploymentMutex.RUnlock()
 	fake.checkRouteMutex.RLock()
 	defer fake.checkRouteMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.copyPackageMutex.RLock()
 	defer fake.copyPackageMutex.RUnlock()
 	fake.createApplicationMutex.RLock()

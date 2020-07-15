@@ -19,6 +19,7 @@ type JSONConfig struct {
 	LogCacheEndpoint         string             `json:"LogCacheEndPoint"`
 	MinCLIVersion            string             `json:"MinCLIVersion"`
 	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
+	NetworkPolicyV1Endpoint  string             `json:"NetworkPolicyV1Endpoint"`
 	TargetedOrganization     Organization       `json:"OrganizationFields"`
 	PluginRepositories       []PluginRepository `json:"PluginRepos"`
 	RefreshToken             string             `json:"RefreshToken"`
@@ -111,6 +112,11 @@ func (config *Config) OverallPollingTimeout() time.Duration {
 	return time.Duration(config.ConfigFile.AsyncTimeout) * time.Minute
 }
 
+// NetworkPolicyV1Endpoint returns the endpoint for V1 of the networking API
+func (config *Config) NetworkPolicyV1Endpoint() string {
+	return config.ConfigFile.NetworkPolicyV1Endpoint
+}
+
 // RefreshToken returns the refresh token for getting a new access token.
 func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
@@ -177,6 +183,7 @@ type TargetInformationArgs struct {
 	Doppler           string
 	LogCache          string
 	MinCLIVersion     string
+	NetworkPolicyV1   string
 	Routing           string
 	SkipSSLValidation bool
 	UAA               string
@@ -192,6 +199,7 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.LogCacheEndpoint = args.LogCache
 	config.ConfigFile.RoutingEndpoint = args.Routing
 	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
+	config.ConfigFile.NetworkPolicyV1Endpoint = args.NetworkPolicyV1
 
 	config.ConfigFile.UAAEndpoint = args.UAA
 	config.ConfigFile.AuthorizationEndpoint = args.Auth

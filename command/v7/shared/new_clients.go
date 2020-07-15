@@ -124,17 +124,14 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv3.Client, mi
 		}
 	}
 
-	_, _, err := ccClient.TargetCF(ccv3.TargetSettings{
+	ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	if minVersionV3 != "" {
-		err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
+		err := command.MinimumCCAPIVersionCheck(config.APIVersion(), minVersionV3)
 		if err != nil {
 			if _, ok := err.(translatableerror.MinimumCFAPIVersionNotMetError); ok {
 				return nil, translatableerror.V3V2SwitchError{}
@@ -142,5 +139,6 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv3.Client, mi
 			return nil, err
 		}
 	}
+
 	return ccClient, nil
 }

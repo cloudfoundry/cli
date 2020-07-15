@@ -45,16 +45,13 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 		}
 	}
 
-	_, _, err := ccClient.TargetCF(ccv3.TargetSettings{
+	ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),
 	})
-	if err != nil {
-		return nil, nil, err
-	}
 
-	if ccClient.UAA() == "" {
+	if config.UAAEndpoint() == "" {
 		return nil, nil, translatableerror.UAAEndpointNotFoundError{}
 	}
 
@@ -71,7 +68,7 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(config.UAAEndpoint(), ccClient.Login())
+	err := uaaClient.SetupResources(config.UAAEndpoint(), config.AuthorizationEndpoint())
 	if err != nil {
 		return nil, nil, err
 	}

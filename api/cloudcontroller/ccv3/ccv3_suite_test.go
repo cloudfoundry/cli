@@ -3,16 +3,13 @@ package ccv3_test
 import (
 	"bytes"
 	"log"
-	"net/http"
-	"strings"
+	"testing"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
-
-	"testing"
 )
 
 func TestCcv3(t *testing.T) {
@@ -47,7 +44,6 @@ func NewFakeRequesterTestClient(requester Requester) (*Client, *ccv3fakes.FakeCl
 }
 
 func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
-	SetupV3Response()
 	var client *Client
 	fakeClock := new(ccv3fakes.FakeClock)
 
@@ -61,45 +57,11 @@ func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
 			NewRequester(singleConfig),
 		)
 	}
-	_, warnings, err := client.TargetCF(TargetSettings{
+	client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
 		URL:               server.URL(),
 	})
-	Expect(err).ToNot(HaveOccurred())
-	Expect(warnings).To(BeEmpty())
 
 	return client, fakeClock
 }
 
-func SetupV3Response() {
-	serverURL := server.URL()
-	rootResponse := strings.Replace(`{
-		"links": {
-			"self": {
-				"href": "SERVER_URL"
-			},
-			"cloud_controller_v2": {
-				"href": "SERVER_URL/v2",
-				"meta": {
-					"version": "2.64.0"
-				}
-			},
-			"cloud_controller_v3": {
-				"href": "SERVER_URL/v3",
-				"meta": {
-					"version": "3.0.0-alpha.5"
-				}
-			},
-			"uaa": {
-				"href": "https://uaa.bosh-lite.com"
-			}
-		}
-	}`, "SERVER_URL", serverURL, -1)
-
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest(http.MethodGet, "/"),
-			RespondWith(http.StatusOK, rootResponse),
-		),
-	)
-}

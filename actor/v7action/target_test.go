@@ -76,7 +76,7 @@ var _ = Describe("Targeting", func() {
 					},
 				},
 			}
-			fakeCloudControllerClient.TargetCFReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
+			fakeCloudControllerClient.GetInfoReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -94,14 +94,14 @@ var _ = Describe("Targeting", func() {
 			Expect(connectionSettings.SkipSSLValidation).To(BeTrue())
 		})
 
-		When("targeting CF fails", func() {
+		When("getting root info fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.TargetCFReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("target-error"))
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("info-error"))
 			})
 
 			It("returns an error and all warnings", func() {
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("target-error"))
+				Expect(err).To(MatchError("info-error"))
 				Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 
 				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))

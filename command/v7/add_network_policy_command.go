@@ -40,7 +40,7 @@ func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) 
 
 	ccClient, uaaClient := cmd.BaseCommand.GetClients()
 
-	networkingClient, err := shared.NewNetworkingClient(ccClient.NetworkPolicyV1(), config, uaaClient, ui)
+	networkingClient, err := shared.NewNetworkingClient(config.NetworkPolicyV1Endpoint(), config, uaaClient, ui)
 	if err != nil {
 		return err
 	}

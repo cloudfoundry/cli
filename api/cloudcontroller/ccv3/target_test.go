@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 
@@ -89,58 +88,14 @@ var _ = Describe("Target", func() {
 			})
 
 			It("calls wrap on all the wrappers", func() {
-				_, _, err := client.TargetCF(TargetSettings{
+				client.TargetCF(TargetSettings{
 					SkipSSLValidation: true,
 					URL:               server.URL(),
 				})
-				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeWrapper1.WrapCallCount()).To(Equal(1))
 				Expect(fakeWrapper2.WrapCallCount()).To(Equal(1))
 				Expect(fakeWrapper2.WrapArgsForCall(0)).To(Equal(fakeWrapper1))
-			})
-		})
-
-		When("passed a valid API URL", func() {
-			When("the server has unverified SSL", func() {
-				When("setting the skip ssl flag", func() {
-					It("sets all the endpoints on the client and returns all warnings", func() {
-						rootInfo, warnings, err := client.TargetCF(TargetSettings{
-							SkipSSLValidation: true,
-							URL:               server.URL(),
-						})
-						Expect(err).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("warning 1"))
-
-						Expect(client.UAA()).To(Equal("https://uaa.bosh-lite.com"))
-						Expect(client.CloudControllerAPIVersion()).To(Equal("3.0.0-alpha.5"))
-						Expect(rootInfo.Links.CCV3.HREF).To(Equal(fmt.Sprintf("%s/v3", serverURL)))
-					})
-				})
-			})
-		})
-
-		When("the cloud controller encounters an error", func() {
-			BeforeEach(func() {
-				server.SetHandler(0,
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/"),
-						RespondWith(
-							http.StatusNotFound,
-							`{"errors": [{}]}`,
-							http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the same error", func() {
-				rootInfo, warnings, err := client.TargetCF(TargetSettings{
-					SkipSSLValidation: true,
-					URL:               server.URL(),
-				})
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{}))
-				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(rootInfo).To(Equal(Info{}))
 			})
 		})
 	})

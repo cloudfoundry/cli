@@ -33,6 +33,7 @@ type Config interface {
 	Locale() string
 	MinCLIVersion() string
 	NOAARequestRetryCount() int
+	NetworkPolicyV1Endpoint() string
 	OverallPollingTimeout() time.Duration
 	PluginHome() string
 	PluginRepositories() []configv3.PluginRepository

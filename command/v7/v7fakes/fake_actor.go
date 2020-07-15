@@ -126,16 +126,6 @@ type FakeActor struct {
 	clearTargetMutex       sync.RWMutex
 	clearTargetArgsForCall []struct {
 	}
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct {
-	}
-	cloudControllerAPIVersionReturns struct {
-		result1 string
-	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
 	CopyPackageStub        func(resources.Application, resources.Application) (v7action.Package, v7action.Warnings, error)
 	copyPackageMutex       sync.RWMutex
 	copyPackageArgsForCall []struct {
@@ -1544,6 +1534,20 @@ type FakeActor struct {
 	}
 	getRevisionsByApplicationNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetRootResponseStub        func() (v7action.Info, v7action.Warnings, error)
+	getRootResponseMutex       sync.RWMutex
+	getRootResponseArgsForCall []struct {
+	}
+	getRootResponseReturns struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRootResponseReturnsOnCall map[int]struct {
+		result1 v7action.Info
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -3584,58 +3588,6 @@ func (fake *FakeActor) ClearTargetCalls(stub func()) {
 	fake.clearTargetMutex.Lock()
 	defer fake.clearTargetMutex.Unlock()
 	fake.ClearTargetStub = stub
-}
-
-func (fake *FakeActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
-}
-
-func (fake *FakeActor) CloudControllerAPIVersionCalls(stub func() string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = stub
-}
-
-func (fake *FakeActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeActor) CopyPackage(arg1 resources.Application, arg2 resources.Application) (v7action.Package, v7action.Warnings, error) {
@@ -9713,6 +9665,64 @@ func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int,
 	}
 	fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRootResponse() (v7action.Info, v7action.Warnings, error) {
+	fake.getRootResponseMutex.Lock()
+	ret, specificReturn := fake.getRootResponseReturnsOnCall[len(fake.getRootResponseArgsForCall)]
+	fake.getRootResponseArgsForCall = append(fake.getRootResponseArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetRootResponse", []interface{}{})
+	fake.getRootResponseMutex.Unlock()
+	if fake.GetRootResponseStub != nil {
+		return fake.GetRootResponseStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRootResponseReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRootResponseCallCount() int {
+	fake.getRootResponseMutex.RLock()
+	defer fake.getRootResponseMutex.RUnlock()
+	return len(fake.getRootResponseArgsForCall)
+}
+
+func (fake *FakeActor) GetRootResponseCalls(stub func() (v7action.Info, v7action.Warnings, error)) {
+	fake.getRootResponseMutex.Lock()
+	defer fake.getRootResponseMutex.Unlock()
+	fake.GetRootResponseStub = stub
+}
+
+func (fake *FakeActor) GetRootResponseReturns(result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+	fake.getRootResponseMutex.Lock()
+	defer fake.getRootResponseMutex.Unlock()
+	fake.GetRootResponseStub = nil
+	fake.getRootResponseReturns = struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRootResponseReturnsOnCall(i int, result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+	fake.getRootResponseMutex.Lock()
+	defer fake.getRootResponseMutex.Unlock()
+	fake.GetRootResponseStub = nil
+	if fake.getRootResponseReturnsOnCall == nil {
+		fake.getRootResponseReturnsOnCall = make(map[int]struct {
+			result1 v7action.Info
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRootResponseReturnsOnCall[i] = struct {
+		result1 v7action.Info
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -16475,8 +16485,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.checkRouteMutex.RUnlock()
 	fake.clearTargetMutex.RLock()
 	defer fake.clearTargetMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.copyPackageMutex.RLock()
 	defer fake.copyPackageMutex.RUnlock()
 	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
@@ -16663,6 +16671,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
+	fake.getRootResponseMutex.RLock()
+	defer fake.getRootResponseMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
 	fake.getRouteDestinationByAppGUIDMutex.RLock()

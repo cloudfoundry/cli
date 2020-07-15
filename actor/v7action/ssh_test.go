@@ -92,8 +92,13 @@ var _ = Describe("SSH Actions", func() {
 
 		When("the app ssh endpoint is empty", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AppSSHEndpointReturns("")
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
+					Links: ccv3.InfoLinks{
+						AppSSH: ccv3.APILink{HREF: ""},
+					},
+				}, nil, nil)
 			})
+
 			It("creates an ssh-endpoint-not-set error", func() {
 				Expect(executeErr).To(MatchError("SSH endpoint not set"))
 			})
@@ -101,9 +106,13 @@ var _ = Describe("SSH Actions", func() {
 
 		When("the app ssh hostkey fingerprint is empty", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AppSSHEndpointReturns("some-app-ssh-endpoint")
-				fakeCloudControllerClient.AppSSHHostKeyFingerprintReturns("")
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
+					Links: ccv3.InfoLinks{
+						AppSSH: ccv3.APILink{HREF: "some-app-ssh-endpoint"},
+					},
+				}, nil, nil)
 			})
+
 			It("creates an ssh-hostkey-fingerprint-not-set error", func() {
 				Expect(executeErr).To(MatchError("SSH hostkey fingerprint not set"))
 			})
@@ -111,8 +120,14 @@ var _ = Describe("SSH Actions", func() {
 
 		When("ssh endpoint and fingerprint are set", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AppSSHEndpointReturns("some-app-ssh-endpoint")
-				fakeCloudControllerClient.AppSSHHostKeyFingerprintReturns("some-app-ssh-fingerprint")
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
+					Links: ccv3.InfoLinks{
+						AppSSH: ccv3.APILink{
+							HREF: "some-app-ssh-endpoint",
+							Meta: ccv3.APILinkMeta{HostKeyFingerprint: "some-app-ssh-fingerprint"},
+						},
+					},
+				}, nil, nil)
 			})
 
 			It("looks up the passcode with the config credentials", func() {

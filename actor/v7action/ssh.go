@@ -25,12 +25,18 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 ) (SSHAuthentication, Warnings, error) {
 	var allWarnings Warnings
 
-	endpoint := actor.CloudControllerClient.AppSSHEndpoint()
+	rootInfo, warnings, err := actor.CloudControllerClient.GetInfo()
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return SSHAuthentication{}, allWarnings, err
+	}
+
+	endpoint := rootInfo.AppSSHEndpoint()
 	if endpoint == "" {
 		return SSHAuthentication{}, nil, actionerror.SSHEndpointNotSetError{}
 	}
 
-	fingerprint := actor.CloudControllerClient.AppSSHHostKeyFingerprint()
+	fingerprint := rootInfo.AppSSHHostKeyFingerprint()
 	if fingerprint == "" {
 		return SSHAuthentication{}, nil, actionerror.SSHHostKeyFingerprintNotSetError{}
 	}

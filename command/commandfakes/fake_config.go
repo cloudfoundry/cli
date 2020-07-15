@@ -241,6 +241,16 @@ type FakeConfig struct {
 	nOAARequestRetryCountReturnsOnCall map[int]struct {
 		result1 int
 	}
+	NetworkPolicyV1EndpointStub        func() string
+	networkPolicyV1EndpointMutex       sync.RWMutex
+	networkPolicyV1EndpointArgsForCall []struct {
+	}
+	networkPolicyV1EndpointReturns struct {
+		result1 string
+	}
+	networkPolicyV1EndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	OverallPollingTimeoutStub        func() time.Duration
 	overallPollingTimeoutMutex       sync.RWMutex
 	overallPollingTimeoutArgsForCall []struct {
@@ -1776,6 +1786,58 @@ func (fake *FakeConfig) NOAARequestRetryCountReturnsOnCall(i int, result1 int) {
 	}
 	fake.nOAARequestRetryCountReturnsOnCall[i] = struct {
 		result1 int
+	}{result1}
+}
+
+func (fake *FakeConfig) NetworkPolicyV1Endpoint() string {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	ret, specificReturn := fake.networkPolicyV1EndpointReturnsOnCall[len(fake.networkPolicyV1EndpointArgsForCall)]
+	fake.networkPolicyV1EndpointArgsForCall = append(fake.networkPolicyV1EndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NetworkPolicyV1Endpoint", []interface{}{})
+	fake.networkPolicyV1EndpointMutex.Unlock()
+	if fake.NetworkPolicyV1EndpointStub != nil {
+		return fake.NetworkPolicyV1EndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.networkPolicyV1EndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointCallCount() int {
+	fake.networkPolicyV1EndpointMutex.RLock()
+	defer fake.networkPolicyV1EndpointMutex.RUnlock()
+	return len(fake.networkPolicyV1EndpointArgsForCall)
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointCalls(stub func() string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = stub
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointReturns(result1 string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = nil
+	fake.networkPolicyV1EndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointReturnsOnCall(i int, result1 string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = nil
+	if fake.networkPolicyV1EndpointReturnsOnCall == nil {
+		fake.networkPolicyV1EndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.networkPolicyV1EndpointReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
@@ -3703,6 +3765,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.nOAARequestRetryCountMutex.RLock()
 	defer fake.nOAARequestRetryCountMutex.RUnlock()
+	fake.networkPolicyV1EndpointMutex.RLock()
+	defer fake.networkPolicyV1EndpointMutex.RUnlock()
 	fake.overallPollingTimeoutMutex.RLock()
 	defer fake.overallPollingTimeoutMutex.RUnlock()
 	fake.pluginHomeMutex.RLock()

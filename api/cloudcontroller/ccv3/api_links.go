@@ -9,16 +9,18 @@ type APILink struct {
 	Method string `json:"method"`
 
 	// Meta contains additional metadata about the API.
-	Meta struct {
-		// Version of the API
-		Version string `json:"version"`
+	Meta APILinkMeta `json:"meta"`
+}
 
-		// Fingerprint to authenticate api with
-		HostKeyFingerprint string `json:"host_key_fingerprint"`
+type APILinkMeta struct {
+	// Version of the API
+	Version string `json:"version"`
 
-		// Identifier for UAA queries
-		OAuthClient string `json:"oath_client"`
-	} `json:"meta"`
+	// Fingerprint to authenticate api with
+	HostKeyFingerprint string `json:"host_key_fingerprint"`
+
+	// Identifier for UAA queries
+	OAuthClient string `json:"oath_client"`
 }
 
 // APILinks is a directory of follow-up urls for the resource.

@@ -218,8 +218,6 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(testUI.Err).To(Say("get space by org warning"))
 						Expect(testUI.Err).To(Say("bind security group to space warning"))
 
-						Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(0))
-
 						Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
 						Expect(fakeActor.GetSecurityGroupArgsForCall(0)).To(Equal("some-security-group"))
 
@@ -419,7 +417,6 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(testUI.Err).To(Say("get space by org warning"))
 						Expect(testUI.Err).To(Say("bind security group to space warning"))
 
-						Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(0))
 						Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
 						Expect(fakeActor.GetSecurityGroupArgsForCall(0)).To(Equal("some-security-group"))
 

@@ -49,7 +49,7 @@ var _ = Describe("target Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		apiVersion = "1.2.3"
-		fakeActor.CloudControllerAPIVersionReturns(apiVersion)
+		fakeConfig.APIVersionReturns(apiVersion)
 		minCLIVersion = "1.0.0"
 		fakeConfig.MinCLIVersionReturns(minCLIVersion)
 		fakeConfig.BinaryVersionReturns("1.0.0")

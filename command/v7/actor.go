@@ -27,7 +27,6 @@ type Actor interface {
 	CancelDeployment(deploymentGUID string) (v7action.Warnings, error)
 	CheckRoute(domainName string, hostname string, path string, port int) (bool, v7action.Warnings, error)
 	ClearTarget()
-	CloudControllerAPIVersion() string
 	CopyPackage(sourceApp resources.Application, targetApp resources.Application) (v7action.Package, v7action.Warnings, error)
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v7action.Package, v7action.Warnings, error)
 	CreateApplicationDroplet(appGUID string) (resources.Droplet, v7action.Warnings, error)
@@ -121,6 +120,7 @@ type Actor interface {
 	GetRecentEventsByApplicationNameAndSpace(appName string, spaceGUID string) ([]v7action.Event, v7action.Warnings, error)
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
 	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.Revisions, v7action.Warnings, error)
+	GetRootResponse() (v7action.Info, v7action.Warnings, error)
 	GetRouteByAttributes(domain resources.Domain, hostname string, path string, port int) (resources.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error)
 	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)

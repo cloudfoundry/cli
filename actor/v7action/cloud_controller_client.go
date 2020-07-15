@@ -14,10 +14,7 @@ import (
 type CloudControllerClient interface {
 	ApplyOrganizationQuota(quotaGUID string, orgGUID string) (resources.RelationshipList, ccv3.Warnings, error)
 	ApplySpaceQuota(quotaGUID string, spaceGUID string) (resources.RelationshipList, ccv3.Warnings, error)
-	AppSSHEndpoint() string
-	AppSSHHostKeyFingerprint() string
 	CheckRoute(domainGUID string, hostname string, path string, port int) (bool, ccv3.Warnings, error)
-	CloudControllerAPIVersion() string
 	CancelDeployment(deploymentGUID string) (ccv3.Warnings, error)
 	CopyPackage(sourcePackageGUID string, targetAppGUID string) (ccv3.Package, ccv3.Warnings, error)
 	CreateApplication(app resources.Application) (resources.Application, ccv3.Warnings, error)
@@ -133,7 +130,7 @@ type CloudControllerClient interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)
 	SharePrivateDomainToOrgs(domainGuid string, sharedOrgs ccv3.SharedOrgs) (ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
-	TargetCF(settings ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)
+	TargetCF(settings ccv3.TargetSettings)
 	UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (ccv3.Warnings, error)

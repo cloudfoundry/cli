@@ -47,7 +47,7 @@ var _ = Describe("Targeting", func() {
 				OAuthClient        string `json:"oath_client"`
 			}
 			meta.Version = expectedAPIVersion
-			fakeCloudControllerClient.TargetCFReturns(ccv3.Info{
+			fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 				Links: ccv3.InfoLinks{
 					CCV3: ccv3.APILink{
 						Meta: meta},
