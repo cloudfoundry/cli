@@ -155,6 +155,22 @@ var _ = Describe("Service Plan Actions", func() {
 					}))
 				})
 			})
+
+			When("the plan is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]resources.ServicePlan{},
+						ccv3.Warnings{"some-service-plan-warning"},
+						nil,
+					)
+				})
+				It("returns an error with the right hint", func() {
+					Expect(executionError).To(MatchError(actionerror.ServicePlanNotFoundError{
+						PlanName:     servicePlanName,
+						OfferingName: serviceOfferingName,
+					}))
+				})
+			})
 		})
 
 		When("the broker name is provided", func() {
@@ -185,6 +201,23 @@ var _ = Describe("Service Plan Actions", func() {
 				It("returns an error with the right hint", func() {
 					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{
 						Name:              servicePlanName,
+						ServiceBrokerName: serviceBrokerName,
+					}))
+				})
+			})
+
+			When("the plan is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]resources.ServicePlan{},
+						ccv3.Warnings{"some-service-plan-warning"},
+						nil,
+					)
+				})
+
+				It("returns an error with the right hint", func() {
+					Expect(executionError).To(MatchError(actionerror.ServicePlanNotFoundError{
+						PlanName:          servicePlanName,
 						ServiceBrokerName: serviceBrokerName,
 					}))
 				})
