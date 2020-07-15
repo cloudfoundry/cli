@@ -87,7 +87,7 @@ var _ = Describe("Routing", func() {
 					baseURL = "https://foo.bar.baz/this/is"
 
 					routes = map[string]Route{
-						routeName: {Path: "/very/good/:name", Method: http.MethodGet},
+						routeName:    {Path: "/very/good/:name", Method: http.MethodGet},
 						badRouteName: {Path: "/very/bad", Method: http.MethodGet},
 					}
 				})

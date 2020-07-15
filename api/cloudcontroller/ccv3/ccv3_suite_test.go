@@ -64,4 +64,3 @@ func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
 
 	return client, fakeClock
 }
-
