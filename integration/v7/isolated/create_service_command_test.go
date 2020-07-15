@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -94,33 +95,72 @@ var _ = Describe("create-service command", func() {
 		})
 
 	})
-	Context("not logged in", func() {
-		BeforeEach(func() {
-			helpers.LogoutCF()
-		})
 
-		It("displays FAILED, an informative error message, and exits 1", func() {
-			session := helpers.CF("create-service", "offering", "plan", "my-instance")
-			Eventually(session).Should(Exit(1))
-			Expect(session).To(Say("FAILED"))
-			Expect(session.Err).To(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
+	When("the environment is not setup correctly", func() {
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "create-service", "foo", "foo", "foo")
 		})
 	})
-	Context("logged in", func() {
+
+	Context("targeting a space", func() {
+		var (
+			userName  string
+			orgName   string
+			spaceName string
+		)
+
 		BeforeEach(func() {
-			helpers.LoginCF()
-			helpers.TargetOrg(ReadOnlyOrg)
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
 		})
 
-		When("Space is not targeted", func() {
-			It("Displays an error and exits", func() {
-				session := helpers.CF("create-service", "offering", "plan", "my-instance")
-				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+		When("there are two offerings with the same name from different brokers", func() {
+			var (
+				serviceOffering string
+				servicePlan     string
+				broker1         *servicebrokerstub.ServiceBrokerStub
+				broker2         *servicebrokerstub.ServiceBrokerStub
+			)
 
+			BeforeEach(func() {
+				broker1 = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker1.FirstServiceOfferingName()
+				servicePlan = broker1.FirstServicePlanName()
+				broker2 = servicebrokerstub.New()
+				broker2.Services[0].Name = serviceOffering
+				broker2.Services[0].Plans[0].Name = servicePlan
+				broker2.EnableServiceAccess()
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+				broker1.Forget()
+				broker2.Forget()
+			})
+
+			It("displays an error message prompting to disambiguate", func() {
+				session := helpers.CF("create-service", serviceOffering, servicePlan, "my-service")
+				Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+					"my-service", orgName, spaceName, userName))
+				Eventually(session.Err).Should(Say("Service plan '%s' is provided by multiple service offerings. Service offering '%s' is provided by multiple service brokers. Specify a broker name by using the '-b' flag.", servicePlan, serviceOffering))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+
+			When("broker is specified", func() {
+				When("there are no plans matching", func() {
+					It("displays an error message", func() {
+						session := helpers.CF("create-service", serviceOffering, "another-service-plan", "my-service", "-b", broker1.Name)
+						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+							"my-service", orgName, spaceName, userName))
+						Eventually(session.Err).Should(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", "another-service-plan", serviceOffering, broker1.Name))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 		})
 	})
-
 })
