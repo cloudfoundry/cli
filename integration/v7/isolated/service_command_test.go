@@ -190,7 +190,7 @@ var _ = Describe("service command", func() {
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
 						Say(`Sharing:\n`),
-						Say(`This service instance is currently not being shared.`),
+						Say(`This service instance is not currently being shared.`),
 						Say(`\n`),
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
