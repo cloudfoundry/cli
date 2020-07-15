@@ -126,11 +126,8 @@ func (actor Actor) getSharedStatus(result ServiceInstanceWithRelationships, serv
 		return SharedStatus{}, warnings, err
 	}
 
-	serviceOffering, serviceOfferingWarning, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(
-		result.ServiceOffering.Name,
-		result.ServiceBrokerName,
-	)
-	warnings = append(warnings, serviceOfferingWarning...)
+	offeringDisablesSharing, serviceOfferingWarnings, err := actor.getOfferingSharingDetails(result.ServiceOffering.Name, result.ServiceBrokerName)
+	warnings = append(warnings, serviceOfferingWarnings...)
 	if err != nil {
 		return SharedStatus{}, warnings, err
 	}
@@ -141,13 +138,25 @@ func (actor Actor) getSharedStatus(result ServiceInstanceWithRelationships, serv
 		return SharedStatus{}, warnings, err
 	}
 
-	isShared := len(sharedSpaces) > 0
-
 	sharedStatus := SharedStatus{
-		IsShared:                isShared,
-		OfferingDisablesSharing: !serviceOffering.AllowsInstanceSharing,
+		IsShared:                len(sharedSpaces) > 0,
+		OfferingDisablesSharing: offeringDisablesSharing,
 		FeatureFlagIsDisabled:   !featureFlag.Enabled,
 	}
 
 	return sharedStatus, warnings, nil
+}
+
+func (actor Actor) getOfferingSharingDetails(serviceOfferingName string, brokerName string) (bool, ccv3.Warnings, error) {
+	serviceOffering, serviceOfferingWarning, err :=
+		actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, brokerName)
+
+	switch err := err.(type) {
+	case nil:
+		return !serviceOffering.AllowsInstanceSharing, serviceOfferingWarning, nil
+	case ccerror.ServiceOfferingNotFoundError:
+		return false, serviceOfferingWarning, nil
+	default:
+		return false, serviceOfferingWarning, err
+	}
 }

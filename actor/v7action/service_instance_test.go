@@ -260,12 +260,31 @@ var _ = Describe("Service Instance Actions", func() {
 						)
 					})
 
-					It("returns service is not shared and feature flag info", func() {
+					It("returns that the service broker does not disable sharing", func() {
 						Expect(serviceInstance.SharedStatus.OfferingDisablesSharing).To(BeFalse())
 
 						actualOfferingName, actualBrokerName := fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerArgsForCall(0)
 						Expect(actualOfferingName).To(Equal(serviceOfferingName))
 						Expect(actualBrokerName).To(Equal(serviceBrokerName))
+					})
+				})
+
+				When("the service offering details can't be found", func() {
+					const warningMessage = "some-offering-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+							resources.ServiceOffering{},
+							ccv3.Warnings{warningMessage},
+							ccerror.ServiceOfferingNotFoundError{},
+						)
+					})
+
+					Context("because they can't actually share this service", func() {
+						It("just returns that the service broker does not disable sharing and carries on", func() {
+							Expect(serviceInstance.SharedStatus.OfferingDisablesSharing).To(BeFalse())
+							Expect(executionError).NotTo(HaveOccurred())
+						})
 					})
 				})
 

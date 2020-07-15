@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -94,7 +96,7 @@ var _ = Describe("Feature Flags Command", func() {
 
 		When("everything is perfect", func() {
 			BeforeEach(func() {
-				flags := []v7action.FeatureFlag{
+				flags := []resources.FeatureFlag{
 					{Name: "flag2", Enabled: true},
 					{Name: "flag1", Enabled: false},
 				}
