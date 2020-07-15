@@ -22,9 +22,13 @@ func (actor Actor) GetServicePlanByNameOfferingAndBroker(servicePlanName, servic
 
 	switch len(servicePlans) {
 	case 0:
-		return resources.ServicePlan{}, Warnings(warnings), actionerror.ServicePlanNotFoundError{PlanName: servicePlanName}
+		return resources.ServicePlan{}, Warnings(warnings), actionerror.ServicePlanNotFoundError{
+			PlanName:          servicePlanName,
+			OfferingName:      serviceOfferingName,
+			ServiceBrokerName: serviceBrokerName,
+		}
 	case 1:
-		return resources.ServicePlan(servicePlans[0]), Warnings(warnings), nil
+		return servicePlans[0], Warnings(warnings), nil
 	default:
 		return resources.ServicePlan{}, Warnings(warnings), actionerror.DuplicateServicePlanError{
 			Name:                servicePlanName,

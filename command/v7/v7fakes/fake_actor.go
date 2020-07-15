@@ -1859,6 +1859,23 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServicePlanByNameOfferingAndBrokerStub        func(string, string, string) (resources.ServicePlan, v7action.Warnings, error)
+	getServicePlanByNameOfferingAndBrokerMutex       sync.RWMutex
+	getServicePlanByNameOfferingAndBrokerArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getServicePlanByNameOfferingAndBrokerReturns struct {
+		result1 resources.ServicePlan
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServicePlanByNameOfferingAndBrokerReturnsOnCall map[int]struct {
+		result1 resources.ServicePlan
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServicePlanLabelsStub        func(string, string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getServicePlanLabelsMutex       sync.RWMutex
 	getServicePlanLabelsArgsForCall []struct {
@@ -11072,6 +11089,74 @@ func (fake *FakeActor) GetServiceOfferingLabelsReturnsOnCall(i int, result1 map[
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBroker(arg1 string, arg2 string, arg3 string) (resources.ServicePlan, v7action.Warnings, error) {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.Lock()
+	ret, specificReturn := fake.getServicePlanByNameOfferingAndBrokerReturnsOnCall[len(fake.getServicePlanByNameOfferingAndBrokerArgsForCall)]
+	fake.getServicePlanByNameOfferingAndBrokerArgsForCall = append(fake.getServicePlanByNameOfferingAndBrokerArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServicePlanByNameOfferingAndBroker", []interface{}{arg1, arg2, arg3})
+	fake.getServicePlanByNameOfferingAndBrokerMutex.Unlock()
+	if fake.GetServicePlanByNameOfferingAndBrokerStub != nil {
+		return fake.GetServicePlanByNameOfferingAndBrokerStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServicePlanByNameOfferingAndBrokerReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBrokerCallCount() int {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.RLock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.RUnlock()
+	return len(fake.getServicePlanByNameOfferingAndBrokerArgsForCall)
+}
+
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBrokerCalls(stub func(string, string, string) (resources.ServicePlan, v7action.Warnings, error)) {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.Lock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.Unlock()
+	fake.GetServicePlanByNameOfferingAndBrokerStub = stub
+}
+
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBrokerArgsForCall(i int) (string, string, string) {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.RLock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.RUnlock()
+	argsForCall := fake.getServicePlanByNameOfferingAndBrokerArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBrokerReturns(result1 resources.ServicePlan, result2 v7action.Warnings, result3 error) {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.Lock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.Unlock()
+	fake.GetServicePlanByNameOfferingAndBrokerStub = nil
+	fake.getServicePlanByNameOfferingAndBrokerReturns = struct {
+		result1 resources.ServicePlan
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServicePlanByNameOfferingAndBrokerReturnsOnCall(i int, result1 resources.ServicePlan, result2 v7action.Warnings, result3 error) {
+	fake.getServicePlanByNameOfferingAndBrokerMutex.Lock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.Unlock()
+	fake.GetServicePlanByNameOfferingAndBrokerStub = nil
+	if fake.getServicePlanByNameOfferingAndBrokerReturnsOnCall == nil {
+		fake.getServicePlanByNameOfferingAndBrokerReturnsOnCall = make(map[int]struct {
+			result1 resources.ServicePlan
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServicePlanByNameOfferingAndBrokerReturnsOnCall[i] = struct {
+		result1 resources.ServicePlan
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServicePlanLabels(arg1 string, arg2 string, arg3 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getServicePlanLabelsMutex.Lock()
 	ret, specificReturn := fake.getServicePlanLabelsReturnsOnCall[len(fake.getServicePlanLabelsArgsForCall)]
@@ -16896,6 +16981,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getServiceInstanceDetailsMutex.RUnlock()
 	fake.getServiceOfferingLabelsMutex.RLock()
 	defer fake.getServiceOfferingLabelsMutex.RUnlock()
+	fake.getServicePlanByNameOfferingAndBrokerMutex.RLock()
+	defer fake.getServicePlanByNameOfferingAndBrokerMutex.RUnlock()
 	fake.getServicePlanLabelsMutex.RLock()
 	defer fake.getServicePlanLabelsMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()
