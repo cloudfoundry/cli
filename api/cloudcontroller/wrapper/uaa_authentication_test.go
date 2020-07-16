@@ -152,6 +152,29 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
+		When("the authorization header is already provided", func() {
+			var (
+				accessToken string
+			)
+
+			BeforeEach(func() {
+				var err error
+				accessToken, err = buildTokenString(time.Now().AddDate(0, 0, 1))
+				Expect(err).ToNot(HaveOccurred())
+				request.Header.Set("Authorization", accessToken)
+			})
+
+			It("does not overwrite the authentication headers", func() {
+				err := wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
+				headers := authenticatedRequest.Header
+				Expect(headers["Authorization"]).To(ConsistOf([]string{accessToken}))
+			})
+		})
+
 		When("the access token is expired", func() {
 			var (
 				expectedBody       string

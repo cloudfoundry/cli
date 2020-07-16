@@ -3,6 +3,7 @@ package v7
 import (
 	"context"
 	"io"
+	"net/http"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -158,6 +159,7 @@ type Actor interface {
 	GetUAAAPIVersion() (string, error)
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	GetUser(username, origin string) (resources.User, error)
+	MakeCurlRequest(httpMethod string, path string, customHeaders []string, httpData string, failOnHTTPError bool) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
 	Marketplace(filter v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
 	ParseAccessToken(accessToken string) (jwt.JWT, error)

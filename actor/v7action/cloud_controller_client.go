@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"io"
+	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -123,6 +124,7 @@ type CloudControllerClient interface {
 	GetStagingSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetUser(userGUID string) (resources.User, ccv3.Warnings, error)
 	GetUsers(query ...ccv3.Query) ([]resources.User, ccv3.Warnings, error)
+	MakeRequestSendReceiveRaw(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)

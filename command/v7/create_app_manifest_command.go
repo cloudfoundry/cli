@@ -68,7 +68,7 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 
 	err = ioutil.WriteFile(pathToYAMLFile, manifestBytes, 0666)
 	if err != nil {
-		return translatableerror.ManifestCreationError{Err: err}
+		return translatableerror.FileCreationError{Err: err}
 	}
 
 	cmd.UI.DisplayText("Manifest file created successfully at {{.FilePath}}", map[string]interface{}{

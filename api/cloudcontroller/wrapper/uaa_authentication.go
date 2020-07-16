@@ -54,12 +54,13 @@ func (t *UAAAuthentication) Make(request *cloudcontroller.Request, passedRespons
 		return t.connection.Make(request, passedResponse)
 	}
 
-	if t.cache.AccessToken() != "" || t.cache.RefreshToken() != "" {
+	if request.Header.Get("Authorization") == "" && (t.cache.AccessToken() != "" || t.cache.RefreshToken() != "") {
 		// assert a valid access token for authenticated requests
-		err := t.refreshToken()
+		err := t.refreshTokenIfNecessary(t.cache.AccessToken())
 		if nil != err {
 			return err
 		}
+
 		request.Header.Set("Authorization", t.cache.AccessToken())
 	}
 
@@ -80,10 +81,10 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 
 // refreshToken refreshes the JWT access token if it is expired or about to expire.
 // If the access token is not yet expired, no action is performed.
-func (t *UAAAuthentication) refreshToken() error {
+func (t *UAAAuthentication) refreshTokenIfNecessary(accessToken string) error {
 	var expiresIn time.Duration
 
-	tokenStr := strings.TrimPrefix(t.cache.AccessToken(), "bearer ")
+	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
 	token, err := jws.ParseJWT([]byte(tokenStr))
 
 	if err == nil {

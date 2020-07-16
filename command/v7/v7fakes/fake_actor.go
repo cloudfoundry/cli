@@ -4,6 +4,7 @@ package v7fakes
 import (
 	"context"
 	"io"
+	"net/http"
 	"sync"
 	"time"
 
@@ -2122,6 +2123,25 @@ type FakeActor struct {
 	getUserReturnsOnCall map[int]struct {
 		result1 resources.User
 		result2 error
+	}
+	MakeCurlRequestStub        func(string, string, []string, string, bool) ([]byte, *http.Response, error)
+	makeCurlRequestMutex       sync.RWMutex
+	makeCurlRequestArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 []string
+		arg4 string
+		arg5 bool
+	}
+	makeCurlRequestReturns struct {
+		result1 []byte
+		result2 *http.Response
+		result3 error
+	}
+	makeCurlRequestReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 *http.Response
+		result3 error
 	}
 	MapRouteStub        func(string, string) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
@@ -12154,6 +12174,81 @@ func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 resources.User, resul
 	}{result1, result2}
 }
 
+func (fake *FakeActor) MakeCurlRequest(arg1 string, arg2 string, arg3 []string, arg4 string, arg5 bool) ([]byte, *http.Response, error) {
+	var arg3Copy []string
+	if arg3 != nil {
+		arg3Copy = make([]string, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.makeCurlRequestMutex.Lock()
+	ret, specificReturn := fake.makeCurlRequestReturnsOnCall[len(fake.makeCurlRequestArgsForCall)]
+	fake.makeCurlRequestArgsForCall = append(fake.makeCurlRequestArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 []string
+		arg4 string
+		arg5 bool
+	}{arg1, arg2, arg3Copy, arg4, arg5})
+	fake.recordInvocation("MakeCurlRequest", []interface{}{arg1, arg2, arg3Copy, arg4, arg5})
+	fake.makeCurlRequestMutex.Unlock()
+	if fake.MakeCurlRequestStub != nil {
+		return fake.MakeCurlRequestStub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.makeCurlRequestReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) MakeCurlRequestCallCount() int {
+	fake.makeCurlRequestMutex.RLock()
+	defer fake.makeCurlRequestMutex.RUnlock()
+	return len(fake.makeCurlRequestArgsForCall)
+}
+
+func (fake *FakeActor) MakeCurlRequestCalls(stub func(string, string, []string, string, bool) ([]byte, *http.Response, error)) {
+	fake.makeCurlRequestMutex.Lock()
+	defer fake.makeCurlRequestMutex.Unlock()
+	fake.MakeCurlRequestStub = stub
+}
+
+func (fake *FakeActor) MakeCurlRequestArgsForCall(i int) (string, string, []string, string, bool) {
+	fake.makeCurlRequestMutex.RLock()
+	defer fake.makeCurlRequestMutex.RUnlock()
+	argsForCall := fake.makeCurlRequestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeActor) MakeCurlRequestReturns(result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeCurlRequestMutex.Lock()
+	defer fake.makeCurlRequestMutex.Unlock()
+	fake.MakeCurlRequestStub = nil
+	fake.makeCurlRequestReturns = struct {
+		result1 []byte
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) MakeCurlRequestReturnsOnCall(i int, result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeCurlRequestMutex.Lock()
+	defer fake.makeCurlRequestMutex.Unlock()
+	fake.MakeCurlRequestStub = nil
+	if fake.makeCurlRequestReturnsOnCall == nil {
+		fake.makeCurlRequestReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.makeCurlRequestReturnsOnCall[i] = struct {
+		result1 []byte
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) MapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
@@ -16747,6 +16842,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
 	fake.getUserMutex.RLock()
 	defer fake.getUserMutex.RUnlock()
+	fake.makeCurlRequestMutex.RLock()
+	defer fake.makeCurlRequestMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	fake.marketplaceMutex.RLock()

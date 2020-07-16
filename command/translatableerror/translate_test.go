@@ -70,7 +70,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JobTimeoutError", JobTimeoutError{}),
 		Entry("JSONSyntaxError", JSONSyntaxError{Err: errors.New("some-error")}),
 		Entry("LifecycleMinimumAPIVersionNotMetError", LifecycleMinimumAPIVersionNotMetError{}),
-		Entry("ManifestCreationError", ManifestCreationError{}),
+		Entry("ManifestCreationError", FileCreationError{}),
 		Entry("ManifestFileNotFoundInDirectoryError", ManifestFileNotFoundInDirectoryError{}),
 		Entry("MinimumCFAPIVersionNotMetError", MinimumCFAPIVersionNotMetError{}),
 		Entry("MinimumCLIVersionNotMetError", MinimumCLIVersionNotMetError{}),

@@ -193,7 +193,7 @@ func ConvertToTranslatableError(err error) error {
 
 	// Manifest Errors
 	case manifest.ManifestCreationError:
-		return ManifestCreationError(e)
+		return FileCreationError(e)
 	case manifest.InheritanceFieldError:
 		return TriggerLegacyPushError{InheritanceRelated: true}
 	case manifest.GlobalFieldsError:

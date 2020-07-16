@@ -123,6 +123,9 @@ func (p *CommandParser) handleError(passedErr error) error {
 			})
 		}
 		return passedErr
+	case translatableerror.CurlExit22Error:
+		p.UI.DisplayError(translatedErr)
+		return passedErr
 	}
 
 	p.UI.DisplayError(translatedErr)
@@ -233,6 +236,8 @@ func (p *CommandParser) parse(args []string, commandList interface{}) (int, erro
 		return 1, err
 	} else if exitError, ok := err.(*ssh.ExitError); ok {
 		return exitError.ExitStatus(), nil
+	} else if curlError, ok := err.(translatableerror.CurlExit22Error); ok {
+		return 22, curlError
 	}
 
 	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())

@@ -385,7 +385,7 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		// Manifest Errors
 		Entry("manifest.ManifestCreationError -> ManifestCreationError",
 			manifest.ManifestCreationError{Err: errors.New("some-error")},
-			ManifestCreationError{Err: errors.New("some-error")}),
+			FileCreationError{Err: errors.New("some-error")}),
 
 		Entry("manifest.InheritanceFieldError -> TriggerLegacyPushError",
 			manifest.InheritanceFieldError{},
