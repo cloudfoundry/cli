@@ -30,15 +30,14 @@ func (cmd RenameServiceCommand) Execute(args []string) error {
 
 	switch e := err.(type) {
 	case nil:
+		cmd.UI.DisplayOK()
+		return nil
 	case actionerror.ServiceInstanceNotFoundError:
 		cmd.UI.DisplayText("TIP: Use 'cf services' to view all services in this org and space.")
 		return translatableerror.ServiceInstanceNotFoundError{Name: e.Name}
 	default:
 		return err
 	}
-
-	cmd.UI.DisplayOK()
-	return nil
 }
 
 func (cmd RenameServiceCommand) Usage() string {
