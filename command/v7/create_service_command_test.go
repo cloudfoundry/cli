@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("create-service Command", func() {
 	var (
-		cmd             *v7.CreateServiceCommand
+		cmd             v7.CreateServiceCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -42,7 +42,7 @@ var _ = Describe("create-service Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 
-		cmd = &v7.CreateServiceCommand{
+		cmd = v7.CreateServiceCommand{
 			BaseCommand: v7.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -51,7 +51,7 @@ var _ = Describe("create-service Command", func() {
 			},
 		}
 
-		setPositionalFlags(cmd, requestedOfferingName, requestedPlanName, requestedServiceInstanceName)
+		setPositionalFlags(&cmd, requestedOfferingName, requestedPlanName, requestedServiceInstanceName)
 	})
 
 	JustBeforeEach(func() {
@@ -122,7 +122,7 @@ var _ = Describe("create-service Command", func() {
 
 			BeforeEach(func() {
 				requestedBrokerName = "aCoolBroker"
-				setFlag(cmd, "-b", requestedBrokerName)
+				setFlag(&cmd, "-b", requestedBrokerName)
 			})
 
 			It("passes the right parameters to the actor", func() {
