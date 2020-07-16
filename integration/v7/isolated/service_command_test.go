@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("service command", func() {
+var _ = Describe("service command", func() {
 	Describe("help", func() {
 		const serviceInstanceName = "fake-service-instance-name"
 
