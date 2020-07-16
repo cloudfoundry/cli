@@ -330,7 +330,7 @@ var _ = Describe("enable service access command", func() {
 					session := helpers.CF("enable-service-access", service, "-p", "plan-does-not-exist")
 					Eventually(session).Should(Say("Enabling access of plan plan-does-not-exist for service %s as %s...", service, username))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("The plan plan-does-not-exist could not be found for service %s", service))
+					Eventually(session.Err).Should(Say("The plan 'plan-does-not-exist' could not be found for service offering '%s'", service))
 					Eventually(session).Should(Exit(1))
 				})
 			})
