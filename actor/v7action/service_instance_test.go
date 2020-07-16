@@ -159,62 +159,60 @@ var _ = Describe("Service Instance Actions", func() {
 				)
 			})
 
-			It("returns a service instance with details and warnings", func() {
-				By("returning warnings and no errors", func() {
-					Expect(executionError).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf(
-						"some-service-instance-warning",
-						"some-parameters-warning",
-					))
-				})
+			It("returns warnings and no errors", func() {
+				Expect(executionError).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(
+					"some-service-instance-warning",
+					"some-parameters-warning",
+				))
+			})
 
-				By("returning the correct service instance details object", func() {
-					Expect(serviceInstance).To(Equal(
-						ServiceInstanceDetails{
-							ServiceInstance: resources.ServiceInstance{
-								Type: resources.ManagedServiceInstance,
-								Name: serviceInstanceName,
-								GUID: serviceInstanceGUID,
-							},
-							ServiceOffering: resources.ServiceOffering{
-								Name:             serviceOfferingName,
-								Description:      serviceOfferingDescription,
-								DocumentationURL: serviceOfferingDocumentation,
-							},
-							ServicePlanName:         servicePlanName,
-							ServiceBrokerName:       serviceBrokerName,
-							SharedStatus:            SharedStatus{},
-							Parameters:              types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
-							ParametersMissingReason: "",
+			It("returns the correct service instance details object", func() {
+				Expect(serviceInstance).To(Equal(
+					ServiceInstanceDetails{
+						ServiceInstance: resources.ServiceInstance{
+							Type: resources.ManagedServiceInstance,
+							Name: serviceInstanceName,
+							GUID: serviceInstanceGUID,
 						},
-					))
-				})
+						ServiceOffering: resources.ServiceOffering{
+							Name:             serviceOfferingName,
+							Description:      serviceOfferingDescription,
+							DocumentationURL: serviceOfferingDocumentation,
+						},
+						ServicePlanName:         servicePlanName,
+						ServiceBrokerName:       serviceBrokerName,
+						SharedStatus:            SharedStatus{},
+						Parameters:              types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+						ParametersMissingReason: "",
+					},
+				))
+			})
 
-				By("making the correct call to get the service instance", func() {
-					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-					actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-					Expect(actualName).To(Equal(serviceInstanceName))
-					Expect(actualSpaceGUID).To(Equal(spaceGUID))
-					Expect(actualQuery).To(ConsistOf(
-						ccv3.Query{
-							Key:    ccv3.FieldsServicePlan,
-							Values: []string{"name", "guid"},
-						},
-						ccv3.Query{
-							Key:    ccv3.FieldsServicePlanServiceOffering,
-							Values: []string{"name", "guid", "description", "documentation_url"},
-						},
-						ccv3.Query{
-							Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
-							Values: []string{"name", "guid"},
-						},
-					))
-				})
+			It("makes the correct call to get the service instance", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(ConsistOf(
+					ccv3.Query{
+						Key:    ccv3.FieldsServicePlan,
+						Values: []string{"name", "guid"},
+					},
+					ccv3.Query{
+						Key:    ccv3.FieldsServicePlanServiceOffering,
+						Values: []string{"name", "guid", "description", "documentation_url"},
+					},
+					ccv3.Query{
+						Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
+						Values: []string{"name", "guid"},
+					},
+				))
+			})
 
-				By("making the correct call to get the parameters", func() {
-					Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
-				})
+			It("makes the correct call to get the parameters", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
 			})
 
 			When("the service instance is managed", func() {

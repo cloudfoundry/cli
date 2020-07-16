@@ -374,7 +374,7 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		When("the was a problem retrieving the parameters", func() {
+		When("there was a problem retrieving the parameters", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceDetailsReturns(
 					v7action.ServiceInstanceDetails{
