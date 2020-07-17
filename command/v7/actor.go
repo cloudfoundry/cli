@@ -173,6 +173,7 @@ type Actor interface {
 	RefreshAccessToken() (string, error)
 	RenameApplicationByNameAndSpaceGUID(oldAppName, newAppName, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	RenameOrganization(oldOrgName, newOrgName string) (resources.Organization, v7action.Warnings, error)
+	RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (v7action.Warnings, error)
 	RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceName, orgGUID string) (resources.Space, v7action.Warnings, error)
 	ResetOrganizationDefaultIsolationSegment(orgGUID string) (v7action.Warnings, error)
 	ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, v7action.Warnings, error)

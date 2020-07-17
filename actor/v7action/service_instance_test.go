@@ -62,13 +62,30 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
+		When("the service instance cannot be found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName, SpaceGUID: spaceGUID},
+				)
+			})
+
+			It("returns an actor error and warnings", func() {
+				Expect(executionError).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}))
+				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
+			})
+		})
+
 		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-service-instance-warning"},
-					errors.New("no service instance"))
+					errors.New("no service instance"),
+				)
 			})
 
 			It("returns an error and warnings", func() {
@@ -659,6 +676,156 @@ var _ = Describe("Service Instance Actions", func() {
 				)
 				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
 				Expect(err).To(MatchError("boom"))
+			})
+		})
+	})
+
+	Describe("RenameServiceInstance", func() {
+		const (
+			currentServiceInstanceName = "current-service-instance-name"
+			currentServiceInstanceGUID = "current-service-instance-guid"
+			newServiceInstanceName     = "new-service-instance-name"
+			spaceGUID                  = "some-source-space-guid"
+		)
+
+		var (
+			warnings       Warnings
+			executionError error
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					Name: currentServiceInstanceName,
+					GUID: currentServiceInstanceGUID,
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"some-get-service-instance-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.UpdateServiceInstanceReturns(
+				"",
+				ccv3.Warnings{"some-update-service-instance-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executionError = actor.RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName)
+		})
+
+		It("gets the service instance", func() {
+			Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+			Expect(actualName).To(Equal(currentServiceInstanceName))
+			Expect(actualSpaceGUID).To(Equal(spaceGUID))
+			Expect(actualQuery).To(BeEmpty())
+		})
+
+		It("updates the service instance", func() {
+			Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+			actualGUID, actualUpdates := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+			Expect(actualGUID).To(Equal(currentServiceInstanceGUID))
+			Expect(actualUpdates).To(Equal(resources.ServiceInstance{Name: newServiceInstanceName}))
+		})
+
+		It("returns warnings and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("some-get-service-instance-warning", "some-update-service-instance-warning"))
+		})
+
+		When("the update is synchronous", func() {
+			It("does not wait on the job", func() {
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
+			})
+		})
+
+		When("the update is asynchronous", func() {
+			const job = "fake-job-url"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					job,
+					ccv3.Warnings{"some-update-service-instance-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"some-poll-job-warning"},
+					nil,
+				)
+			})
+
+			It("waits on the job", func() {
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(BeEquivalentTo(job))
+				Expect(warnings).To(ContainElement("some-poll-job-warning"))
+			})
+
+			When("polling the job returns an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(
+						ccv3.Warnings{"some-poll-job-warning"},
+						errors.New("bad polling issue"),
+					)
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(executionError).To(MatchError("bad polling issue"))
+					Expect(warnings).To(ContainElement("some-poll-job-warning"))
+				})
+			})
+		})
+
+		When("the service instance cannot be found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					ccerror.ServiceInstanceNotFoundError{Name: currentServiceInstanceName, SpaceGUID: spaceGUID},
+				)
+			})
+
+			It("returns an actor error and warnings", func() {
+				Expect(executionError).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: currentServiceInstanceName}))
+				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
+			})
+		})
+
+		When("getting the service instance returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					errors.New("no service instance"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executionError).To(MatchError("no service instance"))
+				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
+			})
+
+			It("does not attempt to update the service instance", func() {
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
+			})
+		})
+
+		When("updating the service instance returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"some-update-service-instance-warning"},
+					errors.New("something awful"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executionError).To(MatchError("something awful"))
+				Expect(warnings).To(ContainElement("some-update-service-instance-warning"))
 			})
 		})
 	})

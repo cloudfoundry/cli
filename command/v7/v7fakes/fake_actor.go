@@ -2334,6 +2334,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	RenameServiceInstanceStub        func(string, string, string) (v7action.Warnings, error)
+	renameServiceInstanceMutex       sync.RWMutex
+	renameServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	renameServiceInstanceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	renameServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	RenameSpaceByNameAndOrganizationGUIDStub        func(string, string, string) (resources.Space, v7action.Warnings, error)
 	renameSpaceByNameAndOrganizationGUIDMutex       sync.RWMutex
 	renameSpaceByNameAndOrganizationGUIDArgsForCall []struct {
@@ -13088,6 +13103,71 @@ func (fake *FakeActor) RenameOrganizationReturnsOnCall(i int, result1 resources.
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) RenameServiceInstance(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+	fake.renameServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.renameServiceInstanceReturnsOnCall[len(fake.renameServiceInstanceArgsForCall)]
+	fake.renameServiceInstanceArgsForCall = append(fake.renameServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("RenameServiceInstance", []interface{}{arg1, arg2, arg3})
+	fake.renameServiceInstanceMutex.Unlock()
+	if fake.RenameServiceInstanceStub != nil {
+		return fake.RenameServiceInstanceStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.renameServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) RenameServiceInstanceCallCount() int {
+	fake.renameServiceInstanceMutex.RLock()
+	defer fake.renameServiceInstanceMutex.RUnlock()
+	return len(fake.renameServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) RenameServiceInstanceCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+	fake.renameServiceInstanceMutex.Lock()
+	defer fake.renameServiceInstanceMutex.Unlock()
+	fake.RenameServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) RenameServiceInstanceArgsForCall(i int) (string, string, string) {
+	fake.renameServiceInstanceMutex.RLock()
+	defer fake.renameServiceInstanceMutex.RUnlock()
+	argsForCall := fake.renameServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) RenameServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.renameServiceInstanceMutex.Lock()
+	defer fake.renameServiceInstanceMutex.Unlock()
+	fake.RenameServiceInstanceStub = nil
+	fake.renameServiceInstanceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) RenameServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.renameServiceInstanceMutex.Lock()
+	defer fake.renameServiceInstanceMutex.Unlock()
+	fake.RenameServiceInstanceStub = nil
+	if fake.renameServiceInstanceReturnsOnCall == nil {
+		fake.renameServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.renameServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUID(arg1 string, arg2 string, arg3 string) (resources.Space, v7action.Warnings, error) {
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Lock()
 	ret, specificReturn := fake.renameSpaceByNameAndOrganizationGUIDReturnsOnCall[len(fake.renameSpaceByNameAndOrganizationGUIDArgsForCall)]
@@ -16870,6 +16950,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.renameApplicationByNameAndSpaceGUIDMutex.RUnlock()
 	fake.renameOrganizationMutex.RLock()
 	defer fake.renameOrganizationMutex.RUnlock()
+	fake.renameServiceInstanceMutex.RLock()
+	defer fake.renameServiceInstanceMutex.RUnlock()
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.RLock()
 	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.RUnlock()
 	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
