@@ -48,7 +48,7 @@ var _ = Describe("unshare-service Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinSupportedV3ClientVersion)
+		fakeConfig.APIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 	})
 
 	JustBeforeEach(func() {
@@ -58,7 +58,7 @@ var _ = Describe("unshare-service Command", func() {
 	When("the API version is below the minimum", func() {
 		olderCurrentVersion := "3.0.1"
 		BeforeEach(func() {
-			fakeActor.CloudControllerV3APIVersionReturns(olderCurrentVersion)
+			fakeConfig.APIVersionReturns(olderCurrentVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
