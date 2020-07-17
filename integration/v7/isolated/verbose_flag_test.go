@@ -280,7 +280,7 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 					Expect(string(contents)).NotTo(MatchRegexp("HTTP REQUEST:"))
 					Expect(string(contents)).NotTo(MatchRegexp("HTTP RESPONSE:"))
-					Expect(string(contents)).To(MatchRegexp(`GET /\s+`))
+					Expect(string(contents)).To(MatchRegexp(`GET /\w+`))
 					Expect(string(contents)).To(MatchRegexp(`Host: log-cache\.`))
 					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
