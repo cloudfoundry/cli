@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 //go:generate counterfeiter . CloudControllerClient
@@ -106,6 +107,7 @@ type CloudControllerClient interface {
 	GetSecurityGroups(query ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetServiceBrokers(query ...ccv3.Query) ([]resources.ServiceBroker, ccv3.Warnings, error)
 	GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)
+	GetServiceInstanceParameters(serviceInstanceGUID string) (types.OptionalObject, ccv3.Warnings, error)
 	GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]resources.Space, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetServiceOfferings(query ...ccv3.Query) ([]resources.ServiceOffering, ccv3.Warnings, error)

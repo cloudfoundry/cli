@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -16,7 +17,7 @@ type ServiceCommand struct {
 	usage           interface{}          `usage:"CF_NAME service SERVICE_INSTANCE"`
 	relatedCommands interface{}          `related_commands:"bind-service, rename-service, update-service"`
 
-	serviceInstance v7action.ServiceInstanceWithRelationships
+	serviceInstance v7action.ServiceInstanceDetails
 }
 
 func (cmd ServiceCommand) Execute(args []string) error {
@@ -94,7 +95,11 @@ func (cmd ServiceCommand) displayManaged() error {
 
 	cmd.UI.DisplayNewline()
 
-	return cmd.displayLastOperation()
+	if err := cmd.displayLastOperation(); err != nil {
+		return err
+	}
+
+	return cmd.displayParameters()
 }
 
 func (cmd ServiceCommand) displaySharingInfo() error {
@@ -147,8 +152,58 @@ func (cmd ServiceCommand) displayLastOperation() error {
 		{cmd.UI.TranslateText("updated:"), cmd.serviceInstance.LastOperation.UpdatedAt},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)
+	cmd.UI.DisplayNewline()
 
 	return nil
+}
+
+func (cmd ServiceCommand) displayParameters() error {
+	switch {
+	case cmd.serviceInstance.ParametersMissingReason != "":
+		cmd.displayParametersMissingReason()
+	case len(cmd.serviceInstance.Parameters.Value) > 0:
+		cmd.displayParametersData()
+	default:
+		cmd.displayParametersEmpty()
+	}
+
+	cmd.UI.DisplayNewline()
+	return nil
+}
+
+func (cmd ServiceCommand) displayParametersEmpty() {
+	cmd.UI.DisplayTextWithFlavor(
+		"No parameters are set for service instance {{.ServiceInstanceName}}...",
+		map[string]interface{}{
+			"ServiceInstanceName": cmd.serviceInstance.Name,
+		},
+	)
+}
+
+func (cmd ServiceCommand) displayParametersData() {
+	cmd.UI.DisplayTextWithFlavor(
+		"Showing parameters for service instance {{.ServiceInstanceName}}...",
+		map[string]interface{}{
+			"ServiceInstanceName": cmd.serviceInstance.Name,
+		},
+	)
+	cmd.UI.DisplayNewline()
+
+	data, err := json.Marshal(cmd.serviceInstance.Parameters.Value)
+	if err != nil {
+		panic(err)
+	}
+
+	cmd.UI.DisplayText(string(data))
+}
+
+func (cmd ServiceCommand) displayParametersMissingReason() {
+	cmd.UI.DisplayText(
+		"Unable to show parameters: {{.Reason}}",
+		map[string]interface{}{
+			"Reason": cmd.serviceInstance.ParametersMissingReason,
+		},
+	)
 }
 
 func (cmd ServiceCommand) displayIntro() error {

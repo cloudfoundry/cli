@@ -95,12 +95,13 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 			})
 		}
 		services = append(services, domain.Service{
-			Name:                s.Name,
-			ID:                  s.ID,
-			Description:         s.Description,
-			Plans:               plans,
-			BindingsRetrievable: s.Bindable,
-			Requires:            brokerCastRequires(s.Requires),
+			Name:                 s.Name,
+			ID:                   s.ID,
+			Description:          s.Description,
+			Plans:                plans,
+			BindingsRetrievable:  s.Bindable,
+			InstancesRetrievable: s.InstancesRetrievable,
+			Requires:             brokerCastRequires(s.Requires),
 			Metadata: &domain.ServiceMetadata{
 				Shareable:        &s.Shareable,
 				DocumentationUrl: s.DocumentationURL,
@@ -155,8 +156,13 @@ func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter
 		return err
 	}
 
+	parameters := details.Parameters
+	if parameters == nil { // Ensure response contains `{}` rather than `null`
+		parameters = make(map[string]interface{})
+	}
+
 	response := map[string]interface{}{
-		"parameters": details.Parameters,
+		"parameters": parameters,
 	}
 
 	w.WriteHeader(http.StatusOK)

@@ -66,7 +66,7 @@ var _ = Describe("service command", func() {
 		})
 
 		fakeActor.GetServiceInstanceDetailsReturns(
-			v7action.ServiceInstanceWithRelationships{
+			v7action.ServiceInstanceDetails{
 				ServiceInstance: resources.ServiceInstance{
 					GUID: serviceInstanceGUID,
 					Name: serviceInstanceName,
@@ -119,7 +119,7 @@ var _ = Describe("service command", func() {
 
 		BeforeEach(func() {
 			fakeActor.GetServiceInstanceDetailsReturns(
-				v7action.ServiceInstanceWithRelationships{
+				v7action.ServiceInstanceDetails{
 					ServiceInstance: resources.ServiceInstance{
 						GUID:            serviceInstanceGUID,
 						Name:            serviceInstanceName,
@@ -174,11 +174,12 @@ var _ = Describe("service command", func() {
 			lastOperationDescription   = "doing amazing work"
 			lastOperationStartTime     = "a second ago"
 			lastOperationUpdatedTime   = "just now"
+			parameters                 = `{"foo":"bar"}`
 		)
 
 		BeforeEach(func() {
 			fakeActor.GetServiceInstanceDetailsReturns(
-				v7action.ServiceInstanceWithRelationships{
+				v7action.ServiceInstanceDetails{
 					ServiceInstance: resources.ServiceInstance{
 						GUID:         serviceInstanceGUID,
 						Name:         serviceInstanceName,
@@ -200,6 +201,7 @@ var _ = Describe("service command", func() {
 					},
 					ServicePlanName:   servicePlanName,
 					ServiceBrokerName: serviceBrokerName,
+					Parameters:        types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
 					SharedStatus: v7action.SharedStatus{
 						IsShared: true,
 					},
@@ -237,6 +239,10 @@ var _ = Describe("service command", func() {
 				Say(`message:\s+%s\n`, lastOperationDescription),
 				Say(`started:\s+%s\n`, lastOperationStartTime),
 				Say(`updated:\s+%s\n`, lastOperationUpdatedTime),
+				Say(`\n`),
+				Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
+				Say(`\n`),
+				Say(`%s\n`, parameters),
 			))
 
 			Expect(testUI.Err).To(SatisfyAll(
@@ -258,7 +264,7 @@ var _ = Describe("service command", func() {
 			When("service is not shared", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceWithRelationships{
+						v7action.ServiceInstanceDetails{
 							ServiceInstance: resources.ServiceInstance{},
 							SharedStatus: v7action.SharedStatus{
 								IsShared: false,
@@ -280,7 +286,7 @@ var _ = Describe("service command", func() {
 			When("the service instance sharing feature is disabled", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceWithRelationships{
+						v7action.ServiceInstanceDetails{
 							ServiceInstance: resources.ServiceInstance{},
 							SharedStatus: v7action.SharedStatus{
 								FeatureFlagIsDisabled: true,
@@ -304,7 +310,7 @@ var _ = Describe("service command", func() {
 			When("the service instance sharing feature is enabled", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceWithRelationships{
+						v7action.ServiceInstanceDetails{
 							ServiceInstance: resources.ServiceInstance{},
 							SharedStatus: v7action.SharedStatus{
 								FeatureFlagIsDisabled: false,
@@ -325,7 +331,7 @@ var _ = Describe("service command", func() {
 			When("the offering does not allow service instance sharing", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceWithRelationships{
+						v7action.ServiceInstanceDetails{
 							ServiceInstance: resources.ServiceInstance{},
 							SharedStatus: v7action.SharedStatus{
 								OfferingDisablesSharing: true,
@@ -349,7 +355,7 @@ var _ = Describe("service command", func() {
 			When("the offering does allow service instance sharing", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceWithRelationships{
+						v7action.ServiceInstanceDetails{
 							ServiceInstance: resources.ServiceInstance{},
 							SharedStatus: v7action.SharedStatus{
 								OfferingDisablesSharing: false,
@@ -368,12 +374,83 @@ var _ = Describe("service command", func() {
 			})
 		})
 
+		When("there was a problem retrieving the parameters", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceDetailsReturns(
+					v7action.ServiceInstanceDetails{
+						ServiceInstance: resources.ServiceInstance{
+							GUID: serviceInstanceGUID,
+							Name: serviceInstanceName,
+							Type: resources.ManagedServiceInstance,
+							LastOperation: resources.LastOperation{
+								Type:        lastOperationType,
+								State:       lastOperationState,
+								Description: lastOperationDescription,
+								CreatedAt:   lastOperationStartTime,
+								UpdatedAt:   lastOperationUpdatedTime,
+							},
+						},
+						ServiceOffering: resources.ServiceOffering{
+							Name:             serviceOfferingName,
+							Description:      serviceOfferingDescription,
+							DocumentationURL: serviceOfferingDocs,
+						},
+						ServicePlanName:         servicePlanName,
+						ServiceBrokerName:       serviceBrokerName,
+						ParametersMissingReason: "because of a good reason",
+					},
+					v7action.Warnings{"warning one", "warning two"},
+					nil,
+				)
+			})
+
+			It("displays the reason", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`Unable to show parameters: because of a good reason\n`))
+			})
+		})
+
+		When("the parameters are empty", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceDetailsReturns(
+					v7action.ServiceInstanceDetails{
+						ServiceInstance: resources.ServiceInstance{
+							GUID: serviceInstanceGUID,
+							Name: serviceInstanceName,
+							Type: resources.ManagedServiceInstance,
+							LastOperation: resources.LastOperation{
+								Type:        lastOperationType,
+								State:       lastOperationState,
+								Description: lastOperationDescription,
+								CreatedAt:   lastOperationStartTime,
+								UpdatedAt:   lastOperationUpdatedTime,
+							},
+						},
+						ServiceOffering: resources.ServiceOffering{
+							Name:             serviceOfferingName,
+							Description:      serviceOfferingDescription,
+							DocumentationURL: serviceOfferingDocs,
+						},
+						ServicePlanName:   servicePlanName,
+						ServiceBrokerName: serviceBrokerName,
+						Parameters:        types.NewOptionalObject(map[string]interface{}{}),
+					},
+					v7action.Warnings{"warning one", "warning two"},
+					nil,
+				)
+			})
+
+			It("says there were no parameters", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`No parameters are set for service instance %s...\n`, serviceInstanceName))
+			})
+		})
 	})
 
 	When("there is a problem looking up the service instance", func() {
 		BeforeEach(func() {
 			fakeActor.GetServiceInstanceDetailsReturns(
-				v7action.ServiceInstanceWithRelationships{},
+				v7action.ServiceInstanceDetails{},
 				v7action.Warnings{"warning one", "warning two"},
 				errors.New("boom"),
 			)
