@@ -6,26 +6,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type FakeV2Actor struct {
-	CreateApplicationManifestByNameAndSpaceStub        func(string, string) (manifest.Application, v2action.Warnings, error)
-	createApplicationManifestByNameAndSpaceMutex       sync.RWMutex
-	createApplicationManifestByNameAndSpaceArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	createApplicationManifestByNameAndSpaceReturns struct {
-		result1 manifest.Application
-		result2 v2action.Warnings
-		result3 error
-	}
-	createApplicationManifestByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 manifest.Application
-		result2 v2action.Warnings
-		result3 error
-	}
 	GetApplicationInstancesWithStatsByApplicationStub        func(string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 	getApplicationInstancesWithStatsByApplicationMutex       sync.RWMutex
 	getApplicationInstancesWithStatsByApplicationArgsForCall []struct {
@@ -134,73 +117,6 @@ type FakeV2Actor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpace(arg1 string, arg2 string) (manifest.Application, v2action.Warnings, error) {
-	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
-	ret, specificReturn := fake.createApplicationManifestByNameAndSpaceReturnsOnCall[len(fake.createApplicationManifestByNameAndSpaceArgsForCall)]
-	fake.createApplicationManifestByNameAndSpaceArgsForCall = append(fake.createApplicationManifestByNameAndSpaceArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("CreateApplicationManifestByNameAndSpace", []interface{}{arg1, arg2})
-	fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
-	if fake.CreateApplicationManifestByNameAndSpaceStub != nil {
-		return fake.CreateApplicationManifestByNameAndSpaceStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.createApplicationManifestByNameAndSpaceReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceCallCount() int {
-	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
-	return len(fake.createApplicationManifestByNameAndSpaceArgsForCall)
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceCalls(stub func(string, string) (manifest.Application, v2action.Warnings, error)) {
-	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
-	fake.CreateApplicationManifestByNameAndSpaceStub = stub
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceArgsForCall(i int) (string, string) {
-	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
-	argsForCall := fake.createApplicationManifestByNameAndSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturns(result1 manifest.Application, result2 v2action.Warnings, result3 error) {
-	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
-	fake.CreateApplicationManifestByNameAndSpaceStub = nil
-	fake.createApplicationManifestByNameAndSpaceReturns = struct {
-		result1 manifest.Application
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturnsOnCall(i int, result1 manifest.Application, result2 v2action.Warnings, result3 error) {
-	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
-	fake.CreateApplicationManifestByNameAndSpaceStub = nil
-	if fake.createApplicationManifestByNameAndSpaceReturnsOnCall == nil {
-		fake.createApplicationManifestByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 manifest.Application
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.createApplicationManifestByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 manifest.Application
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
 }
 
 func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplication(arg1 string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error) {
@@ -662,8 +578,6 @@ func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameReturnsOnCall(i int, resul
 func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
-	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationInstancesWithStatsByApplicationMutex.RLock()
 	defer fake.getApplicationInstancesWithStatsByApplicationMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
