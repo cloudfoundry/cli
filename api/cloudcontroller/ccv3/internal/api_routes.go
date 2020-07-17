@@ -274,7 +274,7 @@ var APIRoutes = map[string]Route{
 	PatchServiceBrokerRequest:                                   {Path: "/v3/service_brokers/:service_broker_guid", Method: http.MethodPatch},
 	GetServiceInstancesRequest:                                  {Path: "/v3/service_instances", Method: http.MethodGet},
 	PostServiceInstanceRequest:                                  {Path: "/v3/service_instances", Method: http.MethodPost},
-	GetServiceInstanceParametersRequest:                         {Path: "/:service_instance_guid/parameters", Method: http.MethodGet},
+	GetServiceInstanceParametersRequest:                         {Path: "/v3/service_instances/:service_instance_guid/parameters", Method: http.MethodGet},
 	PatchServiceInstanceRequest:                                 {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodPatch},
 	GetServiceInstanceRelationshipsSharedSpacesRequest:          {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodGet},
 	PostServiceInstanceRelationshipsSharedSpacesRequest:         {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost},
