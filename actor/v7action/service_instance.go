@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/util"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
@@ -163,22 +164,25 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 }
 
 func (actor Actor) getSharedStatus(result ServiceInstanceDetails, serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {
-	var warnings ccv3.Warnings
+	var featureFlag resources.FeatureFlag
+	var offeringDisablesSharing bool
+	var sharedSpaces []resources.Space
 
-	featureFlag, featureFlagWarning, err := actor.CloudControllerClient.GetFeatureFlag(featureFlagServiceInstanceSharing)
-	warnings = append(warnings, featureFlagWarning...)
-	if err != nil {
-		return SharedStatus{}, warnings, err
-	}
+	warnings, err := util.StartRailway().
+		Track(func() (warnings ccv3.Warnings, err error) {
+			featureFlag, warnings, err = actor.CloudControllerClient.GetFeatureFlag(featureFlagServiceInstanceSharing)
+			return
+		}).
+		Track(func() (warnings ccv3.Warnings, err error) {
+			offeringDisablesSharing, warnings, err = actor.getOfferingSharingDetails(result.ServiceOffering.Name, result.ServiceBrokerName)
+			return
+		}).
+		Track(func() (warnings ccv3.Warnings, err error) {
+			sharedSpaces, warnings, err = actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
+			return
+		}).
+		Execute()
 
-	offeringDisablesSharing, serviceOfferingWarnings, err := actor.getOfferingSharingDetails(result.ServiceOffering.Name, result.ServiceBrokerName)
-	warnings = append(warnings, serviceOfferingWarnings...)
-	if err != nil {
-		return SharedStatus{}, warnings, err
-	}
-
-	sharedSpaces, shareWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
-	warnings = append(warnings, shareWarnings...)
 	if err != nil {
 		return SharedStatus{}, warnings, err
 	}
