@@ -31,6 +31,7 @@ type Config interface {
 	HasTargetedSpace() bool
 	IsTTY() bool
 	Locale() string
+	LogCacheEndpoint() string
 	MinCLIVersion() string
 	NOAARequestRetryCount() int
 	NetworkPolicyV1Endpoint() string

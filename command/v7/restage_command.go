@@ -29,11 +29,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
-	if err != nil {
-		return err
-	}
-	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	logCacheClient := command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
 	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
 
 	return nil

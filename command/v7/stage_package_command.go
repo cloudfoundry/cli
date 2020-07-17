@@ -30,11 +30,7 @@ func (cmd *StagePackageCommand) Setup(config command.Config, ui command.UI) erro
 		return err
 	}
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
-	if err != nil {
-		return err
-	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
 
 	return nil
 }

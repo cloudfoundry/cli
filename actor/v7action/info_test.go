@@ -21,7 +21,7 @@ var _ = Describe("Info Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
-	Describe("GetLogCacheEndpoint", func() {
+	Describe("GetRootResponse", func() {
 		When("getting info is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetInfoReturns(
@@ -35,14 +35,14 @@ var _ = Describe("Info Actions", func() {
 				)
 			})
 
-			It("returns all warnings and the log cache url", func() {
-				logCacheURL, warnings, err := actor.GetLogCacheEndpoint()
+			It("returns all warnings and root info", func() {
+				rootInfo, warnings, err := actor.GetRootResponse()
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeCloudControllerClient.GetInfoCallCount()).To(Equal(1))
-				Expect(logCacheURL).To(Equal("some-log-cache-url"))
+				Expect(rootInfo.Links.LogCache.HREF).To(Equal("some-log-cache-url"))
 			})
 		})
 
@@ -59,11 +59,10 @@ var _ = Describe("Info Actions", func() {
 			})
 
 			It("returns the same error and all warnings", func() {
-				_, warnings, err := actor.GetLogCacheEndpoint()
+				_, warnings, err := actor.GetRootResponse()
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
-
 		})
 	})
 })

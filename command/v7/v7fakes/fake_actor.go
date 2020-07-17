@@ -1265,20 +1265,6 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetLogCacheEndpointStub        func() (string, v7action.Warnings, error)
-	getLogCacheEndpointMutex       sync.RWMutex
-	getLogCacheEndpointArgsForCall []struct {
-	}
-	getLogCacheEndpointReturns struct {
-		result1 string
-		result2 v7action.Warnings
-		result3 error
-	}
-	getLogCacheEndpointReturnsOnCall map[int]struct {
-		result1 string
-		result2 v7action.Warnings
-		result3 error
-	}
 	GetLoginPromptsStub        func() (map[string]coreconfig.AuthPrompt, error)
 	getLoginPromptsMutex       sync.RWMutex
 	getLoginPromptsArgsForCall []struct {
@@ -8531,64 +8517,6 @@ func (fake *FakeActor) GetLatestActiveDeploymentForAppReturnsOnCall(i int, resul
 	}
 	fake.getLatestActiveDeploymentForAppReturnsOnCall[i] = struct {
 		result1 v7action.Deployment
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) GetLogCacheEndpoint() (string, v7action.Warnings, error) {
-	fake.getLogCacheEndpointMutex.Lock()
-	ret, specificReturn := fake.getLogCacheEndpointReturnsOnCall[len(fake.getLogCacheEndpointArgsForCall)]
-	fake.getLogCacheEndpointArgsForCall = append(fake.getLogCacheEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetLogCacheEndpoint", []interface{}{})
-	fake.getLogCacheEndpointMutex.Unlock()
-	if fake.GetLogCacheEndpointStub != nil {
-		return fake.GetLogCacheEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getLogCacheEndpointReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeActor) GetLogCacheEndpointCallCount() int {
-	fake.getLogCacheEndpointMutex.RLock()
-	defer fake.getLogCacheEndpointMutex.RUnlock()
-	return len(fake.getLogCacheEndpointArgsForCall)
-}
-
-func (fake *FakeActor) GetLogCacheEndpointCalls(stub func() (string, v7action.Warnings, error)) {
-	fake.getLogCacheEndpointMutex.Lock()
-	defer fake.getLogCacheEndpointMutex.Unlock()
-	fake.GetLogCacheEndpointStub = stub
-}
-
-func (fake *FakeActor) GetLogCacheEndpointReturns(result1 string, result2 v7action.Warnings, result3 error) {
-	fake.getLogCacheEndpointMutex.Lock()
-	defer fake.getLogCacheEndpointMutex.Unlock()
-	fake.GetLogCacheEndpointStub = nil
-	fake.getLogCacheEndpointReturns = struct {
-		result1 string
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) GetLogCacheEndpointReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
-	fake.getLogCacheEndpointMutex.Lock()
-	defer fake.getLogCacheEndpointMutex.Unlock()
-	fake.GetLogCacheEndpointStub = nil
-	if fake.getLogCacheEndpointReturnsOnCall == nil {
-		fake.getLogCacheEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.getLogCacheEndpointReturnsOnCall[i] = struct {
-		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -16810,8 +16738,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getIsolationSegmentsByOrganizationMutex.RUnlock()
 	fake.getLatestActiveDeploymentForAppMutex.RLock()
 	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
-	fake.getLogCacheEndpointMutex.RLock()
-	defer fake.getLogCacheEndpointMutex.RUnlock()
 	fake.getLoginPromptsMutex.RLock()
 	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.getNewestReadyPackageForApplicationMutex.RLock()

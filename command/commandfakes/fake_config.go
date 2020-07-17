@@ -221,6 +221,16 @@ type FakeConfig struct {
 	localeReturnsOnCall map[int]struct {
 		result1 string
 	}
+	LogCacheEndpointStub        func() string
+	logCacheEndpointMutex       sync.RWMutex
+	logCacheEndpointArgsForCall []struct {
+	}
+	logCacheEndpointReturns struct {
+		result1 string
+	}
+	logCacheEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	MinCLIVersionStub        func() string
 	minCLIVersionMutex       sync.RWMutex
 	minCLIVersionArgsForCall []struct {
@@ -1681,6 +1691,58 @@ func (fake *FakeConfig) LocaleReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.localeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) LogCacheEndpoint() string {
+	fake.logCacheEndpointMutex.Lock()
+	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
+	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
+	fake.logCacheEndpointMutex.Unlock()
+	if fake.LogCacheEndpointStub != nil {
+		return fake.LogCacheEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.logCacheEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) LogCacheEndpointCallCount() int {
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
+	return len(fake.logCacheEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) LogCacheEndpointCalls(stub func() string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = stub
+}
+
+func (fake *FakeConfig) LogCacheEndpointReturns(result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	fake.logCacheEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) LogCacheEndpointReturnsOnCall(i int, result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	if fake.logCacheEndpointReturnsOnCall == nil {
+		fake.logCacheEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.logCacheEndpointReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -3761,6 +3823,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.isTTYMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.nOAARequestRetryCountMutex.RLock()

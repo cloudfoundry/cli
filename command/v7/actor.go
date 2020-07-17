@@ -103,7 +103,6 @@ type Actor interface {
 	GetIsolationSegmentByName(isoSegmentName string) (v7action.IsolationSegment, v7action.Warnings, error)
 	GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
 	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
-	GetLogCacheEndpoint() (string, v7action.Warnings, error)
 	GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error)
 	GetNewestReadyPackageForApplication(app resources.Application) (v7action.Package, v7action.Warnings, error)
 	GetOrgUsersByRoleType(orgGUID string) (map[constant.RoleType][]resources.User, v7action.Warnings, error)

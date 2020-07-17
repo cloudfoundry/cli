@@ -115,11 +115,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.VersionActor = cmd.Actor
 	cmd.PushActor = v7pushaction.NewActor(cmd.Actor, sharedaction.NewActor(config))
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
-	if err != nil {
-		return err
-	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir

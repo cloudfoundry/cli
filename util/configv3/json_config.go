@@ -96,6 +96,11 @@ func (config *Config) HasTargetedSpace() bool {
 	return config.ConfigFile.TargetedSpace.GUID != ""
 }
 
+// LogCacheEndpoint returns the log cache endpoint.
+func (config *Config) LogCacheEndpoint() string {
+	return config.ConfigFile.LogCacheEndpoint
+}
+
 // MinCLIVersion returns the minimum CLI version required by the CC.
 func (config *Config) MinCLIVersion() string {
 	return config.ConfigFile.MinCLIVersion
