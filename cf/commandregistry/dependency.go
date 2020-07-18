@@ -18,7 +18,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/manifest"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
@@ -38,8 +37,6 @@ type Dependency struct {
 	Config             coreconfig.Repository
 	RepoLocator        api.RepositoryLocator
 	PluginConfig       pluginconfig.PluginConfiguration
-	ManifestRepo       manifest.Repository
-	AppManifest        manifest.App
 	Gateways           map[string]net.Gateway
 	TeePrinter         *terminal.TeePrinter
 	PluginRepo         pluginrepo.PluginRepo
@@ -85,9 +82,6 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 		errorHandler(err)
 	}
 	deps.Config = coreconfig.NewRepositoryFromFilepath(configPath, errorHandler)
-
-	deps.ManifestRepo = manifest.NewDiskRepository()
-	deps.AppManifest = manifest.NewGenerator()
 
 	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
 	deps.PluginConfig = pluginconfig.NewPluginConfig(

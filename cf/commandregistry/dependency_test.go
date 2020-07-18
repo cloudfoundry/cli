@@ -21,8 +21,6 @@ var _ = Describe("Dependency", func() {
 		Expect(dependency.Config).ToNot(BeNil())
 		Expect(dependency.RepoLocator).ToNot(BeNil())
 		Expect(dependency.PluginConfig).ToNot(BeNil())
-		Expect(dependency.ManifestRepo).ToNot(BeNil())
-		Expect(dependency.AppManifest).ToNot(BeNil())
 		Expect(dependency.Gateways).ToNot(BeNil())
 		Expect(dependency.TeePrinter).ToNot(BeNil())
 		Expect(dependency.PluginRepo).ToNot(BeNil())
