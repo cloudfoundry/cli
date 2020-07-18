@@ -339,7 +339,8 @@ var _ = Describe("Verbose", func() {
 
 				helpers.LoginCF()
 
-				command := []string{"target", "-o", ReadOnlyOrg, "-v"}
+				username, password := helpers.GetCredentials()
+				command := []string{"auth", username, password, "-v"}
 
 				session := helpers.CF(command...)
 				Eventually(session).Should(Exit(0))
