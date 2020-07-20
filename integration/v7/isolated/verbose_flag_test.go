@@ -215,7 +215,6 @@ var _ = Describe("Verbose", func() {
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say(`GET /\s+`))
 				Eventually(session).Should(Say(`GET /api/v1/read/.*\?\w+`))
 				Eventually(session).Should(Say(`Host: log-cache\.`))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
