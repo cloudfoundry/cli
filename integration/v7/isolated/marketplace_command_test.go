@@ -109,6 +109,8 @@ var _ = Describe("marketplace command", func() {
 		})
 
 		BeforeEach(func() {
+			args = nil
+
 			helpers.LoginCF()
 
 			org1 = helpers.NewOrgName()
@@ -265,7 +267,7 @@ var _ = Describe("marketplace command", func() {
 				})
 
 				It("does not show the unavailable plan", func() {
-					Expect(session.Out.Contents()).NotTo(ContainSubstring(org1PlanName))
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(org1PlanName))
 				})
 
 				When("the --show-unavailable flag is specified", func() {
@@ -368,7 +370,7 @@ var _ = Describe("marketplace command", func() {
 				})
 
 				It("does not show the unavailable plan", func() {
-					Expect(session.Out.Contents()).NotTo(ContainSubstring(org1PlanName))
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(org1PlanName))
 				})
 
 				When("the --show-unavailable flag is specified", func() {
