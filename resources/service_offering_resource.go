@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/jsonry"
 )
 
@@ -13,6 +14,8 @@ type ServiceOffering struct {
 	Description string `json:"description"`
 	// DocumentationURL of the service offering
 	DocumentationURL string `json:"documentation_url"`
+	// Tags are used by apps to identify service instances.
+	Tags types.OptionalStringSlice `jsonry:"tags"`
 	// ServiceBrokerGUID is the guid of the service broker
 	ServiceBrokerGUID string `jsonry:"relationships.service_broker.data.guid"`
 	// ServiceBrokerName is the name of the service broker

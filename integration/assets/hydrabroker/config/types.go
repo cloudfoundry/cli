@@ -22,6 +22,7 @@ type Service struct {
 	ID                   string   `json:"id,omitempty"`
 	Description          string   `json:"description,omitempty"`
 	DocumentationURL     string   `json:"documentation_url,omitempty" validate:"url"`
+	Tags                 []string `json:"tags"`
 	Plans                []Plan   `json:"plans" validate:"min=1,dive"`
 	Shareable            bool     `json:"shareable"`
 	Bindable             bool     `json:"bindable"`

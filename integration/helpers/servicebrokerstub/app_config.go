@@ -33,6 +33,7 @@ func newDefaultServiceOffering() config.Service {
 		Bindable:             true,
 		InstancesRetrievable: true,
 		Plans:                []config.Plan{newDefaultPlan()},
+		Tags:                 []string{"TAG-1", "TAG-2"},
 	}
 }
 
