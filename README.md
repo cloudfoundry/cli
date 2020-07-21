@@ -47,13 +47,12 @@ Now that the v7 cf CLI is GA, all new features, enhancements, and fixes will be 
 The v7 CLI's _minimum supported version_ of the CC API is `v3.85.0` (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)).</br>
 The v7 CLI's _minimum supported version_ of the CF-Deployment is [`v13.5.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.5.0).
 
-Going forward, the v6 line will _only_ be updated to resolve the most severe defects and/or security issues.
-The v6 CLI's **_maximum supported version_** of the CC APIs are now capped at `v2.149.0` and `v3.84.0` (published in [CAPI release v1.94.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.94.0)).</br>
-The v6 CLI's **_maximum supported version_** of the CF-Deployment is [`v13.4.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.4.0).</br>
-If you are on an older version of CF Deployment, we recommend you upgrade to a version of the cf CLI that is compatible with your release of CF-D.</br>
-The v7 CLI's _minimum supported version_ of the CC APIs are `v2.128.0` and `v3.63.0` (published in [CAPI release v1.74.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.74.0)).</br>
-The v6 CLI's _minimum supported version_ of the CF-Deployment is [`v7.0.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v7.0.0).
+Going forward, the v6 CLI will _only_ be updated to resolve the most severe defects and/or security issues.
+At some point in the future, the v2 CC API endpoint will be deprecated by CAPI (see the [v2 CC API deprecation plan](https://docs.google.com/document/d/1KFZogeeexOqFf13oKHloe2QAorLh9OqwQHp8JvBl9lY/edit?usp=sharing)) and the v6 CLI will be incompatible CAPI once a `capi-release` that deprecates the v2 endpoint has been published.
+Until the v2 CC API is deprecated, you can expect the v6 CLI to be fully functional, however, the CLI team's CI/CD resources are now focused on the v7 CLI so the v6 CLIs official **_maximum supported version_** of the CC APIs are now capped at `v2.149.0` and `v3.84.0` (published in [CAPI release v1.94.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.94.0)), and the V6 CLIs official **_maximum supported version_** of the CF-Deployment is now capped at [`v13.4.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.4.0).
 
+The v7 CLI's _minimum supported version_ of the CC APIs are `v2.128.0` and `v3.63.0` (published in [CAPI release v1.74.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.74.0)).</br> 
+The v6 CLI's _minimum supported version_ of the CF-Deployment is [`v7.0.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v7.0.0). If you are on an older version of CF Deployment, we recommend you upgrade to CF-Deployment v7.0.0+.
 
 If you have any questions, ask away on the #cli channel in [our Slack
 community](https://slack.cloudfoundry.org/) and the
