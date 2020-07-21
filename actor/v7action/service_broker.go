@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/railway"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 )
@@ -35,44 +36,34 @@ func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (resources.S
 }
 
 func (actor Actor) CreateServiceBroker(model resources.ServiceBroker) (Warnings, error) {
-	allWarnings := Warnings{}
-
-	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(model)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, warnings...)
-	return allWarnings, err
+	return actor.performAndPoll(func() (ccv3.JobURL, ccv3.Warnings, error) {
+		return actor.CloudControllerClient.CreateServiceBroker(model)
+	})
 }
 
 func (actor Actor) UpdateServiceBroker(serviceBrokerGUID string, model resources.ServiceBroker) (Warnings, error) {
-	allWarnings := Warnings{}
-
-	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, model)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, warnings...)
-	return allWarnings, err
+	return actor.performAndPoll(func() (ccv3.JobURL, ccv3.Warnings, error) {
+		return actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, model)
+	})
 }
 
 func (actor Actor) DeleteServiceBroker(serviceBrokerGUID string) (Warnings, error) {
-	allWarnings := Warnings{}
+	return actor.performAndPoll(func() (ccv3.JobURL, ccv3.Warnings, error) {
+		return actor.CloudControllerClient.DeleteServiceBroker(serviceBrokerGUID)
+	})
+}
 
-	jobURL, warnings, err := actor.CloudControllerClient.DeleteServiceBroker(serviceBrokerGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
+func (actor Actor) performAndPoll(callback func() (ccv3.JobURL, ccv3.Warnings, error)) (Warnings, error) {
+	var jobURL ccv3.JobURL
 
-	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, warnings...)
-
-	return allWarnings, err
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			jobURL, warnings, err = callback()
+			return
+		},
+		func() (ccv3.Warnings, error) {
+			return actor.CloudControllerClient.PollJob(jobURL)
+		},
+	)
+	return Warnings(warnings), err
 }

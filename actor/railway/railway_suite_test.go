@@ -1,4 +1,4 @@
-package util_test
+package railway_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestUtil(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Actor Utils Suite")
+	RunSpecs(t, "Railway Utils Suite")
 }
