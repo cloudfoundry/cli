@@ -145,6 +145,7 @@ var _ = Describe("Service Instance Actions", func() {
 							Name:             serviceOfferingName,
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocumentation,
+							Tags:             types.NewOptionalStringSlice("foo", "bar"),
 						}},
 						ServiceBrokers: []resources.ServiceBroker{{Name: serviceBrokerName}},
 					},
@@ -179,6 +180,7 @@ var _ = Describe("Service Instance Actions", func() {
 							Name:             serviceOfferingName,
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocumentation,
+							Tags:             types.NewOptionalStringSlice("foo", "bar"),
 						},
 						ServicePlanName:         servicePlanName,
 						ServiceBrokerName:       serviceBrokerName,
@@ -201,7 +203,7 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 					ccv3.Query{
 						Key:    ccv3.FieldsServicePlanServiceOffering,
-						Values: []string{"name", "guid", "description", "documentation_url"},
+						Values: []string{"name", "guid", "description", "tags", "documentation_url"},
 					},
 					ccv3.Query{
 						Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,

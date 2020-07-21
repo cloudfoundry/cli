@@ -45,7 +45,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		},
 		{
 			Key:    ccv3.FieldsServicePlanServiceOffering,
-			Values: []string{"name", "guid", "description", "documentation_url"},
+			Values: []string{"name", "guid", "description", "tags", "documentation_url"},
 		},
 		{
 			Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,

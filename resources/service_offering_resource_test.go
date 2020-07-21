@@ -23,6 +23,8 @@ var _ = Describe("service offering resource", func() {
 		Entry("shareable", ServiceOffering{AllowsInstanceSharing: true}, `{"shareable": true}`),
 		Entry("description", ServiceOffering{Description: "once upon a time"}, `{"description": "once upon a time"}`),
 		Entry("documentation_url", ServiceOffering{DocumentationURL: "https://docs.com"}, `{"documentation_url": "https://docs.com"}`),
+		Entry("tags", ServiceOffering{Tags: types.NewOptionalStringSlice("foo", "bar")}, `{"tags": ["foo", "bar"]}`),
+		Entry("tags empty", ServiceOffering{Tags: types.NewOptionalStringSlice()}, `{"tags": []}`),
 		Entry(
 			"service broker guid",
 			ServiceOffering{ServiceBrokerGUID: "fake-service-broker-guid"},
