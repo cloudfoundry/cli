@@ -1501,6 +1501,21 @@ type FakeCloudControllerClient struct {
 		result3 ccv3.Warnings
 		result4 error
 	}
+	GetServiceOfferingByGUIDStub        func(string) (resources.ServiceOffering, ccv3.Warnings, error)
+	getServiceOfferingByGUIDMutex       sync.RWMutex
+	getServiceOfferingByGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getServiceOfferingByGUIDReturns struct {
+		result1 resources.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getServiceOfferingByGUIDReturnsOnCall map[int]struct {
+		result1 resources.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServiceOfferingByNameAndBrokerStub        func(string, string) (resources.ServiceOffering, ccv3.Warnings, error)
 	getServiceOfferingByNameAndBrokerMutex       sync.RWMutex
 	getServiceOfferingByNameAndBrokerArgsForCall []struct {
@@ -8900,6 +8915,72 @@ func (fake *FakeCloudControllerClient) GetServiceInstancesReturnsOnCall(i int, r
 	}{result1, result2, result3, result4}
 }
 
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUID(arg1 string) (resources.ServiceOffering, ccv3.Warnings, error) {
+	fake.getServiceOfferingByGUIDMutex.Lock()
+	ret, specificReturn := fake.getServiceOfferingByGUIDReturnsOnCall[len(fake.getServiceOfferingByGUIDArgsForCall)]
+	fake.getServiceOfferingByGUIDArgsForCall = append(fake.getServiceOfferingByGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetServiceOfferingByGUID", []interface{}{arg1})
+	fake.getServiceOfferingByGUIDMutex.Unlock()
+	if fake.GetServiceOfferingByGUIDStub != nil {
+		return fake.GetServiceOfferingByGUIDStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServiceOfferingByGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUIDCallCount() int {
+	fake.getServiceOfferingByGUIDMutex.RLock()
+	defer fake.getServiceOfferingByGUIDMutex.RUnlock()
+	return len(fake.getServiceOfferingByGUIDArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUIDCalls(stub func(string) (resources.ServiceOffering, ccv3.Warnings, error)) {
+	fake.getServiceOfferingByGUIDMutex.Lock()
+	defer fake.getServiceOfferingByGUIDMutex.Unlock()
+	fake.GetServiceOfferingByGUIDStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUIDArgsForCall(i int) string {
+	fake.getServiceOfferingByGUIDMutex.RLock()
+	defer fake.getServiceOfferingByGUIDMutex.RUnlock()
+	argsForCall := fake.getServiceOfferingByGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUIDReturns(result1 resources.ServiceOffering, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceOfferingByGUIDMutex.Lock()
+	defer fake.getServiceOfferingByGUIDMutex.Unlock()
+	fake.GetServiceOfferingByGUIDStub = nil
+	fake.getServiceOfferingByGUIDReturns = struct {
+		result1 resources.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingByGUIDReturnsOnCall(i int, result1 resources.ServiceOffering, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceOfferingByGUIDMutex.Lock()
+	defer fake.getServiceOfferingByGUIDMutex.Unlock()
+	fake.GetServiceOfferingByGUIDStub = nil
+	if fake.getServiceOfferingByGUIDReturnsOnCall == nil {
+		fake.getServiceOfferingByGUIDReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceOffering
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceOfferingByGUIDReturnsOnCall[i] = struct {
+		result1 resources.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceOfferingByNameAndBroker(arg1 string, arg2 string) (resources.ServiceOffering, ccv3.Warnings, error) {
 	fake.getServiceOfferingByNameAndBrokerMutex.Lock()
 	ret, specificReturn := fake.getServiceOfferingByNameAndBrokerReturnsOnCall[len(fake.getServiceOfferingByNameAndBrokerArgsForCall)]
@@ -13128,6 +13209,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceInstanceSharedSpacesMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()
 	defer fake.getServiceInstancesMutex.RUnlock()
+	fake.getServiceOfferingByGUIDMutex.RLock()
+	defer fake.getServiceOfferingByGUIDMutex.RUnlock()
 	fake.getServiceOfferingByNameAndBrokerMutex.RLock()
 	defer fake.getServiceOfferingByNameAndBrokerMutex.RUnlock()
 	fake.getServiceOfferingsMutex.RLock()

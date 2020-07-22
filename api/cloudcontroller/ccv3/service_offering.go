@@ -34,6 +34,18 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]resources.ServiceOf
 	return result, warnings, err
 }
 
+func (client *Client) GetServiceOfferingByGUID(guid string) (resources.ServiceOffering, Warnings, error) {
+	var result resources.ServiceOffering
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceOfferingRequest,
+		URIParams:    internal.Params{"service_offering_guid": guid},
+		ResponseBody: &result,
+	})
+
+	return result, warnings, err
+}
+
 func (client *Client) GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (resources.ServiceOffering, Warnings, error) {
 	query := []Query{{Key: NameFilter, Values: []string{serviceOfferingName}}}
 	if serviceBrokerName != "" {

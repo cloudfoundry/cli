@@ -40,9 +40,18 @@ func (cmd ServiceCommand) Execute(args []string) error {
 	case cmd.ShowGUID:
 		return cmd.displayGUID()
 	case cmd.serviceInstance.Type == resources.UserProvidedServiceInstance:
-		return cmd.displayUPSI()
+		return cmd.chain(
+			cmd.displayIntro,
+			cmd.displayPropertiesUserProvided,
+		)
 	default:
-		return cmd.displayManaged()
+		return cmd.chain(
+			cmd.displayIntro,
+			cmd.displayPropertiesManaged,
+			cmd.displaySharingInfo,
+			cmd.displayLastOperation,
+			cmd.displayParameters,
+		)
 	}
 }
 
@@ -51,11 +60,7 @@ func (cmd ServiceCommand) displayGUID() error {
 	return nil
 }
 
-func (cmd ServiceCommand) displayUPSI() error {
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
-
+func (cmd ServiceCommand) displayPropertiesUserProvided() error {
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), cmd.serviceInstance.Name},
 		{cmd.UI.TranslateText("guid:"), cmd.serviceInstance.GUID},
@@ -69,11 +74,7 @@ func (cmd ServiceCommand) displayUPSI() error {
 	return nil
 }
 
-func (cmd ServiceCommand) displayManaged() error {
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
-
+func (cmd ServiceCommand) displayPropertiesManaged() error {
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), cmd.serviceInstance.Name},
 		{cmd.UI.TranslateText("guid:"), cmd.serviceInstance.GUID},
@@ -88,19 +89,8 @@ func (cmd ServiceCommand) displayManaged() error {
 		{cmd.UI.TranslateText("dashboard url:"), cmd.serviceInstance.DashboardURL.String()},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)
-	cmd.UI.DisplayNewline()
 
-	if err := cmd.displaySharingInfo(); err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayNewline()
-
-	if err := cmd.displayLastOperation(); err != nil {
-		return err
-	}
-
-	return cmd.displayParameters()
+	return nil
 }
 
 func (cmd ServiceCommand) displaySharingInfo() error {
@@ -110,11 +100,13 @@ func (cmd ServiceCommand) displaySharingInfo() error {
 	cmd.UI.DisplayNewline()
 
 	if sharedStatus.FeatureFlagIsDisabled {
-		cmd.displaySharingFeatureFlagMessage()
+		cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+		cmd.UI.DisplayNewline()
 	}
 
 	if sharedStatus.OfferingDisablesSharing {
-		cmd.displayOfferingSharingMessage()
+		cmd.UI.DisplayText("Service instance sharing is disabled for this service offering.")
+		cmd.UI.DisplayNewline()
 	}
 
 	if sharedStatus.IsShared {
@@ -124,16 +116,6 @@ func (cmd ServiceCommand) displaySharingInfo() error {
 	}
 
 	return nil
-}
-
-func (cmd ServiceCommand) displaySharingFeatureFlagMessage() {
-	cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
-	cmd.UI.DisplayNewline()
-}
-
-func (cmd ServiceCommand) displayOfferingSharingMessage() {
-	cmd.UI.DisplayText("Service instance sharing is disabled for this service offering.")
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd ServiceCommand) displayLastOperation() error {
@@ -153,22 +135,20 @@ func (cmd ServiceCommand) displayLastOperation() error {
 		{cmd.UI.TranslateText("updated:"), cmd.serviceInstance.LastOperation.UpdatedAt},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)
-	cmd.UI.DisplayNewline()
 
 	return nil
 }
 
 func (cmd ServiceCommand) displayParameters() error {
 	switch {
-	case cmd.serviceInstance.ParametersMissingReason != "":
+	case cmd.serviceInstance.Parameters.MissingReason != "":
 		cmd.displayParametersMissingReason()
-	case len(cmd.serviceInstance.Parameters.Value) > 0:
+	case len(cmd.serviceInstance.Parameters.Value.Value) > 0:
 		cmd.displayParametersData()
 	default:
 		cmd.displayParametersEmpty()
 	}
 
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -202,7 +182,7 @@ func (cmd ServiceCommand) displayParametersMissingReason() {
 	cmd.UI.DisplayText(
 		"Unable to show parameters: {{.Reason}}",
 		map[string]interface{}{
-			"Reason": cmd.serviceInstance.ParametersMissingReason,
+			"Reason": cmd.serviceInstance.Parameters.MissingReason,
 		},
 	)
 }
@@ -222,6 +202,20 @@ func (cmd ServiceCommand) displayIntro() error {
 			"Username":            user.Name,
 		},
 	)
-	cmd.UI.DisplayNewline()
+
+	return nil
+}
+
+func (cmd ServiceCommand) chain(steps ...func() error) error {
+	for i, step := range steps {
+		if err := step(); err != nil {
+			return err
+		}
+
+		if i < len(steps) {
+			cmd.UI.DisplayNewline()
+		}
+	}
+
 	return nil
 }
