@@ -23,6 +23,8 @@ type ServiceInstance struct {
 	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
 	// ServicePlanGUID is the service plan that this service instance relates to
 	ServicePlanGUID string `jsonry:"relationships.service_plan.data.guid,omitempty"`
+	// ServiceOfferingGUID is the service offering that this service instance relates to
+	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid,omitempty"`
 	// Tags are used by apps to identify service instances.
 	Tags types.OptionalStringSlice `jsonry:"tags"`
 	// SyslogDrainURL is where logs are streamed

@@ -3,10 +3,10 @@ package v7_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	"errors"
@@ -90,11 +90,6 @@ var _ = Describe("create-service Command", func() {
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
-			fakeActor.GetServicePlanByNameOfferingAndBrokerReturns(
-				resources.ServicePlan{},
-				v7action.Warnings{"be warned", "take care"},
-				nil,
-			)
 		})
 
 		It("prints a message and warnings", func() {
@@ -102,19 +97,16 @@ var _ = Describe("create-service Command", func() {
 				Say("Creating service instance %s in org %s / space %s as %s...", requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
 				Say("OK"),
 			))
-
-			Expect(testUI.Err).To(SatisfyAll(
-				Say("be warned"),
-				Say("take care"),
-			))
 		})
 
-		It("Calls the client with the right arguments", func() {
-			Expect(fakeActor.GetServicePlanByNameOfferingAndBrokerCallCount()).To(Equal(1))
-			planName, offeringName, brokerName := fakeActor.GetServicePlanByNameOfferingAndBrokerArgsForCall(0)
+		It("Calls the actor with the right arguments", func() {
+			Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
+			offeringName, planName, serviceInstanceName, brokerName, spaceGUID := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
 			Expect(planName).To(Equal(requestedPlanName))
 			Expect(offeringName).To(Equal(requestedOfferingName))
 			Expect(brokerName).To(BeEmpty())
+			Expect(serviceInstanceName).To(Equal(requestedServiceInstanceName))
+			Expect(spaceGUID).To(Equal(fakeSpaceGUID))
 		})
 
 		When("requesting from a specific broker", func() {
@@ -128,11 +120,32 @@ var _ = Describe("create-service Command", func() {
 			It("passes the right parameters to the actor", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 
-				Expect(fakeActor.GetServicePlanByNameOfferingAndBrokerCallCount()).To(Equal(1))
-				planName, offeringName, brokerName := fakeActor.GetServicePlanByNameOfferingAndBrokerArgsForCall(0)
+				Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
+				offeringName, planName, serviceInstanceName, brokerName, spaceGUID := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
 				Expect(planName).To(Equal(requestedPlanName))
 				Expect(offeringName).To(Equal(requestedOfferingName))
 				Expect(brokerName).To(Equal(requestedBrokerName))
+				Expect(serviceInstanceName).To(Equal(requestedServiceInstanceName))
+				Expect(spaceGUID).To(Equal(fakeSpaceGUID))
+
+			})
+		})
+
+		When("Creation is successful", func() {
+			BeforeEach(func() {
+				fakeActor.CreateManagedServiceInstanceReturns(
+					v7action.Warnings{"be warned", "take care"},
+					nil,
+				)
+			})
+
+			It("prints a message and warnings", func() {
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("be warned"),
+					Say("take care"),
+				))
+				Expect(testUI.Out).To(Say("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", requestedServiceInstanceName))
+
 			})
 		})
 
@@ -149,8 +162,7 @@ var _ = Describe("create-service Command", func() {
 		When("client returns an error", func() {
 			BeforeEach(func() {
 				expectedError = actionerror.ServicePlanNotFoundError{PlanName: requestedPlanName}
-				fakeActor.GetServicePlanByNameOfferingAndBrokerReturns(
-					resources.ServicePlan{},
+				fakeActor.CreateManagedServiceInstanceReturns(
 					v7action.Warnings{"warning one", "warning two"},
 					expectedError,
 				)
@@ -162,13 +174,28 @@ var _ = Describe("create-service Command", func() {
 				Expect(executeErr).To(MatchError(expectedError))
 			})
 
-			It("prints a message and warnings", func() {
+			It("prints warnings", func() {
 				Expect(testUI.Out).NotTo(Say("OK"))
 
 				Expect(testUI.Err).To(SatisfyAll(
 					Say("warning one"),
 					Say("warning two"),
 				))
+			})
+
+			When("the service instance name is taken", func() {
+				BeforeEach(func() {
+					fakeActor.CreateManagedServiceInstanceReturns([]string{"a-warning", "another-warning"}, ccerror.ServiceInstanceNameTakenError{})
+				})
+
+				It("succeeds, displaying warnings, 'OK' and an informative message", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(testUI.Err).To(Say("a-warning"))
+					Expect(testUI.Err).To(Say("another-warning"))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Service %s already exists", requestedServiceInstanceName))
+				})
 			})
 		})
 	})

@@ -108,6 +108,10 @@ var _ = Describe("create-service command", func() {
 			orgName   string
 			spaceName string
 		)
+		assertCreateMessage := func(session *Session) {
+			Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+				"my-service", orgName, spaceName, userName))
+		}
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
@@ -142,25 +146,35 @@ var _ = Describe("create-service command", func() {
 
 			It("displays an error message prompting to disambiguate", func() {
 				session := helpers.CF("create-service", serviceOffering, servicePlan, "my-service")
-				Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
-					"my-service", orgName, spaceName, userName))
+				assertCreateMessage(session)
 				Eventually(session.Err).Should(Say("Service plan '%s' is provided by multiple service offerings. Service offering '%s' is provided by multiple service brokers. Specify a broker name by using the '-b' flag.", servicePlan, serviceOffering))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
+		})
+		When("there are no plans matching", func() {
+			var (
+				serviceOffering string
+				broker1         *servicebrokerstub.ServiceBrokerStub
+			)
 
-			When("broker is specified", func() {
-				When("there are no plans matching", func() {
-					It("displays an error message", func() {
-						session := helpers.CF("create-service", serviceOffering, "another-service-plan", "my-service", "-b", broker1.Name)
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
-							"my-service", orgName, spaceName, userName))
-						Eventually(session.Err).Should(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", "another-service-plan", serviceOffering, broker1.Name))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
-				})
+			BeforeEach(func() {
+				broker1 = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker1.FirstServiceOfferingName()
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+				broker1.Forget()
+			})
+			It("displays an error message", func() {
+				session := helpers.CF("create-service", serviceOffering, "another-service-plan", "my-service", "-b", broker1.Name)
+				assertCreateMessage(session)
+				Eventually(session.Err).Should(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", "another-service-plan", serviceOffering, broker1.Name))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
+
 	})
 })

@@ -244,7 +244,7 @@ var _ = Describe("disable service access command", func() {
 					Eventually(session).Should(Exit(1))
 					Expect(session).To(Say("Disabling access to plan plan-does-not-exist of service offering %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 					Expect(session).To(Say("FAILED"))
-					Expect(session.Err).To(Say("The plan plan-does-not-exist could not be found for service %s", broker.FirstServiceOfferingName()))
+					Expect(session.Err).To(Say("The plan 'plan-does-not-exist' could not be found for service offering '%s'", broker.FirstServiceOfferingName()))
 				})
 			})
 

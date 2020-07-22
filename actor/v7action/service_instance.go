@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/railway"
 )
@@ -147,4 +148,33 @@ func (actor Actor) fetchServiceInstanceDetails(serviceInstanceName string, space
 	}
 
 	return serviceInstance, included, Warnings(warnings), nil
+}
+
+func (actor Actor) CreateManagedServiceInstance(serviceOfferingName, servicePlanName, serviceInstanceName, serviceBrokerName, spaceGUID string) (Warnings, error) {
+	allWarnings := Warnings{}
+
+	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(servicePlanName, serviceOfferingName, serviceBrokerName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	serviceInstance := resources.ServiceInstance{
+		Type:      resources.ManagedServiceInstance,
+		Name:      serviceInstanceName,
+		PlanGUID:  servicePlan.GUID,
+		SpaceGUID: spaceGUID,
+	}
+
+	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
+	allWarnings = append(allWarnings, clientWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	clientWarnings, err = actor.CloudControllerClient.PollJobForStatus(jobURL, constant.JobPolling)
+	allWarnings = append(allWarnings, clientWarnings...)
+
+	return allWarnings, err
+
 }
