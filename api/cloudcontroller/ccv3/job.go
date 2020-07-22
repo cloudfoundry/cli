@@ -56,6 +56,11 @@ func (job Job) IsComplete() bool {
 	return job.State == constant.JobComplete
 }
 
+// IsAt returns true when the job has reached the desired state.
+func (job Job) IsAt(state constant.JobState) bool {
+	return job.State == state
+}
+
 type jobWarning struct {
 	Detail string `json:"detail"`
 }
@@ -90,6 +95,11 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 // error is encountered, or config.OverallPollingTimeout is reached. In the
 // last case, a JobTimeoutError is returned.
 func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
+	return client.PollJobForStatus(jobURL, constant.JobComplete)
+
+}
+
+func (client *Client) PollJobForStatus(jobURL JobURL, state constant.JobState) (Warnings, error) {
 	var (
 		err         error
 		warnings    Warnings
@@ -111,6 +121,10 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		}
 
 		if job.IsComplete() {
+			return allWarnings, nil
+		}
+
+		if job.IsAt(state) {
 			return allWarnings, nil
 		}
 
