@@ -21,6 +21,8 @@ type ServiceInstance struct {
 	Name string `jsonry:"name,omitempty"`
 	// SpaceGUID is the space that this service instance relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
+	// PlanGUID is the plan this instance is created from
+	PlanGUID string `jsonry:"relationships.service_plan.data.guid,omitempty"`
 	// ServiceOfferingGUID is the service offering that this service instance relates to
 	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid,omitempty"`
 	// Tags are used by apps to identify service instances.

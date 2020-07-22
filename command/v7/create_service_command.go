@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -59,21 +60,37 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := cmd.displayMessage(); err != nil {
+	if err := cmd.displayCreatingMessage(); err != nil {
 		return err
 	}
 
-	_, warnings, err := cmd.Actor.GetServicePlanByNameOfferingAndBroker(cmd.RequiredArgs.ServicePlan, cmd.RequiredArgs.Service, cmd.ServiceBroker)
+	warnings, err := cmd.Actor.CreateManagedServiceInstance(cmd.RequiredArgs.Service, cmd.RequiredArgs.ServicePlan, cmd.RequiredArgs.ServiceInstance, cmd.ServiceBroker, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
+		if _, nameTakenError := err.(ccerror.ServiceInstanceNameTakenError); nameTakenError {
+			cmd.UI.DisplayOK()
+			cmd.UI.DisplayTextWithFlavor("Service {{.ServiceInstance}} already exists",
+				map[string]interface{}{
+					"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+				})
+			return nil
+		}
 		return err
 	}
 
 	cmd.UI.DisplayOK()
+	cmd.displayCreateInProgressMessage()
 	return nil
 }
 
-func (cmd CreateServiceCommand) displayMessage() error {
+func (cmd CreateServiceCommand) displayCreateInProgressMessage() {
+	cmd.UI.DisplayTextWithFlavor("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
+		map[string]interface{}{
+			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+		})
+}
+
+func (cmd CreateServiceCommand) displayCreatingMessage() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
