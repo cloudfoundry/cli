@@ -48,9 +48,9 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		return cmd.chain(
 			cmd.displayIntro,
 			cmd.displayPropertiesManaged,
-			cmd.displaySharingInfo,
 			cmd.displayLastOperation,
 			cmd.displayParameters,
+			cmd.displaySharingInfo,
 		)
 	}
 }
@@ -154,7 +154,7 @@ func (cmd ServiceCommand) displayParameters() error {
 
 func (cmd ServiceCommand) displayParametersEmpty() {
 	cmd.UI.DisplayTextWithFlavor(
-		"No parameters are set for service instance {{.ServiceInstanceName}}...",
+		"No parameters are set for service instance {{.ServiceInstanceName}}.",
 		map[string]interface{}{
 			"ServiceInstanceName": cmd.serviceInstance.Name,
 		},

@@ -183,9 +183,6 @@ var _ = Describe("service command", func() {
 						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
-						Say(`Sharing:\n`),
-						Say(`This service instance is not currently being shared.`),
-						Say(`\n`),
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
 						Say(`status:\s+create succeeded\n`),
@@ -193,7 +190,10 @@ var _ = Describe("service command", func() {
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 						Say(`\n`),
-						Say(`No parameters are set for service instance %s...\n`, serviceInstanceName),
+						Say(`No parameters are set for service instance %s.\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`Sharing:\n`),
+						Say(`This service instance is not currently being shared.`),
 					))
 				})
 			})
@@ -242,9 +242,6 @@ var _ = Describe("service command", func() {
 						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
-						Say(`Sharing:\n`),
-						Say(`This service instance is not currently being shared.`),
-						Say(`\n`),
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
 						Say(`status:\s+create in progress\n`),
@@ -253,6 +250,10 @@ var _ = Describe("service command", func() {
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 						Say(`\n`),
 						Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
+						Say(`\n`),
+						Say(`Sharing:\n`),
+						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
 					))
 				})
 			})
