@@ -35,6 +35,10 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]resources.ServiceOf
 }
 
 func (client *Client) GetServiceOfferingByGUID(guid string) (resources.ServiceOffering, Warnings, error) {
+	if guid == "" {
+		return resources.ServiceOffering{}, nil, ccerror.ServiceOfferingNotFoundError{}
+	}
+
 	var result resources.ServiceOffering
 
 	_, warnings, err := client.MakeRequest(RequestParams{

@@ -199,7 +199,7 @@ var _ = Describe("service command", func() {
 						Description:      serviceOfferingDescription,
 						DocumentationURL: serviceOfferingDocs,
 					},
-					ServicePlanName:   servicePlanName,
+					ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 					ServiceBrokerName: serviceBrokerName,
 					Parameters: v7action.ServiceInstanceParameters{
 						Value: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
@@ -245,6 +245,9 @@ var _ = Describe("service command", func() {
 				Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
 				Say(`\n`),
 				Say(`%s\n`, parameters),
+				Say(`\n`),
+				Say(`Upgrading:\n`),
+				Say(`Upgrades are not supported by this broker.\n`),
 			))
 
 			Expect(testUI.Err).To(SatisfyAll(
@@ -376,6 +379,100 @@ var _ = Describe("service command", func() {
 			})
 		})
 
+		Context("upgrades", func() {
+			When("an upgrade is available", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceDetails{
+							ServiceInstance: resources.ServiceInstance{
+								GUID:         serviceInstanceGUID,
+								Name:         serviceInstanceName,
+								Type:         resources.ManagedServiceInstance,
+								DashboardURL: types.NewOptionalString(dashboardURL),
+								Tags:         types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+								LastOperation: resources.LastOperation{
+									Type:        lastOperationType,
+									State:       lastOperationState,
+									Description: lastOperationDescription,
+									CreatedAt:   lastOperationStartTime,
+									UpdatedAt:   lastOperationUpdatedTime,
+								},
+							},
+							ServiceOffering: resources.ServiceOffering{
+								Name:             serviceOfferingName,
+								Description:      serviceOfferingDescription,
+								DocumentationURL: serviceOfferingDocs,
+							},
+							ServicePlan:       resources.ServicePlan{Name: servicePlanName},
+							ServiceBrokerName: serviceBrokerName,
+							UpgradeStatus: v7action.ServiceInstanceUpgradeStatus{
+								State:       v7action.ServiceInstanceUpgradeAvailable,
+								Description: "really cool upgrade\nwith juicy bits",
+							},
+						},
+						v7action.Warnings{"warning one", "warning two"},
+						nil,
+					)
+				})
+
+				It("says an upgrade is available and shows the description", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Upgrading:\n`),
+						Say(`Showing available upgrade details for this service...\n`),
+						Say(`\n`),
+						Say(`Upgrade description: really cool upgrade\n`),
+						Say(`with juicy bits\n`),
+						Say(`\n`),
+						Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'\n`, serviceInstanceName),
+					))
+				})
+			})
+
+			When("the service instance is up to date", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceInstanceDetailsReturns(
+						v7action.ServiceInstanceDetails{
+							ServiceInstance: resources.ServiceInstance{
+								GUID:         serviceInstanceGUID,
+								Name:         serviceInstanceName,
+								Type:         resources.ManagedServiceInstance,
+								DashboardURL: types.NewOptionalString(dashboardURL),
+								Tags:         types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+								LastOperation: resources.LastOperation{
+									Type:        lastOperationType,
+									State:       lastOperationState,
+									Description: lastOperationDescription,
+									CreatedAt:   lastOperationStartTime,
+									UpdatedAt:   lastOperationUpdatedTime,
+								},
+							},
+							ServiceOffering: resources.ServiceOffering{
+								Name:             serviceOfferingName,
+								Description:      serviceOfferingDescription,
+								DocumentationURL: serviceOfferingDocs,
+							},
+							ServicePlan:       resources.ServicePlan{Name: servicePlanName},
+							ServiceBrokerName: serviceBrokerName,
+							UpgradeStatus: v7action.ServiceInstanceUpgradeStatus{
+								State: v7action.ServiceInstanceUpgradeNotAvailable,
+							},
+						},
+						v7action.Warnings{"warning one", "warning two"},
+						nil,
+					)
+				})
+
+				It("says an upgrade is available and shows the description", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(SatisfyAll(
+						Say(`Upgrading:\n`),
+						Say(`There is no upgrade available for this service.\n`),
+					))
+				})
+			})
+		})
+
 		When("there was a problem retrieving the parameters", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceDetailsReturns(
@@ -397,7 +494,7 @@ var _ = Describe("service command", func() {
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocs,
 						},
-						ServicePlanName:   servicePlanName,
+						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
 						Parameters: v7action.ServiceInstanceParameters{
 							MissingReason: "because of a good reason",
@@ -435,7 +532,7 @@ var _ = Describe("service command", func() {
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocs,
 						},
-						ServicePlanName:   servicePlanName,
+						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
 						Parameters: v7action.ServiceInstanceParameters{
 							Value: types.NewOptionalObject(map[string]interface{}{}),
@@ -448,7 +545,7 @@ var _ = Describe("service command", func() {
 
 			It("says there were no parameters", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say(`No parameters are set for service instance %s...\n`, serviceInstanceName))
+				Expect(testUI.Out).To(Say(`No parameters are set for service instance %s.\n`, serviceInstanceName))
 			})
 		})
 	})

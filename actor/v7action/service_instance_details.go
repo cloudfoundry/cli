@@ -22,34 +22,47 @@ type ServiceInstanceParameters struct {
 	MissingReason string
 }
 
+type ServiceInstanceUpgradeState int
+
+type ServiceInstanceUpgradeStatus struct {
+	State       ServiceInstanceUpgradeState
+	Description string
+}
+
+const (
+	ServiceInstanceUpgradeNotSupported ServiceInstanceUpgradeState = iota
+	ServiceInstanceUpgradeAvailable
+	ServiceInstanceUpgradeNotAvailable
+)
+
 type ServiceInstanceDetails struct {
 	resources.ServiceInstance
 	ServiceOffering   resources.ServiceOffering
-	ServicePlanName   string
+	ServicePlan       resources.ServicePlan
 	ServiceBrokerName string
 	Parameters        ServiceInstanceParameters
 	SharedStatus      SharedStatus
+	UpgradeStatus     ServiceInstanceUpgradeStatus
 }
 
 func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, Warnings, error) {
-	var (
-		serviceInstance resources.ServiceInstance
-		included        ccv3.IncludedResources
-		params          ServiceInstanceParameters
-		sharedStatus    SharedStatus
-	)
+	var serviceInstanceDetails ServiceInstanceDetails
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, included, warnings, err = actor.getServiceInstanceWithIncludes(serviceInstanceName, spaceGUID)
+			serviceInstanceDetails, warnings, err = actor.getServiceInstanceDetails(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			params, warnings = actor.getServiceInstanceParameters(serviceInstance.GUID)
+			serviceInstanceDetails.Parameters, warnings = actor.getServiceInstanceParameters(serviceInstanceDetails.GUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			sharedStatus, warnings, err = actor.getSharedStatus(serviceInstance)
+			serviceInstanceDetails.SharedStatus, warnings, err = actor.getServiceInstanceSharedStatus(serviceInstanceDetails)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstanceDetails.UpgradeStatus, warnings, err = actor.getServiceInstanceUpgradeStatus(serviceInstanceDetails)
 			return
 		},
 	)
@@ -57,19 +70,10 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		return ServiceInstanceDetails{}, Warnings(warnings), err
 	}
 
-	result := ServiceInstanceDetails{
-		ServiceInstance:   serviceInstance,
-		ServicePlanName:   extractServicePlanName(included),
-		ServiceOffering:   extractServiceOffering(included),
-		ServiceBrokerName: extractServiceBrokerName(included),
-		Parameters:        params,
-		SharedStatus:      sharedStatus,
-	}
-
-	return result, Warnings(warnings), nil
+	return serviceInstanceDetails, Warnings(warnings), nil
 }
 
-func (actor Actor) getServiceInstanceWithIncludes(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error) {
+func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, ccv3.Warnings, error) {
 	query := []ccv3.Query{
 		{
 			Key:    ccv3.FieldsServicePlan,
@@ -88,12 +92,20 @@ func (actor Actor) getServiceInstanceWithIncludes(serviceInstanceName string, sp
 	serviceInstance, included, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
 	switch err.(type) {
 	case nil:
-		return serviceInstance, included, warnings, nil
 	case ccerror.ServiceInstanceNotFoundError:
-		return resources.ServiceInstance{}, ccv3.IncludedResources{}, warnings, actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
+		return ServiceInstanceDetails{}, warnings, actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
-		return resources.ServiceInstance{}, ccv3.IncludedResources{}, warnings, err
+		return ServiceInstanceDetails{}, warnings, err
 	}
+
+	result := ServiceInstanceDetails{
+		ServiceInstance:   serviceInstance,
+		ServicePlan:       extractServicePlan(included),
+		ServiceOffering:   extractServiceOffering(included),
+		ServiceBrokerName: extractServiceBrokerName(included),
+	}
+
+	return result, warnings, nil
 }
 
 func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings) {
@@ -109,8 +121,8 @@ func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (Ser
 	return ServiceInstanceParameters{Value: params}, warnings
 }
 
-func (actor Actor) getSharedStatus(serviceInstance resources.ServiceInstance) (SharedStatus, ccv3.Warnings, error) {
-	if serviceInstance.Type != resources.ManagedServiceInstance {
+func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails) (SharedStatus, ccv3.Warnings, error) {
+	if serviceInstanceDetails.Type != resources.ManagedServiceInstance {
 		return SharedStatus{}, nil, nil
 	}
 
@@ -126,11 +138,11 @@ func (actor Actor) getSharedStatus(serviceInstance resources.ServiceInstance) (S
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			offeringDisablesSharing, warnings, err = actor.getOfferingSharingDetails(serviceInstance.ServiceOfferingGUID)
+			offeringDisablesSharing, warnings, err = actor.getOfferingSharingDetails(serviceInstanceDetails.ServiceOffering.GUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			sharedSpaces, warnings, err = actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstance.GUID)
+			sharedSpaces, warnings, err = actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstanceDetails.GUID)
 			return
 		},
 	)
@@ -161,12 +173,37 @@ func (actor Actor) getOfferingSharingDetails(serviceOfferingGUID string) (bool, 
 	}
 }
 
-func extractServicePlanName(included ccv3.IncludedResources) string {
-	if len(included.ServicePlans) == 1 {
-		return included.ServicePlans[0].Name
+func (actor Actor) getServiceInstanceUpgradeStatus(serviceInstanceDetails ServiceInstanceDetails) (ServiceInstanceUpgradeStatus, ccv3.Warnings, error) {
+	if !serviceInstanceDetails.UpgradeAvailable.Value {
+		if serviceInstanceDetails.MaintenanceInfoVersion == "" {
+			return ServiceInstanceUpgradeStatus{State: ServiceInstanceUpgradeNotSupported}, nil, nil
+		}
+		return ServiceInstanceUpgradeStatus{State: ServiceInstanceUpgradeNotAvailable}, nil, nil
 	}
 
-	return ""
+	servicePlan, warnings, err := actor.CloudControllerClient.GetServicePlanByGUID(serviceInstanceDetails.ServicePlanGUID)
+	switch err.(type) {
+	case nil:
+		return ServiceInstanceUpgradeStatus{
+			State:       ServiceInstanceUpgradeAvailable,
+			Description: servicePlan.MaintenanceInfoDescription,
+		}, warnings, nil
+	case ccerror.ServicePlanNotFound:
+		return ServiceInstanceUpgradeStatus{
+			State:       ServiceInstanceUpgradeAvailable,
+			Description: "No upgrade details where found",
+		}, warnings, nil
+	default:
+		return ServiceInstanceUpgradeStatus{}, warnings, err
+	}
+}
+
+func extractServicePlan(included ccv3.IncludedResources) resources.ServicePlan {
+	if len(included.ServicePlans) == 1 {
+		return included.ServicePlans[0]
+	}
+
+	return resources.ServicePlan{}
 }
 
 func extractServiceBrokerName(included ccv3.IncludedResources) string {

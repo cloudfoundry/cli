@@ -209,11 +209,8 @@ var _ = Describe("Service Offering", func() {
 		const guid = "fake-guid"
 
 		var (
-			requester  *ccv3fakes.FakeRequester
-			client     *Client
-			offering   resources.ServiceOffering
-			warnings   Warnings
-			executeErr error
+			requester *ccv3fakes.FakeRequester
+			client    *Client
 		)
 
 		BeforeEach(func() {
@@ -221,26 +218,31 @@ var _ = Describe("Service Offering", func() {
 			client, _ = NewFakeRequesterTestClient(requester)
 		})
 
-		JustBeforeEach(func() {
-			offering, warnings, executeErr = client.GetServiceOfferingByGUID(guid)
-		})
-
 		When("service offering exists", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
 					Expect(params.URIParams).To(BeEquivalentTo(map[string]string{"service_offering_guid": guid}))
+					Expect(params.RequestName).To(Equal(internal.GetServiceOfferingRequest))
 					params.ResponseBody.(*resources.ServiceOffering).GUID = guid
 					return "", Warnings{"one", "two"}, nil
 				})
 			})
 
 			It("returns the service offering with warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
+				offering, warnings, err := client.GetServiceOfferingByGUID(guid)
+				Expect(err).ToNot(HaveOccurred())
 
 				Expect(offering).To(Equal(resources.ServiceOffering{
 					GUID: guid,
 				}))
 				Expect(warnings).To(ConsistOf("one", "two"))
+			})
+		})
+
+		When("no guid was specified", func() {
+			It("fails saying the offering was not found", func() {
+				_, _, err := client.GetServiceOfferingByGUID("")
+				Expect(err).To(MatchError(ccerror.ServiceOfferingNotFoundError{}))
 			})
 		})
 
@@ -268,7 +270,8 @@ var _ = Describe("Service Offering", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.MultiError{
+				_, warnings, err := client.GetServiceOfferingByGUID(guid)
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{
 						{

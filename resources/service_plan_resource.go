@@ -27,6 +27,8 @@ type ServicePlan struct {
 	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid"`
 	// SpaceGUID is the space that a plan from a space-scoped broker relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid"`
+	// MaintenanceInfoDescription is the description of the associated version
+	MaintenanceInfoDescription string `jsonry:"maintenance_info.description"`
 
 	Metadata *Metadata `json:"metadata"`
 }

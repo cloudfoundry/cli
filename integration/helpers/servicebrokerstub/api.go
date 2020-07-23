@@ -147,6 +147,22 @@ func (s *ServiceBrokerStub) WithAsyncDelay(delay time.Duration) *ServiceBrokerSt
 	return s
 }
 
+func (s *ServiceBrokerStub) WithMaintenanceInfo(version string, description ...string) *ServiceBrokerStub {
+	s.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{
+		Version: version,
+	}
+
+	switch len(description) {
+	case 0:
+	case 1:
+		s.Services[0].Plans[0].MaintenanceInfo.Description = description[0]
+	default:
+		panic("too many parameters")
+	}
+
+	return s
+}
+
 func (s *ServiceBrokerStub) FirstServiceOfferingName() string {
 	return s.Services[0].Name
 }

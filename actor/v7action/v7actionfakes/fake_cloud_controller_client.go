@@ -1547,6 +1547,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetServicePlanByGUIDStub        func(string) (resources.ServicePlan, ccv3.Warnings, error)
+	getServicePlanByGUIDMutex       sync.RWMutex
+	getServicePlanByGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getServicePlanByGUIDReturns struct {
+		result1 resources.ServicePlan
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getServicePlanByGUIDReturnsOnCall map[int]struct {
+		result1 resources.ServicePlan
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServicePlanVisibilityStub        func(string) (resources.ServicePlanVisibility, ccv3.Warnings, error)
 	getServicePlanVisibilityMutex       sync.RWMutex
 	getServicePlanVisibilityArgsForCall []struct {
@@ -9114,6 +9129,72 @@ func (fake *FakeCloudControllerClient) GetServiceOfferingsReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetServicePlanByGUID(arg1 string) (resources.ServicePlan, ccv3.Warnings, error) {
+	fake.getServicePlanByGUIDMutex.Lock()
+	ret, specificReturn := fake.getServicePlanByGUIDReturnsOnCall[len(fake.getServicePlanByGUIDArgsForCall)]
+	fake.getServicePlanByGUIDArgsForCall = append(fake.getServicePlanByGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetServicePlanByGUID", []interface{}{arg1})
+	fake.getServicePlanByGUIDMutex.Unlock()
+	if fake.GetServicePlanByGUIDStub != nil {
+		return fake.GetServicePlanByGUIDStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServicePlanByGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServicePlanByGUIDCallCount() int {
+	fake.getServicePlanByGUIDMutex.RLock()
+	defer fake.getServicePlanByGUIDMutex.RUnlock()
+	return len(fake.getServicePlanByGUIDArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServicePlanByGUIDCalls(stub func(string) (resources.ServicePlan, ccv3.Warnings, error)) {
+	fake.getServicePlanByGUIDMutex.Lock()
+	defer fake.getServicePlanByGUIDMutex.Unlock()
+	fake.GetServicePlanByGUIDStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServicePlanByGUIDArgsForCall(i int) string {
+	fake.getServicePlanByGUIDMutex.RLock()
+	defer fake.getServicePlanByGUIDMutex.RUnlock()
+	argsForCall := fake.getServicePlanByGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServicePlanByGUIDReturns(result1 resources.ServicePlan, result2 ccv3.Warnings, result3 error) {
+	fake.getServicePlanByGUIDMutex.Lock()
+	defer fake.getServicePlanByGUIDMutex.Unlock()
+	fake.GetServicePlanByGUIDStub = nil
+	fake.getServicePlanByGUIDReturns = struct {
+		result1 resources.ServicePlan
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServicePlanByGUIDReturnsOnCall(i int, result1 resources.ServicePlan, result2 ccv3.Warnings, result3 error) {
+	fake.getServicePlanByGUIDMutex.Lock()
+	defer fake.getServicePlanByGUIDMutex.Unlock()
+	fake.GetServicePlanByGUIDStub = nil
+	if fake.getServicePlanByGUIDReturnsOnCall == nil {
+		fake.getServicePlanByGUIDReturnsOnCall = make(map[int]struct {
+			result1 resources.ServicePlan
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getServicePlanByGUIDReturnsOnCall[i] = struct {
+		result1 resources.ServicePlan
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServicePlanVisibility(arg1 string) (resources.ServicePlanVisibility, ccv3.Warnings, error) {
 	fake.getServicePlanVisibilityMutex.Lock()
 	ret, specificReturn := fake.getServicePlanVisibilityReturnsOnCall[len(fake.getServicePlanVisibilityArgsForCall)]
@@ -13215,6 +13296,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceOfferingByNameAndBrokerMutex.RUnlock()
 	fake.getServiceOfferingsMutex.RLock()
 	defer fake.getServiceOfferingsMutex.RUnlock()
+	fake.getServicePlanByGUIDMutex.RLock()
+	defer fake.getServicePlanByGUIDMutex.RUnlock()
 	fake.getServicePlanVisibilityMutex.RLock()
 	defer fake.getServicePlanVisibilityMutex.RUnlock()
 	fake.getServicePlansMutex.RLock()

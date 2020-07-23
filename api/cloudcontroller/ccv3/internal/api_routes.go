@@ -83,6 +83,7 @@ const (
 	GetServiceInstanceRelationshipsSharedSpacesRequest          = "GetServiceInstanceRelationshipSharedSpacesRequest"
 	GetServiceOfferingRequest                                   = "GetServiceOffering"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
+	GetServicePlanRequest                                       = "GetServicePlan"
 	GetServicePlansRequest                                      = "GetServicePlans"
 	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
@@ -284,6 +285,7 @@ var APIRoutes = map[string]Route{
 	GetServiceOfferingsRequest:                                  {Path: "/v3/service_offerings", Method: http.MethodGet},
 	PatchServiceOfferingRequest:                                 {Path: "/v3/service_offerings/:service_offering_guid", Method: http.MethodPatch},
 	DeleteServiceOfferingRequest:                                {Path: "/v3/service_offerings/:service_offering_guid", Method: http.MethodDelete},
+	GetServicePlanRequest:                                       {Path: "/v3/service_plans/:service_plan_guid", Method: http.MethodGet},
 	GetServicePlansRequest:                                      {Path: "/v3/service_plans", Method: http.MethodGet},
 	PatchServicePlanRequest:                                     {Path: "/v3/service_plans/:service_plan_guid", Method: http.MethodPatch},
 	GetServicePlanVisibilityRequest:                             {Path: "/v3/service_plans/:service_plan_guid/visibility", Method: http.MethodGet},

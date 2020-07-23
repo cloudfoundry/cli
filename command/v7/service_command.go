@@ -51,6 +51,7 @@ func (cmd ServiceCommand) Execute(args []string) error {
 			cmd.displayLastOperation,
 			cmd.displayParameters,
 			cmd.displaySharingInfo,
+			cmd.displayUpgrades,
 		)
 	}
 }
@@ -81,7 +82,7 @@ func (cmd ServiceCommand) displayPropertiesManaged() error {
 		{cmd.UI.TranslateText("type:"), string(cmd.serviceInstance.Type)},
 		{cmd.UI.TranslateText("broker:"), cmd.serviceInstance.ServiceBrokerName},
 		{cmd.UI.TranslateText("offering:"), cmd.serviceInstance.ServiceOffering.Name},
-		{cmd.UI.TranslateText("plan:"), cmd.serviceInstance.ServicePlanName},
+		{cmd.UI.TranslateText("plan:"), cmd.serviceInstance.ServicePlan.Name},
 		{cmd.UI.TranslateText("tags:"), cmd.serviceInstance.Tags.String()},
 		{cmd.UI.TranslateText("offering tags:"), cmd.serviceInstance.ServiceOffering.Tags.String()},
 		{cmd.UI.TranslateText("description:"), cmd.serviceInstance.ServiceOffering.Description},
@@ -203,6 +204,30 @@ func (cmd ServiceCommand) displayIntro() error {
 		},
 	)
 
+	return nil
+}
+
+func (cmd ServiceCommand) displayUpgrades() error {
+	cmd.UI.DisplayText("Upgrading:")
+
+	switch cmd.serviceInstance.UpgradeStatus.State {
+	case v7action.ServiceInstanceUpgradeAvailable:
+		cmd.UI.DisplayText("Showing available upgrade details for this service...")
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Upgrade description: {{.Description}}", map[string]interface{}{
+			"Description": cmd.serviceInstance.UpgradeStatus.Description,
+		})
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("TIP: You can upgrade using 'cf update-service {{.InstanceName}} --upgrade'", map[string]interface{}{
+			"InstanceName": cmd.serviceInstance.Name,
+		})
+	case v7action.ServiceInstanceUpgradeNotAvailable:
+		cmd.UI.DisplayText("There is no upgrade available for this service.")
+	default:
+		cmd.UI.DisplayText("Upgrades are not supported by this broker.")
+	}
+
+	cmd.UI.DisplayNewline()
 	return nil
 }
 
