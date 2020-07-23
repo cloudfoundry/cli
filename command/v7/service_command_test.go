@@ -201,7 +201,9 @@ var _ = Describe("service command", func() {
 					},
 					ServicePlanName:   servicePlanName,
 					ServiceBrokerName: serviceBrokerName,
-					Parameters:        types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					Parameters: v7action.ServiceInstanceParameters{
+						Value: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					},
 					SharedStatus: v7action.SharedStatus{
 						IsShared: true,
 					},
@@ -395,9 +397,11 @@ var _ = Describe("service command", func() {
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocs,
 						},
-						ServicePlanName:         servicePlanName,
-						ServiceBrokerName:       serviceBrokerName,
-						ParametersMissingReason: "because of a good reason",
+						ServicePlanName:   servicePlanName,
+						ServiceBrokerName: serviceBrokerName,
+						Parameters: v7action.ServiceInstanceParameters{
+							MissingReason: "because of a good reason",
+						},
 					},
 					v7action.Warnings{"warning one", "warning two"},
 					nil,
@@ -433,7 +437,9 @@ var _ = Describe("service command", func() {
 						},
 						ServicePlanName:   servicePlanName,
 						ServiceBrokerName: serviceBrokerName,
-						Parameters:        types.NewOptionalObject(map[string]interface{}{}),
+						Parameters: v7action.ServiceInstanceParameters{
+							Value: types.NewOptionalObject(map[string]interface{}{}),
+						},
 					},
 					v7action.Warnings{"warning one", "warning two"},
 					nil,

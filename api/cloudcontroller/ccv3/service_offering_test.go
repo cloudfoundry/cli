@@ -205,6 +205,89 @@ var _ = Describe("Service Offering", func() {
 		})
 	})
 
+	Describe("GetServiceOfferingByGUID", func() {
+		const guid = "fake-guid"
+
+		var (
+			requester  *ccv3fakes.FakeRequester
+			client     *Client
+			offering   resources.ServiceOffering
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			requester = new(ccv3fakes.FakeRequester)
+			client, _ = NewFakeRequesterTestClient(requester)
+		})
+
+		JustBeforeEach(func() {
+			offering, warnings, executeErr = client.GetServiceOfferingByGUID(guid)
+		})
+
+		When("service offering exists", func() {
+			BeforeEach(func() {
+				requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
+					Expect(params.URIParams).To(BeEquivalentTo(map[string]string{"service_offering_guid": guid}))
+					params.ResponseBody.(*resources.ServiceOffering).GUID = guid
+					return "", Warnings{"one", "two"}, nil
+				})
+			})
+
+			It("returns the service offering with warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(offering).To(Equal(resources.ServiceOffering{
+					GUID: guid,
+				}))
+				Expect(warnings).To(ConsistOf("one", "two"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"one", "two"},
+					ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   42424,
+								Detail: "Some detailed error message",
+								Title:  "CF-SomeErrorTitle",
+							},
+							{
+								Code:   11111,
+								Detail: "Some other detailed error message",
+								Title:  "CF-SomeOtherErrorTitle",
+							},
+						},
+					},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("one", "two"))
+			})
+		})
+	})
+
 	Describe("GetServiceOfferingByNameAndBroker", func() {
 		const (
 			serviceOfferingName = "myServiceOffering"
@@ -417,5 +500,4 @@ var _ = Describe("Service Offering", func() {
 			})
 		})
 	})
-
 })

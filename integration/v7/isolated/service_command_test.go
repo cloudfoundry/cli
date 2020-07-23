@@ -149,7 +149,56 @@ var _ = Describe("service command", func() {
 				broker.Forget()
 			})
 
-			When("the service instance takes time to be created", func() {
+			When("created successfully", func() {
+				const tags = "foo, bar"
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Nanosecond).EnableServiceAccess()
+
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-t", tags,
+					)
+				})
+
+				It("can show the service instance details", func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					username, _ := helpers.GetCredentials()
+					Expect(session).To(SatisfyAll(
+						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`name:\s+%s\n`, serviceInstanceName),
+						Say(`guid:\s+\S+\n`),
+						Say(`type:\s+managed`),
+						Say(`broker:\s+%s`, broker.Name),
+						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+						Say(`tags:\s+%s\n`, tags),
+						Say(`offering tags:\s+%s\n`, strings.Join(broker.Services[0].Tags, ", ")),
+						Say(`description:\s+%s\n`, broker.Services[0].Description),
+						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
+						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`\n`),
+						Say(`Sharing:\n`),
+						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
+						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`status:\s+create succeeded\n`),
+						Say(`message:\s+very happy service\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`No parameters are set for service instance %s...\n`, serviceInstanceName),
+					))
+				})
+			})
+
+			When("creation is in progress", func() {
 				const (
 					tags             = "foo, bar"
 					brokerAsyncDelay = time.Second
@@ -174,60 +223,37 @@ var _ = Describe("service command", func() {
 				})
 
 				It("can show the service instance details", func() {
-					By("reporting that create is in progress", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Exit(0))
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
 
-						username, _ := helpers.GetCredentials()
-						Expect(session).To(SatisfyAll(
-							Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
-							Say(`\n`),
-							Say(`name:\s+%s\n`, serviceInstanceName),
-							Say(`guid:\s+\S+\n`),
-							Say(`type:\s+managed`),
-							Say(`broker:\s+%s`, broker.Name),
-							Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
-							Say(`plan:\s+%s`, broker.FirstServicePlanName()),
-							Say(`tags:\s+%s\n`, tags),
-							Say(`offering tags:\s+%s\n`, strings.Join(broker.Services[0].Tags, ", ")),
-							Say(`description:\s+%s\n`, broker.Services[0].Description),
-							Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
-							Say(`dashboard url:\s+http://example.com\n`),
-							Say(`\n`),
-							Say(`Sharing:\n`),
-							Say(`This service instance is not currently being shared.`),
-							Say(`\n`),
-							Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-							Say(`\n`),
-							Say(`status:\s+create in progress\n`),
-							Say(`message:\s*\n`),
-							Say(`started:\s+%s\n`, helpers.TimestampRegex),
-							Say(`updated:\s+%s\n`, helpers.TimestampRegex),
-							Say(`\n`),
-							Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
-							Say(`\n`),
-						))
-					})
-
-					By("reporting that create has succeeded", func() {
-						output := func() *Buffer {
-							session := helpers.CF("service", serviceInstanceName)
-							session.Wait()
-							return session.Out
-						}
-
-						Eventually(output, testTimeout, testPollingInterval).Should(SatisfyAll(
-							Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-							Say(`\n`),
-							Say(`status:\s+create succeeded\n`),
-							Say(`message:\s+very happy service\n`),
-							Say(`started:\s+%s\n`, helpers.TimestampRegex),
-							Say(`updated:\s+%s\n`, helpers.TimestampRegex),
-							Say(`\n`),
-							Say(`No parameters are set for service instance %s...\n`, serviceInstanceName),
-							Say(`\n`),
-						))
-					})
+					username, _ := helpers.GetCredentials()
+					Expect(session).To(SatisfyAll(
+						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`name:\s+%s\n`, serviceInstanceName),
+						Say(`guid:\s+\S+\n`),
+						Say(`type:\s+managed`),
+						Say(`broker:\s+%s`, broker.Name),
+						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+						Say(`tags:\s+%s\n`, tags),
+						Say(`offering tags:\s+%s\n`, strings.Join(broker.Services[0].Tags, ", ")),
+						Say(`description:\s+%s\n`, broker.Services[0].Description),
+						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
+						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`\n`),
+						Say(`Sharing:\n`),
+						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
+						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`status:\s+create in progress\n`),
+						Say(`message:\s*\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
+					))
 				})
 			})
 

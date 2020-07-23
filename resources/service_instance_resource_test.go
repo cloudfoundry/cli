@@ -25,6 +25,7 @@ var _ = Describe("service instance resource", func() {
 				Expect(parsed).To(Equal(serviceInstance))
 			})
 		},
+		Entry("empty", ServiceInstance{}, `{}`),
 		Entry("type", ServiceInstance{Type: "fake-type"}, `{"type": "fake-type"}`),
 		Entry("name", ServiceInstance{Name: "fake-name"}, `{"name": "fake-name"}`),
 		Entry("guid", ServiceInstance{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
@@ -72,7 +73,6 @@ var _ = Describe("service instance resource", func() {
 				}
 			}`,
 		),
-		Entry("last operation empty", ServiceInstance{}, `{}`),
 		Entry(
 			"space guid",
 			ServiceInstance{SpaceGUID: "fake-space-guid"},
@@ -87,16 +87,30 @@ var _ = Describe("service instance resource", func() {
             }`,
 		),
 		Entry(
+			"service offering guid",
+			ServiceInstance{ServiceOfferingGUID: "fake-service-offering-guid"},
+			`{
+				"relationships": {
+					"service_offering": {
+						"data": {
+							"guid": "fake-service-offering-guid"
+						}
+					}
+				}
+            }`,
+		),
+		Entry(
 			"everything",
 			ServiceInstance{
-				Type:            UserProvidedServiceInstance,
-				GUID:            "fake-guid",
-				Name:            "fake-space-guid",
-				SpaceGUID:       "fake-space-guid",
-				Tags:            types.NewOptionalStringSlice("foo", "bar"),
-				SyslogDrainURL:  types.NewOptionalString("https://fake-syslog.com"),
-				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
-				DashboardURL:    types.NewOptionalString("https://fake-dashboard.com"),
+				Type:                UserProvidedServiceInstance,
+				GUID:                "fake-guid",
+				Name:                "fake-space-guid",
+				SpaceGUID:           "fake-space-guid",
+				ServiceOfferingGUID: "fake-service-offering-guid",
+				Tags:                types.NewOptionalStringSlice("foo", "bar"),
+				SyslogDrainURL:      types.NewOptionalString("https://fake-syslog.com"),
+				RouteServiceURL:     types.NewOptionalString("https://fake-route.com"),
+				DashboardURL:        types.NewOptionalString("https://fake-dashboard.com"),
 				Credentials: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 					"baz": false,
@@ -118,6 +132,11 @@ var _ = Describe("service instance resource", func() {
 					"space": {
 						"data": {
 							"guid": "fake-space-guid"
+						}
+					},
+					"service_offering": {
+						"data": {
+							"guid": "fake-service-offering-guid"
 						}
 					}
 				}
