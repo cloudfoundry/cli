@@ -172,7 +172,7 @@ func (actor Actor) CreateManagedServiceInstance(serviceOfferingName, servicePlan
 		return allWarnings, err
 	}
 
-	clientWarnings, err = actor.CloudControllerClient.PollJobForStatus(jobURL, constant.JobPolling)
+	clientWarnings, err = actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 	allWarnings = append(allWarnings, clientWarnings...)
 
 	return allWarnings, err

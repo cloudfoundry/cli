@@ -131,7 +131,7 @@ type CloudControllerClient interface {
 	MakeRequestSendReceiveRaw(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
-	PollJobForStatus(jobURL ccv3.JobURL, state constant.JobState) (ccv3.Warnings, error)
+	PollJobForState(jobURL ccv3.JobURL, state constant.JobState) (ccv3.Warnings, error)
 	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)
 	ResourceMatch(resources []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)
