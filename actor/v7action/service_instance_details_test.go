@@ -152,10 +152,6 @@ var _ = Describe("Service Instance Details Action", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
 			})
 
-			It("does not get the service plan", func() {
-				Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
-			})
-
 			Describe("sharing", func() {
 				When("the service instance has shared spaces", func() {
 					BeforeEach(func() {
@@ -340,6 +336,10 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("says that upgrades are not supported", func() {
 						Expect(serviceInstance.UpgradeStatus.State).To(Equal(ServiceInstanceUpgradeNotSupported))
 					})
+
+					It("does not get the service plan", func() {
+						Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
+					})
 				})
 
 				When("upgrade is not available but the service instance has maintenance info", func() {
@@ -369,6 +369,10 @@ var _ = Describe("Service Instance Details Action", func() {
 
 					It("says that an upgrade is not available", func() {
 						Expect(serviceInstance.UpgradeStatus.State).To(Equal(ServiceInstanceUpgradeNotAvailable))
+					})
+
+					It("does not get the service plan", func() {
+						Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
 					})
 				})
 
