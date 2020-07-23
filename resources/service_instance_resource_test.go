@@ -88,6 +88,19 @@ var _ = Describe("service instance resource", func() {
             }`,
 		),
 		Entry(
+			"plan guid",
+			ServiceInstance{PlanGUID: "fake-plan-guid"},
+			`{
+				"relationships": {
+					"service_plan": {
+						"data": {
+							"guid": "fake-plan-guid"
+						}
+					}
+				}
+            }`,
+		),
+		Entry(
 			"service offering guid",
 			ServiceInstance{ServicePlanGUID: "fake-service-plan-guid"},
 			`{
@@ -161,6 +174,11 @@ var _ = Describe("service instance resource", func() {
 					"service_plan": {
 						"data": {
 							"guid": "fake-service-plan-guid"
+						}
+					},
+					"service_plan": {
+						"data": {
+							"guid": "fake-plan-guid"
 						}
 					}
 				}

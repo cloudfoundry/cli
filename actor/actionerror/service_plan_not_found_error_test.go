@@ -9,9 +9,13 @@ import (
 )
 
 var _ = Describe("ServicePlanNotFoundError", func() {
+	const (
+		offeringName = "some-service-offering"
+		planName     = "some-plan"
+		brokerName   = "some-broker"
+	)
+
 	It("returns a message with the service offering name and the plan name", func() {
-		offeringName := "some-service-offering"
-		planName := "some-plan"
 		err := actionerror.ServicePlanNotFoundError{
 			OfferingName: offeringName,
 			PlanName:     planName,
@@ -20,9 +24,6 @@ var _ = Describe("ServicePlanNotFoundError", func() {
 	})
 
 	It("returns a message with the service offering name, the plan name and broker name", func() {
-		offeringName := "some-service-offering"
-		planName := "some-plan"
-		brokerName := "some-broker"
 		err := actionerror.ServicePlanNotFoundError{
 			OfferingName:      offeringName,
 			PlanName:          planName,
