@@ -1,8 +1,10 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type CreateServiceCommand struct {
@@ -64,7 +66,16 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	warnings, err := cmd.Actor.CreateManagedServiceInstance(cmd.RequiredArgs.Service, cmd.RequiredArgs.ServicePlan, cmd.RequiredArgs.ServiceInstance, cmd.ServiceBroker, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.CreateManagedServiceInstance(
+		v7action.ManagedServiceInstanceParams{
+			ServiceOfferingName: cmd.RequiredArgs.Service,
+			ServicePlanName:     cmd.RequiredArgs.ServicePlan,
+			ServiceInstanceName: cmd.RequiredArgs.ServiceInstance,
+			ServiceBrokerName:   cmd.ServiceBroker,
+			SpaceGUID:           cmd.Config.TargetedSpace().GUID,
+			Tags:                types.OptionalStringSlice(cmd.Tags),
+		},
+	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, nameTakenError := err.(ccerror.ServiceInstanceNameTakenError); nameTakenError {
