@@ -95,11 +95,11 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 // error is encountered, or config.OverallPollingTimeout is reached. In the
 // last case, a JobTimeoutError is returned.
 func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
-	return client.PollJobForStatus(jobURL, constant.JobComplete)
+	return client.PollJobForState(jobURL, constant.JobComplete)
 
 }
 
-func (client *Client) PollJobForStatus(jobURL JobURL, state constant.JobState) (Warnings, error) {
+func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (Warnings, error) {
 	var (
 		err         error
 		warnings    Warnings
