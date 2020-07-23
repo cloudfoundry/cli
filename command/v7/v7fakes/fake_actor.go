@@ -283,14 +283,10 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateManagedServiceInstanceStub        func(string, string, string, string, string) (v7action.Warnings, error)
+	CreateManagedServiceInstanceStub        func(v7action.ManagedServiceInstanceParams) (v7action.Warnings, error)
 	createManagedServiceInstanceMutex       sync.RWMutex
 	createManagedServiceInstanceArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
+		arg1 v7action.ManagedServiceInstanceParams
 	}
 	createManagedServiceInstanceReturns struct {
 		result1 v7action.Warnings
@@ -4325,20 +4321,16 @@ func (fake *FakeActor) CreateIsolationSegmentByNameReturnsOnCall(i int, result1 
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateManagedServiceInstance(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.ManagedServiceInstanceParams) (v7action.Warnings, error) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.createManagedServiceInstanceReturnsOnCall[len(fake.createManagedServiceInstanceArgsForCall)]
 	fake.createManagedServiceInstanceArgsForCall = append(fake.createManagedServiceInstanceArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("CreateManagedServiceInstance", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg1 v7action.ManagedServiceInstanceParams
+	}{arg1})
+	fake.recordInvocation("CreateManagedServiceInstance", []interface{}{arg1})
 	fake.createManagedServiceInstanceMutex.Unlock()
 	if fake.CreateManagedServiceInstanceStub != nil {
-		return fake.CreateManagedServiceInstanceStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.CreateManagedServiceInstanceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -4353,17 +4345,17 @@ func (fake *FakeActor) CreateManagedServiceInstanceCallCount() int {
 	return len(fake.createManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(string, string, string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(v7action.ManagedServiceInstanceParams) (v7action.Warnings, error)) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	defer fake.createManagedServiceInstanceMutex.Unlock()
 	fake.CreateManagedServiceInstanceStub = stub
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeActor) CreateManagedServiceInstanceArgsForCall(i int) v7action.ManagedServiceInstanceParams {
 	fake.createManagedServiceInstanceMutex.RLock()
 	defer fake.createManagedServiceInstanceMutex.RUnlock()
 	argsForCall := fake.createManagedServiceInstanceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1
 }
 
 func (fake *FakeActor) CreateManagedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {

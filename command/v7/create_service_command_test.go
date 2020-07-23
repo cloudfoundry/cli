@@ -101,12 +101,12 @@ var _ = Describe("create-service Command", func() {
 
 		It("Calls the actor with the right arguments", func() {
 			Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
-			offeringName, planName, serviceInstanceName, brokerName, spaceGUID := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
-			Expect(planName).To(Equal(requestedPlanName))
-			Expect(offeringName).To(Equal(requestedOfferingName))
-			Expect(brokerName).To(BeEmpty())
-			Expect(serviceInstanceName).To(Equal(requestedServiceInstanceName))
-			Expect(spaceGUID).To(Equal(fakeSpaceGUID))
+			params := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
+			Expect(params.ServicePlanName).To(Equal(requestedPlanName))
+			Expect(params.ServiceOfferingName).To(Equal(requestedOfferingName))
+			Expect(params.ServiceBrokerName).To(BeEmpty())
+			Expect(params.ServiceInstanceName).To(Equal(requestedServiceInstanceName))
+			Expect(params.SpaceGUID).To(Equal(fakeSpaceGUID))
 		})
 
 		When("requesting from a specific broker", func() {
@@ -121,12 +121,33 @@ var _ = Describe("create-service Command", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 
 				Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
-				offeringName, planName, serviceInstanceName, brokerName, spaceGUID := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
-				Expect(planName).To(Equal(requestedPlanName))
-				Expect(offeringName).To(Equal(requestedOfferingName))
-				Expect(brokerName).To(Equal(requestedBrokerName))
-				Expect(serviceInstanceName).To(Equal(requestedServiceInstanceName))
-				Expect(spaceGUID).To(Equal(fakeSpaceGUID))
+				params := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
+				Expect(params.ServicePlanName).To(Equal(requestedPlanName))
+				Expect(params.ServiceOfferingName).To(Equal(requestedOfferingName))
+				Expect(params.ServiceBrokerName).To(Equal(requestedBrokerName))
+				Expect(params.ServiceInstanceName).To(Equal(requestedServiceInstanceName))
+				Expect(params.SpaceGUID).To(Equal(fakeSpaceGUID))
+			})
+		})
+
+		When("there are user provided tags", func() {
+			var requestedTags []string
+
+			BeforeEach(func() {
+				requestedTags = []string{"tag-1", "tag-2"}
+				setFlag(&cmd, "-t", requestedTags)
+			})
+
+			It("passes the right parameters to the actor", func() {
+				Expect(executeErr).To(Not(HaveOccurred()))
+
+				Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
+				params := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
+				Expect(params.ServicePlanName).To(Equal(requestedPlanName))
+				Expect(params.ServiceOfferingName).To(Equal(requestedOfferingName))
+				Expect(params.ServiceInstanceName).To(Equal(requestedServiceInstanceName))
+				Expect(params.SpaceGUID).To(Equal(fakeSpaceGUID))
+				Expect(params.Tags).To(Equal(requestedTags))
 
 			})
 		})

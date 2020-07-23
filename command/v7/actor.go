@@ -38,7 +38,7 @@ type Actor interface {
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
 	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
 	CreateIsolationSegmentByName(isolationSegment v7action.IsolationSegment) (v7action.Warnings, error)
-	CreateManagedServiceInstance(serviceOfferingName, servicePlanName, serviceInstanceName, serviceBrokerName, spaceGUID string) (v7action.Warnings, error)
+	CreateManagedServiceInstance(managedServiceInstanceParams v7action.ManagedServiceInstanceParams) (v7action.Warnings, error)
 	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	CreateOrganization(orgName string) (resources.Organization, v7action.Warnings, error)
 	CreateOrganizationQuota(name string, limits v7action.QuotaLimits) (v7action.Warnings, error)
