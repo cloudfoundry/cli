@@ -529,6 +529,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 		var (
 			fakeServiceBrokerName = "fake-broker-name"
+			fakeTags              = types.NewOptionalStringSlice("tag1", "tag2")
 			warnings              Warnings
 			err                   error
 			fakeJobURL            = ccv3.JobURL("http://some-cc-api/v3/jobs/job-guid")
@@ -545,15 +546,26 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, err = actor.CreateManagedServiceInstance(fakeServiceOfferingName, fakeServicePlanName, fakeServiceInstanceName, fakeServiceBrokerName, fakeSpaceGUID)
+			params := ManagedServiceInstanceParams{
+				ServiceOfferingName: fakeServiceOfferingName,
+				ServicePlanName:     fakeServicePlanName,
+				ServiceInstanceName: fakeServiceInstanceName,
+				ServiceBrokerName:   fakeServiceBrokerName,
+				SpaceGUID:           fakeSpaceGUID,
+				Tags:                fakeTags,
+			}
+			warnings, err = actor.CreateManagedServiceInstance(params)
 
 		})
 		It("gets the service plan", func() {
 			Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 			query := fakeCloudControllerClient.GetServicePlansArgsForCall(0)
 			Expect(query[0].Values).To(ConsistOf(fakeServicePlanName))
+			Expect(query[0].Key).To(Equal(ccv3.NameFilter))
 			Expect(query[1].Values).To(ConsistOf(fakeServiceBrokerName))
+			Expect(query[1].Key).To(Equal(ccv3.ServiceBrokerNamesFilter))
 			Expect(query[2].Values).To(ConsistOf(fakeServiceOfferingName))
+			Expect(query[2].Key).To(Equal(ccv3.ServiceOfferingNamesFilter))
 		})
 
 		It("calls the client to create the instance", func() {
@@ -563,6 +575,7 @@ var _ = Describe("Service Instance Actions", func() {
 				Name:      fakeServiceInstanceName,
 				PlanGUID:  "fake-plan-guid",
 				SpaceGUID: fakeSpaceGUID,
+				Tags:      fakeTags,
 			}))
 		})
 

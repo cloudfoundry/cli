@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -106,10 +107,23 @@ func (actor Actor) fetchServiceInstanceDetails(serviceInstanceName string, space
 	return serviceInstance, included, Warnings(warnings), nil
 }
 
-func (actor Actor) CreateManagedServiceInstance(serviceOfferingName, servicePlanName, serviceInstanceName, serviceBrokerName, spaceGUID string) (Warnings, error) {
+type ManagedServiceInstanceParams struct {
+	ServiceOfferingName string
+	ServicePlanName     string
+	ServiceInstanceName string
+	ServiceBrokerName   string
+	SpaceGUID           string
+	Tags                types.OptionalStringSlice
+}
+
+func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(servicePlanName, serviceOfferingName, serviceBrokerName)
+	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
+		params.ServicePlanName,
+		params.ServiceOfferingName,
+		params.ServiceBrokerName,
+	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -117,9 +131,10 @@ func (actor Actor) CreateManagedServiceInstance(serviceOfferingName, servicePlan
 
 	serviceInstance := resources.ServiceInstance{
 		Type:      resources.ManagedServiceInstance,
-		Name:      serviceInstanceName,
+		Name:      params.ServiceInstanceName,
 		PlanGUID:  servicePlan.GUID,
-		SpaceGUID: spaceGUID,
+		SpaceGUID: params.SpaceGUID,
+		Tags:      params.Tags,
 	}
 
 	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
