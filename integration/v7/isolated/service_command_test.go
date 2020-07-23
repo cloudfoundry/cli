@@ -194,6 +194,8 @@ var _ = Describe("service command", func() {
 						Say(`\n`),
 						Say(`Sharing:\n`),
 						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
+						Say(`Upgrades are not supported by this broker.\n`),
 					))
 				})
 			})
@@ -254,6 +256,8 @@ var _ = Describe("service command", func() {
 						Say(`Sharing:\n`),
 						Say(`This service instance is not currently being shared.`),
 						Say(`\n`),
+						Say(`Upgrading:\n`),
+						Say(`Upgrades are not supported by this broker.\n`),
 					))
 				})
 			})
@@ -340,6 +344,54 @@ var _ = Describe("service command", func() {
 						Say(`Sharing:\n`),
 						Say(`This service instance is currently shared.\n`),
 					))
+				})
+			})
+
+			When("the broker supports maintenance info", func() {
+				When("the service is up to date", func() {
+					var serviceInstanceName string
+
+					BeforeEach(func() {
+						serviceInstanceName = helpers.NewServiceInstanceName()
+						broker = servicebrokerstub.New().WithMaintenanceInfo("1.2.3").EnableServiceAccess()
+						helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+					})
+
+					It("says that the service has no upgrades available", func() {
+						session := helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(SatisfyAll(
+							Say(`Upgrading:\n`),
+							Say(`There is no upgrade available for this service.\n`),
+						))
+					})
+				})
+
+				When("an update is available", func() {
+					var serviceInstanceName string
+
+					BeforeEach(func() {
+						serviceInstanceName = helpers.NewServiceInstanceName()
+						broker = servicebrokerstub.New().WithMaintenanceInfo("1.2.3").EnableServiceAccess()
+						helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+						broker.WithMaintenanceInfo("1.2.4", "really cool improvement").Configure().Register()
+					})
+
+					It("displays information about the upgrade", func() {
+						session := helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(SatisfyAll(
+							Say(`Upgrading:\n`),
+							Say(`Showing available upgrade details for this service...\n`),
+							Say(`\n`),
+							Say(`Upgrade description: really cool improvement\n`),
+							Say(`\n`),
+							Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'\n`, serviceInstanceName),
+						))
+					})
 				})
 			})
 		})

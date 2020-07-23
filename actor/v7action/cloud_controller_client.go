@@ -113,6 +113,7 @@ type CloudControllerClient interface {
 	GetServiceOfferingByGUID(guid string) (resources.ServiceOffering, ccv3.Warnings, error)
 	GetServiceOfferings(query ...ccv3.Query) ([]resources.ServiceOffering, ccv3.Warnings, error)
 	GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (resources.ServiceOffering, ccv3.Warnings, error)
+	GetServicePlanByGUID(guid string) (resources.ServicePlan, ccv3.Warnings, error)
 	GetServicePlans(query ...ccv3.Query) ([]resources.ServicePlan, ccv3.Warnings, error)
 	GetServicePlansWithOfferings(query ...ccv3.Query) ([]ccv3.ServiceOfferingWithPlans, ccv3.Warnings, error)
 	GetServicePlansWithSpaceAndOrganization(query ...ccv3.Query) ([]ccv3.ServicePlanWithSpaceAndOrganization, ccv3.Warnings, error)

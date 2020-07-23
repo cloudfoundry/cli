@@ -1,10 +1,27 @@
 package ccv3
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
+
+func (client *Client) GetServicePlanByGUID(guid string) (resources.ServicePlan, Warnings, error) {
+	if guid == "" {
+		return resources.ServicePlan{}, nil, ccerror.ServicePlanNotFound{}
+	}
+
+	var result resources.ServicePlan
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServicePlanRequest,
+		URIParams:    internal.Params{"service_plan_guid": guid},
+		ResponseBody: &result,
+	})
+
+	return result, warnings, err
+}
 
 // GetServicePlans lists service plan with optional filters.
 func (client *Client) GetServicePlans(query ...Query) ([]resources.ServicePlan, Warnings, error) {

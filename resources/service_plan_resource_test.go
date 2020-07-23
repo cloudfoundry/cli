@@ -59,7 +59,8 @@ var _ = Describe("service plan resource", func() {
 						Unit:     "day",
 					},
 				},
-				SpaceGUID: "fake-space-guid",
+				SpaceGUID:                  "fake-space-guid",
+				MaintenanceInfoDescription: "cool upgrade",
 				Metadata: &Metadata{
 					Labels: map[string]types.NullString{
 						"foo": types.NewNullString("bar"),
@@ -86,6 +87,9 @@ var _ = Describe("service plan resource", func() {
 						"unit": "day"
 					}
 				],
+				"maintenance_info": {
+					"description": "cool upgrade"
+				},
 				"metadata": {
 					"labels": {
 						"foo": "bar",

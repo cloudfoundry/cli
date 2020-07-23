@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -21,6 +21,89 @@ var _ = Describe("Service Plan", func() {
 	BeforeEach(func() {
 		client, _ = NewTestClient()
 		query = []Query{}
+	})
+
+	Describe("GetServicePlanByGUID", func() {
+		const guid = "fake-guid"
+
+		var requester *ccv3fakes.FakeRequester
+
+		BeforeEach(func() {
+			requester = new(ccv3fakes.FakeRequester)
+			client, _ = NewFakeRequesterTestClient(requester)
+		})
+
+		When("service plan exists", func() {
+			BeforeEach(func() {
+				requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
+					Expect(params.URIParams).To(BeEquivalentTo(map[string]string{"service_plan_guid": guid}))
+					Expect(params.RequestName).To(Equal(internal.GetServicePlanRequest))
+					params.ResponseBody.(*resources.ServicePlan).GUID = guid
+					return "", Warnings{"one", "two"}, nil
+				})
+			})
+
+			It("returns the service offering with warnings", func() {
+				plan, warnings, err := client.GetServicePlanByGUID(guid)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(plan).To(Equal(resources.ServicePlan{
+					GUID: guid,
+				}))
+				Expect(warnings).To(ConsistOf("one", "two"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"one", "two"},
+					ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   42424,
+								Detail: "Some detailed error message",
+								Title:  "CF-SomeErrorTitle",
+							},
+							{
+								Code:   11111,
+								Detail: "Some other detailed error message",
+								Title:  "CF-SomeOtherErrorTitle",
+							},
+						},
+					},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.GetServicePlanByGUID(guid)
+				Expect(err).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("one", "two"))
+			})
+		})
+
+		When("the guid is not specified", func() {
+			It("fails with an error", func() {
+				_, _, err := client.GetServicePlanByGUID("")
+				Expect(err).To(MatchError(ccerror.ServicePlanNotFound{}))
+			})
+		})
 	})
 
 	Describe("GetServicePlans", func() {

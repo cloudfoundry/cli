@@ -31,6 +31,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			serviceInstanceGUID          = "some-service-instance-guid"
 			spaceGUID                    = "some-source-space-guid"
 			servicePlanName              = "fake-service-plan-name"
+			servicePlanGUID              = "fake-service-plan-guid"
 			serviceOfferingName          = "fake-service-offering-name"
 			serviceOfferingGUID          = "fake-service-offering-guid"
 			serviceOfferingDescription   = "some-service-description"
@@ -66,15 +67,15 @@ var _ = Describe("Service Instance Details Action", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{
-						Type:                resources.ManagedServiceInstance,
-						Name:                serviceInstanceName,
-						GUID:                serviceInstanceGUID,
-						ServiceOfferingGUID: serviceOfferingGUID,
+						Type: resources.ManagedServiceInstance,
+						Name: serviceInstanceName,
+						GUID: serviceInstanceGUID,
 					},
 					ccv3.IncludedResources{
 						ServicePlans: []resources.ServicePlan{{Name: servicePlanName}},
 						ServiceOfferings: []resources.ServiceOffering{{
 							Name:             serviceOfferingName,
+							GUID:             serviceOfferingGUID,
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocumentation,
 							Tags:             types.NewOptionalStringSlice("foo", "bar"),
@@ -104,18 +105,18 @@ var _ = Describe("Service Instance Details Action", func() {
 				Expect(serviceInstance).To(Equal(
 					ServiceInstanceDetails{
 						ServiceInstance: resources.ServiceInstance{
-							Type:                resources.ManagedServiceInstance,
-							Name:                serviceInstanceName,
-							GUID:                serviceInstanceGUID,
-							ServiceOfferingGUID: serviceOfferingGUID,
+							Type: resources.ManagedServiceInstance,
+							Name: serviceInstanceName,
+							GUID: serviceInstanceGUID,
 						},
 						ServiceOffering: resources.ServiceOffering{
 							Name:             serviceOfferingName,
+							GUID:             serviceOfferingGUID,
 							Description:      serviceOfferingDescription,
 							DocumentationURL: serviceOfferingDocumentation,
 							Tags:             types.NewOptionalStringSlice("foo", "bar"),
 						},
-						ServicePlanName:   servicePlanName,
+						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
 						SharedStatus:      SharedStatus{},
 						Parameters: ServiceInstanceParameters{
@@ -151,7 +152,11 @@ var _ = Describe("Service Instance Details Action", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
 			})
 
-			When("the service instance is managed", func() {
+			It("does not get the service plan", func() {
+				Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
+			})
+
+			Describe("sharing", func() {
 				When("the service instance has shared spaces", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
@@ -326,6 +331,128 @@ var _ = Describe("Service Instance Details Action", func() {
 						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
 						Expect(executionError).To(MatchError("no service instance"))
 						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+					})
+				})
+			})
+
+			Describe("upgrades", func() {
+				When("upgrade is not available and the service does not have maintenance info", func() {
+					It("says that upgrades are not supported", func() {
+						Expect(serviceInstance.UpgradeStatus.State).To(Equal(ServiceInstanceUpgradeNotSupported))
+					})
+				})
+
+				When("upgrade is not available but the service instance has maintenance info", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+							resources.ServiceInstance{
+								Type:                   resources.ManagedServiceInstance,
+								Name:                   serviceInstanceName,
+								GUID:                   serviceInstanceGUID,
+								MaintenanceInfoVersion: "1.2.3",
+							},
+							ccv3.IncludedResources{
+								ServicePlans: []resources.ServicePlan{{Name: servicePlanName}},
+								ServiceOfferings: []resources.ServiceOffering{{
+									Name:             serviceOfferingName,
+									GUID:             serviceOfferingGUID,
+									Description:      serviceOfferingDescription,
+									DocumentationURL: serviceOfferingDocumentation,
+									Tags:             types.NewOptionalStringSlice("foo", "bar"),
+								}},
+								ServiceBrokers: []resources.ServiceBroker{{Name: serviceBrokerName}},
+							},
+							ccv3.Warnings{"some-service-instance-warning"},
+							nil,
+						)
+					})
+
+					It("says that an upgrade is not available", func() {
+						Expect(serviceInstance.UpgradeStatus.State).To(Equal(ServiceInstanceUpgradeNotAvailable))
+					})
+				})
+
+				When("an upgrade is available", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+							resources.ServiceInstance{
+								Type:             resources.ManagedServiceInstance,
+								Name:             serviceInstanceName,
+								GUID:             serviceInstanceGUID,
+								ServicePlanGUID:  servicePlanGUID,
+								UpgradeAvailable: types.NewOptionalBoolean(true),
+							},
+							ccv3.IncludedResources{
+								ServicePlans: []resources.ServicePlan{{Name: servicePlanName}},
+								ServiceOfferings: []resources.ServiceOffering{{
+									Name:             serviceOfferingName,
+									GUID:             serviceOfferingGUID,
+									Description:      serviceOfferingDescription,
+									DocumentationURL: serviceOfferingDocumentation,
+									Tags:             types.NewOptionalStringSlice("foo", "bar"),
+								}},
+								ServiceBrokers: []resources.ServiceBroker{{Name: serviceBrokerName}},
+							},
+							ccv3.Warnings{"some-service-instance-warning"},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetServicePlanByGUIDReturns(
+							resources.ServicePlan{
+								GUID:                       servicePlanGUID,
+								Name:                       servicePlanName,
+								MaintenanceInfoDescription: "requires downtime",
+							},
+							ccv3.Warnings{"service-plan-warning"},
+							nil,
+						)
+					})
+
+					It("gets the service plan", func() {
+						Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetServicePlanByGUIDArgsForCall(0)).To(Equal(servicePlanGUID))
+
+						Expect(warnings).To(ContainElement("service-plan-warning"))
+					})
+
+					It("says that an upgrade is available", func() {
+						Expect(serviceInstance.UpgradeStatus).To(Equal(ServiceInstanceUpgradeStatus{
+							State:       ServiceInstanceUpgradeAvailable,
+							Description: "requires downtime",
+						}))
+					})
+
+					When("the service plan cannot be found", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetServicePlanByGUIDReturns(
+								resources.ServicePlan{},
+								ccv3.Warnings{"service-plan-warning"},
+								ccerror.ServicePlanNotFound{},
+							)
+						})
+
+						It("says that an upgrade is available without details", func() {
+							Expect(warnings).To(ContainElement("service-plan-warning"))
+							Expect(serviceInstance.UpgradeStatus).To(Equal(ServiceInstanceUpgradeStatus{
+								State:       ServiceInstanceUpgradeAvailable,
+								Description: "No upgrade details where found",
+							}))
+						})
+					})
+
+					When("getting the service plan fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetServicePlanByGUIDReturns(
+								resources.ServicePlan{},
+								ccv3.Warnings{"service-plan-warning"},
+								errors.New("boom"),
+							)
+						})
+
+						It("says that an upgrade is available without details", func() {
+							Expect(warnings).To(ContainElement("service-plan-warning"))
+							Expect(executionError).To(MatchError("boom"))
+						})
 					})
 				})
 			})

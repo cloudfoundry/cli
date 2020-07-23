@@ -21,8 +21,8 @@ type ServiceInstance struct {
 	Name string `jsonry:"name,omitempty"`
 	// SpaceGUID is the space that this service instance relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
-	// ServiceOfferingGUID is the service offering that this service instance relates to
-	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid,omitempty"`
+	// ServicePlanGUID is the service plan that this service instance relates to
+	ServicePlanGUID string `jsonry:"relationships.service_plan.data.guid,omitempty"`
 	// Tags are used by apps to identify service instances.
 	Tags types.OptionalStringSlice `jsonry:"tags"`
 	// SyslogDrainURL is where logs are streamed
@@ -33,6 +33,10 @@ type ServiceInstance struct {
 	DashboardURL types.OptionalString `jsonry:"dashboard_url"`
 	// Credentials are passed to the app
 	Credentials types.OptionalObject `jsonry:"credentials"`
+	// UpgradeAvailable says whether the plan is at a higher version
+	UpgradeAvailable types.OptionalBoolean `json:"upgrade_available"`
+	// MaintenanceInfoVersion is the version this service is at
+	MaintenanceInfoVersion string `jsonry:"maintenance_info.version,omitempty"`
 	// LastOperation is the last operation on the service instance
 	LastOperation LastOperation `jsonry:"last_operation"`
 }
