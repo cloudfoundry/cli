@@ -922,7 +922,7 @@ var _ = Describe("Service Instance Actions", func() {
 				nil,
 			)
 			fakeCloudControllerClient.CreateServiceInstanceReturns(fakeJobURL, ccv3.Warnings{"fake-warning"}, nil)
-			fakeCloudControllerClient.PollJobForStatusReturns(ccv3.Warnings{"job-warning"}, nil)
+			fakeCloudControllerClient.PollJobForStateReturns(ccv3.Warnings{"job-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -948,8 +948,8 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 
 		It("polls the job until is in polling state", func() {
-			Expect(fakeCloudControllerClient.PollJobForStatusCallCount()).To(Equal(1))
-			jobUrl, status := fakeCloudControllerClient.PollJobForStatusArgsForCall(0)
+			Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+			jobUrl, status := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
 			Expect(jobUrl).To(Equal(fakeJobURL))
 			Expect(status).To(Equal(constant.JobPolling))
 		})
@@ -967,7 +967,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 				It("returns with warnings and an error", func() {
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.PollJobForStatusCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: fakeServicePlanName, OfferingName: fakeServiceOfferingName, ServiceBrokerName: fakeServiceBrokerName}))
@@ -986,7 +986,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 				It("returns warnings and an error", func() {
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.PollJobForStatusCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError(actionerror.DuplicateServicePlanError{Name: fakeServicePlanName, ServiceOfferingName: fakeServiceOfferingName, ServiceBrokerName: ""}))
@@ -1001,7 +1001,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 				It("returns warnings and an error", func() {
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.PollJobForStatusCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError("boom"))
@@ -1014,7 +1014,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				It("returns warnings and an error", func() {
-					Expect(fakeCloudControllerClient.PollJobForStatusCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
 					Expect(warnings).To(ConsistOf("plan-warning", "fake-warning"))
 					Expect(err).To(MatchError("bang"))
@@ -1023,7 +1023,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 			When("there are job errors", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.PollJobForStatusReturns(ccv3.Warnings{"job-warning"}, errors.New("bad job"))
+					fakeCloudControllerClient.PollJobForStateReturns(ccv3.Warnings{"job-warning"}, errors.New("bad job"))
 				})
 
 				It("returns warnings and an error", func() {

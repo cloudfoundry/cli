@@ -431,11 +431,11 @@ var _ = Describe("Job", func() {
 
 		})
 
-		Describe("PollJobForStatus", func() {
+		Describe("PollJobForState", func() {
 
 			JustBeforeEach(func() {
 				startTime = time.Now()
-				warnings, executeErr = client.PollJobForStatus(jobLocation, constant.JobPolling)
+				warnings, executeErr = client.PollJobForState(jobLocation, constant.JobPolling)
 			})
 
 			itFinishesWhenCompleteOrFailed()

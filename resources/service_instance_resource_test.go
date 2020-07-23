@@ -87,12 +87,26 @@ var _ = Describe("service instance resource", func() {
             }`,
 		),
 		Entry(
+			"plan guid",
+			ServiceInstance{PlanGUID: "fake-plan-guid"},
+			`{
+				"relationships": {
+					"service_plan": {
+						"data": {
+							"guid": "fake-plan-guid"
+						}
+					}
+				}
+            }`,
+		),
+		Entry(
 			"everything",
 			ServiceInstance{
 				Type:            UserProvidedServiceInstance,
 				GUID:            "fake-guid",
 				Name:            "fake-space-guid",
 				SpaceGUID:       "fake-space-guid",
+				PlanGUID:        "fake-plan-guid",
 				Tags:            types.NewOptionalStringSlice("foo", "bar"),
 				SyslogDrainURL:  types.NewOptionalString("https://fake-syslog.com"),
 				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
@@ -118,6 +132,11 @@ var _ = Describe("service instance resource", func() {
 					"space": {
 						"data": {
 							"guid": "fake-space-guid"
+						}
+					},
+					"service_plan": {
+						"data": {
+							"guid": "fake-plan-guid"
 						}
 					}
 				}
