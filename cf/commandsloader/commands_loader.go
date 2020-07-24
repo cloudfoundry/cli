@@ -20,7 +20,7 @@ get initialized
 ********************/
 
 func Load() {
-	_ = commands.API{}
+	_ = commands.Curl{}
 	_ = plugin.Plugins{}
 	_ = pluginrepo.RepoPlugins{}
 	_ = service.ShowService{}
