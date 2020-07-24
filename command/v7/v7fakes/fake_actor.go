@@ -2840,6 +2840,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateManagedServiceInstanceStub        func(string, string, resources.ServiceInstance) (v7action.Warnings, error)
+	updateManagedServiceInstanceMutex       sync.RWMutex
+	updateManagedServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 resources.ServiceInstance
+	}
+	updateManagedServiceInstanceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateManagedServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateOrganizationLabelsByOrganizationNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
 	updateOrganizationLabelsByOrganizationNameMutex       sync.RWMutex
 	updateOrganizationLabelsByOrganizationNameArgsForCall []struct {
@@ -15326,6 +15341,71 @@ func (fake *FakeActor) UpdateDomainLabelsByDomainNameReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateManagedServiceInstance(arg1 string, arg2 string, arg3 resources.ServiceInstance) (v7action.Warnings, error) {
+	fake.updateManagedServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.updateManagedServiceInstanceReturnsOnCall[len(fake.updateManagedServiceInstanceArgsForCall)]
+	fake.updateManagedServiceInstanceArgsForCall = append(fake.updateManagedServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 resources.ServiceInstance
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateManagedServiceInstance", []interface{}{arg1, arg2, arg3})
+	fake.updateManagedServiceInstanceMutex.Unlock()
+	if fake.UpdateManagedServiceInstanceStub != nil {
+		return fake.UpdateManagedServiceInstanceStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateManagedServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UpdateManagedServiceInstanceCallCount() int {
+	fake.updateManagedServiceInstanceMutex.RLock()
+	defer fake.updateManagedServiceInstanceMutex.RUnlock()
+	return len(fake.updateManagedServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) UpdateManagedServiceInstanceCalls(stub func(string, string, resources.ServiceInstance) (v7action.Warnings, error)) {
+	fake.updateManagedServiceInstanceMutex.Lock()
+	defer fake.updateManagedServiceInstanceMutex.Unlock()
+	fake.UpdateManagedServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) UpdateManagedServiceInstanceArgsForCall(i int) (string, string, resources.ServiceInstance) {
+	fake.updateManagedServiceInstanceMutex.RLock()
+	defer fake.updateManagedServiceInstanceMutex.RUnlock()
+	argsForCall := fake.updateManagedServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) UpdateManagedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateManagedServiceInstanceMutex.Lock()
+	defer fake.updateManagedServiceInstanceMutex.Unlock()
+	fake.UpdateManagedServiceInstanceStub = nil
+	fake.updateManagedServiceInstanceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UpdateManagedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateManagedServiceInstanceMutex.Lock()
+	defer fake.updateManagedServiceInstanceMutex.Unlock()
+	fake.UpdateManagedServiceInstanceStub = nil
+	if fake.updateManagedServiceInstanceReturnsOnCall == nil {
+		fake.updateManagedServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateManagedServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UpdateOrganizationLabelsByOrganizationName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall[len(fake.updateOrganizationLabelsByOrganizationNameArgsForCall)]
@@ -16946,6 +17026,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
 	fake.updateDomainLabelsByDomainNameMutex.RLock()
 	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
+	fake.updateManagedServiceInstanceMutex.RLock()
+	defer fake.updateManagedServiceInstanceMutex.RUnlock()
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	fake.updateOrganizationQuotaMutex.RLock()

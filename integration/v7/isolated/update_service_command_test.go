@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -382,6 +384,80 @@ var _ = Describe("update-service command", func() {
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, command, "service-instance-name")
+		})
+	})
+
+	When("logged in and targeting a space", func() {
+		var (
+			orgName             string
+			spaceName           string
+			username            string
+			serviceInstanceName string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+
+			username, _ = helpers.GetCredentials()
+
+			serviceInstanceName = helpers.NewServiceInstanceName()
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		When("the service instance doesn't exist", func() {
+			It("fails with an appropriate error", func() {
+				session := helpers.CF(command, serviceInstanceName, "-t", "important")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(SatisfyAll(
+					Say("Updating service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say("FAILED"),
+				))
+				Expect(session.Err).To(Say("Service instance %s not found\n", serviceInstanceName))
+			})
+		})
+
+		When("the service instance exists", func() {
+			const (
+				originalTags = "foo, bar"
+				newTags      = "bax, quz"
+			)
+			var broker *servicebrokerstub.ServiceBrokerStub
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithAsyncDelay(time.Microsecond).EnableServiceAccess()
+				helpers.CreateManagedServiceInstance(
+					broker.FirstServiceOfferingName(),
+					broker.FirstServicePlanName(),
+					serviceInstanceName,
+					"-t", originalTags,
+				)
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("can update tags", func() {
+				session := helpers.CF(command, serviceInstanceName, "-t", newTags)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say("Updating service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`OK`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				session = helpers.CF("service", serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say(`tags:\s+%s`, newTags))
+			})
 		})
 	})
 })

@@ -199,9 +199,9 @@ var _ = Describe("Service Instance Actions", func() {
 
 	Describe("UpdateUserProvidedServiceInstance", func() {
 		const (
-			originalName = "fake-service-instance-name"
-			guid         = "fake-service-instance-guid"
-			spaceGUID    = "fake-space-guid"
+			serviceInstanceName = "fake-service-instance-name"
+			guid                = "fake-service-instance-guid"
+			spaceGUID           = "fake-space-guid"
 		)
 
 		When("the service instance is updated successfully", func() {
@@ -222,12 +222,11 @@ var _ = Describe("Service Instance Actions", func() {
 				)
 			})
 
-			It("returns all warnings", func() {
+			It("makes the right calls and returns all warnings", func() {
 				warnings, err := actor.UpdateUserProvidedServiceInstance(
-					originalName,
+					serviceInstanceName,
 					spaceGUID,
 					resources.ServiceInstance{
-						SpaceGUID:       "fake-space-guid",
 						Tags:            types.NewOptionalStringSlice("foo", "bar"),
 						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
 						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
@@ -242,7 +241,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
 				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-				Expect(actualName).To(Equal(originalName))
+				Expect(actualName).To(Equal(serviceInstanceName))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
 				Expect(actualQuery).To(BeEmpty())
 
@@ -250,7 +249,6 @@ var _ = Describe("Service Instance Actions", func() {
 				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
 				Expect(actualGUID).To(Equal(guid))
 				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
-					SpaceGUID:       "fake-space-guid",
 					Tags:            types.NewOptionalStringSlice("foo", "bar"),
 					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
 					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
@@ -277,10 +275,9 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("fails with warnings", func() {
 				warnings, err := actor.UpdateUserProvidedServiceInstance(
-					originalName,
+					serviceInstanceName,
 					spaceGUID,
 					resources.ServiceInstance{
-						SpaceGUID:       "fake-space-guid",
 						Tags:            types.NewOptionalStringSlice("foo", "bar"),
 						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
 						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
@@ -293,7 +290,7 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(warnings).To(ConsistOf("warning from get"))
 
 				Expect(err).To(MatchError(actionerror.ServiceInstanceTypeError{
-					Name:         originalName,
+					Name:         serviceInstanceName,
 					RequiredType: resources.UserProvidedServiceInstance,
 				}))
 			})
@@ -311,10 +308,9 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("returns warnings and an error", func() {
 				warnings, err := actor.UpdateUserProvidedServiceInstance(
-					originalName,
+					serviceInstanceName,
 					spaceGUID,
 					resources.ServiceInstance{
-						SpaceGUID:       "fake-space-guid",
 						Tags:            types.NewOptionalStringSlice("foo", "bar"),
 						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
 						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
@@ -349,10 +345,9 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("returns warnings and an error", func() {
 				warnings, err := actor.UpdateUserProvidedServiceInstance(
-					originalName,
+					serviceInstanceName,
 					spaceGUID,
 					resources.ServiceInstance{
-						SpaceGUID:       "fake-space-guid",
 						Tags:            types.NewOptionalStringSlice("foo", "bar"),
 						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
 						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
@@ -363,6 +358,239 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 				)
 				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				Expect(err).To(MatchError("boom"))
+			})
+		})
+	})
+
+	Describe("UpdateManagedServiceInstance", func() {
+		const (
+			serviceInstanceName = "fake-service-instance-name"
+			guid                = "fake-service-instance-guid"
+			spaceGUID           = "fake-space-guid"
+		)
+
+		When("the service instance is successfully updated synchronously", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"warning from update"},
+					nil,
+				)
+			})
+
+			It("makes the right calls and returns all warnings", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(BeEmpty())
+
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+				Expect(actualGUID).To(Equal(guid))
+				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+			})
+		})
+
+		When("the service instance is successfully updated asynchronously", func() {
+			const jobURL = ccv3.JobURL("fake-job-url")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					jobURL,
+					ccv3.Warnings{"warning from update"},
+					nil,
+				)
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"warning from poll"},
+					nil,
+				)
+			})
+
+			It("makes the right calls and returns all warnings", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
+
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(BeEmpty())
+
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+				Expect(actualGUID).To(Equal(guid))
+				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(jobURL))
+			})
+		})
+
+		When("the service instance is not managed", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type: resources.UserProvidedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+			})
+
+			It("fails with warnings", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(warnings).To(ConsistOf("warning from get"))
+
+				Expect(err).To(MatchError(actionerror.ServiceInstanceTypeError{
+					Name:         serviceInstanceName,
+					RequiredType: resources.ManagedServiceInstance,
+				}))
+			})
+		})
+
+		When("the service instance is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					ccerror.ServiceInstanceNotFoundError{},
+				)
+			})
+
+			It("returns warnings and an actionerror", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(warnings).To(ConsistOf("warning from get"))
+				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{
+					Name: serviceInstanceName,
+				}))
+			})
+		})
+
+		When("there is an error getting the service instance", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					errors.New("bang"),
+				)
+			})
+
+			It("returns warnings and an error", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(warnings).To(ConsistOf("warning from get"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
+
+		When("there is an error updating the service instance", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"warning from update"},
+					errors.New("boom"),
+				)
+			})
+
+			It("returns warnings and an error", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				Expect(err).To(MatchError("boom"))
+			})
+		})
+
+		When("there is an error polling the job", func() {
+			const jobURL = ccv3.JobURL("fake-job-url")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type: resources.ManagedServiceInstance,
+						GUID: guid,
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					jobURL,
+					ccv3.Warnings{"warning from update"},
+					nil,
+				)
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"warning from poll"},
+					errors.New("boom"),
+				)
+			})
+
+			It("returns warnings and an error", func() {
+				warnings, err := actor.UpdateManagedServiceInstance(
+					serviceInstanceName,
+					spaceGUID,
+					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+				)
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
 				Expect(err).To(MatchError("boom"))
 			})
 		})

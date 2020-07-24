@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/railway"
 )
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -44,6 +45,49 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
 	warnings = append(warnings, updateWarnings...)
 	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	return Warnings(warnings), nil
+}
+
+func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates resources.ServiceInstance) (Warnings, error) {
+	var (
+		original resources.ServiceInstance
+		jobURL   ccv3.JobURL
+	)
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			original, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if original.Type != resources.ManagedServiceInstance {
+				err = actionerror.ServiceInstanceTypeError{
+					Name:         serviceInstanceName,
+					RequiredType: resources.ManagedServiceInstance,
+				}
+			}
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if jobURL != "" {
+				warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+			}
+			return
+		},
+	)
+
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceNotFoundError:
+		return Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
+	default:
 		return Warnings(warnings), err
 	}
 
