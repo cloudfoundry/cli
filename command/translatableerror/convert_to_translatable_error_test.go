@@ -12,8 +12,6 @@ import (
 	. "code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
-	"code.cloudfoundry.org/cli/util/manifest"
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -48,10 +46,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.AppNotFoundInManifestError{Name: "some-app"},
 			AppNotFoundInManifestError{Name: "some-app"}),
 
-		Entry("manifestparse.AppNotInManifestError -> AppNotFoundInManifestError",
-			v6manifestparser.AppNotInManifestError{Name: "some-app"},
-			AppNotFoundInManifestError{Name: "some-app"}),
-
 		Entry("actionerror.AssignDropletError -> AssignDropletError",
 			actionerror.AssignDropletError{Message: "some-message"},
 			AssignDropletError{Message: "some-message"}),
@@ -79,11 +73,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("actionerror.DomainNotFoundError -> DomainNotFoundError",
 			actionerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 			DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"}),
-
-		Entry("actionerror.EmptyBuildpacksError -> EmptyBuildpacksError",
-			manifest.EmptyBuildpacksError{},
-			EmptyBuildpacksError{},
-		),
 
 		Entry("actionerror.EmptyArchiveError -> EmptyDirectoryError",
 			actionerror.EmptyArchiveError{Path: "some-filename"},
@@ -155,10 +144,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 
 		Entry("actionerror.NonexistentAppPathError -> FileNotFoundError",
 			actionerror.NonexistentAppPathError{Path: "some-path"},
-			FileNotFoundError{Path: "some-path"}),
-
-		Entry("v6manifestparser.InvalidManifestApplicationPathError -> FileNotFoundError",
-			v6manifestparser.InvalidManifestApplicationPathError{Path: "some-path"},
 			FileNotFoundError{Path: "some-path"}),
 
 		Entry("actionerror.NoOrganizationTargetedError -> NoOrganizationTargetedError",
@@ -381,31 +366,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			jsonErr,
 			JSONSyntaxError{Err: jsonErr},
 		),
-
-		// Manifest Errors
-		Entry("manifest.ManifestCreationError -> ManifestCreationError",
-			manifest.ManifestCreationError{Err: errors.New("some-error")},
-			ManifestCreationError{Err: errors.New("some-error")}),
-
-		Entry("manifest.InheritanceFieldError -> TriggerLegacyPushError",
-			manifest.InheritanceFieldError{},
-			TriggerLegacyPushError{InheritanceRelated: true}),
-
-		Entry("manifest.GlobalFieldError -> TriggerLegacyPushError",
-			manifest.GlobalFieldsError{Fields: []string{"some-field"}},
-			TriggerLegacyPushError{GlobalRelated: []string{"some-field"}}),
-
-		Entry("manifest.InterpolationError -> InterpolationError",
-			manifest.InterpolationError{Err: errors.New("an-error")},
-			InterpolationError{Err: errors.New("an-error")}),
-
-		Entry("v6manifestparser.InterpolationError -> InterpolationError",
-			v6manifestparser.InterpolationError{Err: errors.New("an-error")},
-			InterpolationError{Err: errors.New("an-error")}),
-
-		Entry("v6manifestparser.InvalidYAMLError -> InvalidYAMLError",
-			v6manifestparser.InvalidYAMLError{Err: errors.New("an-error")},
-			InvalidYAMLError{Err: errors.New("an-error")}),
 
 		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",
