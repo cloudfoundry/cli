@@ -153,6 +153,28 @@ var _ = Describe("create-service Command", func() {
 			})
 		})
 
+		When("there are parameters", func() {
+			var requestedParams map[string]interface{}
+
+			BeforeEach(func() {
+				requestedParams = map[string]interface{}{"param-1": "value-1", "param-2": "value-2"}
+				setFlag(&cmd, "-c", requestedParams)
+			})
+
+			It("passes the right parameters to the actor", func() {
+				Expect(executeErr).To(Not(HaveOccurred()))
+
+				Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
+				params := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
+				Expect(params.ServicePlanName).To(Equal(requestedPlanName))
+				Expect(params.ServiceOfferingName).To(Equal(requestedOfferingName))
+				Expect(params.ServiceInstanceName).To(Equal(requestedServiceInstanceName))
+				Expect(params.SpaceGUID).To(Equal(fakeSpaceGUID))
+				Expect(params.Parameters).To(Equal(types.NewOptionalObject(requestedParams)))
+
+			})
+		})
+
 		When("Creation is successful", func() {
 			BeforeEach(func() {
 				fakeActor.CreateManagedServiceInstanceReturns(

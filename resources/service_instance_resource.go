@@ -39,6 +39,8 @@ type ServiceInstance struct {
 	UpgradeAvailable types.OptionalBoolean `json:"upgrade_available"`
 	// MaintenanceInfoVersion is the version this service is at
 	MaintenanceInfoVersion string `jsonry:"maintenance_info.version,omitempty"`
+	// Parameters passed to the broker
+	Parameters types.OptionalObject `jsonry:"parameters"`
 	// LastOperation is the last operation on the service instance
 	LastOperation LastOperation `jsonry:"last_operation"`
 }
