@@ -1,0 +1,8 @@
+---
+applications:
+- name: app-name
+  memory: 128M
+  instances: 1
+  host: hello
+  domain: app.example.com
+  path: path/to/app

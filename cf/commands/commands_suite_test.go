@@ -15,7 +15,7 @@ func TestCommands(t *testing.T) {
 	config := configuration.NewRepositoryWithDefaults()
 	i18n.T = i18n.Init(config)
 
-	_ = commands.Curl{}
+	_ = commands.API{}
 
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Commands Suite")

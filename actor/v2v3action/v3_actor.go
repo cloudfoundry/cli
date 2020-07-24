@@ -8,6 +8,7 @@ import (
 //go:generate counterfeiter . V3Actor
 
 type V3Actor interface {
+	ManifestV3Actor
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetOrganizationByName(orgName string) (v3action.Organization, v3action.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, v3action.Warnings, error)
