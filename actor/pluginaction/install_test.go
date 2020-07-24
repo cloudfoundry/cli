@@ -603,12 +603,12 @@ var _ = Describe("install actions", func() {
 			Describe("CLI v 8", func() {
 				BeforeEach(func() {
 					fakeConfig.BinaryVersionReturns("8.0.0")
-						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
-							Major: 2,
-							Minor: 0,
-							Build: 0,
-						}
-						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+						Major: 2,
+						Minor: 0,
+						Build: 0,
+					}
+					fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
 				})
 
 				When("the plugin is valid", func() {
