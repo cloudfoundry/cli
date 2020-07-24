@@ -1,6 +1,7 @@
 package commandsloader
 
 import (
+	"code.cloudfoundry.org/cli/cf/commands"
 	"code.cloudfoundry.org/cli/cf/commands/plugin"
 	"code.cloudfoundry.org/cli/cf/commands/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/commands/service"
@@ -19,6 +20,7 @@ get initialized
 ********************/
 
 func Load() {
+	_ = commands.API{}
 	_ = plugin.Plugins{}
 	_ = pluginrepo.RepoPlugins{}
 	_ = service.ShowService{}
