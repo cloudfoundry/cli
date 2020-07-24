@@ -7,6 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 var _ = Describe("create-service command", func() {
@@ -155,6 +158,47 @@ var _ = Describe("create-service command", func() {
 				))
 
 			})
+
+			When("creating with valid params json", func() {
+				parametersJSON := `{"valid":"json"}`
+				It("displays an informative success message, and creates the instance with parameters", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-c", parametersJSON)
+					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
+						serviceInstanceName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Say("%s", parametersJSON))
+				})
+			})
+
+			When("creating with valid params json in a file", func() {
+				var tempFilePath string
+				parametersJSON := `{"valid":"json"}`
+
+				BeforeEach(func() {
+					tempFilePath = helpers.TempFileWithContent(parametersJSON)
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(tempFilePath)).To(Succeed())
+				})
+
+				It("displays an informative success message, exits 0", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-c", tempFilePath)
+					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+						serviceInstanceName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Say("%s", parametersJSON))
+				})
+			})
+
 		})
 
 		When("there are two offerings with the same name from different brokers", func() {
@@ -212,6 +256,52 @@ var _ = Describe("create-service command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
+		When("invalid arguments are passed", func() {
+			When("with an invalid json for -c", func() {
+				It("displays an informative error message, exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", "{")
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 
+			When("the provided file contains invalid json", func() {
+				var tempFilePath string
+
+				BeforeEach(func() {
+					tempFilePath = helpers.TempFileWithContent(`{"invalid"}`)
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(tempFilePath)).To(Succeed())
+				})
+
+				It("displays an informative message and exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", tempFilePath)
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the provided file cannot be read", func() {
+				var emptyDir string
+
+				BeforeEach(func() {
+					var err error
+					emptyDir, err = ioutil.TempDir("", "")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(emptyDir)).To(Succeed())
+				})
+
+				It("displays an informative message and exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", filepath.Join(emptyDir, "non-existent-file"))
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
 	})
 })

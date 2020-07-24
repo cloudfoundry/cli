@@ -158,6 +158,7 @@ type ManagedServiceInstanceParams struct {
 	ServiceBrokerName   string
 	SpaceGUID           string
 	Tags                types.OptionalStringSlice
+	Parameters          types.OptionalObject
 }
 
 func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (Warnings, error) {
@@ -179,6 +180,7 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 		ServicePlanGUID: servicePlan.GUID,
 		SpaceGUID:       params.SpaceGUID,
 		Tags:            params.Tags,
+		Parameters:      params.Parameters,
 	}
 
 	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)

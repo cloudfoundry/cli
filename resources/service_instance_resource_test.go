@@ -63,6 +63,30 @@ var _ = Describe("service instance resource", func() {
 			}`,
 		),
 		Entry(
+			"parameters",
+			ServiceInstance{
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"tomato": "potato",
+					"baz":    true,
+				}),
+			},
+			`{
+				"parameters": {
+					"tomato": "potato",
+					"baz": true
+				}
+			}`,
+		),
+		Entry(
+			"parameters empty",
+			ServiceInstance{
+				Parameters: types.NewOptionalObject(map[string]interface{}{}),
+			},
+			`{
+				"parameters": {}
+			}`,
+		),
+		Entry(
 			"last operation",
 			ServiceInstance{
 				LastOperation: LastOperation{Type: CreateOperation, State: OperationInProgress},
@@ -89,7 +113,7 @@ var _ = Describe("service instance resource", func() {
 		),
 		Entry(
 			"plan guid",
-			ServiceInstance{PlanGUID: "fake-plan-guid"},
+			ServiceInstance{ServicePlanGUID: "fake-plan-guid"},
 			`{
 				"relationships": {
 					"service_plan": {
@@ -102,12 +126,12 @@ var _ = Describe("service instance resource", func() {
 		),
 		Entry(
 			"service offering guid",
-			ServiceInstance{ServicePlanGUID: "fake-service-plan-guid"},
+			ServiceInstance{ServiceOfferingGUID: "fake-service-offering-guid"},
 			`{
 				"relationships": {
-					"service_plan": {
+					"service_offering": {
 						"data": {
-							"guid": "fake-service-plan-guid"
+							"guid": "fake-service-offering-guid"
 						}
 					}
 				}
@@ -130,6 +154,7 @@ var _ = Describe("service instance resource", func() {
 				Name:                   "fake-space-guid",
 				SpaceGUID:              "fake-space-guid",
 				ServicePlanGUID:        "fake-service-plan-guid",
+				ServiceOfferingGUID:    "fake-service-offering-guid",
 				Tags:                   types.NewOptionalStringSlice("foo", "bar"),
 				SyslogDrainURL:         types.NewOptionalString("https://fake-syslog.com"),
 				RouteServiceURL:        types.NewOptionalString("https://fake-route.com"),
@@ -139,6 +164,10 @@ var _ = Describe("service instance resource", func() {
 				Credentials: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 					"baz": false,
+				}),
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"tomato": "potato",
+					"baz":    true,
 				}),
 				LastOperation: LastOperation{
 					Type:  "create",
@@ -161,24 +190,28 @@ var _ = Describe("service instance resource", func() {
 					"foo": "bar",
 					"baz": false
 				},
+				"parameters": {
+					"tomato": "potato",
+					"baz": true
+				},
 				"last_operation": {
 					"type": "create",
 					"state": "in progress"
 				},
 				"relationships": {
-					"space": {
-						"data": {
-							"guid": "fake-space-guid"
-						}
-					},
 					"service_plan": {
 						"data": {
 							"guid": "fake-service-plan-guid"
 						}
 					},
-					"service_plan": {
+					"space": {
 						"data": {
-							"guid": "fake-plan-guid"
+							"guid": "fake-space-guid"
+						}
+					},
+					"service_offering": {
+						"data": {
+							"guid": "fake-service-offering-guid"
 						}
 					}
 				}

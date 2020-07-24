@@ -761,6 +761,7 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings              Warnings
 			err                   error
 			fakeJobURL            = ccv3.JobURL("http://some-cc-api/v3/jobs/job-guid")
+			fakeParams            = types.NewOptionalObject(map[string]interface{}{"param1": "some-value", "param-2": "cool service"})
 		)
 
 		BeforeEach(func() {
@@ -781,6 +782,7 @@ var _ = Describe("Service Instance Actions", func() {
 				ServiceBrokerName:   fakeServiceBrokerName,
 				SpaceGUID:           fakeSpaceGUID,
 				Tags:                fakeTags,
+				Parameters:          fakeParams,
 			}
 			warnings, err = actor.CreateManagedServiceInstance(params)
 
@@ -799,11 +801,12 @@ var _ = Describe("Service Instance Actions", func() {
 		It("calls the client to create the instance", func() {
 			Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(1))
 			Expect(fakeCloudControllerClient.CreateServiceInstanceArgsForCall(0)).To(Equal(resources.ServiceInstance{
-				Type:      "managed",
-				Name:      fakeServiceInstanceName,
-				PlanGUID:  "fake-plan-guid",
-				SpaceGUID: fakeSpaceGUID,
-				Tags:      fakeTags,
+				Type:            "managed",
+				Name:            fakeServiceInstanceName,
+				ServicePlanGUID: "fake-plan-guid",
+				SpaceGUID:       fakeSpaceGUID,
+				Tags:            fakeTags,
+				Parameters:      fakeParams,
 			}))
 		})
 
