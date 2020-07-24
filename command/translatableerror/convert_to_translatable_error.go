@@ -11,8 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
-	"code.cloudfoundry.org/cli/util/manifest"
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -29,8 +27,6 @@ func ConvertToTranslatableError(err error) error {
 		return ApplicationNotStartedError(e)
 	case actionerror.AppNotFoundInManifestError:
 		return AppNotFoundInManifestError(e)
-	case v6manifestparser.AppNotInManifestError:
-		return AppNotFoundInManifestError(e)
 	case actionerror.AssignDropletError:
 		return AssignDropletError(e)
 	case actionerror.BuildpackNotFoundError:
@@ -43,8 +39,6 @@ func ConvertToTranslatableError(err error) error {
 		return DockerPasswordNotSetError{}
 	case actionerror.DomainNotFoundError:
 		return DomainNotFoundError(e)
-	case manifest.EmptyBuildpacksError:
-		return EmptyBuildpacksError(e)
 	case actionerror.EmptyArchiveError:
 		return EmptyDirectoryError(e)
 	case actionerror.EmptyDirectoryError:
@@ -82,8 +76,6 @@ func ConvertToTranslatableError(err error) error {
 	case actionerror.NoMatchingDomainError:
 		return NoMatchingDomainError(e)
 	case actionerror.NonexistentAppPathError:
-		return FileNotFoundError(e)
-	case v6manifestparser.InvalidManifestApplicationPathError:
 		return FileNotFoundError(e)
 	case actionerror.NoOrganizationTargetedError:
 		return NoOrganizationTargetedError(e)
@@ -190,22 +182,6 @@ func ConvertToTranslatableError(err error) error {
 	// JSON Errors
 	case *json.SyntaxError:
 		return JSONSyntaxError{Err: e}
-
-	// Manifest Errors
-	case manifest.ManifestCreationError:
-		return FileCreationError(e)
-	case manifest.InheritanceFieldError:
-		return TriggerLegacyPushError{InheritanceRelated: true}
-	case manifest.GlobalFieldsError:
-		return TriggerLegacyPushError{GlobalRelated: e.Fields}
-	case manifest.InterpolationError:
-		return InterpolationError(e)
-
-	// ManifestParser Errors
-	case v6manifestparser.InterpolationError:
-		return InterpolationError(e)
-	case v6manifestparser.InvalidYAMLError:
-		return InvalidYAMLError(e)
 
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:

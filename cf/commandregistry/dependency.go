@@ -14,12 +14,10 @@ import (
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/actors/servicebuilder"
 	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/manifest"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
@@ -39,8 +37,6 @@ type Dependency struct {
 	Config             coreconfig.Repository
 	RepoLocator        api.RepositoryLocator
 	PluginConfig       pluginconfig.PluginConfiguration
-	ManifestRepo       manifest.Repository
-	AppManifest        manifest.App
 	Gateways           map[string]net.Gateway
 	TeePrinter         *terminal.TeePrinter
 	PluginRepo         pluginrepo.PluginRepo
@@ -51,10 +47,6 @@ type Dependency struct {
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
 	WordGenerator      RandomWordGenerator
-	AppZipper          appfiles.Zipper
-	AppFiles           appfiles.AppFiles
-	PushActor          actors.PushActor
-	RouteActor         actors.RouteActor
 	ChecksumUtil       util.Sha1Checksum
 	WildcardDependency interface{} //use for injecting fakes
 	Logger             trace.Printer
@@ -90,9 +82,6 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 		errorHandler(err)
 	}
 	deps.Config = coreconfig.NewRepositoryFromFilepath(configPath, errorHandler)
-
-	deps.ManifestRepo = manifest.NewDiskRepository()
-	deps.AppManifest = manifest.NewGenerator()
 
 	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
 	deps.PluginConfig = pluginconfig.NewPluginConfig(
@@ -146,12 +135,6 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 	)
 
 	deps.WordGenerator = randomword.NewGenerator()
-
-	deps.AppZipper = appfiles.ApplicationZipper{}
-	deps.AppFiles = appfiles.ApplicationFiles{}
-
-	deps.RouteActor = actors.NewRouteActor(deps.UI, deps.RepoLocator.GetRouteRepository(), deps.RepoLocator.GetDomainRepository())
-	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles, deps.RouteActor)
 
 	deps.ChecksumUtil = util.NewSha1Checksum("")
 
