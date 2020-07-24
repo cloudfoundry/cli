@@ -10,7 +10,11 @@ xargs_func () {
   fi
 }
 
-CF_API=${CF_INT_API:-"api.bosh-lite.com"}
+if [[ -z $CF_INT_API ]]; then
+  echo "\$CF_INT_API is unset! Did you run 'int'?"
+fi
+
+CF_API=${CF_INT_API:-"NO-BOSH-LITE-SET"}
 export CF_USERNAME=${CF_INT_USERNAME:-"admin"}
 export CF_PASSWORD=${CF_INT_PASSWORD:-"admin"}
 
@@ -51,28 +55,19 @@ cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 
 cf delete-org -f temp-org
 
-if [[ $(cf version) == *"version 6"* ]]; then
-  cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $1, $6); } else { printf("cf delete-buildpack -f %s\n", $1); }}'
-else
-  cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $2, $3); } else { printf("cf delete-buildpack -f %s\n", $2); }}'
-fi | bash
+cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $2, $3); } else { printf("cf delete-buildpack -f %s\n", $2); }}'
 
-if [[ $(cf version) == *"version 6"* ]]; then
-  stack_version=2
-else
-  stack_version=3
-fi
 for stack in $(cf stacks | awk '/INTEGRATION-STACK/ { print $1 }'); do
   echo Deleting $stack
-  cf curl -X DELETE "/v${stack_version}/stacks/$(cf stack --guid $stack)"
+  cf curl -X DELETE "/v3/stacks/$(cf stack --guid $stack)"
 done
 
-CF_USERS=$(cf curl /v2/users | grep total_results | grep -o '[0-9]\+')
+CF_USERS=$(cf curl /v3/users | grep total_results | grep -o '[0-9]\+')
 USER_PAGES=$(( $CF_USERS / 50 + 1))
 
 for ((i=1; i<=${USER_PAGES}; i++)) ; do
-  cf curl "/v2/users?results-per-page=50&page=${i}" | \
-  jq -r .resources[].entity.username | \
+  cf curl "/v3/users?per_page=50&page=${i}" | \
+  jq -r .resources[].username | \
   grep -i -e ^integration-user -e CATS- | \
   xargs_func cf delete-user -f || echo
 done
