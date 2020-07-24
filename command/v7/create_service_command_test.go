@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	"errors"
@@ -131,10 +132,10 @@ var _ = Describe("create-service Command", func() {
 		})
 
 		When("there are user provided tags", func() {
-			var requestedTags []string
+			var requestedTags types.OptionalStringSlice
 
 			BeforeEach(func() {
-				requestedTags = []string{"tag-1", "tag-2"}
+				requestedTags = types.NewOptionalStringSlice("tag-1", "tag-2")
 				setFlag(&cmd, "-t", requestedTags)
 			})
 

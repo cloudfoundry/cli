@@ -247,7 +247,7 @@ var _ = Describe("service command", func() {
 						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
 						Say(`\n`),
 						Say(`status:\s+create in progress\n`),
-						Say(`message:\s*\n`),
+						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 						Say(`\n`),
