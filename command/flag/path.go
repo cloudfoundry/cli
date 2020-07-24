@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -56,7 +56,7 @@ func (p *ManifestPathWithExistenceCheck) UnmarshalFlag(path string) error {
 	}
 
 	if fileInfo.IsDir() {
-		locator := manifestparser.NewLocator()
+		locator := v6manifestparser.NewLocator()
 		pathToFile, existsInDirectory, err := locator.Path(path)
 		if err != nil {
 			return err
