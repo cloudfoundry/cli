@@ -106,6 +106,10 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 		if pluginLibraryMajorVersion > 1 {
 			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
 		}
+	case 8:
+		if pluginLibraryMajorVersion != 2 {
+			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
+		}
 	default:
 		panic("unrecognized major version")
 	}
