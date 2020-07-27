@@ -12,9 +12,10 @@ import (
 const featureFlagServiceInstanceSharing string = "service_instance_sharing"
 
 type SharedStatus struct {
-	FeatureFlagIsDisabled   bool
-	OfferingDisablesSharing bool
-	IsShared                bool
+	FeatureFlagIsDisabled     bool
+	OfferingDisablesSharing   bool
+	IsSharedToOtherSpaces     bool
+	IsSharedFromOriginalSpace bool
 }
 
 type ServiceInstanceParameters struct {
@@ -37,6 +38,8 @@ const (
 
 type ServiceInstanceDetails struct {
 	resources.ServiceInstance
+	SpaceName         string
+	OrganizationName  string
 	ServiceOffering   resources.ServiceOffering
 	ServicePlan       resources.ServicePlan
 	ServiceBrokerName string
@@ -58,7 +61,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.SharedStatus, warnings, err = actor.getServiceInstanceSharedStatus(serviceInstanceDetails)
+			serviceInstanceDetails.SharedStatus, warnings, err = actor.getServiceInstanceSharedStatus(serviceInstanceDetails, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -87,6 +90,14 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 			Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
 			Values: []string{"name", "guid"},
 		},
+		{
+			Key:    ccv3.FieldsSpace,
+			Values: []string{"name", "guid"},
+		},
+		{
+			Key:    ccv3.FieldsSpaceOrganization,
+			Values: []string{"name", "guid"},
+		},
 	}
 
 	serviceInstance, included, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
@@ -103,6 +114,8 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 		ServicePlan:       extractServicePlan(included),
 		ServiceOffering:   extractServiceOffering(included),
 		ServiceBrokerName: extractServiceBrokerName(included),
+		SpaceName:         extractSpaceName(included),
+		OrganizationName:  extractOrganizationName(included),
 	}
 
 	return result, warnings, nil
@@ -121,9 +134,13 @@ func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (Ser
 	return ServiceInstanceParameters{Value: params}, warnings
 }
 
-func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails) (SharedStatus, ccv3.Warnings, error) {
+func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {
 	if serviceInstanceDetails.Type != resources.ManagedServiceInstance {
 		return SharedStatus{}, nil, nil
+	}
+
+	if targetedSpace != serviceInstanceDetails.SpaceGUID {
+		return SharedStatus{IsSharedFromOriginalSpace: true}, nil, nil
 	}
 
 	var (
@@ -151,7 +168,7 @@ func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails Service
 	}
 
 	sharedStatus := SharedStatus{
-		IsShared:                len(sharedSpaces) > 0,
+		IsSharedToOtherSpaces:   len(sharedSpaces) > 0,
 		OfferingDisablesSharing: offeringDisablesSharing,
 		FeatureFlagIsDisabled:   !featureFlag.Enabled,
 	}
@@ -220,4 +237,20 @@ func extractServiceOffering(included ccv3.IncludedResources) resources.ServiceOf
 	}
 
 	return resources.ServiceOffering{}
+}
+
+func extractSpaceName(included ccv3.IncludedResources) string {
+	if len(included.Spaces) == 1 {
+		return included.Spaces[0].Name
+	}
+
+	return ""
+}
+
+func extractOrganizationName(included ccv3.IncludedResources) string {
+	if len(included.Organizations) == 1 {
+		return included.Organizations[0].Name
+	}
+
+	return ""
 }

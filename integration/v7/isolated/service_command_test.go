@@ -137,7 +137,7 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		When("the service instance is managed by a broker", func() {
+		FWhen("the service instance is managed by a broker", func() {
 			const (
 				testPollingInterval = time.Second
 				testTimeout         = time.Minute
@@ -343,6 +343,65 @@ var _ = Describe("service command", func() {
 					Expect(session).To(SatisfyAll(
 						Say(`Sharing:\n`),
 						Say(`This service instance is currently shared.\n`),
+					))
+				})
+			})
+
+			When("the instance is being accessed form shared to space", func() {
+				var sharedToSpaceName string
+
+				BeforeEach(func() {
+					sharedToSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(sharedToSpaceName)
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					output := func() *Buffer {
+						session := helpers.CF("service", serviceInstanceName)
+						session.Wait()
+						return session.Out
+					}
+
+					Eventually(output, testTimeout, testPollingInterval).Should(Say(`status:\s+create succeeded\n`))
+
+					command = []string{
+						"share-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.TargetOrgAndSpace(orgName, sharedToSpaceName)
+				})
+
+				AfterEach(func() {
+					helpers.TargetOrgAndSpace(orgName, spaceName)
+
+					command := []string{
+						"unshare-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+						"-f",
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.QuickDeleteSpace(sharedToSpaceName)
+				})
+
+				It("can show that the service has been shared", func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Sharing:\n`),
+						Say(`This service instance is shared from space %s of org %s.\n`, spaceName, orgName),
 					))
 				})
 			})
