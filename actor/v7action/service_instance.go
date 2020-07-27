@@ -59,7 +59,7 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 		jobURL   ccv3.JobURL
 	)
 
-	warnings, err := railway.Sequentially(
+	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
 			original, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
@@ -78,49 +78,33 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			if jobURL != "" {
-				warnings, err = actor.CloudControllerClient.PollJob(jobURL)
-			}
-			return
+			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
-	)
-
-	switch err.(type) {
-	case nil:
-	case ccerror.ServiceInstanceNotFoundError:
-		return Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
-	default:
-		return Warnings(warnings), err
-	}
-
-	return Warnings(warnings), nil
+	))
 }
 
 func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
-	var serviceInstance resources.ServiceInstance
-	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(currentServiceInstanceName, spaceGUID)
-	if err != nil {
-		return warnings, err
-	}
-
-	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateServiceInstance(
-		serviceInstance.GUID,
-		resources.ServiceInstance{Name: newServiceInstanceName},
+	var (
+		serviceInstance resources.ServiceInstance
+		jobURL          ccv3.JobURL
 	)
-	warnings = append(warnings, updateWarnings...)
-	if err != nil {
-		return warnings, err
-	}
 
-	if jobURL != "" {
-		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-		warnings = append(warnings, pollWarnings...)
-		if err != nil {
-			return warnings, err
-		}
-	}
-
-	return warnings, nil
+	return handleServiceInstanceErrors(railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(currentServiceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(
+				serviceInstance.GUID,
+				resources.ServiceInstance{Name: newServiceInstanceName},
+			)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
+		},
+	))
 }
 
 func (actor Actor) fetchServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, ccv3.IncludedResources, Warnings, error) {
@@ -194,4 +178,15 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 
 	return allWarnings, err
 
+}
+
+func handleServiceInstanceErrors(warnings ccv3.Warnings, err error) (Warnings, error) {
+	switch e := err.(type) {
+	case nil:
+		return Warnings(warnings), nil
+	case ccerror.ServiceInstanceNotFoundError:
+		return Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: e.Name}
+	default:
+		return Warnings(warnings), err
+	}
 }

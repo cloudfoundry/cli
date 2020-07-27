@@ -194,6 +194,19 @@ var _ = Describe("Job", func() {
 			fakeClock         *ccv3fakes.FakeClock
 		)
 
+		itSkipsEmptyURLs := func() {
+			When("the job URL is empty", func() {
+				BeforeEach(func() {
+					jobLocation = ""
+				})
+
+				It("immediately succeeds", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(BeEmpty())
+				})
+			})
+		}
+
 		itFinishesWhenCompleteOrFailed := func() {
 			When("the job starts queued and then finishes successfully", func() {
 				BeforeEach(func() {
@@ -254,6 +267,7 @@ var _ = Describe("Job", func() {
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 				})
 			})
+
 			When("the job starts queued and then fails", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
@@ -319,7 +333,6 @@ var _ = Describe("Job", func() {
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 				})
 			})
-
 		}
 
 		itRespectsTimeouts := func() {
@@ -420,24 +433,23 @@ var _ = Describe("Job", func() {
 		})
 
 		Describe("PollJob", func() {
-
 			JustBeforeEach(func() {
 				startTime = time.Now()
 				warnings, executeErr = client.PollJob(jobLocation)
 			})
 
+			itSkipsEmptyURLs()
 			itFinishesWhenCompleteOrFailed()
 			itRespectsTimeouts()
-
 		})
 
 		Describe("PollJobForState", func() {
-
 			JustBeforeEach(func() {
 				startTime = time.Now()
 				warnings, executeErr = client.PollJobForState(jobLocation, constant.JobPolling)
 			})
 
+			itSkipsEmptyURLs()
 			itFinishesWhenCompleteOrFailed()
 			itRespectsTimeouts()
 
