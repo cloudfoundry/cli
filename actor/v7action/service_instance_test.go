@@ -266,6 +266,7 @@ var _ = Describe("Service Instance Actions", func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{
 						Type: resources.ManagedServiceInstance,
+						Name: serviceInstanceName,
 						GUID: guid,
 					},
 					ccv3.IncludedResources{},
@@ -393,7 +394,10 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{
+						Tags:       types.NewOptionalStringSlice("foo", "bar"),
+						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					},
 				)
 
 				By("returning warnings and no error", func() {
@@ -413,7 +417,10 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
 					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
 					Expect(actualGUID).To(Equal(guid))
-					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
+						Tags:       types.NewOptionalStringSlice("foo", "bar"),
+						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					}))
 				})
 
 				By("specifying an empty job URL", func() {
@@ -452,7 +459,10 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{
+						Tags:       types.NewOptionalStringSlice("foo", "bar"),
+						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					},
 				)
 
 				By("returning warnings and no error", func() {
@@ -472,7 +482,10 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
 					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
 					Expect(actualGUID).To(Equal(guid))
-					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
+						Tags:       types.NewOptionalStringSlice("foo", "bar"),
+						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+					}))
 				})
 
 				By("polling the job", func() {
@@ -489,6 +502,7 @@ var _ = Describe("Service Instance Actions", func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{
 						Type: resources.UserProvidedServiceInstance,
+						Name: serviceInstanceName,
 						GUID: guid,
 					},
 					ccv3.IncludedResources{},
@@ -501,7 +515,7 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
 				Expect(warnings).To(ConsistOf("warning from get"))
 
@@ -526,7 +540,7 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
 				Expect(warnings).To(ConsistOf("warning from get"))
 				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{
@@ -549,7 +563,7 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
 				Expect(warnings).To(ConsistOf("warning from get"))
 				Expect(err).To(MatchError("bang"))
@@ -578,7 +592,7 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
 				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
 				Expect(err).To(MatchError("boom"))
@@ -613,7 +627,7 @@ var _ = Describe("Service Instance Actions", func() {
 				warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
-					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
+					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
 				Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
 				Expect(err).To(MatchError("boom"))

@@ -10,6 +10,11 @@ import (
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
+type ServiceInstanceUpdateManagedParams struct {
+	Tags       types.OptionalStringSlice
+	Parameters types.OptionalObject
+}
+
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
 	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	switch e := err.(type) {
@@ -32,32 +37,36 @@ func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.S
 }
 
 func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates resources.ServiceInstance) (Warnings, error) {
-	original, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
-	if err != nil {
-		return Warnings(warnings), err
-	}
+	var original resources.ServiceInstance
 
-	if original.Type != resources.UserProvidedServiceInstance {
-		return Warnings(warnings), actionerror.ServiceInstanceTypeError{
-			Name:         serviceInstanceName,
-			RequiredType: resources.UserProvidedServiceInstance,
-		}
-	}
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			original, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			err = assertServiceInstanceType(resources.UserProvidedServiceInstance, original)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			_, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
+			return
+		},
+	)
 
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
-	warnings = append(warnings, updateWarnings...)
-	if err != nil {
-		return Warnings(warnings), err
-	}
-
-	return Warnings(warnings), nil
+	return Warnings(warnings), err
 }
 
-func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates resources.ServiceInstance) (Warnings, error) {
+func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (Warnings, error) {
 	var (
 		original resources.ServiceInstance
 		jobURL   ccv3.JobURL
 	)
+
+	updates := resources.ServiceInstance{
+		Tags:       serviceInstanceUpdates.Tags,
+		Parameters: serviceInstanceUpdates.Parameters,
+	}
 
 	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
@@ -65,16 +74,11 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			if original.Type != resources.ManagedServiceInstance {
-				err = actionerror.ServiceInstanceTypeError{
-					Name:         serviceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				}
-			}
+			err = assertServiceInstanceType(resources.ManagedServiceInstance, original)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(original.GUID, serviceInstanceUpdates)
+			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(original.GUID, updates)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -178,6 +182,17 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 
 	return allWarnings, err
 
+}
+
+func assertServiceInstanceType(requiredType resources.ServiceInstanceType, instance resources.ServiceInstance) error {
+	if instance.Type != requiredType {
+		return actionerror.ServiceInstanceTypeError{
+			Name:         instance.Name,
+			RequiredType: requiredType,
+		}
+	}
+
+	return nil
 }
 
 func handleServiceInstanceErrors(warnings ccv3.Warnings, err error) (Warnings, error) {

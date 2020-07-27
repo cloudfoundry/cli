@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -395,6 +396,10 @@ var _ = Describe("update-service command", func() {
 			serviceInstanceName string
 		)
 
+		waitUntilUpdateComplete := func(serviceInstanceName string) {
+			Eventually(helpers.CF("service", serviceInstanceName)).Should(Say(`status:\s+update succeeded`))
+		}
+
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
@@ -454,9 +459,63 @@ var _ = Describe("update-service command", func() {
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
 
+				waitUntilUpdateComplete(serviceInstanceName)
 				session = helpers.CF("service", serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 				Expect(session.Out).To(Say(`tags:\s+%s`, newTags))
+			})
+
+			Describe("updating parameters", func() {
+				const (
+					validParams   = `{"funky":"chicken"}`
+					invalidParams = `{"funky":chicken"}`
+				)
+
+				checkParams := func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
+						Say(`\n`),
+						Say(`%s\n`, validParams),
+					))
+				}
+
+				It("accepts JSON on the command line", func() {
+					session := helpers.CF(command, serviceInstanceName, "-c", validParams)
+					Eventually(session).Should(Exit(0))
+
+					waitUntilUpdateComplete(serviceInstanceName)
+					checkParams()
+				})
+
+				It("rejects invalid JSON on the command line", func() {
+					session := helpers.CF(command, serviceInstanceName, "-c", invalidParams)
+					Eventually(session).Should(Exit(1))
+
+					Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.\n"))
+				})
+
+				It("accepts JSON from a file", func() {
+					path := helpers.TempFileWithContent(validParams)
+					defer os.Remove(path)
+
+					session := helpers.CF(command, serviceInstanceName, "-c", path, "-v")
+					Eventually(session).Should(Exit(0))
+
+					waitUntilUpdateComplete(serviceInstanceName)
+					checkParams()
+				})
+
+				It("rejects invalid JSON from a file", func() {
+					path := helpers.TempFileWithContent(invalidParams)
+					defer os.Remove(path)
+
+					session := helpers.CF(command, serviceInstanceName, "-c", path)
+					Eventually(session).Should(Exit(1))
+
+					Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.\n"))
+				})
 			})
 		})
 	})
