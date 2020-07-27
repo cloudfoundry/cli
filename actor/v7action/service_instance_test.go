@@ -1,7 +1,6 @@
 package v7action_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -9,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
@@ -395,19 +395,32 @@ var _ = Describe("Service Instance Actions", func() {
 					spaceGUID,
 					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
 
-				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-				Expect(actualName).To(Equal(serviceInstanceName))
-				Expect(actualSpaceGUID).To(Equal(spaceGUID))
-				Expect(actualQuery).To(BeEmpty())
+				By("returning warnings and no error", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				})
 
-				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-				Expect(actualGUID).To(Equal(guid))
-				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+				By("getting the service instance", func() {
+					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+					actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+					Expect(actualName).To(Equal(serviceInstanceName))
+					Expect(actualSpaceGUID).To(Equal(spaceGUID))
+					Expect(actualQuery).To(BeEmpty())
+				})
+
+				By("updating the service instance", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+					Expect(actualGUID).To(Equal(guid))
+					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+				})
+
+				By("specifying an empty job URL", func() {
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+					actualURL, _ := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(actualURL).To(BeEmpty())
+				})
 			})
 		})
 
@@ -429,7 +442,7 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from update"},
 					nil,
 				)
-				fakeCloudControllerClient.PollJobReturns(
+				fakeCloudControllerClient.PollJobForStateReturns(
 					ccv3.Warnings{"warning from poll"},
 					nil,
 				)
@@ -441,22 +454,33 @@ var _ = Describe("Service Instance Actions", func() {
 					spaceGUID,
 					resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
 
-				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-				Expect(actualName).To(Equal(serviceInstanceName))
-				Expect(actualSpaceGUID).To(Equal(spaceGUID))
-				Expect(actualQuery).To(BeEmpty())
+				By("returning warnings and no error", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
+				})
 
-				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-				actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-				Expect(actualGUID).To(Equal(guid))
-				Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+				By("getting the service instance", func() {
+					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+					actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+					Expect(actualName).To(Equal(serviceInstanceName))
+					Expect(actualSpaceGUID).To(Equal(spaceGUID))
+					Expect(actualQuery).To(BeEmpty())
+				})
 
-				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(jobURL))
+				By("updating the service instance", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+					Expect(actualGUID).To(Equal(guid))
+					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{Tags: types.NewOptionalStringSlice("foo", "bar")}))
+				})
+
+				By("polling the job", func() {
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+					actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(actualURL).To(Equal(jobURL))
+					Expect(actualState).To(Equal(constant.JobPolling))
+				})
 			})
 		})
 
@@ -494,7 +518,7 @@ var _ = Describe("Service Instance Actions", func() {
 					resources.ServiceInstance{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
-					ccerror.ServiceInstanceNotFoundError{},
+					ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
 			})
 
@@ -579,7 +603,7 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from update"},
 					nil,
 				)
-				fakeCloudControllerClient.PollJobReturns(
+				fakeCloudControllerClient.PollJobForStateReturns(
 					ccv3.Warnings{"warning from poll"},
 					errors.New("boom"),
 				)
@@ -668,21 +692,23 @@ var _ = Describe("Service Instance Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.PollJobReturns(
+				fakeCloudControllerClient.PollJobForStateReturns(
 					ccv3.Warnings{"some-poll-job-warning"},
 					nil,
 				)
 			})
 
 			It("waits on the job", func() {
-				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(BeEquivalentTo(job))
+				Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+				actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+				Expect(actualURL).To(Equal(actualURL))
+				Expect(actualState).To(Equal(constant.JobPolling))
 				Expect(warnings).To(ContainElement("some-poll-job-warning"))
 			})
 
 			When("polling the job returns an error", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.PollJobReturns(
+					fakeCloudControllerClient.PollJobForStateReturns(
 						ccv3.Warnings{"some-poll-job-warning"},
 						errors.New("bad polling issue"),
 					)

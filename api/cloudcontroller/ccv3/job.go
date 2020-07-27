@@ -100,6 +100,10 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 }
 
 func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (Warnings, error) {
+	if jobURL == "" {
+		return nil, nil
+	}
+
 	var (
 		err         error
 		warnings    Warnings
