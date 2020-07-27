@@ -63,6 +63,7 @@ type commandList struct {
 	DeleteRoute                        v7.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v7.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
 	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
+	DeleteServiceV3                    v7.DeleteServiceCommand                      `command:"v3-delete-service" alias:"ds" description:"Delete a service instance"`
 	DeleteServiceBroker                v7.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
 	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
 	DeleteSharedDomain                 v7.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
@@ -188,7 +189,7 @@ type commandList struct {
 	UpdateOrgQuota                     v7.UpdateOrgQuotaCommand                     `command:"update-org-quota" alias:"update-quota" description:"Update an existing organization quota"`
 	UpdateSecurityGroup                v7.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
 	UpdateService                      v6.UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
-	UpdateServiceV8                    v7.UpdateServiceCommand                      `command:"v3-update-service" description:"Update a service instance"`
+	UpdateServiceV3                    v7.UpdateServiceCommand                      `command:"v3-update-service" description:"Update a service instance"`
 	UpdateServiceBroker                v7.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateSpaceQuota                   v7.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
 	UpdateUserProvidedService          v7.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
