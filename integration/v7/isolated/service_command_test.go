@@ -137,7 +137,7 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		FWhen("the service instance is managed by a broker", func() {
+		When("the service instance is managed by a broker", func() {
 			const (
 				testPollingInterval = time.Second
 				testTimeout         = time.Minute
