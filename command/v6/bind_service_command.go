@@ -70,7 +70,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	serviceBinding, warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName.Value, cmd.ParametersAsJSON)
+	serviceBinding, warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName.Value, cmd.ParametersAsJSON.Value)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isTakenError := err.(ccerror.ServiceBindingTakenError); isTakenError {

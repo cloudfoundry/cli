@@ -104,5 +104,10 @@ func (c *BrokerConfigurationStore) RetrieveServiceInstance(brokerGUID string, se
 		return resources.ServiceInstanceDetails{}, fmt.Errorf("service broker not found: %s", brokerGUID)
 	}
 
-	return entry.state.instances[serviceInstanceGUID], nil
+	instance, ok := entry.state.instances[serviceInstanceGUID]
+	if !ok {
+		return resources.ServiceInstanceDetails{}, fmt.Errorf("service instance %s not found for broker %s", serviceInstanceGUID, brokerGUID)
+	}
+
+	return instance, nil
 }

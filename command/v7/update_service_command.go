@@ -1,25 +1,26 @@
 package v7
 
 import (
+	"errors"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/v7action"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
 type UpdateServiceCommand struct {
 	BaseCommand
 
-	RequiredArgs     flag.ServiceInstance `positional-args:"yes"`
-	ParametersAsJSON flag.Path            `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	Plan             flag.OptionalString  `short:"p" description:"Change service plan for a service instance"`
-	Tags             flag.Tags            `short:"t" description:"User provided tags"`
-	Upgrade          bool                 `short:"u" long:"upgrade" description:"Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t."`
-	ForceUpgrade     bool                 `short:"f" long:"force" description:"Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade."`
+	RequiredArgs flag.ServiceInstance          `positional-args:"yes"`
+	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
+	Plan         flag.OptionalString           `short:"p" description:"Change service plan for a service instance"`
+	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
+	Upgrade      bool                          `short:"u" long:"upgrade" description:"Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t."`
+	ForceUpgrade bool                          `short:"f" long:"force" description:"Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade."`
 
 	relatedCommands interface{} `related_commands:"rename-service, services, update-user-provided-service"`
 }
@@ -41,7 +42,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	changes, _, err := cmd.processInput()
+	_, err := cmd.processParameters()
 	if err != nil {
 		return err
 	}
@@ -49,7 +50,10 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
 		cmd.RequiredArgs.ServiceInstance,
 		cmd.Config.TargetedSpace().GUID,
-		changes,
+		v7action.ServiceInstanceUpdateManagedParams{
+			Tags:       types.OptionalStringSlice(cmd.Tags),
+			Parameters: types.OptionalObject(cmd.Parameters),
+		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	switch err.(type) {
@@ -119,13 +123,10 @@ func (cmd UpdateServiceCommand) displayIntro() error {
 	return nil
 }
 
-func (cmd UpdateServiceCommand) processInput() (resources.ServiceInstance, serviceInstanceUpdateType, error) {
-	var changes resources.ServiceInstance
-
-	if cmd.Tags.IsSet {
-		changes.Tags = types.OptionalStringSlice(cmd.Tags)
-		return changes, serviceInstanceUpdate, nil
+func (cmd UpdateServiceCommand) processParameters() (serviceInstanceUpdateType, error) {
+	if cmd.Tags.IsSet || cmd.Parameters.IsSet {
+		return serviceInstanceUpdate, nil
 	}
 
-	return resources.ServiceInstance{}, serviceInstanceNoUpdate, errors.New("not implemented")
+	return serviceInstanceNoUpdate, errors.New("not implemented")
 }

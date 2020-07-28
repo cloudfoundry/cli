@@ -125,19 +125,6 @@ var _ = Describe("service instance resource", func() {
             }`,
 		),
 		Entry(
-			"service offering guid",
-			ServiceInstance{ServiceOfferingGUID: "fake-service-offering-guid"},
-			`{
-				"relationships": {
-					"service_offering": {
-						"data": {
-							"guid": "fake-service-offering-guid"
-						}
-					}
-				}
-            }`,
-		),
-		Entry(
 			"maintenance info version",
 			ServiceInstance{MaintenanceInfoVersion: "3.2.1"},
 			`{
@@ -154,7 +141,6 @@ var _ = Describe("service instance resource", func() {
 				Name:                   "fake-space-guid",
 				SpaceGUID:              "fake-space-guid",
 				ServicePlanGUID:        "fake-service-plan-guid",
-				ServiceOfferingGUID:    "fake-service-offering-guid",
 				Tags:                   types.NewOptionalStringSlice("foo", "bar"),
 				SyslogDrainURL:         types.NewOptionalString("https://fake-syslog.com"),
 				RouteServiceURL:        types.NewOptionalString("https://fake-route.com"),
@@ -207,11 +193,6 @@ var _ = Describe("service instance resource", func() {
 					"space": {
 						"data": {
 							"guid": "fake-space-guid"
-						}
-					},
-					"service_offering": {
-						"data": {
-							"guid": "fake-service-offering-guid"
 						}
 					}
 				}

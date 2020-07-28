@@ -64,7 +64,7 @@ func (cmd CreateServiceKeyCommand) Execute(args []string) error {
 			"User":                user.Name,
 		})
 
-	_, warnings, err := cmd.Actor.CreateServiceKey(serviceInstanceName, keyName, cmd.Config.TargetedSpace().GUID, cmd.ParametersAsJSON)
+	_, warnings, err := cmd.Actor.CreateServiceKey(serviceInstanceName, keyName, cmd.Config.TargetedSpace().GUID, cmd.ParametersAsJSON.Value)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isTakenError := err.(ccerror.ServiceKeyTakenError); isTakenError {

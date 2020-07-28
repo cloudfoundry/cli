@@ -2870,12 +2870,12 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateManagedServiceInstanceStub        func(string, string, resources.ServiceInstance) (v7action.Warnings, error)
+	UpdateManagedServiceInstanceStub        func(string, string, v7action.ServiceInstanceUpdateManagedParams) (v7action.Warnings, error)
 	updateManagedServiceInstanceMutex       sync.RWMutex
 	updateManagedServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 resources.ServiceInstance
+		arg3 v7action.ServiceInstanceUpdateManagedParams
 	}
 	updateManagedServiceInstanceReturns struct {
 		result1 v7action.Warnings
@@ -15502,13 +15502,13 @@ func (fake *FakeActor) UpdateDomainLabelsByDomainNameReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstance(arg1 string, arg2 string, arg3 resources.ServiceInstance) (v7action.Warnings, error) {
+func (fake *FakeActor) UpdateManagedServiceInstance(arg1 string, arg2 string, arg3 v7action.ServiceInstanceUpdateManagedParams) (v7action.Warnings, error) {
 	fake.updateManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.updateManagedServiceInstanceReturnsOnCall[len(fake.updateManagedServiceInstanceArgsForCall)]
 	fake.updateManagedServiceInstanceArgsForCall = append(fake.updateManagedServiceInstanceArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 resources.ServiceInstance
+		arg3 v7action.ServiceInstanceUpdateManagedParams
 	}{arg1, arg2, arg3})
 	fake.recordInvocation("UpdateManagedServiceInstance", []interface{}{arg1, arg2, arg3})
 	fake.updateManagedServiceInstanceMutex.Unlock()
@@ -15528,13 +15528,13 @@ func (fake *FakeActor) UpdateManagedServiceInstanceCallCount() int {
 	return len(fake.updateManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstanceCalls(stub func(string, string, resources.ServiceInstance) (v7action.Warnings, error)) {
+func (fake *FakeActor) UpdateManagedServiceInstanceCalls(stub func(string, string, v7action.ServiceInstanceUpdateManagedParams) (v7action.Warnings, error)) {
 	fake.updateManagedServiceInstanceMutex.Lock()
 	defer fake.updateManagedServiceInstanceMutex.Unlock()
 	fake.UpdateManagedServiceInstanceStub = stub
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstanceArgsForCall(i int) (string, string, resources.ServiceInstance) {
+func (fake *FakeActor) UpdateManagedServiceInstanceArgsForCall(i int) (string, string, v7action.ServiceInstanceUpdateManagedParams) {
 	fake.updateManagedServiceInstanceMutex.RLock()
 	defer fake.updateManagedServiceInstanceMutex.RUnlock()
 	argsForCall := fake.updateManagedServiceInstanceArgsForCall[i]

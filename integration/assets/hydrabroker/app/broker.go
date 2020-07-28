@@ -171,7 +171,7 @@ func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter
 }
 
 func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, _, err := brokerParseHeaders(store, r)
+	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
@@ -179,6 +179,21 @@ func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 	if config.UpdateResponse != 0 {
 		w.WriteHeader(config.UpdateResponse)
 		return nil
+	}
+
+	_, err = store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return nil
+	}
+
+	var details resources.ServiceInstanceDetails
+	if err := json.NewDecoder(r.Body).Decode(&details); err != nil {
+		return newBadRequestError("invalid JSON", err)
+	}
+
+	if err := store.CreateServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
+		return err
 	}
 
 	switch config.AsyncResponseDelay {
@@ -211,13 +226,19 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 }
 
 func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, _, err := brokerParseHeaders(store, r)
+	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
 
 	if config.BindResponse != 0 {
 		w.WriteHeader(config.BindResponse)
+		return nil
+	}
+
+	_, err = store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		return nil
 	}
 

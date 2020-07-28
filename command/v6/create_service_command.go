@@ -77,7 +77,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		cmd.RequiredArgs.ServicePlan,
 		cmd.RequiredArgs.ServiceInstance,
 		cmd.ServiceBroker,
-		cmd.ParametersAsJSON,
+		cmd.ParametersAsJSON.Value,
 		cmd.Tags.Value,
 	)
 

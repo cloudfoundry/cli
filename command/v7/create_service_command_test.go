@@ -1,6 +1,8 @@
 package v7_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -10,7 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -158,7 +159,7 @@ var _ = Describe("create-service Command", func() {
 
 			BeforeEach(func() {
 				requestedParams = map[string]interface{}{"param-1": "value-1", "param-2": "value-2"}
-				setFlag(&cmd, "-c", requestedParams)
+				setFlag(&cmd, "-c", types.NewOptionalObject(requestedParams))
 			})
 
 			It("passes the right parameters to the actor", func() {

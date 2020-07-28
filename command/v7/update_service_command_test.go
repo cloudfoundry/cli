@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -80,16 +79,6 @@ var _ = Describe("update-service command", func() {
 		Expect(spaceChecked).To(BeTrue())
 	})
 
-	When("parameters are set", func() {
-		BeforeEach(func() {
-			setFlag(&cmd, "-c", flag.Path("stuff"))
-		})
-
-		It("fails", func() {
-			Expect(executeErr).To(MatchError("not implemented"))
-		})
-	})
-
 	When("plan is set", func() {
 		BeforeEach(func() {
 			setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: "coolplan"})
@@ -100,9 +89,13 @@ var _ = Describe("update-service command", func() {
 		})
 	})
 
-	When("tags are set", func() {
+	Describe("updates", func() {
 		BeforeEach(func() {
 			setFlag(&cmd, "-t", flag.Tags{IsSet: true, Value: []string{"foo", "bar"}})
+			setFlag(&cmd, "-c", flag.JSONOrFileWithValidation{
+				IsSet: true,
+				Value: map[string]interface{}{"baz": "quz"},
+			})
 		})
 
 		It("does not return an error", func() {
@@ -124,8 +117,9 @@ var _ = Describe("update-service command", func() {
 			actualName, actualSpaceGUID, actualUpdates := fakeActor.UpdateManagedServiceInstanceArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
-			Expect(actualUpdates).To(Equal(resources.ServiceInstance{
-				Tags: types.NewOptionalStringSlice("foo", "bar"),
+			Expect(actualUpdates).To(Equal(v7action.ServiceInstanceUpdateManagedParams{
+				Tags:       types.NewOptionalStringSlice("foo", "bar"),
+				Parameters: types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
 			}))
 		})
 

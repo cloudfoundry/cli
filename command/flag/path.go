@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	"github.com/jessevdk/go-flags"
 )
@@ -77,7 +78,7 @@ func (p *ManifestPathWithExistenceCheck) UnmarshalFlag(path string) error {
 	return nil
 }
 
-type JSONOrFileWithValidation map[string]interface{}
+type JSONOrFileWithValidation types.OptionalObject
 
 func (JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
@@ -101,13 +102,11 @@ func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
 		jsonBytes = []byte(pathOrJSON)
 	}
 
-	var jsonMap map[string]interface{}
-
-	if jsonIsInvalid := json.Unmarshal(jsonBytes, &jsonMap); jsonIsInvalid != nil {
+	if jsonIsInvalid := json.Unmarshal(jsonBytes, &p.Value); jsonIsInvalid != nil {
 		return errorToReturn
 	}
 
-	*p = JSONOrFileWithValidation(jsonMap)
+	p.IsSet = true
 	return nil
 }
 

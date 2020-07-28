@@ -131,7 +131,7 @@ var _ = Describe("create-service Command", func() {
 
 			Context("the user passes in parameters", func() {
 				BeforeEach(func() {
-					cmd.ParametersAsJSON = map[string]interface{}{
+					cmd.ParametersAsJSON.Value = map[string]interface{}{
 						"some-key": "some-value",
 					}
 				})

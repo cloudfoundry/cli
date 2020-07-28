@@ -147,7 +147,7 @@ var _ = Describe("create-service-key Command", func() {
 
 				BeforeEach(func() {
 					params = map[string]interface{}{"foo": "bar"}
-					cmd.ParametersAsJSON = params
+					cmd.ParametersAsJSON.Value = params
 				})
 
 				It("behaves as usual, passing on the params", func() {

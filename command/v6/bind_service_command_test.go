@@ -44,7 +44,7 @@ var _ = Describe("bind-service Command", func() {
 
 		cmd.RequiredArgs.AppName = "some-app"
 		cmd.RequiredArgs.ServiceInstanceName = "some-service"
-		cmd.ParametersAsJSON = map[string]interface{}{
+		cmd.ParametersAsJSON.Value = map[string]interface{}{
 			"some-parameter": "some-value",
 		}
 

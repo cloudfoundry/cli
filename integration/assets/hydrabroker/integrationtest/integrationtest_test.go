@@ -174,6 +174,38 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 				fromJSON(response.Body, &instance)
 				Expect(instance.Parameters).To(Equal(parameters))
 			})
+
+			It("allows a service instance to be updated", func() {
+				By("trying to update the parameters")
+
+				parameters = map[string]interface{}{"bar": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PATCH", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+				expectStatusCode(response, http.StatusOK)
+
+				By("checking the update happened")
+				response = httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var instance apiresponses.GetInstanceResponse
+				fromJSON(response.Body, &instance)
+				Expect(instance.Parameters).To(Equal(parameters))
+			})
+
+			It("allows a binding to be created", func() {
+				bindingGUID := randomString()
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
+				expectStatusCode(response, http.StatusCreated)
+
+				var r map[string]interface{}
+				fromJSON(response.Body, &r)
+				Expect(r).To(BeEmpty())
+			})
 		})
 
 		It("allows a service instance to be deleted", func() {
@@ -186,23 +218,20 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 			Expect(r).To(BeEmpty())
 		})
 
-		It("allows a service instance to be updated", func() {
+		It("does not allow a service instance to be updated", func() {
 			instanceGUID := randomString()
 
 			cfg.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "1.2.3"}
 			response := httpRequest(cfg, "PATCH", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(cfg))
-			expectStatusCode(response, http.StatusOK)
+			expectStatusCode(response, http.StatusNotFound)
 		})
 
-		It("allows a binding to be created", func() {
+		It("does not allow a binding to be created", func() {
 			instanceGUID := randomString()
 			bindingGUID := randomString()
 			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
-			expectStatusCode(response, http.StatusCreated)
+			expectStatusCode(response, http.StatusNotFound)
 
-			var r map[string]interface{}
-			fromJSON(response.Body, &r)
-			Expect(r).To(BeEmpty())
 		})
 
 		It("allows a binding to be retrieved", func() {
@@ -431,32 +460,63 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 			})
 		})
 
-		It("does async bind", func() {
-			var operation string
-			instanceGUID := randomString()
-			bindingGUID := randomString()
+		When("a service instance exists", func() {
+			var (
+				instanceGUID string
+				parameters   map[string]interface{}
+			)
 
-			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
+			BeforeEach(func() {
+				instanceGUID = randomString()
+				parameters = map[string]interface{}{"foo": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					PlanID:     cfg.Services[0].Plans[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", toJSON(request))
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
 				fromJSON(response.Body, &provisionResponse)
-				operation = provisionResponse.OperationData
-			})
 
-			By("responding that the operation is still in progress", func() {
-				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
-				Expect(state).To(Equal("in progress"))
-				Expect(description).To(Equal("very happy service"))
-			})
+				time.Sleep(delay)
 
-			time.Sleep(delay)
-
-			By("responding that the operation is complete", func() {
-				state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+				state, _ := getInstanceLastOperation(cfg, guid, instanceGUID, provisionResponse.OperationData)
 				Expect(state).To(Equal("succeeded"))
-				Expect(description).To(Equal("very happy service"))
+
+			})
+
+			It("does async bind", func() {
+				var operation string
+
+				bindingGUID := randomString()
+
+				By("accepting the request", func() {
+
+					response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
+					expectStatusCode(response, http.StatusAccepted)
+
+					var provisionResponse apiresponses.ProvisioningResponse
+					fromJSON(response.Body, &provisionResponse)
+					operation = provisionResponse.OperationData
+				})
+
+				By("responding that the operation is still in progress", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("in progress"))
+					Expect(description).To(Equal("very happy service"))
+				})
+
+				time.Sleep(delay)
+
+				By("responding that the operation is complete", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("succeeded"))
+					Expect(description).To(Equal("very happy service"))
+				})
 			})
 		})
 

@@ -74,7 +74,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 			ServiceBrokerName:   cmd.ServiceBroker,
 			SpaceGUID:           cmd.Config.TargetedSpace().GUID,
 			Tags:                types.OptionalStringSlice(cmd.Tags),
-			Parameters:          types.NewOptionalObject(cmd.ParametersAsJSON),
+			Parameters:          types.OptionalObject(cmd.ParametersAsJSON),
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
