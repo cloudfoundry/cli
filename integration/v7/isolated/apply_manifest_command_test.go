@@ -185,8 +185,13 @@ var _ = Describe("apply-manifest command", func() {
 		})
 
 		When("-f is not provided", func() {
-			When("a properly formatted manifest is present in the pwd", func() {
-				It("autodetects and applies the manifest", func() {
+			FWhen("a properly formatted manifest is present in the pwd", func() {
+
+				var (
+					session      *Session
+					formatString string
+				)
+				BeforeEach(func() {
 					userName, _ := helpers.GetCredentials()
 					helpers.WriteManifest(filepath.Join(appDir, "manifest.yml"), map[string]interface{}{
 						"applications": []map[string]interface{}{
@@ -197,14 +202,22 @@ var _ = Describe("apply-manifest command", func() {
 						},
 					})
 
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "apply-manifest")
-					formatString := fmt.Sprintf("Applying manifest %%s in org %s / space %s as %s...", orgName, spaceName, userName)
-					Eventually(session).Should(helpers.SayPath(formatString, manifestPath))
+					formatString = fmt.Sprintf("Applying manifest %%s in org %s / space %s as %s...", orgName, spaceName, userName)
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "apply-manifest")
 					Eventually(session).Should(Exit())
+				})
+				It("autodetects and applies the manifest", func() {
+					Expect(session).To(helpers.SayPath(formatString, manifestPath))
 
 					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say(`instances:\s+%s`, `\d/3`))
-					Eventually(session).Should(Exit())
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(`instances:\s+%s`, `\d/3`))
+				})
+
+				It("outputs the diff between the manifests", func() {
+					Expect(session).To(Say("---"))
+					Expect(session).To(Say("-  instances: 1"))
+					Expect(session).To(Say("+  instances: 3"))
 				})
 			})
 

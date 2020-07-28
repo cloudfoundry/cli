@@ -15,23 +15,43 @@ var _ = Describe("Application Manifest", func() {
 	var (
 		client    *Client
 		requester *ccv3fakes.FakeRequester
-	)
+		appGUID   string
 
+		spaceGUID   string
+		rawManifest []byte
+		warnings    Warnings
+		executeErr  error
+
+		expectedYAML []byte
+	)
 	BeforeEach(func() {
 		requester = new(ccv3fakes.FakeRequester)
 		client, _ = NewFakeRequesterTestClient(requester)
 	})
 
+	Describe("GetSpaceManifestDiff", func() {
+
+		BeforeEach(func() {
+			spaceGUID = "sarahs-favorite-space-guid"
+
+		})
+		JustBeforeEach(func() {
+			_, warnings, executeErr = client.GetSpaceManifestDiff(spaceGUID, nil)
+			expectedYAML = []byte("---\n- banana")
+			requester.MakeRequestReceiveRawReturns(expectedYAML, Warnings{"this is a warning"}, nil)
+		})
+		When("getting the manifest diff is successful", func() {
+			It("makes the correct request", func() {
+				Expect(requester.MakeRequestReceiveRawCallCount()).To(Equal(1))
+				requestName, uriParams, responseBody := requester.MakeRequestReceiveRawArgsForCall(0)
+				Expect(requestName).To(Equal(internal.GetSpaceManifestDiffRequest))
+				Expect(uriParams).To(Equal(internal.Params{"space_guid": spaceGUID}))
+				Expect(responseBody).To(Equal("application/x-yaml"))
+			})
+		})
+	})
+
 	Describe("GetApplicationManifest", func() {
-		var (
-			appGUID string
-
-			rawManifest []byte
-			warnings    Warnings
-			executeErr  error
-
-			expectedYAML []byte
-		)
 
 		BeforeEach(func() {
 			appGUID = "some-app-guid"

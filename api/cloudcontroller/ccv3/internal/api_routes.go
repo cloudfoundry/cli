@@ -87,6 +87,7 @@ const (
 	GetServicePlansRequest                                      = "GetServicePlans"
 	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
+	GetSpaceManifestDiffRequest                                 = "GetSpaceManifestDiff"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
 	GetSpaceRunningSecurityGroupsRequest                        = "GetSpaceRunningSecurityGroups"
 	GetSpacesRequest                                            = "GetSpaces"
@@ -296,6 +297,7 @@ var APIRoutes = map[string]Route{
 	DeleteSpaceRequest:                                          {Path: "/v3/spaces/:space_guid", Method: http.MethodDelete},
 	PatchSpaceRequest:                                           {Path: "/v3/spaces/:space_guid", Method: http.MethodPatch},
 	PostSpaceActionApplyManifestRequest:                         {Path: "/v3/spaces/:space_guid/actions/apply_manifest", Method: http.MethodPost},
+	GetSpaceManifestDiffRequest:                                 {Path: "/v3/spaces/:space_guid/manifest_diff", Method: http.MethodPost},
 	GetSpaceRelationshipIsolationSegmentRequest:                 {Path: "/v3/spaces/:space_guid/relationships/isolation_segment", Method: http.MethodGet},
 	PatchSpaceRelationshipIsolationSegmentRequest:               {Path: "/v3/spaces/:space_guid/relationships/isolation_segment", Method: http.MethodPatch},
 	DeleteOrphanedRoutesRequest:                                 {Path: "/v3/spaces/:space_guid/routes", Method: http.MethodDelete},
