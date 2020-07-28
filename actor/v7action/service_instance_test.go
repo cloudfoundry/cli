@@ -796,15 +796,20 @@ var _ = Describe("Service Instance Actions", func() {
 		)
 
 		var (
-			fakeServiceBrokerName = "fake-broker-name"
-			fakeTags              = types.NewOptionalStringSlice("tag1", "tag2")
+			fakeServiceBrokerName string
+			fakeTags              types.OptionalStringSlice
 			warnings              Warnings
 			err                   error
-			fakeJobURL            = ccv3.JobURL("http://some-cc-api/v3/jobs/job-guid")
-			fakeParams            = types.NewOptionalObject(map[string]interface{}{"param1": "some-value", "param-2": "cool service"})
+			fakeJobURL            ccv3.JobURL
+			fakeParams            types.OptionalObject
 		)
 
 		BeforeEach(func() {
+			fakeServiceBrokerName = "fake-broker-name"
+			fakeTags = types.NewOptionalStringSlice("tag1", "tag2")
+			fakeJobURL = "http://some-cc-api/v3/jobs/job-guid"
+			fakeParams = types.NewOptionalObject(map[string]interface{}{"param1": "some-value", "param-2": "cool service"})
+
 			fakeCloudControllerClient.GetServicePlansReturns(
 				[]resources.ServicePlan{{GUID: "fake-plan-guid"}},
 				ccv3.Warnings{"plan-warning"},
@@ -827,6 +832,7 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings, err = actor.CreateManagedServiceInstance(params)
 
 		})
+
 		It("gets the service plan", func() {
 			Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 			query := fakeCloudControllerClient.GetServicePlansArgsForCall(0)
