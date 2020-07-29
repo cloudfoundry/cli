@@ -154,7 +154,7 @@ func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter
 
 	details, err := store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
-		return err
+		return notFoundError{}
 	}
 
 	parameters := details.Parameters
@@ -183,8 +183,7 @@ func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 
 	_, err = store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return nil
+		return notFoundError{}
 	}
 
 	var details resources.ServiceInstanceDetails

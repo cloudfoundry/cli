@@ -47,7 +47,9 @@ func (c *BrokerConfigurationStore) UpdateBroker(guid string, cfg config.BrokerCo
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.data[guid] = brokerStoreEntry{config: cfg}
+	brokerEntry := c.data[guid]
+	brokerEntry.config = cfg
+	c.data[guid] = brokerEntry
 }
 
 func (c *BrokerConfigurationStore) DeleteBroker(guid string) {

@@ -285,6 +285,15 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 		It("allows the broker to be reconfigured", func() {
 			newCfg := randomConfiguration()
 
+			instanceGUID := randomString()
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
+
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+			expectStatusCode(response, http.StatusCreated)
+
 			By("accepting the reconfigure request", func() {
 				request, err := http.NewRequest("PUT", server.URL+"/config/"+guid, toJSON(newCfg))
 				Expect(err).NotTo(HaveOccurred())
@@ -300,6 +309,11 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 				var catalog apiresponses.CatalogResponse
 				fromJSON(response.Body, &catalog)
 				Expect(catalog.Services[0].Name).To(Equal(newCfg.Services[0].Name))
+			})
+
+			By("retaining information about service instances", func() {
+				response := httpRequest(newCfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
 			})
 		})
 	})

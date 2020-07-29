@@ -24,7 +24,7 @@ func configCreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWr
 	return respondWithJSON(w, config.NewBrokerResponse{GUID: guid})
 }
 
-func configRecreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configUpdateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
 	c, err := configParse(r.Body)
 	if err != nil {
 		return err

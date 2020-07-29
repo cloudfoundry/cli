@@ -24,7 +24,7 @@ func App() *mux.Router {
 	r.HandleFunc("/config", handle(configCreateBroker)).Methods("POST")
 	r.HandleFunc("/config", handle(configListBrokers)).Methods("GET")
 	r.HandleFunc("/config/{broker_guid}", handle(configDeleteBroker)).Methods("DELETE")
-	r.HandleFunc("/config/{broker_guid}", handle(configRecreateBroker)).Methods("PUT")
+	r.HandleFunc("/config/{broker_guid}", handle(configUpdateBroker)).Methods("PUT")
 
 	r.HandleFunc("/broker/{broker_guid}/v2/catalog", handle(brokerCatalog)).Methods("GET")
 	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerProvision)).Methods("PUT")
