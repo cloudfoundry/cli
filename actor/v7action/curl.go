@@ -40,7 +40,7 @@ func (actor Actor) MakeCurlRequest(
 		}
 	}
 
-	responseBody, httpResponse, err := actor.CloudControllerClient.MakeRequestSendReceiveRaw(
+	responseBody, httpResponse, err := actor.CloudControllerClient.MakeRequestSendReceiveRawByUrl(
 		method,
 		url,
 		requestHeaders,

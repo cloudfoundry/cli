@@ -27,6 +27,388 @@ var _ = Describe("shared request helpers", func() {
 		client, _ = NewTestClient()
 	})
 
+	Describe("MakeListRequest", func() {
+		var (
+			requestParams RequestParams
+
+			includedResources IncludedResources
+			warnings          Warnings
+			executeErr        error
+		)
+
+		JustBeforeEach(func() {
+			includedResources, warnings, executeErr = client.MakeListRequest(requestParams)
+		})
+
+		Context("with query params and included resources", func() {
+			var (
+				resourceList []resources.Role
+				query        []Query
+			)
+
+			BeforeEach(func() {
+				resourceList = []resources.Role{}
+				query = []Query{
+					{
+						Key:    OrganizationGUIDFilter,
+						Values: []string{"some-org-name"},
+					},
+					{
+						Key:    Include,
+						Values: []string{"users"},
+					},
+				}
+				requestParams = RequestParams{
+					RequestName:  internal.GetRolesRequest,
+					Query:        query,
+					ResponseBody: resources.Role{},
+					AppendToList: func(item interface{}) error {
+						resourceList = append(resourceList, item.(resources.Role))
+						return nil
+					},
+				}
+			})
+
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1&include=users"
+		}
+	},
+  "resources": [
+    {
+      "guid": "role-guid-1",
+      "type": "organization_user"
+    }
+  ]
+}`, server.URL())
+					response2 := `{
+							"pagination": {
+								"next": null
+							},
+						 "resources": [
+						   {
+						     "guid": "role-guid-2",
+						     "type": "organization_manager"
+						   }
+						 ]
+						}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1&include=users"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("returns the given resources and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(resourceList).To(Equal([]resources.Role{{
+						GUID: "role-guid-1",
+						Type: constant.OrgUserRole,
+					}, {
+						GUID: "role-guid-2",
+						Type: constant.OrgManagerRole,
+					}}))
+				})
+			})
+
+			When("the response includes other resources", func() {
+				BeforeEach(func() {
+					response1 := fmt.Sprintf(`{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1&include=users"
+							}
+						},
+						"resources": [
+							{
+							  "guid": "role-guid-1",
+							  "type": "organization_user",
+							  "relationships": {
+								"user": {
+								  "data": {"guid": "user-guid-1"}
+								}
+							  }
+							}
+						],
+						"included": {
+							"users": [
+								{
+									"guid": "user-guid-1",
+									"username": "user-name-1",
+									"origin": "uaa"
+							  	}
+							],
+							"spaces": [
+								{
+									"guid": "space-guid-1",
+									"name": "space-name-1"
+							  	}
+							],
+							"organizations": [
+								{
+									"guid": "org-guid-1",
+									"name": "org-name-1"
+							  	}
+							],
+							"service_brokers": [
+								{
+									"guid": "broker-guid-1",
+									"name": "broker-name-1"
+								}
+							],
+							"service_offerings": [
+								{
+									"guid": "offering-guid-1",
+									"name": "offering-name-1"
+								}
+							],
+							"service_plans": [
+								{
+									"guid": "plan-guid-1",
+									"name": "plan-name-1"
+								}
+							]
+						}
+					}`, server.URL())
+
+					response2 := `{
+							"pagination": {
+								"next": null
+							},
+						 "resources": [
+						   {
+						     "guid": "role-guid-2",
+						     "type": "organization_manager",
+							  "relationships": {
+								"user": {
+								  "data": {"guid": "user-guid-2"}
+								}
+							  }
+						   }
+						 ],
+						"included": {
+							"users": [
+							  {
+								"guid": "user-guid-2",
+								"username": "user-name-2",
+								"origin": "uaa"
+							  }
+							],
+							"spaces": [
+								{
+									"guid": "space-guid-2",
+									"name": "space-name-2"
+							  	}
+							],
+							"organizations": [
+								{
+									"guid": "org-guid-2",
+									"name": "org-name-2"
+							  	}
+							],
+							"service_brokers": [
+								{
+									"guid": "broker-guid-2",
+									"name": "broker-name-2"
+								}
+							],
+							"service_offerings": [
+								{
+									"guid": "offering-guid-2",
+									"name": "offering-name-2"
+								}
+							],
+							"service_plans": [
+								{
+									"guid": "plan-guid-2",
+									"name": "plan-name-2"
+								}
+							]
+						  }
+						}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1&include=users"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("returns the queried and additional resources", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(resourceList).To(Equal([]resources.Role{{
+						GUID:     "role-guid-1",
+						Type:     constant.OrgUserRole,
+						UserGUID: "user-guid-1",
+					}, {
+						GUID:     "role-guid-2",
+						Type:     constant.OrgManagerRole,
+						UserGUID: "user-guid-2",
+					}}))
+
+					Expect(includedResources).To(Equal(IncludedResources{
+						Users: []resources.User{
+							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
+							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
+						},
+						Spaces: []Space{
+							{GUID: "space-guid-1", Name: "space-name-1"},
+							{GUID: "space-guid-2", Name: "space-name-2"},
+						},
+						Organizations: []Organization{
+							{GUID: "org-guid-1", Name: "org-name-1"},
+							{GUID: "org-guid-2", Name: "org-name-2"},
+						},
+						ServiceBrokers: []ServiceBroker{
+							{Name: "broker-name-1", GUID: "broker-guid-1"},
+							{Name: "broker-name-2", GUID: "broker-guid-2"},
+						},
+						ServiceOfferings: []ServiceOffering{
+							{Name: "offering-name-1", GUID: "offering-guid-1"},
+							{Name: "offering-name-2", GUID: "offering-guid-2"},
+						},
+						ServicePlans: []ServicePlan{
+							{Name: "plan-name-1", GUID: "plan-guid-1"},
+							{Name: "plan-name-2", GUID: "plan-guid-2"},
+						},
+					}))
+				})
+			})
+
+			When("the request has a URI parameter", func() {
+				var (
+					appGUID   string
+					resources []Process
+				)
+
+				BeforeEach(func() {
+					appGUID = "some-app-guid"
+
+					response1 := fmt.Sprintf(`{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/apps/%s/processes?page=2"
+							}
+						},
+					  "resources": [
+							{
+							  "guid": "process-guid-1"
+							}
+					  	]
+					}`, server.URL(), appGUID)
+					response2 := `{
+							"pagination": {
+								"next": null
+							},
+							 "resources": [
+							   {
+								 "guid": "process-guid-2"
+							   }
+							 ]
+						}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/processes", appGUID)),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/processes", appGUID), "page=2"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+
+					requestParams = RequestParams{
+						RequestName:  internal.GetApplicationProcessesRequest,
+						URIParams:    internal.Params{"app_guid": appGUID},
+						ResponseBody: Process{},
+						AppendToList: func(item interface{}) error {
+							resources = append(resources, item.(Process))
+							return nil
+						},
+					}
+				})
+
+				It("returns the given resources and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(resources).To(Equal([]Process{{
+						GUID: "process-guid-1",
+					}, {
+						GUID: "process-guid-2",
+					}}))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Org not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Org not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+	})
+
 	Describe("MakeRequest", func() {
 		var (
 			requestParams RequestParams
@@ -443,479 +825,6 @@ var _ = Describe("shared request helpers", func() {
 		})
 	})
 
-	Describe("MakeRequestSendReceiveRaw", func() {
-		var (
-			method        string
-			url           string
-			headers       http.Header
-			requestBody   []byte
-			responseBytes []byte
-			httpResponse  *http.Response
-			executeErr    error
-		)
-		JustBeforeEach(func() {
-			responseBytes, httpResponse, executeErr = client.MakeRequestSendReceiveRaw(method, url, headers, requestBody)
-		})
-
-		Context("PATCH request with body", func() {
-			BeforeEach(func() {
-				method = "PATCH"
-				url = fmt.Sprintf("%s/v3/apps/%s", server.URL(), "some-app-guid")
-				headers = http.Header{}
-				headers.Set("Banana", "Plantain")
-
-				var err error
-				requestBody, err = json.Marshal(Application{
-					GUID:                "some-app-guid",
-					Name:                "some-app-name",
-					StackName:           "some-stack-name",
-					LifecycleType:       constant.AppLifecycleTypeBuildpack,
-					LifecycleBuildpacks: []string{"some-buildpack"},
-					SpaceGUID:           "some-space-guid",
-				})
-
-				Expect(err).NotTo(HaveOccurred())
-
-				response := `{
-					"guid": "some-app-guid",
-					"name": "some-app-name",
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {
-							"buildpacks": ["some-buildpack"],
-							"stack": "some-stack-name"
-						}
-					}
-				}`
-
-				expectedBody := map[string]interface{}{
-					"name": "some-app-name",
-					"lifecycle": map[string]interface{}{
-						"type": "buildpack",
-						"data": map[string]interface{}{
-							"buildpacks": []string{"some-buildpack"},
-							"stack":      "some-stack-name",
-						},
-					},
-					"relationships": map[string]interface{}{
-						"space": map[string]interface{}{
-							"data": map[string]string{
-								"guid": "some-space-guid",
-							},
-						},
-					},
-				}
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
-						VerifyHeader(http.Header{"Banana": {"Plantain"}}),
-						VerifyJSONRepresenting(expectedBody),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("successfully makes the request", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				actualResponse := `{
-					"guid": "some-app-guid",
-					"name": "some-app-name",
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {
-							"buildpacks": ["some-buildpack"],
-							"stack": "some-stack-name"
-						}
-					}
-				}`
-				Expect(string(responseBytes)).To(Equal(actualResponse))
-				Expect(httpResponse.Header["X-Cf-Warnings"][0]).To(Equal("this is a warning"))
-			})
-		})
-	})
-
-	Describe("MakeListRequest", func() {
-		var (
-			requestParams RequestParams
-
-			includedResources IncludedResources
-			warnings          Warnings
-			executeErr        error
-		)
-
-		JustBeforeEach(func() {
-			includedResources, warnings, executeErr = client.MakeListRequest(requestParams)
-		})
-
-		Context("with query params and included resources", func() {
-			var (
-				resourceList []resources.Role
-				query        []Query
-			)
-
-			BeforeEach(func() {
-				resourceList = []resources.Role{}
-				query = []Query{
-					{
-						Key:    OrganizationGUIDFilter,
-						Values: []string{"some-org-name"},
-					},
-					{
-						Key:    Include,
-						Values: []string{"users"},
-					},
-				}
-				requestParams = RequestParams{
-					RequestName:  internal.GetRolesRequest,
-					Query:        query,
-					ResponseBody: resources.Role{},
-					AppendToList: func(item interface{}) error {
-						resourceList = append(resourceList, item.(resources.Role))
-						return nil
-					},
-				}
-			})
-
-			When("the request succeeds", func() {
-				BeforeEach(func() {
-					response1 := fmt.Sprintf(`{
-	"pagination": {
-		"next": {
-			"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1&include=users"
-		}
-	},
-  "resources": [
-    {
-      "guid": "role-guid-1",
-      "type": "organization_user"
-    }
-  ]
-}`, server.URL())
-					response2 := `{
-							"pagination": {
-								"next": null
-							},
-						 "resources": [
-						   {
-						     "guid": "role-guid-2",
-						     "type": "organization_manager"
-						   }
-						 ]
-						}`
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
-							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						),
-					)
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1&include=users"),
-							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						),
-					)
-				})
-
-				It("returns the given resources and all warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resourceList).To(Equal([]resources.Role{{
-						GUID: "role-guid-1",
-						Type: constant.OrgUserRole,
-					}, {
-						GUID: "role-guid-2",
-						Type: constant.OrgManagerRole,
-					}}))
-				})
-			})
-
-			When("the response includes other resources", func() {
-				BeforeEach(func() {
-					response1 := fmt.Sprintf(`{
-						"pagination": {
-							"next": {
-								"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1&include=users"
-							}
-						},
-						"resources": [
-							{
-							  "guid": "role-guid-1",
-							  "type": "organization_user",
-							  "relationships": {
-								"user": {
-								  "data": {"guid": "user-guid-1"}
-								}
-							  }
-							}
-						],
-						"included": {
-							"users": [
-								{
-									"guid": "user-guid-1",
-									"username": "user-name-1",
-									"origin": "uaa"
-							  	}
-							],
-							"spaces": [
-								{
-									"guid": "space-guid-1",
-									"name": "space-name-1"
-							  	}
-							],
-							"organizations": [
-								{
-									"guid": "org-guid-1",
-									"name": "org-name-1"
-							  	}
-							],
-							"service_brokers": [
-								{
-									"guid": "broker-guid-1",
-									"name": "broker-name-1"
-								}
-							],
-							"service_offerings": [
-								{
-									"guid": "offering-guid-1",
-									"name": "offering-name-1"
-								}
-							],
-							"service_plans": [
-								{
-									"guid": "plan-guid-1",
-									"name": "plan-name-1"
-								}
-							]
-						}
-					}`, server.URL())
-
-					response2 := `{
-							"pagination": {
-								"next": null
-							},
-						 "resources": [
-						   {
-						     "guid": "role-guid-2",
-						     "type": "organization_manager",
-							  "relationships": {
-								"user": {
-								  "data": {"guid": "user-guid-2"}
-								}
-							  }
-						   }
-						 ],
-						"included": {
-							"users": [
-							  {
-								"guid": "user-guid-2",
-								"username": "user-name-2",
-								"origin": "uaa"
-							  }
-							],
-							"spaces": [
-								{
-									"guid": "space-guid-2",
-									"name": "space-name-2"
-							  	}
-							],
-							"organizations": [
-								{
-									"guid": "org-guid-2",
-									"name": "org-name-2"
-							  	}
-							],
-							"service_brokers": [
-								{
-									"guid": "broker-guid-2",
-									"name": "broker-name-2"
-								}
-							],
-							"service_offerings": [
-								{
-									"guid": "offering-guid-2",
-									"name": "offering-name-2"
-								}
-							],
-							"service_plans": [
-								{
-									"guid": "plan-guid-2",
-									"name": "plan-name-2"
-								}
-							]
-						  }
-						}`
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
-							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						),
-					)
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1&include=users"),
-							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						),
-					)
-				})
-
-				It("returns the queried and additional resources", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-
-					Expect(resourceList).To(Equal([]resources.Role{{
-						GUID:     "role-guid-1",
-						Type:     constant.OrgUserRole,
-						UserGUID: "user-guid-1",
-					}, {
-						GUID:     "role-guid-2",
-						Type:     constant.OrgManagerRole,
-						UserGUID: "user-guid-2",
-					}}))
-
-					Expect(includedResources).To(Equal(IncludedResources{
-						Users: []resources.User{
-							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
-							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
-						},
-						Spaces: []Space{
-							{GUID: "space-guid-1", Name: "space-name-1"},
-							{GUID: "space-guid-2", Name: "space-name-2"},
-						},
-						Organizations: []Organization{
-							{GUID: "org-guid-1", Name: "org-name-1"},
-							{GUID: "org-guid-2", Name: "org-name-2"},
-						},
-						ServiceBrokers: []ServiceBroker{
-							{Name: "broker-name-1", GUID: "broker-guid-1"},
-							{Name: "broker-name-2", GUID: "broker-guid-2"},
-						},
-						ServiceOfferings: []ServiceOffering{
-							{Name: "offering-name-1", GUID: "offering-guid-1"},
-							{Name: "offering-name-2", GUID: "offering-guid-2"},
-						},
-						ServicePlans: []ServicePlan{
-							{Name: "plan-name-1", GUID: "plan-guid-1"},
-							{Name: "plan-name-2", GUID: "plan-guid-2"},
-						},
-					}))
-				})
-			})
-
-			When("the request has a URI parameter", func() {
-				var (
-					appGUID   string
-					resources []Process
-				)
-
-				BeforeEach(func() {
-					appGUID = "some-app-guid"
-
-					response1 := fmt.Sprintf(`{
-						"pagination": {
-							"next": {
-								"href": "%s/v3/apps/%s/processes?page=2"
-							}
-						},
-					  "resources": [
-							{
-							  "guid": "process-guid-1"
-							}
-					  	]
-					}`, server.URL(), appGUID)
-					response2 := `{
-							"pagination": {
-								"next": null
-							},
-							 "resources": [
-							   {
-								 "guid": "process-guid-2"
-							   }
-							 ]
-						}`
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/processes", appGUID)),
-							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						),
-					)
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/processes", appGUID), "page=2"),
-							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						),
-					)
-
-					requestParams = RequestParams{
-						RequestName:  internal.GetApplicationProcessesRequest,
-						URIParams:    internal.Params{"app_guid": appGUID},
-						ResponseBody: Process{},
-						AppendToList: func(item interface{}) error {
-							resources = append(resources, item.(Process))
-							return nil
-						},
-					}
-				})
-
-				It("returns the given resources and all warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resources).To(Equal([]Process{{
-						GUID: "process-guid-1",
-					}, {
-						GUID: "process-guid-2",
-					}}))
-				})
-			})
-
-			When("the cloud controller returns errors and warnings", func() {
-				BeforeEach(func() {
-					response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-    {
-      "code": 10010,
-      "detail": "Org not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles"),
-							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-						),
-					)
-				})
-
-				It("returns the error and all warnings", func() {
-					Expect(executeErr).To(MatchError(ccerror.MultiError{
-						ResponseCode: http.StatusTeapot,
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "Org not found",
-								Title:  "CF-ResourceNotFound",
-							},
-						},
-					}))
-					Expect(warnings).To(ConsistOf("this is a warning"))
-				})
-			})
-		})
-	})
-
 	Describe("MakeRequestReceiveRaw", func() {
 		var (
 			requestName string
@@ -1014,6 +923,190 @@ var _ = Describe("shared request helpers", func() {
 					}))
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
+			})
+		})
+	})
+
+	Describe("MakeRequestSendReceiveRaw", func() {
+		var (
+			requestName         string
+			uriParams           internal.Params
+			requestBodyMimeType string
+
+			requestBody             []byte
+			expectedRawResponseBody []byte
+			rawResponseBody         []byte
+			warnings                Warnings
+			executeErr              error
+			responseBodyMimeType    string
+		)
+
+		JustBeforeEach(func() {
+			rawResponseBody, warnings, executeErr = client.MakeRequestSendReceiveRaw(requestName, uriParams, requestBody, requestBodyMimeType, responseBodyMimeType)
+		})
+
+		BeforeEach(func() {
+			requestBody = []byte("fake-manifest")
+			expectedRawResponseBody = []byte("fake-raw-response-body")
+
+			requestName = internal.GetSpaceManifestDiffRequest
+			uriParams = internal.Params{"space_guid": "space-guid"}
+			requestBodyMimeType = "multipart/form-data"
+		})
+
+		When("the resource is successfully created", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/spaces/space-guid/manifest_diff"),
+						VerifyBody(requestBody),
+						VerifyHeaderKV("Content-Type", "multipart/form-data"),
+						RespondWith(http.StatusCreated, expectedRawResponseBody, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+						}),
+					),
+				)
+			})
+
+			It("returns the resource and warnings", func() {
+				Expect(rawResponseBody).To(Equal(expectedRawResponseBody))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the resource returns all errors and warnings", func() {
+			BeforeEach(func() {
+				response := ` {
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Hamster not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/spaces/space-guid/manifest_diff"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Hamster not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("MakeRequestSendReceiveRawByUrl", func() {
+		var (
+			method        string
+			url           string
+			headers       http.Header
+			requestBody   []byte
+			responseBytes []byte
+			httpResponse  *http.Response
+			executeErr    error
+		)
+		JustBeforeEach(func() {
+			responseBytes, httpResponse, executeErr = client.MakeRequestSendReceiveRawByUrl(method, url, headers, requestBody)
+		})
+
+		Context("PATCH request with body", func() {
+			BeforeEach(func() {
+				method = "PATCH"
+				url = fmt.Sprintf("%s/v3/apps/%s", server.URL(), "some-app-guid")
+				headers = http.Header{}
+				headers.Set("Banana", "Plantain")
+
+				var err error
+				requestBody, err = json.Marshal(Application{
+					GUID:                "some-app-guid",
+					Name:                "some-app-name",
+					StackName:           "some-stack-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"some-buildpack"},
+					SpaceGUID:           "some-space-guid",
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"lifecycle": map[string]interface{}{
+						"type": "buildpack",
+						"data": map[string]interface{}{
+							"buildpacks": []string{"some-buildpack"},
+							"stack":      "some-stack-name",
+						},
+					},
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
+						VerifyHeader(http.Header{"Banana": {"Plantain"}}),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("successfully makes the request", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				actualResponse := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+				Expect(string(responseBytes)).To(Equal(actualResponse))
+				Expect(httpResponse.Header["X-Cf-Warnings"][0]).To(Equal("this is a warning"))
 			})
 		})
 	})

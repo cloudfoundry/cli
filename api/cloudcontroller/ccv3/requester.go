@@ -48,6 +48,14 @@ type Requester interface {
 	) (string, Warnings, error)
 
 	MakeRequestSendReceiveRaw(
+		requestName string,
+		uriParams internal.Params,
+		requestBody []byte,
+		requestBodyMimeType string,
+		responseBodyMimeType string,
+	) ([]byte, Warnings, error)
+
+	MakeRequestSendReceiveRawByUrl(
 		Method string,
 		URL string,
 		headers http.Header,
@@ -137,6 +145,32 @@ func (requester *RealRequester) MakeRequestReceiveRaw(
 }
 
 func (requester *RealRequester) MakeRequestSendReceiveRaw(
+	requestName string,
+	uriParams internal.Params,
+	requestBody []byte,
+	requestBodyMimeType string,
+	responseBodyMimeType string,
+) ([]byte, Warnings, error) {
+	request, err := requester.newHTTPRequest(requestOptions{
+		RequestName: requestName,
+		URIParams:   uriParams,
+		Body:        bytes.NewReader(requestBody),
+	})
+	if err != nil {
+		return []byte{}, nil, err
+	}
+
+	request.Header.Set("Content-type", requestBodyMimeType)
+	request.Header.Set("Accept", responseBodyMimeType)
+
+	response := cloudcontroller.Response{}
+
+	err = requester.connection.Make(request, &response)
+
+	return response.RawResponse, response.Warnings, err
+}
+
+func (requester *RealRequester) MakeRequestSendReceiveRawByUrl(
 	Method string,
 	URL string,
 	headers http.Header,

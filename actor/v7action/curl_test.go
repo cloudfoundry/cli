@@ -52,7 +52,7 @@ var _ = Describe("Curl Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			fakeCloudControllerClient.MakeRequestSendReceiveRawReturns(
+			fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlReturns(
 				mockResponseBody,
 				mockHTTPResponse,
 				mockErr,
@@ -64,9 +64,9 @@ var _ = Describe("Curl Actions", func() {
 		When("no method is given", func() {
 			It("makes the request", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 				Expect(givenMethod).To(Equal(""))
 				Expect(givenURL).To(Equal("api.com/v3/is/great"))
 				Expect(givenHeaders).To(Equal(http.Header{}))
@@ -85,9 +85,9 @@ var _ = Describe("Curl Actions", func() {
 
 			It("uses the given method", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 				Expect(givenMethod).To(Equal("PATCH"))
 				Expect(givenURL).To(Equal("api.com/v3/is/great"))
 				Expect(givenHeaders).To(Equal(http.Header{}))
@@ -105,9 +105,9 @@ var _ = Describe("Curl Actions", func() {
 
 			It("uses method POST", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 				Expect(givenMethod).To(Equal("POST"))
 				Expect(givenURL).To(Equal("api.com/v3/is/great"))
 				Expect(givenHeaders).To(Equal(http.Header{}))
@@ -139,9 +139,9 @@ var _ = Describe("Curl Actions", func() {
 
 				It("reads the file and uses the contents as the request body", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-					givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+					givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 					Expect(givenMethod).To(Equal("POST"))
 					Expect(givenURL).To(Equal("api.com/v3/is/great"))
 					Expect(givenHeaders).To(Equal(http.Header{}))
@@ -172,9 +172,9 @@ var _ = Describe("Curl Actions", func() {
 
 				It("reads the file and uses the contents as the request body", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-					givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+					givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 					Expect(givenMethod).To(Equal("POST"))
 					Expect(givenURL).To(Equal("api.com/v3/is/great"))
 					Expect(givenHeaders).To(Equal(http.Header{}))
@@ -205,9 +205,9 @@ var _ = Describe("Curl Actions", func() {
 
 			It("uses those headers for the request", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlCallCount()).To(Equal(1))
 
-				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawArgsForCall(0)
+				givenMethod, givenURL, givenHeaders, givenBody := fakeCloudControllerClient.MakeRequestSendReceiveRawByUrlArgsForCall(0)
 				Expect(givenMethod).To(Equal(""))
 				Expect(givenURL).To(Equal("api.com/v3/is/great"))
 				Expect(givenHeaders).To(Equal(http.Header{

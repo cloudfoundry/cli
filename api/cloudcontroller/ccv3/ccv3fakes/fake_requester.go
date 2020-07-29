@@ -87,20 +87,39 @@ type FakeRequester struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	MakeRequestSendReceiveRawStub        func(string, string, http.Header, []byte) ([]byte, *http.Response, error)
+	MakeRequestSendReceiveRawStub        func(string, internal.Params, []byte, string, string) ([]byte, ccv3.Warnings, error)
 	makeRequestSendReceiveRawMutex       sync.RWMutex
 	makeRequestSendReceiveRawArgsForCall []struct {
+		arg1 string
+		arg2 internal.Params
+		arg3 []byte
+		arg4 string
+		arg5 string
+	}
+	makeRequestSendReceiveRawReturns struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
+	makeRequestSendReceiveRawReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
+	MakeRequestSendReceiveRawByUrlStub        func(string, string, http.Header, []byte) ([]byte, *http.Response, error)
+	makeRequestSendReceiveRawByUrlMutex       sync.RWMutex
+	makeRequestSendReceiveRawByUrlArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 http.Header
 		arg4 []byte
 	}
-	makeRequestSendReceiveRawReturns struct {
+	makeRequestSendReceiveRawByUrlReturns struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
 	}
-	makeRequestSendReceiveRawReturnsOnCall map[int]struct {
+	makeRequestSendReceiveRawByUrlReturnsOnCall map[int]struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
@@ -472,24 +491,25 @@ func (fake *FakeRequester) MakeRequestSendRawReturnsOnCall(i int, result1 string
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRequester) MakeRequestSendReceiveRaw(arg1 string, arg2 string, arg3 http.Header, arg4 []byte) ([]byte, *http.Response, error) {
-	var arg4Copy []byte
-	if arg4 != nil {
-		arg4Copy = make([]byte, len(arg4))
-		copy(arg4Copy, arg4)
+func (fake *FakeRequester) MakeRequestSendReceiveRaw(arg1 string, arg2 internal.Params, arg3 []byte, arg4 string, arg5 string) ([]byte, ccv3.Warnings, error) {
+	var arg3Copy []byte
+	if arg3 != nil {
+		arg3Copy = make([]byte, len(arg3))
+		copy(arg3Copy, arg3)
 	}
 	fake.makeRequestSendReceiveRawMutex.Lock()
 	ret, specificReturn := fake.makeRequestSendReceiveRawReturnsOnCall[len(fake.makeRequestSendReceiveRawArgsForCall)]
 	fake.makeRequestSendReceiveRawArgsForCall = append(fake.makeRequestSendReceiveRawArgsForCall, struct {
 		arg1 string
-		arg2 string
-		arg3 http.Header
-		arg4 []byte
-	}{arg1, arg2, arg3, arg4Copy})
-	fake.recordInvocation("MakeRequestSendReceiveRaw", []interface{}{arg1, arg2, arg3, arg4Copy})
+		arg2 internal.Params
+		arg3 []byte
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3Copy, arg4, arg5})
+	fake.recordInvocation("MakeRequestSendReceiveRaw", []interface{}{arg1, arg2, arg3Copy, arg4, arg5})
 	fake.makeRequestSendReceiveRawMutex.Unlock()
 	if fake.MakeRequestSendReceiveRawStub != nil {
-		return fake.MakeRequestSendReceiveRawStub(arg1, arg2, arg3, arg4)
+		return fake.MakeRequestSendReceiveRawStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -504,42 +524,116 @@ func (fake *FakeRequester) MakeRequestSendReceiveRawCallCount() int {
 	return len(fake.makeRequestSendReceiveRawArgsForCall)
 }
 
-func (fake *FakeRequester) MakeRequestSendReceiveRawCalls(stub func(string, string, http.Header, []byte) ([]byte, *http.Response, error)) {
+func (fake *FakeRequester) MakeRequestSendReceiveRawCalls(stub func(string, internal.Params, []byte, string, string) ([]byte, ccv3.Warnings, error)) {
 	fake.makeRequestSendReceiveRawMutex.Lock()
 	defer fake.makeRequestSendReceiveRawMutex.Unlock()
 	fake.MakeRequestSendReceiveRawStub = stub
 }
 
-func (fake *FakeRequester) MakeRequestSendReceiveRawArgsForCall(i int) (string, string, http.Header, []byte) {
+func (fake *FakeRequester) MakeRequestSendReceiveRawArgsForCall(i int) (string, internal.Params, []byte, string, string) {
 	fake.makeRequestSendReceiveRawMutex.RLock()
 	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
 	argsForCall := fake.makeRequestSendReceiveRawArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeRequester) MakeRequestSendReceiveRawReturns(result1 []byte, result2 *http.Response, result3 error) {
+func (fake *FakeRequester) MakeRequestSendReceiveRawReturns(result1 []byte, result2 ccv3.Warnings, result3 error) {
 	fake.makeRequestSendReceiveRawMutex.Lock()
 	defer fake.makeRequestSendReceiveRawMutex.Unlock()
 	fake.MakeRequestSendReceiveRawStub = nil
 	fake.makeRequestSendReceiveRawReturns = struct {
 		result1 []byte
-		result2 *http.Response
+		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRequester) MakeRequestSendReceiveRawReturnsOnCall(i int, result1 []byte, result2 *http.Response, result3 error) {
+func (fake *FakeRequester) MakeRequestSendReceiveRawReturnsOnCall(i int, result1 []byte, result2 ccv3.Warnings, result3 error) {
 	fake.makeRequestSendReceiveRawMutex.Lock()
 	defer fake.makeRequestSendReceiveRawMutex.Unlock()
 	fake.MakeRequestSendReceiveRawStub = nil
 	if fake.makeRequestSendReceiveRawReturnsOnCall == nil {
 		fake.makeRequestSendReceiveRawReturnsOnCall = make(map[int]struct {
 			result1 []byte
-			result2 *http.Response
+			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.makeRequestSendReceiveRawReturnsOnCall[i] = struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrl(arg1 string, arg2 string, arg3 http.Header, arg4 []byte) ([]byte, *http.Response, error) {
+	var arg4Copy []byte
+	if arg4 != nil {
+		arg4Copy = make([]byte, len(arg4))
+		copy(arg4Copy, arg4)
+	}
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	ret, specificReturn := fake.makeRequestSendReceiveRawByUrlReturnsOnCall[len(fake.makeRequestSendReceiveRawByUrlArgsForCall)]
+	fake.makeRequestSendReceiveRawByUrlArgsForCall = append(fake.makeRequestSendReceiveRawByUrlArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 http.Header
+		arg4 []byte
+	}{arg1, arg2, arg3, arg4Copy})
+	fake.recordInvocation("MakeRequestSendReceiveRawByUrl", []interface{}{arg1, arg2, arg3, arg4Copy})
+	fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	if fake.MakeRequestSendReceiveRawByUrlStub != nil {
+		return fake.MakeRequestSendReceiveRawByUrlStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.makeRequestSendReceiveRawByUrlReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrlCallCount() int {
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
+	return len(fake.makeRequestSendReceiveRawByUrlArgsForCall)
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrlCalls(stub func(string, string, http.Header, []byte) ([]byte, *http.Response, error)) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = stub
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrlArgsForCall(i int) (string, string, http.Header, []byte) {
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
+	argsForCall := fake.makeRequestSendReceiveRawByUrlArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrlReturns(result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = nil
+	fake.makeRequestSendReceiveRawByUrlReturns = struct {
+		result1 []byte
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRequester) MakeRequestSendReceiveRawByUrlReturnsOnCall(i int, result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = nil
+	if fake.makeRequestSendReceiveRawByUrlReturnsOnCall == nil {
+		fake.makeRequestSendReceiveRawByUrlReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.makeRequestSendReceiveRawByUrlReturnsOnCall[i] = struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
@@ -666,6 +760,8 @@ func (fake *FakeRequester) Invocations() map[string][][]interface{} {
 	defer fake.makeRequestSendRawMutex.RUnlock()
 	fake.makeRequestSendReceiveRawMutex.RLock()
 	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
 	fake.makeRequestUploadAsyncMutex.RLock()
 	defer fake.makeRequestUploadAsyncMutex.RUnlock()
 	fake.wrapConnectionMutex.RLock()

@@ -1761,20 +1761,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	MakeRequestSendReceiveRawStub        func(string, string, http.Header, []byte) ([]byte, *http.Response, error)
-	makeRequestSendReceiveRawMutex       sync.RWMutex
-	makeRequestSendReceiveRawArgsForCall []struct {
+	MakeRequestSendReceiveRawByUrlStub        func(string, string, http.Header, []byte) ([]byte, *http.Response, error)
+	makeRequestSendReceiveRawByUrlMutex       sync.RWMutex
+	makeRequestSendReceiveRawByUrlArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 http.Header
 		arg4 []byte
 	}
-	makeRequestSendReceiveRawReturns struct {
+	makeRequestSendReceiveRawByUrlReturns struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
 	}
-	makeRequestSendReceiveRawReturnsOnCall map[int]struct {
+	makeRequestSendReceiveRawByUrlReturnsOnCall map[int]struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
@@ -10072,74 +10072,74 @@ func (fake *FakeCloudControllerClient) GetUsersReturnsOnCall(i int, result1 []re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRaw(arg1 string, arg2 string, arg3 http.Header, arg4 []byte) ([]byte, *http.Response, error) {
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrl(arg1 string, arg2 string, arg3 http.Header, arg4 []byte) ([]byte, *http.Response, error) {
 	var arg4Copy []byte
 	if arg4 != nil {
 		arg4Copy = make([]byte, len(arg4))
 		copy(arg4Copy, arg4)
 	}
-	fake.makeRequestSendReceiveRawMutex.Lock()
-	ret, specificReturn := fake.makeRequestSendReceiveRawReturnsOnCall[len(fake.makeRequestSendReceiveRawArgsForCall)]
-	fake.makeRequestSendReceiveRawArgsForCall = append(fake.makeRequestSendReceiveRawArgsForCall, struct {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	ret, specificReturn := fake.makeRequestSendReceiveRawByUrlReturnsOnCall[len(fake.makeRequestSendReceiveRawByUrlArgsForCall)]
+	fake.makeRequestSendReceiveRawByUrlArgsForCall = append(fake.makeRequestSendReceiveRawByUrlArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 http.Header
 		arg4 []byte
 	}{arg1, arg2, arg3, arg4Copy})
-	fake.recordInvocation("MakeRequestSendReceiveRaw", []interface{}{arg1, arg2, arg3, arg4Copy})
-	fake.makeRequestSendReceiveRawMutex.Unlock()
-	if fake.MakeRequestSendReceiveRawStub != nil {
-		return fake.MakeRequestSendReceiveRawStub(arg1, arg2, arg3, arg4)
+	fake.recordInvocation("MakeRequestSendReceiveRawByUrl", []interface{}{arg1, arg2, arg3, arg4Copy})
+	fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	if fake.MakeRequestSendReceiveRawByUrlStub != nil {
+		return fake.MakeRequestSendReceiveRawByUrlStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.makeRequestSendReceiveRawReturns
+	fakeReturns := fake.makeRequestSendReceiveRawByUrlReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawCallCount() int {
-	fake.makeRequestSendReceiveRawMutex.RLock()
-	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
-	return len(fake.makeRequestSendReceiveRawArgsForCall)
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrlCallCount() int {
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
+	return len(fake.makeRequestSendReceiveRawByUrlArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawCalls(stub func(string, string, http.Header, []byte) ([]byte, *http.Response, error)) {
-	fake.makeRequestSendReceiveRawMutex.Lock()
-	defer fake.makeRequestSendReceiveRawMutex.Unlock()
-	fake.MakeRequestSendReceiveRawStub = stub
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrlCalls(stub func(string, string, http.Header, []byte) ([]byte, *http.Response, error)) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = stub
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawArgsForCall(i int) (string, string, http.Header, []byte) {
-	fake.makeRequestSendReceiveRawMutex.RLock()
-	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
-	argsForCall := fake.makeRequestSendReceiveRawArgsForCall[i]
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrlArgsForCall(i int) (string, string, http.Header, []byte) {
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
+	argsForCall := fake.makeRequestSendReceiveRawByUrlArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawReturns(result1 []byte, result2 *http.Response, result3 error) {
-	fake.makeRequestSendReceiveRawMutex.Lock()
-	defer fake.makeRequestSendReceiveRawMutex.Unlock()
-	fake.MakeRequestSendReceiveRawStub = nil
-	fake.makeRequestSendReceiveRawReturns = struct {
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrlReturns(result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = nil
+	fake.makeRequestSendReceiveRawByUrlReturns = struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawReturnsOnCall(i int, result1 []byte, result2 *http.Response, result3 error) {
-	fake.makeRequestSendReceiveRawMutex.Lock()
-	defer fake.makeRequestSendReceiveRawMutex.Unlock()
-	fake.MakeRequestSendReceiveRawStub = nil
-	if fake.makeRequestSendReceiveRawReturnsOnCall == nil {
-		fake.makeRequestSendReceiveRawReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawByUrlReturnsOnCall(i int, result1 []byte, result2 *http.Response, result3 error) {
+	fake.makeRequestSendReceiveRawByUrlMutex.Lock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.Unlock()
+	fake.MakeRequestSendReceiveRawByUrlStub = nil
+	if fake.makeRequestSendReceiveRawByUrlReturnsOnCall == nil {
+		fake.makeRequestSendReceiveRawByUrlReturnsOnCall = make(map[int]struct {
 			result1 []byte
 			result2 *http.Response
 			result3 error
 		})
 	}
-	fake.makeRequestSendReceiveRawReturnsOnCall[i] = struct {
+	fake.makeRequestSendReceiveRawByUrlReturnsOnCall[i] = struct {
 		result1 []byte
 		result2 *http.Response
 		result3 error
@@ -13402,8 +13402,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getUserMutex.RUnlock()
 	fake.getUsersMutex.RLock()
 	defer fake.getUsersMutex.RUnlock()
-	fake.makeRequestSendReceiveRawMutex.RLock()
-	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
+	fake.makeRequestSendReceiveRawByUrlMutex.RLock()
+	defer fake.makeRequestSendReceiveRawByUrlMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	fake.pollJobMutex.RLock()

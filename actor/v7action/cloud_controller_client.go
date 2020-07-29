@@ -128,7 +128,7 @@ type CloudControllerClient interface {
 	GetStagingSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetUser(userGUID string) (resources.User, ccv3.Warnings, error)
 	GetUsers(query ...ccv3.Query) ([]resources.User, ccv3.Warnings, error)
-	MakeRequestSendReceiveRaw(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
+	MakeRequestSendReceiveRawByUrl(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	PollJobForState(jobURL ccv3.JobURL, state constant.JobState) (ccv3.Warnings, error)
