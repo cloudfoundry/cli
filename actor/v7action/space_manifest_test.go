@@ -127,4 +127,61 @@ var _ = Describe("Application Manifest Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetSpaceManifestDiff", func() {
+		var (
+			spaceGUID    string
+			newManifest  []byte
+			manifestDiff []byte
+
+			returnedDiff []byte
+			warnings     Warnings
+			executeErr   error
+		)
+
+		BeforeEach(func() {
+			spaceGUID = "some-space-guid"
+			newManifest = []byte("---\n- applications:\n name: my-app")
+			manifestDiff = []byte(`{"diff": [{"op": "replace", "path": "/applications/2/processes/1/memory", "was": "256M", "value": "512M"}}]}`)
+		})
+
+		JustBeforeEach(func() {
+			returnedDiff, warnings, executeErr = actor.GetSpaceManifestDiff(spaceGUID, newManifest)
+		})
+
+		When("getting the manifest diff succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceManifestDiffReturns(
+					manifestDiff,
+					ccv3.Warnings{"get-manifest-diff-warning"},
+					nil,
+				)
+			})
+
+			It("returns the manifest diff and warnings", func() {
+				Expect(returnedDiff).To(Equal(manifestDiff))
+				Expect(warnings).To(ConsistOf("get-manifest-diff-warning"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("getting the manifest diff errors", func() {
+			var getDiffErr error
+
+			BeforeEach(func() {
+				getDiffErr = errors.New("some-get-manifest-diff-err")
+				fakeCloudControllerClient.GetSpaceManifestDiffReturns(
+					[]byte{},
+					ccv3.Warnings{"get-manifest-diff-warning"},
+					getDiffErr,
+				)
+			})
+
+			It("reports a error trying to apply the manifest", func() {
+				Expect(warnings).To(ConsistOf("get-manifest-diff-warning"))
+				Expect(executeErr).To(Equal(getDiffErr))
+			})
+		})
+
+	})
 })

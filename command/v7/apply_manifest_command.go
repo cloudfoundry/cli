@@ -90,7 +90,13 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
+	_, warnings, err := cmd.Actor.GetSpaceManifestDiff(cmd.Config.TargetedSpace().GUID, rawManifest)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	warnings, err = cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

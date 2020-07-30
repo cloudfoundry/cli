@@ -15,43 +15,23 @@ var _ = Describe("Application Manifest", func() {
 	var (
 		client    *Client
 		requester *ccv3fakes.FakeRequester
-		appGUID   string
-
-		spaceGUID   string
-		rawManifest []byte
-		warnings    Warnings
-		executeErr  error
-
-		expectedYAML []byte
 	)
+
 	BeforeEach(func() {
 		requester = new(ccv3fakes.FakeRequester)
 		client, _ = NewFakeRequesterTestClient(requester)
 	})
 
-	Describe("GetSpaceManifestDiff", func() {
-
-		BeforeEach(func() {
-			spaceGUID = "sarahs-favorite-space-guid"
-
-		})
-		JustBeforeEach(func() {
-			_, warnings, executeErr = client.GetSpaceManifestDiff(spaceGUID, nil)
-			expectedYAML = []byte("---\n- banana")
-			requester.MakeRequestReceiveRawReturns(expectedYAML, Warnings{"this is a warning"}, nil)
-		})
-		When("getting the manifest diff is successful", func() {
-			It("makes the correct request", func() {
-				Expect(requester.MakeRequestReceiveRawCallCount()).To(Equal(1))
-				requestName, uriParams, responseBody := requester.MakeRequestReceiveRawArgsForCall(0)
-				Expect(requestName).To(Equal(internal.GetSpaceManifestDiffRequest))
-				Expect(uriParams).To(Equal(internal.Params{"space_guid": spaceGUID}))
-				Expect(responseBody).To(Equal("application/x-yaml"))
-			})
-		})
-	})
-
 	Describe("GetApplicationManifest", func() {
+		var (
+			appGUID string
+
+			rawManifest []byte
+			warnings    Warnings
+			executeErr  error
+
+			expectedYAML []byte
+		)
 
 		BeforeEach(func() {
 			appGUID = "some-app-guid"
@@ -75,7 +55,7 @@ var _ = Describe("Application Manifest", func() {
 				Expect(responseBody).To(Equal("application/x-yaml"))
 			})
 
-			It("the manifest and warnings", func() {
+			It("returns the manifest and warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
@@ -119,6 +99,94 @@ var _ = Describe("Application Manifest", func() {
 							Code:   10010,
 							Detail: "App not found",
 							Title:  "CF-AppNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetSpaceManifestDiff", func() {
+		var (
+			spaceGUID   string
+			newManifest []byte
+
+			rawDiff    []byte
+			warnings   Warnings
+			executeErr error
+
+			expectedJSON []byte
+		)
+
+		BeforeEach(func() {
+			spaceGUID = "sarahs-favorite-space-guid"
+			expectedJSON = []byte("---\n applications")
+			newManifest = []byte("---\n manifest")
+		})
+
+		JustBeforeEach(func() {
+			rawDiff, warnings, executeErr = client.GetSpaceManifestDiff(spaceGUID, newManifest)
+		})
+
+		When("getting the manifest diff is successful", func() {
+			BeforeEach(func() {
+				requester.MakeRequestSendReceiveRawReturns(expectedJSON, Warnings{"this is a warning"}, nil)
+			})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeRequestSendReceiveRawCallCount()).To(Equal(1))
+				requestName, uriParams, requestBody, requestBodyMimeType, responseBodyMimeType := requester.MakeRequestSendReceiveRawArgsForCall(0)
+				Expect(requestName).To(Equal(internal.GetSpaceManifestDiffRequest))
+				Expect(uriParams).To(Equal(internal.Params{"space_guid": spaceGUID}))
+				Expect(requestBody).To(Equal(newManifest))
+				Expect(requestBodyMimeType).To(Equal("application/x-yaml"))
+				Expect(responseBodyMimeType).To(Equal("application/json"))
+			})
+
+			It("returns the manifest and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(rawDiff).To(Equal(expectedJSON))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				errors := []ccerror.V3Error{
+					{
+						Code:   10008,
+						Detail: "The request is semantically invalid: command presence",
+						Title:  "CF-UnprocessableEntity",
+					},
+					{
+						Code:   10010,
+						Detail: "Space not found",
+						Title:  "CF-SpaceNotFound",
+					},
+				}
+
+				requester.MakeRequestSendReceiveRawReturns(
+					nil,
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
+				)
+
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Space not found",
+							Title:  "CF-SpaceNotFound",
 						},
 					},
 				}))

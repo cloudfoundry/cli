@@ -26,3 +26,11 @@ func (actor Actor) SetSpaceManifest(spaceGUID string, rawManifest []byte) (Warni
 	}
 	return allWarnings, nil
 }
+
+func (actor Actor) GetSpaceManifestDiff(spaceGUID string, newManifest []byte) ([]byte, Warnings, error) {
+	manifestDiff, warnings, err := actor.CloudControllerClient.GetSpaceManifestDiff(spaceGUID, newManifest)
+	if err != nil {
+		return []byte{}, Warnings(warnings), err
+	}
+	return manifestDiff, Warnings(warnings), err
+}

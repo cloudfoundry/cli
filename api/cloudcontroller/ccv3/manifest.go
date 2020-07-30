@@ -17,10 +17,12 @@ func (client *Client) GetApplicationManifest(appGUID string) ([]byte, Warnings, 
 }
 
 func (client *Client) GetSpaceManifestDiff(spaceGUID string, newManifest []byte) ([]byte, Warnings, error) {
-	bytes, warnings, err := client.MakeRequestReceiveRaw(
+	bytes, warnings, err := client.MakeRequestSendReceiveRaw(
 		internal.GetSpaceManifestDiffRequest,
 		internal.Params{"space_guid": spaceGUID},
+		newManifest,
 		"application/x-yaml",
+		"application/json",
 	)
 
 	return bytes, warnings, err

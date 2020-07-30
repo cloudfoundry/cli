@@ -1653,6 +1653,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetSpaceManifestDiffStub        func(string, []byte) ([]byte, ccv3.Warnings, error)
+	getSpaceManifestDiffMutex       sync.RWMutex
+	getSpaceManifestDiffArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	getSpaceManifestDiffReturns struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getSpaceManifestDiffReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetSpaceQuotaStub        func(string) (resources.SpaceQuota, ccv3.Warnings, error)
 	getSpaceQuotaMutex       sync.RWMutex
 	getSpaceQuotaArgsForCall []struct {
@@ -9606,6 +9622,78 @@ func (fake *FakeCloudControllerClient) GetSpaceIsolationSegmentReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiff(arg1 string, arg2 []byte) ([]byte, ccv3.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.getSpaceManifestDiffMutex.Lock()
+	ret, specificReturn := fake.getSpaceManifestDiffReturnsOnCall[len(fake.getSpaceManifestDiffArgsForCall)]
+	fake.getSpaceManifestDiffArgsForCall = append(fake.getSpaceManifestDiffArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("GetSpaceManifestDiff", []interface{}{arg1, arg2Copy})
+	fake.getSpaceManifestDiffMutex.Unlock()
+	if fake.GetSpaceManifestDiffStub != nil {
+		return fake.GetSpaceManifestDiffStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSpaceManifestDiffReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffCallCount() int {
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
+	return len(fake.getSpaceManifestDiffArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffCalls(stub func(string, []byte) ([]byte, ccv3.Warnings, error)) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffArgsForCall(i int) (string, []byte) {
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
+	argsForCall := fake.getSpaceManifestDiffArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturns(result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = nil
+	fake.getSpaceManifestDiffReturns = struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturnsOnCall(i int, result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = nil
+	if fake.getSpaceManifestDiffReturnsOnCall == nil {
+		fake.getSpaceManifestDiffReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceManifestDiffReturnsOnCall[i] = struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceQuota(arg1 string) (resources.SpaceQuota, ccv3.Warnings, error) {
 	fake.getSpaceQuotaMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotaReturnsOnCall[len(fake.getSpaceQuotaArgsForCall)]
@@ -13388,6 +13476,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceFeatureMutex.RUnlock()
 	fake.getSpaceIsolationSegmentMutex.RLock()
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
 	fake.getSpaceQuotaMutex.RLock()
 	defer fake.getSpaceQuotaMutex.RUnlock()
 	fake.getSpaceQuotasMutex.RLock()

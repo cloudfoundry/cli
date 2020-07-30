@@ -1955,6 +1955,22 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetSpaceManifestDiffStub        func(string, []byte) ([]byte, v7action.Warnings, error)
+	getSpaceManifestDiffMutex       sync.RWMutex
+	getSpaceManifestDiffArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	getSpaceManifestDiffReturns struct {
+		result1 []byte
+		result2 v7action.Warnings
+		result3 error
+	}
+	getSpaceManifestDiffReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetSpaceQuotaByNameStub        func(string, string) (resources.SpaceQuota, v7action.Warnings, error)
 	getSpaceQuotaByNameMutex       sync.RWMutex
 	getSpaceQuotaByNameArgsForCall []struct {
@@ -11503,6 +11519,78 @@ func (fake *FakeActor) GetSpaceLabelsReturnsOnCall(i int, result1 map[string]typ
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetSpaceManifestDiff(arg1 string, arg2 []byte) ([]byte, v7action.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.getSpaceManifestDiffMutex.Lock()
+	ret, specificReturn := fake.getSpaceManifestDiffReturnsOnCall[len(fake.getSpaceManifestDiffArgsForCall)]
+	fake.getSpaceManifestDiffArgsForCall = append(fake.getSpaceManifestDiffArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("GetSpaceManifestDiff", []interface{}{arg1, arg2Copy})
+	fake.getSpaceManifestDiffMutex.Unlock()
+	if fake.GetSpaceManifestDiffStub != nil {
+		return fake.GetSpaceManifestDiffStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSpaceManifestDiffReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetSpaceManifestDiffCallCount() int {
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
+	return len(fake.getSpaceManifestDiffArgsForCall)
+}
+
+func (fake *FakeActor) GetSpaceManifestDiffCalls(stub func(string, []byte) ([]byte, v7action.Warnings, error)) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = stub
+}
+
+func (fake *FakeActor) GetSpaceManifestDiffArgsForCall(i int) (string, []byte) {
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
+	argsForCall := fake.getSpaceManifestDiffArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetSpaceManifestDiffReturns(result1 []byte, result2 v7action.Warnings, result3 error) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = nil
+	fake.getSpaceManifestDiffReturns = struct {
+		result1 []byte
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetSpaceManifestDiffReturnsOnCall(i int, result1 []byte, result2 v7action.Warnings, result3 error) {
+	fake.getSpaceManifestDiffMutex.Lock()
+	defer fake.getSpaceManifestDiffMutex.Unlock()
+	fake.GetSpaceManifestDiffStub = nil
+	if fake.getSpaceManifestDiffReturnsOnCall == nil {
+		fake.getSpaceManifestDiffReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceManifestDiffReturnsOnCall[i] = struct {
+		result1 []byte
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetSpaceQuotaByName(arg1 string, arg2 string) (resources.SpaceQuota, v7action.Warnings, error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotaByNameReturnsOnCall[len(fake.getSpaceQuotaByNameArgsForCall)]
@@ -17069,6 +17157,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getSpaceFeatureMutex.RUnlock()
 	fake.getSpaceLabelsMutex.RLock()
 	defer fake.getSpaceLabelsMutex.RUnlock()
+	fake.getSpaceManifestDiffMutex.RLock()
+	defer fake.getSpaceManifestDiffMutex.RUnlock()
 	fake.getSpaceQuotaByNameMutex.RLock()
 	defer fake.getSpaceQuotaByNameMutex.RUnlock()
 	fake.getSpaceQuotasByOrgGUIDMutex.RLock()
