@@ -14,12 +14,14 @@ import (
 )
 
 var _ = Describe("service command", func() {
+	const serviceCommand = "v3-service"
+
 	Describe("help", func() {
 		const serviceInstanceName = "fake-service-instance-name"
 
 		matchHelpMessage := SatisfyAll(
 			Say(`NAME:\n`),
-			Say(`\s+service - Show service instance info\n`),
+			Say(fmt.Sprintf(`\s+%s - Show service instance info\n`, serviceCommand)),
 			Say(`\n`),
 			Say(`USAGE:\n`),
 			Say(`\s+cf service SERVICE_INSTANCE\n`),
@@ -34,7 +36,7 @@ var _ = Describe("service command", func() {
 
 		When("the -h flag is specified", func() {
 			It("succeeds and prints help", func() {
-				session := helpers.CF("service", serviceInstanceName, "-h")
+				session := helpers.CF(serviceCommand, serviceInstanceName, "-h")
 				Eventually(session).Should(Exit(0))
 				Expect(session.Out).To(matchHelpMessage)
 			})
@@ -42,7 +44,7 @@ var _ = Describe("service command", func() {
 
 		When("the service instance name is missing", func() {
 			It("fails with an error and prints help", func() {
-				session := helpers.CF("service")
+				session := helpers.CF(serviceCommand)
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE_INSTANCE` was not provided"))
 				Expect(session.Out).To(matchHelpMessage)
@@ -51,7 +53,7 @@ var _ = Describe("service command", func() {
 
 		When("an extra parameter is specified", func() {
 			It("fails with an error and prints help", func() {
-				session := helpers.CF("service", serviceInstanceName, "anotherRandomParameter")
+				session := helpers.CF(serviceCommand, serviceInstanceName, "anotherRandomParameter")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "anotherRandomParameter"`))
 				Expect(session.Out).To(SatisfyAll(
@@ -63,7 +65,7 @@ var _ = Describe("service command", func() {
 
 		When("an extra flag is specified", func() {
 			It("fails with an error and prints help", func() {
-				session := helpers.CF("service", serviceInstanceName, "--anotherRandomFlag")
+				session := helpers.CF(serviceCommand, serviceInstanceName, "--anotherRandomFlag")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say("Incorrect Usage: unknown flag `anotherRandomFlag'"))
 				Expect(session.Out).To(matchHelpMessage)
@@ -73,7 +75,7 @@ var _ = Describe("service command", func() {
 
 	When("environment is not set up", func() {
 		It("displays an error and exits 1", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "service", "serviceInstanceName")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, serviceCommand, "serviceInstanceName")
 		})
 	})
 
@@ -114,13 +116,13 @@ var _ = Describe("service command", func() {
 			})
 
 			It("can show the GUID", func() {
-				session := helpers.CF("service", serviceInstanceName, "--guid")
+				session := helpers.CF(serviceCommand, serviceInstanceName, "--guid")
 				Eventually(session).Should(Exit(0))
 				Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
 			})
 
 			It("can show the service instance details", func() {
-				session := helpers.CF("service", serviceInstanceName)
+				session := helpers.CF(serviceCommand, serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 
 				username, _ := helpers.GetCredentials()
@@ -164,7 +166,7 @@ var _ = Describe("service command", func() {
 				})
 
 				It("can show the service instance details", func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
 					username, _ := helpers.GetCredentials()
@@ -219,13 +221,13 @@ var _ = Describe("service command", func() {
 				})
 
 				It("can show the GUID immediately", func() {
-					session := helpers.CF("service", serviceInstanceName, "--guid")
+					session := helpers.CF(serviceCommand, serviceInstanceName, "--guid")
 					Eventually(session).Should(Exit(0))
 					Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
 				})
 
 				It("can show the service instance details", func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
 					username, _ := helpers.GetCredentials()
@@ -276,11 +278,11 @@ var _ = Describe("service command", func() {
 						"-c", parameters,
 					}
 					Eventually(helpers.CF(command...)).Should(Exit(0))
-					Eventually(helpers.CF("service", serviceInstanceName)).Should(Say(`status:\s+create succeeded`))
+					Eventually(helpers.CF(serviceCommand, serviceInstanceName)).Should(Say(`status:\s+create succeeded`))
 				})
 
 				It("reports the service instance parameters", func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
@@ -309,7 +311,7 @@ var _ = Describe("service command", func() {
 					Eventually(helpers.CF(command...)).Should(Exit(0))
 
 					output := func() *Buffer {
-						session := helpers.CF("service", serviceInstanceName)
+						session := helpers.CF(serviceCommand, serviceInstanceName)
 						session.Wait()
 						return session.Out
 					}
@@ -337,7 +339,7 @@ var _ = Describe("service command", func() {
 				})
 
 				It("can show that the service is being shared", func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
@@ -364,7 +366,7 @@ var _ = Describe("service command", func() {
 					Eventually(helpers.CF(command...)).Should(Exit(0))
 
 					output := func() *Buffer {
-						session := helpers.CF("service", serviceInstanceName)
+						session := helpers.CF(serviceCommand, serviceInstanceName)
 						session.Wait()
 						return session.Out
 					}
@@ -396,7 +398,7 @@ var _ = Describe("service command", func() {
 				})
 
 				It("can show that the service has been shared", func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
@@ -417,7 +419,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("says that the service has no upgrades available", func() {
-						session := helpers.CF("service", serviceInstanceName)
+						session := helpers.CF(serviceCommand, serviceInstanceName)
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(SatisfyAll(
@@ -439,7 +441,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("displays information about the upgrade", func() {
-						session := helpers.CF("service", serviceInstanceName)
+						session := helpers.CF(serviceCommand, serviceInstanceName)
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(SatisfyAll(
