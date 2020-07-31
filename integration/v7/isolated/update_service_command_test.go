@@ -389,6 +389,8 @@ var _ = Describe("update-service command", func() {
 	})
 
 	When("logged in and targeting a space", func() {
+		const serviceCommand = "v3-service"
+
 		var (
 			orgName             string
 			spaceName           string
@@ -472,7 +474,7 @@ var _ = Describe("update-service command", func() {
 				)
 
 				checkParams := func() {
-					session := helpers.CF("service", serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),

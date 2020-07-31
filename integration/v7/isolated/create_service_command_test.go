@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 )
 
+const serviceCommand = "v3-service"
+
 var _ = Describe("create-service command", func() {
 	Describe("help", func() {
 
@@ -149,7 +151,7 @@ var _ = Describe("create-service command", func() {
 				Eventually(session).Should(Say("Create in progress. Use 'cf services' or 'cf service my-service' to check operation status."))
 				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("service", serviceInstanceName)
+				session = helpers.CF(serviceCommand, serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(SatisfyAll(
 					Say(`name:\s+%s`, serviceInstanceName),
@@ -168,7 +170,7 @@ var _ = Describe("create-service command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("service", serviceInstanceName)
+					session = helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 					Eventually(session).Should(Say("%s", parametersJSON))
 				})
@@ -193,7 +195,7 @@ var _ = Describe("create-service command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("service", serviceInstanceName)
+					session = helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 					Eventually(session).Should(Say("%s", parametersJSON))
 				})
