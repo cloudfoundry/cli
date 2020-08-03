@@ -1,0 +1,58 @@
+---
+https://uaa.cloud-sight.lite.cli.fun:
+  skip_ssl_validation: true
+  ca_cert: 
+  prompts:
+    username:
+    - text
+    - Email
+    password:
+    - password
+    - Password
+    passcode:
+    - password
+    - Temporary Authentication Code ( Get one at https://login.cloud-sight.lite.cli.fun/passcode
+      )
+  contexts:
+    admin:
+      current: true
+      client_id: admin
+      access_token: eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vdWFhLmNsb3VkLXNpZ2h0LmxpdGUuY2xpLmZ1bi90b2tlbl9rZXlzIiwia2lkIjoia2V5LTEiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiIzMTRjZWYxYWJjMzI0MGZlYjVjY2FlZDIxZGFmNTA0YyIsInN1YiI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsidWFhLnJlc291cmNlIiwiRVhJU1RJTkctUEVSTUlTU0lPTlMiXSwic2NvcGUiOlsidWFhLnJlc291cmNlIiwiRVhJU1RJTkctUEVSTUlTU0lPTlMiXSwiY2xpZW50X2lkIjoiYWRtaW4iLCJjaWQiOiJhZG1pbiIsImF6cCI6ImFkbWluIiwicmV2b2NhYmxlIjp0cnVlLCJncmFudF90eXBlIjoiY2xpZW50X2NyZWRlbnRpYWxzIiwicmV2X3NpZyI6IjUxMzg3YjA5IiwiaWF0IjoxNTk2MTQ4MTE2LCJleHAiOjE1OTYxOTEzMTYsImlzcyI6Imh0dHBzOi8vdWFhLmNsb3VkLXNpZ2h0LmxpdGUuY2xpLmZ1bi9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsImF1ZCI6WyJ1YWEiLCJhZG1pbiJdfQ.HlnQ4DlzpWNWkoAdtYZ-SstrvUdd6kfK5i_kTDhW9_6eGFpFZEJDvxERBi53ReGvl-qL9_BQWwxXzKxlSaIBa8xjnPZZJjHLs0KzcrPwaZGskpDbIWOYBZz06E4lzfucTU8Z74SumrmBB60zlSzdxbnVVTm-TxzjNLAmgUooneIat7PtR_fU0Qwhbr1-PSIRMSM_23xiPWG9MaRj_cXuwchCP48mmN_B2CcdQx3p1lfH1y-nJ_E0J4p7o0B9Sn1ZBxRHoVjh4cLJUr2xhtH3AcurYvHLS2VewbC1LYqu2X5LckFep-nFJkNivm_ssE_BapyHddoNOOvk4pRpS2H6Zg
+      token_type: bearer
+      expires_in: 43199
+      scope:
+      - uaa.resource
+      - EXISTING-PERMISSIONS
+      jti: 314cef1abc3240feb5ccaed21daf504c
+https://uaa.geode-bane.lite.cli.fun:
+  skip_ssl_validation: true
+  ca_cert: 
+  prompts:
+    username:
+    - text
+    - Email
+    password:
+    - password
+    - Password
+    passcode:
+    - password
+    - Temporary Authentication Code ( Get one at https://login.geode-bane.lite.cli.fun/passcode
+      )
+  contexts:
+    admin:
+      current: true
+      client_id: admin
+      access_token: eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vdWFhLmdlb2RlLWJhbmUubGl0ZS5jbGkuZnVuL3Rva2VuX2tleXMiLCJraWQiOiJrZXktMSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGNkYjJiZjBlYjU0ZjNjOGY2YTA5ZWI5MDBlOWU0NiIsInN1YiI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiY2xpZW50cy5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbGllbnRzLnNlY3JldCIsInVhYS5yZXNvdXJjZSIsImNsaWVudHMud3JpdGUiLCJ1YWEuYWRtaW4iLCJzY2ltLndyaXRlIiwic2NpbS5yZWFkIl0sInNjb3BlIjpbImNsaWVudHMucmVhZCIsInBhc3N3b3JkLndyaXRlIiwiY2xpZW50cy5zZWNyZXQiLCJ1YWEucmVzb3VyY2UiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwic2NpbS53cml0ZSIsInNjaW0ucmVhZCJdLCJjbGllbnRfaWQiOiJhZG1pbiIsImNpZCI6ImFkbWluIiwiYXpwIjoiYWRtaW4iLCJyZXZvY2FibGUiOnRydWUsImdyYW50X3R5cGUiOiJjbGllbnRfY3JlZGVudGlhbHMiLCJyZXZfc2lnIjoiNGYyZTg2YjUiLCJpYXQiOjE1OTYyNDA2MTUsImV4cCI6MTU5NjI4MzgxNSwiaXNzIjoiaHR0cHM6Ly91YWEuZ2VvZGUtYmFuZS5saXRlLmNsaS5mdW4vb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJhdWQiOlsic2NpbSIsInBhc3N3b3JkIiwiY2xpZW50cyIsInVhYSIsImFkbWluIl19.O3oewpjxtWbiA0bzjhN6qBRC_I-cW4z1lF6wTluse3FWTc7jwpDtvphtK9A4G_FDd_6M75EqbK7fMMjAmpiPnSPSfGumVOwpni5ZybxLs4ERf0XhD4XzMqRCoqvyqwbDDomND7bodmDEF7_FZbBD-62c1BzfZUe4y51Tb5_2mg8NJhW1Nj0IE-TUFzi5aYciHb-Q4sjXiW8l2b0kLQlnGPmxVrRKIo9HrGXEXUTpf9_zMeF4tq-wm0iIDCNXg2YIMybrNVkYXq90_OBYSsbM3kb1ACUAjhd_4x1_1TB0ZYkP9vDDc6z0kWsxDKeFJYVTHUtMKGJTp8Pi7ZFBEumoFw
+      token_type: bearer
+      expires_in: 43199
+      scope:
+      - clients.read
+      - password.write
+      - clients.secret
+      - uaa.resource
+      - clients.write
+      - uaa.admin
+      - scim.write
+      - scim.read
+      jti: 54cdb2bf0eb54f3c8f6a09eb900e9e46
+  current: true

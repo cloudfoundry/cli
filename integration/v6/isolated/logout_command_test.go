@@ -1,6 +1,11 @@
 package isolated
 
 import (
+	"fmt"
+	"net/http"
+	"path"
+	"strings"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -49,6 +54,32 @@ var _ = Describe("logout command", func() {
 			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("cf"))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(BeEmpty())
+		})
+
+		When("a valid refresh token is present", func() {
+
+			var introspectRequest *http.Request
+
+			BeforeEach(func() {
+				helpers.SkipIfClientCredentialsTestMode()
+
+				config, err := configv3.LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				jwt := helpers.ParseTokenString(config.ConfigFile.RefreshToken)
+				tokenID, ok := jwt.Claims().JWTID()
+				Expect(ok).To(BeTrue())
+				uaaURL := path.Join(config.ConfigFile.UAAEndpoint, "introspect")
+				body := strings.NewReader(fmt.Sprintf("token=%s", tokenID))
+
+				// TODO: This requires the uaa.resource authority
+				introspectRequest, err = http.NewRequest(http.MethodGet, uaaURL, body)
+
+			})
+
+			It("invalidates the Refresh token", func() {
+
+				
+			})
 		})
 	})
 })

@@ -1,7 +1,9 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 type LogoutCommand struct {
@@ -9,11 +11,19 @@ type LogoutCommand struct {
 
 	UI     command.UI
 	Config command.Config
+	Actor  AuthActor
 }
 
 func (cmd *LogoutCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+
+	_, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v2action.NewActor(nil, uaaClient, config)
+
 	return nil
 }
 
@@ -23,10 +33,15 @@ func (cmd LogoutCommand) Execute(args []string) error {
 		return err
 	}
 
+	cmd.Actor.Revoke()
+	return nil
+
 	cmd.UI.DisplayText("Logging out {{.Username}}...",
 		map[string]interface{}{
 			"Username": user.Name,
 		})
+
+	cmd.Actor.Revoke()
 	cmd.Config.UnsetUserInformation()
 	cmd.UI.DisplayOK()
 
