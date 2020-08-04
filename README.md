@@ -6,7 +6,7 @@
 The official command line client for [Cloud Foundry](https://cloudfoundry.org).
 
 ## Announcement ==> The V7 CLI is now Generally Available!
-View the latest help for each command [here](https://cli.cloudfoundry.org) (v7 docs pending) (or run `cf help -a` with either version of the CLI for help on all commands available).
+View the latest help for each command [here](https://cli.cloudfoundry.org/en-US/v7) (or run `cf help -a` with either version of the CLI for help on all commands available).
 
 [![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases/latest)
 [![Documentation](https://img.shields.io/badge/docs-online-ff69b4.svg)](https://docs.cloudfoundry.org/cf-cli)
