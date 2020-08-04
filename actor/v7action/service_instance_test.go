@@ -599,6 +599,55 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
+		Context("there is an error getting the plan", func() {
+			var (
+				warnings Warnings
+				err      error
+			)
+
+			const (
+				fakeServicePlanName     = "invalid-plan"
+				fakeServiceInstanceName = "my-instance"
+				fakeSpaceGUID           = "some-guid"
+			)
+
+			JustBeforeEach(func() {
+				params := ServiceInstanceUpdateManagedParams{
+					ServicePlanName: types.NewOptionalString(fakeServicePlanName),
+				}
+				warnings, err = actor.UpdateManagedServiceInstance(fakeServiceInstanceName, fakeSpaceGUID, params)
+			})
+
+			When("no plan found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
+				})
+
+				It("returns with warnings and an error", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
+
+					Expect(warnings).To(ConsistOf("be warned"))
+					Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: fakeServicePlanName}))
+				})
+			})
+
+			When("client error when getting the plan", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, errors.New("boom"))
+				})
+
+				It("returns warnings and an error", func() {
+					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
+
+					Expect(warnings).To(ConsistOf("be warned"))
+					Expect(err).To(MatchError("boom"))
+				})
+			})
+
+		})
+
 		When("there is an error polling the job", func() {
 			const jobURL = ccv3.JobURL("fake-job-url")
 
