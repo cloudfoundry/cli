@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"errors"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -19,19 +18,9 @@ type UpdateServiceCommand struct {
 	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Plan         flag.OptionalString           `short:"p" description:"Change service plan for a service instance"`
 	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
-	Upgrade      bool                          `short:"u" long:"upgrade" description:"Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t."`
-	ForceUpgrade bool                          `short:"f" long:"force" description:"Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade."`
 
 	relatedCommands interface{} `related_commands:"rename-service, services, update-user-provided-service"`
 }
-
-type serviceInstanceUpdateType int
-
-const (
-	serviceInstanceNoUpdate serviceInstanceUpdateType = iota
-	serviceInstanceUpdate
-	serviceInstanceUpgrade
-)
 
 func (cmd UpdateServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
@@ -42,17 +31,18 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, err := cmd.processParameters()
-	if err != nil {
-		return err
+	if cmd.noFlagsProvided() {
+		cmd.UI.DisplayText("No flags specified. No changes were made.")
+		cmd.UI.DisplayOK()
+		return nil
 	}
-
 	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
 		cmd.RequiredArgs.ServiceInstance,
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
-			Tags:       types.OptionalStringSlice(cmd.Tags),
-			Parameters: types.OptionalObject(cmd.Parameters),
+			Tags:            types.OptionalStringSlice(cmd.Tags),
+			Parameters:      types.OptionalObject(cmd.Parameters),
+			ServicePlanName: types.OptionalString(cmd.Plan),
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -62,6 +52,8 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return nil
 	case actionerror.ServiceInstanceNotFoundError:
 		return translatableerror.ServiceInstanceNotFoundError{Name: cmd.RequiredArgs.ServiceInstance}
+	case actionerror.ServicePlanNotFoundError:
+		return translatableerror.ServicePlanNotFoundError{PlanName: cmd.Plan.Value}
 	default:
 		return err
 	}
@@ -69,7 +61,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 
 func (cmd UpdateServiceCommand) Usage() string {
 	return strings.TrimSpace(`
-CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS] [--upgrade]
+CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]
 
 Optionally provide service-specific configuration parameters in a valid JSON object in-line:
 CF_NAME update-service SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
@@ -97,8 +89,6 @@ CF_NAME update-service mydb -p gold
 CF_NAME update-service mydb -c '{"ram_gb":4}'
 CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json
 CF_NAME update-service mydb -t "list, of, tags"
-CF_NAME update-service mydb --upgrade
-CF_NAME update-service mydb --upgrade --force
 `,
 	)
 }
@@ -123,10 +113,6 @@ func (cmd UpdateServiceCommand) displayIntro() error {
 	return nil
 }
 
-func (cmd UpdateServiceCommand) processParameters() (serviceInstanceUpdateType, error) {
-	if cmd.Tags.IsSet || cmd.Parameters.IsSet {
-		return serviceInstanceUpdate, nil
-	}
-
-	return serviceInstanceNoUpdate, errors.New("not implemented")
+func (cmd UpdateServiceCommand) noFlagsProvided() bool {
+	return !(cmd.Tags.IsSet || cmd.Parameters.IsSet || cmd.Plan.IsSet)
 }

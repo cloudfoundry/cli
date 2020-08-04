@@ -293,7 +293,7 @@ var _ = Describe("update-service command", func() {
 			Say(`\s+%s - Update a service instance\n`, command),
 			Say(`\n`),
 			Say(`USAGE:\n`),
-			Say(`\s+cf update-service SERVICE_INSTANCE \[-p NEW_PLAN\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\] \[--upgrade\]\n`),
+			Say(`\s+cf update-service SERVICE_INSTANCE \[-p NEW_PLAN\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\]\n`),
 			Say(`\n`),
 			Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n`),
 			Say(`\s+cf update-service SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n`),
@@ -313,14 +313,10 @@ var _ = Describe("update-service command", func() {
 			Say(`\s+cf update-service mydb -c '{\"ram_gb\":4}'\n`),
 			Say(`\s+cf update-service mydb -c ~/workspace/tmp/instance_config.json\n`),
 			Say(`\s+cf update-service mydb -t "list, of, tags"\n`),
-			Say(`\s+cf update-service mydb --upgrade\n`),
-			Say(`\s+cf update-service mydb --upgrade --force\n`),
 			Say(`OPTIONS:\n`),
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.\n`),
 			Say(`\s+-p\s+Change service plan for a service instance\n`),
 			Say(`\s+-t\s+User provided tags\n`),
-			Say(`\s+--upgrade, -u\s+Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t.\n`),
-			Say(`\s+--force, -f\s+Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade.\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+rename-service, services, update-user-provided-service\n`),
 		)
@@ -517,6 +513,20 @@ var _ = Describe("update-service command", func() {
 					Eventually(session).Should(Exit(1))
 
 					Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.\n"))
+				})
+			})
+
+			Describe("updating plan", func() {
+				const (
+					invalidPlan = "invalid-plan"
+				)
+
+				When("plan does not exist", func() {
+					It("displays an error and exits 1", func() {
+						session := helpers.CF(command, serviceInstanceName, "-p", invalidPlan)
+						Eventually(session).Should(Exit(1))
+						Expect(session.Err).To(Say("Service plan '%s' not found.", invalidPlan))
+					})
 				})
 			})
 		})

@@ -79,13 +79,10 @@ var _ = Describe("update-service command", func() {
 		Expect(spaceChecked).To(BeTrue())
 	})
 
-	When("plan is set", func() {
-		BeforeEach(func() {
-			setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: "coolplan"})
-		})
-
-		It("fails", func() {
-			Expect(executeErr).To(MatchError("not implemented"))
+	When("no parameters specified", func() {
+		It("prints a message and exits 0", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say("No flags specified. No changes were made"))
 		})
 	})
 
@@ -96,6 +93,7 @@ var _ = Describe("update-service command", func() {
 				IsSet: true,
 				Value: map[string]interface{}{"baz": "quz"},
 			})
+			setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: "some-plan"})
 		})
 
 		It("does not return an error", func() {
@@ -118,8 +116,9 @@ var _ = Describe("update-service command", func() {
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 			Expect(actualUpdates).To(Equal(v7action.ServiceInstanceUpdateManagedParams{
-				Tags:       types.NewOptionalStringSlice("foo", "bar"),
-				Parameters: types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
+				Tags:            types.NewOptionalStringSlice("foo", "bar"),
+				Parameters:      types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
+				ServicePlanName: types.NewOptionalString("some-plan"),
 			}))
 		})
 
@@ -149,6 +148,27 @@ var _ = Describe("update-service command", func() {
 			})
 		})
 
+		When("plan not found", func() {
+			const (
+				invalidPlan = "invalid-plan"
+			)
+
+			BeforeEach(func() {
+				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: invalidPlan})
+				fakeActor.UpdateManagedServiceInstanceReturns(
+					v7action.Warnings{"actor warning"},
+					actionerror.ServicePlanNotFoundError{PlanName: invalidPlan},
+				)
+			})
+
+			It("prints warnings and returns a translatable error", func() {
+				Expect(testUI.Err).To(Say("actor warning"))
+				Expect(executeErr).To(MatchError(translatableerror.ServicePlanNotFoundError{
+					PlanName: invalidPlan,
+				}))
+			})
+		})
+
 		When("the actor fails with an unexpected error", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
@@ -161,16 +181,6 @@ var _ = Describe("update-service command", func() {
 				Expect(testUI.Err).To(Say("actor warning"))
 				Expect(executeErr).To(MatchError("boof"))
 			})
-		})
-	})
-
-	When("upgrade is specified", func() {
-		BeforeEach(func() {
-			setFlag(&cmd, "-u", true)
-		})
-
-		It("fails", func() {
-			Expect(executeErr).To(MatchError("not implemented"))
 		})
 	})
 

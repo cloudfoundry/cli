@@ -11,8 +11,9 @@ import (
 )
 
 type ServiceInstanceUpdateManagedParams struct {
-	Tags       types.OptionalStringSlice
-	Parameters types.OptionalObject
+	ServicePlanName types.OptionalString
+	Tags            types.OptionalStringSlice
+	Parameters      types.OptionalObject
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -59,16 +60,29 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 
 func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (Warnings, error) {
 	var (
-		original resources.ServiceInstance
-		jobURL   ccv3.JobURL
+		original    resources.ServiceInstance
+		jobURL      ccv3.JobURL
+		allWarnings Warnings
 	)
+
+	if serviceInstanceUpdates.ServicePlanName.IsSet {
+		_, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
+			serviceInstanceUpdates.ServicePlanName.Value,
+			"",
+			"",
+		)
+		if err != nil {
+			return warnings, err
+		}
+		allWarnings = append(allWarnings, warnings...)
+	}
 
 	updates := resources.ServiceInstance{
 		Tags:       serviceInstanceUpdates.Tags,
 		Parameters: serviceInstanceUpdates.Parameters,
 	}
 
-	return handleServiceInstanceErrors(railway.Sequentially(
+	warnings, err := handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
 			original, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
@@ -85,6 +99,10 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
 	))
+
+	allWarnings = append(allWarnings, warnings...)
+
+	return allWarnings, err
 }
 
 func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
