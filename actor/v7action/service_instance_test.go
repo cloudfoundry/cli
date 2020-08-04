@@ -942,4 +942,187 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 	})
+
+	Describe("DeleteServiceInstance", func() {
+		const (
+			fakeServiceInstanceName = "fake-service-instance-name"
+			fakeSpaceGUID           = "fake-space-GUID"
+		)
+
+		var (
+			wait     bool
+			warnings Warnings
+			err      error
+			state    ServiceInstanceDeleteState
+		)
+
+		BeforeEach(func() {
+			wait = false
+		})
+
+		JustBeforeEach(func() {
+			state, warnings, err = actor.DeleteServiceInstance(fakeServiceInstanceName, fakeSpaceGUID, wait)
+		})
+
+		It("makes a request to get the service instance", func() {
+			Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+			actualName, actualSpace, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+			Expect(actualName).To(Equal(fakeServiceInstanceName))
+			Expect(actualSpace).To(Equal(fakeSpaceGUID))
+			Expect(actualQuery).To(BeEmpty())
+		})
+
+		When("the service instance does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					ccerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName},
+				)
+			})
+
+			It("does not try to delete", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
+			})
+
+			It("returns the appropriate state flag", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(state).To(Equal(ServiceInstanceDidNotExist))
+			})
+		})
+
+		When("the service instance exists", func() {
+			const fakeServiceInstanceGUID = "fake-si-guid"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: fakeServiceInstanceGUID},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					nil,
+				)
+			})
+
+			It("makes the right call to delete the service instance", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceArgsForCall(0)).To(Equal(fakeServiceInstanceGUID))
+			})
+
+			When("the delete response is synchronous", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteServiceInstanceReturns(
+						"",
+						ccv3.Warnings{"delete warning"},
+						nil,
+					)
+				})
+
+				It("returns the appropriate state flag", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
+					Expect(state).To(Equal(ServiceInstanceGone))
+				})
+			})
+
+			When("the delete response is asynchronous", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteServiceInstanceReturns(
+						"a fake job url",
+						ccv3.Warnings{"delete warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.PollJobForStateReturns(
+						ccv3.Warnings{"poll warning"},
+						nil,
+					)
+				})
+
+				It("polls the job", func() {
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+					actualJobURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(actualJobURL).To(BeEquivalentTo("a fake job url"))
+					Expect(actualState).To(Equal(constant.JobPolling))
+				})
+
+				It("returns the appropriate state flag", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll warning"))
+					Expect(state).To(Equal(ServiceInstanceDeleteInProgress))
+				})
+
+				When("the `wait` flag is specified", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PollJobReturns(
+							ccv3.Warnings{"poll job warning"},
+							nil,
+						)
+
+						wait = true
+					})
+
+					It("polls the job until complete", func() {
+						Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(BeEquivalentTo("a fake job url"))
+					})
+
+					It("returns the appropriate state flag", func() {
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll job warning"))
+						Expect(state).To(Equal(ServiceInstanceGone))
+					})
+				})
+
+				When("polling the job fails", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PollJobForStateReturns(
+							ccv3.Warnings{"poll warning"},
+							errors.New("bang"),
+						)
+					})
+
+					It("return the error and warnings", func() {
+						Expect(err).To(MatchError("bang"))
+						Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll warning"))
+						Expect(state).To(Equal(ServiceInstanceUnknownState))
+					})
+				})
+			})
+
+			When("the delete responds with failure", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteServiceInstanceReturns(
+						"a fake job url",
+						ccv3.Warnings{"delete warning"},
+						errors.New("bong"),
+					)
+				})
+
+				It("return the error and warnings", func() {
+					Expect(err).To(MatchError("bong"))
+					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
+					Expect(state).To(Equal(ServiceInstanceUnknownState))
+				})
+			})
+		})
+
+		When("getting the service instance fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					errors.New("boom"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(state).To(Equal(ServiceInstanceUnknownState))
+			})
+		})
+	})
 })

@@ -588,6 +588,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteServiceInstanceStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteServiceInstanceMutex       sync.RWMutex
+	deleteServiceInstanceArgsForCall []struct {
+		arg1 string
+	}
+	deleteServiceInstanceReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteServiceInstanceReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteServiceInstanceRelationshipsSharedSpaceStub        func(string, string) (ccv3.Warnings, error)
 	deleteServiceInstanceRelationshipsSharedSpaceMutex       sync.RWMutex
 	deleteServiceInstanceRelationshipsSharedSpaceArgsForCall []struct {
@@ -4973,6 +4988,72 @@ func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturnsOnCall(i int, r
 		})
 	}
 	fake.deleteServiceBrokerReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstance(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.deleteServiceInstanceReturnsOnCall[len(fake.deleteServiceInstanceArgsForCall)]
+	fake.deleteServiceInstanceArgsForCall = append(fake.deleteServiceInstanceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteServiceInstance", []interface{}{arg1})
+	fake.deleteServiceInstanceMutex.Unlock()
+	if fake.DeleteServiceInstanceStub != nil {
+		return fake.DeleteServiceInstanceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceCallCount() int {
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
+	return len(fake.deleteServiceInstanceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceArgsForCall(i int) string {
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
+	argsForCall := fake.deleteServiceInstanceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = nil
+	fake.deleteServiceInstanceReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = nil
+	if fake.deleteServiceInstanceReturnsOnCall == nil {
+		fake.deleteServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceInstanceReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -13248,6 +13329,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()
 	defer fake.deleteServiceBrokerMutex.RUnlock()
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
 	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
 	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
 	fake.deleteServicePlanVisibilityMutex.RLock()

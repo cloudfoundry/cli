@@ -404,61 +404,99 @@ var _ = Describe("Service Instance", func() {
 	})
 
 	Describe("UpdateServiceInstance", func() {
-		Context("synchronous response", func() {
-			const guid = "fake-user-provided-service-instance-guid"
+		const (
+			guid   = "fake-service-instance-guid"
+			jobURL = JobURL("fake-job-url")
+		)
 
-			When("the request succeeds", func() {
-				It("returns warnings and no errors", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, nil)
+		var serviceInstance resources.ServiceInstance
 
-					si := resources.ServiceInstance{
-						Name:            "fake-new-user-provided-service-instance",
-						Tags:            types.NewOptionalStringSlice("foo", "bar"),
-						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
-						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
-						Credentials: types.NewOptionalObject(map[string]interface{}{
-							"foo": "bar",
-							"baz": 42,
-						}),
-					}
+		BeforeEach(func() {
+			serviceInstance = resources.ServiceInstance{
+				Name:            "fake-new-user-provided-service-instance",
+				Tags:            types.NewOptionalStringSlice("foo", "bar"),
+				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+				SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+				Credentials: types.NewOptionalObject(map[string]interface{}{
+					"foo": "bar",
+					"baz": 42,
+				}),
+			}
+		})
 
-					jobURL, warnings, err := client.UpdateServiceInstance(guid, si)
-
-					Expect(jobURL).To(BeEmpty())
-					Expect(warnings).To(ConsistOf("fake-warning"))
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(requester.MakeRequestCallCount()).To(Equal(1))
-					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-						RequestName: internal.PatchServiceInstanceRequest,
-						URIParams:   internal.Params{"service_instance_guid": guid},
-						RequestBody: si,
-					}))
-				})
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
 			})
 
-			When("the request fails", func() {
-				It("returns errors and warnings", func() {
-					requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+			It("returns warnings and no errors", func() {
+				job, warnings, err := client.UpdateServiceInstance(guid, serviceInstance)
 
-					si := resources.ServiceInstance{
-						Name:            "fake-new-user-provided-service-instance",
-						SpaceGUID:       "fake-space-guid",
-						Tags:            types.NewOptionalStringSlice("foo", "bar"),
-						RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
-						SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
-						Credentials: types.NewOptionalObject(map[string]interface{}{
-							"foo": "bar",
-							"baz": 42,
-						}),
-					}
+				Expect(job).To(Equal(jobURL))
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
 
-					jobURL, warnings, err := client.UpdateServiceInstance(guid, si)
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+					RequestName: internal.PatchServiceInstanceRequest,
+					URIParams:   internal.Params{"service_instance_guid": guid},
+					RequestBody: serviceInstance,
+				}))
+			})
+		})
 
-					Expect(jobURL).To(BeEmpty())
-					Expect(warnings).To(ConsistOf("fake-warning"))
-					Expect(err).To(MatchError("bang"))
-				})
+		When("the request fails", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+			})
+
+			It("returns errors and warnings", func() {
+				jobURL, warnings, err := client.UpdateServiceInstance(guid, serviceInstance)
+
+				Expect(jobURL).To(BeEmpty())
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
+	})
+
+	Describe("DeleteServiceInstance", func() {
+		const (
+			guid   = "fake-service-instance-guid"
+			jobURL = JobURL("fake-job-url")
+		)
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+			})
+
+			It("returns warnings and no errors", func() {
+				job, warnings, err := client.DeleteServiceInstance(guid)
+
+				Expect(job).To(Equal(jobURL))
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+					RequestName: internal.DeleteServiceInstanceRequest,
+					URIParams:   internal.Params{"service_instance_guid": guid},
+				}))
+			})
+		})
+
+		When("the request fails", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+			})
+
+			It("returns errors and warnings", func() {
+				jobURL, warnings, err := client.DeleteServiceInstance(guid)
+
+				Expect(jobURL).To(BeEmpty())
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
 			})
 		})
 	})

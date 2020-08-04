@@ -184,6 +184,58 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 
 }
 
+type ServiceInstanceDeleteState int
+
+const (
+	ServiceInstanceUnknownState ServiceInstanceDeleteState = iota
+	ServiceInstanceDidNotExist
+	ServiceInstanceGone
+	ServiceInstanceDeleteInProgress
+)
+
+func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, wait bool) (ServiceInstanceDeleteState, Warnings, error) {
+	var (
+		serviceInstance resources.ServiceInstance
+		jobURL          ccv3.JobURL
+	)
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if serviceInstance.GUID != "" {
+				jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceInstance(serviceInstance.GUID)
+			}
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			switch {
+			case jobURL == "":
+				return
+			case wait:
+				return actor.CloudControllerClient.PollJob(jobURL)
+			default:
+				return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
+			}
+		},
+	)
+
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceNotFoundError:
+		return ServiceInstanceDidNotExist, Warnings(warnings), nil
+	default:
+		return ServiceInstanceUnknownState, Warnings(warnings), err
+	}
+
+	if jobURL != "" && !wait {
+		return ServiceInstanceDeleteInProgress, Warnings(warnings), nil
+	}
+	return ServiceInstanceGone, Warnings(warnings), nil
+}
+
 func assertServiceInstanceType(requiredType resources.ServiceInstanceType, instance resources.ServiceInstance) error {
 	if instance.Type != requiredType {
 		return actionerror.ServiceInstanceTypeError{
