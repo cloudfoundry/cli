@@ -205,20 +205,11 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, 
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			if serviceInstance.GUID != "" {
-				jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceInstance(serviceInstance.GUID)
-			}
+			jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceInstance(serviceInstance.GUID)
 			return
 		},
-		func() (warnings ccv3.Warnings, err error) {
-			switch {
-			case jobURL == "":
-				return
-			case wait:
-				return actor.CloudControllerClient.PollJob(jobURL)
-			default:
-				return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
-			}
+		func() (ccv3.Warnings, error) {
+			return actor.pollJob(jobURL, wait)
 		},
 	)
 
@@ -234,6 +225,17 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, 
 		return ServiceInstanceDeleteInProgress, Warnings(warnings), nil
 	}
 	return ServiceInstanceGone, Warnings(warnings), nil
+}
+
+func (actor Actor) pollJob(jobURL ccv3.JobURL, wait bool) (ccv3.Warnings, error) {
+	switch {
+	case jobURL == "":
+		return ccv3.Warnings{}, nil
+	case wait:
+		return actor.CloudControllerClient.PollJob(jobURL)
+	default:
+		return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
+	}
 }
 
 func assertServiceInstanceType(requiredType resources.ServiceInstanceType, instance resources.ServiceInstance) error {
