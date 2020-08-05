@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("delete-service command", func() {
-	const command = "v3-delete-service"
+	const command = "delete-service"
 
 	Describe("help", func() {
 		matchHelpMessage := SatisfyAll(

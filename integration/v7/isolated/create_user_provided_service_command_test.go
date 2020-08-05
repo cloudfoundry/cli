@@ -206,5 +206,5 @@ func expectOKMessage(session *Session, serviceName, orgName, spaceName, userName
 }
 
 func deleteUserProvidedService(name string) {
-	Eventually(helpers.CF("delete-service", name)).Should(Exit(0))
+	Eventually(helpers.CF("delete-service", "-f", name)).Should(Exit(0))
 }
