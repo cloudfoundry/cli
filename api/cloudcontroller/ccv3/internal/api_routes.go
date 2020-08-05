@@ -25,6 +25,7 @@ const (
 	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
+	DeleteServiceInstanceRequest                                = "DeleteServiceInstance"
 	DeleteServiceOfferingRequest                                = "DeleteServiceOffering"
 	DeleteServicePlanVisibilityRequest                          = "DeleteServicePlanVisibility"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
@@ -278,6 +279,7 @@ var APIRoutes = map[string]Route{
 	PostServiceInstanceRequest:                                  {Path: "/v3/service_instances", Method: http.MethodPost},
 	GetServiceInstanceParametersRequest:                         {Path: "/v3/service_instances/:service_instance_guid/parameters", Method: http.MethodGet},
 	PatchServiceInstanceRequest:                                 {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodPatch},
+	DeleteServiceInstanceRequest:                                {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodDelete},
 	GetServiceInstanceRelationshipsSharedSpacesRequest:          {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodGet},
 	PostServiceInstanceRelationshipsSharedSpacesRequest:         {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost},
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest:        {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete},

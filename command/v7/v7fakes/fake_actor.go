@@ -679,6 +679,23 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DeleteServiceInstanceStub        func(string, string, bool) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)
+	deleteServiceInstanceMutex       sync.RWMutex
+	deleteServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}
+	deleteServiceInstanceReturns struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}
+	deleteServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}
 	DeleteSpaceByNameAndOrganizationNameStub        func(string, string) (v7action.Warnings, error)
 	deleteSpaceByNameAndOrganizationNameMutex       sync.RWMutex
 	deleteSpaceByNameAndOrganizationNameArgsForCall []struct {
@@ -6069,6 +6086,74 @@ func (fake *FakeActor) DeleteServiceBrokerReturnsOnCall(i int, result1 v7action.
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteServiceInstance(arg1 string, arg2 string, arg3 bool) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.deleteServiceInstanceReturnsOnCall[len(fake.deleteServiceInstanceArgsForCall)]
+	fake.deleteServiceInstanceArgsForCall = append(fake.deleteServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("DeleteServiceInstance", []interface{}{arg1, arg2, arg3})
+	fake.deleteServiceInstanceMutex.Unlock()
+	if fake.DeleteServiceInstanceStub != nil {
+		return fake.DeleteServiceInstanceStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) DeleteServiceInstanceCallCount() int {
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
+	return len(fake.deleteServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) DeleteServiceInstanceCalls(stub func(string, string, bool) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) DeleteServiceInstanceArgsForCall(i int) (string, string, bool) {
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
+	argsForCall := fake.deleteServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) DeleteServiceInstanceReturns(result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = nil
+	fake.deleteServiceInstanceReturns = struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteServiceInstanceReturnsOnCall(i int, result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceInstanceMutex.Lock()
+	defer fake.deleteServiceInstanceMutex.Unlock()
+	fake.DeleteServiceInstanceStub = nil
+	if fake.deleteServiceInstanceReturnsOnCall == nil {
+		fake.deleteServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.ServiceInstanceDeleteState
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 string) (v7action.Warnings, error) {
@@ -16903,6 +16988,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()
 	defer fake.deleteServiceBrokerMutex.RUnlock()
+	fake.deleteServiceInstanceMutex.RLock()
+	defer fake.deleteServiceInstanceMutex.RUnlock()
 	fake.deleteSpaceByNameAndOrganizationNameMutex.RLock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.RUnlock()
 	fake.deleteSpaceQuotaByNameMutex.RLock()

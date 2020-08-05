@@ -86,6 +86,13 @@ func (client *Client) UpdateServiceInstance(serviceInstanceGUID string, serviceI
 	})
 }
 
+func (client *Client) DeleteServiceInstance(serviceInstanceGUID string) (JobURL, Warnings, error) {
+	return client.MakeRequest(RequestParams{
+		RequestName: internal.DeleteServiceInstanceRequest,
+		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
+	})
+}
+
 // ShareServiceInstanceToSpaces will create a sharing relationship between
 // the service instance and the shared-to space for each space provided.
 func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, Warnings, error) {

@@ -32,6 +32,14 @@ var _ = Describe("update-user-provided-service Command", func() {
 		executeErr      error
 	)
 
+	expectOKMessage := func(testUI *ui.UI, serviceName, orgName, spaceName, userName string) {
+		Expect(testUI.Out).To(SatisfyAll(
+			Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName),
+			Say("OK"),
+			Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"),
+		))
+	}
+
 	BeforeEach(func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
@@ -260,11 +268,3 @@ var _ = Describe("update-user-provided-service Command", func() {
 		})
 	})
 })
-
-func expectOKMessage(testUI *ui.UI, serviceName, orgName, spaceName, userName string) {
-	Expect(testUI.Out).To(SatisfyAll(
-		Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName),
-		Say("OK"),
-		Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"),
-	))
-}
