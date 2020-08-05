@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
@@ -136,13 +135,13 @@ var _ = Describe("update-service command", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
 					v7action.Warnings{"actor warning"},
-					actionerror.ServiceInstanceNotFoundError{},
+					actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
 			})
 
-			It("prints warnings and returns a translatable error", func() {
+			It("prints warnings and returns an error", func() {
 				Expect(testUI.Err).To(Say("actor warning"))
-				Expect(executeErr).To(MatchError(translatableerror.ServiceInstanceNotFoundError{
+				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{
 					Name: serviceInstanceName,
 				}))
 			})
