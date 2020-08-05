@@ -5,9 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -46,17 +44,12 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
-	switch err.(type) {
-	case nil:
-		cmd.UI.DisplayOK()
-		return nil
-	case actionerror.ServiceInstanceNotFoundError:
-		return translatableerror.ServiceInstanceNotFoundError{Name: cmd.RequiredArgs.ServiceInstance}
-	case actionerror.ServicePlanNotFoundError:
-		return translatableerror.ServicePlanNotFoundError{PlanName: cmd.Plan.Value}
-	default:
+	if err != nil {
 		return err
 	}
+
+	cmd.UI.DisplayOK()
+	return nil
 }
 
 func (cmd UpdateServiceCommand) Usage() string {

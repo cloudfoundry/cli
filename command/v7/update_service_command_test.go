@@ -157,14 +157,16 @@ var _ = Describe("update-service command", func() {
 				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: invalidPlan})
 				fakeActor.UpdateManagedServiceInstanceReturns(
 					v7action.Warnings{"actor warning"},
-					actionerror.ServicePlanNotFoundError{PlanName: invalidPlan},
+					actionerror.ServicePlanNotFoundError{PlanName: invalidPlan, ServiceBrokerName: "the-broker", OfferingName: "the-offering"},
 				)
 			})
 
 			It("prints warnings and returns a translatable error", func() {
 				Expect(testUI.Err).To(Say("actor warning"))
-				Expect(executeErr).To(MatchError(translatableerror.ServicePlanNotFoundError{
-					PlanName: invalidPlan,
+				Expect(executeErr).To(MatchError(actionerror.ServicePlanNotFoundError{
+					PlanName:          invalidPlan,
+					OfferingName:      "the-offering",
+					ServiceBrokerName: "the-broker",
 				}))
 			})
 		})

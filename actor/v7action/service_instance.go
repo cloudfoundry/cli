@@ -60,35 +60,51 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 
 func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (Warnings, error) {
 	var (
-		original    resources.ServiceInstance
-		jobURL      ccv3.JobURL
-		allWarnings Warnings
+		original             resources.ServiceInstance
+		jobURL               ccv3.JobURL
+		allWarnings          Warnings
+		includedResources    ccv3.IncludedResources
+		serviceInstanceQuery []ccv3.Query
 	)
-
-	if serviceInstanceUpdates.ServicePlanName.IsSet {
-		_, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
-			serviceInstanceUpdates.ServicePlanName.Value,
-			"",
-			"",
-		)
-		if err != nil {
-			return warnings, err
-		}
-		allWarnings = append(allWarnings, warnings...)
-	}
 
 	updates := resources.ServiceInstance{
 		Tags:       serviceInstanceUpdates.Tags,
 		Parameters: serviceInstanceUpdates.Parameters,
 	}
 
+	if serviceInstanceUpdates.ServicePlanName.IsSet {
+		serviceInstanceQuery = []ccv3.Query{
+			{
+				Key:    ccv3.FieldsServicePlanServiceOffering,
+				Values: []string{"name"},
+			},
+			{
+				Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
+				Values: []string{"name"},
+			},
+		}
+	}
 	warnings, err := handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			original, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			original, includedResources, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, serviceInstanceQuery...)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			err = assertServiceInstanceType(resources.ManagedServiceInstance, original)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if !serviceInstanceUpdates.ServicePlanName.IsSet {
+				return
+			}
+			_, actorWarnings, err := actor.GetServicePlanByNameOfferingAndBroker(
+				serviceInstanceUpdates.ServicePlanName.Value,
+				includedResources.ServiceOfferings[0].Name,
+				includedResources.ServiceBrokers[0].Name,
+			)
+			if err != nil {
+				return ccv3.Warnings(actorWarnings), err
+			}
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
