@@ -135,6 +135,31 @@ var _ = Describe("Auth Actions", func() {
 		})
 	})
 
+	Describe("Revoke", func() {
+		var (
+			expectedAccessToken  string
+			expectedRefreshToken string
+		)
+		BeforeEach(func() {
+			expectedAccessToken = "I'm a fake access token"
+			expectedRefreshToken = "I'm a fake refresh token"
+
+			fakeConfig.AccessTokenReturns(expectedAccessToken)
+			fakeConfig.RefreshTokenReturns(expectedRefreshToken)
+		})
+
+		JustBeforeEach(func() {
+			_ = actor.Revoke()
+		})
+
+		It("calls the UAA to revoke refresh and access tokens", func() {
+			Expect(fakeUAAClient.RevokeCallCount()).To(Equal(2))
+
+			Expect(fakeUAAClient.RevokeArgsForCall(0)).To(Equal(expectedRefreshToken))
+			Expect(fakeUAAClient.RevokeArgsForCall(1)).To(Equal(expectedAccessToken))
+		})
+	})
+
 	Describe("GetLoginPrompts", func() {
 		When("getting login prompts info from UAA", func() {
 			var (

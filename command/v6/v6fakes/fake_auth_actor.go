@@ -33,6 +33,16 @@ type FakeAuthActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
+	RevokeStub        func() error
+	revokeMutex       sync.RWMutex
+	revokeArgsForCall []struct {
+	}
+	revokeReturns struct {
+		result1 error
+	}
+	revokeReturnsOnCall map[int]struct {
+		result1 error
+	}
 	UAAAPIVersionStub        func() string
 	uAAAPIVersionMutex       sync.RWMutex
 	uAAAPIVersionArgsForCall []struct {
@@ -162,6 +172,58 @@ func (fake *FakeAuthActor) CloudControllerAPIVersionReturnsOnCall(i int, result1
 	}{result1}
 }
 
+func (fake *FakeAuthActor) Revoke() error {
+	fake.revokeMutex.Lock()
+	ret, specificReturn := fake.revokeReturnsOnCall[len(fake.revokeArgsForCall)]
+	fake.revokeArgsForCall = append(fake.revokeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Revoke", []interface{}{})
+	fake.revokeMutex.Unlock()
+	if fake.RevokeStub != nil {
+		return fake.RevokeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.revokeReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeAuthActor) RevokeCallCount() int {
+	fake.revokeMutex.RLock()
+	defer fake.revokeMutex.RUnlock()
+	return len(fake.revokeArgsForCall)
+}
+
+func (fake *FakeAuthActor) RevokeCalls(stub func() error) {
+	fake.revokeMutex.Lock()
+	defer fake.revokeMutex.Unlock()
+	fake.RevokeStub = stub
+}
+
+func (fake *FakeAuthActor) RevokeReturns(result1 error) {
+	fake.revokeMutex.Lock()
+	defer fake.revokeMutex.Unlock()
+	fake.RevokeStub = nil
+	fake.revokeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeAuthActor) RevokeReturnsOnCall(i int, result1 error) {
+	fake.revokeMutex.Lock()
+	defer fake.revokeMutex.Unlock()
+	fake.RevokeStub = nil
+	if fake.revokeReturnsOnCall == nil {
+		fake.revokeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.revokeReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeAuthActor) UAAAPIVersion() string {
 	fake.uAAAPIVersionMutex.Lock()
 	ret, specificReturn := fake.uAAAPIVersionReturnsOnCall[len(fake.uAAAPIVersionArgsForCall)]
@@ -221,6 +283,8 @@ func (fake *FakeAuthActor) Invocations() map[string][][]interface{} {
 	defer fake.authenticateMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.revokeMutex.RLock()
+	defer fake.revokeMutex.RUnlock()
 	fake.uAAAPIVersionMutex.RLock()
 	defer fake.uAAAPIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

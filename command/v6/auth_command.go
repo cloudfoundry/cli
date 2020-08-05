@@ -18,6 +18,7 @@ type AuthActor interface {
 	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
 	CloudControllerAPIVersion() string
 	UAAAPIVersion() string
+	Revoke() error
 }
 
 type AuthCommand struct {

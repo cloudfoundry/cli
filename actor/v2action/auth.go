@@ -63,3 +63,14 @@ var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{
 	"text":     coreconfig.AuthPromptTypeText,
 	"password": coreconfig.AuthPromptTypePassword,
 }
+
+// TODO: error check this in future stories
+func (actor Actor) Revoke() error {
+	refreshToken := actor.Config.RefreshToken()
+	_ = actor.UAAClient.Revoke(refreshToken)
+
+	accessToken := actor.Config.AccessToken()
+	_ = actor.UAAClient.Revoke(accessToken)
+
+	return nil
+}

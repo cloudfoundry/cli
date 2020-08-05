@@ -1,6 +1,7 @@
 package uaa_test
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -15,9 +16,16 @@ import (
 
 var _ = Describe("Auth", func() {
 	var (
-		client *Client
+		client      *Client
+		credentials map[string]string
 
-		fakeConfig *uaafakes.FakeConfig
+		origin    string
+		grantType constant.GrantType
+
+		accessToken  string
+		refreshToken string
+		executeErr   error
+		fakeConfig   *uaafakes.FakeConfig
 	)
 
 	BeforeEach(func() {
@@ -27,16 +35,6 @@ var _ = Describe("Auth", func() {
 	})
 
 	Describe("Authenticate", func() {
-		var (
-			credentials map[string]string
-
-			origin    string
-			grantType constant.GrantType
-
-			accessToken  string
-			refreshToken string
-			executeErr   error
-		)
 
 		JustBeforeEach(func() {
 			accessToken, refreshToken, executeErr = client.Authenticate(credentials, origin, grantType)
@@ -187,6 +185,64 @@ var _ = Describe("Auth", func() {
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
 				}))
+			})
+		})
+	})
+
+	Describe("Revoke", func() {
+		var (
+			jtiFromToken string
+			testToken    string
+			actualError  error
+		)
+
+		JustBeforeEach(func() {
+			actualError = client.Revoke(testToken)
+		})
+
+		When("the call to revoke succeeds", func() {
+			BeforeEach(func() {
+				testToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NWZiOTVlM2M5OTY0MmYxODQxMTUyZWIwNmFjYTM4NiIsInJldm9jYWJsZSI6dHJ1ZX0.EYvzQDsCqXRO0r1dowPRYIgeqP_V320v1WbLTG5y6iA"
+				jtiFromToken = "55fb95e3c99642f1841152eb06aca386"
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/oauth/token/revoke/%s", jtiFromToken)),
+						VerifyHeaderKV("Authorization: Bearer "+testToken),
+						RespondWith(http.StatusOK, nil),
+					))
+			})
+
+			It("makes a call to find the jti and uses that jti to revoke the token", func() {
+				Expect(actualError).To(BeNil())
+				Expect(len(server.ReceivedRequests())).To(Equal(2))
+				Expect(server.ReceivedRequests()[1].RequestURI).To(Equal("/oauth/token/revoke/55fb95e3c99642f1841152eb06aca386"))
+			})
+		})
+
+		When("the call to revoke the token fails", func() {
+			BeforeEach(func() {
+				testToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NWZiOTVlM2M5OTY0MmYxODQxMTUyZWIwNmFjYTM4NiIsInJldm9jYWJsZSI6dHJ1ZX0.EYvzQDsCqXRO0r1dowPRYIgeqP_V320v1WbLTG5y6iA"
+				jtiFromToken = "55fb95e3c99642f1841152eb06aca386"
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/oauth/token/revoke/%s", jtiFromToken)),
+						VerifyHeaderKV("Authorization: Bearer "+testToken),
+						RespondWith(http.StatusForbidden, nil),
+					))
+
+			})
+			It("returns that failure", func() {
+				Expect(actualError).To(MatchError(RawHTTPStatusError{StatusCode: 403, RawResponse: []byte{}}))
+			})
+		})
+
+		When("the token contains no jti", func() {
+			BeforeEach(func() {
+				testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+			})
+			It("returns an error saying it could not parse the jti", func() {
+				Expect(actualError).To(Equal(errors.New("could not parse jti from payload")))
 			})
 		})
 	})

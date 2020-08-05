@@ -32,9 +32,9 @@ var _ = Describe("logout command", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("logout")
 
-			Eventually(session).Should(Say(`Logging out %s\.\.\.`, username))
-			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
+			Expect(session).To(Say(`Logging out %s\.\.\.`, username))
+			Expect(session).To(Say("OK"))
 
 			config, err := configv3.LoadConfig()
 			Expect(err).ToNot(HaveOccurred())
@@ -49,6 +49,12 @@ var _ = Describe("logout command", func() {
 			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("cf"))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(BeEmpty())
+
+			session = helpers.CF("orgs")
+			Eventually(session).Should(Exit(1))
+			Expect(session.Out).To(Say("FAILED"))
+			Expect(session.Err).To(Say("Not logged in."))
+
 		})
 	})
 })

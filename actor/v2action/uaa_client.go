@@ -14,4 +14,5 @@ type UAAClient interface {
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)
 	LoginPrompts() map[string][]string
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
+	Revoke(token string) error
 }
