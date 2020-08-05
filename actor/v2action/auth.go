@@ -1,7 +1,10 @@
 package v2action
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -66,11 +69,35 @@ var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{
 
 // TODO: error check this in future stories
 func (actor Actor) Revoke() error {
-	refreshToken := actor.Config.RefreshToken()
-	_ = actor.UAAClient.Revoke(refreshToken)
-
 	accessToken := actor.Config.AccessToken()
-	_ = actor.UAAClient.Revoke(accessToken)
-
+	if actor.isTokenRevocable(accessToken) {
+		refreshToken := actor.Config.RefreshToken()
+		_ = actor.UAAClient.Revoke(refreshToken)
+		_ = actor.UAAClient.Revoke(accessToken)
+	}
 	return nil
+}
+
+func (actor Actor) isTokenRevocable(token string) bool {
+	segments := strings.Split(token, ".")
+
+	if len(segments) < 2 {
+		return false
+	}
+
+	jsonPayload, err := base64.RawURLEncoding.DecodeString(segments[1])
+
+	if err != nil {
+		return false
+	}
+
+	payload := make(map[string]interface{})
+	json.Unmarshal(jsonPayload, &payload)
+	revocable, ok := payload["revocable"].(bool)
+
+	if !ok {
+		return false
+	}
+
+	return revocable
 }
