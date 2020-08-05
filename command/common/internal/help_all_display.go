@@ -29,7 +29,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "SERVICES:",
 		CommandList: [][]string{
 			{"marketplace", "services", "service"},
-			{"create-service", "update-service", "delete-service", "rename-service"},
+			{"create-service", "update-service", "upgrade-service", "delete-service", "rename-service"},
 			{"create-service-key", "service-keys", "service-key", "delete-service-key"},
 			{"bind-service", "unbind-service"},
 			{"bind-route-service", "unbind-route-service"},
