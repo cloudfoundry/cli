@@ -191,6 +191,7 @@ type commandList struct {
 	UpdateSecurityGroup                v7.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
 	UpdateService                      v6.UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
 	UpdateServiceV3                    v7.UpdateServiceCommand                      `command:"v3-update-service" description:"Update a service instance"`
+	UpgradeService                     v7.UpgradeServiceCommand                     `command:"upgrade-service" description:"Upgrade a service instance to the latest available version of its current service plan"`
 	UpdateServiceBroker                v7.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateSpaceQuota                   v7.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
 	UpdateUserProvidedService          v7.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
