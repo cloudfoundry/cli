@@ -547,14 +547,22 @@ var _ = Describe("app summary displayer", func() {
 						Stack: "cflinuxfs2",
 						Buildpacks: []resources.DropletBuildpack{
 							{
-								Name:         "ruby_buildpack",
-								DetectOutput: "some-detect-output",
-								Version: "0.0.1",
+								Name:          "ruby_buildpack",
+								BuildpackName: "ruby_buildpack_name",
+								DetectOutput:  "some-detect-output",
+								Version:       "0.0.1",
 							},
 							{
-								Name: "go_buildpack_without_version",
-								DetectOutput: "some-other-detect-output",
-								Version: "",
+								Name:          "go_buildpack_without_detect_output",
+								BuildpackName: "go_buildpack_name",
+								DetectOutput:  "",
+								Version:       "0.0.2",
+							},
+							{
+								Name:          "go_buildpack_without_version",
+								BuildpackName: "go_buildpack_name",
+								DetectOutput:  "",
+								Version:       "",
 							},
 							{
 								Name:         "some-buildpack",
@@ -567,9 +575,9 @@ var _ = Describe("app summary displayer", func() {
 
 			It("displays stack and buildpacks", func() {
 				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
-				Expect(testUI.Out).To(Say(`buildpacks:\s+some-detect-output, some-other-detect-output, some-buildpack`))
-				Expect(testUI.Out).To(Say(`buildpack versions:\s+some-detect-output 0.0.1, some-other-detect-output, some-buildpack`))
-				Expect(testUI.Out).To(Say(`buildpack names:\s+ruby_buildpack, go_buildpack_without_version, some-buildpack`))
+				Expect(testUI.Out).To(Say(`buildpacks:\s+ruby_buildpack_name, go_buildpack_name, go_buildpack_name, some-buildpack`))
+				Expect(testUI.Out).To(Say(`buildpack versions:\s+ruby_buildpack_name 0.0.1, go_buildpack_name 0.0.2, go_buildpack_name, some-buildpack`))
+				Expect(testUI.Out).To(Say(`buildpack names:\s+ruby_buildpack, go_buildpack_without_detect_output, go_buildpack_without_version, some-buildpack`))
 			})
 		})
 	})

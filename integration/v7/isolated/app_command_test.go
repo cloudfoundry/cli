@@ -80,6 +80,8 @@ var _ = Describe("app command", func() {
 					Eventually(session).Should(Say(`last uploaded:\s+\n`))
 					Eventually(session).Should(Say(`stack:\s+\n`))
 					Eventually(session).Should(Say(`buildpacks:\s+\n`))
+					Eventually(session).Should(Say(`buildpack versions:\s+\n`))
+					Eventually(session).Should(Say(`buildpack names:\s+\n`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -128,6 +130,8 @@ applications:
 						Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
 						Eventually(session).Should(Say(`stack:\s+cflinuxfs`))
 						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+						Eventually(session).Should(Say(`buildpack versions:\s+staticfile\s+[\d\.]+`))
+						Eventually(session).Should(Say(`buildpack names:\s+staticfile_buildpack`))
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+\d/2`))
 						Eventually(session).Should(Say(`memory usage:\s+128M`))
@@ -236,7 +240,9 @@ applications:
 
 				It("displays the app buildpacks", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say(`buildpacks:\s+ruby_buildpack,\s+go`))
+					Eventually(session).Should(Say(`buildpacks:\s+ruby,\s+go`))
+					Eventually(session).Should(Say(`buildpack versions:\s+ruby\s+[\d\.]+,\s+go\s+[\d\.]+`))
+					Eventually(session).Should(Say(`buildpack names:\s+ruby_buildpack,\s+go_buildpack`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

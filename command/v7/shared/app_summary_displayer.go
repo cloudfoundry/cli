@@ -146,31 +146,39 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	return ""
 }
 
-func (AppSummaryDisplayer) buildpackInfo(buildpacks []resources.DropletBuildpack) (string, string, string) {
+func (display AppSummaryDisplayer) buildpackInfo(buildpacks []resources.DropletBuildpack) (string, string, string) {
 	var names []string
 	var versions []string
 	var userProvidedNames []string
 
 	for _, buildpack := range buildpacks {
-		if buildpack.DetectOutput != "" {
-			names = append(names, buildpack.DetectOutput)
-			buildpackVersion := []string{buildpack.DetectOutput, buildpack.Version}
-			if buildpack.Version != "" {
-				versions = append(versions, strings.Join(buildpackVersion, " "))
-			} else {
-				versions = append(versions, buildpack.DetectOutput)
-			}
-		} else {
-			names = append(names, buildpack.Name)
-			versions = append(versions, buildpack.Name)
-		}
+		name := display.buildpackName(buildpack)
+		names = append(names, name)
+		versions = append(versions, display.buildpackVersion(name, buildpack.Version))
+
 		userProvidedNames = append(userProvidedNames, buildpack.Name)
 	}
 
 	detectedNamesString := strings.Join(names, ", ")
 	versionsString := strings.TrimSpace(strings.Join(versions, ", "))
-	userProvidedNamesString:= strings.TrimSpace(strings.Join(userProvidedNames, ", "))
+	userProvidedNamesString := strings.TrimSpace(strings.Join(userProvidedNames, ", "))
 	return detectedNamesString, versionsString, userProvidedNamesString
+}
+
+func (AppSummaryDisplayer) buildpackName(buildpack resources.DropletBuildpack) string {
+	if buildpack.BuildpackName != "" {
+		return buildpack.BuildpackName
+	}
+
+	return buildpack.Name
+}
+
+func (AppSummaryDisplayer) buildpackVersion(name, version string) string {
+	if version == "" {
+		return name
+	}
+
+	return strings.Join([]string{name, version}, " ")
 }
 
 func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
