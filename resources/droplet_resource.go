@@ -30,6 +30,8 @@ type DropletBuildpack struct {
 	Name string `json:"name"`
 	//DetectOutput is the output during buildpack detect process.
 	DetectOutput string `json:"detect_output"`
+	// Name reported by the buildpack
+	BuildpackName string `json:"buildpack_name"`
 	//Version is the version of the detected buildpack.
 	Version string `json:"version"`
 }
