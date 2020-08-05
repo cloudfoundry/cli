@@ -432,7 +432,7 @@ var _ = Describe("update-service command", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = servicebrokerstub.New().WithAsyncDelay(time.Microsecond).EnableServiceAccess()
+				broker = servicebrokerstub.New().WithPlans(2).WithAsyncDelay(time.Microsecond).EnableServiceAccess()
 				helpers.CreateManagedServiceInstance(
 					broker.FirstServiceOfferingName(),
 					broker.FirstServicePlanName(),
@@ -517,15 +517,18 @@ var _ = Describe("update-service command", func() {
 			})
 
 			Describe("updating plan", func() {
-				const (
-					invalidPlan = "invalid-plan"
-				)
+				It("exits 0", func() {
+					session := helpers.CF(command, serviceInstanceName, "-p", broker.Services[0].Plans[1].Name)
+					Eventually(session).Should(Exit(0))
+				})
 
 				When("plan does not exist", func() {
+					const invalidPlan = "invalid-plan"
+
 					It("displays an error and exits 1", func() {
 						session := helpers.CF(command, serviceInstanceName, "-p", invalidPlan)
 						Eventually(session).Should(Exit(1))
-						Expect(session.Err).To(Say("Service plan '%s' not found.", invalidPlan))
+						Expect(session.Err).To(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", invalidPlan, broker.Services[0].Name, broker.Name))
 					})
 				})
 			})

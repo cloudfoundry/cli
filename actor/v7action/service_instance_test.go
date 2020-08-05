@@ -599,7 +599,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("there is an error getting the plan", func() {
+		Context("getting the plan", func() {
 			var (
 				warnings Warnings
 				err      error
@@ -607,45 +607,104 @@ var _ = Describe("Service Instance Actions", func() {
 
 			const (
 				fakeServicePlanName     = "invalid-plan"
-				fakeServiceInstanceName = "my-instance"
-				fakeSpaceGUID           = "some-guid"
+				fakeServiceOfferingName = "my-service-offering"
+				fakeServiceBrokerName   = "my-broker"
 			)
 
 			JustBeforeEach(func() {
 				params := ServiceInstanceUpdateManagedParams{
 					ServicePlanName: types.NewOptionalString(fakeServicePlanName),
 				}
-				warnings, err = actor.UpdateManagedServiceInstance(fakeServiceInstanceName, fakeSpaceGUID, params)
+
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						Type:                resources.ManagedServiceInstance,
+						GUID:                guid,
+						ServiceOfferingGUID: "something",
+					},
+					ccv3.IncludedResources{
+						ServiceOfferings: []resources.ServiceOffering{{Name: fakeServiceOfferingName}},
+						ServiceBrokers:   []resources.ServiceBroker{{Name: fakeServiceBrokerName}},
+					},
+					ccv3.Warnings{"warning from get"},
+					nil,
+				)
+				warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
 			})
 
-			When("no plan found", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
-				})
-
-				It("returns with warnings and an error", func() {
-					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
-
-					Expect(warnings).To(ConsistOf("be warned"))
-					Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: fakeServicePlanName}))
-				})
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
 			})
 
-			When("client error when getting the plan", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, errors.New("boom"))
-				})
+			It("makes the right call to fetch the plan", func() {
+				By("Passing the right query to fetch the instance")
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(ConsistOf(
+					[]ccv3.Query{
+						{
+							Key:    ccv3.FieldsServicePlanServiceOffering,
+							Values: []string{"name"},
+						},
+						{
+							Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
+							Values: []string{"name"},
+						},
+					},
+				))
 
-				It("returns warnings and an error", func() {
-					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
+				By("Passing the right query to get the plan")
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetServicePlansArgsForCall(0)
+				Expect(query[0].Key).To(Equal(ccv3.NameFilter))
+				Expect(query[0].Values[0]).To(Equal(fakeServicePlanName))
+				Expect(query[1].Key).To(Equal(ccv3.ServiceBrokerNamesFilter))
+				Expect(query[1].Values[0]).To(Equal(fakeServiceBrokerName))
+				Expect(query[2].Key).To(Equal(ccv3.ServiceOfferingNamesFilter))
+				Expect(query[2].Values[0]).To(Equal(fakeServiceOfferingName))
 
-					Expect(warnings).To(ConsistOf("be warned"))
-					Expect(err).To(MatchError("boom"))
-				})
 			})
 
+			It("returns all warnings", func() {
+				Expect(warnings).To(ConsistOf("be warned", "warning from get"))
+
+			})
+
+			Context("errors getting the plan", func() {
+				When("no plan found", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
+					})
+
+					It("returns with warnings and an error", func() {
+						Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
+
+						Expect(warnings).To(ConsistOf("warning from get", "be warned"))
+						Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{
+							PlanName:          fakeServicePlanName,
+							ServiceBrokerName: fakeServiceBrokerName,
+							OfferingName:      fakeServiceOfferingName,
+						}))
+					})
+				})
+
+				When("client error when getting the plan", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, errors.New("boom"))
+					})
+
+					It("returns warnings and an error", func() {
+						Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
+
+						Expect(warnings).To(ConsistOf("warning from get", "be warned"))
+						Expect(err).To(MatchError("boom"))
+					})
+				})
+			})
 		})
 
 		When("there is an error polling the job", func() {
