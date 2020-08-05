@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("upgrade-service command", func() {
+var _ = Describe("upgrade-service command", func() {
 	const command = "upgrade-service"
 
 	Describe("help", func() {
