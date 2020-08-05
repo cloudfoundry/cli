@@ -62,7 +62,8 @@ type commandList struct {
 	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" alias:"delete-domain" description:"Delete a private domain"`
 	DeleteRoute                        v7.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v7.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
-	DeleteService                      v7.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
+	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
+	DeleteServiceV3                    v7.DeleteServiceCommand                      `command:"v3-delete-service" alias:"ds" description:"Delete a service instance"`
 	DeleteServiceBroker                v7.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
 	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
 	DeleteSharedDomain                 v7.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
