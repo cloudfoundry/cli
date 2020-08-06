@@ -66,6 +66,13 @@ var _ = Describe("create-user-provided-service command", func() {
 			serviceName string
 		)
 
+		expectOKMessage := func(session *Session, serviceName, orgName, spaceName, userName string) {
+			Expect(session.Out).To(SatisfyAll(
+				Say("Creating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName),
+				Say("OK"),
+			))
+		}
+
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
@@ -76,7 +83,6 @@ var _ = Describe("create-user-provided-service command", func() {
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
-			deleteUserProvidedService(serviceName)
 		})
 
 		When("a name is provided", func() {
@@ -196,15 +202,4 @@ func expectHelpMessage(session *Session) {
 		Say(`SEE ALSO:`),
 		Say(`bind-service, services`),
 	))
-}
-
-func expectOKMessage(session *Session, serviceName, orgName, spaceName, userName string) {
-	Expect(session.Out).To(SatisfyAll(
-		Say("Creating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName),
-		Say("OK"),
-	))
-}
-
-func deleteUserProvidedService(name string) {
-	Eventually(helpers.CF("delete-service", "-f", name)).Should(Exit(0))
 }
