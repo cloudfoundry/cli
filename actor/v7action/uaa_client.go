@@ -18,4 +18,5 @@ type UAAClient interface {
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 	UpdatePassword(userGUID string, oldPassword string, newPassword string) error
 	ValidateClientUser(clientID string) error
+	Revoke(token string) error
 }

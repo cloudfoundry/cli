@@ -48,6 +48,16 @@ func (actor Actor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
 	return prompts
 }
 
+func (actor Actor) RevokeAccessAndRefreshTokens() error {
+	refreshToken := actor.Config.RefreshToken()
+	_ = actor.UAAClient.Revoke(refreshToken)
+
+	accessToken := actor.Config.AccessToken()
+	_ = actor.UAAClient.Revoke(accessToken)
+
+	return nil
+}
+
 var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{
 	"text":     coreconfig.AuthPromptTypeText,
 	"password": coreconfig.AuthPromptTypePassword,

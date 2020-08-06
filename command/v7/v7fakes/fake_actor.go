@@ -2326,6 +2326,16 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	RevokeAccessAndRefreshTokensStub        func() error
+	revokeAccessAndRefreshTokensMutex       sync.RWMutex
+	revokeAccessAndRefreshTokensArgsForCall []struct {
+	}
+	revokeAccessAndRefreshTokensReturns struct {
+		result1 error
+	}
+	revokeAccessAndRefreshTokensReturnsOnCall map[int]struct {
+		result1 error
+	}
 	RunTaskStub        func(string, v7action.Task) (v7action.Task, v7action.Warnings, error)
 	runTaskMutex       sync.RWMutex
 	runTaskArgsForCall []struct {
@@ -12997,6 +13007,58 @@ func (fake *FakeActor) RestartApplicationReturnsOnCall(i int, result1 v7action.W
 	}{result1, result2}
 }
 
+func (fake *FakeActor) RevokeAccessAndRefreshTokens() error {
+	fake.revokeAccessAndRefreshTokensMutex.Lock()
+	ret, specificReturn := fake.revokeAccessAndRefreshTokensReturnsOnCall[len(fake.revokeAccessAndRefreshTokensArgsForCall)]
+	fake.revokeAccessAndRefreshTokensArgsForCall = append(fake.revokeAccessAndRefreshTokensArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RevokeAccessAndRefreshTokens", []interface{}{})
+	fake.revokeAccessAndRefreshTokensMutex.Unlock()
+	if fake.RevokeAccessAndRefreshTokensStub != nil {
+		return fake.RevokeAccessAndRefreshTokensStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.revokeAccessAndRefreshTokensReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeActor) RevokeAccessAndRefreshTokensCallCount() int {
+	fake.revokeAccessAndRefreshTokensMutex.RLock()
+	defer fake.revokeAccessAndRefreshTokensMutex.RUnlock()
+	return len(fake.revokeAccessAndRefreshTokensArgsForCall)
+}
+
+func (fake *FakeActor) RevokeAccessAndRefreshTokensCalls(stub func() error) {
+	fake.revokeAccessAndRefreshTokensMutex.Lock()
+	defer fake.revokeAccessAndRefreshTokensMutex.Unlock()
+	fake.RevokeAccessAndRefreshTokensStub = stub
+}
+
+func (fake *FakeActor) RevokeAccessAndRefreshTokensReturns(result1 error) {
+	fake.revokeAccessAndRefreshTokensMutex.Lock()
+	defer fake.revokeAccessAndRefreshTokensMutex.Unlock()
+	fake.RevokeAccessAndRefreshTokensStub = nil
+	fake.revokeAccessAndRefreshTokensReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeActor) RevokeAccessAndRefreshTokensReturnsOnCall(i int, result1 error) {
+	fake.revokeAccessAndRefreshTokensMutex.Lock()
+	defer fake.revokeAccessAndRefreshTokensMutex.Unlock()
+	fake.RevokeAccessAndRefreshTokensStub = nil
+	if fake.revokeAccessAndRefreshTokensReturnsOnCall == nil {
+		fake.revokeAccessAndRefreshTokensReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.revokeAccessAndRefreshTokensReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeActor) RunTask(arg1 string, arg2 v7action.Task) (v7action.Task, v7action.Warnings, error) {
 	fake.runTaskMutex.Lock()
 	ret, specificReturn := fake.runTaskReturnsOnCall[len(fake.runTaskArgsForCall)]
@@ -16433,6 +16495,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.resourceMatchMutex.RUnlock()
 	fake.restartApplicationMutex.RLock()
 	defer fake.restartApplicationMutex.RUnlock()
+	fake.revokeAccessAndRefreshTokensMutex.RLock()
+	defer fake.revokeAccessAndRefreshTokensMutex.RUnlock()
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
 	fake.scaleProcessByApplicationMutex.RLock()

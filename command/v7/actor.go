@@ -172,6 +172,7 @@ type Actor interface {
 	ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, v7action.Warnings, error)
 	ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
+	RevokeAccessAndRefreshTokens() error
 	RunTask(appGUID string, task v7action.Task) (v7action.Task, v7action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	ScheduleTokenRefresh(func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) (<-chan error, error)
