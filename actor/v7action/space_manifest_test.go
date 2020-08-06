@@ -130,23 +130,25 @@ var _ = Describe("Application Manifest Actions", func() {
 
 	Describe("GetSpaceManifestDiff", func() {
 		var (
-			spaceGUID    string
-			newManifest  []byte
-			manifestDiff []byte
+			spaceGUID        string
+			newManifest      []byte
+			manifestDiff     []byte
+			expectedManifest []byte
 
-			returnedDiff []byte
-			warnings     Warnings
-			executeErr   error
+			returnedManifest string
+			warnings         Warnings
+			executeErr       error
 		)
 
 		BeforeEach(func() {
 			spaceGUID = "some-space-guid"
 			newManifest = []byte("---\n- applications:\n name: my-app")
-			manifestDiff = []byte(`{"diff": [{"op": "replace", "path": "/applications/2/processes/1/memory", "was": "256M", "value": "512M"}}]}`)
+			manifestDiff = []byte(`[{"op": "replace", "path": "/applications/2/processes/1/memory", "was": "256M", "value": "512M"}]`)
+			expectedManifest = []byte("---\n- applications:\n name: my-app")
 		})
 
 		JustBeforeEach(func() {
-			returnedDiff, warnings, executeErr = actor.GetSpaceManifestDiff(spaceGUID, newManifest)
+			returnedManifest, warnings, executeErr = actor.GetSpaceManifestDiff(spaceGUID, newManifest)
 		})
 
 		When("getting the manifest diff succeeds", func() {
@@ -159,7 +161,7 @@ var _ = Describe("Application Manifest Actions", func() {
 			})
 
 			It("returns the manifest diff and warnings", func() {
-				Expect(returnedDiff).To(Equal(manifestDiff))
+				Expect(returnedManifest).To(Equal(expectedManifest))
 				Expect(warnings).To(ConsistOf("get-manifest-diff-warning"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})

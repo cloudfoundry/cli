@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -90,11 +91,13 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, warnings, err := cmd.Actor.GetSpaceManifestDiff(cmd.Config.TargetedSpace().GUID, rawManifest)
+	manifestDiff, warnings, err := cmd.Actor.GetSpaceManifestDiff(cmd.Config.TargetedSpace().GUID, rawManifest)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+	fmt.Print(string(manifestDiff))
+	fmt.Print(string(rawManifest))
 
 	warnings, err = cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
 	cmd.UI.DisplayWarnings(warnings)
