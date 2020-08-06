@@ -480,7 +480,7 @@ var _ = Describe("service command", func() {
 						Say(`Upgrade description: really cool upgrade\n`),
 						Say(`with juicy bits\n`),
 						Say(`\n`),
-						Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'\n`, serviceInstanceName),
+						Say(`TIP: You can upgrade using 'cf upgrade-service %s'\n`, serviceInstanceName),
 					))
 				})
 			})
