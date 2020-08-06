@@ -77,7 +77,12 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varFilePath))
 	}
 
-	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	rawManifest, err := cmd.ManifestParser.InterpolateManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	if err != nil {
+		return err
+	}
+
+	manifest, err := cmd.ManifestParser.ParseManifest(pathToManifest, rawManifest)
 	if err != nil {
 		if _, ok := err.(*yaml.TypeError); ok {
 			return errors.New("Unable to apply manifest because its format is invalid.")
@@ -85,7 +90,7 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	rawManifest, err := cmd.ManifestParser.MarshalManifest(manifest)
+	rawManifest, err = cmd.ManifestParser.MarshalManifest(manifest)
 	if err != nil {
 		return err
 	}

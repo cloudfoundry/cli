@@ -223,7 +223,7 @@ var _ = Describe("push Command", func() {
 					BeforeEach(func() {
 						// essentially fakes GetBaseManifest
 						fakeManifestLocator.PathReturns("", true, nil)
-						fakeManifestParser.InterpolateAndParseReturns(
+						fakeManifestParser.ParseManifestReturns(
 							manifestparser.Manifest{
 								Applications: []manifestparser.Application{
 									{
@@ -804,7 +804,7 @@ var _ = Describe("push Command", func() {
 			When("a manifest exists in the current dir", func() {
 				BeforeEach(func() {
 					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-					fakeManifestParser.InterpolateAndParseReturns(
+					fakeManifestParser.ParseManifestReturns(
 						manifestparser.Manifest{
 							Applications: []manifestparser.Application{
 								{Name: "new-app"},
@@ -827,8 +827,12 @@ var _ = Describe("push Command", func() {
 					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.CWD))
 
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+					actualManifestPath, _, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
+					Expect(actualManifestPath).To(Equal("/manifest/path"))
+
+					Expect(fakeManifestParser.ParseManifestCallCount()).To(Equal(1))
+					actualManifestPath, _ = fakeManifestParser.ParseManifestArgsForCall(0)
 					Expect(actualManifestPath).To(Equal("/manifest/path"))
 				})
 			})
@@ -841,7 +845,7 @@ var _ = Describe("push Command", func() {
 
 				It("ignores the file not found error", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(0))
 				})
 
 				It("returns a default empty manifest", func() {
@@ -862,14 +866,29 @@ var _ = Describe("push Command", func() {
 
 				It("returns the error", func() {
 					Expect(executeErr).To(MatchError("err-location"))
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(0))
+				})
+			})
+
+			When("interpolating the manifest fails", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+					fakeManifestParser.InterpolateManifestReturns(
+						nil,
+						errors.New("bad yaml"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("bad yaml"))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
 				})
 			})
 
 			When("parsing the manifest fails", func() {
 				BeforeEach(func() {
 					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-					fakeManifestParser.InterpolateAndParseReturns(
+					fakeManifestParser.ParseManifestReturns(
 						manifestparser.Manifest{},
 						errors.New("bad yaml"),
 					)
@@ -877,7 +896,7 @@ var _ = Describe("push Command", func() {
 
 				It("returns the error", func() {
 					Expect(executeErr).To(MatchError("bad yaml"))
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					Expect(fakeManifestParser.ParseManifestCallCount()).To(Equal(1))
 				})
 			})
 		})
@@ -887,7 +906,7 @@ var _ = Describe("push Command", func() {
 				somePath = "some-path"
 				flagOverrides.ManifestPath = somePath
 				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				fakeManifestParser.InterpolateAndParseReturns(
+				fakeManifestParser.ParseManifestReturns(
 					manifestparser.Manifest{
 						Applications: []manifestparser.Application{
 							{Name: "new-app"},
@@ -903,8 +922,8 @@ var _ = Describe("push Command", func() {
 				Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				actualManifestPath, _, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualManifestPath).To(Equal("/manifest/path"))
 				Expect(manifest).To(Equal(
 					manifestparser.Manifest{
@@ -928,8 +947,8 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				_, actualVarsFiles, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualVarsFiles).To(Equal(varsFiles))
 			})
 		})
@@ -948,8 +967,8 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				_, _, actualVars := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualVars).To(Equal(vars))
 			})
 		})

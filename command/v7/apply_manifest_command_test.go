@@ -159,6 +159,7 @@ var _ = Describe("apply-manifest Command", func() {
 							v7action.Warnings{"some-manifest-warning"},
 							nil,
 						)
+						fakeParser.InterpolateManifestReturns([]byte("interpolated!"), nil)
 						fakeParser.MarshalManifestReturns([]byte("manifesto"), nil)
 					})
 
@@ -168,11 +169,16 @@ var _ = Describe("apply-manifest Command", func() {
 						Expect(testUI.Err).To(Say("some-manifest-warning"))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
-						path, varsFiles, vars := fakeParser.InterpolateAndParseArgsForCall(0)
+						Expect(fakeParser.InterpolateManifestCallCount()).To(Equal(1))
+						path, varsFiles, vars := fakeParser.InterpolateManifestArgsForCall(0)
 						Expect(path).To(Equal(resolvedPath))
 						Expect(varsFiles).To(Equal([]string{"vars.yml"}))
 						Expect(vars).To(Equal([]template.VarKV{{Name: "o", Value: "nice"}}))
+
+						Expect(fakeParser.ParseManifestCallCount()).To(Equal(1))
+						path, rawManifest := fakeParser.ParseManifestArgsForCall(0)
+						Expect(path).To(Equal(resolvedPath))
+						Expect(rawManifest).To(Equal([]byte("interpolated!")))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 						spaceGUIDArg, actualBytes := fakeActor.SetSpaceManifestArgsForCall(0)
@@ -183,7 +189,7 @@ var _ = Describe("apply-manifest Command", func() {
 
 				When("the manifest is unparseable", func() {
 					BeforeEach(func() {
-						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, &yaml.TypeError{
+						fakeParser.ParseManifestReturns(manifestparser.Manifest{}, &yaml.TypeError{
 							Errors: []string{"oooooh nooooos"},
 						})
 					})
