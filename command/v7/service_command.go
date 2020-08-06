@@ -227,7 +227,7 @@ func (cmd ServiceCommand) displayUpgrades() error {
 			"Description": cmd.serviceInstance.UpgradeStatus.Description,
 		})
 		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("TIP: You can upgrade using 'cf update-service {{.InstanceName}} --upgrade'", map[string]interface{}{
+		cmd.UI.DisplayText("TIP: You can upgrade using 'cf upgrade-service {{.InstanceName}}'", map[string]interface{}{
 			"InstanceName": cmd.serviceInstance.Name,
 		})
 	case v7action.ServiceInstanceUpgradeNotAvailable:

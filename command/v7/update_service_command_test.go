@@ -78,6 +78,17 @@ var _ = Describe("update-service command", func() {
 		Expect(spaceChecked).To(BeTrue())
 	})
 
+	When("upgrade flag specified", func() {
+		BeforeEach(func() {
+			setFlag(&cmd, "--upgrade")
+		})
+
+		It("prints a message and exits 0", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say("Upgrading is no longer supported via updates, please run cf upgrade-service fake-service-instance-name instead."))
+		})
+	})
+
 	When("no parameters specified", func() {
 		It("prints a message and exits 0", func() {
 			Expect(executeErr).NotTo(HaveOccurred())

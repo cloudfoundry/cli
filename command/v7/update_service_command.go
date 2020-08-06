@@ -16,6 +16,7 @@ type UpdateServiceCommand struct {
 	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Plan         flag.OptionalString           `short:"p" description:"Change service plan for a service instance"`
 	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
+	Upgrade      bool                          `long:"upgrade" hidden:"true"`
 
 	relatedCommands interface{} `related_commands:"rename-service, services, update-user-provided-service"`
 }
@@ -29,13 +30,27 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
+	serviceInstance := cmd.RequiredArgs.ServiceInstance
+
+	if cmd.Upgrade {
+		cmd.UI.DisplayTextWithFlavor(
+			"Upgrading is no longer supported via updates, please run {{.UpgradeCommand}} instead.",
+			map[string]interface{}{
+				"UpgradeCommand": "cf upgrade-service " + serviceInstance,
+			},
+		)
+		cmd.UI.DisplayOK()
+
+		return nil
+	}
+
 	if cmd.noFlagsProvided() {
 		cmd.UI.DisplayText("No flags specified. No changes were made.")
 		cmd.UI.DisplayOK()
 		return nil
 	}
 	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-		cmd.RequiredArgs.ServiceInstance,
+		serviceInstance,
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
 			Tags:            types.OptionalStringSlice(cmd.Tags),
