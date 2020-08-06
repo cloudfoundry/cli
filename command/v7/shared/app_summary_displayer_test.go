@@ -575,9 +575,10 @@ var _ = Describe("app summary displayer", func() {
 
 			It("displays stack and buildpacks", func() {
 				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
-				Expect(testUI.Out).To(Say(`buildpacks:\s+ruby_buildpack_name, go_buildpack_name, go_buildpack_name, some-buildpack`))
-				Expect(testUI.Out).To(Say(`buildpack versions:\s+ruby_buildpack_name 0.0.1, go_buildpack_name 0.0.2, go_buildpack_name, some-buildpack`))
-				Expect(testUI.Out).To(Say(`buildpack names:\s+ruby_buildpack, go_buildpack_without_detect_output, go_buildpack_without_version, some-buildpack`))
+				Expect(testUI.Out).To(Say(`buildpacks:`))
+				Expect(testUI.Out).To(Say(`name                                 version   detect output        buildpack name`))
+				Expect(testUI.Out).To(Say(`ruby_buildpack                       0.0.1     some-detect-output   ruby_buildpack_name`))
+				Expect(testUI.Out).To(Say(`some-buildpack`))
 			})
 		})
 	})

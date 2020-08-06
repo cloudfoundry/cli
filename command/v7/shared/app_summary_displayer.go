@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -30,18 +31,10 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 	}
 
 	var lifecycleInfo []string
-	var buildpackVersions []string
-	var buildpackUserProvidedNames []string
-
 	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
 		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
-	} else {
-		names, versions, userProvidedNames := display.buildpackInfo(summary.CurrentDroplet.Buildpacks)
-		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), names}
-		buildpackVersions = []string{display.UI.TranslateText("buildpack versions:"), versions}
-		buildpackUserProvidedNames = []string{display.UI.TranslateText("buildpack names:"), userProvidedNames}
-
 	}
+
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
@@ -50,11 +43,14 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		lifecycleInfo,
-		buildpackVersions,
-		buildpackUserProvidedNames,
+		isoRow,
 	}
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
+
+	if len(lifecycleInfo) == 0 {
+		display.displayBuildpackTable(summary.CurrentDroplet.Buildpacks)
+	}
 
 	display.displayProcessTable(summary, displayStartCommand)
 }
@@ -64,6 +60,7 @@ func routeSummary(rs []resources.Route) string {
 	for _, route := range rs {
 		formattedRoutes = append(formattedRoutes, route.URL)
 	}
+
 	return strings.Join(formattedRoutes, ", ")
 }
 
@@ -146,41 +143,31 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	return ""
 }
 
-func (display AppSummaryDisplayer) buildpackInfo(buildpacks []resources.DropletBuildpack) (string, string, string) {
-	var names []string
-	var versions []string
-	var userProvidedNames []string
-
-	for _, buildpack := range buildpacks {
-		name := display.buildpackName(buildpack)
-		names = append(names, name)
-		versions = append(versions, display.buildpackVersion(name, buildpack.Version))
-
-		userProvidedNames = append(userProvidedNames, buildpack.Name)
-	}
-
-	detectedNamesString := strings.Join(names, ", ")
-	versionsString := strings.TrimSpace(strings.Join(versions, ", "))
-	userProvidedNamesString := strings.TrimSpace(strings.Join(userProvidedNames, ", "))
-	return detectedNamesString, versionsString, userProvidedNamesString
-}
-
-func (AppSummaryDisplayer) buildpackName(buildpack resources.DropletBuildpack) string {
-	if buildpack.BuildpackName != "" {
-		return buildpack.BuildpackName
-	}
-
-	return buildpack.Name
-}
-
-func (AppSummaryDisplayer) buildpackVersion(name, version string) string {
-	if version == "" {
-		return name
-	}
-
-	return strings.Join([]string{name, version}, " ")
-}
-
 func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 	return input.UTC().Format(time.RFC3339)
+}
+
+func (display AppSummaryDisplayer) displayBuildpackTable(buildpacks []resources.DropletBuildpack) {
+	if len(buildpacks) > 0 {
+		var keyValueTable = [][]string{
+			{
+				display.UI.TranslateText("name"),
+				display.UI.TranslateText("version"),
+				display.UI.TranslateText("detect output"),
+				display.UI.TranslateText("buildpack name"),
+			},
+		}
+
+		for _, buildpack := range buildpacks {
+			keyValueTable = append(keyValueTable, []string{
+				buildpack.Name,
+				buildpack.Version,
+				buildpack.DetectOutput,
+				buildpack.BuildpackName,
+			})
+		}
+
+		display.UI.DisplayText("buildpacks:")
+		display.UI.DisplayTableWithHeader("\t", keyValueTable, ui.DefaultTableSpacePadding)
+	}
 }
