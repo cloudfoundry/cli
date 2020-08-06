@@ -82,10 +82,6 @@ var _ = Describe("update-user-provided-service command", func() {
 				createUserProvidedService(serviceName)
 			})
 
-			AfterEach(func() {
-				deleteUserProvidedService(serviceName)
-			})
-
 			When("no flags are provided", func() {
 				It("displays an informative message and exits 0", func() {
 					session := helpers.CF("update-user-provided-service", serviceName)
@@ -254,8 +250,4 @@ func randomUserProvidedServiceName() string {
 
 func createUserProvidedService(name string) {
 	Eventually(helpers.CF("create-user-provided-service", name)).Should(Exit(0))
-}
-
-func deleteUserProvidedService(name string) {
-	Eventually(helpers.CF("delete-service", name)).Should(Exit(0))
 }
