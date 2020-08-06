@@ -47,6 +47,24 @@ type FakeUI struct {
 	displayDeprecationWarningMutex       sync.RWMutex
 	displayDeprecationWarningArgsForCall []struct {
 	}
+	DisplayDiffAdditionStub        func(string, int)
+	displayDiffAdditionMutex       sync.RWMutex
+	displayDiffAdditionArgsForCall []struct {
+		arg1 string
+		arg2 int
+	}
+	DisplayDiffRemovalStub        func(string, int)
+	displayDiffRemovalMutex       sync.RWMutex
+	displayDiffRemovalArgsForCall []struct {
+		arg1 string
+		arg2 int
+	}
+	DisplayDiffUnchangedStub        func(string, int)
+	displayDiffUnchangedMutex       sync.RWMutex
+	displayDiffUnchangedArgsForCall []struct {
+		arg1 string
+		arg2 int
+	}
 	DisplayErrorStub        func(error)
 	displayErrorMutex       sync.RWMutex
 	displayErrorArgsForCall []struct {
@@ -464,6 +482,102 @@ func (fake *FakeUI) DisplayDeprecationWarningCalls(stub func()) {
 	fake.displayDeprecationWarningMutex.Lock()
 	defer fake.displayDeprecationWarningMutex.Unlock()
 	fake.DisplayDeprecationWarningStub = stub
+}
+
+func (fake *FakeUI) DisplayDiffAddition(arg1 string, arg2 int) {
+	fake.displayDiffAdditionMutex.Lock()
+	fake.displayDiffAdditionArgsForCall = append(fake.displayDiffAdditionArgsForCall, struct {
+		arg1 string
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("DisplayDiffAddition", []interface{}{arg1, arg2})
+	fake.displayDiffAdditionMutex.Unlock()
+	if fake.DisplayDiffAdditionStub != nil {
+		fake.DisplayDiffAdditionStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeUI) DisplayDiffAdditionCallCount() int {
+	fake.displayDiffAdditionMutex.RLock()
+	defer fake.displayDiffAdditionMutex.RUnlock()
+	return len(fake.displayDiffAdditionArgsForCall)
+}
+
+func (fake *FakeUI) DisplayDiffAdditionCalls(stub func(string, int)) {
+	fake.displayDiffAdditionMutex.Lock()
+	defer fake.displayDiffAdditionMutex.Unlock()
+	fake.DisplayDiffAdditionStub = stub
+}
+
+func (fake *FakeUI) DisplayDiffAdditionArgsForCall(i int) (string, int) {
+	fake.displayDiffAdditionMutex.RLock()
+	defer fake.displayDiffAdditionMutex.RUnlock()
+	argsForCall := fake.displayDiffAdditionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeUI) DisplayDiffRemoval(arg1 string, arg2 int) {
+	fake.displayDiffRemovalMutex.Lock()
+	fake.displayDiffRemovalArgsForCall = append(fake.displayDiffRemovalArgsForCall, struct {
+		arg1 string
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("DisplayDiffRemoval", []interface{}{arg1, arg2})
+	fake.displayDiffRemovalMutex.Unlock()
+	if fake.DisplayDiffRemovalStub != nil {
+		fake.DisplayDiffRemovalStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeUI) DisplayDiffRemovalCallCount() int {
+	fake.displayDiffRemovalMutex.RLock()
+	defer fake.displayDiffRemovalMutex.RUnlock()
+	return len(fake.displayDiffRemovalArgsForCall)
+}
+
+func (fake *FakeUI) DisplayDiffRemovalCalls(stub func(string, int)) {
+	fake.displayDiffRemovalMutex.Lock()
+	defer fake.displayDiffRemovalMutex.Unlock()
+	fake.DisplayDiffRemovalStub = stub
+}
+
+func (fake *FakeUI) DisplayDiffRemovalArgsForCall(i int) (string, int) {
+	fake.displayDiffRemovalMutex.RLock()
+	defer fake.displayDiffRemovalMutex.RUnlock()
+	argsForCall := fake.displayDiffRemovalArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeUI) DisplayDiffUnchanged(arg1 string, arg2 int) {
+	fake.displayDiffUnchangedMutex.Lock()
+	fake.displayDiffUnchangedArgsForCall = append(fake.displayDiffUnchangedArgsForCall, struct {
+		arg1 string
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("DisplayDiffUnchanged", []interface{}{arg1, arg2})
+	fake.displayDiffUnchangedMutex.Unlock()
+	if fake.DisplayDiffUnchangedStub != nil {
+		fake.DisplayDiffUnchangedStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeUI) DisplayDiffUnchangedCallCount() int {
+	fake.displayDiffUnchangedMutex.RLock()
+	defer fake.displayDiffUnchangedMutex.RUnlock()
+	return len(fake.displayDiffUnchangedArgsForCall)
+}
+
+func (fake *FakeUI) DisplayDiffUnchangedCalls(stub func(string, int)) {
+	fake.displayDiffUnchangedMutex.Lock()
+	defer fake.displayDiffUnchangedMutex.Unlock()
+	fake.DisplayDiffUnchangedStub = stub
+}
+
+func (fake *FakeUI) DisplayDiffUnchangedArgsForCall(i int) (string, int) {
+	fake.displayDiffUnchangedMutex.RLock()
+	defer fake.displayDiffUnchangedMutex.RUnlock()
+	argsForCall := fake.displayDiffUnchangedArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeUI) DisplayError(arg1 error) {
@@ -1699,6 +1813,12 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayChangesForPushMutex.RUnlock()
 	fake.displayDeprecationWarningMutex.RLock()
 	defer fake.displayDeprecationWarningMutex.RUnlock()
+	fake.displayDiffAdditionMutex.RLock()
+	defer fake.displayDiffAdditionMutex.RUnlock()
+	fake.displayDiffRemovalMutex.RLock()
+	defer fake.displayDiffRemovalMutex.RUnlock()
+	fake.displayDiffUnchangedMutex.RLock()
+	defer fake.displayDiffUnchangedMutex.RUnlock()
 	fake.displayErrorMutex.RLock()
 	defer fake.displayErrorMutex.RUnlock()
 	fake.displayFileDeprecationWarningMutex.RLock()

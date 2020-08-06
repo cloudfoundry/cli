@@ -55,7 +55,8 @@ type V7ActorForPush interface {
 //go:generate counterfeiter . ManifestParser
 
 type ManifestParser interface {
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (manifestparser.Manifest, error)
+	InterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error)
+	ParseManifest(pathToManifest string, rawManifest []byte) (manifestparser.Manifest, error)
 	MarshalManifest(manifest manifestparser.Manifest) ([]byte, error)
 }
 
@@ -63,6 +64,12 @@ type ManifestParser interface {
 
 type ManifestLocator interface {
 	Path(filepathOrDirectory string) (string, bool, error)
+}
+
+//go:generate counterfeiter . DiffDisplayer
+
+type DiffDisplayer interface {
+	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error
 }
 
 type PushCommand struct {
@@ -260,12 +267,18 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
+	rawManifest, err := cmd.ManifestParser.InterpolateManifest(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
 		log.Errorln("reading manifest:", err)
 		if _, ok := err.(*yaml.TypeError); ok {
 			return manifestparser.Manifest{}, errors.New(fmt.Sprintf("Unable to push app because manifest %s is not valid yaml.", pathToManifest))
 		}
+		return manifestparser.Manifest{}, err
+	}
+
+	manifest, err := cmd.ManifestParser.ParseManifest(pathToManifest, rawManifest)
+	if err != nil {
+		log.Errorln("parsing manifest:", err)
 		return manifestparser.Manifest{}, err
 	}
 

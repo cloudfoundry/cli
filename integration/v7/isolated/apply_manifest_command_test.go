@@ -182,6 +182,7 @@ var _ = Describe("apply-manifest command", func() {
 					Eventually(session).Should(Exit())
 				})
 			})
+
 		})
 
 		When("-f is not provided", func() {
@@ -217,6 +218,51 @@ var _ = Describe("apply-manifest command", func() {
 					Eventually(session.Err).Should(helpers.SayPath(`Could not find 'manifest.yml' file in %s`, currentDir))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		When("testing manifest diffing output", func() {
+			var (
+				userName string
+			)
+
+			BeforeEach(func() {
+				userName, _ = helpers.GetCredentials()
+			})
+
+			When("there are no changes in the manifest", func() {
+				It("shows no changes", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+						session := helpers.CF("apply-manifest", "-f", manifestPath)
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+						Eventually(session).Should(Say("Updating with these attributes..."))
+						Consistently(session).ShouldNot(Say(`^\+ `))
+						Consistently(session).ShouldNot(Say(`^- `))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("there are changes in the manifest", func() {
+				It("shows changes", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+
+						session := helpers.CF("scale", appName, "-i", "3")
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("apply-manifest", "-f", manifestPath)
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+						Eventually(session).Should(Say("Updating with these attributes..."))
+						Eventually(session).Should(Say("applications"))
+						Eventually(session).Should(Say(`\n-\s+instances: 3`))
+						Eventually(session).Should(Say(`\n\+\s+instances: 1`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
@@ -259,3 +305,15 @@ var _ = Describe("apply-manifest command", func() {
 		})
 	})
 })
+
+func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, string) {
+	session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+	Eventually(session).Should(Exit(0))
+	manifestPath := fmt.Sprintf("%s/manifest.yml", dir)
+	session = helpers.CF("create-app-manifest", appName, "-p", manifestPath)
+	Eventually(session).Should(Say(fmt.Sprintf("Manifest file created successfully at %s", manifestPath)))
+	Eventually(session).Should(Exit(0))
+	manifest := helpers.ReadManifest(manifestPath)
+
+	return manifest, manifestPath
+}

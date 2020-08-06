@@ -8,12 +8,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Application Manifest Actions", func() {
+var _ = Describe("Space Manifest Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -22,6 +23,67 @@ var _ = Describe("Application Manifest Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+	})
+
+	Describe("DiffSpaceManifest", func() {
+		var (
+			spaceGUID   string
+			rawManifest []byte
+
+			diff       resources.ManifestDiff
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			spaceGUID = "some-space-guid"
+			rawManifest = []byte("---\n- applications:\n name: my-app")
+		})
+
+		JustBeforeEach(func() {
+			diff, warnings, executeErr = actor.DiffSpaceManifest(spaceGUID, rawManifest)
+		})
+
+		When("getting the diff succeeds", func() {
+			BeforeEach(func() {
+				returnedDiff := resources.ManifestDiff{
+					Diffs: []resources.Diff{
+						{Op: resources.AddOperation, Path: "/some/path", Value: "wow"},
+					},
+				}
+
+				fakeCloudControllerClient.GetSpaceManifestDiffReturns(
+					returnedDiff,
+					ccv3.Warnings{"diff-manifest-warning"},
+					nil,
+				)
+			})
+
+			It("returns the diff and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(diff).To(Equal(resources.ManifestDiff{
+					Diffs: []resources.Diff{
+						{Op: resources.AddOperation, Path: "/some/path", Value: "wow"},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("diff-manifest-warning"))
+			})
+		})
+
+		When("getting the diff errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceManifestDiffReturns(
+					resources.ManifestDiff{},
+					ccv3.Warnings{"diff-manifest-warning"},
+					errors.New("diff-manifest-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("diff-manifest-error"))
+				Expect(warnings).To(ConsistOf("diff-manifest-warning"))
+			})
+		})
 	})
 
 	Describe("SetSpaceManifest", func() {

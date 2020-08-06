@@ -121,6 +121,7 @@ type CloudControllerClient interface {
 	GetServicePlansWithSpaceAndOrganization(query ...ccv3.Query) ([]ccv3.ServicePlanWithSpaceAndOrganization, ccv3.Warnings, error)
 	GetSpaceFeature(spaceGUID string, featureName string) (bool, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (resources.Relationship, ccv3.Warnings, error)
+	GetSpaceManifestDiff(spaceGUID string, rawManifest []byte) (resources.ManifestDiff, ccv3.Warnings, error)
 	GetSpaceQuota(spaceQuotaGUID string) (resources.SpaceQuota, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]resources.Space, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetSpaceQuotas(query ...ccv3.Query) ([]resources.SpaceQuota, ccv3.Warnings, error)

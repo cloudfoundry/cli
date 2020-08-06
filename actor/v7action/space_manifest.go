@@ -3,7 +3,17 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 )
+
+func (actor Actor) DiffSpaceManifest(spaceGUID string, rawManifest []byte) (resources.ManifestDiff, Warnings, error) {
+	diff, warnings, err := actor.CloudControllerClient.GetSpaceManifestDiff(
+		spaceGUID,
+		rawManifest,
+	)
+
+	return diff, Warnings(warnings), err
+}
 
 func (actor Actor) SetSpaceManifest(spaceGUID string, rawManifest []byte) (Warnings, error) {
 	var allWarnings Warnings

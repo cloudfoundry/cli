@@ -330,6 +330,27 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DisplayDiffAddition", func() {
+		It("displays a green indented line with a +", func() {
+			ui.DisplayDiffAddition("added", 3)
+			Expect(out).To(Say(`\x1b\[32m\+       added\x1b\[0m`))
+		})
+	})
+
+	Describe("DisplayDiffRemoval", func() {
+		It("displays a red indented line with a -", func() {
+			ui.DisplayDiffRemoval("removed", 3)
+			Expect(out).To(Say(`\x1b\[31m\-       removed\x1b\[0m`))
+		})
+	})
+
+	Describe("DisplayDiffUnchanged", func() {
+		It("displays a plain indented line with no prefix", func() {
+			ui.DisplayDiffUnchanged("unchanged", 3)
+			Expect(out).To(Say("        unchanged"))
+		})
+	})
+
 	Describe("TranslateText", func() {
 		It("returns the template", func() {
 			Expect(ui.TranslateText("some-template")).To(Equal("some-template"))

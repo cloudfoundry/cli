@@ -4,13 +4,13 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/errors"
-	"gopkg.in/yaml.v2"
-
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
+	"gopkg.in/yaml.v2"
 )
 
 type ApplyManifestCommand struct {
@@ -24,12 +24,15 @@ type ApplyManifestCommand struct {
 
 	ManifestLocator ManifestLocator
 	ManifestParser  ManifestParser
-	CWD             string
+
+	DiffDisplayer DiffDisplayer
+	CWD           string
 }
 
 func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
+	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
 
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -72,12 +75,19 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		"Username":     user.Name,
 	})
 
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+
 	var pathsToVarsFiles []string
 	for _, varFilePath := range cmd.PathsToVarsFiles {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varFilePath))
 	}
 
-	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	interpolatedManifestBytes, err := cmd.ManifestParser.InterpolateManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	if err != nil {
+		return err
+	}
+
+	manifest, err := cmd.ManifestParser.ParseManifest(pathToManifest, interpolatedManifestBytes)
 	if err != nil {
 		if _, ok := err.(*yaml.TypeError); ok {
 			return errors.New("Unable to apply manifest because its format is invalid.")
@@ -85,17 +95,32 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	rawManifest, err := cmd.ManifestParser.MarshalManifest(manifest)
+	manifestBytes, err := cmd.ManifestParser.MarshalManifest(manifest)
 	if err != nil {
 		return err
 	}
 
-	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
+	diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, manifestBytes)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Updating with these attributes...")
+
+	err = cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
+	if err != nil {
+		return err
+	}
+
+	warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayOK()
 
 	return nil

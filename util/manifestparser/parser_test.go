@@ -6,28 +6,25 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
-
 	. "code.cloudfoundry.org/cli/util/manifestparser"
-
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 var _ = Describe("ManifestParser", func() {
 	var parser ManifestParser
 
-	Describe("InterpolateAndParse", func() {
+	Describe("InterpolateManifest", func() {
 		var (
+			givenManifest    []byte
 			pathToManifest   string
 			pathsToVarsFiles []string
 			vars             []template.VarKV
 
-			executeErr     error
-			parsedManifest Manifest
-
-			rawManifest []byte
+			interpolatedManifest []byte
+			executeErr           error
 		)
 
 		BeforeEach(func() {
@@ -48,57 +45,38 @@ var _ = Describe("ManifestParser", func() {
 		})
 
 		JustBeforeEach(func() {
-			parsedManifest, executeErr = parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, vars)
+			interpolatedManifest, executeErr = parser.InterpolateManifest(pathToManifest, pathsToVarsFiles, vars)
 		})
 
 		When("the manifest does *not* need interpolation", func() {
 			BeforeEach(func() {
-				rawManifest = []byte(`---
+				givenManifest = []byte(`---
 applications:
 - name: spark
 - name: flame
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := ioutil.WriteFile(pathToManifest, givenManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("parses the manifest properly", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(parsedManifest).To(Equal(Manifest{
-					PathToManifest: pathToManifest,
-					Applications: []Application{
-						{Name: "spark", RemainingManifestFields: map[string]interface{}{}},
-						{Name: "flame", RemainingManifestFields: map[string]interface{}{}},
-					},
-				}))
+				Expect(string(interpolatedManifest)).To(Equal(`applications:
+- name: spark
+- name: flame
+`))
 			})
-		})
-
-		When("the manifest does not contain applications", func() {
-			BeforeEach(func() {
-				rawManifest = []byte(`---
-applications:
-`)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(HaveOccurred())
-				Expect(executeErr).To(MatchError(errors.New("Manifest must have at least one application.")))
-			})
-
 		})
 
 		When("the manifest contains variables that need interpolation", func() {
 			BeforeEach(func() {
-				rawManifest = []byte(`---
+				givenManifest = []byte(`---
 applications:
 - name: ((var1))
 - name: ((var2))
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := ioutil.WriteFile(pathToManifest, givenManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -142,14 +120,20 @@ applications:
 
 					It("interpolates the placeholder values", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(parsedManifest.AppNames()).To(ConsistOf("spark", "flame"))
+						Expect(string(interpolatedManifest)).To(Equal(`applications:
+- name: spark
+- name: flame
+`))
 					})
 				})
 
 				When("the provided files exists and contain valid yaml", func() {
 					It("interpolates the placeholder values", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(parsedManifest.AppNames()).To(ConsistOf("spark", "flame"))
+						Expect(string(interpolatedManifest)).To(Equal(`applications:
+- name: spark
+- name: flame
+`))
 					})
 				})
 
@@ -206,7 +190,10 @@ applications:
 
 				It("interpolates the placeholder values", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(parsedManifest.AppNames()).To(ConsistOf("spark", "flame"))
+					Expect(string(interpolatedManifest)).To(Equal(`applications:
+- name: spark
+- name: flame
+`))
 				})
 			})
 
@@ -233,16 +220,48 @@ applications:
 
 				It("interpolates the placeholder values, prioritizing the vars flag", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(parsedManifest.AppNames()).To(ConsistOf("spark", "flame"))
+					Expect(string(interpolatedManifest)).To(Equal(`applications:
+- name: spark
+- name: flame
+`))
 				})
+			})
+		})
+	})
+
+	Describe("ParseManifest", func() {
+		var (
+			pathToManifest string
+			rawManifest    []byte
+
+			executeErr     error
+			parsedManifest Manifest
+		)
+
+		BeforeEach(func() {
+			pathToManifest = "/some/path/to/manifest.yml"
+			rawManifest = nil
+		})
+
+		JustBeforeEach(func() {
+			parsedManifest, executeErr = parser.ParseManifest(pathToManifest, rawManifest)
+		})
+
+		When("the manifest does not contain applications", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`applications:
+`)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(errors.New("Manifest must have at least one application.")))
 			})
 		})
 
 		When("invalid yaml is passed", func() {
 			BeforeEach(func() {
 				rawManifest = []byte("\t\t")
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("returns an error", func() {
@@ -253,15 +272,27 @@ applications:
 		When("unmarshalling returns an error", func() {
 			BeforeEach(func() {
 				rawManifest = []byte(`---
-blah blah
-`)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
+	blah blah
+	`)
 			})
 
 			It("returns an error", func() {
 				Expect(executeErr).To(HaveOccurred())
 				Expect(executeErr).To(MatchError(&yaml.TypeError{}))
+			})
+		})
+
+		When("the manifest is valid", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`applications:
+- name: one
+- name: two
+`)
+			})
+
+			It("interpolates the placeholder values", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(parsedManifest.AppNames()).To(ConsistOf("one", "two"))
 			})
 		})
 	})

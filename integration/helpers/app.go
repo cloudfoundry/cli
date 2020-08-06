@@ -256,6 +256,15 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 	Expect(err).ToNot(HaveOccurred())
 }
 
+func ReadManifest(path string) map[string]interface{} {
+	manifestBytes, err := ioutil.ReadFile(path)
+	Expect(err).ToNot(HaveOccurred())
+	var manifest map[string]interface{}
+	err = yaml.Unmarshal(manifestBytes, &manifest)
+	Expect(err).ToNot(HaveOccurred())
+	return manifest
+}
+
 // Zipit zips the source into a .zip file in the target dir.
 func Zipit(source, target, prefix string) error {
 	// Thanks to Svett Ralchev
