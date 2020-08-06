@@ -9,8 +9,8 @@ type DeleteServiceCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
-	Force           bool                 `short:"f" description:"Force deletion without confirmation"`
-	Wait            bool                 `short:"w" description:"Wait for the delete operation to complete"`
+	Force           bool                 `short:"f" long:"force" description:"Force deletion without confirmation"`
+	Wait            bool                 `short:"w" long:"wait" description:"Wait for the delete operation to complete"`
 	relatedCommands interface{}          `related_commands:"unbind-service, services"`
 }
 
