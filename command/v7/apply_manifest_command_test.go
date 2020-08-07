@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -24,15 +25,16 @@ import (
 
 var _ = Describe("apply-manifest Command", func() {
 	var (
-		cmd             ApplyManifestCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
-		fakeParser      *v7fakes.FakeManifestParser
-		fakeLocator     *v7fakes.FakeManifestLocator
-		binaryName      string
-		executeErr      error
+		cmd               ApplyManifestCommand
+		testUI            *ui.UI
+		fakeConfig        *commandfakes.FakeConfig
+		fakeSharedActor   *commandfakes.FakeSharedActor
+		fakeActor         *v7fakes.FakeActor
+		fakeParser        *v7fakes.FakeManifestParser
+		fakeLocator       *v7fakes.FakeManifestLocator
+		fakeDiffDisplayer *v7fakes.FakeDiffDisplayer
+		binaryName        string
+		executeErr        error
 	)
 
 	BeforeEach(func() {
@@ -42,6 +44,7 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 		fakeParser = new(v7fakes.FakeManifestParser)
 		fakeLocator = new(v7fakes.FakeManifestLocator)
+		fakeDiffDisplayer = new(v7fakes.FakeDiffDisplayer)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -55,6 +58,7 @@ var _ = Describe("apply-manifest Command", func() {
 			},
 			ManifestParser:  fakeParser,
 			ManifestLocator: fakeLocator,
+			DiffDisplayer:   fakeDiffDisplayer,
 			CWD:             "fake-directory",
 		}
 	})
@@ -154,13 +158,22 @@ var _ = Describe("apply-manifest Command", func() {
 				})
 
 				When("the manifest is successfully parsed", func() {
+					var expectedDiff resources.ManifestDiff
+
 					BeforeEach(func() {
+						expectedDiff = resources.ManifestDiff{
+							Diffs: []resources.Diff{
+								{Op: resources.AddOperation, Path: "/path/to/field", Value: "hello"},
+							},
+						}
+
 						fakeActor.SetSpaceManifestReturns(
 							v7action.Warnings{"some-manifest-warning"},
 							nil,
 						)
 						fakeParser.InterpolateManifestReturns([]byte("interpolated!"), nil)
 						fakeParser.MarshalManifestReturns([]byte("manifesto"), nil)
+						fakeActor.DiffSpaceManifestReturns(expectedDiff, nil, nil)
 					})
 
 					It("displays the success text", func() {
@@ -179,6 +192,16 @@ var _ = Describe("apply-manifest Command", func() {
 						path, rawManifest := fakeParser.ParseManifestArgsForCall(0)
 						Expect(path).To(Equal(resolvedPath))
 						Expect(rawManifest).To(Equal([]byte("interpolated!")))
+
+						Expect(fakeActor.DiffSpaceManifestCallCount()).To(Equal(1))
+						spaceGUID, manifestBytes := fakeActor.DiffSpaceManifestArgsForCall(0)
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(manifestBytes).To(Equal([]byte("manifesto")))
+
+						Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(1))
+						manifestBytes, diff := fakeDiffDisplayer.DisplayDiffArgsForCall(0)
+						Expect(manifestBytes).To(Equal([]byte("manifesto")))
+						Expect(diff).To(Equal(expectedDiff))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 						spaceGUIDArg, actualBytes := fakeActor.SetSpaceManifestArgsForCall(0)
