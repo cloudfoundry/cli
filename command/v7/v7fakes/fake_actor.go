@@ -754,6 +754,22 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DiffSpaceManifestStub        func(string, []byte) (resources.ManifestDiff, v7action.Warnings, error)
+	diffSpaceManifestMutex       sync.RWMutex
+	diffSpaceManifestArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	diffSpaceManifestReturns struct {
+		result1 resources.ManifestDiff
+		result2 v7action.Warnings
+		result3 error
+	}
+	diffSpaceManifestReturnsOnCall map[int]struct {
+		result1 resources.ManifestDiff
+		result2 v7action.Warnings
+		result3 error
+	}
 	DisableFeatureFlagStub        func(string) (v7action.Warnings, error)
 	disableFeatureFlagMutex       sync.RWMutex
 	disableFeatureFlagArgsForCall []struct {
@@ -6412,6 +6428,78 @@ func (fake *FakeActor) DeleteUserReturnsOnCall(i int, result1 v7action.Warnings,
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) DiffSpaceManifest(arg1 string, arg2 []byte) (resources.ManifestDiff, v7action.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.diffSpaceManifestMutex.Lock()
+	ret, specificReturn := fake.diffSpaceManifestReturnsOnCall[len(fake.diffSpaceManifestArgsForCall)]
+	fake.diffSpaceManifestArgsForCall = append(fake.diffSpaceManifestArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("DiffSpaceManifest", []interface{}{arg1, arg2Copy})
+	fake.diffSpaceManifestMutex.Unlock()
+	if fake.DiffSpaceManifestStub != nil {
+		return fake.DiffSpaceManifestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.diffSpaceManifestReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) DiffSpaceManifestCallCount() int {
+	fake.diffSpaceManifestMutex.RLock()
+	defer fake.diffSpaceManifestMutex.RUnlock()
+	return len(fake.diffSpaceManifestArgsForCall)
+}
+
+func (fake *FakeActor) DiffSpaceManifestCalls(stub func(string, []byte) (resources.ManifestDiff, v7action.Warnings, error)) {
+	fake.diffSpaceManifestMutex.Lock()
+	defer fake.diffSpaceManifestMutex.Unlock()
+	fake.DiffSpaceManifestStub = stub
+}
+
+func (fake *FakeActor) DiffSpaceManifestArgsForCall(i int) (string, []byte) {
+	fake.diffSpaceManifestMutex.RLock()
+	defer fake.diffSpaceManifestMutex.RUnlock()
+	argsForCall := fake.diffSpaceManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) DiffSpaceManifestReturns(result1 resources.ManifestDiff, result2 v7action.Warnings, result3 error) {
+	fake.diffSpaceManifestMutex.Lock()
+	defer fake.diffSpaceManifestMutex.Unlock()
+	fake.DiffSpaceManifestStub = nil
+	fake.diffSpaceManifestReturns = struct {
+		result1 resources.ManifestDiff
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DiffSpaceManifestReturnsOnCall(i int, result1 resources.ManifestDiff, result2 v7action.Warnings, result3 error) {
+	fake.diffSpaceManifestMutex.Lock()
+	defer fake.diffSpaceManifestMutex.Unlock()
+	fake.DiffSpaceManifestStub = nil
+	if fake.diffSpaceManifestReturnsOnCall == nil {
+		fake.diffSpaceManifestReturnsOnCall = make(map[int]struct {
+			result1 resources.ManifestDiff
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.diffSpaceManifestReturnsOnCall[i] = struct {
+		result1 resources.ManifestDiff
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DisableFeatureFlag(arg1 string) (v7action.Warnings, error) {
@@ -16998,6 +17086,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteSpaceRoleMutex.RUnlock()
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
+	fake.diffSpaceManifestMutex.RLock()
+	defer fake.diffSpaceManifestMutex.RUnlock()
 	fake.disableFeatureFlagMutex.RLock()
 	defer fake.disableFeatureFlagMutex.RUnlock()
 	fake.disableServiceAccessMutex.RLock()
