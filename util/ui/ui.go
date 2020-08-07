@@ -274,6 +274,41 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
+// DisplayDiffAddition displays an added line in a diff, colored green and prefixed with '+'
+func (ui *UI) DisplayDiffAddition(line string, depth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	indent := strings.Repeat("  ", depth)
+	template := "+ " + indent + line
+	formatted := ui.modifyColor(template, color.New(color.FgGreen))
+
+	fmt.Fprintf(ui.Out, "%s\n", formatted)
+}
+
+// DisplayDiffRemoval displays a removed line in a diff, colored red and prefixed with '-'
+func (ui *UI) DisplayDiffRemoval(line string, depth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	indent := strings.Repeat("  ", depth)
+	template := "- " + indent + line
+	formatted := ui.modifyColor(template, color.New(color.FgRed))
+
+	fmt.Fprintf(ui.Out, "%s\n", formatted)
+}
+
+// DisplayDiffUnchanged displays an unchanged line in a diff, with no color or prefix
+func (ui *UI) DisplayDiffUnchanged(line string, depth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	indent := strings.Repeat("  ", depth)
+	template := "  " + indent + line
+
+	fmt.Fprintf(ui.Out, "%s\n", template)
+}
+
 // FlushDeferred displays text previously deferred (using DeferText) to the UI's
 // `Out`.
 func (ui *UI) FlushDeferred() {
