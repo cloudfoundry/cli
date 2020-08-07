@@ -63,6 +63,12 @@ type ManifestLocator interface {
 	Path(filepathOrDirectory string) (string, bool, error)
 }
 
+//go:generate counterfeiter . DiffDisplayer
+
+type DiffDisplayer interface {
+	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff)
+}
+
 type PushCommand struct {
 	BaseCommand
 
