@@ -46,14 +46,14 @@ var _ = Describe("Space Manifest Actions", func() {
 
 		When("getting the diff succeeds", func() {
 			BeforeEach(func() {
-				diff = resources.ManifestDiff{
+				returnedDiff := resources.ManifestDiff{
 					Diffs: []resources.Diff{
 						{Op: resources.AddOperation, Path: "/some/path", Value: "wow"},
 					},
 				}
 
 				fakeCloudControllerClient.GetSpaceManifestDiffReturns(
-					diff,
+					returnedDiff,
 					ccv3.Warnings{"diff-manifest-warning"},
 					nil,
 				)

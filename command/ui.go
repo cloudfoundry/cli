@@ -14,6 +14,9 @@ type UI interface {
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayChangesForPush(changeSet []ui.Change) error
 	DisplayDeprecationWarning()
+	DisplayDiffAddition(line string, depth int)
+	DisplayDiffRemoval(line string, depth int)
+	DisplayDiffUnchanged(line string, depth int)
 	DisplayError(err error)
 	DisplayFileDeprecationWarning()
 	DisplayHeader(text string)

@@ -70,6 +70,7 @@ type Actor interface {
 	DeleteUser(userGuid string) (v7action.Warnings, error)
 	DeleteIsolationSegmentByName(name string) (v7action.Warnings, error)
 	DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)
+	DiffSpaceManifest(spaceGUID string, rawManifest []byte) (resources.ManifestDiff, v7action.Warnings, error)
 	DisableFeatureFlag(flagName string) (v7action.Warnings, error)
 	DisableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	DownloadCurrentDropletByAppName(appName string, spaceGUID string) ([]byte, string, v7action.Warnings, error)
