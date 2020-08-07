@@ -1668,7 +1668,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetSpaceManifestDiffStub        func(string, []byte) (resources.ManifestDiff, v7action.Warnings, error)
+	GetSpaceManifestDiffStub        func(string, []byte) (resources.ManifestDiff, ccv3.Warnings, error)
 	getSpaceManifestDiffMutex       sync.RWMutex
 	getSpaceManifestDiffArgsForCall []struct {
 		arg1 string
@@ -1676,12 +1676,12 @@ type FakeCloudControllerClient struct {
 	}
 	getSpaceManifestDiffReturns struct {
 		result1 resources.ManifestDiff
-		result2 v7action.Warnings
+		result2 ccv3.Warnings
 		result3 error
 	}
 	getSpaceManifestDiffReturnsOnCall map[int]struct {
 		result1 resources.ManifestDiff
-		result2 v7action.Warnings
+		result2 ccv3.Warnings
 		result3 error
 	}
 	GetSpaceQuotaStub        func(string) (resources.SpaceQuota, ccv3.Warnings, error)
@@ -9703,7 +9703,7 @@ func (fake *FakeCloudControllerClient) GetSpaceIsolationSegmentReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceManifestDiff(arg1 string, arg2 []byte) (resources.ManifestDiff, v7action.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiff(arg1 string, arg2 []byte) (resources.ManifestDiff, ccv3.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
 		arg2Copy = make([]byte, len(arg2))
@@ -9733,7 +9733,7 @@ func (fake *FakeCloudControllerClient) GetSpaceManifestDiffCallCount() int {
 	return len(fake.getSpaceManifestDiffArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceManifestDiffCalls(stub func(string, []byte) (resources.ManifestDiff, v7action.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffCalls(stub func(string, []byte) (resources.ManifestDiff, ccv3.Warnings, error)) {
 	fake.getSpaceManifestDiffMutex.Lock()
 	defer fake.getSpaceManifestDiffMutex.Unlock()
 	fake.GetSpaceManifestDiffStub = stub
@@ -9746,31 +9746,31 @@ func (fake *FakeCloudControllerClient) GetSpaceManifestDiffArgsForCall(i int) (s
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturns(result1 resources.ManifestDiff, result2 v7action.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturns(result1 resources.ManifestDiff, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceManifestDiffMutex.Lock()
 	defer fake.getSpaceManifestDiffMutex.Unlock()
 	fake.GetSpaceManifestDiffStub = nil
 	fake.getSpaceManifestDiffReturns = struct {
 		result1 resources.ManifestDiff
-		result2 v7action.Warnings
+		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturnsOnCall(i int, result1 resources.ManifestDiff, result2 v7action.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceManifestDiffReturnsOnCall(i int, result1 resources.ManifestDiff, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceManifestDiffMutex.Lock()
 	defer fake.getSpaceManifestDiffMutex.Unlock()
 	fake.GetSpaceManifestDiffStub = nil
 	if fake.getSpaceManifestDiffReturnsOnCall == nil {
 		fake.getSpaceManifestDiffReturnsOnCall = make(map[int]struct {
 			result1 resources.ManifestDiff
-			result2 v7action.Warnings
+			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceManifestDiffReturnsOnCall[i] = struct {
 		result1 resources.ManifestDiff
-		result2 v7action.Warnings
+		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
