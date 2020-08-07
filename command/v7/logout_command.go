@@ -16,6 +16,8 @@ func (cmd LogoutCommand) Execute(args []string) error {
 		map[string]interface{}{
 			"Username": user.Name,
 		})
+
+	cmd.Actor.RevokeAccessAndRefreshTokens()
 	cmd.Config.UnsetUserInformation()
 	cmd.UI.DisplayOK()
 

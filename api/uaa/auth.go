@@ -1,7 +1,9 @@
 package uaa
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -69,4 +71,50 @@ func (client Client) Authenticate(creds map[string]string, origin string, grantT
 
 	err = client.connection.Make(request, &response)
 	return responseBody.AccessToken, responseBody.RefreshToken, err
+}
+
+func (client Client) Revoke(token string) error {
+	jti, err := client.getJtiFromToken(token)
+	if err != nil {
+		return err
+	}
+
+	revokeRequest, err := client.newRequest(requestOptions{
+		RequestName: internal.DeleteTokenRequest,
+		URIParams: map[string]string{
+			"token_id": jti,
+		},
+	})
+	revokeRequest.Header.Set("Authorization", "Bearer "+token)
+
+	if err != nil {
+		return err
+	}
+
+	err = client.connection.Make(revokeRequest, &Response{})
+	return err
+}
+
+func (client Client) getJtiFromToken(token string) (string, error) {
+	segments := strings.Split(token, ".")
+
+	if len(segments) < 2 {
+		return "", errors.New("access token missing segments")
+	}
+
+	jsonPayload, err := base64.RawURLEncoding.DecodeString(segments[1])
+
+	if err != nil {
+		return "", errors.New("could not base64 decode token payload")
+	}
+
+	payload := make(map[string]interface{})
+	json.Unmarshal(jsonPayload, &payload)
+	jti, ok := payload["jti"].(string)
+
+	if !ok {
+		return "", errors.New("could not parse jti from payload")
+	}
+
+	return jti, nil
 }

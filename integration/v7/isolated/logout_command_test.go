@@ -49,6 +49,11 @@ var _ = Describe("logout command", func() {
 			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("cf"))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(BeEmpty())
+
+			session = helpers.CF("orgs")
+			Eventually(session).Should(Exit(1))
+			Expect(session.Out).To(Say("FAILED"))
+			Expect(session.Err).To(Say("Not logged in."))
 		})
 	})
 })

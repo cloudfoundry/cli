@@ -209,6 +209,10 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.UAAEndpoint = args.UAA
 	config.ConfigFile.AuthorizationEndpoint = args.Auth
 
+	// NOTE: This gets written to the config file, but I do not believe it is currently
+	// ever read from there.
+	config.ConfigFile.AuthorizationEndpoint = args.Auth
+
 	config.UnsetOrganizationAndSpaceInformation()
 }
 
