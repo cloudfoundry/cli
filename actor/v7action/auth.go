@@ -1,7 +1,10 @@
 package v7action
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -53,14 +56,39 @@ func (actor Actor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
 	return prompts, nil
 }
 
+// TODO: error check this in future stories
 func (actor Actor) RevokeAccessAndRefreshTokens() error {
-	refreshToken := actor.Config.RefreshToken()
-	_ = actor.UAAClient.Revoke(refreshToken)
-
 	accessToken := actor.Config.AccessToken()
-	_ = actor.UAAClient.Revoke(accessToken)
-
+	if actor.isTokenRevocable(accessToken) {
+		refreshToken := actor.Config.RefreshToken()
+		_ = actor.UAAClient.Revoke(refreshToken)
+		_ = actor.UAAClient.Revoke(accessToken)
+	}
 	return nil
+}
+
+func (actor Actor) isTokenRevocable(token string) bool {
+	segments := strings.Split(token, ".")
+
+	if len(segments) < 2 {
+		return false
+	}
+
+	jsonPayload, err := base64.RawURLEncoding.DecodeString(segments[1])
+
+	if err != nil {
+		return false
+	}
+
+	payload := make(map[string]interface{})
+	json.Unmarshal(jsonPayload, &payload)
+	revocable, ok := payload["revocable"].(bool)
+
+	if !ok {
+		return false
+	}
+
+	return revocable
 }
 
 var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{

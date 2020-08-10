@@ -159,10 +159,10 @@ var _ = Describe("Auth Actions", func() {
 			expectedAccessToken  string
 			expectedRefreshToken string
 		)
-		BeforeEach(func() {
-			expectedAccessToken = "I'm a fake access token"
-			expectedRefreshToken = "I'm a fake refresh token"
 
+		BeforeEach(func() {
+			expectedAccessToken = "eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vdWFhLmdlb2RlLWJhbmUubGl0ZS5jbGkuZnVuL3Rva2VuX2tleXMiLCJraWQiOiJrZXktMSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzN2IyZjA0NmIyMGY0MjY1OGY1MWYzZGY4NDZhNjFhOSIsInN1YiI6IjExMjc0OTU2LTYyNTUtNDAyNi05MjUzLWM4ZjE0OWMxZDBkOCIsInNjb3BlIjpbImNsb3VkX2NvbnRyb2xsZXIuYWRtaW4iLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMucmVhZCIsImNsb3VkX2NvbnRyb2xsZXIud3JpdGUiLCJuZXR3b3JrLmFkbWluIiwiZG9wcGxlci5maXJlaG9zZSIsImNsaWVudHMucmVhZCIsInVhYS5yZXNvdXJjZSIsIm9wZW5pZCIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy53cml0ZSIsInNjaW0ucmVhZCIsInVhYS51c2VyIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJzY2ltLndyaXRlIl0sImNsaWVudF9pZCI6ImNmIiwiY2lkIjoiY2YiLCJhenAiOiJjZiIsInJldm9jYWJsZSI6dHJ1ZSwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjExMjc0OTU2LTYyNTUtNDAyNi05MjUzLWM4ZjE0OWMxZDBkOCIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsImF1dGhfdGltZSI6MTU5NjY2Nzk0NywicmV2X3NpZyI6ImNlNzJmN2IzIiwiaWF0IjoxNTk2NjY3OTQ3LCJleHAiOjE1OTY2Njg1NDcsImlzcyI6Imh0dHBzOi8vdWFhLmdlb2RlLWJhbmUubGl0ZS5jbGkuZnVuL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbImNsb3VkX2NvbnRyb2xsZXIiLCJzY2ltIiwicGFzc3dvcmQiLCJjZiIsImNsaWVudHMiLCJ1YWEiLCJvcGVuaWQiLCJkb3BwbGVyIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzIiwibmV0d29yayJdfQ.WGRIexU6aheL6VOxK3lOCdQzv8GNK_O1IHu77pyEl0Y5wxa10T1H0VppzpKPbxYJ1C9QvQp1UwTk8fU9ylJ6lFAhA1xXLpBHNMI66QSVYc2m2TmOMUbJjWoE3w7cF-cBM1Unle3JlRk7y8yK4jeo0Gwj1fWcE4JNDKypTrT7yd5WxRCcMk1pWTJtLH9Rgng0Ei6i15NJ9K2SbF-rQWQp0qr1l4PBcyrjf7hWbf365yZFUSDMtPAToiJeKT3qmmN37elDmvFYzFNN4MEqEoirWYfjjakulLh9TPWELiygwNzDi11MYO07ksCUow9ArcA7cSlpnh9qrfPOqlfZTizBGg"
+			expectedRefreshToken = "eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vdWFhLmdlb2RlLWJhbmUubGl0ZS5jbGkuZnVuL3Rva2VuX2tleXMiLCJraWQiOiJrZXktMSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzN2IyZjA0NmIyMGY0MjY1OGY1MWYzZGY4NDZhNjFhOSIsInN1YiI6IjExMjc0OTU2LTYyNTUtNDAyNi05MjUzLWM4ZjE0OWMxZDBkOCIsInNjb3BlIjpbImNsb3VkX2NvbnRyb2xsZXIuYWRtaW4iLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMucmVhZCIsImNsb3VkX2NvbnRyb2xsZXIud3JpdGUiLCJuZXR3b3JrLmFkbWluIiwiZG9wcGxlci5maXJlaG9zZSIsImNsaWVudHMucmVhZCIsInVhYS5yZXNvdXJjZSIsIm9wZW5pZCIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy53cml0ZSIsInNjaW0ucmVhZCIsInVhYS51c2VyIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJzY2ltLndyaXRlIl0sImNsaWVudF9pZCI6ImNmIiwiY2lkIjoiY2YiLCJhenAiOiJjZiIsInJldm9jYWJsZSI6dHJ1ZSwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjExMjc0OTU2LTYyNTUtNDAyNi05MjUzLWM4ZjE0OWMxZDBkOCIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsImF1dGhfdGltZSI6MTU5NjY2Nzk0NywicmV2X3NpZyI6ImNlNzJmN2IzIiwiaWF0IjoxNTk2NjY3OTQ3LCJleHAiOjE1OTY2Njg1NDcsImlzcyI6Imh0dHBzOi8vdWFhLmdlb2RlLWJhbmUubGl0ZS5jbGkuZnVuL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbImNsb3VkX2NvbnRyb2xsZXIiLCJzY2ltIiwicGFzc3dvcmQiLCJjZiIsImNsaWVudHMiLCJ1YWEiLCJvcGVuaWQiLCJkb3BwbGVyIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzIiwibmV0d29yayJdfQ.WGRIexU6aheL6VOxK3lOCdQzv8GNK_O1IHu77pyEl0Y5wxa10T1H0VppzpKPbxYJ1C9QvQp1UwTk8fU9ylJ6lFAhA1xXLpBHNMI66QSVYc2m2TmOMUbJjWoE3w7cF-cBM1Unle3JlRk7y8yK4jeo0Gwj1fWcE4JNDKypTrT7yd5WxRCcMk1pWTJtLH9Rgng0Ei6i15NJ9K2SbF-rQWQp0qr1l4PBcyrjf7hWbf365yZFUSDMtPAToiJeKT3qmmN37elDmvFYzFNN4MEqEoirWYfjjakulLh9TPWELiygwNzDi11MYO07ksCUow9ArcA7cSlpnh9qrfPOqlfZTizBGg"
 			fakeConfig.AccessTokenReturns(expectedAccessToken)
 			fakeConfig.RefreshTokenReturns(expectedRefreshToken)
 		})
@@ -171,11 +171,26 @@ var _ = Describe("Auth Actions", func() {
 			_ = actor.RevokeAccessAndRefreshTokens()
 		})
 
-		It("calls the UAA to revoke refresh and access tokens", func() {
-			Expect(fakeUAAClient.RevokeCallCount()).To(Equal(2))
+		When("the token is revokable", func() {
 
-			Expect(fakeUAAClient.RevokeArgsForCall(0)).To(Equal(expectedRefreshToken))
-			Expect(fakeUAAClient.RevokeArgsForCall(1)).To(Equal(expectedAccessToken))
+			It("calls the UAA to revoke refresh and access tokens", func() {
+				Expect(fakeUAAClient.RevokeCallCount()).To(Equal(2))
+
+				Expect(fakeUAAClient.RevokeArgsForCall(0)).To(Equal(expectedRefreshToken))
+				Expect(fakeUAAClient.RevokeArgsForCall(1)).To(Equal(expectedAccessToken))
+			})
+		})
+
+		When("the token is not revokable", func() {
+			BeforeEach(func() {
+				expectedAccessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMTI3NDk1Ni02MjU1LTQwMjYtOTI1My1jOGYxNDljMWQwZDgiLCJhdWQiOltdfQ.rVlUqVTglhod_MEbdnczGwj4IJIMHqiLrqaX2wvEWMw"
+				fakeConfig.AccessTokenReturns(expectedAccessToken)
+			})
+
+			It("does not call the UAA to revoke refresh and access tokens", func() {
+				Expect(fakeUAAClient.RevokeCallCount()).To(Equal(0))
+			})
 		})
 	})
+
 })
