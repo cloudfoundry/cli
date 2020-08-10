@@ -3148,6 +3148,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpgradeServiceInstanceStub        func(string, string) (v7action.Warnings, error)
+	upgradeServiceInstanceMutex       sync.RWMutex
+	upgradeServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	upgradeServiceInstanceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	upgradeServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UploadBitsPackageStub        func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
@@ -16749,6 +16763,70 @@ func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpgradeServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.upgradeServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.upgradeServiceInstanceReturnsOnCall[len(fake.upgradeServiceInstanceArgsForCall)]
+	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1, arg2})
+	fake.upgradeServiceInstanceMutex.Unlock()
+	if fake.UpgradeServiceInstanceStub != nil {
+		return fake.UpgradeServiceInstanceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.upgradeServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UpgradeServiceInstanceCallCount() int {
+	fake.upgradeServiceInstanceMutex.RLock()
+	defer fake.upgradeServiceInstanceMutex.RUnlock()
+	return len(fake.upgradeServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) UpgradeServiceInstanceCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.upgradeServiceInstanceMutex.Lock()
+	defer fake.upgradeServiceInstanceMutex.Unlock()
+	fake.UpgradeServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) UpgradeServiceInstanceArgsForCall(i int) (string, string) {
+	fake.upgradeServiceInstanceMutex.RLock()
+	defer fake.upgradeServiceInstanceMutex.RUnlock()
+	argsForCall := fake.upgradeServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) UpgradeServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.upgradeServiceInstanceMutex.Lock()
+	defer fake.upgradeServiceInstanceMutex.Unlock()
+	fake.UpgradeServiceInstanceStub = nil
+	fake.upgradeServiceInstanceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UpgradeServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.upgradeServiceInstanceMutex.Lock()
+	defer fake.upgradeServiceInstanceMutex.Unlock()
+	fake.UpgradeServiceInstanceStub = nil
+	if fake.upgradeServiceInstanceReturnsOnCall == nil {
+		fake.upgradeServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.upgradeServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
 	var arg2Copy []sharedaction.V3Resource
 	if arg2 != nil {
@@ -17376,6 +17454,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateUserPasswordMutex.RUnlock()
 	fake.updateUserProvidedServiceInstanceMutex.RLock()
 	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
+	fake.upgradeServiceInstanceMutex.RLock()
+	defer fake.upgradeServiceInstanceMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()

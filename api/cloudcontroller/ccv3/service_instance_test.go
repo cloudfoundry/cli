@@ -421,6 +421,7 @@ var _ = Describe("Service Instance", func() {
 					"foo": "bar",
 					"baz": 42,
 				}),
+				MaintenanceInfoVersion: "9.1.2",
 			}
 		})
 

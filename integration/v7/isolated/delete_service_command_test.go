@@ -100,7 +100,7 @@ var _ = Describe("delete-service command", func() {
 		})
 
 		When("the service instance does not exist", func() {
-			It("prints a message and exists successfully", func() {
+			It("prints a message and exits successfully", func() {
 				session := helpers.CF(command, "-f", serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 
@@ -120,7 +120,7 @@ var _ = Describe("delete-service command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			It("prints a message and exists successfully", func() {
+			It("prints a message and exits successfully", func() {
 				session := helpers.CF(command, "-f", serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 
@@ -149,7 +149,7 @@ var _ = Describe("delete-service command", func() {
 				broker.Forget()
 			})
 
-			It("prints a message and exists successfully", func() {
+			It("prints a message and exits successfully", func() {
 				session := helpers.CF(command, "-f", serviceInstanceName)
 				Eventually(session).Should(Exit(0))
 
