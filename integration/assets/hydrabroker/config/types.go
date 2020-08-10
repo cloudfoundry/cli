@@ -26,6 +26,7 @@ type Service struct {
 	Plans                []Plan   `json:"plans" validate:"min=1,dive"`
 	Shareable            bool     `json:"shareable"`
 	Bindable             bool     `json:"bindable"`
+	PlanUpdatable        bool     `json:"plan_updateable"`
 	InstancesRetrievable bool     `json:"instances_retrievable"`
 	Requires             []string `json:"requires,omitempty"`
 }

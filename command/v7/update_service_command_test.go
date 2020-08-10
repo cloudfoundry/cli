@@ -63,6 +63,7 @@ var _ = Describe("update-service command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
 
 		fakeActor.UpdateManagedServiceInstanceReturns(
+			false,
 			v7action.Warnings{"actor warning"},
 			nil,
 		)
@@ -137,6 +138,27 @@ var _ = Describe("update-service command", func() {
 			}))
 		})
 
+		When("plan is current plan", func() {
+			const (
+				currentPlan = "current-plan"
+			)
+
+			BeforeEach(func() {
+				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: currentPlan})
+				fakeActor.UpdateManagedServiceInstanceReturns(
+					true,
+					v7action.Warnings{"actor warning"},
+					nil,
+				)
+			})
+
+			It("prints warnings and a message", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Err).To(Say("actor warning"))
+				Expect(testUI.Out).To(Say("No changes were made"))
+			})
+		})
+
 		When("getting the user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bang"))
@@ -150,6 +172,7 @@ var _ = Describe("update-service command", func() {
 		When("the actor reports the service instance was not found", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
+					false,
 					v7action.Warnings{"actor warning"},
 					actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
@@ -171,6 +194,7 @@ var _ = Describe("update-service command", func() {
 			BeforeEach(func() {
 				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: invalidPlan})
 				fakeActor.UpdateManagedServiceInstanceReturns(
+					false,
 					v7action.Warnings{"actor warning"},
 					actionerror.ServicePlanNotFoundError{PlanName: invalidPlan, ServiceBrokerName: "the-broker", OfferingName: "the-offering"},
 				)
@@ -189,6 +213,7 @@ var _ = Describe("update-service command", func() {
 		When("the actor fails with an unexpected error", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
+					false,
 					v7action.Warnings{"actor warning"},
 					errors.New("boof"),
 				)

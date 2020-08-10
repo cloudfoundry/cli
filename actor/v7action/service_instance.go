@@ -58,67 +58,44 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	return Warnings(warnings), err
 }
 
-func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (Warnings, error) {
+// TODO finish this refactor
+func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (bool, Warnings, error) {
 	var (
-		original             resources.ServiceInstance
-		jobURL               ccv3.JobURL
-		allWarnings          Warnings
-		includedResources    ccv3.IncludedResources
-		serviceInstanceQuery []ccv3.Query
+		jobURL      ccv3.JobURL
+		allWarnings Warnings
+		updates     serviceInstanceUpdate
 	)
 
-	updates := resources.ServiceInstance{
-		Tags:       serviceInstanceUpdates.Tags,
-		Parameters: serviceInstanceUpdates.Parameters,
+	updatesBuilder := &serviceInstanceUpdateBuilder{
+		actor:               actor,
+		requestedUpdates:    serviceInstanceUpdates,
+		serviceInstanceName: serviceInstanceName,
+		spaceGUID:           spaceGUID,
 	}
 
-	if serviceInstanceUpdates.ServicePlanName.IsSet {
-		serviceInstanceQuery = []ccv3.Query{
-			{
-				Key:    ccv3.FieldsServicePlanServiceOffering,
-				Values: []string{"name"},
-			},
-			{
-				Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
-				Values: []string{"name"},
-			},
-		}
-	}
 	warnings, err := handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			original, includedResources, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, serviceInstanceQuery...)
+			updates, warnings, err = updatesBuilder.build()
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			err = assertServiceInstanceType(resources.ManagedServiceInstance, original)
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
-			if !serviceInstanceUpdates.ServicePlanName.IsSet {
+			if updatesBuilder.IsNoop() {
 				return
 			}
-			_, actorWarnings, err := actor.GetServicePlanByNameOfferingAndBroker(
-				serviceInstanceUpdates.ServicePlanName.Value,
-				includedResources.ServiceOfferings[0].Name,
-				includedResources.ServiceBrokers[0].Name,
-			)
-			if err != nil {
-				return ccv3.Warnings(actorWarnings), err
+			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(updatesBuilder.serviceInstance.GUID, *updates.serviceInstance)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if updatesBuilder.IsNoop() {
+				return
 			}
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(original.GUID, updates)
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
 			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
 	))
 
 	allWarnings = append(allWarnings, warnings...)
 
-	return allWarnings, err
+	return updatesBuilder.IsNoop(), allWarnings, err
 }
 
 func (actor Actor) UpgradeServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
@@ -324,4 +301,107 @@ func handleServiceInstanceErrors(warnings ccv3.Warnings, err error) (Warnings, e
 	default:
 		return Warnings(warnings), err
 	}
+}
+
+type serviceInstanceUpdateBuilder struct {
+	actor               Actor
+	requestedUpdates    ServiceInstanceUpdateManagedParams
+	serviceInstanceName string
+	spaceGUID           string
+	serviceInstance     resources.ServiceInstance
+	serviceOfferingName string
+	serviceBrokerName   string
+	updates             *serviceInstanceUpdate
+}
+
+type serviceInstanceUpdate struct {
+	serviceInstance *resources.ServiceInstance
+	isNoop          bool
+}
+
+func (builder *serviceInstanceUpdateBuilder) build() (serviceInstanceUpdate, ccv3.Warnings, error) {
+	builder.updates = &serviceInstanceUpdate{
+		serviceInstance: &resources.ServiceInstance{
+			Tags:       builder.requestedUpdates.Tags,
+			Parameters: builder.requestedUpdates.Parameters,
+		},
+		isNoop: false,
+	}
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			return builder.GetServiceInstanceToUpdate()
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			err = assertServiceInstanceType(resources.ManagedServiceInstance, builder.serviceInstance)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			return builder.GetServicePlan()
+		},
+	)
+	if err != nil {
+		return serviceInstanceUpdate{}, warnings, err
+	}
+	return *builder.updates, warnings, err
+}
+
+func (builder *serviceInstanceUpdateBuilder) GetServicePlan() (ccv3.Warnings, error) {
+	var actorWarnings Warnings
+
+	if !builder.requestedUpdates.ServicePlanName.IsSet {
+		return nil, nil
+	}
+
+	plan, actorWarnings, err := builder.actor.GetServicePlanByNameOfferingAndBroker(
+		builder.requestedUpdates.ServicePlanName.Value,
+		builder.serviceOfferingName,
+		builder.serviceBrokerName,
+	)
+	if err == nil {
+		builder.updates.serviceInstance.ServicePlanGUID = plan.GUID
+	}
+	return ccv3.Warnings(actorWarnings), err
+}
+
+func (builder *serviceInstanceUpdateBuilder) GetServiceInstanceToUpdate() (warnings ccv3.Warnings, err error) {
+	var serviceInstanceQuery []ccv3.Query
+
+	if builder.requestedUpdates.ServicePlanName.IsSet {
+		serviceInstanceQuery = []ccv3.Query{
+			{
+				Key:    ccv3.FieldsServicePlanServiceOffering,
+				Values: []string{"name"},
+			},
+			{
+				Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
+				Values: []string{"name"},
+			},
+		}
+	}
+	var includedResources ccv3.IncludedResources
+
+	builder.serviceInstance, includedResources, warnings, err = builder.actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
+		builder.serviceInstanceName,
+		builder.spaceGUID,
+		serviceInstanceQuery...,
+	)
+
+	if len(includedResources.ServiceBrokers) > 0 {
+		builder.serviceBrokerName = includedResources.ServiceBrokers[0].Name
+	}
+	if len(includedResources.ServiceOfferings) > 0 {
+		builder.serviceOfferingName = includedResources.ServiceOfferings[0].Name
+	}
+
+	return warnings, err
+}
+
+func (builder *serviceInstanceUpdateBuilder) IsNoop() bool {
+	if builder.updates.serviceInstance.ServicePlanGUID == builder.serviceInstance.ServicePlanGUID {
+		if !(builder.updates.serviceInstance.Tags.IsSet || builder.updates.serviceInstance.Parameters.IsSet) {
+			return true
+		}
+	}
+	return false
 }

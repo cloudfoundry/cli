@@ -102,6 +102,7 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 			Plans:                plans,
 			BindingsRetrievable:  s.Bindable,
 			InstancesRetrievable: s.InstancesRetrievable,
+			PlanUpdatable:        s.PlanUpdatable,
 			Requires:             brokerCastRequires(s.Requires),
 			Metadata: &domain.ServiceMetadata{
 				Shareable:        &s.Shareable,

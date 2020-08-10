@@ -376,8 +376,9 @@ var _ = Describe("Service Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
 					resources.ServiceInstance{
-						Type: resources.ManagedServiceInstance,
-						GUID: guid,
+						Type:            resources.ManagedServiceInstance,
+						GUID:            guid,
+						ServicePlanGUID: "some-plan-guid",
 					},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning from get"},
@@ -391,7 +392,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("makes the right calls and returns all warnings", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{
@@ -456,7 +457,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("makes the right calls and returns all warnings", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				noop, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{
@@ -465,7 +466,8 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 				)
 
-				By("returning warnings and no error", func() {
+				By("returning noop flag, warnings and no error", func() {
+					Expect(noop).To(BeFalse())
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
 				})
@@ -512,7 +514,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("fails with warnings", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
@@ -537,7 +539,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns warnings and an actionerror", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
@@ -560,7 +562,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns warnings and an error", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
@@ -589,7 +591,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns warnings and an error", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
@@ -599,20 +601,30 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("getting the plan", func() {
+		Context("updating the plan", func() {
 			var (
-				warnings Warnings
-				err      error
+				warnings            Warnings
+				err                 error
+				fakeServicePlanName string
+				fakeServicePlanGUID string
+				noop                bool
+				params              ServiceInstanceUpdateManagedParams
 			)
 
 			const (
-				fakeServicePlanName     = "invalid-plan"
 				fakeServiceOfferingName = "my-service-offering"
 				fakeServiceBrokerName   = "my-broker"
 			)
 
 			JustBeforeEach(func() {
-				params := ServiceInstanceUpdateManagedParams{
+
+				noop, warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
+			})
+
+			BeforeEach(func() {
+				fakeServicePlanName = "some-plan"
+
+				params = ServiceInstanceUpdateManagedParams{
 					ServicePlanName: types.NewOptionalString(fakeServicePlanName),
 				}
 
@@ -620,24 +632,27 @@ var _ = Describe("Service Instance Actions", func() {
 					resources.ServiceInstance{
 						Type:                resources.ManagedServiceInstance,
 						GUID:                guid,
+						ServicePlanGUID:     "current-plan-guid",
 						ServiceOfferingGUID: "something",
 					},
 					ccv3.IncludedResources{
 						ServiceOfferings: []resources.ServiceOffering{{Name: fakeServiceOfferingName}},
 						ServiceBrokers:   []resources.ServiceBroker{{Name: fakeServiceBrokerName}},
 					},
-					ccv3.Warnings{"warning from get"},
+					ccv3.Warnings{"warning from getServiceInstance"},
 					nil,
 				)
-				warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
-			})
 
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
+				fakeServicePlanGUID = "plan-guid"
+
+				fakeCloudControllerClient.GetServicePlansReturns(
+					[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
+					ccv3.Warnings{"warning from getServicePlan"},
+					nil)
 			})
 
 			It("makes the right call to fetch the plan", func() {
-				By("Passing the right query to fetch the instance")
+				By("Getting the service offering and broker when retrieving the instance")
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
 				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
 				Expect(actualName).To(Equal(serviceInstanceName))
@@ -667,22 +682,31 @@ var _ = Describe("Service Instance Actions", func() {
 
 			})
 
-			It("returns all warnings", func() {
-				Expect(warnings).To(ConsistOf("be warned", "warning from get"))
+			It("sends the plan guid in the update request", func() {
+				guid, updates := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+				Expect(guid).To(Equal(guid))
+				Expect(updates.ServicePlanGUID).To(Equal(fakeServicePlanGUID))
+			})
+
+			It("returns all warnings and noop flag", func() {
+				Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
+				Expect(noop).To(BeFalse())
 
 			})
 
 			Context("errors getting the plan", func() {
 				When("no plan found", func() {
+					fakeServicePlanName = "invalid-plan"
+
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, nil)
+						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"warning from getServicePlan"}, nil)
 					})
 
 					It("returns with warnings and an error", func() {
 						Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
 						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
-						Expect(warnings).To(ConsistOf("warning from get", "be warned"))
+						Expect(warnings).To(ConsistOf("warning from getServiceInstance", "warning from getServicePlan"))
 						Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{
 							PlanName:          fakeServicePlanName,
 							ServiceBrokerName: fakeServiceBrokerName,
@@ -693,15 +717,78 @@ var _ = Describe("Service Instance Actions", func() {
 
 				When("client error when getting the plan", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"be warned"}, errors.New("boom"))
+						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"warning from getServicePlan"}, errors.New("boom"))
 					})
 
 					It("returns warnings and an error", func() {
 						Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
 						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
-						Expect(warnings).To(ConsistOf("warning from get", "be warned"))
+						Expect(warnings).To(ConsistOf("warning from getServiceInstance", "warning from getServicePlan"))
 						Expect(err).To(MatchError("boom"))
+					})
+				})
+			})
+
+			Context("noop flag", func() {
+				When("plan is the current plan", func() {
+					BeforeEach(func() {
+						fakeServicePlanGUID = "current-plan-guid"
+
+						fakeCloudControllerClient.GetServicePlansReturns(
+							[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
+							ccv3.Warnings{"warning from getServicePlan"},
+							nil)
+					})
+
+					It("returns all warnings and noop flag", func() {
+						Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
+						Expect(noop).To(BeTrue())
+
+					})
+
+					When("tags are passed", func() {
+						BeforeEach(func() {
+							fakeServicePlanGUID = "current-plan-guid"
+
+							fakeCloudControllerClient.GetServicePlansReturns(
+								[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
+								ccv3.Warnings{"warning from getServicePlan"},
+								nil)
+
+							params = ServiceInstanceUpdateManagedParams{
+								ServicePlanName: types.NewOptionalString(fakeServicePlanName),
+								Tags:            types.NewOptionalStringSlice("a-tag"),
+							}
+						})
+
+						It("returns all warnings and noop flag", func() {
+							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
+							Expect(noop).To(BeFalse())
+
+						})
+					})
+
+					When("params are passed", func() {
+						BeforeEach(func() {
+							fakeServicePlanGUID = "current-plan-guid"
+
+							fakeCloudControllerClient.GetServicePlansReturns(
+								[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
+								ccv3.Warnings{"warning from getServicePlan"},
+								nil)
+
+							params = ServiceInstanceUpdateManagedParams{
+								ServicePlanName: types.NewOptionalString(fakeServicePlanName),
+								Parameters:      types.NewOptionalObject(map[string]interface{}{"some-param": "a-param"}),
+							}
+						})
+
+						It("returns all warnings and noop flag", func() {
+							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
+							Expect(noop).To(BeFalse())
+
+						})
 					})
 				})
 			})
@@ -732,7 +819,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns warnings and an error", func() {
-				warnings, err := actor.UpdateManagedServiceInstance(
+				_, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},

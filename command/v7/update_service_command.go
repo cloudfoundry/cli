@@ -45,7 +45,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
-	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
+	noop, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
 		serviceInstance,
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
@@ -54,12 +54,17 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 			ServicePlanName: types.OptionalString(cmd.Plan),
 		},
 	)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayOK()
+	if noop {
+		cmd.UI.DisplayText("No changes were made.")
+	}
+
 	return nil
 }
 

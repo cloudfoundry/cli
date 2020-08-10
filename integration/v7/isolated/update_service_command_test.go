@@ -439,6 +439,9 @@ var _ = Describe("update-service command", func() {
 					serviceInstanceName,
 					"-t", originalTags,
 				)
+				session := helpers.CF("m")
+				Eventually(session).Should(Exit(0))
+
 			})
 
 			AfterEach(func() {
@@ -517,9 +520,16 @@ var _ = Describe("update-service command", func() {
 			})
 
 			Describe("updating plan", func() {
-				It("exits 0", func() {
-					session := helpers.CF(command, serviceInstanceName, "-p", broker.Services[0].Plans[1].Name)
+				It("updates the plan", func() {
+					newPlanName := broker.Services[0].Plans[1].Name
+					session := helpers.CF(command, serviceInstanceName, "-p", newPlanName)
 					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("service", serviceInstanceName)).Should(
+						SatisfyAll(
+							Say(`plan:\s+%s`, newPlanName),
+							Say(`status:\s+update succeeded`),
+						),
+					)
 				})
 
 				When("plan does not exist", func() {
@@ -529,6 +539,15 @@ var _ = Describe("update-service command", func() {
 						session := helpers.CF(command, serviceInstanceName, "-p", invalidPlan)
 						Eventually(session).Should(Exit(1))
 						Expect(session.Err).To(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", invalidPlan, broker.Services[0].Name, broker.Name))
+					})
+				})
+
+				When("plan is the same as current", func() {
+					It("displays a message and exits 0", func() {
+						session := helpers.CF(command, serviceInstanceName, "-p", broker.Services[0].Plans[0].Name)
+						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say("OK"))
+						Expect(session.Out).To(Say("No changes were made."))
 					})
 				})
 			})
