@@ -1309,6 +1309,7 @@ var _ = Describe("Service Instance Actions", func() {
 		When("there is an upgrade available", func() {
 			const guid = "some-guid"
 			const planGUID = "some-plan-guid"
+			const jobURL = ccv3.JobURL("fake-job-url")
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
@@ -1326,7 +1327,6 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from get"},
 					nil,
 				)
-
 				fakeCloudControllerClient.GetServicePlanByGUIDReturns(
 					resources.ServicePlan{
 						MaintenanceInfoVersion: "9.1.2",
@@ -1334,88 +1334,43 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from plan"},
 					nil,
 				)
+				fakeCloudControllerClient.UpdateServiceInstanceReturns(
+					jobURL,
+					ccv3.Warnings{"warning from update"},
+					nil,
+				)
+				fakeCloudControllerClient.PollJobForStateReturns(
+					ccv3.Warnings{"warning from poll"},
+					nil,
+				)
 			})
 
-			Context("and it is done synchronously", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateServiceInstanceReturns(
-						"",
-						ccv3.Warnings{"warning from update"},
-						nil,
-					)
+			It("makes the right calls and returns all warnings", func() {
+				By("getting the service plan", func() {
+					Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(1))
+					actualPlanGUID := fakeCloudControllerClient.GetServicePlanByGUIDArgsForCall(0)
+					Expect(actualPlanGUID).To(Equal(planGUID))
 				})
 
-				It("makes the right calls and returns all warnings", func() {
-					By("getting the service plan", func() {
-						Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(1))
-						actualPlanGUID := fakeCloudControllerClient.GetServicePlanByGUIDArgsForCall(0)
-						Expect(actualPlanGUID).To(Equal(planGUID))
-					})
-
-					By("updating the service instance", func() {
-						Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-						actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-						Expect(actualGUID).To(Equal(guid))
-						Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
-							MaintenanceInfoVersion: "9.1.2",
-						}))
-					})
-
-					By("returning warnings and no error", func() {
-						Expect(err).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("warning from get", "warning from plan", "warning from update"))
-					})
-
-					By("specifying an empty job URL", func() {
-						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-						actualURL, _ := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
-						Expect(actualURL).To(BeEmpty())
-					})
-				})
-			})
-
-			Context("and it is done asynchronously", func() {
-				const jobURL = ccv3.JobURL("fake-job-url")
-
-				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateServiceInstanceReturns(
-						jobURL,
-						ccv3.Warnings{"warning from update"},
-						nil,
-					)
-					fakeCloudControllerClient.PollJobForStateReturns(
-						ccv3.Warnings{"warning from poll"},
-						nil,
-					)
+				By("updating the service instance", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+					Expect(actualGUID).To(Equal(guid))
+					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
+						MaintenanceInfoVersion: "9.1.2",
+					}))
 				})
 
-				It("makes the right calls and returns all warnings", func() {
-					By("getting the service plan", func() {
-						Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(1))
-						actualPlanGUID := fakeCloudControllerClient.GetServicePlanByGUIDArgsForCall(0)
-						Expect(actualPlanGUID).To(Equal(planGUID))
-					})
+				By("polling the job", func() {
+					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
+					actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(actualURL).To(Equal(jobURL))
+					Expect(actualState).To(Equal(constant.JobPolling))
+				})
 
-					By("updating the service instance", func() {
-						Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-						actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-						Expect(actualGUID).To(Equal(guid))
-						Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
-							MaintenanceInfoVersion: "9.1.2",
-						}))
-					})
-
-					By("returning warnings and no error", func() {
-						Expect(err).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("warning from get", "warning from plan", "warning from update", "warning from poll"))
-					})
-
-					By("polling the job", func() {
-						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-						actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
-						Expect(actualURL).To(Equal(jobURL))
-						Expect(actualState).To(Equal(constant.JobPolling))
-					})
+				By("returning warnings and no error", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning from get", "warning from plan", "warning from update", "warning from poll"))
 				})
 			})
 		})

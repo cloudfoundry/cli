@@ -2,10 +2,8 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"strings"
-
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 type UpgradeServiceCommand struct {
@@ -61,9 +59,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 }
 
 func (cmd UpgradeServiceCommand) Usage() string {
-	return strings.TrimSpace(`
-		CF_NAME upgrade-service SERVICE_INSTANCE
-	`)
+	return "CF_NAME upgrade-service SERVICE_INSTANCE"
 }
 
 func (cmd UpgradeServiceCommand) displayIntro() error {

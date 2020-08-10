@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -33,15 +34,10 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 	serviceInstance := cmd.RequiredArgs.ServiceInstance
 
 	if cmd.Upgrade {
-		cmd.UI.DisplayTextWithFlavor(
-			"Upgrading is no longer supported via updates, please run {{.UpgradeCommand}} instead.",
-			map[string]interface{}{
-				"UpgradeCommand": "cf upgrade-service " + serviceInstance,
-			},
+		return fmt.Errorf(
+			`Upgrading is no longer supported via updates, please run "cf upgrade-service %s" instead.`,
+			serviceInstance,
 		)
-		cmd.UI.DisplayOK()
-
-		return nil
 	}
 
 	if cmd.noFlagsProvided() {
