@@ -32,7 +32,7 @@ type ApplyManifestCommand struct {
 func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
-	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(cmd.UI)
+	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
 
 	currentDir, err := os.Getwd()
 	if err != nil {
