@@ -1,5 +1,7 @@
 package flag
 
+import "code.cloudfoundry.org/cli/types"
+
 type AppName struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 }
@@ -38,7 +40,7 @@ type Service struct {
 }
 
 type ServiceInstance struct {
-	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
+	ServiceInstance types.TrimmedString `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
 }
 
 type Organization struct {

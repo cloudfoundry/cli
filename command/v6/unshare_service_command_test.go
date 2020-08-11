@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -44,7 +45,7 @@ var _ = Describe("unshare-service Command", func() {
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
+		cmd.RequiredArgs.ServiceInstance = types.NewTrimmedString("some-service-instance")
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)

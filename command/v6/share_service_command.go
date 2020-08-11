@@ -79,8 +79,10 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		orgName = cmd.OrgName
 	}
 
+	serviceInstanceName := cmd.RequiredArgs.ServiceInstance.Value
+
 	cmd.UI.DisplayTextWithFlavor("Sharing service instance {{.ServiceInstanceName}} into org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+		"ServiceInstanceName": serviceInstanceName,
 		"OrgName":             orgName,
 		"SpaceName":           cmd.SpaceName,
 		"Username":            user.Name,
@@ -89,9 +91,9 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 	var warnings v2v3action.Warnings
 
 	if cmd.OrgName != "" {
-		warnings, err = cmd.Actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(cmd.SpaceName, cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID, cmd.OrgName)
+		warnings, err = cmd.Actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(cmd.SpaceName, serviceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.OrgName)
 	} else {
-		warnings, err = cmd.Actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(cmd.SpaceName, cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID, cmd.Config.TargetedOrganization().GUID)
+		warnings, err = cmd.Actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(cmd.SpaceName, serviceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.Config.TargetedOrganization().GUID)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -99,7 +101,7 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		switch err.(type) {
 		case actionerror.ServiceInstanceAlreadySharedError:
 			cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} is already shared with that space.", map[string]interface{}{
-				"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+				"ServiceInstanceName": serviceInstanceName,
 			})
 		default:
 			return err

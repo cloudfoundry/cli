@@ -1,12 +1,11 @@
 package v7
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
+	"encoding/json"
+	"fmt"
 )
 
 type ServiceCommand struct {
@@ -30,7 +29,7 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(cmd.RequiredArgs.ServiceInstance.Value, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

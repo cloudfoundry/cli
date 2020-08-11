@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -47,7 +48,7 @@ var _ = Describe("update-user-provided-service Command", func() {
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,
 			Actor:        fakeActor,
-			RequiredArgs: flag.ServiceInstance{ServiceInstance: fakeServiceInstanceName},
+			RequiredArgs: flag.ServiceInstance{ServiceInstance: types.NewTrimmedString(fakeServiceInstanceName)},
 		}
 	})
 
