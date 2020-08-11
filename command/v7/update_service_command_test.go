@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -83,9 +84,13 @@ var _ = Describe("update-service command", func() {
 			setFlag(&cmd, "--upgrade")
 		})
 
-		It("prints a message and exits 0", func() {
-			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say("Upgrading is no longer supported via updates, please run cf upgrade-service fake-service-instance-name instead."))
+		It("prints a message and returns an error", func() {
+			Expect(executeErr).To(MatchError(
+				fmt.Sprintf(
+					`Upgrading is no longer supported via updates, please run "cf upgrade-service %s" instead.`,
+					serviceInstanceName,
+				),
+			))
 		})
 	})
 

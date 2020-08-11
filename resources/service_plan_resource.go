@@ -29,6 +29,8 @@ type ServicePlan struct {
 	SpaceGUID string `jsonry:"relationships.space.data.guid"`
 	// MaintenanceInfoDescription is the description of the associated version
 	MaintenanceInfoDescription string `jsonry:"maintenance_info.description"`
+	// MaintenanceInfoVersion is the version of the service plan
+	MaintenanceInfoVersion string `jsonry:"maintenance_info.version"`
 
 	Metadata *Metadata `json:"metadata"`
 }

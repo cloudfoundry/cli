@@ -44,7 +44,7 @@ func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInsta
 	}
 
 	if !upgradeIsAvailable(serviceInstance, servicePlan) {
-		return warnings, actionerror.ServiceUpgradeNotAvailableError{}
+		return warnings, actionerror.ServiceInstanceUpgradeNotAvailableError{}
 	}
 
 	updateWarnings, err := c.UpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfo(

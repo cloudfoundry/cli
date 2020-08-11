@@ -112,7 +112,7 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 				})
 
 				It("returns an error informing that no upgrade is available", func() {
-					expectedErr := actionerror.ServiceUpgradeNotAvailableError{}
+					expectedErr := actionerror.ServiceInstanceUpgradeNotAvailableError{}
 					Expect(err).To(MatchError(expectedErr))
 				})
 

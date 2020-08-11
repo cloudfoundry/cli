@@ -121,6 +121,38 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 	return allWarnings, err
 }
 
+func (actor Actor) UpgradeServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var servicePlan resources.ServicePlan
+	var jobURL ccv3.JobURL
+
+	return handleServiceInstanceErrors(railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if serviceInstance.UpgradeAvailable.Value != true {
+				err = actionerror.ServiceInstanceUpgradeNotAvailableError{}
+			}
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			servicePlan, warnings, err = actor.CloudControllerClient.GetServicePlanByGUID(serviceInstance.ServicePlanGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(serviceInstance.GUID, resources.ServiceInstance{
+				MaintenanceInfoVersion: servicePlan.MaintenanceInfoVersion,
+			})
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
+		},
+	))
+}
+
 func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance

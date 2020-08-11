@@ -239,13 +239,13 @@ var _ = Describe("update-service Command", func() {
 							BeforeEach(func() {
 								fakeActor.UpgradeServiceInstanceReturns(
 									v2action.Warnings{},
-									actionerror.ServiceUpgradeNotAvailableError{},
+									actionerror.ServiceInstanceUpgradeNotAvailableError{},
 								)
 							})
 
 							It("says that the update has failed", func() {
 								expectedErr := translatableerror.TipDecoratorError{
-									BaseError: actionerror.ServiceUpgradeNotAvailableError{},
+									BaseError: actionerror.ServiceInstanceUpgradeNotAvailableError{},
 									Tip:       "To find out if upgrade is available run `cf service {{.ServiceName}}`.",
 									TipKeys: map[string]interface{}{
 										"ServiceName": serviceInstanceName,
