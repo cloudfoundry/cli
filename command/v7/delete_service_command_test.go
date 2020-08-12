@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	"errors"
@@ -150,7 +151,7 @@ var _ = Describe("delete-service command", func() {
 			},
 		}
 
-		setPositionalFlags(&cmd, serviceInstanceName)
+		setPositionalFlags(&cmd, types.NewTrimmedString(serviceInstanceName))
 	})
 
 	JustBeforeEach(func() {

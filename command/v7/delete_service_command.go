@@ -36,7 +36,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 	}
 
 	state, warnings, err := cmd.Actor.DeleteServiceInstance(
-		cmd.RequiredArgs.ServiceInstance,
+		cmd.RequiredArgs.ServiceInstance.Value,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Wait,
 	)

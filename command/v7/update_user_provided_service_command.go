@@ -39,7 +39,9 @@ func (cmd *UpdateUserProvidedServiceCommand) Execute(args []string) error {
 		return nil
 	}
 
-	warnings, err := cmd.Actor.UpdateUserProvidedServiceInstance(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID, resources.ServiceInstance{
+	serviceInstanceName := cmd.RequiredArgs.ServiceInstance.Value
+
+	warnings, err := cmd.Actor.UpdateUserProvidedServiceInstance(serviceInstanceName, cmd.Config.TargetedSpace().GUID, resources.ServiceInstance{
 		Tags:            types.OptionalStringSlice(cmd.Tags),
 		SyslogDrainURL:  types.OptionalString(cmd.SyslogDrainURL),
 		RouteServiceURL: types.OptionalString(cmd.RouteServiceURL),
@@ -48,7 +50,7 @@ func (cmd *UpdateUserProvidedServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	switch err.(type) {
 	case ccerror.ServiceInstanceNotFoundError:
-		return actionerror.ServiceInstanceNotFoundError{Name: cmd.RequiredArgs.ServiceInstance}
+		return actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
 		return err
 	case nil:

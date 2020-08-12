@@ -84,7 +84,7 @@ func (cmd *UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	instance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	instance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(cmd.RequiredArgs.ServiceInstance.Value, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

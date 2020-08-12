@@ -79,7 +79,7 @@ var _ = Describe("service command", func() {
 			nil,
 		)
 
-		setPositionalFlags(&cmd, serviceInstanceName)
+		setPositionalFlags(&cmd, types.NewTrimmedString(serviceInstanceName))
 	})
 
 	It("checks the user is logged in, and targeting an org and space", func() {

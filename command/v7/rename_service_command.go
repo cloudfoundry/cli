@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"strings"
 )
 
 type RenameServiceCommand struct {
@@ -16,6 +17,9 @@ func (cmd RenameServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
+
+	cmd.RequiredArgs.ServiceInstance = strings.TrimSpace(cmd.RequiredArgs.ServiceInstance)
+	cmd.RequiredArgs.NewServiceInstanceName = strings.TrimSpace(cmd.RequiredArgs.NewServiceInstanceName)
 
 	if err := cmd.displayMessage(); err != nil {
 		return err
