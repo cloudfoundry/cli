@@ -212,7 +212,7 @@ type Actor interface {
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates v7action.ServiceInstanceUpdateManagedParams) (bool, v7action.Warnings, error)
-	UpgradeServiceInstance(serviceInstanceName, spaceGUID string) (v7action.Warnings, error)
+	UpgradeManagedServiceInstance(serviceInstanceName, spaceGUID string) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationQuota(quotaName string, newName string, limits v7action.QuotaLimits) (v7action.Warnings, error)
 	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess v7action.Process) (v7action.Warnings, error)

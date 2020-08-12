@@ -16,6 +16,25 @@ type ServiceInstanceUpdateManagedParams struct {
 	Parameters      types.OptionalObject
 }
 
+type ManagedServiceInstanceParams struct {
+	ServiceOfferingName string
+	ServicePlanName     string
+	ServiceInstanceName string
+	ServiceBrokerName   string
+	SpaceGUID           string
+	Tags                types.OptionalStringSlice
+	Parameters          types.OptionalObject
+}
+
+type ServiceInstanceDeleteState int
+
+const (
+	ServiceInstanceUnknownState ServiceInstanceDeleteState = iota
+	ServiceInstanceDidNotExist
+	ServiceInstanceGone
+	ServiceInstanceDeleteInProgress
+)
+
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
 	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	switch e := err.(type) {
@@ -24,11 +43,6 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 	default:
 		return serviceInstance, Warnings(warnings), err
 	}
-}
-
-func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
-	return Warnings(warnings), err
 }
 
 func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.ServiceInstance) (Warnings, error) {
@@ -58,15 +72,50 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	return Warnings(warnings), err
 }
 
+func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (Warnings, error) {
+	allWarnings := Warnings{}
+
+	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
+		params.ServicePlanName,
+		params.ServiceOfferingName,
+		params.ServiceBrokerName,
+	)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	serviceInstance := resources.ServiceInstance{
+		Type:            resources.ManagedServiceInstance,
+		Name:            params.ServiceInstanceName,
+		ServicePlanGUID: servicePlan.GUID,
+		SpaceGUID:       params.SpaceGUID,
+		Tags:            params.Tags,
+		Parameters:      params.Parameters,
+	}
+
+	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
+	allWarnings = append(allWarnings, clientWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	clientWarnings, err = actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
+	allWarnings = append(allWarnings, clientWarnings...)
+
+	return allWarnings, err
+
+}
+
 // TODO finish this refactor
 func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (bool, Warnings, error) {
 	var (
 		jobURL      ccv3.JobURL
 		allWarnings Warnings
-		updates     serviceInstanceUpdate
+		updates     managedServiceInstanceUpdate
 	)
 
-	updatesBuilder := &serviceInstanceUpdateBuilder{
+	updatesBuilder := &managedServiceInstanceUpdateBuilder{
 		actor:               actor,
 		requestedUpdates:    serviceInstanceUpdates,
 		serviceInstanceName: serviceInstanceName,
@@ -98,7 +147,7 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 	return updatesBuilder.IsNoop(), allWarnings, err
 }
 
-func (actor Actor) UpgradeServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
+func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
 	var serviceInstance resources.ServiceInstance
 	var servicePlan resources.ServicePlan
 	var jobURL ccv3.JobURL
@@ -154,88 +203,6 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 	))
 }
 
-func (actor Actor) fetchServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, ccv3.IncludedResources, Warnings, error) {
-	query := []ccv3.Query{
-		{
-			Key:    ccv3.FieldsServicePlan,
-			Values: []string{"name", "guid"},
-		},
-		{
-			Key:    ccv3.FieldsServicePlanServiceOffering,
-			Values: []string{"name", "guid", "description", "tags", "documentation_url"},
-		},
-		{
-			Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
-			Values: []string{"name", "guid"},
-		},
-	}
-
-	serviceInstance, included, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
-	switch err.(type) {
-	case nil:
-	case ccerror.ServiceInstanceNotFoundError:
-		return resources.ServiceInstance{}, ccv3.IncludedResources{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
-	default:
-		return resources.ServiceInstance{}, ccv3.IncludedResources{}, Warnings(warnings), err
-	}
-
-	return serviceInstance, included, Warnings(warnings), nil
-}
-
-type ManagedServiceInstanceParams struct {
-	ServiceOfferingName string
-	ServicePlanName     string
-	ServiceInstanceName string
-	ServiceBrokerName   string
-	SpaceGUID           string
-	Tags                types.OptionalStringSlice
-	Parameters          types.OptionalObject
-}
-
-func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (Warnings, error) {
-	allWarnings := Warnings{}
-
-	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
-		params.ServicePlanName,
-		params.ServiceOfferingName,
-		params.ServiceBrokerName,
-	)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	serviceInstance := resources.ServiceInstance{
-		Type:            resources.ManagedServiceInstance,
-		Name:            params.ServiceInstanceName,
-		ServicePlanGUID: servicePlan.GUID,
-		SpaceGUID:       params.SpaceGUID,
-		Tags:            params.Tags,
-		Parameters:      params.Parameters,
-	}
-
-	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
-	allWarnings = append(allWarnings, clientWarnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	clientWarnings, err = actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
-	allWarnings = append(allWarnings, clientWarnings...)
-
-	return allWarnings, err
-
-}
-
-type ServiceInstanceDeleteState int
-
-const (
-	ServiceInstanceUnknownState ServiceInstanceDeleteState = iota
-	ServiceInstanceDidNotExist
-	ServiceInstanceGone
-	ServiceInstanceDeleteInProgress
-)
-
 func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, wait bool) (ServiceInstanceDeleteState, Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance
@@ -268,6 +235,11 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, 
 		return ServiceInstanceDeleteInProgress, Warnings(warnings), nil
 	}
 	return ServiceInstanceGone, Warnings(warnings), nil
+}
+
+func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
+	return Warnings(warnings), err
 }
 
 func (actor Actor) pollJob(jobURL ccv3.JobURL, wait bool) (ccv3.Warnings, error) {
@@ -303,24 +275,25 @@ func handleServiceInstanceErrors(warnings ccv3.Warnings, err error) (Warnings, e
 	}
 }
 
-type serviceInstanceUpdateBuilder struct {
+type managedServiceInstanceUpdateBuilder struct {
 	actor               Actor
 	requestedUpdates    ServiceInstanceUpdateManagedParams
 	serviceInstanceName string
 	spaceGUID           string
+
 	serviceInstance     resources.ServiceInstance
 	serviceOfferingName string
 	serviceBrokerName   string
-	updates             *serviceInstanceUpdate
+	updates             *managedServiceInstanceUpdate
 }
 
-type serviceInstanceUpdate struct {
+type managedServiceInstanceUpdate struct {
 	serviceInstance *resources.ServiceInstance
 	isNoop          bool
 }
 
-func (builder *serviceInstanceUpdateBuilder) build() (serviceInstanceUpdate, ccv3.Warnings, error) {
-	builder.updates = &serviceInstanceUpdate{
+func (builder *managedServiceInstanceUpdateBuilder) build() (managedServiceInstanceUpdate, ccv3.Warnings, error) {
+	builder.updates = &managedServiceInstanceUpdate{
 		serviceInstance: &resources.ServiceInstance{
 			Tags:       builder.requestedUpdates.Tags,
 			Parameters: builder.requestedUpdates.Parameters,
@@ -341,12 +314,12 @@ func (builder *serviceInstanceUpdateBuilder) build() (serviceInstanceUpdate, ccv
 		},
 	)
 	if err != nil {
-		return serviceInstanceUpdate{}, warnings, err
+		return managedServiceInstanceUpdate{}, warnings, err
 	}
 	return *builder.updates, warnings, err
 }
 
-func (builder *serviceInstanceUpdateBuilder) GetServicePlan() (ccv3.Warnings, error) {
+func (builder *managedServiceInstanceUpdateBuilder) GetServicePlan() (ccv3.Warnings, error) {
 	var actorWarnings Warnings
 
 	if !builder.requestedUpdates.ServicePlanName.IsSet {
@@ -364,7 +337,7 @@ func (builder *serviceInstanceUpdateBuilder) GetServicePlan() (ccv3.Warnings, er
 	return ccv3.Warnings(actorWarnings), err
 }
 
-func (builder *serviceInstanceUpdateBuilder) GetServiceInstanceToUpdate() (warnings ccv3.Warnings, err error) {
+func (builder *managedServiceInstanceUpdateBuilder) GetServiceInstanceToUpdate() (warnings ccv3.Warnings, err error) {
 	var serviceInstanceQuery []ccv3.Query
 
 	if builder.requestedUpdates.ServicePlanName.IsSet {
@@ -397,7 +370,7 @@ func (builder *serviceInstanceUpdateBuilder) GetServiceInstanceToUpdate() (warni
 	return warnings, err
 }
 
-func (builder *serviceInstanceUpdateBuilder) IsNoop() bool {
+func (builder *managedServiceInstanceUpdateBuilder) IsNoop() bool {
 	if builder.updates.serviceInstance.ServicePlanGUID == builder.serviceInstance.ServicePlanGUID {
 		if !(builder.updates.serviceInstance.Tags.IsSet || builder.updates.serviceInstance.Parameters.IsSet) {
 			return true

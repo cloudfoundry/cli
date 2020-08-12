@@ -1321,7 +1321,7 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 	})
 
-	Describe("UpgradeServiceInstance", func() {
+	Describe("UpgradeManagedServiceInstance", func() {
 		const (
 			fakeServiceInstanceName = "fake-service-instance-name"
 			fakeSpaceGUID           = "fake-space-GUID"
@@ -1333,7 +1333,7 @@ var _ = Describe("Service Instance Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, err = actor.UpgradeServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
+			warnings, err = actor.UpgradeManagedServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
 		})
 
 		It("makes a request to get the service instance", func() {

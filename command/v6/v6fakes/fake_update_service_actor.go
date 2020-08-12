@@ -177,7 +177,7 @@ func (fake *FakeUpdateServiceActor) UpgradeServiceInstance(arg1 v2action.Service
 	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
 		arg1 v2action.ServiceInstance
 	}{arg1})
-	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1})
+	fake.recordInvocation("UpgradeManagedServiceInstance", []interface{}{arg1})
 	fake.upgradeServiceInstanceMutex.Unlock()
 	if fake.UpgradeServiceInstanceStub != nil {
 		return fake.UpgradeServiceInstanceStub(arg1)

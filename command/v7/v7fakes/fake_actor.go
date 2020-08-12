@@ -16768,14 +16768,14 @@ func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpgradeServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.upgradeServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.upgradeServiceInstanceReturnsOnCall[len(fake.upgradeServiceInstanceArgsForCall)]
 	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1, arg2})
+	fake.recordInvocation("UpgradeManagedServiceInstance", []interface{}{arg1, arg2})
 	fake.upgradeServiceInstanceMutex.Unlock()
 	if fake.UpgradeServiceInstanceStub != nil {
 		return fake.UpgradeServiceInstanceStub(arg1, arg2)
