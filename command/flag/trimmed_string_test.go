@@ -9,12 +9,6 @@ import (
 var _ = Describe("TrimmedString", func() {
 	var trimmedString TrimmedString
 
-	Describe("default value", func() {
-		It("has an empty value", func() {
-			Expect(trimmedString).To(BeEmpty())
-		})
-	})
-
 	Describe("UnmarshalFlag", func() {
 		BeforeEach(func() {
 			err := trimmedString.UnmarshalFlag("   some string   ")
