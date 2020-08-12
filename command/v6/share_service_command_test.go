@@ -1,7 +1,6 @@
 package v6_test
 
 import (
-	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -43,7 +42,7 @@ var _ = Describe("share-service Command", func() {
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.ServiceInstance = types.NewTrimmedString("some-service-instance")
+		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
 		cmd.SpaceName = "some-space"
 
 		binaryName = "faceman"

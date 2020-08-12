@@ -53,7 +53,7 @@ var _ = Describe("update-service command", func() {
 			},
 		}
 
-		setPositionalFlags(&cmd, types.NewTrimmedString(serviceInstanceName))
+		setPositionalFlags(&cmd, flag.TrimmedString(serviceInstanceName))
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{

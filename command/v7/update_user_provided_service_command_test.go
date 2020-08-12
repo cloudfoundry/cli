@@ -99,7 +99,7 @@ var _ = Describe("update-user-provided-service Command", func() {
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
-			setPositionalFlags(&cmd, types.NewTrimmedString(fakeServiceInstanceName))
+			setPositionalFlags(&cmd, fakeServiceInstanceName)
 
 			fakeActor.UpdateUserProvidedServiceInstanceReturns(v7action.Warnings{"something obstreperous"}, nil)
 		})

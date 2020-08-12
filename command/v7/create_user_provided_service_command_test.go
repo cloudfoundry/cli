@@ -88,7 +88,7 @@ var _ = Describe("create-user-provided-service Command", func() {
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
-			setPositionalFlags(&cmd, types.NewTrimmedString(fakeServiceInstanceName))
+			setPositionalFlags(&cmd, fakeServiceInstanceName)
 
 			fakeActor.CreateUserProvidedServiceInstanceReturns(v7action.Warnings{"be warned", "take care"}, nil)
 		})

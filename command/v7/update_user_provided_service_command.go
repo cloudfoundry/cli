@@ -39,7 +39,7 @@ func (cmd *UpdateUserProvidedServiceCommand) Execute(args []string) error {
 		return nil
 	}
 
-	serviceInstanceName := cmd.RequiredArgs.ServiceInstance.Value
+	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
 
 	warnings, err := cmd.Actor.UpdateUserProvidedServiceInstance(serviceInstanceName, cmd.Config.TargetedSpace().GUID, resources.ServiceInstance{
 		Tags:            types.OptionalStringSlice(cmd.Tags),

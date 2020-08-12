@@ -44,7 +44,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return nil
 	}
 	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-		cmd.RequiredArgs.ServiceInstance.Value,
+		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
 			Tags:            types.OptionalStringSlice(cmd.Tags),

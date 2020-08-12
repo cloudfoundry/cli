@@ -1,7 +1,6 @@
 package v6_test
 
 import (
-	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -46,7 +45,7 @@ var _ = Describe("service Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		cmd.RequiredArgs.ServiceInstance = types.NewTrimmedString("some-service-instance")
+		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
 
 		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionMaintenanceInfoInSummaryV2)
 	})

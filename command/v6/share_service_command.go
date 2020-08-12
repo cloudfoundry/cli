@@ -79,7 +79,7 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		orgName = cmd.OrgName
 	}
 
-	serviceInstanceName := cmd.RequiredArgs.ServiceInstance.Value
+	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
 
 	cmd.UI.DisplayTextWithFlavor("Sharing service instance {{.ServiceInstanceName}} into org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"ServiceInstanceName": serviceInstanceName,
