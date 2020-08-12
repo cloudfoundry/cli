@@ -43,9 +43,9 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
-  
+
 	noop, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-    string(cmd.RequiredArgs.ServiceInstance),
+		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
 			Tags:            types.OptionalStringSlice(cmd.Tags),
