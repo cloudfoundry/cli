@@ -43,8 +43,9 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
-	warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-		string(cmd.RequiredArgs.ServiceInstance),
+  
+	noop, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
+    string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
 			Tags:            types.OptionalStringSlice(cmd.Tags),
@@ -52,12 +53,17 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 			ServicePlanName: types.OptionalString(cmd.Plan),
 		},
 	)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayOK()
+	if noop {
+		cmd.UI.DisplayText("No changes were made.")
+	}
+
 	return nil
 }
 

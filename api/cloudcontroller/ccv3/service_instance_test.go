@@ -411,38 +411,72 @@ var _ = Describe("Service Instance", func() {
 
 		var serviceInstance resources.ServiceInstance
 
-		BeforeEach(func() {
-			serviceInstance = resources.ServiceInstance{
-				Name:            "fake-new-user-provided-service-instance",
-				Tags:            types.NewOptionalStringSlice("foo", "bar"),
-				RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
-				SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
-				Credentials: types.NewOptionalObject(map[string]interface{}{
-					"foo": "bar",
-					"baz": 42,
-				}),
-				MaintenanceInfoVersion: "9.1.2",
-			}
-		})
-
-		When("the request succeeds", func() {
+		Context("user provided", func() {
 			BeforeEach(func() {
-				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+				serviceInstance = resources.ServiceInstance{
+					Name:            "fake-new-user-provided-service-instance",
+					Tags:            types.NewOptionalStringSlice("foo", "bar"),
+					RouteServiceURL: types.NewOptionalString("https://fake-route.com"),
+					SyslogDrainURL:  types.NewOptionalString("https://fake-sylogg.com"),
+					Credentials: types.NewOptionalObject(map[string]interface{}{
+						"foo": "bar",
+						"baz": 42,
+					}),
+					MaintenanceInfoVersion: "9.1.2",
+				}
 			})
 
-			It("returns warnings and no errors", func() {
-				job, warnings, err := client.UpdateServiceInstance(guid, serviceInstance)
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+				})
 
-				Expect(job).To(Equal(jobURL))
-				Expect(warnings).To(ConsistOf("fake-warning"))
-				Expect(err).NotTo(HaveOccurred())
+				It("returns warnings and no errors", func() {
+					job, warnings, err := client.UpdateServiceInstance(guid, serviceInstance)
 
-				Expect(requester.MakeRequestCallCount()).To(Equal(1))
-				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-					RequestName: internal.PatchServiceInstanceRequest,
-					URIParams:   internal.Params{"service_instance_guid": guid},
-					RequestBody: serviceInstance,
-				}))
+					Expect(job).To(Equal(jobURL))
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(requester.MakeRequestCallCount()).To(Equal(1))
+					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+						RequestName: internal.PatchServiceInstanceRequest,
+						URIParams:   internal.Params{"service_instance_guid": guid},
+						RequestBody: serviceInstance,
+					}))
+				})
+			})
+		})
+
+		Context("managed", func() {
+			BeforeEach(func() {
+				serviceInstance = resources.ServiceInstance{
+					Name:            "fake-new-user-provided-service-instance",
+					Tags:            types.NewOptionalStringSlice("foo", "bar"),
+					ServicePlanGUID: guid,
+					Parameters:      types.NewOptionalObject(map[string]interface{}{"some-param": "some-value"}),
+				}
+			})
+
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+				})
+
+				It("returns warnings and no errors", func() {
+					job, warnings, err := client.UpdateServiceInstance(guid, serviceInstance)
+
+					Expect(job).To(Equal(jobURL))
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(requester.MakeRequestCallCount()).To(Equal(1))
+					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+						RequestName: internal.PatchServiceInstanceRequest,
+						URIParams:   internal.Params{"service_instance_guid": guid},
+						RequestBody: serviceInstance,
+					}))
+				})
 			})
 		})
 

@@ -37,7 +37,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 
 	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
 
-	warnings, actorError := cmd.Actor.UpgradeServiceInstance(
+	warnings, actorError := cmd.Actor.UpgradeManagedServiceInstance(
 		serviceInstanceName,
 		cmd.Config.TargetedSpace().GUID,
 	)

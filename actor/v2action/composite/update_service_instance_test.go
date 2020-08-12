@@ -36,7 +36,7 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 		}
 	})
 
-	Describe("UpgradeServiceInstance", func() {
+	Describe("UpgradeManagedServiceInstance", func() {
 		var (
 			serviceInstanceGUID    = "service-instance-guid"
 			servicePlanGUID        = "service-plan-guid"

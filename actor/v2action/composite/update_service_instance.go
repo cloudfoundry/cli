@@ -36,7 +36,7 @@ type UpdateServiceInstanceCompositeActor struct {
 	GetAPIVersionActor                        GetAPIVersionActor
 }
 
-// UpgradeServiceInstance requests update on the service instance with the `maintenance_info` available on the plan
+// UpgradeManagedServiceInstance requests update on the service instance with the `maintenance_info` available on the plan
 func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInstance v2action.ServiceInstance) (v2action.Warnings, error) {
 	servicePlan, warnings, err := c.GetServicePlanActor.GetServicePlan(serviceInstance.ServicePlanGUID)
 	if err != nil {
