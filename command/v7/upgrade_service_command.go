@@ -19,7 +19,6 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
-
 	if err := cmd.displayIntro(); err != nil {
 		return err
 	}
@@ -36,8 +35,10 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		}
 	}
 
+	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
+
 	warnings, actorError := cmd.Actor.UpgradeManagedServiceInstance(
-		cmd.RequiredArgs.ServiceInstance,
+		serviceInstanceName,
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -50,7 +51,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(actorError.Error())
 		cmd.UI.DisplayOK()
 	case actionerror.ServiceInstanceNotFoundError:
-		return translatableerror.ServiceInstanceNotFoundError{Name: cmd.RequiredArgs.ServiceInstance}
+		return translatableerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
 		return actorError
 	}

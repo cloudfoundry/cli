@@ -33,7 +33,7 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 	}
 
 	serviceInstance := resources.ServiceInstance{
-		Name:            cmd.RequiredArgs.ServiceInstance,
+		Name:            string(cmd.RequiredArgs.ServiceInstance),
 		SpaceGUID:       cmd.Config.TargetedSpace().GUID,
 		Tags:            types.OptionalStringSlice(cmd.Tags),
 		SyslogDrainURL:  types.OptionalString(cmd.SyslogDrainURL),

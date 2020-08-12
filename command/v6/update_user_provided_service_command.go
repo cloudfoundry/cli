@@ -88,7 +88,7 @@ func (cmd *UpdateUserProvidedServiceCommand) Execute(args []string) error {
 }
 
 func (cmd *UpdateUserProvidedServiceCommand) findServiceInstance() (v2action.ServiceInstance, error) {
-	serviceInstance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	serviceInstance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v2action.ServiceInstance{}, err

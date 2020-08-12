@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
+	"strings"
 )
 
 type CreateServiceCommand struct {
@@ -61,6 +62,8 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
+
+	cmd.RequiredArgs.ServiceInstance = strings.TrimSpace(cmd.RequiredArgs.ServiceInstance)
 
 	if err := cmd.displayCreatingMessage(); err != nil {
 		return err

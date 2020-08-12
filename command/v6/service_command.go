@@ -61,7 +61,7 @@ func (cmd ServiceCommand) Execute(args []string) error {
 }
 
 func (cmd ServiceCommand) displayServiceInstanceGUID() error {
-	serviceInstance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	serviceInstance, warnings, err := cmd.Actor.GetServiceInstanceByNameAndSpace(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	})
 	cmd.UI.DisplayNewline()
 
-	serviceInstanceSummary, warnings, err := cmd.Actor.GetServiceInstanceSummaryByNameAndSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	serviceInstanceSummary, warnings, err := cmd.Actor.GetServiceInstanceSummaryByNameAndSpace(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

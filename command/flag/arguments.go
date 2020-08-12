@@ -38,7 +38,7 @@ type Service struct {
 }
 
 type ServiceInstance struct {
-	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
+	ServiceInstance TrimmedString `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
 }
 
 type Organization struct {

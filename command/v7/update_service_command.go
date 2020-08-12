@@ -31,12 +31,10 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	serviceInstance := cmd.RequiredArgs.ServiceInstance
-
 	if cmd.Upgrade {
 		return fmt.Errorf(
 			`Upgrading is no longer supported via updates, please run "cf upgrade-service %s" instead.`,
-			serviceInstance,
+			cmd.RequiredArgs.ServiceInstance,
 		)
 	}
 
@@ -45,9 +43,9 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
-
+  
 	noop, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-		serviceInstance,
+    string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
 			Tags:            types.OptionalStringSlice(cmd.Tags),

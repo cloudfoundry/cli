@@ -102,7 +102,7 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		"Username":            user.Name,
 	})
 
-	warnings, err := cmd.Actor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace(orgName, cmd.SharedToSpaceName, cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace(orgName, cmd.SharedToSpaceName, string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
