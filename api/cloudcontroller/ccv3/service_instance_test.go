@@ -501,6 +501,25 @@ var _ = Describe("Service Instance", func() {
 			jobURL = JobURL("fake-job-url")
 		)
 
+		It("makes the right request", func() {
+			client.DeleteServiceInstance(guid)
+
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+				RequestName: internal.DeleteServiceInstanceRequest,
+				URIParams:   internal.Params{"service_instance_guid": guid},
+			}))
+		})
+
+		When("there are query parameters", func() {
+			It("passes them through", func() {
+				client.DeleteServiceInstance(guid, Query{Key: NameFilter, Values: []string{"foo"}})
+
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeRequestArgsForCall(0).Query).To(ConsistOf(Query{Key: NameFilter, Values: []string{"foo"}}))
+			})
+		})
+
 		When("the request succeeds", func() {
 			BeforeEach(func() {
 				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
@@ -512,12 +531,6 @@ var _ = Describe("Service Instance", func() {
 				Expect(job).To(Equal(jobURL))
 				Expect(warnings).To(ConsistOf("fake-warning"))
 				Expect(err).NotTo(HaveOccurred())
-
-				Expect(requester.MakeRequestCallCount()).To(Equal(1))
-				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-					RequestName: internal.DeleteServiceInstanceRequest,
-					URIParams:   internal.Params{"service_instance_guid": guid},
-				}))
 			})
 		})
 

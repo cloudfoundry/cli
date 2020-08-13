@@ -232,6 +232,33 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, 
 	return ServiceInstanceGone, Warnings(warnings), nil
 }
 
+func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (ServiceInstanceDeleteState, Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			_, warnings, err = actor.CloudControllerClient.DeleteServiceInstance(
+				serviceInstance.GUID,
+				ccv3.Query{Key: ccv3.Purge, Values: []string{"true"}},
+			)
+			return
+		},
+	)
+
+	switch err.(type) {
+	case nil:
+		return ServiceInstanceGone, Warnings(warnings), nil
+	case ccerror.ServiceInstanceNotFoundError:
+		return ServiceInstanceDidNotExist, Warnings(warnings), nil
+	default:
+		return ServiceInstanceUnknownState, Warnings(warnings), err
+	}
+}
+
 func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
 	return Warnings(warnings), err

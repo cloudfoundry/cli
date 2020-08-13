@@ -9,26 +9,24 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("delete-service command", func() {
-	const command = "delete-service"
+var _ = Describe("purge-service-instance command", func() {
+	const command = "v3-purge-service-instance"
 
 	Describe("help", func() {
 		matchHelpMessage := SatisfyAll(
 			Say(`NAME:\n`),
-			Say(`\s+%s - Delete a service instance\n`, command),
+			Say(`\s+%s - Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker\n`, command),
 			Say(`\n`),
 			Say(`USAGE:\n`),
-			Say(`\s+cf delete-service SERVICE_INSTANCE \[-f\] \[-w\]\n`),
+			Say(`\s+cf purge-service-instance SERVICE_INSTANCE \[-f\]\n`),
 			Say(`\n`),
-			Say(`ALIAS:\n`),
-			Say(`\s+ds\n`),
+			Say(`WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.\n`),
 			Say(`\n`),
 			Say(`OPTIONS:\n`),
 			Say(`\s+--force, -f\s+Force deletion without confirmation\n`),
-			Say(`\s+--wait, -w\s+Wait for the delete operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
-			Say(`\s+services, unbind-service\n`),
+			Say(`\s+delete-service, service-brokers, services\n`),
 		)
 
 		When("--help is specified", func() {
@@ -84,7 +82,17 @@ var _ = Describe("delete-service command", func() {
 			orgName             string
 			spaceName           string
 			username            string
+			appName             string
 		)
+
+		bindToApp := func() {
+			appName = helpers.NewAppName()
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+
+			Eventually(helpers.CF("bind-service", appName, serviceInstanceName)).Should(Exit(0))
+		}
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
@@ -105,7 +113,7 @@ var _ = Describe("delete-service command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session.Out).To(SatisfyAll(
-					Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say("Purging service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 					Say("\n"),
 					Say("Service instance %s did not exist.\n", serviceInstanceName),
 				))
@@ -118,6 +126,8 @@ var _ = Describe("delete-service command", func() {
 			BeforeEach(func() {
 				session := helpers.CF("cups", serviceInstanceName)
 				Eventually(session).Should(Exit(0))
+
+				bindToApp()
 			})
 
 			It("prints a message and exits successfully", func() {
@@ -125,9 +135,9 @@ var _ = Describe("delete-service command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session.Out).To(SatisfyAll(
-					Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say("Purging service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 					Say("\n"),
-					Say("Service instance %s deleted.\n", serviceInstanceName),
+					Say("Service instance %s purged.\n", serviceInstanceName),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
@@ -143,6 +153,8 @@ var _ = Describe("delete-service command", func() {
 			BeforeEach(func() {
 				broker = servicebrokerstub.EnableServiceAccess()
 				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+				bindToApp()
 			})
 
 			AfterEach(func() {
@@ -154,30 +166,12 @@ var _ = Describe("delete-service command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session.Out).To(SatisfyAll(
-					Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say("Purging service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 					Say("\n"),
-					Say("Delete in progress. Use 'cf services' or 'cf service %s' to check operation status.\n", serviceInstanceName),
+					Say("Service instance %s purged.\n", serviceInstanceName),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
-			})
-
-			When("the wait flag is specified", func() {
-				It("waits for the delete operation", func() {
-					session := helpers.CF(command, "-f", "-w", serviceInstanceName)
-					Eventually(session).Should(Exit(0))
-
-					Expect(session.Out).To(SatisfyAll(
-						Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
-						Say("\n"),
-						Say("Service instance %s deleted.\n", serviceInstanceName),
-					))
-
-					Expect(string(session.Err.Contents())).To(BeEmpty())
-
-					session = helpers.CF("services").Wait()
-					Expect(session.Out).NotTo(Say(serviceInstanceName))
-				})
 			})
 		})
 	})

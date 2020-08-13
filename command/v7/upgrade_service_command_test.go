@@ -1,6 +1,8 @@
 package v7_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -66,15 +67,15 @@ var _ = Describe("upgrade-service command", func() {
 
 	testActorInteractions := func() {
 		It("delegates to the actor", func() {
-			Expect(fakeActor.UpgradeServiceInstanceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID := fakeActor.UpgradeServiceInstanceArgsForCall(0)
+			Expect(fakeActor.UpgradeManagedServiceInstanceCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.UpgradeManagedServiceInstanceArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
 		})
 
 		When("the service instance does not exist", func() {
 			BeforeEach(func() {
-				fakeActor.UpgradeServiceInstanceReturns(
+				fakeActor.UpgradeManagedServiceInstanceReturns(
 					v7action.Warnings{"upgrade warning"},
 					actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
@@ -90,7 +91,7 @@ var _ = Describe("upgrade-service command", func() {
 
 		When("the service instance upgrade starts successfully", func() {
 			BeforeEach(func() {
-				fakeActor.UpgradeServiceInstanceReturns(
+				fakeActor.UpgradeManagedServiceInstanceReturns(
 					v7action.Warnings{"upgrade warning"},
 					nil,
 				)
@@ -109,7 +110,7 @@ var _ = Describe("upgrade-service command", func() {
 
 		When("the actor returns an unexpected error", func() {
 			BeforeEach(func() {
-				fakeActor.UpgradeServiceInstanceReturns(
+				fakeActor.UpgradeManagedServiceInstanceReturns(
 					v7action.Warnings{"upgrade warning"},
 					errors.New("bang"),
 				)

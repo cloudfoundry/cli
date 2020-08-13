@@ -2308,6 +2308,22 @@ type FakeActor struct {
 		result1 string
 		result2 error
 	}
+	PurgeServiceInstanceStub        func(string, string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)
+	purgeServiceInstanceMutex       sync.RWMutex
+	purgeServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	purgeServiceInstanceReturns struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}
+	purgeServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}
 	PurgeServiceOfferingByNameAndBrokerStub        func(string, string) (v7action.Warnings, error)
 	purgeServiceOfferingByNameAndBrokerMutex       sync.RWMutex
 	purgeServiceOfferingByNameAndBrokerArgsForCall []struct {
@@ -3150,17 +3166,17 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpgradeServiceInstanceStub        func(string, string) (v7action.Warnings, error)
-	upgradeServiceInstanceMutex       sync.RWMutex
-	upgradeServiceInstanceArgsForCall []struct {
+	UpgradeManagedServiceInstanceStub        func(string, string) (v7action.Warnings, error)
+	upgradeManagedServiceInstanceMutex       sync.RWMutex
+	upgradeManagedServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	upgradeServiceInstanceReturns struct {
+	upgradeManagedServiceInstanceReturns struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	upgradeServiceInstanceReturnsOnCall map[int]struct {
+	upgradeManagedServiceInstanceReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -13064,6 +13080,73 @@ func (fake *FakeActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, 
 	}{result1, result2}
 }
 
+func (fake *FakeActor) PurgeServiceInstance(arg1 string, arg2 string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error) {
+	fake.purgeServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.purgeServiceInstanceReturnsOnCall[len(fake.purgeServiceInstanceArgsForCall)]
+	fake.purgeServiceInstanceArgsForCall = append(fake.purgeServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("PurgeServiceInstance", []interface{}{arg1, arg2})
+	fake.purgeServiceInstanceMutex.Unlock()
+	if fake.PurgeServiceInstanceStub != nil {
+		return fake.PurgeServiceInstanceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.purgeServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) PurgeServiceInstanceCallCount() int {
+	fake.purgeServiceInstanceMutex.RLock()
+	defer fake.purgeServiceInstanceMutex.RUnlock()
+	return len(fake.purgeServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) PurgeServiceInstanceCalls(stub func(string, string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)) {
+	fake.purgeServiceInstanceMutex.Lock()
+	defer fake.purgeServiceInstanceMutex.Unlock()
+	fake.PurgeServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) PurgeServiceInstanceArgsForCall(i int) (string, string) {
+	fake.purgeServiceInstanceMutex.RLock()
+	defer fake.purgeServiceInstanceMutex.RUnlock()
+	argsForCall := fake.purgeServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) PurgeServiceInstanceReturns(result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+	fake.purgeServiceInstanceMutex.Lock()
+	defer fake.purgeServiceInstanceMutex.Unlock()
+	fake.PurgeServiceInstanceStub = nil
+	fake.purgeServiceInstanceReturns = struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) PurgeServiceInstanceReturnsOnCall(i int, result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+	fake.purgeServiceInstanceMutex.Lock()
+	defer fake.purgeServiceInstanceMutex.Unlock()
+	fake.PurgeServiceInstanceStub = nil
+	if fake.purgeServiceInstanceReturnsOnCall == nil {
+		fake.purgeServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.ServiceInstanceDeleteState
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.purgeServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.ServiceInstanceDeleteState
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) PurgeServiceOfferingByNameAndBroker(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.purgeServiceOfferingByNameAndBrokerMutex.Lock()
 	ret, specificReturn := fake.purgeServiceOfferingByNameAndBrokerReturnsOnCall[len(fake.purgeServiceOfferingByNameAndBrokerArgsForCall)]
@@ -16769,64 +16852,64 @@ func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, res
 }
 
 func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
-	fake.upgradeServiceInstanceMutex.Lock()
-	ret, specificReturn := fake.upgradeServiceInstanceReturnsOnCall[len(fake.upgradeServiceInstanceArgsForCall)]
-	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
+	fake.upgradeManagedServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.upgradeManagedServiceInstanceReturnsOnCall[len(fake.upgradeManagedServiceInstanceArgsForCall)]
+	fake.upgradeManagedServiceInstanceArgsForCall = append(fake.upgradeManagedServiceInstanceArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
 	fake.recordInvocation("UpgradeManagedServiceInstance", []interface{}{arg1, arg2})
-	fake.upgradeServiceInstanceMutex.Unlock()
-	if fake.UpgradeServiceInstanceStub != nil {
-		return fake.UpgradeServiceInstanceStub(arg1, arg2)
+	fake.upgradeManagedServiceInstanceMutex.Unlock()
+	if fake.UpgradeManagedServiceInstanceStub != nil {
+		return fake.UpgradeManagedServiceInstanceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.upgradeServiceInstanceReturns
+	fakeReturns := fake.upgradeManagedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeActor) UpgradeServiceInstanceCallCount() int {
-	fake.upgradeServiceInstanceMutex.RLock()
-	defer fake.upgradeServiceInstanceMutex.RUnlock()
-	return len(fake.upgradeServiceInstanceArgsForCall)
+func (fake *FakeActor) UpgradeManagedServiceInstanceCallCount() int {
+	fake.upgradeManagedServiceInstanceMutex.RLock()
+	defer fake.upgradeManagedServiceInstanceMutex.RUnlock()
+	return len(fake.upgradeManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) UpgradeServiceInstanceCalls(stub func(string, string) (v7action.Warnings, error)) {
-	fake.upgradeServiceInstanceMutex.Lock()
-	defer fake.upgradeServiceInstanceMutex.Unlock()
-	fake.UpgradeServiceInstanceStub = stub
+func (fake *FakeActor) UpgradeManagedServiceInstanceCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.upgradeManagedServiceInstanceMutex.Lock()
+	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
+	fake.UpgradeManagedServiceInstanceStub = stub
 }
 
-func (fake *FakeActor) UpgradeServiceInstanceArgsForCall(i int) (string, string) {
-	fake.upgradeServiceInstanceMutex.RLock()
-	defer fake.upgradeServiceInstanceMutex.RUnlock()
-	argsForCall := fake.upgradeServiceInstanceArgsForCall[i]
+func (fake *FakeActor) UpgradeManagedServiceInstanceArgsForCall(i int) (string, string) {
+	fake.upgradeManagedServiceInstanceMutex.RLock()
+	defer fake.upgradeManagedServiceInstanceMutex.RUnlock()
+	argsForCall := fake.upgradeManagedServiceInstanceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) UpgradeServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
-	fake.upgradeServiceInstanceMutex.Lock()
-	defer fake.upgradeServiceInstanceMutex.Unlock()
-	fake.UpgradeServiceInstanceStub = nil
-	fake.upgradeServiceInstanceReturns = struct {
+func (fake *FakeActor) UpgradeManagedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+	fake.upgradeManagedServiceInstanceMutex.Lock()
+	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
+	fake.UpgradeManagedServiceInstanceStub = nil
+	fake.upgradeManagedServiceInstanceReturns = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpgradeServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.upgradeServiceInstanceMutex.Lock()
-	defer fake.upgradeServiceInstanceMutex.Unlock()
-	fake.UpgradeServiceInstanceStub = nil
-	if fake.upgradeServiceInstanceReturnsOnCall == nil {
-		fake.upgradeServiceInstanceReturnsOnCall = make(map[int]struct {
+func (fake *FakeActor) UpgradeManagedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.upgradeManagedServiceInstanceMutex.Lock()
+	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
+	fake.UpgradeManagedServiceInstanceStub = nil
+	if fake.upgradeManagedServiceInstanceReturnsOnCall == nil {
+		fake.upgradeManagedServiceInstanceReturnsOnCall = make(map[int]struct {
 			result1 v7action.Warnings
 			result2 error
 		})
 	}
-	fake.upgradeServiceInstanceReturnsOnCall[i] = struct {
+	fake.upgradeManagedServiceInstanceReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -17345,6 +17428,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.pollUploadBuildpackJobMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	fake.purgeServiceInstanceMutex.RLock()
+	defer fake.purgeServiceInstanceMutex.RUnlock()
 	fake.purgeServiceOfferingByNameAndBrokerMutex.RLock()
 	defer fake.purgeServiceOfferingByNameAndBrokerMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
@@ -17459,8 +17544,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateUserPasswordMutex.RUnlock()
 	fake.updateUserProvidedServiceInstanceMutex.RLock()
 	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
-	fake.upgradeServiceInstanceMutex.RLock()
-	defer fake.upgradeServiceInstanceMutex.RUnlock()
+	fake.upgradeManagedServiceInstanceMutex.RLock()
+	defer fake.upgradeManagedServiceInstanceMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()
