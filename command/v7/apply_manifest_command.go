@@ -108,11 +108,11 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 
 	cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
 
-	warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
+	// warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
+	// cmd.UI.DisplayWarnings(warnings)
+	// if err != nil {
+	// 	return err
+	// }
 
 	cmd.UI.DisplayOK()
 

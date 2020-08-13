@@ -25,7 +25,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 		displayer = NewManifestDiffDisplayer(testUI)
 	})
 
-	Describe("DisplayDiff", func() {
+	FDescribe("DisplayDiff", func() {
 		var (
 			rawManifest []byte
 			diff        resources.ManifestDiff
@@ -35,7 +35,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 			displayer.DisplayDiff(rawManifest, diff)
 		})
 
-		Context("Operation kinds", func() {
+		FContext("Operation kinds", func() {
 			When("additions", func() {
 				BeforeEach(func() {
 					rawManifest = []byte("applications:\n- name: dora\n  env:\n    a: b\n    r: m")
@@ -49,16 +49,15 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 				It("outputs correctly formatted diff", func() {
 					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
   applications:
-    0:
-      name: dora
-      env:
-        a: b
-+       r: m
+    name: dora
+    env:
+      a: b
++     r: m
 `))
 				})
 			})
 
-			When("removal", func() {
+			FWhen("removal", func() {
 				BeforeEach(func() {
 					rawManifest = []byte("applications:\n- name: dora\n  env:\n    r: m")
 					diff = resources.ManifestDiff{
@@ -68,15 +67,16 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 					}
 				})
 
-				It("outputs correctly formatted diff", func() {
+				FIt("outputs correctly formatted diff", func() {
+					// TODO: Remove printline, currently just printing test output
 					fmt.Printf("%+v", string(outputBuffer.Contents()))
+
 					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
   applications:
-    0:
-      name: dora
-      env:
--       a: b
-        r: m
+    name: dora
+    env:
+-     a: b
+      r: m
 `))
 				})
 			})
@@ -92,15 +92,16 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 				})
 
 				It("outputs correctly formatted diff", func() {
+					// TODO: Remove printline, currently just printing test output
 					fmt.Printf("%+v", string(outputBuffer.Contents()))
+
 					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
   applications:
-    0:
-      name: dora
-      env:
--       a: b
-+       a: c
-        r: m
+    name: dora
+    env:
+-     a: b
++     a: c
+      r: m
 `))
 				})
 			})
@@ -108,7 +109,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 		})
 
 		Context("Edge Cases", func() {
-			When("array", func() {
+			When("the diff value contains a map", func() {
 				BeforeEach(func() {
 					rawManifest = []byte(`applications:
     -
@@ -118,46 +119,68 @@ var _ = Describe("ManifestDiffDisplayer", func() {
         r: m
     -
       name: dora1
+      env:
+        new: variable
 `)
 
 					diff = resources.ManifestDiff{
 						Diffs: []resources.Diff{
-							{Op: resources.AddOperation, Path: "/applications/1", Value: map[string]interface{}{"name": "dora1"}},
+							{Op: resources.AddOperation, Path: "/applications/1/name", Value: "dora1"},
+							{Op: resources.AddOperation, Path: "/applications/1/env", Value: map[string]interface{}{"new": "variable"}},
 						},
 					}
 				})
 
 				It("outputs correctly formatted diff for array", func() {
+					// TODO: Remove printline, currently just printing test output
 					fmt.Printf("%+v", string(outputBuffer.Contents()))
+
 					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
   applications:
-    0:
-      name: dora
-      env:
-        a: b
-        r: m
-+   1:
-+     name: dora1
+    name: dora
+    env:
+      a: b
+      r: m
++   name: dora1
++   env:
++     new: variable
 `))
 				})
 			})
 
-			When("maps", func() {
+			When("The diff value contains an array of maps", func() {
+				BeforeEach(func() {
+					rawManifest = []byte(`applications:
+    -
+      name: dora
+      routes:
+      - route: new-route.com
+      - route: another-new-route.com
+`)
+
+					diff = resources.ManifestDiff{
+						Diffs: []resources.Diff{
+							{Op: resources.AddOperation, Path: "/applications/0/routes", Value: []map[string]interface{}{{"route": "new-route.com"}, {"route": "another-new-route.com"}}},
+						},
+					}
+				})
+
+				It("outputs correctly formatted diff for map", func() {
+					// TODO: Remove printline, currently just printing test output
+					fmt.Printf("%+v", string(outputBuffer.Contents()))
+
+					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
+  applications:
+    name: dora
++   routes:
++     route: new-route.com
++     route: another-new-route.com
+`))
+				})
 			})
 
-			When("multiline", func() {
+			When("The diff value contains a multiline field", func() {
 			})
 		})
-
-		// When("example", func() {
-		// 	BeforeEach(func() {
-		// 		rawManifest = []byte("something")
-		// 		diff = resources.ManifestDiff{}
-		// 	})
-
-		// 	It("does something", func() {
-		// 		Expect(testUI.Out).To(Say("..."))
-		// 	})
-		// })
 	})
 })

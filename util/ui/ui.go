@@ -274,6 +274,23 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
+func (ui UI) DisplayDiffAdditionForMapStringInterface(lineMap map[string]interface{}, depth int) {
+	var lineKeys []string
+	for key := range lineMap {
+		lineKeys = append(lineKeys, key)
+	}
+
+	for _, key := range lineKeys {
+		if lineVal, ok := lineMap[key].(string); ok {
+			indent := strings.Repeat("  ", depth)
+			template := "+ " + indent + key + ": " + lineVal
+			formatted := ui.modifyColor(template, color.New(color.FgGreen))
+
+			fmt.Fprintf(ui.Out, "%v\n", formatted)
+		}
+	}
+}
+
 // DisplayDiffAddition displays an added line in a diff, colored green and prefixed with '+'
 func (ui *UI) DisplayDiffAddition(line string, depth int) {
 	ui.terminalLock.Lock()

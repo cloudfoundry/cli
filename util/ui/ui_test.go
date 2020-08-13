@@ -330,6 +330,14 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DisplayDiffForMapStringInterface", func() {
+		It("displays a green indented line with key values and a +", func() {
+			lineMap := map[string]interface{}{"key": "val"}
+			ui.DisplayDiffAdditionForMapStringInterface(lineMap, 3)
+			Expect(out).To(Say(`\x1b\[32m\+       key: val\x1b\[0m`))
+		})
+	})
+
 	Describe("DisplayDiffAddition", func() {
 		It("displays a green indented line with a +", func() {
 			ui.DisplayDiffAddition("added", 3)
