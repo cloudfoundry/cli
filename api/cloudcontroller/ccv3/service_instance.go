@@ -86,10 +86,11 @@ func (client *Client) UpdateServiceInstance(serviceInstanceGUID string, serviceI
 	})
 }
 
-func (client *Client) DeleteServiceInstance(serviceInstanceGUID string) (JobURL, Warnings, error) {
+func (client *Client) DeleteServiceInstance(serviceInstanceGUID string, query ...Query) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteServiceInstanceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
+		Query:       query,
 	})
 }
 

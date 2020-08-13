@@ -588,10 +588,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	DeleteServiceInstanceStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	DeleteServiceInstanceStub        func(string, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteServiceInstanceMutex       sync.RWMutex
 	deleteServiceInstanceArgsForCall []struct {
 		arg1 string
+		arg2 []ccv3.Query
 	}
 	deleteServiceInstanceReturns struct {
 		result1 ccv3.JobURL
@@ -4994,16 +4995,17 @@ func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceInstance(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteServiceInstance(arg1 string, arg2 ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.deleteServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.deleteServiceInstanceReturnsOnCall[len(fake.deleteServiceInstanceArgsForCall)]
 	fake.deleteServiceInstanceArgsForCall = append(fake.deleteServiceInstanceArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("DeleteServiceInstance", []interface{}{arg1})
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("DeleteServiceInstance", []interface{}{arg1, arg2})
 	fake.deleteServiceInstanceMutex.Unlock()
 	if fake.DeleteServiceInstanceStub != nil {
-		return fake.DeleteServiceInstanceStub(arg1)
+		return fake.DeleteServiceInstanceStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -5018,17 +5020,17 @@ func (fake *FakeCloudControllerClient) DeleteServiceInstanceCallCount() int {
 	return len(fake.deleteServiceInstanceArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceInstanceCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceCalls(stub func(string, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.deleteServiceInstanceMutex.Lock()
 	defer fake.deleteServiceInstanceMutex.Unlock()
 	fake.DeleteServiceInstanceStub = stub
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceInstanceArgsForCall(i int) string {
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceArgsForCall(i int) (string, []ccv3.Query) {
 	fake.deleteServiceInstanceMutex.RLock()
 	defer fake.deleteServiceInstanceMutex.RUnlock()
 	argsForCall := fake.deleteServiceInstanceArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceInstanceReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {

@@ -1321,6 +1321,117 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 	})
 
+	Describe("PurgeServiceInstance", func() {
+		const (
+			fakeServiceInstanceName = "fake-service-instance-name"
+			fakeSpaceGUID           = "fake-space-GUID"
+		)
+
+		var (
+			warnings Warnings
+			err      error
+			state    ServiceInstanceDeleteState
+		)
+
+		JustBeforeEach(func() {
+			state, warnings, err = actor.PurgeServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
+		})
+
+		It("makes a request to get the service instance", func() {
+			Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+			actualName, actualSpace, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+			Expect(actualName).To(Equal(fakeServiceInstanceName))
+			Expect(actualSpace).To(Equal(fakeSpaceGUID))
+			Expect(actualQuery).To(BeEmpty())
+		})
+
+		When("the service instance does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					ccerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName},
+				)
+			})
+
+			It("does not try to purge", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
+			})
+
+			It("returns the appropriate state flag", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(state).To(Equal(ServiceInstanceDidNotExist))
+			})
+		})
+
+		When("the service instance exists", func() {
+			const fakeServiceInstanceGUID = "fake-si-guid"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: fakeServiceInstanceGUID},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteServiceInstanceReturns(
+					"",
+					ccv3.Warnings{"purge warning"},
+					nil,
+				)
+			})
+
+			It("makes the right call to purge the service instance", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(Equal(1))
+				actualGUID, actualQuery := fakeCloudControllerClient.DeleteServiceInstanceArgsForCall(0)
+				Expect(actualGUID).To(Equal(fakeServiceInstanceGUID))
+				Expect(actualQuery).To(ConsistOf(ccv3.Query{Key: ccv3.Purge, Values: []string{"true"}}))
+			})
+
+			It("returns the appropriate state flag", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get warning", "purge warning"))
+				Expect(state).To(Equal(ServiceInstanceGone))
+			})
+
+			When("the purge responds with failure", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteServiceInstanceReturns(
+						"a fake job url",
+						ccv3.Warnings{"delete warning"},
+						errors.New("bong"),
+					)
+				})
+
+				It("return the error and warnings", func() {
+					Expect(err).To(MatchError("bong"))
+					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
+					Expect(state).To(Equal(ServiceInstanceUnknownState))
+				})
+			})
+		})
+
+		When("getting the service instance fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					errors.New("boom"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(state).To(Equal(ServiceInstanceUnknownState))
+			})
+		})
+	})
+
 	Describe("UpgradeManagedServiceInstance", func() {
 		const (
 			fakeServiceInstanceName = "fake-service-instance-name"

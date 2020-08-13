@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -14,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("delete-service command", func() {
+var _ = Describe("purge-service-instance command", func() {
 	const (
 		serviceInstanceName = "service-instance-name"
 		orgName             = "fake-org-name"
@@ -29,31 +30,30 @@ var _ = Describe("delete-service command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeActor
-		cmd             DeleteServiceCommand
+		cmd             PurgeServiceInstanceCommand
 		executeErr      error
 	)
 
 	testActorInteractions := func() {
 		It("delegates to the actor", func() {
-			Expect(fakeActor.DeleteServiceInstanceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID, actualWait := fakeActor.DeleteServiceInstanceArgsForCall(0)
+			Expect(fakeActor.PurgeServiceInstanceCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.PurgeServiceInstanceArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
-			Expect(actualWait).To(BeFalse())
 		})
 
 		When("the service instance did not exist", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteServiceInstanceReturns(
+				fakeActor.PurgeServiceInstanceReturns(
 					v7action.ServiceInstanceDidNotExist,
-					v7action.Warnings{"delete warning"},
+					v7action.Warnings{"purge warning"},
 					nil,
 				)
 			})
 
 			It("succeeds with a message", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Err).To(Say("delete warning"))
+				Expect(testUI.Err).To(Say("purge warning"))
 				Expect(testUI.Out).To(SatisfyAll(
 					Say("\n"),
 					Say(`Service instance %s did not exist\.\n`, serviceInstanceName),
@@ -62,41 +62,21 @@ var _ = Describe("delete-service command", func() {
 			})
 		})
 
-		When("the service instance is successfully deleted", func() {
+		When("the service instance is successfully purged", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteServiceInstanceReturns(
+				fakeActor.PurgeServiceInstanceReturns(
 					v7action.ServiceInstanceGone,
-					v7action.Warnings{"delete warning"},
+					v7action.Warnings{"purge warning"},
 					nil,
 				)
 			})
 
 			It("succeeds with a message", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Err).To(Say("delete warning"))
+				Expect(testUI.Err).To(Say("purge warning"))
 				Expect(testUI.Out).To(SatisfyAll(
 					Say("\n"),
-					Say(`Service instance %s deleted\.\n`, serviceInstanceName),
-					Say("OK\n"),
-				))
-			})
-		})
-
-		When("the service instance deletion is in progress", func() {
-			BeforeEach(func() {
-				fakeActor.DeleteServiceInstanceReturns(
-					v7action.ServiceInstanceDeleteInProgress,
-					v7action.Warnings{"delete warning"},
-					nil,
-				)
-			})
-
-			It("succeeds with a message", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Err).To(Say("delete warning"))
-				Expect(testUI.Out).To(SatisfyAll(
-					Say("\n"),
-					Say(`Delete in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+					Say(`Service instance %s purged\.\n`, serviceInstanceName),
 					Say("OK\n"),
 				))
 			})
@@ -104,29 +84,17 @@ var _ = Describe("delete-service command", func() {
 
 		When("the actor returns an error", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteServiceInstanceReturns(
+				fakeActor.PurgeServiceInstanceReturns(
 					v7action.ServiceInstanceUnknownState,
-					v7action.Warnings{"delete warning"},
+					v7action.Warnings{"purge warning"},
 					errors.New("bang"),
 				)
 			})
 
 			It("fails with warnings", func() {
 				Expect(executeErr).To(MatchError("bang"))
-				Expect(testUI.Err).To(Say("delete warning"))
+				Expect(testUI.Err).To(Say("purge warning"))
 				Expect(testUI.Out).NotTo(Say("OK"))
-			})
-		})
-
-		When("the -w flag is specified", func() {
-			BeforeEach(func() {
-				setFlag(&cmd, "-w")
-			})
-
-			It("passes the wait flag to the actor", func() {
-				Expect(fakeActor.DeleteServiceInstanceCallCount()).To(Equal(1))
-				_, _, actualWait := fakeActor.DeleteServiceInstanceArgsForCall(0)
-				Expect(actualWait).To(BeTrue())
 			})
 		})
 	}
@@ -142,7 +110,7 @@ var _ = Describe("delete-service command", func() {
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: spaceGUID})
 		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
 
-		cmd = DeleteServiceCommand{
+		cmd = PurgeServiceInstanceCommand{
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -152,6 +120,8 @@ var _ = Describe("delete-service command", func() {
 		}
 
 		setPositionalFlags(&cmd, serviceInstanceName)
+
+		_ = executeErr
 	})
 
 	JustBeforeEach(func() {
@@ -167,9 +137,11 @@ var _ = Describe("delete-service command", func() {
 
 	It("prompts the user", func() {
 		Expect(testUI.Out).To(SatisfyAll(
-			Say(`Deleting service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+			Say(`Purging service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
 			Say(`\n`),
-			Say(`Really delete the service instance %s\? \[yN\]:`, serviceInstanceName),
+			Say(`WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.\n`),
+			Say(`\n`),
+			Say(`Really purge service instance %s from Cloud Foundry\? \[yN\]:`, serviceInstanceName),
 		))
 	})
 
@@ -189,12 +161,12 @@ var _ = Describe("delete-service command", func() {
 		})
 
 		It("does not call the actor", func() {
-			Expect(fakeActor.DeleteServiceInstanceCallCount()).To(BeZero())
+			Expect(fakeActor.PurgeServiceInstanceCallCount()).To(BeZero())
 		})
 
 		It("says the delete was cancelled", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say("Delete cancelled\n"))
+			Expect(testUI.Out).To(Say("Purge cancelled\n"))
 		})
 	})
 
@@ -204,7 +176,7 @@ var _ = Describe("delete-service command", func() {
 		})
 
 		It("does not prompt the user", func() {
-			Expect(testUI.Out).NotTo(Say("Really delete"))
+			Expect(testUI.Out).NotTo(Say("Really purge"))
 		})
 
 		testActorInteractions()

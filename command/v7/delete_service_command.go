@@ -50,7 +50,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 }
 
 func (cmd DeleteServiceCommand) Usage() string {
-	return "CF_NAME delete-service SERVICE_INSTANCE [-f]"
+	return "CF_NAME delete-service SERVICE_INSTANCE [-f] [-w]"
 }
 
 func (cmd DeleteServiceCommand) displayIntro() error {
