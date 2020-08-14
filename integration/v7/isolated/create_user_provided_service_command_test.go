@@ -12,6 +12,42 @@ import (
 
 var _ = Describe("create-user-provided-service command", func() {
 	Describe("help", func() {
+		expectHelpMessage := func(session *Session) {
+			Expect(session).To(SatisfyAll(
+				Say(`NAME:`),
+				Say(`create-user-provided-service - Make a user-provided service instance available to CF apps`),
+				Say(`USAGE:`),
+				Say(`cf create-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`),
+				Say(`Pass comma separated credential parameter names to enable interactive mode:`),
+				Say(`cf create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`),
+				Say(`Pass credential parameters as JSON to create a service non-interactively:`),
+				Say(`cf create-user-provided-service SERVICE_INSTANCE -p '\{"key1":"value1","key2":"value2"\}'`),
+				Say(`Specify a path to a file containing JSON:`),
+				Say(`cf create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`),
+				Say(`EXAMPLES:`),
+				Say(`cf create-user-provided-service my-db-mine -p "username, password"`),
+				Say(`cf create-user-provided-service my-db-mine -p /path/to/credentials.json`),
+				Say(`cf create-user-provided-service my-db-mine -t "list, of, tags"`),
+				Say(`cf create-user-provided-service my-drain-service -l syslog://example.com`),
+				Say(`cf create-user-provided-service my-route-service -r https://example.com`),
+				Say(`Linux/Mac:`),
+				Say(`cf create-user-provided-service my-db-mine -p '\{"username":"admin","password":"pa55woRD"\}'`),
+				Say(`Windows Command Line:`),
+				Say(`cf create-user-provided-service my-db-mine -p "\{\\"username\\":\\"admin\\",\\"password\\":\\"pa55woRD\\"\}"`),
+				Say(`Windows PowerShell:`),
+				Say(`cf create-user-provided-service my-db-mine -p '\{\\"username\\":\\"admin\\",\\"password\\":\\"pa55woRD\\"\}'`),
+				Say(`ALIAS:`),
+				Say(`cups`),
+				Say(`OPTIONS:`),
+				Say(`-l      URL to which logs for bound applications will be streamed`),
+				Say(`-p      Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications`),
+				Say(`-r      URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`),
+				Say(`-t      User provided tags`),
+				Say(`SEE ALSO:`),
+				Say(`bind-service, services`),
+			))
+		}
+
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("create-user-provided-service", "--help")
@@ -167,39 +203,3 @@ var _ = Describe("create-user-provided-service command", func() {
 		})
 	})
 })
-
-func expectHelpMessage(session *Session) {
-	Expect(session).To(SatisfyAll(
-		Say(`NAME:`),
-		Say(`create-user-provided-service - Make a user-provided service instance available to CF apps`),
-		Say(`USAGE:`),
-		Say(`cf create-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`),
-		Say(`Pass comma separated credential parameter names to enable interactive mode:`),
-		Say(`cf create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`),
-		Say(`Pass credential parameters as JSON to create a service non-interactively:`),
-		Say(`cf create-user-provided-service SERVICE_INSTANCE -p '\{"key1":"value1","key2":"value2"\}'`),
-		Say(`Specify a path to a file containing JSON:`),
-		Say(`cf create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`),
-		Say(`EXAMPLES:`),
-		Say(`cf create-user-provided-service my-db-mine -p "username, password"`),
-		Say(`cf create-user-provided-service my-db-mine -p /path/to/credentials.json`),
-		Say(`cf create-user-provided-service my-db-mine -t "list, of, tags"`),
-		Say(`cf create-user-provided-service my-drain-service -l syslog://example.com`),
-		Say(`cf create-user-provided-service my-route-service -r https://example.com`),
-		Say(`Linux/Mac:`),
-		Say(`cf create-user-provided-service my-db-mine -p '\{"username":"admin","password":"pa55woRD"\}'`),
-		Say(`Windows Command Line:`),
-		Say(`cf create-user-provided-service my-db-mine -p "\{\\"username\\":\\"admin\\",\\"password\\":\\"pa55woRD\\"\}"`),
-		Say(`Windows PowerShell:`),
-		Say(`cf create-user-provided-service my-db-mine -p '\{\\"username\\":\\"admin\\",\\"password\\":\\"pa55woRD\\"\}'`),
-		Say(`ALIAS:`),
-		Say(`cups`),
-		Say(`OPTIONS:`),
-		Say(`-l      URL to which logs for bound applications will be streamed`),
-		Say(`-p      Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications`),
-		Say(`-r      URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`),
-		Say(`-t      User provided tags`),
-		Say(`SEE ALSO:`),
-		Say(`bind-service, services`),
-	))
-}

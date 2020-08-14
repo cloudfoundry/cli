@@ -11,6 +11,48 @@ import (
 )
 
 var _ = Describe("update-user-provided-service command", func() {
+	expectOKMessage := func(session *Session, serviceName, orgName, spaceName, userName string) {
+		Expect(session.Out).To(Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName))
+		Expect(session.Out).To(Say("OK"))
+		Expect(session.Out).To(Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"))
+	}
+
+	expectHelpMessage := func(session *Session) {
+		Expect(session).To(Say(`NAME:`))
+		Expect(session).To(Say(`\s+update-user-provided-service - Update user-provided service instance`))
+		Expect(session).To(Say(`USAGE:`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`))
+		Expect(session).To(Say(`\s+Pass comma separated credential parameter names to enable interactive mode:`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`))
+		Expect(session).To(Say(`\s+Pass credential parameters as JSON to create a service non-interactively:`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'`))
+		Expect(session).To(Say(`\s+Specify a path to a file containing JSON:`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`))
+		Expect(session).To(Say(`EXAMPLES:`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p /path/to/credentials.json`))
+		Expect(session).To(Say(`\s+cf create-user-provided-service my-db-mine -t "list, of, tags"`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service my-drain-service -l syslog://example.com`))
+		Expect(session).To(Say(`\s+cf update-user-provided-service my-route-service -r https://example.com`))
+		Expect(session).To(Say(`ALIAS:`))
+		Expect(session).To(Say(`\s+uups`))
+		Expect(session).To(Say(`OPTIONS:`))
+		Expect(session).To(Say(`\s+-l\s+URL to which logs for bound applications will be streamed`))
+		Expect(session).To(Say(`\s+-p\s+Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications. Provided credentials will override existing credentials.`))
+		Expect(session).To(Say(`\s+-r\s+URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`))
+		Expect(session).To(Say(`\s+-t\s+User provided tags`))
+		Expect(session).To(Say(`SEE ALSO:`))
+		Expect(session).To(Say(`\s+rename-service, services, update-service`))
+	}
+
+	randomUserProvidedServiceName := func() string {
+		return helpers.PrefixedRandomName("ups")
+	}
+
+	createUserProvidedService := func(name string) {
+		Eventually(helpers.CF("create-user-provided-service", name)).Should(Exit(0))
+	}
+
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
@@ -209,45 +251,3 @@ var _ = Describe("update-user-provided-service command", func() {
 		})
 	})
 })
-
-func expectHelpMessage(session *Session) {
-	Expect(session).To(Say(`NAME:`))
-	Expect(session).To(Say(`\s+update-user-provided-service - Update user-provided service instance`))
-	Expect(session).To(Say(`USAGE:`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE \[-p CREDENTIALS\] \[-l SYSLOG_DRAIN_URL\] \[-r ROUTE_SERVICE_URL\] \[-t TAGS\]`))
-	Expect(session).To(Say(`\s+Pass comma separated credential parameter names to enable interactive mode:`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"`))
-	Expect(session).To(Say(`\s+Pass credential parameters as JSON to create a service non-interactively:`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'`))
-	Expect(session).To(Say(`\s+Specify a path to a file containing JSON:`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`))
-	Expect(session).To(Say(`EXAMPLES:`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service my-db-mine -p /path/to/credentials.json`))
-	Expect(session).To(Say(`\s+cf create-user-provided-service my-db-mine -t "list, of, tags"`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service my-drain-service -l syslog://example.com`))
-	Expect(session).To(Say(`\s+cf update-user-provided-service my-route-service -r https://example.com`))
-	Expect(session).To(Say(`ALIAS:`))
-	Expect(session).To(Say(`\s+uups`))
-	Expect(session).To(Say(`OPTIONS:`))
-	Expect(session).To(Say(`\s+-l\s+URL to which logs for bound applications will be streamed`))
-	Expect(session).To(Say(`\s+-p\s+Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications. Provided credentials will override existing credentials.`))
-	Expect(session).To(Say(`\s+-r\s+URL to which requests for bound routes will be forwarded. Scheme for this URL must be https`))
-	Expect(session).To(Say(`\s+-t\s+User provided tags`))
-	Expect(session).To(Say(`SEE ALSO:`))
-	Expect(session).To(Say(`\s+rename-service, services, update-service`))
-}
-
-func expectOKMessage(session *Session, serviceName, orgName, spaceName, userName string) {
-	Expect(session.Out).To(Say("Updating user provided service %s in org %s / space %s as %s...", serviceName, orgName, spaceName, userName))
-	Expect(session.Out).To(Say("OK"))
-	Expect(session.Out).To(Say("TIP: Use 'cf restage' for any bound apps to ensure your env variable changes take effect"))
-}
-
-func randomUserProvidedServiceName() string {
-	return helpers.PrefixedRandomName("ups")
-}
-
-func createUserProvidedService(name string) {
-	Eventually(helpers.CF("create-user-provided-service", name)).Should(Exit(0))
-}
