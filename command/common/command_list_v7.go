@@ -106,8 +106,7 @@ type commandList struct {
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
 	Passwd                             v7.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
-	PurgeServiceInstance               v6.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
-	PurgeServiceInstanceV3             v7.PurgeServiceInstanceCommand               `command:"v3-purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
+	PurgeServiceInstance               v7.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v7.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	RemoveNetworkPolicy                v7.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
