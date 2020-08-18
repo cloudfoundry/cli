@@ -301,7 +301,7 @@ var _ = Describe("curl command", func() {
 
 						Expect(session).Should(Say("FAILED"))
 						Expect(session).Should(Say("Error creating request:"))
-						Expect(session).Should(Say("Error parsing headers: malformed MIME header line: not-a-valid-header"))
+						Expect(session).Should(Say(`Error parsing headers:.+not-a-valid-header`))
 					})
 				})
 			})
