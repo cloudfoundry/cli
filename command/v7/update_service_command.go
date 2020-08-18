@@ -62,6 +62,8 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	if noop {
 		cmd.UI.DisplayText("No changes were made.")
+	} else {
+		cmd.displayUpdateInProgressMessage()
 	}
 
 	return nil
@@ -123,4 +125,11 @@ func (cmd UpdateServiceCommand) displayIntro() error {
 
 func (cmd UpdateServiceCommand) noFlagsProvided() bool {
 	return !(cmd.Tags.IsSet || cmd.Parameters.IsSet || cmd.Plan.IsSet)
+}
+
+func (cmd UpdateServiceCommand) displayUpdateInProgressMessage() {
+	cmd.UI.DisplayTextWithFlavor("Update in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
+		map[string]interface{}{
+			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+		})
 }

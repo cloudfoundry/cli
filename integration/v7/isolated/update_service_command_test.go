@@ -185,6 +185,7 @@ var _ = Describe("update-service command", func() {
 					Say("Updating service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
 					Say(`OK`),
+					Say(`Update in progress`),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())

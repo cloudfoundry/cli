@@ -121,6 +121,8 @@ var _ = Describe("update-service command", func() {
 				Say(`Updating service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
 				Say(`\n`),
 				Say(`OK\n`),
+				Say(`\n`),
+				Say("Update in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstanceName),
 			))
 
 			Expect(testUI.Err).To(Say("actor warning"))
