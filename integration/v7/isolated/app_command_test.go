@@ -127,7 +127,7 @@ applications:
 						Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
 						Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
 						Eventually(session).Should(Say(`stack:\s+cflinuxfs`))
-						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+						Eventually(session).Should(Say(`staticfile_buildpack\s+\d+.\d+.\d+\s+staticfile\s+staticfile`))
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+\d/2`))
 						Eventually(session).Should(Say(`memory usage:\s+128M`))
@@ -236,7 +236,7 @@ applications:
 
 				It("displays the app buildpacks", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say(`buildpacks:\s+ruby_buildpack,\s+go`))
+					Eventually(session).Should(Say(`ruby_buildpack\s+\d+.\d+.\d+\s+ruby`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

@@ -37,10 +37,12 @@ var _ = Describe("buildpacks", func() {
 							"-b", "default",
 						)
 
-						Eventually(session).Should(Say(`name:\s+%s`, appName))
-						Eventually(session).Should(Say(`requested state:\s+started`))
-						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say(`name:\s+%s`, appName))
+						Expect(session).To(Say(`requested state:\s+started`))
+						Expect(session).To(Say("buildpacks:"))
+						Expect(session).To(Say(`staticfile_buildpack\s+\d+.\d+.\d+`))
 					})
 				})
 
@@ -51,10 +53,12 @@ var _ = Describe("buildpacks", func() {
 							"-b", "null",
 						)
 
-						Eventually(session).Should(Say(`name:\s+%s`, appName))
-						Eventually(session).Should(Say(`requested state:\s+started`))
-						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say(`name:\s+%s`, appName))
+						Expect(session).To(Say(`requested state:\s+started`))
+						Expect(session).To(Say("buildpacks:"))
+						Expect(session).To(Say(`staticfile_buildpack\s+\d+.\d+.\d+`))
 					})
 				})
 			})
@@ -63,8 +67,10 @@ var _ = Describe("buildpacks", func() {
 				It("continues using previously set buildpack", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName)
-						Eventually(session).Should(Say("FAILED"))
+
 						Eventually(session).Should(Exit(1))
+
+						Expect(session).To(Say("FAILED"))
 					})
 				})
 			})
@@ -74,9 +80,11 @@ var _ = Describe("buildpacks", func() {
 			It("errors and does not push the app", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "-b", "wut")
-					Eventually(session.Err).Should(Say(`For application '%s': Specified unknown buildpack name: "wut"`, appName))
-					Eventually(session).Should(Say("FAILED"))
+
 					Eventually(session).Should(Exit(1))
+
+					Expect(session.Err).To(Say(`For application '%s': Specified unknown buildpack name: "wut"`, appName))
+					Expect(session).To(Say("FAILED"))
 				})
 			})
 		})
@@ -91,10 +99,12 @@ var _ = Describe("buildpacks", func() {
 								"-b", "staticfile_buildpack",
 							)
 
-							Eventually(session).Should(Say(`name:\s+%s`, appName))
-							Eventually(session).Should(Say(`requested state:\s+started`))
-							Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say(`name:\s+%s`, appName))
+							Expect(session).To(Say(`requested state:\s+started`))
+							Expect(session).To(Say("buildpacks:"))
+							Expect(session).To(Say(`staticfile_buildpack\s+\d+.\d+.\d+`))
 						})
 					})
 				})
@@ -108,13 +118,15 @@ var _ = Describe("buildpacks", func() {
 								"-b", "go_buildpack",
 							)
 
-							Eventually(session).Should(Say("Ruby Buildpack"))
-							Eventually(session).Should(Say("Go Buildpack"))
-
-							Eventually(session).Should(Say(`name:\s+%s`, appName))
-							Eventually(session).Should(Say(`requested state:\s+started`))
-							Eventually(session).Should(Say(`buildpacks:\s+ruby.*go`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("Ruby Buildpack"))
+							Expect(session).To(Say("Go Buildpack"))
+							Expect(session).To(Say(`name:\s+%s`, appName))
+							Expect(session).To(Say(`requested state:\s+started`))
+							Expect(session).To(Say("buildpacks:"))
+							Expect(session).To(Say(`ruby_buildpack\s+\d+.\d+.\d+`))
+							Expect(session).To(Say(`go_buildpack\s+\d+.\d+.\d+`))
 						})
 					})
 				})
@@ -128,10 +140,12 @@ var _ = Describe("buildpacks", func() {
 							"-b", "https://github.com/cloudfoundry/staticfile-buildpack",
 						)
 
-						Eventually(session).Should(Say(`name:\s+%s`, appName))
-						Eventually(session).Should(Say(`requested state:\s+started`))
-						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say(`name:\s+%s`, appName))
+						Expect(session).To(Say(`requested state:\s+started`))
+						Expect(session).To(Say("buildpacks:"))
+						Expect(session).To(Say(`https://github.com/cloudfoundry/staticfile-buildpack\s+\d+.\d+.\d+`))
 					})
 				})
 			})

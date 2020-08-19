@@ -538,17 +538,40 @@ var _ = Describe("app summary displayer", func() {
 				Expect(testUI.Out).To(Say(`stack:\s+\n`))
 				Expect(testUI.Out).To(Say(`(?m)docker image:\s+docker/some-image$\n`))
 			})
+
+			It("does not display the buildpack info for docker apps", func() {
+				Expect(testUI.Out).ToNot(Say("buildpacks:"))
+			})
 		})
 
 		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: resources.Application{
+							LifecycleType: constant.AppLifecycleTypeBuildpack,
+						},
+					},
 					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
 						Buildpacks: []resources.DropletBuildpack{
 							{
-								Name:         "ruby_buildpack",
-								DetectOutput: "some-detect-output",
+								Name:          "ruby_buildpack",
+								BuildpackName: "ruby_buildpack_name",
+								DetectOutput:  "some-detect-output",
+								Version:       "0.0.1",
+							},
+							{
+								Name:          "go_buildpack_without_detect_output",
+								BuildpackName: "go_buildpack_name",
+								DetectOutput:  "",
+								Version:       "0.0.2",
+							},
+							{
+								Name:          "go_buildpack_without_version",
+								BuildpackName: "go_buildpack_name",
+								DetectOutput:  "",
+								Version:       "",
 							},
 							{
 								Name:         "some-buildpack",
@@ -560,8 +583,11 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays stack and buildpacks", func() {
-				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
-				Expect(testUI.Out).To(Say(`buildpacks:\s+some-detect-output, some-buildpack`))
+				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2\n`))
+				Expect(testUI.Out).To(Say(`buildpacks:\s+\n`))
+				Expect(testUI.Out).To(Say(`name\s+version\s+detect output\s+buildpack name\n`))
+				Expect(testUI.Out).To(Say(`ruby_buildpack\s+0.0.1\s+some-detect-output\s+ruby_buildpack_name\n`))
+				Expect(testUI.Out).To(Say(`some-buildpack`))
 			})
 		})
 	})

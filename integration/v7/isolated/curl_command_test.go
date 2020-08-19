@@ -298,7 +298,7 @@ var _ = Describe("curl command", func() {
 						Eventually(session).Should(Exit(1))
 
 						Expect(session).Should(Say("FAILED"))
-						Expect(session.Err).Should(Say("Error creating request: malformed MIME header line: not-a-valid-header"))
+						Expect(session.Err).Should(Say(`Error creating request:.+not-a-valid-header`))
 					})
 				})
 			})
