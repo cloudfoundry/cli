@@ -2,6 +2,7 @@ package manifestparser
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"

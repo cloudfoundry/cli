@@ -1,6 +1,7 @@
 package push
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"time"
@@ -13,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Output", func() {
+var _ = FDescribe("Output", func() {
 	var (
 		appName  string
 		appName2 string

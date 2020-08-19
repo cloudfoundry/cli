@@ -25,7 +25,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 		displayer = NewManifestDiffDisplayer(testUI)
 	})
 
-	FDescribe("DisplayDiff", func() {
+	Describe("DisplayDiff", func() {
 		var (
 			rawManifest []byte
 			diff        resources.ManifestDiff
@@ -46,7 +46,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 					}
 				})
 
-				It("outputs correctly formatted diff", func() {
+				It("outputs a diff indicating addition", func() {
 					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
   applications:
     name: dora
@@ -57,7 +57,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 				})
 			})
 
-			FWhen("removal", func() {
+			When("removal", func() {
 				BeforeEach(func() {
 					rawManifest = []byte("applications:\n- name: dora\n  env:\n    r: m")
 					diff = resources.ManifestDiff{
@@ -67,7 +67,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 					}
 				})
 
-				FIt("outputs correctly formatted diff", func() {
+				It("outputs correctly formatted diff", func() {
 					// TODO: Remove printline, currently just printing test output
 					fmt.Printf("%+v", string(outputBuffer.Contents()))
 

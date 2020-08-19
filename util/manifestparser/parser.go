@@ -2,6 +2,7 @@ package manifestparser
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"

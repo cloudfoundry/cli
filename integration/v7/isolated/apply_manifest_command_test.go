@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("apply-manifest command", func() {
+var _ = FDescribe("apply-manifest command", func() {
 	var (
 		orgName      string
 		spaceName    string
@@ -182,6 +182,40 @@ var _ = Describe("apply-manifest command", func() {
 					Eventually(session).Should(Exit())
 				})
 			})
+
+			FWhen("and it is making a change to an existing app", func() {
+				var (
+					userName string
+				)
+
+				BeforeEach(func() {
+					userName, _ = helpers.GetCredentials()
+				})
+
+				When("there are no changes in the manifest", func() {
+					It("shows no changes", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+							session := helpers.CF("apply-manifest", "-f", manifestPath)
+							Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+							Eventually(session).Should(Say("i don't want no diffs"))
+							Eventually(session).Should(Exit(0))
+						})
+						// map[
+						// applications:[map[
+						// name:Inteegration....
+						// processes:[map[
+						// disk_quota:1024M
+						// health-check-type:port
+						// instances:1
+						// memory:32M
+						// type:web]]
+						//routes:[map[route:Integration...]]
+						// stack:cflinuxfs3]]]
+					})
+				})
+			})
 		})
 
 		When("-f is not provided", func() {
@@ -257,5 +291,18 @@ var _ = Describe("apply-manifest command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
 	})
 })
+
+func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, string) {
+	session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+	Eventually(session).Should(Exit(0))
+	manifestPath := fmt.Sprintf("%s/manifest.yml", dir)
+	session = helpers.CF("create-app-manifest", appName, "-p", manifestPath)
+	Eventually(session).Should(Say(fmt.Sprintf("Manifest file created successfully at %s", manifestPath)))
+	Eventually(session).Should(Exit(0))
+	manifest := helpers.ReadManifest(manifestPath)
+
+	return manifest, manifestPath
+}

@@ -137,11 +137,8 @@ func formatKeyValue(key string, value interface{}) string {
 	return key + ": " + interfaceToString(value)
 }
 
-func getLastPart(path string) string {
-	parts := strings.Split(path, "/")
-	return parts[len(parts)-1]
-}
-
 func interfaceToString(value interface{}) string {
 	return fmt.Sprintf("%v", value)
+	// val, _ := yaml.Marshal(value)
+	// return string(val)
 }
