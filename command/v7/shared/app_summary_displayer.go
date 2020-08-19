@@ -31,9 +31,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
 	}
 
-	var lifecycleInfo []string
 	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
-		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
 		keyValueTable = [][]string{
 			{display.UI.TranslateText("name:"), summary.Application.Name},
 			{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
@@ -41,7 +39,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 			{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
 			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-			lifecycleInfo,
+			{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image},
 			isoRow,
 		}
 	} else {
@@ -53,14 +51,13 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 			{display.UI.TranslateText("buildpacks:"), ""},
-			lifecycleInfo,
 			isoRow,
 		}
 	}
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
-	if len(lifecycleInfo) == 0 {
+	if summary.LifecycleType == constant.AppLifecycleTypeBuildpack {
 		display.displayBuildpackTable(summary.CurrentDroplet.Buildpacks)
 	}
 
