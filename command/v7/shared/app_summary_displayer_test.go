@@ -547,6 +547,11 @@ var _ = Describe("app summary displayer", func() {
 		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: resources.Application{
+							LifecycleType: constant.AppLifecycleTypeBuildpack,
+						},
+					},
 					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
 						Buildpacks: []resources.DropletBuildpack{
