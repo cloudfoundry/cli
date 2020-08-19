@@ -538,6 +538,10 @@ var _ = Describe("app summary displayer", func() {
 				Expect(testUI.Out).To(Say(`stack:\s+\n`))
 				Expect(testUI.Out).To(Say(`(?m)docker image:\s+docker/some-image$\n`))
 			})
+
+			It("does not display the buildpack info for docker apps", func() {
+				Expect(testUI.Out).ToNot(Say("buildpacks:"))
+			})
 		})
 
 		When("the application is a buildpack app", func() {

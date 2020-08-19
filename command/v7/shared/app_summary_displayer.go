@@ -26,6 +26,7 @@ func NewAppSummaryDisplayer(ui command.UI) *AppSummaryDisplayer {
 
 func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicationSummary, displayStartCommand bool) {
 	var isoRow []string
+	var keyValueTable [][]string
 	if name, exists := summary.GetIsolationSegmentName(); exists {
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
 	}
@@ -33,18 +34,28 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 	var lifecycleInfo []string
 	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
 		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
-	}
-
-	keyValueTable := [][]string{
-		{display.UI.TranslateText("name:"), summary.Application.Name},
-		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
-		isoRow,
-		{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
-		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
-		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-		{display.UI.TranslateText("buildpacks:"), ""},
-		lifecycleInfo,
-		isoRow,
+		keyValueTable = [][]string{
+			{display.UI.TranslateText("name:"), summary.Application.Name},
+			{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+			isoRow,
+			{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
+			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
+			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+			lifecycleInfo,
+			isoRow,
+		}
+	} else {
+		keyValueTable = [][]string{
+			{display.UI.TranslateText("name:"), summary.Application.Name},
+			{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+			isoRow,
+			{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
+			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
+			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+			{display.UI.TranslateText("buildpacks:"), ""},
+			lifecycleInfo,
+			isoRow,
+		}
 	}
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
