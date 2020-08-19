@@ -350,7 +350,7 @@ var _ = Describe("app stager", func() {
 		When("the deployment strategy is rolling", func() {
 			BeforeEach(func() {
 				strategy = constant.DeploymentStrategyRolling
-				fakeActor.CreateDeploymentReturns(
+				fakeActor.CreateDeploymentByApplicationAndDropletReturns(
 					"some-deployment-guid",
 					v7action.Warnings{"create-deployment-warning"},
 					nil,
@@ -367,8 +367,8 @@ var _ = Describe("app stager", func() {
 					Expect(executeErr).To(BeNil())
 
 					Expect(testUI.Out).To(Say("Creating deployment for app %s...", app.Name))
-					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
-					appGUID, dropletGUID := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(fakeActor.CreateDeploymentByApplicationAndDropletCallCount()).To(Equal(1))
+					appGUID, dropletGUID := fakeActor.CreateDeploymentByApplicationAndDropletArgsForCall(0)
 					Expect(appGUID).To(Equal(app.GUID))
 					Expect(dropletGUID).To(Equal("droplet-guid"))
 					Expect(testUI.Err).To(Say("create-deployment-warning"))
@@ -381,7 +381,7 @@ var _ = Describe("app stager", func() {
 
 			When("creating a deployment fails", func() {
 				BeforeEach(func() {
-					fakeActor.CreateDeploymentReturns(
+					fakeActor.CreateDeploymentByApplicationAndDropletReturns(
 						"",
 						v7action.Warnings{"create-deployment-warning"},
 						errors.New("create-deployment-error"),

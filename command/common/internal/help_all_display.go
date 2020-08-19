@@ -163,4 +163,11 @@ var HelpCategoryList = []HelpCategory{
 	},
 }
 
-var ExperimentalHelpCategoryList = []HelpCategory{}
+var ExperimentalHelpCategoryList = []HelpCategory{
+	{
+		CategoryName: "EXPERIMENTAL COMMANDS:",
+		CommandList: [][]string{
+			{"rollback"},
+		},
+	},
+}

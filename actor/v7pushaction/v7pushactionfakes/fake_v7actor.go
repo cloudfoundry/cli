@@ -58,18 +58,18 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateDeploymentStub        func(string, string) (string, v7action.Warnings, error)
-	createDeploymentMutex       sync.RWMutex
-	createDeploymentArgsForCall []struct {
+	CreateDeploymentByApplicationAndDropletStub        func(string, string) (string, v7action.Warnings, error)
+	createDeploymentByApplicationAndDropletMutex       sync.RWMutex
+	createDeploymentByApplicationAndDropletArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	createDeploymentReturns struct {
+	createDeploymentByApplicationAndDropletReturns struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}
-	createDeploymentReturnsOnCall map[int]struct {
+	createDeploymentByApplicationAndDropletReturnsOnCall map[int]struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -704,67 +704,67 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDeployment(arg1 string, arg2 string) (string, v7action.Warnings, error) {
-	fake.createDeploymentMutex.Lock()
-	ret, specificReturn := fake.createDeploymentReturnsOnCall[len(fake.createDeploymentArgsForCall)]
-	fake.createDeploymentArgsForCall = append(fake.createDeploymentArgsForCall, struct {
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDroplet(arg1 string, arg2 string) (string, v7action.Warnings, error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	ret, specificReturn := fake.createDeploymentByApplicationAndDropletReturnsOnCall[len(fake.createDeploymentByApplicationAndDropletArgsForCall)]
+	fake.createDeploymentByApplicationAndDropletArgsForCall = append(fake.createDeploymentByApplicationAndDropletArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("CreateDeployment", []interface{}{arg1, arg2})
-	fake.createDeploymentMutex.Unlock()
-	if fake.CreateDeploymentStub != nil {
-		return fake.CreateDeploymentStub(arg1, arg2)
+	fake.recordInvocation("CreateDeploymentByApplicationAndDroplet", []interface{}{arg1, arg2})
+	fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	if fake.CreateDeploymentByApplicationAndDropletStub != nil {
+		return fake.CreateDeploymentByApplicationAndDropletStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentReturns
+	fakeReturns := fake.createDeploymentByApplicationAndDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeV7Actor) CreateDeploymentCallCount() int {
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
-	return len(fake.createDeploymentArgsForCall)
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletCallCount() int {
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	return len(fake.createDeploymentByApplicationAndDropletArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateDeploymentCalls(stub func(string, string) (string, v7action.Warnings, error)) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = stub
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletCalls(stub func(string, string) (string, v7action.Warnings, error)) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = stub
 }
 
-func (fake *FakeV7Actor) CreateDeploymentArgsForCall(i int) (string, string) {
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
-	argsForCall := fake.createDeploymentArgsForCall[i]
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletArgsForCall(i int) (string, string) {
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	argsForCall := fake.createDeploymentByApplicationAndDropletArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) CreateDeploymentReturns(result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = nil
-	fake.createDeploymentReturns = struct {
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = nil
+	fake.createDeploymentByApplicationAndDropletReturns = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDeploymentReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = nil
-	if fake.createDeploymentReturnsOnCall == nil {
-		fake.createDeploymentReturnsOnCall = make(map[int]struct {
+func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = nil
+	if fake.createDeploymentByApplicationAndDropletReturnsOnCall == nil {
+		fake.createDeploymentByApplicationAndDropletReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.createDeploymentReturnsOnCall[i] = struct {
+	fake.createDeploymentByApplicationAndDropletReturnsOnCall[i] = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -2647,8 +2647,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	fake.createBitsPackageByApplicationMutex.RLock()
 	defer fake.createBitsPackageByApplicationMutex.RUnlock()
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
 	fake.createDockerPackageByApplicationMutex.RLock()
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()

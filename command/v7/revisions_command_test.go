@@ -9,6 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -91,7 +92,7 @@ var _ = Describe("revisions Command", func() {
 
 			When("getting the revisions", func() {
 				BeforeEach(func() {
-					revisions := v7action.Revisions{
+					revisions := []resources.Revision{
 						{
 							Version:     1,
 							GUID:        "17E0E587-0E53-4A6E-B6AE-82073159F910",
@@ -142,7 +143,7 @@ var _ = Describe("revisions Command", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(v7action.Revisions{}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+					fakeActor.GetRevisionsByApplicationNameAndSpaceReturns([]resources.Revision{}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 				})
 
 				It("returns the error", func() {

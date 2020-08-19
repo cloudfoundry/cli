@@ -1,27 +1,21 @@
 package ccv3
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
+)
 
-type Revision struct {
-	GUID        string
-	Version     int
-	Description string
-	Deployable  bool
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
-}
-
-func (client *Client) GetApplicationRevisions(appGUID string) ([]Revision, Warnings, error) {
-	var resources []Revision
+func (client *Client) GetApplicationRevisions(appGUID string) ([]resources.Revision, Warnings, error) {
+	var revisions []resources.Revision
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationRevisionsRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
-		ResponseBody: Revision{},
+		ResponseBody: resources.Revision{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Revision))
+			revisions = append(revisions, item.(resources.Revision))
 			return nil
 		},
 	})
-	return resources, warnings, err
+	return revisions, warnings, err
 }

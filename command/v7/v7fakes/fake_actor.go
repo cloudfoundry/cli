@@ -230,18 +230,34 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateDeploymentStub        func(string, string) (string, v7action.Warnings, error)
-	createDeploymentMutex       sync.RWMutex
-	createDeploymentArgsForCall []struct {
+	CreateDeploymentByApplicationAndDropletStub        func(string, string) (string, v7action.Warnings, error)
+	createDeploymentByApplicationAndDropletMutex       sync.RWMutex
+	createDeploymentByApplicationAndDropletArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	createDeploymentReturns struct {
+	createDeploymentByApplicationAndDropletReturns struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}
-	createDeploymentReturnsOnCall map[int]struct {
+	createDeploymentByApplicationAndDropletReturnsOnCall map[int]struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
+	CreateDeploymentByApplicationAndRevisionStub        func(string, string) (string, v7action.Warnings, error)
+	createDeploymentByApplicationAndRevisionMutex       sync.RWMutex
+	createDeploymentByApplicationAndRevisionArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	createDeploymentByApplicationAndRevisionReturns struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
+	createDeploymentByApplicationAndRevisionReturnsOnCall map[int]struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -1516,19 +1532,35 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRevisionsByApplicationNameAndSpaceStub        func(string, string) (v7action.Revisions, v7action.Warnings, error)
+	GetRevisionByApplicationAndVersionStub        func(string, int) (resources.Revision, v7action.Warnings, error)
+	getRevisionByApplicationAndVersionMutex       sync.RWMutex
+	getRevisionByApplicationAndVersionArgsForCall []struct {
+		arg1 string
+		arg2 int
+	}
+	getRevisionByApplicationAndVersionReturns struct {
+		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRevisionByApplicationAndVersionReturnsOnCall map[int]struct {
+		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetRevisionsByApplicationNameAndSpaceStub        func(string, string) ([]resources.Revision, v7action.Warnings, error)
 	getRevisionsByApplicationNameAndSpaceMutex       sync.RWMutex
 	getRevisionsByApplicationNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getRevisionsByApplicationNameAndSpaceReturns struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}
 	getRevisionsByApplicationNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -3984,67 +4016,134 @@ func (fake *FakeActor) CreateBuildpackReturnsOnCall(i int, result1 v7action.Buil
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateDeployment(arg1 string, arg2 string) (string, v7action.Warnings, error) {
-	fake.createDeploymentMutex.Lock()
-	ret, specificReturn := fake.createDeploymentReturnsOnCall[len(fake.createDeploymentArgsForCall)]
-	fake.createDeploymentArgsForCall = append(fake.createDeploymentArgsForCall, struct {
+func (fake *FakeActor) CreateDeploymentByApplicationAndDroplet(arg1 string, arg2 string) (string, v7action.Warnings, error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	ret, specificReturn := fake.createDeploymentByApplicationAndDropletReturnsOnCall[len(fake.createDeploymentByApplicationAndDropletArgsForCall)]
+	fake.createDeploymentByApplicationAndDropletArgsForCall = append(fake.createDeploymentByApplicationAndDropletArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("CreateDeployment", []interface{}{arg1, arg2})
-	fake.createDeploymentMutex.Unlock()
-	if fake.CreateDeploymentStub != nil {
-		return fake.CreateDeploymentStub(arg1, arg2)
+	fake.recordInvocation("CreateDeploymentByApplicationAndDroplet", []interface{}{arg1, arg2})
+	fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	if fake.CreateDeploymentByApplicationAndDropletStub != nil {
+		return fake.CreateDeploymentByApplicationAndDropletStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentReturns
+	fakeReturns := fake.createDeploymentByApplicationAndDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeActor) CreateDeploymentCallCount() int {
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
-	return len(fake.createDeploymentArgsForCall)
+func (fake *FakeActor) CreateDeploymentByApplicationAndDropletCallCount() int {
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	return len(fake.createDeploymentByApplicationAndDropletArgsForCall)
 }
 
-func (fake *FakeActor) CreateDeploymentCalls(stub func(string, string) (string, v7action.Warnings, error)) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = stub
+func (fake *FakeActor) CreateDeploymentByApplicationAndDropletCalls(stub func(string, string) (string, v7action.Warnings, error)) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = stub
 }
 
-func (fake *FakeActor) CreateDeploymentArgsForCall(i int) (string, string) {
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
-	argsForCall := fake.createDeploymentArgsForCall[i]
+func (fake *FakeActor) CreateDeploymentByApplicationAndDropletArgsForCall(i int) (string, string) {
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	argsForCall := fake.createDeploymentByApplicationAndDropletArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) CreateDeploymentReturns(result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = nil
-	fake.createDeploymentReturns = struct {
+func (fake *FakeActor) CreateDeploymentByApplicationAndDropletReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = nil
+	fake.createDeploymentByApplicationAndDropletReturns = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateDeploymentReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentMutex.Lock()
-	defer fake.createDeploymentMutex.Unlock()
-	fake.CreateDeploymentStub = nil
-	if fake.createDeploymentReturnsOnCall == nil {
-		fake.createDeploymentReturnsOnCall = make(map[int]struct {
+func (fake *FakeActor) CreateDeploymentByApplicationAndDropletReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndDropletMutex.Lock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndDropletStub = nil
+	if fake.createDeploymentByApplicationAndDropletReturnsOnCall == nil {
+		fake.createDeploymentByApplicationAndDropletReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.createDeploymentReturnsOnCall[i] = struct {
+	fake.createDeploymentByApplicationAndDropletReturnsOnCall[i] = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevision(arg1 string, arg2 string) (string, v7action.Warnings, error) {
+	fake.createDeploymentByApplicationAndRevisionMutex.Lock()
+	ret, specificReturn := fake.createDeploymentByApplicationAndRevisionReturnsOnCall[len(fake.createDeploymentByApplicationAndRevisionArgsForCall)]
+	fake.createDeploymentByApplicationAndRevisionArgsForCall = append(fake.createDeploymentByApplicationAndRevisionArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateDeploymentByApplicationAndRevision", []interface{}{arg1, arg2})
+	fake.createDeploymentByApplicationAndRevisionMutex.Unlock()
+	if fake.CreateDeploymentByApplicationAndRevisionStub != nil {
+		return fake.CreateDeploymentByApplicationAndRevisionStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createDeploymentByApplicationAndRevisionReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevisionCallCount() int {
+	fake.createDeploymentByApplicationAndRevisionMutex.RLock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.RUnlock()
+	return len(fake.createDeploymentByApplicationAndRevisionArgsForCall)
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevisionCalls(stub func(string, string) (string, v7action.Warnings, error)) {
+	fake.createDeploymentByApplicationAndRevisionMutex.Lock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndRevisionStub = stub
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevisionArgsForCall(i int) (string, string) {
+	fake.createDeploymentByApplicationAndRevisionMutex.RLock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.RUnlock()
+	argsForCall := fake.createDeploymentByApplicationAndRevisionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevisionReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndRevisionMutex.Lock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndRevisionStub = nil
+	fake.createDeploymentByApplicationAndRevisionReturns = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateDeploymentByApplicationAndRevisionReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentByApplicationAndRevisionMutex.Lock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.Unlock()
+	fake.CreateDeploymentByApplicationAndRevisionStub = nil
+	if fake.createDeploymentByApplicationAndRevisionReturnsOnCall == nil {
+		fake.createDeploymentByApplicationAndRevisionReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createDeploymentByApplicationAndRevisionReturnsOnCall[i] = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -9531,7 +9630,74 @@ func (fake *FakeActor) GetRecentLogsForApplicationByNameAndSpaceReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 string) (v7action.Revisions, v7action.Warnings, error) {
+func (fake *FakeActor) GetRevisionByApplicationAndVersion(arg1 string, arg2 int) (resources.Revision, v7action.Warnings, error) {
+	fake.getRevisionByApplicationAndVersionMutex.Lock()
+	ret, specificReturn := fake.getRevisionByApplicationAndVersionReturnsOnCall[len(fake.getRevisionByApplicationAndVersionArgsForCall)]
+	fake.getRevisionByApplicationAndVersionArgsForCall = append(fake.getRevisionByApplicationAndVersionArgsForCall, struct {
+		arg1 string
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("GetRevisionByApplicationAndVersion", []interface{}{arg1, arg2})
+	fake.getRevisionByApplicationAndVersionMutex.Unlock()
+	if fake.GetRevisionByApplicationAndVersionStub != nil {
+		return fake.GetRevisionByApplicationAndVersionStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRevisionByApplicationAndVersionReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRevisionByApplicationAndVersionCallCount() int {
+	fake.getRevisionByApplicationAndVersionMutex.RLock()
+	defer fake.getRevisionByApplicationAndVersionMutex.RUnlock()
+	return len(fake.getRevisionByApplicationAndVersionArgsForCall)
+}
+
+func (fake *FakeActor) GetRevisionByApplicationAndVersionCalls(stub func(string, int) (resources.Revision, v7action.Warnings, error)) {
+	fake.getRevisionByApplicationAndVersionMutex.Lock()
+	defer fake.getRevisionByApplicationAndVersionMutex.Unlock()
+	fake.GetRevisionByApplicationAndVersionStub = stub
+}
+
+func (fake *FakeActor) GetRevisionByApplicationAndVersionArgsForCall(i int) (string, int) {
+	fake.getRevisionByApplicationAndVersionMutex.RLock()
+	defer fake.getRevisionByApplicationAndVersionMutex.RUnlock()
+	argsForCall := fake.getRevisionByApplicationAndVersionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetRevisionByApplicationAndVersionReturns(result1 resources.Revision, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionByApplicationAndVersionMutex.Lock()
+	defer fake.getRevisionByApplicationAndVersionMutex.Unlock()
+	fake.GetRevisionByApplicationAndVersionStub = nil
+	fake.getRevisionByApplicationAndVersionReturns = struct {
+		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionByApplicationAndVersionReturnsOnCall(i int, result1 resources.Revision, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionByApplicationAndVersionMutex.Lock()
+	defer fake.getRevisionByApplicationAndVersionMutex.Unlock()
+	fake.GetRevisionByApplicationAndVersionStub = nil
+	if fake.getRevisionByApplicationAndVersionReturnsOnCall == nil {
+		fake.getRevisionByApplicationAndVersionReturnsOnCall = make(map[int]struct {
+			result1 resources.Revision
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRevisionByApplicationAndVersionReturnsOnCall[i] = struct {
+		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 string) ([]resources.Revision, v7action.Warnings, error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)]
 	fake.getRevisionsByApplicationNameAndSpaceArgsForCall = append(fake.getRevisionsByApplicationNameAndSpaceArgsForCall, struct {
@@ -9556,7 +9722,7 @@ func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceCallCount() int {
 	return len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceCalls(stub func(string, string) (v7action.Revisions, v7action.Warnings, error)) {
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceCalls(stub func(string, string) ([]resources.Revision, v7action.Warnings, error)) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = stub
@@ -9569,30 +9735,30 @@ func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceArgsForCall(i int) (
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturns(result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturns(result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
 	fake.getRevisionsByApplicationNameAndSpaceReturns = struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int, result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int, result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
 	if fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall == nil {
 		fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Revisions
+			result1 []resources.Revision
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -16219,8 +16385,10 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createBitsPackageByApplicationMutex.RUnlock()
 	fake.createBuildpackMutex.RLock()
 	defer fake.createBuildpackMutex.RUnlock()
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
+	fake.createDeploymentByApplicationAndDropletMutex.RLock()
+	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	fake.createDeploymentByApplicationAndRevisionMutex.RLock()
+	defer fake.createDeploymentByApplicationAndRevisionMutex.RUnlock()
 	fake.createDockerPackageByApplicationMutex.RLock()
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
@@ -16389,6 +16557,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getRecentEventsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getRevisionByApplicationAndVersionMutex.RLock()
+	defer fake.getRevisionByApplicationAndVersionMutex.RUnlock()
 	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()

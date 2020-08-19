@@ -52,7 +52,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 					return nil, nil
 				})
 
-				fakeV7Actor.CreateDeploymentReturns(
+				fakeV7Actor.CreateDeploymentByApplicationAndDropletReturns(
 					"some-deployment-guid",
 					v7action.Warnings{"some-deployment-warning"},
 					nil,
@@ -85,7 +85,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			BeforeEach(func() {
 				someErr = errors.New("failed to create deployment")
 
-				fakeV7Actor.CreateDeploymentReturns(
+				fakeV7Actor.CreateDeploymentByApplicationAndDropletReturns(
 					"",
 					v7action.Warnings{"some-deployment-warning"},
 					someErr,

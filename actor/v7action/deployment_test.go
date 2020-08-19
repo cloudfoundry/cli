@@ -22,11 +22,32 @@ var _ = Describe("Deployment Actions", func() {
 		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
 	})
 
-	Describe("CreateDeployment", func() {
+	Describe("CreateDeploymentByApplicationAndRevision", func() {
+		It("delegates to the cloud controller client", func() {
+			fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+				"some-deployment-guid",
+				ccv3.Warnings{"create-warning-1", "create-warning-2"},
+				errors.New("create-error"),
+			)
+
+			returnedDeploymentGUID, warnings, _ := actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+
+			Expect(fakeCloudControllerClient.CreateApplicationDeploymentByRevisionCallCount()).To(Equal(1), "CreateApplicationDeploymentByRevision call count")
+			givenAppGUID, givenRevisionGUID := fakeCloudControllerClient.CreateApplicationDeploymentByRevisionArgsForCall(0)
+
+			Expect(givenAppGUID).To(Equal("some-app-guid"))
+			Expect(givenRevisionGUID).To(Equal("some-revision-guid"))
+
+			Expect(returnedDeploymentGUID).To(Equal("some-deployment-guid"))
+			Expect(warnings).To(Equal(Warnings{"create-warning-1", "create-warning-2"}))
+		})
+	})
+
+	Describe("CreateDeploymentByApplicationAndDroplet", func() {
 		It("delegates to the cloud controller client", func() {
 			fakeCloudControllerClient.CreateApplicationDeploymentReturns("some-deployment-guid", ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
 
-			returnedDeploymentGUID, warnings, executeErr := actor.CreateDeployment("some-app-guid", "some-droplet-guid")
+			returnedDeploymentGUID, warnings, executeErr := actor.CreateDeploymentByApplicationAndDroplet("some-app-guid", "some-droplet-guid")
 
 			Expect(fakeCloudControllerClient.CreateApplicationDeploymentCallCount()).To(Equal(1))
 			givenAppGUID, givenDropletGUID := fakeCloudControllerClient.CreateApplicationDeploymentArgsForCall(0)

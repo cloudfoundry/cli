@@ -19,7 +19,7 @@ var _ = Describe("Revisions Actions", func() {
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			appName                   string
 			spaceGUID                 string
-			fetchedRevisions          Revisions
+			fetchedRevisions          []resources.Revision
 			executeErr                error
 			warnings                  Warnings
 		)
@@ -53,7 +53,7 @@ var _ = Describe("Revisions Actions", func() {
 
 			When("getting the app revisions fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationRevisionsReturns([]ccv3.Revision{}, ccv3.Warnings{"some-revisions-warnings"}, errors.New("some-revisions-error"))
+					fakeCloudControllerClient.GetApplicationRevisionsReturns([]resources.Revision{}, ccv3.Warnings{"some-revisions-warnings"}, errors.New("some-revisions-error"))
 				})
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("some-revisions-error"))
@@ -64,7 +64,7 @@ var _ = Describe("Revisions Actions", func() {
 			When("getting the app revisions succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationRevisionsReturns(
-						Revisions{
+						[]resources.Revision{
 							{GUID: "1"},
 							{GUID: "2"},
 							{GUID: "3"},
@@ -85,7 +85,7 @@ var _ = Describe("Revisions Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fetchedRevisions).To(Equal(
-						Revisions{
+						[]resources.Revision{
 							{GUID: "1"},
 							{GUID: "2"},
 							{GUID: "3"},
@@ -97,4 +97,49 @@ var _ = Describe("Revisions Actions", func() {
 		})
 	})
 
+	Describe("GetRevisionByApplicationAndVersion", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			appGUID                   string
+			revisionVersion           int
+			err                       error
+			warnings                  Warnings
+			revision                  resources.Revision
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+			appGUID = "some-app-guid"
+			revisionVersion = 1
+		})
+
+		JustBeforeEach(func() {
+			revision, warnings, err = actor.GetRevisionByApplicationAndVersion(appGUID, revisionVersion)
+		})
+
+		When("finding the revision succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsReturns(
+					[]resources.Revision{
+						{GUID: "revision-guid-1", Version: 1},
+						{GUID: "revision-guid-2", Version: 2},
+					},
+					ccv3.Warnings{"get-revisions-warning-1"},
+					nil,
+				)
+			})
+
+			It("returns the revision", func() {
+				Expect(fakeCloudControllerClient.GetApplicationRevisionsCallCount()).To(Equal(1), "GetApplicationRevisions call count")
+				Expect(fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)).To(Equal("some-app-guid"))
+
+				Expect(revision.Version).To(Equal(1))
+				Expect(revision.GUID).To(Equal("revision-guid-1"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-revisions-warning-1"))
+			})
+		})
+	})
 })

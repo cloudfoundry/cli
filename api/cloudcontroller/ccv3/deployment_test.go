@@ -232,6 +232,55 @@ var _ = Describe("Task", func() {
 		})
 	})
 
+	Describe("CreateApplicationDeploymentByRevision", func() {
+		var (
+			deploymentGUID string
+			warnings       Warnings
+			executeErr     error
+			revisionGUID   string
+		)
+
+		JustBeforeEach(func() {
+			deploymentGUID, warnings, executeErr = client.CreateApplicationDeploymentByRevision("some-app-guid", revisionGUID)
+		})
+
+		Context("when the application exists", func() {
+			var response string
+			BeforeEach(func() {
+				revisionGUID = "some-revision-guid"
+				response = `{
+  "guid": "some-deployment-guid",
+  "created_at": "2018-04-25T22:42:10Z",
+  "relationships": {
+    "app": {
+      "data": {
+        "guid": "some-app-guid"
+      }
+    }
+  }
+}`
+			})
+
+			Context("when creating the deployment succeeds", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/deployments"),
+							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						),
+					)
+				})
+
+				It("creates the deployment with no errors and returns all warnings", func() {
+					Expect(deploymentGUID).To(Equal("some-deployment-guid"))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning"))
+				})
+			})
+		})
+	})
+
 	Describe("GetDeployment", func() {
 		var response string
 		Context("When the deployments exists", func() {
