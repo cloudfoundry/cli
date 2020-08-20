@@ -12,7 +12,7 @@ import (
 var _ = Describe("share-service command", func() {
 	const shareServiceCommand = "v3-share-service"
 
-	FDescribe("help", func() {
+	Describe("help", func() {
 		const serviceInstanceName = "fake-service-instance-name"
 
 		matchHelpMessage := SatisfyAll(
