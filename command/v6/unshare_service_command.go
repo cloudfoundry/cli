@@ -80,7 +80,10 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.")
+		cmd.UI.DisplayWarning(
+			`WARNING: Unsharing this service instance will remove any existing bindings originating from the service instance in the space "{{.SpaceName}}". This could cause apps to stop working.`,
+			map[string]interface{}{"SpaceName": cmd.SharedToSpaceName},
+		)
 		cmd.UI.DisplayNewline()
 
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really unshare the service instance?", map[string]interface{}{

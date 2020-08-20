@@ -85,6 +85,11 @@ var _ = Describe("unshare-service Command", func() {
 	})
 
 	When("the user is logged in, and a space and org are targeted", func() {
+		const (
+			sharedToSpaceName = "some-shared-to-space"
+			expectedWarning   = `WARNING: Unsharing this service instance will remove any existing bindings originating from the service instance in the space \"` + sharedToSpaceName + `\". This could cause apps to stop working.`
+		)
+
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
@@ -142,7 +147,7 @@ var _ = Describe("unshare-service Command", func() {
 							Expect(testUI.Out).To(Say(`Unsharing service instance some-service-instance from org some-org / space some-shared-to-space as some-user\.\.\.`))
 							Expect(testUI.Out).To(Say("OK"))
 
-							Expect(testUI.Err).ToNot(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+							Expect(testUI.Err).ToNot(Say("WARNING"))
 							Expect(testUI.Err).To(Say("unshare-service-warning"))
 
 							Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(1))
@@ -202,7 +207,7 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Out).To(Say(`Unsharing service instance some-service-instance from org some-other-org / space some-other-space as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Err).ToNot(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Expect(testUI.Err).ToNot(Say("WARNING"))
 						Expect(testUI.Err).To(Say("unshare-service-warning"))
 
 						Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(1))
@@ -218,7 +223,7 @@ var _ = Describe("unshare-service Command", func() {
 			When("the -f flag is NOT provided", func() {
 				BeforeEach(func() {
 					cmd.Force = false
-					cmd.SharedToSpaceName = "some-shared-to-space"
+					cmd.SharedToSpaceName = sharedToSpaceName
 				})
 
 				When("the user inputs yes", func() {
@@ -238,7 +243,7 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Out).To(Say(`Unsharing service instance some-service-instance from org some-org / space some-shared-to-space as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Err).To(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Expect(testUI.Err).To(Say(expectedWarning))
 						Expect(testUI.Err).To(Say("unshare-service-warning"))
 
 						Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(1))
@@ -262,7 +267,7 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Out).To(Say(`Really unshare the service instance\? \[yN\]`))
 						Expect(testUI.Out).To(Say("Unshare cancelled"))
 
-						Expect(testUI.Err).To(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Expect(testUI.Err).To(Say(expectedWarning))
 
 						Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(0))
 					})
@@ -280,7 +285,7 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Out).To(Say(`Really unshare the service instance\? \[yN\]`))
 						Expect(testUI.Out).To(Say("Unshare cancelled"))
 
-						Expect(testUI.Err).To(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Expect(testUI.Err).To(Say(expectedWarning))
 
 						Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(0))
 					})
@@ -299,7 +304,7 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
 						Expect(testUI.Out).To(Say(`Really unshare the service instance\? \[yN\]`))
 
-						Expect(testUI.Err).To(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Expect(testUI.Err).To(Say(expectedWarning))
 
 						Expect(fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceCallCount()).To(Equal(0))
 					})
