@@ -42,16 +42,16 @@ var _ = Describe("share-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	It("checks the user is logged in, and targeting an org and space", func() {
+		Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+		orgChecked, spaceChecked := fakeSharedActor.CheckTargetArgsForCall(0)
+		Expect(orgChecked).To(BeTrue())
+		Expect(spaceChecked).To(BeTrue())
+	})
+
 	Context("user not targeting space", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(errors.New("space not targeted"))
-		})
-
-		It("checks the user is logged in, and targeting an org and space", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			orgChecked, spaceChecked := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(orgChecked).To(BeTrue())
-			Expect(spaceChecked).To(BeTrue())
 		})
 
 		It("fails the command", func() {
