@@ -6,6 +6,7 @@ type Revision struct {
 	GUID        string
 	Version     int
 	Description string
+	Deployable  bool
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
