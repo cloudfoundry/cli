@@ -183,39 +183,6 @@ var _ = FDescribe("apply-manifest command", func() {
 				})
 			})
 
-			FWhen("and it is making a change to an existing app", func() {
-				var (
-					userName string
-				)
-
-				BeforeEach(func() {
-					userName, _ = helpers.GetCredentials()
-				})
-
-				When("there are no changes in the manifest", func() {
-					It("shows no changes", func() {
-						helpers.WithHelloWorldApp(func(dir string) {
-							manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
-							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
-							session := helpers.CF("apply-manifest", "-f", manifestPath)
-							Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
-							Eventually(session).Should(Say("i don't want no diffs"))
-							Eventually(session).Should(Exit(0))
-						})
-						// map[
-						// applications:[map[
-						// name:Inteegration....
-						// processes:[map[
-						// disk_quota:1024M
-						// health-check-type:port
-						// instances:1
-						// memory:32M
-						// type:web]]
-						//routes:[map[route:Integration...]]
-						// stack:cflinuxfs3]]]
-					})
-				})
-			})
 		})
 
 		When("-f is not provided", func() {
@@ -251,6 +218,43 @@ var _ = FDescribe("apply-manifest command", func() {
 					Eventually(session.Err).Should(helpers.SayPath(`Could not find 'manifest.yml' file in %s`, currentDir))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		FWhen("testing manifest diffing output", func() {
+			var (
+				userName string
+			)
+
+			BeforeEach(func() {
+				userName, _ = helpers.GetCredentials()
+			})
+
+			When("there are no changes in the manifest", func() {
+				It("shows no changes", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+						session := helpers.CF("apply-manifest", "-f", manifestPath)
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+						Eventually(session).Should(Say("i don't want no diffs"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+			FWhen("the manifest is making additions", func() {
+				It("shows additive changes", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						manifest, manifestPath := pushAppAndGenerateManifestForAddition(appName, dir)
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+						session := helpers.CF("apply-manifest", "-f", manifestPath)
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+						Eventually(session).Should(Say("applications"))
+						Consistently(session).ShouldNot(Say("\\+"))
+						Consistently(session).ShouldNot(Say("\\-"))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
@@ -304,5 +308,34 @@ func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, st
 	Eventually(session).Should(Exit(0))
 	manifest := helpers.ReadManifest(manifestPath)
 
+	return manifest, manifestPath
+}
+
+func pushAppAndGenerateManifestForAddition(appName, dir string) (map[string]interface{}, string) {
+	session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+	Eventually(session).Should(Exit(0))
+
+	manifest := map[string]interface{}{
+		// note: we should do additions to complex structures on appName app too, so we can prove that our iteration is working also
+		// note: to get ahead of potential future problems, lets be sure to unit test metadata
+		"applications": []map[string]interface{}{
+			{
+				"name": appName,
+			},
+			{
+				"name": "app2",
+				"buildpacks": []string{
+					"ruby",
+					"java",
+				},
+				"env": map[string]string{
+					"var":  "value",
+					"var2": "value",
+				},
+				"stack": "cflinuxfs3",
+			},
+		},
+	}
+	manifestPath := fmt.Sprintf("%s/manifest.yml", dir)
 	return manifest, manifestPath
 }

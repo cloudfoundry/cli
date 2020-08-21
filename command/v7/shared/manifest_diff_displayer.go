@@ -88,14 +88,18 @@ func (display *ManifestDiffDisplayer) generateDiff(currentManifestPath string, v
 func (display *ManifestDiffDisplayer) displayDiff(field string, diff resources.Diff, depth int) {
 	switch diff.Op {
 	case resources.AddOperation:
-		fmt.Printf("%T\n", diff.Value)
+		// fmt.Printf("%T\n", diff.Value)
 		if mapDiff, ok := diff.Value.(map[string]interface{}); ok {
 			display.UI.DisplayDiffAddition(field+":", depth)
 			display.UI.DisplayDiffAdditionForMapStringInterface(mapDiff, depth+1)
-		} else if mapDiff, ok := diff.Value.([]map[string]interface{}); ok {
+		} else if mapDiff, ok := diff.Value.([]interface{}); ok {
 			display.UI.DisplayDiffAddition(field+":", depth)
-			for _, line := range mapDiff {
-				display.UI.DisplayDiffAdditionForMapStringInterface(line, depth+1)
+			for _, entry := range mapDiff {
+				if mapDiff, ok := convertToMap(entry); ok {
+					display.UI.DisplayDiffAdditionForMapStringInterface(mapDiff, depth+1)
+				} else if stringDiff, ok := diff.Value.(string); ok {
+					display.UI.DisplayDiffAddition(stringDiff, depth)
+				}
 			}
 		} else {
 			display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth)
@@ -106,6 +110,13 @@ func (display *ManifestDiffDisplayer) displayDiff(field string, diff resources.D
 	case resources.RemoveOperation:
 		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth)
 	}
+}
+
+func convertToMap(value interface{}) (map[string]interface{}, bool) {
+	if mapDiff, ok := value.(map[string]interface{}); ok {
+		return mapDiff, ok
+	}
+	return make(map[string]interface{}), false
 }
 
 func formatKeyValue(key string, value interface{}) string {
