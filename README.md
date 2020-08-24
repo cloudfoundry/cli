@@ -74,7 +74,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 
 ## Downloads
 
-Installation instructions:
+### Installation instructions
 - [Install V6](./doc/installation-instructions/installation-instructions-v6.md)
 - [Install V7](./doc/installation-instructions/installation-instructions-v7.md)
 
