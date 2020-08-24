@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
-	//"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -86,11 +85,10 @@ var _ = Describe("share-service command", func() {
 		})
 	})
 
-	FDescribe("command parameters are invalid", func() {
+	Describe("command parameters are invalid", func() {
 		var (
-			orgName   string
-			spaceName string
-			username  string
+			orgName  string
+			username string
 		)
 
 		BeforeEach(func() {
@@ -121,7 +119,7 @@ var _ = Describe("share-service command", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = servicebrokerstub.New().EnableServiceAccess()
+				broker = servicebrokerstub.New().Create().EnableServiceAccess()
 
 				serviceInstanceName = helpers.NewServiceInstanceName()
 				helpers.CreateManagedServiceInstance(
@@ -129,13 +127,16 @@ var _ = Describe("share-service command", func() {
 					broker.FirstServicePlanName(),
 					serviceInstanceName,
 				)
+
+				shareToSpaceName = helpers.NewSpaceName()
+				shareToOrgName = helpers.NewOrgName()
 			})
 
 			AfterEach(func() {
 				broker.Forget()
 			})
 
-			Context("space cannot be retrieved", func() {
+			Context("space cannot be retrieved in targeted org", func() {
 				It("fails with an error", func() {
 					session := helpers.CF(shareServiceCommand, serviceInstanceName, shareToSpaceName)
 					Eventually(session).Should(Exit(1))
@@ -147,19 +148,35 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("organization cannot be retrieved", func() {
+			Context("space cannot be retrieved in specified org", func() {
 				BeforeEach(func() {
-					helpers.CreateSpace(shareToSpaceName)
+					helpers.CreateOrg(shareToOrgName)
+				})
+
+				AfterEach(func() {
+					helpers.QuickDeleteOrg(shareToOrgName)
 				})
 
 				It("fails with an error", func() {
 					session := helpers.CF(shareServiceCommand, serviceInstanceName, shareToSpaceName, "-o", shareToOrgName)
 					Eventually(session).Should(Exit(1))
 					Expect(session.Out).To(SatisfyAll(
-						Say("Sharing service instance %s to org %s / space %s as %s...", serviceInstanceName, orgName, shareToSpaceName, username),
+						Say("Sharing service instance %s to org %s / space %s as %s...", serviceInstanceName, shareToOrgName, shareToSpaceName, username),
 						Say("FAILED"),
 					))
-					Eventually(session.Err).Should(Say("Org '%s' not found.", spaceName))
+					Eventually(session.Err).Should(Say("Space '%s' not found.", shareToSpaceName))
+				})
+			})
+
+			Context("specified organization cannot be retrieved", func() {
+				It("fails with an error", func() {
+					session := helpers.CF(shareServiceCommand, serviceInstanceName, shareToSpaceName, "-o", shareToOrgName)
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(SatisfyAll(
+						Say("Sharing service instance %s to org %s / space %s as %s...", serviceInstanceName, shareToOrgName, shareToSpaceName, username),
+						Say("FAILED"),
+					))
+					Eventually(session.Err).Should(Say("Organization '%s' not found.", shareToOrgName))
 				})
 			})
 		})

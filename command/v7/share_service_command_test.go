@@ -119,17 +119,15 @@ var _ = Describe("share-service Command", func() {
 			})
 		})
 
-		Context("resources do not exist", func() {
+		When("the actor errors", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(nil)
 				fakeActor.ShareServiceInstanceToSpaceAndOrgReturns(v7action.Warnings{}, errors.New("test error"))
 			})
 
-			When("service instance cannot be accessed", func() {
-				It("fails with an error", func() {
-					Expect(executeErr).To(Not(BeNil()))
-					Expect(executeErr.Error()).To(ContainSubstring("test error"))
-				})
+			It("fails with an error", func() {
+				Expect(executeErr).To(Not(BeNil()))
+				Expect(executeErr.Error()).To(ContainSubstring("test error"))
 			})
 		})
 	})
