@@ -15,15 +15,17 @@ import (
 
 var _ = Describe("rollback command", func() {
 	var (
+		appName   string
 		orgName   string
 		spaceName string
-		appName   string
+		userName  string
 	)
 
 	BeforeEach(func() {
+		appName = helpers.PrefixedRandomName("app")
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
-		appName = helpers.PrefixedRandomName("app")
+		userName, _ = helpers.GetCredentials()
 	})
 
 	Describe("help", func() {
@@ -44,6 +46,7 @@ var _ = Describe("rollback command", func() {
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say(`cf rollback APP_NAME \[--revision REVISION_NUMBER\]`))
 				Expect(session).To(Say("OPTIONS:"))
+				Expect(session).To(Say("-f              Force rollback without confirmation"))
 				Expect(session).To(Say("--revision      Roll back to the given app revision"))
 				Expect(session).To(Say("SEE ALSO:"))
 				Expect(session).To(Say("revisions"))
@@ -85,23 +88,77 @@ applications:
 						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
-						// Create manifest
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
 					})
 				})
 
-				It("succeeds", func() {
-					userName, _ := helpers.GetCredentials()
+				When("the -f flag is provided", func() {
+					It("does not prompt the user, and just rolls back", func() {
+						session := helpers.CF("rollback", appName, "--revision", "1", "-f")
+						Eventually(session).Should(Exit(0))
 
-					session := helpers.CF("rollback", appName, "--revision", "1")
+						Expect(session).To(Say("Rolling back to revision 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Expect(session).To(Say("OK"))
 
-					Eventually(session).Should(Say(`Rolling back to revision 1 for app %s in org %s / space %s as %s...`, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`OK`))
-					Eventually(session).Should(Exit(0))
-					session = helpers.CF("revisions", appName)
-					Eventually(session).Should(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
-					Eventually(session).Should(Exit(0))
+						Expect(session).ToNot(Say("Are you sure you want to continue?"))
+
+						session = helpers.CF("revisions", appName)
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
+					})
+				})
+
+				Describe("the -f flag is not provided", func() {
+					var buffer *Buffer
+
+					BeforeEach(func() {
+						buffer = NewBuffer()
+					})
+
+					When("the user enters y", func() {
+						BeforeEach(func() {
+							_, err := buffer.Write([]byte("y\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("prompts the user to rollback, then successfully rolls back", func() {
+							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", appName))
+							Expect(session).To(Say("Are you sure you want to continue?"))
+							Expect(session).To(Say("Rolling back to revision 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Expect(session).To(Say("OK"))
+
+							session = helpers.CF("revisions", appName)
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
+						})
+					})
+
+					When("the user enters n", func() {
+						BeforeEach(func() {
+							_, err := buffer.Write([]byte("n\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("prompts the user to rollback, then does not rollback", func() {
+							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", appName))
+							Expect(session).To(Say("Are you sure you want to continue?"))
+							Expect(session).To(Say("App '%s' has not been rolled back to revision '1'", appName))
+
+							session = helpers.CF("revisions", appName)
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).ToNot(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
+						})
+					})
 				})
 			})
 		})
