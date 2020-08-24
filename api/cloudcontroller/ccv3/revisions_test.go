@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -24,7 +25,7 @@ var _ = Describe("Revisions", func() {
 
 	Describe("GetApplicationRevisions", func() {
 		var (
-			revisions  []Revision
+			revisions  []resources.Revision
 			warnings   Warnings
 			executeErr error
 		)
@@ -78,7 +79,7 @@ var _ = Describe("Revisions", func() {
 		When("applications exist", func() {
 			BeforeEach(func() {
 				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-					err := requestParams.AppendToList(Revision{GUID: "app-guid-1"})
+					err := requestParams.AppendToList(resources.Revision{GUID: "app-guid-1"})
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{}, Warnings{"this is a warning", "this is another warning"}, nil
 				})
@@ -92,7 +93,7 @@ var _ = Describe("Revisions", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 
-				Expect(revisions).To(ConsistOf([]Revision{{GUID: "app-guid-1"}}))
+				Expect(revisions).To(ConsistOf([]resources.Revision{{GUID: "app-guid-1"}}))
 			})
 		})
 

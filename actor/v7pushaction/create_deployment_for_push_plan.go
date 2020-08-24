@@ -3,7 +3,7 @@ package v7pushaction
 func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	eventStream <- &PushEvent{Plan: pushPlan, Event: StartingDeployment}
 
-	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(pushPlan.Application.GUID, pushPlan.DropletGUID)
+	deploymentGUID, warnings, err := actor.V7Actor.CreateDeploymentByApplicationAndDroplet(pushPlan.Application.GUID, pushPlan.DropletGUID)
 
 	if err != nil {
 		return pushPlan, Warnings(warnings), err

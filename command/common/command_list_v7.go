@@ -121,6 +121,7 @@ type commandList struct {
 	ResetSpaceIsolationSegment         v7.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v7.RestageCommand                            `command:"restage" alias:"rg" description:"Stage the app's latest package into a droplet and restart the app with this new droplet and updated configuration (environment variables, service bindings, buildpack, stack, etc.)."`
 	Revisions                          v7.RevisionsCommand                          `command:"revisions" description:"Lists revisions for an app"`
+	Rollback                           v7.RollbackCommand                           `command:"rollback" description:"Rollback to the specified revision of an app"`
 	StagePackage                       v7.StagePackageCommand                       `command:"stage-package" alias:"stage" description:"Stage a package into a droplet"`
 	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`

@@ -5,13 +5,14 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . RevisionsActor
 
 type RevisionsActor interface {
-	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.Revisions, v7action.Warnings, error)
+	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) ([]resources.Revision, v7action.Warnings, error)
 }
 
 type RevisionsCommand struct {
@@ -54,10 +55,11 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"version",
 		"guid",
 		"description",
+		"deployable",
 		"created at",
 	}}
 	for _, revision := range revisions {
-		table = append(table, []string{strconv.Itoa(revision.Version), revision.GUID, revision.Description, revision.CreatedAt})
+		table = append(table, []string{strconv.Itoa(revision.Version), revision.GUID, revision.Description, strconv.FormatBool(revision.Deployable), revision.CreatedAt})
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)

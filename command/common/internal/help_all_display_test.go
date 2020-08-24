@@ -34,6 +34,16 @@ var _ = Describe("test help all display", func() {
 				}
 			}
 		}
+
+		for _, category := range internal.ExperimentalHelpCategoryList {
+			for _, row := range category.CommandList {
+				for _, command := range row {
+					if command != "" {
+						fromHelpAllDisplay = append(fromHelpAllDisplay, command)
+					}
+				}
+			}
+		}
 	})
 
 	It("lists all commands from command list in at least one category", func() {

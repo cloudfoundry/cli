@@ -8,10 +8,16 @@ import (
 
 type Deployment ccv3.Deployment
 
-func (actor Actor) CreateDeployment(appGUID string, dropletGUID string) (string, Warnings, error) {
+func (actor Actor) CreateDeploymentByApplicationAndDroplet(appGUID string, dropletGUID string) (string, Warnings, error) {
 	deploymentGUID, warnings, err := actor.CloudControllerClient.CreateApplicationDeployment(appGUID, dropletGUID)
 
 	return deploymentGUID, Warnings(warnings), err
+}
+
+func (actor Actor) CreateDeploymentByApplicationAndRevision(appGUID string, revisionGUID string) (string, Warnings, error) {
+	deploymentGUID, warnings, _ := actor.CloudControllerClient.CreateApplicationDeploymentByRevision(appGUID, revisionGUID)
+
+	return deploymentGUID, Warnings(warnings), nil
 }
 
 func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (Deployment, Warnings, error) {

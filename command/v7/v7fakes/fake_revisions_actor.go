@@ -6,22 +6,23 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeRevisionsActor struct {
-	GetRevisionsByApplicationNameAndSpaceStub        func(string, string) (v7action.Revisions, v7action.Warnings, error)
+	GetRevisionsByApplicationNameAndSpaceStub        func(string, string) ([]resources.Revision, v7action.Warnings, error)
 	getRevisionsByApplicationNameAndSpaceMutex       sync.RWMutex
 	getRevisionsByApplicationNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getRevisionsByApplicationNameAndSpaceReturns struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}
 	getRevisionsByApplicationNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -29,7 +30,7 @@ type FakeRevisionsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 string) (v7action.Revisions, v7action.Warnings, error) {
+func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 string) ([]resources.Revision, v7action.Warnings, error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)]
 	fake.getRevisionsByApplicationNameAndSpaceArgsForCall = append(fake.getRevisionsByApplicationNameAndSpaceArgsForCall, struct {
@@ -54,7 +55,7 @@ func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceCallCount()
 	return len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceCalls(stub func(string, string) (v7action.Revisions, v7action.Warnings, error)) {
+func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceCalls(stub func(string, string) ([]resources.Revision, v7action.Warnings, error)) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = stub
@@ -67,30 +68,30 @@ func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceArgsForCall
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceReturns(result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceReturns(result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
 	fake.getRevisionsByApplicationNameAndSpaceReturns = struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int, result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int, result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
 	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
 	if fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall == nil {
 		fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Revisions
+			result1 []resources.Revision
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Revisions
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
