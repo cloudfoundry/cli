@@ -83,9 +83,6 @@ applications:
 			})
 
 			It("outputs the manifest without + or -", func() {
-				println(string(rawManifest))
-				println("000000000000")
-				println(string(outputBuffer.Contents()))
 				Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
 version: 1
 applications:
@@ -139,7 +136,8 @@ applications:
 applications:
 - name: dora
   env:
-    a: b`)
+    a: b
+    r: m`)
 					diff = resources.ManifestDiff{
 						Diffs: []resources.Diff{
 							{Op: resources.AddOperation, Path: "/applications/0/env/r", Value: "m"},
@@ -147,19 +145,23 @@ applications:
 					}
 				})
 
-				FIt("outputs a diff indicating addition", func() {
+				It("outputs a diff indicating addition", func() {
 					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
-  applications:
-  -  name: dora
-     env:
-       a: b
-  +    r: m`))
+applications:
+- name: dora
+  env:
+    a: b
++   r: m`))
 				})
 			})
 
 			When("remove", func() {
 				BeforeEach(func() {
-					rawManifest = []byte("applications:\n- name: dora\n  env:\n    r: m")
+					rawManifest = []byte(`---
+  applications:
+  - name: dora
+    env:
+      r: m`)
 					diff = resources.ManifestDiff{
 						Diffs: []resources.Diff{
 							{Op: resources.RemoveOperation, Path: "/applications/0/env/a", Was: "b"},
@@ -168,22 +170,24 @@ applications:
 				})
 
 				It("outputs correctly formatted diff", func() {
-					// TODO: Remove printline, currently just printing test output
-					fmt.Printf("%+v", string(outputBuffer.Contents()))
-
-					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
+					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
   applications:
-    name: dora
+  - name: dora
     env:
--     a: b
       r: m
+-     a: b
 `))
 				})
 			})
 
 			When("replace", func() {
 				BeforeEach(func() {
-					rawManifest = []byte("applications:\n- name: dora\n  env:\n    a: c\n    r: m")
+					rawManifest = []byte(`---
+  applications:
+  - name: dora
+    env:
+      a: c
+      r: m`)
 					diff = resources.ManifestDiff{
 						Diffs: []resources.Diff{
 							{Op: resources.ReplaceOperation, Path: "/applications/0/env/a", Was: "b", Value: "c"},
@@ -192,12 +196,9 @@ applications:
 				})
 
 				It("outputs correctly formatted diff", func() {
-					// TODO: Remove printline, currently just printing test output
-					fmt.Printf("%+v", string(outputBuffer.Contents()))
-
-					Expect(string(outputBuffer.Contents())).To(Equal(`  ---
+					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
   applications:
-    name: dora
+  - name: dora
     env:
 -     a: b
 +     a: c

@@ -24,6 +24,7 @@ func NewManifestDiffDisplayer(ui command.UI) *ManifestDiffDisplayer {
 
 func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) {
 	// If there are no diffs, just print the manifest
+	// TODO: Should we just print something like "no diffs here"?
 	if len(diff.Diffs) == 0 {
 		display.UI.DisplayDiffUnchanged(string(rawManifest), 0)
 		return
@@ -36,76 +37,80 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 		log.Errorln("unmarshaling manifest for diff:", err)
 	}
 
-	pathDiffMap := make(map[string]resources.Diff)
-	pathRemoveMap := make(map[string]resources.Diff)
+	// Distinguish between add/remove and replace diffs
+	// Replace diffs have the key in the given manifest so we can navigate to that path and display the changed value
+	// Add/Remove diffs will not, so we need to know their parent's path to insert the diff as a child
+	pathReplaceMap := make(map[string]resources.Diff)
+	pathAddRemoveMap := make(map[string]resources.Diff)
 	for _, diff := range diff.Diffs {
 		switch diff.Op {
 		case resources.AddOperation, resources.ReplaceOperation:
-			pathDiffMap[diff.Path] = diff
+			pathReplaceMap[diff.Path] = diff
 		case resources.RemoveOperation:
-			pathRemoveMap[path.Dir(diff.Path)] = diff
+			pathAddRemoveMap[path.Dir(diff.Path)] = diff
 		}
 	}
 
-	// todo: will this ever run more than once?
+	// Always display the yaml header line
 	display.UI.DisplayDiffUnchanged("---", 0)
-	// F
+	// For each entry in the provided manifest, process any diffs at or below that entry
 	for _, entry := range yamlManifest {
-		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathDiffMap, &pathRemoveMap)
+		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathReplaceMap, &pathAddRemoveMap)
 	}
 }
 
-func (display *ManifestDiffDisplayer) processDiffsRecursively(currentManifestPath string, value interface{}, depth int, pathDiffMap, pathRemoveMap *map[string]resources.Diff) {
+func (display *ManifestDiffDisplayer) processDiffsRecursively(currentManifestPath string, value interface{}, depth int, pathReplaceMap, pathAddRemoveMap *map[string]resources.Diff) {
 	field := path.Base(currentManifestPath)
 
-	if diffExistsAtTheCurrentPath(currentManifestPath, pathDiffMap) {
-		display.formatDiff(field, (*pathDiffMap)[currentManifestPath], depth)
+	// If there is a diff at the current path, print it
+	if diff, ok := diffExistsAtTheCurrentPath(currentManifestPath, pathReplaceMap); ok {
+		display.formatDiff(field, diff, depth)
 		return
 	}
 
-	switch reflect.TypeOf(value).Kind() {
-	case reflect.String, reflect.Bool, reflect.Int:
-		display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth)
-	case reflect.Slice:
+	// If the value is a slice type (i.e. a yaml.MapSlice or a slice), recurse into it
+	if isSliceType(value) {
+		// Do not print the numeric values in the paths used to indicate array position, i.e. /applications/0/env
 		if !isInt(field) {
 			display.UI.DisplayDiffUnchanged(field+":", depth)
 		}
 
-		if asSlice, isSlice := value.([]interface{}); isSlice {
-			for index, sliceValue := range asSlice {
-				display.processDiffsRecursively(currentManifestPath+"/"+strconv.Itoa(index), sliceValue, depth, pathDiffMap, pathRemoveMap)
-			}
-
-		} else if mapSlice, ok := value.(yaml.MapSlice); ok {
-			if diff, ok := (*pathRemoveMap)[currentManifestPath]; ok {
-				display.formatDiff(path.Base(diff.Path), diff, depth+1)
-			}
+		if mapSlice, ok := value.(yaml.MapSlice); ok {
+			// If a map, recursively process each entry
 			for _, entry := range mapSlice {
-				display.processDiffsRecursively(currentManifestPath+"/"+interfaceToString(entry.Key), entry.Value, depth+1, pathDiffMap, pathRemoveMap)
+				display.processDiffsRecursively(currentManifestPath+"/"+interfaceToString(entry.Key), entry.Value, depth+1, pathReplaceMap, pathAddRemoveMap)
+			}
+		} else if asSlice, ok := value.([]interface{}); ok {
+			// If a slice, recursively process each element
+			for index, sliceValue := range asSlice {
+				display.processDiffsRecursively(currentManifestPath+"/"+strconv.Itoa(index), sliceValue, depth, pathReplaceMap, pathAddRemoveMap)
 			}
 		}
-	default:
-		// TODO what do to here? maybe a warning?
+
+		// Print add/remove diffs after printing the rest of the map or slice
+		if diff, ok := (*pathAddRemoveMap)[currentManifestPath]; ok {
+			display.formatDiff(path.Base(diff.Path), diff, depth+1)
+		}
+
+		return
 	}
+
+	// Otherwise, print the unchanged field and value
+	display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth)
 }
 
-func diffExistsAtTheCurrentPath(currentManifestPath string, pathDiffMap *map[string]resources.Diff) bool {
-	_, ok := (*pathDiffMap)[currentManifestPath]
-	return ok
+func diffExistsAtTheCurrentPath(currentManifestPath string, pathDiffMap *map[string]resources.Diff) (resources.Diff, bool) {
+	diff, ok := (*pathDiffMap)[currentManifestPath]
+	return diff, ok
+}
+
+func isSliceType(value interface{}) bool {
+	return reflect.TypeOf(value).Kind() == reflect.Slice
 }
 
 func isInt(field string) bool {
 	_, err := strconv.Atoi(field)
 	return err == nil
-}
-
-func isScalarKind(valueType reflect.Type) bool {
-	switch valueType.Kind() {
-	case reflect.String, reflect.Bool, reflect.Int:
-		return true
-	default:
-		return false
-	}
 }
 
 func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int) {
