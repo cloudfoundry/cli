@@ -23,6 +23,13 @@ func NewManifestDiffDisplayer(ui command.UI) *ManifestDiffDisplayer {
 }
 
 func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) {
+	// If there are no diffs, just print the manifest
+	if len(diff.Diffs) == 0 {
+		display.UI.DisplayDiffUnchanged(string(rawManifest), 0)
+		return
+	}
+
+	//  We unmarshal into a MapSlice vs a map[string]{interface} here to preserve the order of map keys
 	var yamlManifest yaml.MapSlice
 	err := yaml.Unmarshal(rawManifest, &yamlManifest)
 	if err != nil {
@@ -42,53 +49,68 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 
 	// todo: will this ever run more than once?
 	display.UI.DisplayDiffUnchanged("---", 0)
+	// F
 	for _, entry := range yamlManifest {
-		display.generateDiff("/"+interfaceToString(entry.Key), entry.Value, 0, &pathDiffMap, &pathRemoveMap)
+		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathDiffMap, &pathRemoveMap)
 	}
 }
 
-func (display *ManifestDiffDisplayer) generateDiff(currentManifestPath string, value interface{}, depth int, pathDiffMap, pathRemoveMap *map[string]resources.Diff) {
+func (display *ManifestDiffDisplayer) processDiffsRecursively(currentManifestPath string, value interface{}, depth int, pathDiffMap, pathRemoveMap *map[string]resources.Diff) {
 	field := path.Base(currentManifestPath)
 
-	if diff, ok := (*pathDiffMap)[currentManifestPath]; ok {
-		display.displayDiff(field, diff, depth)
-	} else {
+	if diffExistsAtTheCurrentPath(currentManifestPath, pathDiffMap) {
+		display.formatDiff(field, (*pathDiffMap)[currentManifestPath], depth)
+		return
+	}
 
-		switch reflect.TypeOf(value).Kind() {
-		case reflect.String, reflect.Bool, reflect.Int:
-			display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth)
-		case reflect.Slice:
-			if _, err := strconv.Atoi(field); err != nil {
-				display.UI.DisplayDiffUnchanged(field+":", depth)
-			}
-
-			if asSlice, isSlice := value.([]interface{}); isSlice {
-				for index, sliceValue := range asSlice {
-					display.generateDiff(currentManifestPath+"/"+strconv.Itoa(index), sliceValue, depth, pathDiffMap, pathRemoveMap)
-				}
-
-			} else if mapSlice, ok := value.(yaml.MapSlice); ok {
-				if diff, ok := (*pathRemoveMap)[currentManifestPath]; ok {
-					display.displayDiff(path.Base(diff.Path), diff, depth+1)
-				}
-				for _, entry := range mapSlice {
-					display.generateDiff(currentManifestPath+"/"+interfaceToString(entry.Key), entry.Value, depth+1, pathDiffMap, pathRemoveMap)
-				}
-			}
-
-		default:
-			fmt.Printf("\nunknown kind: %+v", reflect.TypeOf(value).Kind())
-			fmt.Printf("\n   for value: %+v\n", value)
-			// TODO what do to here? maybe a warning?
-			//panic("unknown kind?")
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.String, reflect.Bool, reflect.Int:
+		display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth)
+	case reflect.Slice:
+		if !isInt(field) {
+			display.UI.DisplayDiffUnchanged(field+":", depth)
 		}
+
+		if asSlice, isSlice := value.([]interface{}); isSlice {
+			for index, sliceValue := range asSlice {
+				display.processDiffsRecursively(currentManifestPath+"/"+strconv.Itoa(index), sliceValue, depth, pathDiffMap, pathRemoveMap)
+			}
+
+		} else if mapSlice, ok := value.(yaml.MapSlice); ok {
+			if diff, ok := (*pathRemoveMap)[currentManifestPath]; ok {
+				display.formatDiff(path.Base(diff.Path), diff, depth+1)
+			}
+			for _, entry := range mapSlice {
+				display.processDiffsRecursively(currentManifestPath+"/"+interfaceToString(entry.Key), entry.Value, depth+1, pathDiffMap, pathRemoveMap)
+			}
+		}
+	default:
+		// TODO what do to here? maybe a warning?
 	}
 }
 
-func (display *ManifestDiffDisplayer) displayDiff(field string, diff resources.Diff, depth int) {
+func diffExistsAtTheCurrentPath(currentManifestPath string, pathDiffMap *map[string]resources.Diff) bool {
+	_, ok := (*pathDiffMap)[currentManifestPath]
+	return ok
+}
+
+func isInt(field string) bool {
+	_, err := strconv.Atoi(field)
+	return err == nil
+}
+
+func isScalarKind(valueType reflect.Type) bool {
+	switch valueType.Kind() {
+	case reflect.String, reflect.Bool, reflect.Int:
+		return true
+	default:
+		return false
+	}
+}
+
+func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int) {
 	switch diff.Op {
 	case resources.AddOperation:
-		// fmt.Printf("%T\n", diff.Value)
 		if mapDiff, ok := diff.Value.(map[string]interface{}); ok {
 			display.UI.DisplayDiffAddition(field+":", depth)
 			display.UI.DisplayDiffAdditionForMapStringInterface(mapDiff, depth+1)
