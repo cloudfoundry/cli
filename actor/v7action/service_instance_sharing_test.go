@@ -43,7 +43,12 @@ var _ = Describe("Service Instance Sharing", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, serviceInstanceSharingParams)
+			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
+				serviceInstanceName,
+				targetedSpaceGUID,
+				targetedOrgGUID,
+				serviceInstanceSharingParams,
+			)
 		})
 
 		When("the service instance cannot be found", func() {

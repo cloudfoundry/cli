@@ -68,7 +68,7 @@ var _ = Describe("share-service Command", func() {
 		})
 	})
 
-	Context("user is logged in", func() {
+	Context("user is targeting a space and org", func() {
 		var (
 			expectedServiceInstanceName = "fake-service-instance-name"
 			expectedSpaceName           = "fake-space-name"
@@ -108,10 +108,7 @@ var _ = Describe("share-service Command", func() {
 			It("calls the actor to share in specified space and org", func() {
 				Expect(fakeActor.ShareServiceInstanceToSpaceAndOrgCallCount()).To(Equal(1))
 
-				actualServiceInstance, actualTargetedSpace, actualTargetedOrg, actualSharingParams := fakeActor.ShareServiceInstanceToSpaceAndOrgArgsForCall(0)
-				Expect(actualServiceInstance).To(Equal(expectedServiceInstanceName))
-				Expect(actualTargetedSpace).To(Equal(expectedTargetedSpaceGuid))
-				Expect(actualTargetedOrg).To(Equal(expectedTargetedOrgGuid))
+				_, _, _, actualSharingParams := fakeActor.ShareServiceInstanceToSpaceAndOrgArgsForCall(0)
 				Expect(actualSharingParams).To(Equal(v7action.ServiceInstanceSharingParams{
 					SpaceName: expectedSpaceName,
 					OrgName:   types.NewOptionalString(expectedSpecifiedOrgName),
