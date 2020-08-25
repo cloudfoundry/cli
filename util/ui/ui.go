@@ -320,6 +320,9 @@ func (ui *UI) DisplayDiffUnchanged(line string, depth int) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
+	if strings.HasPrefix("-", line) {
+		depth -= 1
+	}
 	indent := strings.Repeat("  ", depth)
 	template := "  " + indent + line
 

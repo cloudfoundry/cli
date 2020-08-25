@@ -55,12 +55,21 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 	display.UI.DisplayDiffUnchanged("---", 0)
 	// For each entry in the provided manifest, process any diffs at or below that entry
 	for _, entry := range yamlManifest {
-		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathReplaceMap, &pathAddRemoveMap)
+		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathReplaceMap, &pathAddRemoveMap, false)
 	}
 }
 
-func (display *ManifestDiffDisplayer) processDiffsRecursively(currentManifestPath string, value interface{}, depth int, pathReplaceMap, pathAddRemoveMap *map[string]resources.Diff) {
+func (display *ManifestDiffDisplayer) processDiffsRecursively(
+	currentManifestPath string,
+	value interface{},
+	depth int,
+	pathReplaceMap, pathAddRemoveMap *map[string]resources.Diff,
+	shouldIDash bool,
+) {
 	field := path.Base(currentManifestPath)
+	if shouldIDash {
+		field = fmt.Sprintf("- %s", field)
+	}
 
 	// If there is a diff at the current path, print it
 	if diff, ok := diffExistsAtTheCurrentPath(currentManifestPath, pathReplaceMap); ok {
@@ -70,25 +79,37 @@ func (display *ManifestDiffDisplayer) processDiffsRecursively(currentManifestPat
 
 	// If the value is a slice type (i.e. a yaml.MapSlice or a slice), recurse into it
 	if isSliceType(value) {
-		// Do not print the numeric values in the paths used to indicate array position, i.e. /applications/0/env
+		// Do not print the numeric values in the diffs/paths used to indicate array position, i.e. /applications/0/env
 		if !isInt(field) {
 			display.UI.DisplayDiffUnchanged(field+":", depth)
 		}
 
 		if mapSlice, ok := value.(yaml.MapSlice); ok {
 			// If a map, recursively process each entry
-			for _, entry := range mapSlice {
-				display.processDiffsRecursively(currentManifestPath+"/"+interfaceToString(entry.Key), entry.Value, depth+1, pathReplaceMap, pathAddRemoveMap)
+			for index, entry := range mapSlice {
+				display.processDiffsRecursively(
+					currentManifestPath+"/"+interfaceToString(entry.Key),
+					entry.Value,
+					depth+1,
+					pathReplaceMap, pathAddRemoveMap,
+					isInt(field) && index == 0,
+				)
 			}
 		} else if asSlice, ok := value.([]interface{}); ok {
 			// If a slice, recursively process each element
 			for index, sliceValue := range asSlice {
-				display.processDiffsRecursively(currentManifestPath+"/"+strconv.Itoa(index), sliceValue, depth, pathReplaceMap, pathAddRemoveMap)
+				display.processDiffsRecursively(
+					currentManifestPath+"/"+strconv.Itoa(index),
+					sliceValue,
+					depth,
+					pathReplaceMap, pathAddRemoveMap,
+					isInt(field) && index == 0,
+				)
 			}
 		}
 
 		// Print add/remove diffs after printing the rest of the map or slice
-		if diff, ok := (*pathAddRemoveMap)[currentManifestPath]; ok {
+		if diff, ok := diffExistsAtTheCurrentPath(currentManifestPath, pathAddRemoveMap); ok {
 			display.formatDiff(path.Base(diff.Path), diff, depth+1)
 		}
 
