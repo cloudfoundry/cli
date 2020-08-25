@@ -32,9 +32,7 @@ func (actor Actor) ShareServiceInstanceToSpaceAndOrg(
 
 				organization, orgWarnings, err = actor.GetOrganizationByName(sharedToDetails.OrgName.Value)
 				warnings = ccv3.Warnings(orgWarnings)
-				if err == nil {
-					shareToOrgGUID = organization.GUID
-				}
+				shareToOrgGUID = organization.GUID
 			}
 			return
 		},
