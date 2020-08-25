@@ -34,13 +34,17 @@ var _ = Describe("Service Instance Sharing", func() {
 		)
 
 		var (
+			serviceInstanceSharingParams = ServiceInstanceSharingParams{}
+			warnings                     Warnings
+			executionError               error
+		)
+
+		BeforeEach(func() {
 			serviceInstanceSharingParams = ServiceInstanceSharingParams{
 				SpaceName: shareToSpaceName,
 				OrgName:   types.OptionalString{},
 			}
-			warnings       Warnings
-			executionError error
-		)
+		})
 
 		JustBeforeEach(func() {
 			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
