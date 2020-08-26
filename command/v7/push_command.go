@@ -2,6 +2,7 @@ package v7
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -20,6 +22,7 @@ import (
 	"code.cloudfoundry.org/cli/util/progressbar"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 //go:generate counterfeiter . ProgressBar
@@ -260,7 +263,10 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
 		log.Errorln("reading manifest:", err)
-		return manifestparser.Manifest{}, err
+		if _, ok := err.(*yaml.TypeError); ok {
+			return manifestparser.Manifest{}, errors.New(fmt.Sprintf("Unable to push app because manifest %s is not valid yaml.", pathToManifest))
+		}
+		return manifestparser.Manifest{}, errors.New("bad yaml")
 	}
 
 	return manifest, nil
