@@ -183,5 +183,36 @@ var _ = Describe("Service Instance Sharing", func() {
 				})
 			})
 		})
+
+		When("we make a successful share request", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]resources.Space{{GUID: "fake-space-guid"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-space-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: "fake-service-instance-guid"},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					nil,
+				)
+			})
+
+			It("makes a request to the cloud controller", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
+
+				actualServiceInstanceGUID, actualSpaces := fakeCloudControllerClient.ShareServiceInstanceToSpacesArgsForCall(0)
+				Expect(actualServiceInstanceGUID).To(Equal("fake-service-instance-guid"))
+				Expect(actualSpaces[0]).To(Equal("fake-space-guid"))
+
+				Expect(executionError).To(BeNil())
+				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
+			})
+		})
+
 	})
 })

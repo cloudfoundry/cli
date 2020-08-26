@@ -16,11 +16,13 @@ func (actor Actor) ShareServiceInstanceToSpaceAndOrg(
 	serviceInstanceName, targetedSpaceGUID, targetedOrgGUID string,
 	sharedToDetails ServiceInstanceSharingParams,
 ) (Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var shareSpace resources.Space
 	var shareToOrgGUID = targetedOrgGUID
 
 	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			_, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, targetedSpaceGUID)
+			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, targetedSpaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -38,8 +40,12 @@ func (actor Actor) ShareServiceInstanceToSpaceAndOrg(
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			var spaceWarnings Warnings
-			_, spaceWarnings, err = actor.GetSpaceByNameAndOrganization(sharedToDetails.SpaceName, shareToOrgGUID)
+			shareSpace, spaceWarnings, err = actor.GetSpaceByNameAndOrganization(sharedToDetails.SpaceName, shareToOrgGUID)
 			warnings = ccv3.Warnings(spaceWarnings)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			_, warnings, err = actor.CloudControllerClient.ShareServiceInstanceToSpaces(serviceInstance.GUID, []string{shareSpace.GUID})
 			return
 		},
 	))
