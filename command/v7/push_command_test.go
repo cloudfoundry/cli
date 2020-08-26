@@ -26,6 +26,7 @@ import (
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"gopkg.in/yaml.v2"
 )
 
 type Step struct {
@@ -867,17 +868,34 @@ var _ = Describe("push Command", func() {
 			})
 
 			When("parsing the manifest fails", func() {
-				BeforeEach(func() {
-					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-					fakeManifestParser.InterpolateAndParseReturns(
-						manifestparser.Manifest{},
-						errors.New("bad yaml"),
-					)
+				When("parsing the manifest yields a yaml TypeError", func() {
+					BeforeEach(func() {
+						fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+						fakeManifestParser.InterpolateAndParseReturns(
+							manifestparser.Manifest{},
+							&yaml.TypeError{},
+						)
+					})
+
+					It("returns a special error", func() {
+						Expect(executeErr).To(MatchError("Unable to push app because manifest /manifest/path is not valid yaml."))
+						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					})
 				})
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("bad yaml"))
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				When("parsing the manifest yields a generic error", func() {
+					BeforeEach(func() {
+						fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+						fakeManifestParser.InterpolateAndParseReturns(
+							manifestparser.Manifest{},
+							errors.New("bad yaml"),
+						)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("bad yaml"))
+						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					})
 				})
 			})
 		})
