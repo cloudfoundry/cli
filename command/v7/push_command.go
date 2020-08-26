@@ -270,7 +270,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 		if _, ok := err.(*yaml.TypeError); ok {
 			return manifestparser.Manifest{}, errors.New(fmt.Sprintf("Unable to push app because manifest %s is not valid yaml.", pathToManifest))
 		}
-		return manifestparser.Manifest{}, errors.New("bad yaml")
+		return manifestparser.Manifest{}, err
 	}
 
 	return manifest, nil
