@@ -156,8 +156,7 @@ type commandList struct {
 	SetSpaceRole                       v7.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v7.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
 	SharePrivateDomain                 v7.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with a specific org"`
-	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
-	ShareServiceV3                     v7.ShareServiceCommand                       `command:"v3-share-service" description:"Share a service instance with another space"`
+	ShareService                       v7.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	Space                              v7.SpaceCommand                              `command:"space" description:"Show space info"`
 	SpaceQuota                         v7.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
 	SpaceQuotas                        v7.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space quotas"`

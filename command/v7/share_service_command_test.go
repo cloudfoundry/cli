@@ -73,7 +73,9 @@ var _ = Describe("share-service Command", func() {
 			expectedServiceInstanceName = "fake-service-instance-name"
 			expectedSpaceName           = "fake-space-name"
 			expectedTargetedSpaceGuid   = "fake-space-guid"
+			expectedTargetedOrgName     = "fake-org-name"
 			expectedTargetedOrgGuid     = "fake-org-guid"
+			expectedUser                = "fake-username"
 		)
 
 		BeforeEach(func() {
@@ -82,7 +84,30 @@ var _ = Describe("share-service Command", func() {
 
 			fakeSharedActor.CheckTargetReturns(nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: expectedTargetedOrgGuid})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: expectedTargetedOrgGuid, Name: expectedTargetedOrgName})
+			fakeConfig.CurrentUserReturns(configv3.User{Name: expectedUser}, nil)
+		})
+
+		When("the share completes successfully", func() {
+			BeforeEach(func() {
+				fakeActor.ShareServiceInstanceToSpaceAndOrgReturns(v7action.Warnings{"warning one", "warning two"}, nil)
+			})
+
+			It("returns an OK message", func() {
+				Expect(executeErr).To(BeNil())
+
+				Expect(testUI.Out).To(
+					Say(`Sharing service instance %s to org %s / space %s as %s`,
+						expectedServiceInstanceName,
+						expectedTargetedOrgName,
+						expectedSpaceName,
+						expectedUser))
+				Expect(testUI.Out).To(Say(`OK`))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
+			})
 		})
 
 		It("calls the actor to share in specified space and targeted org", func() {

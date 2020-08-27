@@ -39,6 +39,8 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		return err
 	}
 
+	cmd.UI.DisplayOK()
+
 	return nil
 }
 
