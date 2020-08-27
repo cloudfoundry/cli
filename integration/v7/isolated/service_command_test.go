@@ -321,7 +321,7 @@ var _ = Describe("service command", func() {
 					command = []string{
 						"share-service",
 						serviceInstanceName,
-						"-s", sharedToSpaceName,
+						sharedToSpaceName,
 					}
 					Eventually(helpers.CF(command...)).Should(Exit(0))
 				})
@@ -376,7 +376,7 @@ var _ = Describe("service command", func() {
 					command = []string{
 						"share-service",
 						serviceInstanceName,
-						"-s", sharedToSpaceName,
+						sharedToSpaceName,
 					}
 					Eventually(helpers.CF(command...)).Should(Exit(0))
 
