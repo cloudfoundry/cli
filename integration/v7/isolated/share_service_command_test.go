@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("share-service command", func() {
 	var (
-		shareServiceCommand = "v3-share-service"
+		shareServiceCommand = "share-service"
 		serviceInstanceName = "fake-service-instance-name"
 		shareToSpaceName    = "fake-space-name"
 		shareToOrgName      = "fake-org-name"
