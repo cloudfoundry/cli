@@ -40,7 +40,8 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	cmd.UI.DisplayOK()
+
+	cmd.UI.DisplayNewline()
 
 	revisions, warnings, err := cmd.Actor.GetRevisionsByApplicationNameAndSpace(
 		appName,
@@ -49,6 +50,11 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	if len(revisions) == 0 {
+		cmd.UI.DisplayText("No revisions found")
+		return nil
 	}
 
 	table := [][]string{{

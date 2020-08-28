@@ -74,6 +74,20 @@ var _ = Describe("revisions command", func() {
 			})
 		})
 
+		When("an app has been pushed without staging", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
+				})
+			})
+
+			It("prints a 'not found' message without failing", func() {
+				session := helpers.CF("revisions", appName)
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(`No \w+ found`))
+			})
+		})
+
 		When("An app has been pushed several times", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
@@ -85,7 +99,6 @@ var _ = Describe("revisions command", func() {
 				session := helpers.CF("revisions", appName)
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(regexp.QuoteMeta(`Getting revisions for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
-				Expect(session).Should(Say("OK"))
 
 				Expect(session.Out.Contents()).Should(ContainSubstring("Initial revision"))
 				Expect(session.Out.Contents()).Should(ContainSubstring("New droplet deployed"))
