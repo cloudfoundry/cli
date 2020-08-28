@@ -15,111 +15,23 @@ import (
 
 var _ = Describe("Service Instance Sharing", func() {
 	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		actor                        *Actor
+		fakeCloudControllerClient    *v7actionfakes.FakeCloudControllerClient
+		serviceInstanceSharingParams ServiceInstanceSharingParams
+		warnings                     Warnings
+		executionError               error
 	)
 
-	BeforeEach(func() {
-		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
-	})
+	const (
+		serviceInstanceName = "some-service-instance"
+		targetedSpaceGUID   = "some-source-space-guid"
+		targetedOrgGUID     = "some-org-guid"
 
-	Describe("ShareServiceInstanceToSpaceAndOrg", func() {
-		const (
-			serviceInstanceName = "some-service-instance"
-			targetedSpaceGUID   = "some-source-space-guid"
-			targetedOrgGUID     = "some-org-guid"
+		shareToSpaceName = "share-to-space-name"
+		shareToOrgName   = "share-to-org-name"
+	)
 
-			shareToSpaceName = "share-to-space-name"
-			shareToOrgName   = "share-to-org-name"
-		)
-
-		var (
-			serviceInstanceSharingParams = ServiceInstanceSharingParams{}
-			warnings                     Warnings
-			executionError               error
-		)
-
-		BeforeEach(func() {
-			serviceInstanceSharingParams = ServiceInstanceSharingParams{
-				SpaceName: shareToSpaceName,
-				OrgName:   types.OptionalString{},
-			}
-		})
-
-		JustBeforeEach(func() {
-			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
-				serviceInstanceName,
-				targetedSpaceGUID,
-				targetedOrgGUID,
-				serviceInstanceSharingParams,
-			)
-		})
-
-		When("we make a successful share request", func() {
-			spaceGUID := "fake-space-guid"
-			serviceInstanceGUID := "fake-service-instance-guid"
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns(
-					[]resources.Space{{GUID: spaceGUID}},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-space-warning"},
-					nil,
-				)
-
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{GUID: serviceInstanceGUID},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-service-instance-warning"},
-					nil,
-				)
-			})
-
-			It("makes a request to the cloud controller", func() {
-				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
-
-				actualServiceInstanceGUID, actualSpaces := fakeCloudControllerClient.ShareServiceInstanceToSpacesArgsForCall(0)
-				Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
-				Expect(actualSpaces[0]).To(Equal(spaceGUID))
-
-				Expect(executionError).To(BeNil())
-				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
-			})
-		})
-
-		When("sharing request returns an error", func() {
-			spaceGUID := "fake-space-guid"
-			serviceInstanceGUID := "fake-service-instance-guid"
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns(
-					[]resources.Space{{GUID: spaceGUID}},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-space-warning"},
-					nil,
-				)
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{GUID: serviceInstanceGUID},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-service-instance-warning"},
-					nil,
-				)
-				fakeCloudControllerClient.ShareServiceInstanceToSpacesReturns(
-					resources.RelationshipList{},
-					ccv3.Warnings{"some-share-warning"},
-					errors.New("cannot share the instance"),
-				)
-			})
-
-			It("returns an error and warnings", func() {
-				Expect(executionError.Error()).To(Equal("cannot share the instance"))
-				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-share-warning"))
-			})
-		})
-
+	itValidatesParameters := func() {
 		When("the service instance cannot be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
@@ -251,5 +163,115 @@ var _ = Describe("Service Instance Sharing", func() {
 				})
 			})
 		})
+	}
+
+	BeforeEach(func() {
+		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+	})
+
+	Describe("ShareServiceInstanceToSpaceAndOrg", func() {
+		BeforeEach(func() {
+			serviceInstanceSharingParams = ServiceInstanceSharingParams{
+				SpaceName: shareToSpaceName,
+				OrgName:   types.OptionalString{},
+			}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
+				serviceInstanceName,
+				targetedSpaceGUID,
+				targetedOrgGUID,
+				serviceInstanceSharingParams,
+			)
+		})
+
+		itValidatesParameters()
+
+		When("we make a successful share request", func() {
+			spaceGUID := "fake-space-guid"
+			serviceInstanceGUID := "fake-service-instance-guid"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]resources.Space{{GUID: spaceGUID}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-space-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: serviceInstanceGUID},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					nil,
+				)
+			})
+
+			It("makes a request to the cloud controller", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
+
+				actualServiceInstanceGUID, actualSpaces := fakeCloudControllerClient.ShareServiceInstanceToSpacesArgsForCall(0)
+				Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+				Expect(actualSpaces[0]).To(Equal(spaceGUID))
+
+				Expect(executionError).To(BeNil())
+				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
+			})
+		})
+
+		When("sharing request returns an error", func() {
+			spaceGUID := "fake-space-guid"
+			serviceInstanceGUID := "fake-service-instance-guid"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]resources.Space{{GUID: spaceGUID}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-space-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: serviceInstanceGUID},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.ShareServiceInstanceToSpacesReturns(
+					resources.RelationshipList{},
+					ccv3.Warnings{"some-share-warning"},
+					errors.New("cannot share the instance"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executionError.Error()).To(Equal("cannot share the instance"))
+				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-share-warning"))
+			})
+		})
+	})
+
+	Describe("UnShareServiceInstanceToSpaceAndOrg", func() {
+		BeforeEach(func() {
+			serviceInstanceSharingParams = ServiceInstanceSharingParams{
+				SpaceName: shareToSpaceName,
+				OrgName:   types.OptionalString{},
+			}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
+				serviceInstanceName,
+				targetedSpaceGUID,
+				targetedOrgGUID,
+				serviceInstanceSharingParams,
+			)
+		})
+
+		itValidatesParameters()
+
 	})
 })

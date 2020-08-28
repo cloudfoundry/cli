@@ -1,6 +1,9 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"errors"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -56,7 +59,70 @@ var _ = Describe("unshare-service Command", func() {
 
 		It("fails the command", func() {
 			Expect(executeErr).To(Not(BeNil()))
-			Expect(executeErr.Error()).To(ContainSubstring("space not targeted"))
+			Expect(executeErr).To(MatchError("space not targeted"))
+		})
+	})
+
+	Context("user is targeting a space and org", func() {
+		var (
+			expectedServiceInstanceName = "fake-service-instance-name"
+			expectedSpaceName           = "fake-space-name"
+			expectedTargetedSpaceGuid   = "fake-space-guid"
+			expectedTargetedOrgGuid     = "fake-org-guid"
+		)
+
+		BeforeEach(func() {
+			cmd.RequiredArgs.ServiceInstance = expectedServiceInstanceName
+			cmd.RequiredArgs.SpaceName = expectedSpaceName
+
+			fakeSharedActor.CheckTargetReturns(nil)
+			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: expectedTargetedOrgGuid})
+		})
+
+		It("calls the actor to share in specified space and targeted org", func() {
+			Expect(fakeActor.UnshareServiceInstanceFromSpaceAndOrgCallCount()).To(Equal(1))
+
+			actualServiceInstance, actualTargetedSpace, actualTargetedOrg, actualSharingParams := fakeActor.UnshareServiceInstanceFromSpaceAndOrgArgsForCall(0)
+			Expect(actualServiceInstance).To(Equal(expectedServiceInstanceName))
+			Expect(actualTargetedSpace).To(Equal(expectedTargetedSpaceGuid))
+			Expect(actualTargetedOrg).To(Equal(expectedTargetedOrgGuid))
+			Expect(actualSharingParams).To(Equal(v7action.ServiceInstanceSharingParams{
+				SpaceName: expectedSpaceName,
+				OrgName:   types.OptionalString{},
+			}))
+		})
+
+		When("organization flag is specified", func() {
+			var expectedSpecifiedOrgName = "fake-org-name"
+
+			BeforeEach(func() {
+				setFlag(&cmd, "-o", types.NewOptionalString(expectedSpecifiedOrgName))
+			})
+
+			It("calls the actor to share in specified space and org", func() {
+				Expect(fakeActor.UnshareServiceInstanceFromSpaceAndOrgCallCount()).To(Equal(1))
+
+				_, _, _, actualSharingParams := fakeActor.UnshareServiceInstanceFromSpaceAndOrgArgsForCall(0)
+				Expect(actualSharingParams).To(Equal(v7action.ServiceInstanceSharingParams{
+					SpaceName: expectedSpaceName,
+					OrgName:   types.NewOptionalString(expectedSpecifiedOrgName),
+				}))
+			})
+		})
+
+		When("the actor errors", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(nil)
+				fakeActor.UnshareServiceInstanceFromSpaceAndOrgReturns(v7action.Warnings{"actor warning"}, errors.New("test error"))
+			})
+
+			It("prints all warnings and fails with an error", func() {
+				Expect(executeErr).To(Not(BeNil()))
+				Expect(testUI.Err).To(Say("actor warning"))
+				Expect(executeErr).To(MatchError("test error"))
+
+			})
 		})
 	})
 
