@@ -2870,6 +2870,22 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UnshareServiceInstanceFromSpaceAndOrgStub        func(string, string, string, v7action.ServiceInstanceSharingParams) (v7action.Warnings, error)
+	unshareServiceInstanceFromSpaceAndOrgMutex       sync.RWMutex
+	unshareServiceInstanceFromSpaceAndOrgArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 v7action.ServiceInstanceSharingParams
+	}
+	unshareServiceInstanceFromSpaceAndOrgReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	unshareServiceInstanceFromSpaceAndOrgReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateAppFeatureStub        func(resources.Application, bool, string) (v7action.Warnings, error)
 	updateAppFeatureMutex       sync.RWMutex
 	updateAppFeatureArgsForCall []struct {
@@ -15603,6 +15619,72 @@ func (fake *FakeActor) UnsharePrivateDomainReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrg(arg1 string, arg2 string, arg3 string, arg4 v7action.ServiceInstanceSharingParams) (v7action.Warnings, error) {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Lock()
+	ret, specificReturn := fake.unshareServiceInstanceFromSpaceAndOrgReturnsOnCall[len(fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall)]
+	fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall = append(fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 v7action.ServiceInstanceSharingParams
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UnshareServiceInstanceFromSpaceAndOrg", []interface{}{arg1, arg2, arg3, arg4})
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Unlock()
+	if fake.UnshareServiceInstanceFromSpaceAndOrgStub != nil {
+		return fake.UnshareServiceInstanceFromSpaceAndOrgStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unshareServiceInstanceFromSpaceAndOrgReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrgCallCount() int {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.RLock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.RUnlock()
+	return len(fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall)
+}
+
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrgCalls(stub func(string, string, string, v7action.ServiceInstanceSharingParams) (v7action.Warnings, error)) {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Lock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.Unlock()
+	fake.UnshareServiceInstanceFromSpaceAndOrgStub = stub
+}
+
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrgArgsForCall(i int) (string, string, string, v7action.ServiceInstanceSharingParams) {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.RLock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.RUnlock()
+	argsForCall := fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrgReturns(result1 v7action.Warnings, result2 error) {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Lock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.Unlock()
+	fake.UnshareServiceInstanceFromSpaceAndOrgStub = nil
+	fake.unshareServiceInstanceFromSpaceAndOrgReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrgReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Lock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.Unlock()
+	fake.UnshareServiceInstanceFromSpaceAndOrgStub = nil
+	if fake.unshareServiceInstanceFromSpaceAndOrgReturnsOnCall == nil {
+		fake.unshareServiceInstanceFromSpaceAndOrgReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.unshareServiceInstanceFromSpaceAndOrgReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UpdateAppFeature(arg1 resources.Application, arg2 bool, arg3 string) (v7action.Warnings, error) {
 	fake.updateAppFeatureMutex.Lock()
 	ret, specificReturn := fake.updateAppFeatureReturnsOnCall[len(fake.updateAppFeatureArgsForCall)]
@@ -17752,6 +17834,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.unsetSpaceQuotaMutex.RUnlock()
 	fake.unsharePrivateDomainMutex.RLock()
 	defer fake.unsharePrivateDomainMutex.RUnlock()
+	fake.unshareServiceInstanceFromSpaceAndOrgMutex.RLock()
+	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.RUnlock()
 	fake.updateAppFeatureMutex.RLock()
 	defer fake.updateAppFeatureMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
