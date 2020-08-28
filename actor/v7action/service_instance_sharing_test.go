@@ -263,7 +263,7 @@ var _ = Describe("Service Instance Sharing", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executionError = actor.ShareServiceInstanceToSpaceAndOrg(
+			warnings, executionError = actor.UnshareServiceInstanceFromSpaceAndOrg(
 				serviceInstanceName,
 				targetedSpaceGUID,
 				targetedOrgGUID,

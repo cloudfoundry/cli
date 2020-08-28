@@ -21,9 +21,7 @@ func (actor Actor) ShareServiceInstanceToSpaceAndOrg(
 
 	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			var actorWarnings Warnings
-			serviceInstance, shareSpace, actorWarnings, err = actor.validateSharingDetails(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, sharedToDetails)
-			warnings = ccv3.Warnings(actorWarnings)
+			serviceInstance, shareSpace, warnings, err = actor.validateSharingDetails(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, sharedToDetails)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -31,8 +29,6 @@ func (actor Actor) ShareServiceInstanceToSpaceAndOrg(
 			return
 		},
 	))
-
-	return Warnings{}, nil
 }
 
 func (actor Actor) UnshareServiceInstanceFromSpaceAndOrg(
@@ -41,25 +37,21 @@ func (actor Actor) UnshareServiceInstanceFromSpaceAndOrg(
 ) (Warnings, error) {
 	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			var actorWarnings Warnings
-			_, _, actorWarnings, err = actor.validateSharingDetails(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, sharedToDetails)
-			warnings = ccv3.Warnings(actorWarnings)
+			_, _, warnings, err = actor.validateSharingDetails(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, sharedToDetails)
 			return
 		},
 	))
-
-	return Warnings{}, nil
 }
 
 func (actor Actor) validateSharingDetails(
 	serviceInstanceName, targetedSpaceGUID, targetedOrgGUID string,
 	sharedToDetails ServiceInstanceSharingParams,
-) (resources.ServiceInstance, resources.Space, Warnings, error) {
+) (resources.ServiceInstance, resources.Space, ccv3.Warnings, error) {
 	var serviceInstance resources.ServiceInstance
 	var shareSpace resources.Space
 	var shareToOrgGUID = targetedOrgGUID
 
-	warnings, err := handleServiceInstanceErrors(railway.Sequentially(
+	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
 			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, targetedSpaceGUID)
 			return
@@ -83,7 +75,7 @@ func (actor Actor) validateSharingDetails(
 			warnings = ccv3.Warnings(spaceWarnings)
 			return
 		},
-	))
+	)
 
 	if err != nil {
 		return resources.ServiceInstance{}, resources.Space{}, warnings, err
