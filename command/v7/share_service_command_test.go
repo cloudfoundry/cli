@@ -79,8 +79,8 @@ var _ = Describe("share-service Command", func() {
 		)
 
 		BeforeEach(func() {
-			cmd.RequiredArgs.ServiceInstance = expectedServiceInstanceName
-			cmd.RequiredArgs.SpaceName = expectedSpaceName
+			cmd.RequiredArgs.ServiceInstance = flag.TrimmedString(expectedServiceInstanceName)
+			cmd.SpaceName = expectedSpaceName
 
 			fakeSharedActor.CheckTargetReturns(nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})
@@ -97,7 +97,7 @@ var _ = Describe("share-service Command", func() {
 				Expect(executeErr).To(BeNil())
 
 				Expect(testUI.Out).To(
-					Say(`Sharing service instance %s to org %s / space %s as %s`,
+					Say(`Sharing service instance %s into org %s / space %s as %s`,
 						expectedServiceInstanceName,
 						expectedTargetedOrgName,
 						expectedSpaceName,

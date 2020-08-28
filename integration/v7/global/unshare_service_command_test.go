@@ -135,7 +135,7 @@ var _ = Describe("unshare-service command", func() {
 
 			When("I have shared my service instance to a space in another org ('-o' flag provided)", func() {
 				BeforeEach(func() {
-					session := helpers.CF("share-service", serviceInstance, sharedToSpaceName, "-o", sharedToOrgName)
+					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -172,7 +172,7 @@ var _ = Describe("unshare-service command", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(sharedToSpaceName)
 
-					session := helpers.CF("share-service", serviceInstance, sharedToSpaceName)
+					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -336,7 +336,7 @@ var _ = Describe("unshare-service command", func() {
 
 				helpers.SetupCF(sourceOrgName, sourceSpaceName)
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-				Eventually(helpers.CF("share-service", serviceInstance, sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
+				Eventually(helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
 
 				Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
 				Eventually(helpers.CF("set-space-role", user, sharedToOrgName, sharedToSpaceName, "SpaceDeveloper")).Should(Exit(0))
