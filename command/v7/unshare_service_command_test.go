@@ -73,7 +73,7 @@ var _ = Describe("unshare-service Command", func() {
 
 		BeforeEach(func() {
 			cmd.RequiredArgs.ServiceInstance = expectedServiceInstanceName
-			cmd.RequiredArgs.SpaceName = expectedSpaceName
+			setFlag(&cmd, "-s", expectedSpaceName)
 
 			fakeSharedActor.CheckTargetReturns(nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})

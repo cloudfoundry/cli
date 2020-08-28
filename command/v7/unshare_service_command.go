@@ -11,13 +11,14 @@ type UnshareServiceCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.ShareServiceArgs `positional-args:"yes"`
+	SpaceName       string                `short:"s" required:"true" description:"Space to unshare the service instance from"`
 	OrgName         flag.OptionalString   `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	Force           bool                  `short:"f" description:"Force unshare without confirmation"`
 	relatedCommands interface{}           `related_commands:"delete-service, service, services, share-service, unbind-service"`
 }
 
 func (cmd UnshareServiceCommand) Usage() string {
-	return "CF_NAME unshare-service SERVICE_INSTANCE OTHER_SPACE [-o OTHER_ORG] [-f]"
+	return "CF_NAME unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG] [-f]"
 }
 
 func (cmd UnshareServiceCommand) Execute(args []string) error {
@@ -32,7 +33,7 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
 		v7action.ServiceInstanceSharingParams{
-			SpaceName: cmd.RequiredArgs.SpaceName,
+			SpaceName: cmd.SpaceName,
 			OrgName:   types.OptionalString(cmd.OrgName),
 		})
 
@@ -60,7 +61,7 @@ func (cmd UnshareServiceCommand) displayIntro() error {
 		map[string]interface{}{
 			"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
 			"OrgName":             orgName,
-			"SpaceName":           cmd.RequiredArgs.SpaceName,
+			"SpaceName":           cmd.SpaceName,
 			"Username":            user.Name,
 		},
 	)

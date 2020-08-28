@@ -205,7 +205,6 @@ type RenameServiceArgs struct {
 
 type ShareServiceArgs struct {
 	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance to rename"`
-	SpaceName       string `positional-arg-name:"OTHER_SPACE" required:"true" description:"The space to share the service instance into"`
 }
 
 type BindServiceArgs struct {
