@@ -112,24 +112,21 @@ var _ = Describe("rollback Command", func() {
 		})
 	})
 
-	// TODO: Missing app #174107413
-	// When("getting the applications returns an error", func() {
-	// 	var expectedErr error
+	When("failing to retireve the app", func() {
+		var expectedErr error
 
-	// 	BeforeEach(func() {
-	// 		expectedErr = ccerror.RequestError{}
-	// 		fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
-	// 	})
+		BeforeEach(func() {
+			expectedErr = errors.New("test error")
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+		})
 
-	// 	It("returns the error and prints warnings", func() {
-	// 		Expect(executeErr).To(Equal(ccerror.RequestError{}))
+		It("returns the error and prints warnings", func() {
+			Expect(executeErr).To(Equal(errors.New("test error")))
 
-	// 		Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
-
-	// 		Expect(testUI.Err).To(Say("warning-1"))
-	// 		Expect(testUI.Err).To(Say("warning-2"))
-	// 	})
-	// })
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+		})
+	})
 
 	When("an app has no revisions", func() {
 		BeforeEach(func() {

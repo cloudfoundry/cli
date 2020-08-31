@@ -14,19 +14,6 @@ import (
 )
 
 var _ = Describe("rollback command", func() {
-	var (
-		appName   string
-		orgName   string
-		spaceName string
-		userName  string
-	)
-
-	BeforeEach(func() {
-		appName = helpers.PrefixedRandomName("app")
-		orgName = helpers.NewOrgName()
-		spaceName = helpers.NewSpaceName()
-		userName, _ = helpers.GetCredentials()
-	})
 
 	Describe("help", func() {
 		When("--help flag is set", func() {
@@ -55,7 +42,18 @@ var _ = Describe("rollback command", func() {
 	})
 
 	When("the environment is set up correctly", func() {
+		var (
+			appName   string
+			orgName   string
+			spaceName string
+			userName  string
+		)
+
 		BeforeEach(func() {
+			appName = helpers.PrefixedRandomName("app")
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			userName, _ = helpers.GetCredentials()
 			helpers.SetupCF(orgName, spaceName)
 		})
 
@@ -63,16 +61,25 @@ var _ = Describe("rollback command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Describe("version dependent display", func() {
+		Describe("the app does not exist", func() {
+			It("errors with app not found", func() {
+				session := helpers.CF("rollback", appName, "--revision", "1")
+				Eventually(session).Should(Exit(1))
 
-			var domainName string
+				Expect(session).ToNot(Say("Are you sure you want to continue?"))
 
-			BeforeEach(func() {
-				domainName = helpers.DefaultSharedDomain()
+				Expect(session.Err).To(Say("App '%s' not found.", appName))
+				Expect(session).To(Say("FAILED"))
 			})
 
+		})
+
+		Describe("the app exists with revisions", func() {
+
 			When("the app is started and has 2 instances", func() {
+				var domainName string
 				BeforeEach(func() {
+					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -117,7 +124,7 @@ applications:
 						buffer = NewBuffer()
 					})
 
-					When("the user enters y", func() {
+					When("the user confirms the prompt", func() {
 						BeforeEach(func() {
 							_, err := buffer.Write([]byte("y\n"))
 							Expect(err).ToNot(HaveOccurred())

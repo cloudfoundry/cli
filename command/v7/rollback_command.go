@@ -33,8 +33,12 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		return err
 	}
 
-	app, warnings, _ := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+
 	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
 
 	revisions, warnings, _ := cmd.Actor.GetRevisionsByApplicationNameAndSpace(app.Name, cmd.Config.TargetedSpace().GUID)
 
