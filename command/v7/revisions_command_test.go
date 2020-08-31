@@ -98,11 +98,11 @@ var _ = Describe("revisions Command", func() {
 				BeforeEach(func() {
 					revisions := []resources.Revision{
 						{
-							Version:     1,
-							GUID:        "17E0E587-0E53-4A6E-B6AE-82073159F910",
-							Description: "Something",
-							CreatedAt:   "2020-03-04T13:23:32Z",
-							Deployable:  false,
+							Version:     3,
+							GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+							Description: "On a different note",
+							CreatedAt:   "2020-03-10T17:11:58Z",
+							Deployable:  true,
 						},
 						{
 							Version:     2,
@@ -112,11 +112,11 @@ var _ = Describe("revisions Command", func() {
 							Deployable:  true,
 						},
 						{
-							Version:     3,
-							GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
-							Description: "On a different note",
-							CreatedAt:   "2020-03-10T17:11:58Z",
-							Deployable:  true,
+							Version:     1,
+							GUID:        "17E0E587-0E53-4A6E-B6AE-82073159F910",
+							Description: "Something",
+							CreatedAt:   "2020-03-04T13:23:32Z",
+							Deployable:  false,
 						},
 					}
 					fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(revisions, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
@@ -127,9 +127,9 @@ var _ = Describe("revisions Command", func() {
 
 					Expect(testUI.Out).To(Say(`Getting revisions for app some-app in org some-org / space some-space as banana\.\.\.`))
 					Expect(testUI.Out).To(Say("version   guid                                   description           deployable   created at"))
-					Expect(testUI.Out).To(Say("1         17E0E587-0E53-4A6E-B6AE-82073159F910   Something             false        2020-03-04T13:23:32Z"))
-					Expect(testUI.Out).To(Say("2         A89F8259-D32B-491A-ABD6-F100AC42D74C   Something else        true         2020-03-08T12:43:30Z"))
 					Expect(testUI.Out).To(Say("3         A68F13F7-7E5E-4411-88E8-1FAC54F73F50   On a different note   true         2020-03-10T17:11:58Z"))
+					Expect(testUI.Out).To(Say("2         A89F8259-D32B-491A-ABD6-F100AC42D74C   Something else        true         2020-03-08T12:43:30Z"))
+					Expect(testUI.Out).To(Say("1         17E0E587-0E53-4A6E-B6AE-82073159F910   Something             false        2020-03-04T13:23:32Z"))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))

@@ -1,6 +1,8 @@
 package v7action
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -13,8 +15,15 @@ func (actor *Actor) GetRevisionsByApplicationNameAndSpace(appName string, spaceG
 
 	revisions, v3Warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(app.GUID)
 	warnings = append(warnings, v3Warnings...)
+	if apiErr != nil {
+		return []resources.Revision{}, warnings, apiErr
+	}
 
-	return revisions, warnings, apiErr
+	sort.Slice(revisions, func(i, j int) bool {
+		return revisions[i].Version > revisions[j].Version
+	})
+
+	return revisions, warnings, nil
 }
 
 func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVersion int) (resources.Revision, Warnings, error) {
