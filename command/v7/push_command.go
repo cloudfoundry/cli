@@ -66,7 +66,7 @@ type ManifestLocator interface {
 //go:generate counterfeiter . DiffDisplayer
 
 type DiffDisplayer interface {
-	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff)
+	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error
 }
 
 type PushCommand struct {

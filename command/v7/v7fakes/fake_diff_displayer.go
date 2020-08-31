@@ -9,23 +9,30 @@ import (
 )
 
 type FakeDiffDisplayer struct {
-	DisplayDiffStub        func([]byte, resources.ManifestDiff)
+	DisplayDiffStub        func([]byte, resources.ManifestDiff) error
 	displayDiffMutex       sync.RWMutex
 	displayDiffArgsForCall []struct {
 		arg1 []byte
 		arg2 resources.ManifestDiff
 	}
+	displayDiffReturns struct {
+		result1 error
+	}
+	displayDiffReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDiffDisplayer) DisplayDiff(arg1 []byte, arg2 resources.ManifestDiff) {
+func (fake *FakeDiffDisplayer) DisplayDiff(arg1 []byte, arg2 resources.ManifestDiff) error {
 	var arg1Copy []byte
 	if arg1 != nil {
 		arg1Copy = make([]byte, len(arg1))
 		copy(arg1Copy, arg1)
 	}
 	fake.displayDiffMutex.Lock()
+	ret, specificReturn := fake.displayDiffReturnsOnCall[len(fake.displayDiffArgsForCall)]
 	fake.displayDiffArgsForCall = append(fake.displayDiffArgsForCall, struct {
 		arg1 []byte
 		arg2 resources.ManifestDiff
@@ -33,8 +40,13 @@ func (fake *FakeDiffDisplayer) DisplayDiff(arg1 []byte, arg2 resources.ManifestD
 	fake.recordInvocation("DisplayDiff", []interface{}{arg1Copy, arg2})
 	fake.displayDiffMutex.Unlock()
 	if fake.DisplayDiffStub != nil {
-		fake.DisplayDiffStub(arg1, arg2)
+		return fake.DisplayDiffStub(arg1, arg2)
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.displayDiffReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeDiffDisplayer) DisplayDiffCallCount() int {
@@ -43,7 +55,7 @@ func (fake *FakeDiffDisplayer) DisplayDiffCallCount() int {
 	return len(fake.displayDiffArgsForCall)
 }
 
-func (fake *FakeDiffDisplayer) DisplayDiffCalls(stub func([]byte, resources.ManifestDiff)) {
+func (fake *FakeDiffDisplayer) DisplayDiffCalls(stub func([]byte, resources.ManifestDiff) error) {
 	fake.displayDiffMutex.Lock()
 	defer fake.displayDiffMutex.Unlock()
 	fake.DisplayDiffStub = stub
@@ -54,6 +66,29 @@ func (fake *FakeDiffDisplayer) DisplayDiffArgsForCall(i int) ([]byte, resources.
 	defer fake.displayDiffMutex.RUnlock()
 	argsForCall := fake.displayDiffArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeDiffDisplayer) DisplayDiffReturns(result1 error) {
+	fake.displayDiffMutex.Lock()
+	defer fake.displayDiffMutex.Unlock()
+	fake.DisplayDiffStub = nil
+	fake.displayDiffReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeDiffDisplayer) DisplayDiffReturnsOnCall(i int, result1 error) {
+	fake.displayDiffMutex.Lock()
+	defer fake.displayDiffMutex.Unlock()
+	fake.DisplayDiffStub = nil
+	if fake.displayDiffReturnsOnCall == nil {
+		fake.displayDiffReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayDiffReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeDiffDisplayer) Invocations() map[string][][]interface{} {

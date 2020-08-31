@@ -274,59 +274,60 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
-func (ui UI) DisplayDiffAdditionForMapStringInterface(lineMap map[string]interface{}, depth int) {
-	var lineKeys []string
-	for key := range lineMap {
-		lineKeys = append(lineKeys, key)
-	}
+// DisplayDiffAddition displays added lines in a diff, colored green and prefixed with '+'
+func (ui *UI) DisplayDiffAddition(lines string, depth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
 
-	for _, key := range lineKeys {
-		if lineVal, ok := lineMap[key].(string); ok {
-			indent := strings.Repeat("  ", depth)
-			template := "+ " + indent + key + ": " + lineVal
-			formatted := ui.modifyColor(template, color.New(color.FgGreen))
+	indent := strings.Repeat("  ", depth)
 
-			fmt.Fprintf(ui.Out, "%v\n", formatted)
+	for _, line := range strings.Split(lines, "\n") {
+		if line == "" {
+			continue
 		}
+
+		template := "+ " + indent + line
+		formatted := ui.modifyColor(template, color.New(color.FgGreen))
+
+		fmt.Fprintf(ui.Out, "%s\n", formatted)
 	}
 }
 
-// DisplayDiffAddition displays an added line in a diff, colored green and prefixed with '+'
-func (ui *UI) DisplayDiffAddition(line string, depth int) {
+// DisplayDiffRemoval displays removed lines in a diff, colored red and prefixed with '-'
+func (ui *UI) DisplayDiffRemoval(lines string, depth int) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
 	indent := strings.Repeat("  ", depth)
-	template := "+ " + indent + line
-	formatted := ui.modifyColor(template, color.New(color.FgGreen))
 
-	fmt.Fprintf(ui.Out, "%s\n", formatted)
-}
+	for _, line := range strings.Split(lines, "\n") {
+		if line == "" {
+			continue
+		}
 
-// DisplayDiffRemoval displays a removed line in a diff, colored red and prefixed with '-'
-func (ui *UI) DisplayDiffRemoval(line string, depth int) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
+		template := "- " + indent + line
+		formatted := ui.modifyColor(template, color.New(color.FgRed))
 
-	indent := strings.Repeat("  ", depth)
-	template := "- " + indent + line
-	formatted := ui.modifyColor(template, color.New(color.FgRed))
-
-	fmt.Fprintf(ui.Out, "%s\n", formatted)
-}
-
-// DisplayDiffUnchanged displays an unchanged line in a diff, with no color or prefix
-func (ui *UI) DisplayDiffUnchanged(line string, depth int) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	if strings.HasPrefix("-", line) {
-		depth -= 1
+		fmt.Fprintf(ui.Out, "%s\n", formatted)
 	}
-	indent := strings.Repeat("  ", depth)
-	template := "  " + indent + line
+}
 
-	fmt.Fprintf(ui.Out, "%s\n", template)
+// DisplayDiffUnchanged displays unchanged lines in a diff, with no color or prefix
+func (ui *UI) DisplayDiffUnchanged(lines string, depth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	indent := strings.Repeat("  ", depth)
+
+	for _, line := range strings.Split(lines, "\n") {
+		if line == "" {
+			continue
+		}
+
+		template := "  " + indent + line
+
+		fmt.Fprintf(ui.Out, "%s\n", template)
+	}
 }
 
 // FlushDeferred displays text previously deferred (using DeferText) to the UI's

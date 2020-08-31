@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("apply-manifest command", func() {
+var _ = Describe("apply-manifest command", func() {
 	var (
 		orgName      string
 		spaceName    string
@@ -222,7 +222,7 @@ var _ = FDescribe("apply-manifest command", func() {
 			})
 		})
 
-		FWhen("testing manifest diffing output", func() {
+		When("testing manifest diffing output", func() {
 			var (
 				userName string
 			)
@@ -238,21 +238,29 @@ var _ = FDescribe("apply-manifest command", func() {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
 						session := helpers.CF("apply-manifest", "-f", manifestPath)
 						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
-						Eventually(session).Should(Say("i don't want no diffs"))
+						Eventually(session).Should(Say("Updating with these attributes..."))
+						Consistently(session).ShouldNot(Say(`^\+ `))
+						Consistently(session).ShouldNot(Say(`^- `))
 						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
-			FWhen("the manifest is making additions", func() {
-				It("shows additive changes", func() {
+
+			When("there are changes in the manifest", func() {
+				It("shows changes", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
-						manifest, manifestPath := pushAppAndGenerateManifestForAddition(appName, dir)
+						manifest, manifestPath := pushAppAndGenerateManifest(appName, dir)
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
-						session := helpers.CF("apply-manifest", "-f", manifestPath)
+
+						session := helpers.CF("scale", appName, "-i", "3")
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("apply-manifest", "-f", manifestPath)
 						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+						Eventually(session).Should(Say("Updating with these attributes..."))
 						Eventually(session).Should(Say("applications"))
-						Consistently(session).ShouldNot(Say("\\+"))
-						Consistently(session).ShouldNot(Say("\\-"))
+						Eventually(session).Should(Say(`\n-\s+instances: 3`))
+						Eventually(session).Should(Say(`\n\+\s+instances: 1`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -295,7 +303,6 @@ var _ = FDescribe("apply-manifest command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
-
 	})
 })
 
@@ -308,34 +315,5 @@ func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, st
 	Eventually(session).Should(Exit(0))
 	manifest := helpers.ReadManifest(manifestPath)
 
-	return manifest, manifestPath
-}
-
-func pushAppAndGenerateManifestForAddition(appName, dir string) (map[string]interface{}, string) {
-	session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
-	Eventually(session).Should(Exit(0))
-
-	manifest := map[string]interface{}{
-		// note: we should do additions to complex structures on appName app too, so we can prove that our iteration is working also
-		// note: to get ahead of potential future problems, lets be sure to unit test metadata
-		"applications": []map[string]interface{}{
-			{
-				"name": appName,
-			},
-			{
-				"name": "app2",
-				"buildpacks": []string{
-					"ruby",
-					"java",
-				},
-				"env": map[string]string{
-					"var":  "value",
-					"var2": "value",
-				},
-				"stack": "cflinuxfs3",
-			},
-		},
-	}
-	manifestPath := fmt.Sprintf("%s/manifest.yml", dir)
 	return manifest, manifestPath
 }

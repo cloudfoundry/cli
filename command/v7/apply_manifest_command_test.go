@@ -223,6 +223,17 @@ var _ = Describe("apply-manifest Command", func() {
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
 					})
 				})
+
+				When("displaying the manifest diff fails", func() {
+					BeforeEach(func() {
+						fakeDiffDisplayer.DisplayDiffReturns(errors.New("diff failed"))
+					})
+
+					It("returns the diff error", func() {
+						Expect(executeErr).To(MatchError("diff failed"))
+						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
+					})
+				})
 			})
 		})
 	})

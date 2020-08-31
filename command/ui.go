@@ -15,7 +15,6 @@ type UI interface {
 	DisplayChangesForPush(changeSet []ui.Change) error
 	DisplayDeprecationWarning()
 	DisplayDiffAddition(line string, depth int)
-	DisplayDiffAdditionForMapStringInterface(lineMap map[string]interface{}, depth int)
 	DisplayDiffRemoval(line string, depth int)
 	DisplayDiffUnchanged(line string, depth int)
 	DisplayError(err error)

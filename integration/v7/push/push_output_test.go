@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("Output", func() {
+var _ = Describe("Output", func() {
 	var (
 		appName  string
 		appName2 string

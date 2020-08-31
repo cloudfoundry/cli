@@ -53,12 +53,6 @@ type FakeUI struct {
 		arg1 string
 		arg2 int
 	}
-	DisplayDiffAdditionForMapStringInterfaceStub        func(map[string]interface{}, int)
-	displayDiffAdditionForMapStringInterfaceMutex       sync.RWMutex
-	displayDiffAdditionForMapStringInterfaceArgsForCall []struct {
-		arg1 map[string]interface{}
-		arg2 int
-	}
 	DisplayDiffRemovalStub        func(string, int)
 	displayDiffRemovalMutex       sync.RWMutex
 	displayDiffRemovalArgsForCall []struct {
@@ -519,38 +513,6 @@ func (fake *FakeUI) DisplayDiffAdditionArgsForCall(i int) (string, int) {
 	fake.displayDiffAdditionMutex.RLock()
 	defer fake.displayDiffAdditionMutex.RUnlock()
 	argsForCall := fake.displayDiffAdditionArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeUI) DisplayDiffAdditionForMapStringInterface(arg1 map[string]interface{}, arg2 int) {
-	fake.displayDiffAdditionForMapStringInterfaceMutex.Lock()
-	fake.displayDiffAdditionForMapStringInterfaceArgsForCall = append(fake.displayDiffAdditionForMapStringInterfaceArgsForCall, struct {
-		arg1 map[string]interface{}
-		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("DisplayDiffAdditionForMapStringInterface", []interface{}{arg1, arg2})
-	fake.displayDiffAdditionForMapStringInterfaceMutex.Unlock()
-	if fake.DisplayDiffAdditionForMapStringInterfaceStub != nil {
-		fake.DisplayDiffAdditionForMapStringInterfaceStub(arg1, arg2)
-	}
-}
-
-func (fake *FakeUI) DisplayDiffAdditionForMapStringInterfaceCallCount() int {
-	fake.displayDiffAdditionForMapStringInterfaceMutex.RLock()
-	defer fake.displayDiffAdditionForMapStringInterfaceMutex.RUnlock()
-	return len(fake.displayDiffAdditionForMapStringInterfaceArgsForCall)
-}
-
-func (fake *FakeUI) DisplayDiffAdditionForMapStringInterfaceCalls(stub func(map[string]interface{}, int)) {
-	fake.displayDiffAdditionForMapStringInterfaceMutex.Lock()
-	defer fake.displayDiffAdditionForMapStringInterfaceMutex.Unlock()
-	fake.DisplayDiffAdditionForMapStringInterfaceStub = stub
-}
-
-func (fake *FakeUI) DisplayDiffAdditionForMapStringInterfaceArgsForCall(i int) (map[string]interface{}, int) {
-	fake.displayDiffAdditionForMapStringInterfaceMutex.RLock()
-	defer fake.displayDiffAdditionForMapStringInterfaceMutex.RUnlock()
-	argsForCall := fake.displayDiffAdditionForMapStringInterfaceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
@@ -1853,8 +1815,6 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayDeprecationWarningMutex.RUnlock()
 	fake.displayDiffAdditionMutex.RLock()
 	defer fake.displayDiffAdditionMutex.RUnlock()
-	fake.displayDiffAdditionForMapStringInterfaceMutex.RLock()
-	defer fake.displayDiffAdditionForMapStringInterfaceMutex.RUnlock()
 	fake.displayDiffRemovalMutex.RLock()
 	defer fake.displayDiffRemovalMutex.RUnlock()
 	fake.displayDiffUnchangedMutex.RLock()

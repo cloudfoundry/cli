@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"fmt"
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -101,23 +100,27 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	fmt.Print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-	fmt.Printf("%s\n", string(manifestBytes))
-
 	diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, manifestBytes)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Updating with these attributes...")
 
-	// warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
-	// cmd.UI.DisplayWarnings(warnings)
-	// if err != nil {
-	// 	return err
-	// }
+	err = cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
+	if err != nil {
+		return err
+	}
 
+	warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayOK()
 
 	return nil
