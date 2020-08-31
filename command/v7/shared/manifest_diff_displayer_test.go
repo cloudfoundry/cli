@@ -12,14 +12,12 @@ import (
 
 var _ = Describe("ManifestDiffDisplayer", func() {
 	var (
-		testUI       *ui.UI
-		outputBuffer *Buffer
-		displayer    *ManifestDiffDisplayer
+		testUI    *ui.UI
+		displayer *ManifestDiffDisplayer
 	)
 
 	BeforeEach(func() {
-		outputBuffer = NewBuffer()
-		testUI = ui.NewTestUI(nil, outputBuffer, NewBuffer())
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		displayer = NewManifestDiffDisplayer(testUI)
 	})
 
@@ -40,6 +38,7 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 
 		Context("No diffs", func() {
 			BeforeEach(func() {
+				diff = resources.ManifestDiff{}
 				rawManifest = []byte(`---
 version: 1
 applications:
@@ -86,7 +85,7 @@ applications:
 			})
 
 			It("outputs the manifest without + or -", func() {
-				Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+				Expect(testUI.Out).To(Say(`---
   version: 1
   applications:
   - name: app1
@@ -149,7 +148,7 @@ applications:
 				})
 
 				It("outputs a diff indicating addition for a single line", func() {
-					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+					Expect(testUI.Out).To(Say(`---
   applications:
     -
       name: dora
@@ -179,7 +178,7 @@ applications:
 				})
 
 				It("outputs a diff indicating addition of a map type", func() {
-					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+					Expect(testUI.Out).To(Say(`---
   applications:
 \+   -
 \+     env:
@@ -205,7 +204,7 @@ applications:
 				})
 
 				It("outputs a diff indicating addition of a map type", func() {
-					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+					Expect(testUI.Out).To(Say(`---
   applications:
     -
       name: dora
@@ -244,7 +243,7 @@ applications:
 
 				When("each element of the array is a map value", func() {
 					It("outputs a diff indicating addition for each map type", func() {
-						Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+						Expect(testUI.Out).To(Say(`---
   applications:
     -
       name: dora
@@ -272,7 +271,7 @@ applications:
 				})
 
 				It("outputs correctly formatted diff with key removed", func() {
-					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+					Expect(testUI.Out).To(Say(`---
   applications:
     -
       name: dora
@@ -298,7 +297,7 @@ applications:
 				})
 
 				It("outputs correctly formatted diff", func() {
-					Expect(string(outputBuffer.Contents())).To(MatchRegexp(`---
+					Expect(testUI.Out).To(Say(`---
   applications:
     -
       name: dora
