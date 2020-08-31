@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -27,10 +28,13 @@ var _ = Describe("revisions Command", func() {
 		binaryName      string
 		executeErr      error
 		appName         string
+
+		out *Buffer
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		out = NewBuffer()
+		testUI = ui.NewTestUI(nil, out, NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
@@ -122,7 +126,6 @@ var _ = Describe("revisions Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say(`Getting revisions for app some-app in org some-org / space some-space as banana\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Out).To(Say("version   guid                                   description           deployable   created at"))
 					Expect(testUI.Out).To(Say("1         17E0E587-0E53-4A6E-B6AE-82073159F910   Something             false        2020-03-04T13:23:32Z"))
 					Expect(testUI.Out).To(Say("2         A89F8259-D32B-491A-ABD6-F100AC42D74C   Something else        true         2020-03-08T12:43:30Z"))
@@ -139,6 +142,28 @@ var _ = Describe("revisions Command", func() {
 
 			})
 
+			When("there are no revisions available", func() {
+				BeforeEach(func() {
+					fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(
+						[]resources.Revision{},
+						v7action.Warnings{"get-warning-1", "get-warning-2"},
+						nil,
+					)
+				})
+
+				It("returns 'no revisions found'", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(strings.TrimSpace(string(out.Contents()))).To(Equal(strings.TrimSpace(`
+Getting revisions for app some-app in org some-org / space some-space as banana...
+
+No revisions found
+`)))
+					Expect(testUI.Err).To(Say("get-warning-1"))
+					Expect(testUI.Err).To(Say("get-warning-2"))
+				})
+			})
+
 			When("revisions variables returns an unknown error", func() {
 				var expectedErr error
 				BeforeEach(func() {
@@ -149,7 +174,6 @@ var _ = Describe("revisions Command", func() {
 				It("returns the error", func() {
 					Expect(executeErr).To(Equal(expectedErr))
 					Expect(testUI.Out).To(Say(`Getting revisions for app some-app in org some-org / space some-space as banana\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))
