@@ -312,6 +312,11 @@ applications:
 
 		Context("when the YAML cannot be parsed", func() {
 			BeforeEach(func() {
+				diff = resources.ManifestDiff{
+					Diffs: []resources.Diff{
+						{Op: resources.ReplaceOperation, Path: "/applications/0/env/a", Was: "b", Value: "c"},
+					},
+				}
 				rawManifest = []byte(`not-real-yaml!`)
 			})
 
