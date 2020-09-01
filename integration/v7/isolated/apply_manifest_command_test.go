@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 
@@ -310,7 +309,7 @@ var _ = Describe("apply-manifest command", func() {
 func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, string) {
 	session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
 	Eventually(session).Should(Exit(0))
-	manifestPath := path.Join(dir, "manifest.yml")
+	manifestPath := filepath.Join(dir, "manifest.yml")
 	session = helpers.CF("create-app-manifest", appName, "-p", manifestPath)
 	Eventually(session).Should(Say(fmt.Sprintf("Manifest file created successfully at %s", manifestPath)))
 	Eventually(session).Should(Exit(0))
