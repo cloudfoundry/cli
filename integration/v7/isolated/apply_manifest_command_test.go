@@ -311,7 +311,7 @@ func pushAppAndGenerateManifest(appName, dir string) (map[string]interface{}, st
 	Eventually(session).Should(Exit(0))
 	manifestPath := filepath.Join(dir, "manifest.yml")
 	session = helpers.CF("create-app-manifest", appName, "-p", manifestPath)
-	Eventually(session).Should(Say(fmt.Sprintf("Manifest file created successfully at %s", manifestPath)))
+	Eventually(session).Should(helpers.SayPath(`Manifest file created successfully at %s`, manifestPath))
 	Eventually(session).Should(Exit(0))
 	manifest := helpers.ReadManifest(manifestPath)
 
