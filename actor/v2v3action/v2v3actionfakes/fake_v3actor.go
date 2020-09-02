@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeV3Actor struct {
@@ -67,36 +66,6 @@ type FakeV3Actor struct {
 		result1 v3action.Organization
 		result2 v3action.Warnings
 		result3 error
-	}
-	ShareServiceInstanceToSpacesStub        func(string, []string) (resources.RelationshipList, v3action.Warnings, error)
-	shareServiceInstanceToSpacesMutex       sync.RWMutex
-	shareServiceInstanceToSpacesArgsForCall []struct {
-		arg1 string
-		arg2 []string
-	}
-	shareServiceInstanceToSpacesReturns struct {
-		result1 resources.RelationshipList
-		result2 v3action.Warnings
-		result3 error
-	}
-	shareServiceInstanceToSpacesReturnsOnCall map[int]struct {
-		result1 resources.RelationshipList
-		result2 v3action.Warnings
-		result3 error
-	}
-	UnshareServiceInstanceByServiceInstanceAndSpaceStub        func(string, string) (v3action.Warnings, error)
-	unshareServiceInstanceByServiceInstanceAndSpaceMutex       sync.RWMutex
-	unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	unshareServiceInstanceByServiceInstanceAndSpaceReturns struct {
-		result1 v3action.Warnings
-		result2 error
-	}
-	unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall map[int]struct {
-		result1 v3action.Warnings
-		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -355,142 +324,6 @@ func (fake *FakeV3Actor) GetOrganizationByNameReturnsOnCall(i int, result1 v3act
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3Actor) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (resources.RelationshipList, v3action.Warnings, error) {
-	var arg2Copy []string
-	if arg2 != nil {
-		arg2Copy = make([]string, len(arg2))
-		copy(arg2Copy, arg2)
-	}
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	ret, specificReturn := fake.shareServiceInstanceToSpacesReturnsOnCall[len(fake.shareServiceInstanceToSpacesArgsForCall)]
-	fake.shareServiceInstanceToSpacesArgsForCall = append(fake.shareServiceInstanceToSpacesArgsForCall, struct {
-		arg1 string
-		arg2 []string
-	}{arg1, arg2Copy})
-	fake.recordInvocation("ShareServiceInstanceToSpaces", []interface{}{arg1, arg2Copy})
-	fake.shareServiceInstanceToSpacesMutex.Unlock()
-	if fake.ShareServiceInstanceToSpacesStub != nil {
-		return fake.ShareServiceInstanceToSpacesStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.shareServiceInstanceToSpacesReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesCallCount() int {
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	return len(fake.shareServiceInstanceToSpacesArgsForCall)
-}
-
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesCalls(stub func(string, []string) (resources.RelationshipList, v3action.Warnings, error)) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = stub
-}
-
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesArgsForCall(i int) (string, []string) {
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	argsForCall := fake.shareServiceInstanceToSpacesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturns(result1 resources.RelationshipList, result2 v3action.Warnings, result3 error) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = nil
-	fake.shareServiceInstanceToSpacesReturns = struct {
-		result1 resources.RelationshipList
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturnsOnCall(i int, result1 resources.RelationshipList, result2 v3action.Warnings, result3 error) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = nil
-	if fake.shareServiceInstanceToSpacesReturnsOnCall == nil {
-		fake.shareServiceInstanceToSpacesReturnsOnCall = make(map[int]struct {
-			result1 resources.RelationshipList
-			result2 v3action.Warnings
-			result3 error
-		})
-	}
-	fake.shareServiceInstanceToSpacesReturnsOnCall[i] = struct {
-		result1 resources.RelationshipList
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpace(arg1 string, arg2 string) (v3action.Warnings, error) {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Lock()
-	ret, specificReturn := fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall[len(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall)]
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall = append(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("UnshareServiceInstanceByServiceInstanceAndSpace", []interface{}{arg1, arg2})
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
-	if fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub != nil {
-		return fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceCallCount() int {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
-	return len(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall)
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceCalls(stub func(string, string) (v3action.Warnings, error)) {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Lock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
-	fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub = stub
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceArgsForCall(i int) (string, string) {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
-	argsForCall := fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceReturns(result1 v3action.Warnings, result2 error) {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Lock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
-	fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub = nil
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Lock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
-	fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub = nil
-	if fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall == nil {
-		fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v3action.Warnings
-			result2 error
-		})
-	}
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall[i] = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -502,10 +335,6 @@ func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
