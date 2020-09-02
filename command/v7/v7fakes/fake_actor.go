@@ -847,19 +847,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	GetAppFeatureStub        func(string, string) (ccv3.ApplicationFeature, v7action.Warnings, error)
+	GetAppFeatureStub        func(string, string) (resources.ApplicationFeature, v7action.Warnings, error)
 	getAppFeatureMutex       sync.RWMutex
 	getAppFeatureArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getAppFeatureReturns struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 v7action.Warnings
 		result3 error
 	}
 	getAppFeatureReturnsOnCall map[int]struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -6696,7 +6696,7 @@ func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameReturnsOnCall(
 	}{result1, result2}
 }
 
-func (fake *FakeActor) GetAppFeature(arg1 string, arg2 string) (ccv3.ApplicationFeature, v7action.Warnings, error) {
+func (fake *FakeActor) GetAppFeature(arg1 string, arg2 string) (resources.ApplicationFeature, v7action.Warnings, error) {
 	fake.getAppFeatureMutex.Lock()
 	ret, specificReturn := fake.getAppFeatureReturnsOnCall[len(fake.getAppFeatureArgsForCall)]
 	fake.getAppFeatureArgsForCall = append(fake.getAppFeatureArgsForCall, struct {
@@ -6721,7 +6721,7 @@ func (fake *FakeActor) GetAppFeatureCallCount() int {
 	return len(fake.getAppFeatureArgsForCall)
 }
 
-func (fake *FakeActor) GetAppFeatureCalls(stub func(string, string) (ccv3.ApplicationFeature, v7action.Warnings, error)) {
+func (fake *FakeActor) GetAppFeatureCalls(stub func(string, string) (resources.ApplicationFeature, v7action.Warnings, error)) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = stub
@@ -6734,30 +6734,30 @@ func (fake *FakeActor) GetAppFeatureArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetAppFeatureReturns(result1 ccv3.ApplicationFeature, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetAppFeatureReturns(result1 resources.ApplicationFeature, result2 v7action.Warnings, result3 error) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = nil
 	fake.getAppFeatureReturns = struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetAppFeatureReturnsOnCall(i int, result1 ccv3.ApplicationFeature, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetAppFeatureReturnsOnCall(i int, result1 resources.ApplicationFeature, result2 v7action.Warnings, result3 error) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = nil
 	if fake.getAppFeatureReturnsOnCall == nil {
 		fake.getAppFeatureReturnsOnCall = make(map[int]struct {
-			result1 ccv3.ApplicationFeature
+			result1 resources.ApplicationFeature
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getAppFeatureReturnsOnCall[i] = struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

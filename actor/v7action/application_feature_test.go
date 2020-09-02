@@ -33,7 +33,7 @@ var _ = Describe("Application Feature Actions", func() {
 			appGUID    = "some-app-guid"
 			warnings   Warnings
 			executeErr error
-			appFeature ccv3.ApplicationFeature
+			appFeature resources.ApplicationFeature
 		)
 
 		JustBeforeEach(func() {
@@ -44,7 +44,7 @@ var _ = Describe("Application Feature Actions", func() {
 			When("it succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetAppFeatureReturns(
-						ccv3.ApplicationFeature{Name: "ssh", Enabled: true},
+						resources.ApplicationFeature{Name: "ssh", Enabled: true},
 						ccv3.Warnings{},
 						nil,
 					)
@@ -65,7 +65,7 @@ var _ = Describe("Application Feature Actions", func() {
 				When("desired enabled state is already, the current state", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetAppFeatureReturns(
-							ccv3.ApplicationFeature{Enabled: true},
+							resources.ApplicationFeature{Enabled: true},
 							ccv3.Warnings{"some-ccv3-warning"},
 							nil,
 						)
@@ -80,7 +80,7 @@ var _ = Describe("Application Feature Actions", func() {
 			When("when the API layer call returns an error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetAppFeatureReturns(
-						ccv3.ApplicationFeature{Enabled: false},
+						resources.ApplicationFeature{Enabled: false},
 						ccv3.Warnings{"some-get-ssh-warning"},
 						errors.New("some-get-ssh-error"),
 					)

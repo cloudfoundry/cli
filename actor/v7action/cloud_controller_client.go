@@ -119,7 +119,7 @@ type CloudControllerClient interface {
 	GetSpaces(query ...ccv3.Query) ([]resources.Space, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetSpaceQuotas(query ...ccv3.Query) ([]resources.SpaceQuota, ccv3.Warnings, error)
 	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, ccv3.Warnings, error)
-	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, ccv3.Warnings, error)
+	GetAppFeature(appGUID string, featureName string) (resources.ApplicationFeature, ccv3.Warnings, error)
 	GetStacks(query ...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)
 	GetStagingSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetUser(userGUID string) (resources.User, ccv3.Warnings, error)
