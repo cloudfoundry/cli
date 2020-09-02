@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"bytes"
+	"fmt"
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -104,7 +106,27 @@ var _ = Describe("revisions command", func() {
 				Expect(session.Out.Contents()).Should(ContainSubstring("New droplet deployed"))
 
 			})
-		})
 
+			When("revisions are disabled for the app", func() {
+
+				BeforeEach(func() {
+					session := helpers.CF("app", appName, "--guid")
+					Eventually(session).Should(Exit(0))
+
+					appGuid := bytes.TrimSpace(session.Out.Contents())
+					routeToDisableRevisions := fmt.Sprintf(`/v3/apps/%s/features/revisions`, appGuid)
+					session = helpers.CF("curl", routeToDisableRevisions, "-X", "PATCH", "-d", `{ "enabled": false }`)
+					Eventually(session).Should(Exit(0))
+				})
+				It("outputs the revisions with a warning", func() {
+					session := helpers.CF("revisions", appName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta(`Getting revisions for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+					Expect(session.Err.Contents()).To(ContainSubstring(fmt.Sprintf("Warning: Revisions for app '%s' are disabled. Updates to the app will not create new revisions.", appName)))
+					Expect(session.Out.Contents()).Should(ContainSubstring("Initial revision"))
+					Expect(session.Out.Contents()).Should(ContainSubstring("New droplet deployed"))
+				})
+			})
+		})
 	})
 })

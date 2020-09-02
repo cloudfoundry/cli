@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -80,7 +79,7 @@ var _ = Describe("disable-ssh Command", func() {
 					nil,
 				)
 				fakeDisableSSHActor.GetAppFeatureReturns(
-					ccv3.ApplicationFeature{Enabled: true, Name: "ssh"},
+					resources.ApplicationFeature{Enabled: true, Name: "ssh"},
 					v7action.Warnings{"some-feature-warnings"},
 					nil,
 				)
@@ -126,7 +125,7 @@ var _ = Describe("disable-ssh Command", func() {
 					nil,
 				)
 				fakeDisableSSHActor.GetAppFeatureReturns(
-					ccv3.ApplicationFeature{Enabled: false, Name: "ssh"},
+					resources.ApplicationFeature{Enabled: false, Name: "ssh"},
 					v7action.Warnings{},
 					nil,
 				)
@@ -163,7 +162,7 @@ var _ = Describe("disable-ssh Command", func() {
 				BeforeEach(func() {
 
 					fakeDisableSSHActor.GetAppFeatureReturns(
-						ccv3.ApplicationFeature{},
+						resources.ApplicationFeature{},
 						nil,
 						returnedErr,
 					)

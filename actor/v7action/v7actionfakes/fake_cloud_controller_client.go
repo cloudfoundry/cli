@@ -710,19 +710,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetAppFeatureStub        func(string, string) (ccv3.ApplicationFeature, ccv3.Warnings, error)
+	GetAppFeatureStub        func(string, string) (resources.ApplicationFeature, ccv3.Warnings, error)
 	getAppFeatureMutex       sync.RWMutex
 	getAppFeatureArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getAppFeatureReturns struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getAppFeatureReturnsOnCall map[int]struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -5561,7 +5561,7 @@ func (fake *FakeCloudControllerClient) EntitleIsolationSegmentToOrganizationsRet
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetAppFeature(arg1 string, arg2 string) (ccv3.ApplicationFeature, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetAppFeature(arg1 string, arg2 string) (resources.ApplicationFeature, ccv3.Warnings, error) {
 	fake.getAppFeatureMutex.Lock()
 	ret, specificReturn := fake.getAppFeatureReturnsOnCall[len(fake.getAppFeatureArgsForCall)]
 	fake.getAppFeatureArgsForCall = append(fake.getAppFeatureArgsForCall, struct {
@@ -5586,7 +5586,7 @@ func (fake *FakeCloudControllerClient) GetAppFeatureCallCount() int {
 	return len(fake.getAppFeatureArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetAppFeatureCalls(stub func(string, string) (ccv3.ApplicationFeature, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetAppFeatureCalls(stub func(string, string) (resources.ApplicationFeature, ccv3.Warnings, error)) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = stub
@@ -5599,30 +5599,30 @@ func (fake *FakeCloudControllerClient) GetAppFeatureArgsForCall(i int) (string, 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeCloudControllerClient) GetAppFeatureReturns(result1 ccv3.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetAppFeatureReturns(result1 resources.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = nil
 	fake.getAppFeatureReturns = struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetAppFeatureReturnsOnCall(i int, result1 ccv3.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetAppFeatureReturnsOnCall(i int, result1 resources.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
 	fake.getAppFeatureMutex.Lock()
 	defer fake.getAppFeatureMutex.Unlock()
 	fake.GetAppFeatureStub = nil
 	if fake.getAppFeatureReturnsOnCall == nil {
 		fake.getAppFeatureReturnsOnCall = make(map[int]struct {
-			result1 ccv3.ApplicationFeature
+			result1 resources.ApplicationFeature
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getAppFeatureReturnsOnCall[i] = struct {
-		result1 ccv3.ApplicationFeature
+		result1 resources.ApplicationFeature
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

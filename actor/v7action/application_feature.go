@@ -5,9 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-type ApplicationFeature ccv3.Buildpack
-
-func (actor Actor) GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, Warnings, error) {
+func (actor Actor) GetAppFeature(appGUID string, featureName string) (resources.ApplicationFeature, Warnings, error) {
 	appFeature, warnings, err := actor.CloudControllerClient.GetAppFeature(appGUID, featureName)
 
 	return appFeature, Warnings(warnings), err

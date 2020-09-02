@@ -2,22 +2,16 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-type ApplicationFeature struct {
-	// Name of the application feature
-	Name    string
-	Enabled bool
-	//Reason  string `json:omitempty`
-}
 
 type SSHEnabled struct {
 	Enabled bool
 	Reason  string
 }
 
-func (client *Client) GetAppFeature(appGUID string, featureName string) (ApplicationFeature, Warnings, error) {
-	var responseBody ApplicationFeature
+func (client *Client) GetAppFeature(appGUID string, featureName string) (resources.ApplicationFeature, Warnings, error) {
+	var responseBody resources.ApplicationFeature
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetApplicationFeaturesRequest,

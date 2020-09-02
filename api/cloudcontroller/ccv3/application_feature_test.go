@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -105,7 +106,7 @@ var _ = Describe("Application", func() {
 			warnings           Warnings
 			executeErr         error
 			appGUID            = "some-app-guid"
-			applicationFeature ApplicationFeature
+			applicationFeature resources.ApplicationFeature
 		)
 
 		Context("Getting SSH", func() {

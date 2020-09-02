@@ -41,6 +41,26 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"Username":  user.Name,
 	})
 
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	appGUID := app.GUID
+	revisionsFeature, warnings, err := cmd.Actor.GetAppFeature(appGUID, "revisions")
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	if !revisionsFeature.Enabled {
+		cmd.UI.DisplayWarning("Warning: Revisions for app '{{.AppName}}' are disabled. Updates to the app will not create new revisions.",
+			map[string]interface{}{
+				"AppName": appName,
+			})
+	}
+
 	cmd.UI.DisplayNewline()
 
 	revisions, warnings, err := cmd.Actor.GetRevisionsByApplicationNameAndSpace(

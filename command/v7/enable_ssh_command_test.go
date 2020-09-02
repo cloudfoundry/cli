@@ -80,7 +80,7 @@ var _ = Describe("enable-ssh Command", func() {
 					nil,
 				)
 				fakeEnableSSHActor.GetAppFeatureReturns(
-					ccv3.ApplicationFeature{Enabled: false, Name: "ssh"},
+					resources.ApplicationFeature{Enabled: false, Name: "ssh"},
 					v7action.Warnings{"some-feature-warnings"},
 					nil,
 				)
@@ -150,7 +150,7 @@ var _ = Describe("enable-ssh Command", func() {
 					nil,
 				)
 				fakeEnableSSHActor.GetAppFeatureReturns(
-					ccv3.ApplicationFeature{Enabled: true, Name: "ssh"},
+					resources.ApplicationFeature{Enabled: true, Name: "ssh"},
 					v7action.Warnings{},
 					nil,
 				)
@@ -187,7 +187,7 @@ var _ = Describe("enable-ssh Command", func() {
 				BeforeEach(func() {
 
 					fakeEnableSSHActor.GetAppFeatureReturns(
-						ccv3.ApplicationFeature{},
+						resources.ApplicationFeature{},
 						nil,
 						returnedErr,
 					)
