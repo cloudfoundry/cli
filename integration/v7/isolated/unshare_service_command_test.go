@@ -105,7 +105,7 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	FContext("unshare-service command is valid", func() {
+	Context("unshare-service command is valid", func() {
 		var (
 			orgName  string
 			username string
@@ -203,7 +203,7 @@ var _ = Describe("unshare-service command", func() {
 			})
 		})
 
-		Describe("when unsharing the service instance succeeds", func() {
+		Describe("successful unsharing of the service instance", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {

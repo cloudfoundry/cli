@@ -160,13 +160,8 @@ var _ = Describe("unshare-service command", func() {
 		})
 
 		It("prompts the user", func() {
+			Expect(testUI.Err).To(Say(`WARNING: Unsharing this service instance will remove any existing bindings originating from the service instance in the space "%s". This could cause apps to stop working.`, expectedSpaceName))
 			Expect(testUI.Out).To(SatisfyAll(
-				Say(`Unsharing service instance %s from org %s / space %s as %s`,
-					expectedServiceInstanceName,
-					expectedTargetedOrgName,
-					expectedSpaceName,
-					expectedUser),
-				Say(`\n`),
 				Say(`Really unshare the service instance %s from space %s\? \[yN\]:`,
 					expectedServiceInstanceName,
 					expectedSpaceName),
@@ -224,6 +219,7 @@ var _ = Describe("unshare-service command", func() {
 
 		When("getting the username fails", func() {
 			BeforeEach(func() {
+				input.Write([]byte("y\n"))
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
 			})
 

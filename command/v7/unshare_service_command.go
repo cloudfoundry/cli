@@ -25,11 +25,12 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
-
 	if !cmd.Force {
+		cmd.UI.DisplayWarning(
+			`WARNING: Unsharing this service instance will remove any existing bindings originating from the service instance in the space "{{.SpaceName}}". This could cause apps to stop working.`,
+			map[string]interface{}{"SpaceName": cmd.SpaceName},
+		)
+
 		unshare, err := cmd.displayPrompt()
 		if err != nil {
 			return err
@@ -39,6 +40,10 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("Unshare cancelled")
 			return nil
 		}
+	}
+
+	if err := cmd.displayIntro(); err != nil {
+		return err
 	}
 
 	warnings, err := cmd.Actor.UnshareServiceInstanceFromSpaceAndOrg(
