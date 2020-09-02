@@ -96,59 +96,6 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 	})
 
-	Describe("UnshareServiceInstanceByServiceInstanceAndSpace", func() {
-		var (
-			serviceInstanceGUID string
-			sharedToSpaceGUID   string
-
-			warnings   Warnings
-			executeErr error
-		)
-
-		BeforeEach(func() {
-			serviceInstanceGUID = "some-service-instance-guid"
-			sharedToSpaceGUID = "some-other-space-guid"
-		})
-
-		JustBeforeEach(func() {
-			warnings, executeErr = actor.UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID, sharedToSpaceGUID)
-		})
-
-		When("no errors occur deleting the service instance share relationship", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceReturns(
-					ccv3.Warnings{"delete-share-relationship-warning"},
-					nil)
-			})
-
-			It("returns no errors and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("delete-share-relationship-warning"))
-
-				Expect(fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceCallCount()).To(Equal(1))
-				serviceInstanceGUIDArg, sharedToSpaceGUIDArg := fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceArgsForCall(0)
-				Expect(serviceInstanceGUIDArg).To(Equal(serviceInstanceGUID))
-				Expect(sharedToSpaceGUIDArg).To(Equal(sharedToSpaceGUID))
-			})
-		})
-
-		When("an error occurs deleting the service instance share relationship", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("delete share relationship error")
-				fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceReturns(
-					ccv3.Warnings{"delete-share-relationship-warning"},
-					expectedErr)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("delete-share-relationship-warning"))
-			})
-		})
-	})
-
 	Describe("CreateUserProvidedServiceInstance", func() {
 		When("the service instance is created successfully", func() {
 			It("returns warnings", func() {

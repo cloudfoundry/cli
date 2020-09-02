@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
 )
 
 type UnshareServiceCommand struct {
@@ -26,7 +25,26 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.displayIntro()
+	if !cmd.Force {
+		cmd.UI.DisplayWarning(
+			`WARNING: Unsharing this service instance will remove any existing bindings originating from the service instance in the space "{{.SpaceName}}". This could cause apps to stop working.`,
+			map[string]interface{}{"SpaceName": cmd.SpaceName},
+		)
+
+		unshare, err := cmd.displayPrompt()
+		if err != nil {
+			return err
+		}
+
+		if !unshare {
+			cmd.UI.DisplayText("Unshare cancelled")
+			return nil
+		}
+	}
+
+	if err := cmd.displayIntro(); err != nil {
+		return err
+	}
 
 	warnings, err := cmd.Actor.UnshareServiceInstanceFromSpaceAndOrg(
 		cmd.RequiredArgs.ServiceInstance,
@@ -38,11 +56,13 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		})
 
 	cmd.UI.DisplayWarnings(warnings)
-
 	if err != nil {
 		return err
 	}
-	return errors.New("Not yet implemented")
+
+	cmd.UI.DisplayOK()
+
+	return nil
 }
 
 func (cmd UnshareServiceCommand) displayIntro() error {
@@ -67,4 +87,20 @@ func (cmd UnshareServiceCommand) displayIntro() error {
 	)
 
 	return nil
+}
+
+func (cmd UnshareServiceCommand) displayPrompt() (bool, error) {
+	cmd.UI.DisplayNewline()
+	unshare, err := cmd.UI.DisplayBoolPrompt(
+		false,
+		"Really unshare the service instance {{.ServiceInstanceName}} from space {{.SpaceName}}?",
+		map[string]interface{}{
+			"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+			"SpaceName":           cmd.SpaceName,
+		})
+	if err != nil {
+		return false, err
+	}
+
+	return unshare, nil
 }

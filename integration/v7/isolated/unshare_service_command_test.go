@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("unshare-service command", func() {
-	const unshareServiceCommand = "v3-unshare-service"
+	const unshareServiceCommand = "unshare-service"
 
 	var (
 		serviceInstanceName  string
@@ -105,7 +105,7 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	Describe("command parameters are invalid", func() {
+	Context("unshare-service command is valid", func() {
 		var (
 			orgName  string
 			username string
@@ -123,19 +123,87 @@ var _ = Describe("unshare-service command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("service instance cannot be retrieved", func() {
-			It("fails with an error", func() {
-				session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName)
-				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(SatisfyAll(
-					Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
-					Say("FAILED"),
-				))
-				Expect(session.Err).To(Say("Service instance %s not found", serviceInstanceName))
+		Describe("command parameters are invalid", func() {
+			Context("service instance cannot be retrieved", func() {
+				It("fails with an error", func() {
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(SatisfyAll(
+						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
+						Say("FAILED"),
+					))
+					Expect(session.Err).To(Say("Service instance %s not found", serviceInstanceName))
+				})
+			})
+
+			Context("service instance exists", func() {
+				var broker *servicebrokerstub.ServiceBrokerStub
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.New().Create().EnableServiceAccess()
+
+					serviceInstanceName = helpers.NewServiceInstanceName()
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					)
+
+					unshareFromSpaceName = helpers.NewSpaceName()
+					unshareFromOrgName = helpers.NewOrgName()
+				})
+
+				AfterEach(func() {
+					broker.Forget()
+				})
+
+				Context("space cannot be retrieved in targeted org", func() {
+					It("fails with an error", func() {
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
+						Eventually(session).Should(Exit(1))
+						Expect(session.Out).To(SatisfyAll(
+							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
+							Say("FAILED"),
+						))
+						Eventually(session.Err).Should(Say("Space '%s' not found.", unshareFromSpaceName))
+					})
+				})
+
+				Context("space cannot be retrieved in specified org", func() {
+					BeforeEach(func() {
+						helpers.CreateOrg(unshareFromOrgName)
+					})
+
+					AfterEach(func() {
+						helpers.QuickDeleteOrg(unshareFromOrgName)
+					})
+
+					It("fails with an error", func() {
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+						Eventually(session).Should(Exit(1))
+						Expect(session.Out).To(SatisfyAll(
+							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
+							Say("FAILED"),
+						))
+						Eventually(session.Err).Should(Say("Space '%s' not found.", unshareFromSpaceName))
+					})
+				})
+
+				Context("specified organization cannot be retrieved", func() {
+					It("fails with an error", func() {
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+						Eventually(session).Should(Exit(1))
+						Expect(session.Out).To(SatisfyAll(
+							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
+							Say("FAILED"),
+						))
+						Eventually(session.Err).Should(Say("Organization '%s' not found.", unshareFromOrgName))
+					})
+				})
 			})
 		})
 
-		Context("service instance exists", func() {
+		Describe("successful unsharing of the service instance", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
@@ -147,56 +215,72 @@ var _ = Describe("unshare-service command", func() {
 					broker.FirstServicePlanName(),
 					serviceInstanceName,
 				)
-
-				unshareFromSpaceName = helpers.NewSpaceName()
-				unshareFromOrgName = helpers.NewOrgName()
 			})
 
 			AfterEach(func() {
 				broker.Forget()
 			})
 
-			Context("space cannot be retrieved in targeted org", func() {
-				It("fails with an error", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName)
-					Eventually(session).Should(Exit(1))
+			When("space is in targeted org", func() {
+				BeforeEach(func() {
+					unshareFromSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(unshareFromSpaceName)
+
+					session := helpers.CF("share-service", serviceInstanceName, "-s", unshareFromSpaceName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					helpers.QuickDeleteSpace(unshareFromSpaceName)
+				})
+
+				It("shares the service to space in targeted org", func() {
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
+
+					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(
 						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
-						Say("FAILED"),
+						Say("OK"),
 					))
-					Eventually(session.Err).Should(Say("Space '%s' not found.", unshareFromSpaceName))
+
+					By("validating the service is unshared", func() {
+						session = helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+						Expect(session.Out).To(Say(`This service is not currently shared.`))
+					})
 				})
 			})
 
-			Context("space cannot be retrieved in specified org", func() {
+			When("the space to share is in specified org", func() {
 				BeforeEach(func() {
+					unshareFromOrgName = helpers.NewOrgName()
 					helpers.CreateOrg(unshareFromOrgName)
+
+					unshareFromSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpaceInOrg(unshareFromSpaceName, unshareFromOrgName)
+
+					session := helpers.CF("share-service", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+					Eventually(session).Should(Exit(0))
 				})
 
 				AfterEach(func() {
 					helpers.QuickDeleteOrg(unshareFromOrgName)
 				})
 
-				It("fails with an error", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
-					Eventually(session).Should(Exit(1))
-					Expect(session.Out).To(SatisfyAll(
-						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
-						Say("FAILED"),
-					))
-					Eventually(session.Err).Should(Say("Space '%s' not found.", unshareFromSpaceName))
-				})
-			})
+				It("shares the service to space in specified org", func() {
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
 
-			Context("specified organization cannot be retrieved", func() {
-				It("fails with an error", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(
 						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
-						Say("FAILED"),
+						Say("OK"),
 					))
-					Eventually(session.Err).Should(Say("Organization '%s' not found.", unshareFromOrgName))
+
+					By("validating the service is unshared", func() {
+						session = helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+						Expect(session.Out).To(Say(`This service is not currently shared.`))
+					})
 				})
 			})
 		})

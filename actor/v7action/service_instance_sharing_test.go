@@ -1,6 +1,8 @@
 package v7action_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -8,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -189,7 +190,7 @@ var _ = Describe("Service Instance Sharing", func() {
 
 		itValidatesParameters()
 
-		When("we make a successful share request", func() {
+		When("a successful share request is made", func() {
 			spaceGUID := "fake-space-guid"
 			serviceInstanceGUID := "fake-service-instance-guid"
 
@@ -218,7 +219,7 @@ var _ = Describe("Service Instance Sharing", func() {
 				Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
 				Expect(actualSpaces[0]).To(Equal(spaceGUID))
 
-				Expect(executionError).To(BeNil())
+				Expect(executionError).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
 			})
 		})
@@ -248,13 +249,13 @@ var _ = Describe("Service Instance Sharing", func() {
 			})
 
 			It("returns an error and warnings", func() {
-				Expect(executionError.Error()).To(Equal("cannot share the instance"))
+				Expect(executionError).To(MatchError("cannot share the instance"))
 				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-share-warning"))
 			})
 		})
 	})
 
-	Describe("UnShareServiceInstanceToSpaceAndOrg", func() {
+	Describe("UnshareServiceInstanceFromSpaceAndOrg", func() {
 		BeforeEach(func() {
 			serviceInstanceSharingParams = ServiceInstanceSharingParams{
 				SpaceName: shareToSpaceName,
@@ -273,5 +274,64 @@ var _ = Describe("Service Instance Sharing", func() {
 
 		itValidatesParameters()
 
+		When("a unshare request is made", func() {
+			expectedSpaceGUID := "fake-space-guid"
+			expectedServiceInstanceGUID := "fake-service-instance-guid"
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]resources.Space{{GUID: expectedSpaceGUID}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-space-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{GUID: expectedServiceInstanceGUID},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-instance-warning"},
+					nil,
+				)
+			})
+
+			It("makes the right request", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UnshareServiceInstanceFromSpaceCallCount()).To(Equal(1))
+
+				actualServiceInstanceGUID, actualSpace := fakeCloudControllerClient.UnshareServiceInstanceFromSpaceArgsForCall(0)
+				Expect(actualServiceInstanceGUID).To(Equal(expectedServiceInstanceGUID))
+				Expect(actualSpace).To(Equal(expectedSpaceGUID))
+			})
+
+			When("the request is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
+						ccv3.Warnings{"some-unshare-warning"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(executionError).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-unshare-warning"))
+				})
+			})
+
+			When("the request fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
+						ccv3.Warnings{"some-unshare-warning"},
+						errors.New("cannot unshare the instance"),
+					)
+				})
+
+				It("returns warnings and an error", func() {
+					Expect(executionError).To(MatchError("cannot unshare the instance"))
+					Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-unshare-warning"))
+
+				})
+			})
+		})
 	})
 })
