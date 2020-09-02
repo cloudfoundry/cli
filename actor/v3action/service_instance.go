@@ -25,6 +25,6 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 }
 
 func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
+	warnings, err := actor.CloudControllerClient.UnshareServiceInstanceFromSpace(serviceInstanceGUID, sharedToSpaceGUID)
 	return Warnings(warnings), err
 }

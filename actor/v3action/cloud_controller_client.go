@@ -26,7 +26,7 @@ type CloudControllerClient interface {
 	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
 	DeleteIsolationSegmentOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
-	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
+	UnshareServiceInstanceFromSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (resources.Droplet, ccv3.Warnings, error)
 	GetApplicationEnvironment(appGUID string) (ccv3.Environment, ccv3.Warnings, error)
