@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("unshare-service command", func() {
-	const unshareServiceCommand = "v3-unshare-service"
+	const unshareServiceCommand = "unshare-service"
 
 	var (
 		serviceInstanceName  string

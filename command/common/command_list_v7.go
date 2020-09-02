@@ -185,8 +185,7 @@ type commandList struct {
 	UnsetSpaceQuota                    v7.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
 	UnsetSpaceRole                     v7.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
 	UnsharePrivateDomain               v7.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with a specific org"`
-	UnshareService                     v6.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
-	UnshareServiceV3                   v7.UnshareServiceCommand                     `command:"v3-unshare-service" description:"Unshare a shared service instance from a space"`
+	UnshareService                     v7.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
 	UpdateBuildpack                    v7.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
 	UpdateOrgQuota                     v7.UpdateOrgQuotaCommand                     `command:"update-org-quota" alias:"update-quota" description:"Update an existing organization quota"`
 	UpdateSecurityGroup                v7.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
