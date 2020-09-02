@@ -126,7 +126,7 @@ var _ = Describe("unshare-service command", func() {
 		Describe("command parameters are invalid", func() {
 			Context("service instance cannot be retrieved", func() {
 				It("fails with an error", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName)
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
 					Eventually(session).Should(Exit(1))
 					Expect(session.Out).To(SatisfyAll(
 						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
@@ -159,7 +159,7 @@ var _ = Describe("unshare-service command", func() {
 
 				Context("space cannot be retrieved in targeted org", func() {
 					It("fails with an error", func() {
-						session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName)
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
 						Eventually(session).Should(Exit(1))
 						Expect(session.Out).To(SatisfyAll(
 							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
@@ -179,7 +179,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 
 					It("fails with an error", func() {
-						session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
 						Eventually(session).Should(Exit(1))
 						Expect(session.Out).To(SatisfyAll(
 							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
@@ -191,7 +191,7 @@ var _ = Describe("unshare-service command", func() {
 
 				Context("specified organization cannot be retrieved", func() {
 					It("fails with an error", func() {
-						session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+						session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
 						Eventually(session).Should(Exit(1))
 						Expect(session.Out).To(SatisfyAll(
 							Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, unshareFromOrgName, unshareFromSpaceName, username),
@@ -235,7 +235,7 @@ var _ = Describe("unshare-service command", func() {
 				})
 
 				It("shares the service to space in targeted org", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName)
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName)
 
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(
@@ -268,7 +268,7 @@ var _ = Describe("unshare-service command", func() {
 				})
 
 				It("shares the service to space in specified org", func() {
-					session := helpers.CF(unshareServiceCommand, serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
+					session := helpers.CF(unshareServiceCommand, "-f", serviceInstanceName, "-s", unshareFromSpaceName, "-o", unshareFromOrgName)
 
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(

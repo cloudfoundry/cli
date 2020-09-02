@@ -24,7 +24,9 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.displayIntro()
+	if err := cmd.displayIntro(); err != nil {
+		return err
+	}
 
 	warnings, err := cmd.Actor.ShareServiceInstanceToSpaceAndOrg(
 		string(cmd.RequiredArgs.ServiceInstance),

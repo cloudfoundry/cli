@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("share-service Command", func() {
+var _ = Describe("share-service command", func() {
 	var (
 		cmd             ShareServiceCommand
 		testUI          *ui.UI
@@ -150,6 +150,28 @@ var _ = Describe("share-service Command", func() {
 			It("fails with an error", func() {
 				Expect(executeErr).To(Not(BeNil()))
 				Expect(executeErr.Error()).To(ContainSubstring("test error"))
+			})
+		})
+	})
+
+	Context("pre-share errors", func() {
+		When("checking the target returns an error", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(errors.New("explode"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("explode"))
+			})
+		})
+
+		When("getting the username fails", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("boom"))
 			})
 		})
 	})
