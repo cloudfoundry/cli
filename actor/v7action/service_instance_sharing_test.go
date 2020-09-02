@@ -219,7 +219,7 @@ var _ = Describe("Service Instance Sharing", func() {
 				Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
 				Expect(actualSpaces[0]).To(Equal(spaceGUID))
 
-				Expect(executionError).To(BeNil())
+				Expect(executionError).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
 			})
 		})
@@ -249,14 +249,13 @@ var _ = Describe("Service Instance Sharing", func() {
 			})
 
 			It("returns an error and warnings", func() {
-				Expect(executionError).ToNot(BeNil())
-				Expect(executionError.Error()).To(Equal("cannot share the instance"))
+				Expect(executionError).To(MatchError("cannot share the instance"))
 				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-share-warning"))
 			})
 		})
 	})
 
-	Describe("UnshareServiceInstanceToSpaceAndOrg", func() {
+	Describe("UnshareServiceInstanceFromSpaceAndOrg", func() {
 		BeforeEach(func() {
 			serviceInstanceSharingParams = ServiceInstanceSharingParams{
 				SpaceName: shareToSpaceName,
@@ -275,7 +274,7 @@ var _ = Describe("Service Instance Sharing", func() {
 
 		itValidatesParameters()
 
-		When("a successful unshare request is made", func() {
+		When("a unshare request is made", func() {
 			expectedSpaceGUID := "fake-space-guid"
 			expectedServiceInstanceGUID := "fake-service-instance-guid"
 
@@ -295,7 +294,7 @@ var _ = Describe("Service Instance Sharing", func() {
 				)
 			})
 
-			It("makes a request to the cloud controller", func() {
+			It("makes the right request", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UnshareServiceInstanceFromSpaceCallCount()).To(Equal(1))
@@ -303,39 +302,35 @@ var _ = Describe("Service Instance Sharing", func() {
 				actualServiceInstanceGUID, actualSpace := fakeCloudControllerClient.UnshareServiceInstanceFromSpaceArgsForCall(0)
 				Expect(actualServiceInstanceGUID).To(Equal(expectedServiceInstanceGUID))
 				Expect(actualSpace).To(Equal(expectedSpaceGUID))
-
-				Expect(executionError).To(BeNil())
-				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning"))
-			})
-		})
-
-		When("unsharing request returns an error", func() {
-			spaceGUID := "fake-space-guid"
-			serviceInstanceGUID := "fake-service-instance-guid"
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns(
-					[]resources.Space{{GUID: spaceGUID}},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-space-warning"},
-					nil,
-				)
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{GUID: serviceInstanceGUID},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"some-service-instance-warning"},
-					nil,
-				)
-				fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
-					ccv3.Warnings{"some-unshare-warning"},
-					errors.New("cannot unshare the instance"),
-				)
 			})
 
-			It("returns an error and warnings", func() {
-				Expect(executionError).ToNot(BeNil())
-				Expect(executionError.Error()).To(Equal("cannot unshare the instance"))
-				Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-unshare-warning"))
+			When("the request is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
+						ccv3.Warnings{"some-unshare-warning"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(executionError).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-unshare-warning"))
+				})
+			})
+
+			When("the request fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
+						ccv3.Warnings{"some-unshare-warning"},
+						errors.New("cannot unshare the instance"),
+					)
+				})
+
+				It("returns warnings and an error", func() {
+					Expect(executionError).To(MatchError("cannot unshare the instance"))
+					Expect(warnings).To(ConsistOf("some-space-warning", "some-service-instance-warning", "some-unshare-warning"))
+
+				})
 			})
 		})
 	})

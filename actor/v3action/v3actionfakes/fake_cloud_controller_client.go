@@ -614,22 +614,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	ShareServiceInstanceToSpacesStub        func(string, []string) (resources.RelationshipList, ccv3.Warnings, error)
-	shareServiceInstanceToSpacesMutex       sync.RWMutex
-	shareServiceInstanceToSpacesArgsForCall []struct {
-		arg1 string
-		arg2 []string
-	}
-	shareServiceInstanceToSpacesReturns struct {
-		result1 resources.RelationshipList
-		result2 ccv3.Warnings
-		result3 error
-	}
-	shareServiceInstanceToSpacesReturnsOnCall map[int]struct {
-		result1 resources.RelationshipList
-		result2 ccv3.Warnings
-		result3 error
-	}
 	TargetCFStub        func(ccv3.TargetSettings)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
@@ -3521,78 +3505,6 @@ func (fake *FakeCloudControllerClient) SetApplicationDropletReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (resources.RelationshipList, ccv3.Warnings, error) {
-	var arg2Copy []string
-	if arg2 != nil {
-		arg2Copy = make([]string, len(arg2))
-		copy(arg2Copy, arg2)
-	}
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	ret, specificReturn := fake.shareServiceInstanceToSpacesReturnsOnCall[len(fake.shareServiceInstanceToSpacesArgsForCall)]
-	fake.shareServiceInstanceToSpacesArgsForCall = append(fake.shareServiceInstanceToSpacesArgsForCall, struct {
-		arg1 string
-		arg2 []string
-	}{arg1, arg2Copy})
-	fake.recordInvocation("ShareServiceInstanceToSpaces", []interface{}{arg1, arg2Copy})
-	fake.shareServiceInstanceToSpacesMutex.Unlock()
-	if fake.ShareServiceInstanceToSpacesStub != nil {
-		return fake.ShareServiceInstanceToSpacesStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.shareServiceInstanceToSpacesReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesCallCount() int {
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	return len(fake.shareServiceInstanceToSpacesArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesCalls(stub func(string, []string) (resources.RelationshipList, ccv3.Warnings, error)) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = stub
-}
-
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesArgsForCall(i int) (string, []string) {
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	argsForCall := fake.shareServiceInstanceToSpacesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturns(result1 resources.RelationshipList, result2 ccv3.Warnings, result3 error) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = nil
-	fake.shareServiceInstanceToSpacesReturns = struct {
-		result1 resources.RelationshipList
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturnsOnCall(i int, result1 resources.RelationshipList, result2 ccv3.Warnings, result3 error) {
-	fake.shareServiceInstanceToSpacesMutex.Lock()
-	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
-	fake.ShareServiceInstanceToSpacesStub = nil
-	if fake.shareServiceInstanceToSpacesReturnsOnCall == nil {
-		fake.shareServiceInstanceToSpacesReturnsOnCall = make(map[int]struct {
-			result1 resources.RelationshipList
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.shareServiceInstanceToSpacesReturnsOnCall[i] = struct {
-		result1 resources.RelationshipList
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) {
 	fake.targetCFMutex.Lock()
 	fake.targetCFArgsForCall = append(fake.targetCFArgsForCall, struct {
@@ -4652,8 +4564,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.pollJobMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
-	fake.shareServiceInstanceToSpacesMutex.RLock()
-	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
 	fake.unshareServiceInstanceFromSpaceMutex.RLock()

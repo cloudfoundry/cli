@@ -109,7 +109,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 	return responseBody, warnings, err
 }
 
-// DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
+// UnshareServiceInstanceFromSpace will delete the sharing relationship
 // between the service instance and the shared-to space provided.
 func (client *Client) UnshareServiceInstanceFromSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
