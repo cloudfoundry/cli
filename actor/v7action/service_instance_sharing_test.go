@@ -298,9 +298,9 @@ var _ = Describe("Service Instance Sharing", func() {
 			It("makes a request to the cloud controller", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UnshareServiceInstanceFromSpaceCallCount()).To(Equal(1))
 
-				actualServiceInstanceGUID, actualSpace := fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceArgsForCall(0)
+				actualServiceInstanceGUID, actualSpace := fakeCloudControllerClient.UnshareServiceInstanceFromSpaceArgsForCall(0)
 				Expect(actualServiceInstanceGUID).To(Equal(expectedServiceInstanceGUID))
 				Expect(actualSpace).To(Equal(expectedSpaceGUID))
 
@@ -326,7 +326,7 @@ var _ = Describe("Service Instance Sharing", func() {
 					ccv3.Warnings{"some-service-instance-warning"},
 					nil,
 				)
-				fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceReturns(
+				fakeCloudControllerClient.UnshareServiceInstanceFromSpaceReturns(
 					ccv3.Warnings{"some-unshare-warning"},
 					errors.New("cannot unshare the instance"),
 				)

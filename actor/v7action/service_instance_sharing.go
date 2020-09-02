@@ -49,7 +49,7 @@ func (actor Actor) UnshareServiceInstanceFromSpaceAndOrg(
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			warnings, err = actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstance.GUID, unshareSpace.GUID)
+			warnings, err = actor.CloudControllerClient.UnshareServiceInstanceFromSpace(serviceInstance.GUID, unshareSpace.GUID)
 			return
 		},
 	))

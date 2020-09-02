@@ -259,11 +259,6 @@ func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (
 	}
 }
 
-func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
-	return Warnings(warnings), err
-}
-
 func (actor Actor) pollJob(jobURL ccv3.JobURL, wait bool) (ccv3.Warnings, error) {
 	switch {
 	case jobURL == "":
