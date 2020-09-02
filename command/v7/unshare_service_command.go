@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
 )
 
 type UnshareServiceCommand struct {
@@ -38,11 +37,13 @@ func (cmd UnshareServiceCommand) Execute(args []string) error {
 		})
 
 	cmd.UI.DisplayWarnings(warnings)
-
 	if err != nil {
 		return err
 	}
-	return errors.New("Not yet implemented")
+
+	cmd.UI.DisplayOK()
+
+	return nil
 }
 
 func (cmd UnshareServiceCommand) displayIntro() error {

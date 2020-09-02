@@ -35,9 +35,21 @@ func (actor Actor) UnshareServiceInstanceFromSpaceAndOrg(
 	serviceInstanceName, targetedSpaceGUID, targetedOrgGUID string,
 	sharedToDetails ServiceInstanceSharingParams,
 ) (Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var unshareSpace resources.Space
+
 	return handleServiceInstanceErrors(railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			_, _, warnings, err = actor.validateSharingDetails(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID, sharedToDetails)
+			serviceInstance, unshareSpace, warnings, err = actor.validateSharingDetails(
+				serviceInstanceName,
+				targetedSpaceGUID,
+				targetedOrgGUID,
+				sharedToDetails,
+			)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			warnings, err = actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstance.GUID, unshareSpace.GUID)
 			return
 		},
 	))
