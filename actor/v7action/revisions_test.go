@@ -65,9 +65,9 @@ var _ = Describe("Revisions Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationRevisionsReturns(
 						[]resources.Revision{
-							{GUID: "1", Version: 1},
-							{GUID: "2", Version: 2},
-							{GUID: "3", Version: 3},
+							{GUID: "3"},
+							{GUID: "2"},
+							{GUID: "1"},
 						},
 						ccv3.Warnings{"some-revisions-warnings"},
 						nil,
@@ -82,13 +82,16 @@ var _ = Describe("Revisions Actions", func() {
 					))
 
 					Expect(fakeCloudControllerClient.GetApplicationRevisionsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)).To(Equal("some-app-guid"))
+
+					appGuidArg, queryArg := fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)
+					Expect(appGuidArg).To(Equal("some-app-guid"))
+					Expect(queryArg).To(Equal([]ccv3.Query{{Key: ccv3.OrderBy, Values: []string{"-created_at"}}}))
 
 					Expect(fetchedRevisions).To(Equal(
 						[]resources.Revision{
-							{GUID: "3", Version: 3},
-							{GUID: "2", Version: 2},
-							{GUID: "1", Version: 1},
+							{GUID: "3"},
+							{GUID: "2"},
+							{GUID: "1"},
 						}))
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-application-warning", "some-revisions-warnings"))

@@ -1,8 +1,7 @@
 package v7action
 
 import (
-	"sort"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -12,16 +11,14 @@ func (actor *Actor) GetRevisionsByApplicationNameAndSpace(appName string, spaceG
 	if appErr != nil {
 		return []resources.Revision{}, warnings, appErr
 	}
-
-	revisions, v3Warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(app.GUID)
+	revisions, v3Warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(
+		app.GUID,
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+	)
 	warnings = append(warnings, v3Warnings...)
 	if apiErr != nil {
 		return []resources.Revision{}, warnings, apiErr
 	}
-
-	sort.Slice(revisions, func(i, j int) bool {
-		return revisions[i].Version > revisions[j].Version
-	})
 
 	return revisions, warnings, nil
 }

@@ -829,10 +829,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetApplicationRevisionsStub        func(string) ([]resources.Revision, ccv3.Warnings, error)
+	GetApplicationRevisionsStub        func(string, ...ccv3.Query) ([]resources.Revision, ccv3.Warnings, error)
 	getApplicationRevisionsMutex       sync.RWMutex
 	getApplicationRevisionsArgsForCall []struct {
 		arg1 string
+		arg2 []ccv3.Query
 	}
 	getApplicationRevisionsReturns struct {
 		result1 []resources.Revision
@@ -5977,16 +5978,17 @@ func (fake *FakeCloudControllerClient) GetApplicationProcessesReturnsOnCall(i in
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetApplicationRevisions(arg1 string) ([]resources.Revision, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetApplicationRevisions(arg1 string, arg2 ...ccv3.Query) ([]resources.Revision, ccv3.Warnings, error) {
 	fake.getApplicationRevisionsMutex.Lock()
 	ret, specificReturn := fake.getApplicationRevisionsReturnsOnCall[len(fake.getApplicationRevisionsArgsForCall)]
 	fake.getApplicationRevisionsArgsForCall = append(fake.getApplicationRevisionsArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetApplicationRevisions", []interface{}{arg1})
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationRevisions", []interface{}{arg1, arg2})
 	fake.getApplicationRevisionsMutex.Unlock()
 	if fake.GetApplicationRevisionsStub != nil {
-		return fake.GetApplicationRevisionsStub(arg1)
+		return fake.GetApplicationRevisionsStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -6001,17 +6003,17 @@ func (fake *FakeCloudControllerClient) GetApplicationRevisionsCallCount() int {
 	return len(fake.getApplicationRevisionsArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetApplicationRevisionsCalls(stub func(string) ([]resources.Revision, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsCalls(stub func(string, ...ccv3.Query) ([]resources.Revision, ccv3.Warnings, error)) {
 	fake.getApplicationRevisionsMutex.Lock()
 	defer fake.getApplicationRevisionsMutex.Unlock()
 	fake.GetApplicationRevisionsStub = stub
 }
 
-func (fake *FakeCloudControllerClient) GetApplicationRevisionsArgsForCall(i int) string {
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsArgsForCall(i int) (string, []ccv3.Query) {
 	fake.getApplicationRevisionsMutex.RLock()
 	defer fake.getApplicationRevisionsMutex.RUnlock()
 	argsForCall := fake.getApplicationRevisionsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCloudControllerClient) GetApplicationRevisionsReturns(result1 []resources.Revision, result2 ccv3.Warnings, result3 error) {

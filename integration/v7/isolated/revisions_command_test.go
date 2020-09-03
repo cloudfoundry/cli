@@ -97,14 +97,14 @@ var _ = Describe("revisions command", func() {
 					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 				})
 			})
+
 			It("Retrieves the revisions", func() {
 				session := helpers.CF("revisions", appName)
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(regexp.QuoteMeta(`Getting revisions for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 
-				Expect(session.Out.Contents()).Should(ContainSubstring("Initial revision"))
-				Expect(session.Out.Contents()).Should(ContainSubstring("New droplet deployed"))
-
+				Expect(session).Should(Say("New droplet deployed"))
+				Expect(session).Should(Say("Initial revision"))
 			})
 
 			When("revisions are disabled for the app", func() {

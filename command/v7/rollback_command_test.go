@@ -42,8 +42,8 @@ var _ = Describe("rollback Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 
 		revisions := []resources.Revision{
-			resources.Revision{Version: 1},
 			resources.Revision{Version: 2},
+			resources.Revision{Version: 1},
 		}
 
 		fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(
