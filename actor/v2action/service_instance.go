@@ -11,24 +11,6 @@ import (
 type ServiceInstance ccv2.ServiceInstance
 type MaintenanceInfo ccv2.MaintenanceInfo
 
-// CreateServiceInstance creates a new service instance with the provided attributes.
-func (actor Actor) CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName, brokerName string, params map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
-	var allWarnings Warnings
-	plan, allWarnings, err := actor.getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerName)
-
-	if err != nil {
-		return ServiceInstance{}, allWarnings, err
-	}
-
-	instance, warnings, err := actor.CloudControllerClient.CreateServiceInstance(spaceGUID, plan.GUID, serviceInstanceName, params, tags)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return ServiceInstance{}, allWarnings, err
-	}
-
-	return ServiceInstance(instance), allWarnings, nil
-}
-
 func (actor Actor) GetServiceInstance(guid string) (ServiceInstance, Warnings, error) {
 	instance, warnings, err := actor.CloudControllerClient.GetServiceInstance(guid)
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
