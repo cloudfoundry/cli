@@ -84,12 +84,6 @@ func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstan
 	return serviceInstances, Warnings(warnings), nil
 }
 
-// UpdateServiceInstanceMaintenanceInfo requests that the service instance be updated to the specified `maintenance_info`
-func (actor Actor) UpdateServiceInstanceMaintenanceInfo(guid string, maintenanceInfo MaintenanceInfo) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.UpdateServiceInstanceMaintenanceInfo(guid, ccv2.MaintenanceInfo(maintenanceInfo))
-	return Warnings(warnings), err
-}
-
 // IsManaged returns true if the service instance is managed, otherwise false.
 func (instance ServiceInstance) IsManaged() bool {
 	return ccv2.ServiceInstance(instance).Managed()
