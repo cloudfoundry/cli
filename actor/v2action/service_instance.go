@@ -11,24 +11,6 @@ import (
 type ServiceInstance ccv2.ServiceInstance
 type MaintenanceInfo ccv2.MaintenanceInfo
 
-// CreateServiceInstance creates a new service instance with the provided attributes.
-func (actor Actor) CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName, brokerName string, params map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
-	var allWarnings Warnings
-	plan, allWarnings, err := actor.getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerName)
-
-	if err != nil {
-		return ServiceInstance{}, allWarnings, err
-	}
-
-	instance, warnings, err := actor.CloudControllerClient.CreateServiceInstance(spaceGUID, plan.GUID, serviceInstanceName, params, tags)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return ServiceInstance{}, allWarnings, err
-	}
-
-	return ServiceInstance(instance), allWarnings, nil
-}
-
 func (actor Actor) GetServiceInstance(guid string) (ServiceInstance, Warnings, error) {
 	instance, warnings, err := actor.CloudControllerClient.GetServiceInstance(guid)
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
@@ -100,12 +82,6 @@ func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstan
 	}
 
 	return serviceInstances, Warnings(warnings), nil
-}
-
-// UpdateServiceInstanceMaintenanceInfo requests that the service instance be updated to the specified `maintenance_info`
-func (actor Actor) UpdateServiceInstanceMaintenanceInfo(guid string, maintenanceInfo MaintenanceInfo) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.UpdateServiceInstanceMaintenanceInfo(guid, ccv2.MaintenanceInfo(maintenanceInfo))
-	return Warnings(warnings), err
 }
 
 // IsManaged returns true if the service instance is managed, otherwise false.
