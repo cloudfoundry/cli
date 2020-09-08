@@ -25,13 +25,14 @@ var _ = Describe("Revisions", func() {
 
 	Describe("GetApplicationRevisions", func() {
 		var (
+			query      Query
 			revisions  []resources.Revision
 			warnings   Warnings
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			revisions, warnings, executeErr = client.GetApplicationRevisions("some-app-guid")
+			revisions, warnings, executeErr = client.GetApplicationRevisions("some-app-guid", query)
 		})
 
 		When("the cloud controller returns errors and warnings", func() {
@@ -83,12 +84,14 @@ var _ = Describe("Revisions", func() {
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{}, Warnings{"this is a warning", "this is another warning"}, nil
 				})
+				query = Query{Key: OrderBy, Values: []string{"-created_at"}}
 			})
 
 			It("returns the revisions and all warnings", func() {
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationRevisionsRequest))
+				Expect(actualParams.Query).To(Equal([]Query{query}))
 
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))

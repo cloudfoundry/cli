@@ -78,14 +78,20 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	}
 
 	table := [][]string{{
-		"version",
-		"guid",
+		"revision",
 		"description",
 		"deployable",
+		"revision guid",
 		"created at",
 	}}
 	for _, revision := range revisions {
-		table = append(table, []string{strconv.Itoa(revision.Version), revision.GUID, revision.Description, strconv.FormatBool(revision.Deployable), revision.CreatedAt})
+		table = append(table,
+			[]string{strconv.Itoa(revision.Version),
+				revision.Description,
+				strconv.FormatBool(revision.Deployable),
+				revision.GUID,
+				revision.CreatedAt,
+			})
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)

@@ -42,7 +42,7 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	if len(revisions) == 0 {
 		return errors.New(fmt.Sprintf("No revisions for app %s", cmd.RequiredArgs.AppName))
 	}
-	newRevision := revisions[len(revisions)-1].Version + 1
+	newRevision := revisions[0].Version + 1
 	revision, warnings, _ := cmd.Actor.GetRevisionByApplicationAndVersion(app.GUID, targetRevision)
 	cmd.UI.DisplayWarnings(warnings)
 
