@@ -40,15 +40,25 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		return err
 	}
 
-	revisions, warnings, _ := cmd.Actor.GetRevisionsByApplicationNameAndSpace(app.Name, cmd.Config.TargetedSpace().GUID)
+	revisions, warnings, err := cmd.Actor.GetRevisionsByApplicationNameAndSpace(app.Name, cmd.Config.TargetedSpace().GUID)
+
+	if err != nil {
+		return err
+	}
 
 	cmd.UI.DisplayWarnings(warnings)
 	if len(revisions) == 0 {
+		//TODO make translatable
 		return errors.New(fmt.Sprintf("No revisions for app %s", cmd.RequiredArgs.AppName))
 	}
-	newRevision := revisions[0].Version + 1
-	revision, warnings, _ := cmd.Actor.GetRevisionByApplicationAndVersion(app.GUID, targetRevision)
+
+	newRevision := revisions[len(revisions)-1].Version + 1
+	revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(app.GUID, targetRevision)
 	cmd.UI.DisplayWarnings(warnings)
+
+	if err != nil {
+		return err
+	}
 
 	// TODO Localization?
 
@@ -83,7 +93,10 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	_, warnings, _ = cmd.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, revision.GUID)
+	_, warnings, err = cmd.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, revision.GUID)
+	if err != nil {
+		return err
+	}
 	cmd.UI.DisplayWarnings(warnings)
 
 	cmd.UI.DisplayOK()

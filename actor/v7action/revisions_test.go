@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -37,11 +38,11 @@ var _ = Describe("Revisions Actions", func() {
 
 		When("finding the app fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
+				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-executeError"))
 			})
 
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("get-application-error"))
+			It("returns an executeError", func() {
+				Expect(executeErr).To(MatchError("get-application-executeError"))
 				Expect(warnings).To(ConsistOf("get-application-warning"))
 			})
 		})
@@ -53,10 +54,11 @@ var _ = Describe("Revisions Actions", func() {
 
 			When("getting the app revisions fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationRevisionsReturns([]resources.Revision{}, ccv3.Warnings{"some-revisions-warnings"}, errors.New("some-revisions-error"))
+					fakeCloudControllerClient.GetApplicationRevisionsReturns([]resources.Revision{}, ccv3.Warnings{"some-revisions-warnings"}, errors.New("some-revisions-executeError"))
 				})
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("some-revisions-error"))
+
+				It("returns an executeError", func() {
+					Expect(executeErr).To(MatchError("some-revisions-executeError"))
 					Expect(warnings).To(ConsistOf("get-application-warning", "some-revisions-warnings"))
 				})
 			})
@@ -106,7 +108,7 @@ var _ = Describe("Revisions Actions", func() {
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			appGUID                   string
 			revisionVersion           int
-			err                       error
+			executeErr                error
 			warnings                  Warnings
 			revision                  resources.Revision
 		)
@@ -119,7 +121,7 @@ var _ = Describe("Revisions Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			revision, warnings, err = actor.GetRevisionByApplicationAndVersion(appGUID, revisionVersion)
+			revision, warnings, executeErr = actor.GetRevisionByApplicationAndVersion(appGUID, revisionVersion)
 		})
 
 		When("finding the revision succeeds", func() {
@@ -140,8 +142,35 @@ var _ = Describe("Revisions Actions", func() {
 
 				Expect(revision.Version).To(Equal(1))
 				Expect(revision.GUID).To(Equal("revision-guid-1"))
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-revisions-warning-1"))
+			})
+		})
+		When("no matching revision found", func() {
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsReturns(
+					[]resources.Revision{
+						{GUID: "revision-guid-1", Version: 11},
+						{GUID: "revision-guid-2", Version: 22},
+					},
+					ccv3.Warnings{"get-revisions-warning-1"},
+					nil,
+				)
+			})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.RevisionNotFoundError{Version: 1}))
+				Expect(warnings).To(ConsistOf("get-revisions-warning-1"))
+			})
+		})
+		When("finding the revision fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-application-error"))
+				Expect(warnings).To(ConsistOf("get-application-warning"))
 			})
 		})
 	})

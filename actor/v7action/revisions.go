@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 )
@@ -24,12 +25,16 @@ func (actor *Actor) GetRevisionsByApplicationNameAndSpace(appName string, spaceG
 }
 
 func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVersion int) (resources.Revision, Warnings, error) {
-	revisions, warnings, _ := actor.CloudControllerClient.GetApplicationRevisions(appGUID)
+	revisions, warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(appGUID)
+	if apiErr != nil {
+		return resources.Revision{}, Warnings(warnings), apiErr
+	}
 
 	for _, revision := range revisions {
 		if revision.Version == revisionVersion {
 			return revision, Warnings(warnings), nil
 		}
 	}
-	return resources.Revision{}, Warnings(warnings), nil
+
+	return resources.Revision{}, Warnings(warnings), actionerror.RevisionNotFoundError{Version: revisionVersion}
 }
