@@ -78,7 +78,7 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	}
 
 	table := [][]string{{
-		"version",
+		"revision",
 		"guid",
 		"description",
 		"deployable",
