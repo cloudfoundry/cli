@@ -74,7 +74,6 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		"SpaceName":      cmd.Config.TargetedSpace().Name,
 		"Username":       user.Name,
 	})
-	cmd.UI.DisplayNewline()
 
 	_, warnings, err = cmd.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, revision.GUID)
 	cmd.UI.DisplayWarnings(warnings)
