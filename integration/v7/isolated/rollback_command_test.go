@@ -106,7 +106,7 @@ applications:
 						session = helpers.CF("revisions", appName)
 						Eventually(session).Should(Exit(0))
 
-						Expect(session).To(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
+						Expect(session).To(Say(`3\s+New droplet deployed.`))
 					})
 				})
 
@@ -135,7 +135,7 @@ applications:
 							session = helpers.CF("revisions", appName)
 							Eventually(session).Should(Exit(0))
 
-							Expect(session).To(Say(`3\s+[\w\-]+\s+New droplet deployed.`))
+							Expect(session).To(Say(`3\s+New droplet deployed.`))
 						})
 					})
 
