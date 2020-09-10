@@ -63,7 +63,7 @@ var _ = Describe("revisions command", func() {
 				session := helpers.CF("revisions")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err.Contents()).Should(ContainSubstring("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-				Expect(session).Should(Say("revisions - Lists revisions for an app"))
+				Expect(session).Should(Say("revisions - List revisions of an app"))
 			})
 		})
 
