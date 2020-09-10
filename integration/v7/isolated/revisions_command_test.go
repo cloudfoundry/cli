@@ -33,15 +33,17 @@ var _ = Describe("revisions command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("revisions", "APPS", "Lists revisions for an app"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("revisions", "APPS", "List revisions of an app"))
 			})
 
 			It("Displays command usage to output", func() {
 				session := helpers.CF("revisions", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("revisions - Lists revisions for an app"))
+				Eventually(session).Should(Say("revisions - List revisions of an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf revisions APP_NAME"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("rollback"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

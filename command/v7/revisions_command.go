@@ -20,6 +20,7 @@ type RevisionsCommand struct {
 	usage        interface{}          `usage:"CF_NAME revisions APP_NAME"`
 
 	BaseCommand
+	relatedCommands interface{} `related_commands:"rollback"`
 }
 
 func (cmd RevisionsCommand) Execute(_ []string) error {
