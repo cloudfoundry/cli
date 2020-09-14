@@ -38,3 +38,7 @@ func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVe
 
 	return resources.Revision{}, Warnings(warnings), actionerror.RevisionNotFoundError{Version: revisionVersion}
 }
+
+func (actor Actor) GetRevisionByApplicationNameAndSpaceAndVersion(appGUID string, spaceGUID string, revisionVersion int) (resources.Revision, Warnings, error) {
+	return resources.Revision{}, nil, nil
+}

@@ -1,9 +1,6 @@
 package v7
 
 import (
-	"fmt"
-
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 )
@@ -40,19 +37,6 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		return err
 	}
 
-	revisions, warnings, err := cmd.Actor.GetRevisionsByApplicationNameAndSpace(app.Name, cmd.Config.TargetedSpace().GUID)
-
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayWarnings(warnings)
-	if len(revisions) == 0 {
-		//TODO make translatable
-		return errors.New(fmt.Sprintf("No revisions for app %s", cmd.RequiredArgs.AppName))
-	}
-
-	newRevision := revisions[len(revisions)-1].Version + 1
 	revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(app.GUID, targetRevision)
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -63,10 +47,9 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	// TODO Localization?
 
 	if !cmd.Force {
-		cmd.UI.DisplayTextWithFlavor("Rolling '{{.AppName}}' back to revision '{{.TargetRevision}}' will create a new revision. The new revision '{{.NewRevision}}' will use the settings from revision '{{.TargetRevision}}'.", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Rolling '{{.AppName}}' back to revision '{{.TargetRevision}}' will create a new revision. The new revision will use the settings from revision '{{.TargetRevision}}'.", map[string]interface{}{
 			"AppName":        cmd.RequiredArgs.AppName,
 			"TargetRevision": targetRevision,
-			"NewRevision":    newRevision,
 		})
 
 		prompt := "Are you sure you want to continue?"
@@ -94,10 +77,10 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	_, warnings, err = cmd.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, revision.GUID)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayWarnings(warnings)
 
 	cmd.UI.DisplayOK()
 	return nil
