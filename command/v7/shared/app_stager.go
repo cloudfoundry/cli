@@ -39,7 +39,7 @@ type AppStager interface {
 
 	StartApp(
 		app resources.Application,
-		droplet resources.Droplet,
+		resourceGuid string,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
 		space configv3.Space,
@@ -57,6 +57,7 @@ type Stager struct {
 
 type stagingAndStartActor interface {
 	CreateDeploymentByApplicationAndDroplet(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
+	CreateDeploymentByApplicationAndRevision(appGUID string, revisionGUID string) (string, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
@@ -93,7 +94,7 @@ func (stager *Stager) StageAndStart(
 
 	stager.UI.DisplayNewline()
 
-	err = stager.StartApp(app, droplet, strategy, noWait, space, organization, appAction)
+	err = stager.StartApp(app, droplet.GUID, strategy, noWait, space, organization, appAction)
 	if err != nil {
 		return err
 	}
@@ -126,7 +127,7 @@ func (stager *Stager) StageApp(app resources.Application, packageGUID string, sp
 
 func (stager *Stager) StartApp(
 	app resources.Application,
-	droplet resources.Droplet,
+	resourceGuid string,
 	strategy constant.DeploymentStrategy,
 	noWait bool,
 	space configv3.Space,
@@ -139,7 +140,20 @@ func (stager *Stager) StartApp(
 				"AppName": app.Name,
 			},
 		)
-		deploymentGUID, warnings, err := stager.Actor.CreateDeploymentByApplicationAndDroplet(app.GUID, droplet.GUID)
+
+		var (
+			deploymentGUID string
+			warnings       v7action.Warnings
+			err            error
+		)
+
+		switch appAction {
+		case constant.ApplicationRollingBack:
+			deploymentGUID, warnings, err = stager.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, resourceGuid)
+		default:
+			deploymentGUID, warnings, err = stager.Actor.CreateDeploymentByApplicationAndDroplet(app.GUID, resourceGuid)
+		}
+
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -195,9 +209,9 @@ func (stager *Stager) StartApp(
 			}
 		}
 
-		if droplet.GUID != "" {
+		if resourceGuid != "" {
 			// attach droplet to app
-			warnings, err := stager.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
+			warnings, err := stager.Actor.SetApplicationDroplet(app.GUID, resourceGuid)
 			stager.UI.DisplayWarnings(warnings)
 			if err != nil {
 				return err

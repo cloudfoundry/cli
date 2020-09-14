@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/resources"
 )
 
 type RestartCommand struct {
@@ -76,7 +75,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, resources.Droplet{}, cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
+		err = cmd.Stager.StartApp(app, "", cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
 		if err != nil {
 			return err
 		}
