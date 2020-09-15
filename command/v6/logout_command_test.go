@@ -34,7 +34,8 @@ var _ = Describe("logout command", func() {
 			configv3.User{
 				Name: "some-user",
 			},
-			nil)
+			nil,
+		)
 	})
 
 	JustBeforeEach(func() {
@@ -53,17 +54,33 @@ var _ = Describe("logout command", func() {
 		Expect(fakeActor.RevokeCallCount()).To(Equal(1))
 	})
 
-	When("The revoking of tokens fails", func() {
+	When("unable to revoke token", func() {
+		When("because user is not logged in (has no access token)", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(configv3.User{}, nil)
+			})
 
-		BeforeEach(func() {
-			fakeActor.RevokeReturns(error(uaa.UnauthorizedError{Message: "test error"}))
+			It("does not impact the logout", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+				Expect(fakeConfig.UnsetUserInformationCallCount()).To(Equal(1))
+				Expect(testUI.Out).To(Say("Logging out ..."))
+				Expect(testUI.Out).To(Say("OK"))
+			})
 		})
-		It("does not impact the logout", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(fakeConfig.UnsetUserInformationCallCount()).To(Equal(1))
-			Expect(testUI.Out).To(Say("Logging out some-user..."))
-			Expect(testUI.Out).To(Say("OK"))
+		When("because the attempt to revoke fails", func() {
+			BeforeEach(func() {
+				fakeActor.RevokeReturns(error(uaa.UnauthorizedError{Message: "test error"}))
+			})
+
+			It("does not impact the logout", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeConfig.UnsetUserInformationCallCount()).To(Equal(1))
+				Expect(testUI.Out).To(Say("Logging out some-user..."))
+				Expect(testUI.Out).To(Say("OK"))
+			})
 		})
 	})
 })

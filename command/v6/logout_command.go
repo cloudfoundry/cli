@@ -18,10 +18,7 @@ func (cmd *LogoutCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	_, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
-	if err != nil {
-		return err
-	}
+	_, uaaClient, _ := shared.GetNewClientsAndConnectToCF(config, ui)
 	cmd.Actor = v2action.NewActor(nil, uaaClient, config)
 
 	return nil
