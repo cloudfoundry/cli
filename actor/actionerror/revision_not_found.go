@@ -6,11 +6,10 @@ import "fmt"
 // found.
 type RevisionNotFoundError struct {
 	Version int
-	App     string
 }
 
 func (e RevisionNotFoundError) Error() string {
-	return fmt.Sprintf("Revision '%d' for app '%s' not found", e.Version, e.App)
+	return fmt.Sprintf("Revision (%d) not found", e.Version)
 }
 
 type RevisionAmbiguousError struct {
@@ -18,5 +17,5 @@ type RevisionAmbiguousError struct {
 }
 
 func (e RevisionAmbiguousError) Error() string {
-	return fmt.Sprintf("More than one revision '%d' found", e.Version)
+	return fmt.Sprintf("More than one revision (%d) found", e.Version)
 }
