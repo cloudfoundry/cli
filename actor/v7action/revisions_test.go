@@ -2,6 +2,7 @@ package v7action_test
 
 import (
 	"errors"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -129,7 +130,6 @@ var _ = Describe("Revisions Actions", func() {
 				fakeCloudControllerClient.GetApplicationRevisionsReturns(
 					[]resources.Revision{
 						{GUID: "revision-guid-1", Version: 1},
-						{GUID: "revision-guid-2", Version: 2},
 					},
 					ccv3.Warnings{"get-revisions-warning-1"},
 					nil,
@@ -137,8 +137,14 @@ var _ = Describe("Revisions Actions", func() {
 			})
 
 			It("returns the revision", func() {
+				expectedQuery := ccv3.Query{
+					Key:    ccv3.VersionsFilter,
+					Values: []string{strconv.Itoa(revisionVersion)},
+				}
 				Expect(fakeCloudControllerClient.GetApplicationRevisionsCallCount()).To(Equal(1), "GetApplicationRevisions call count")
-				Expect(fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)).To(Equal("some-app-guid"))
+				appGuid, query := fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)
+				Expect(appGuid).To(Equal("some-app-guid"))
+				Expect(query).To(ContainElement(expectedQuery))
 
 				Expect(revision.Version).To(Equal(1))
 				Expect(revision.GUID).To(Equal("revision-guid-1"))
@@ -150,8 +156,22 @@ var _ = Describe("Revisions Actions", func() {
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationRevisionsReturns(
+					[]resources.Revision{},
+					ccv3.Warnings{"get-revisions-warning-1"},
+					nil,
+				)
+			})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.RevisionNotFoundError{Version: 1}))
+				Expect(warnings).To(ConsistOf("get-revisions-warning-1"))
+			})
+		})
+		When("more than one revision found", func() {
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsReturns(
 					[]resources.Revision{
-						{GUID: "revision-guid-1", Version: 11},
+						{GUID: "revision-guid-1", Version: 1},
 						{GUID: "revision-guid-2", Version: 22},
 					},
 					ccv3.Warnings{"get-revisions-warning-1"},
@@ -159,7 +179,7 @@ var _ = Describe("Revisions Actions", func() {
 				)
 			})
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(actionerror.RevisionNotFoundError{Version: 1}))
+				Expect(executeErr).To(MatchError(actionerror.RevisionAmbiguousError{Version: 1}))
 				Expect(warnings).To(ConsistOf("get-revisions-warning-1"))
 			})
 		})

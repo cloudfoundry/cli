@@ -12,3 +12,11 @@ type RevisionNotFoundError struct {
 func (e RevisionNotFoundError) Error() string {
 	return fmt.Sprintf("Revision '%d' for app '%s' not found", e.Version, e.App)
 }
+
+type RevisionAmbiguousError struct {
+	Version int
+}
+
+func (e RevisionAmbiguousError) Error() string {
+	return fmt.Sprintf("More than one revision '%d' found", e.Version)
+}

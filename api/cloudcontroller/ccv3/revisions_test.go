@@ -91,7 +91,12 @@ var _ = Describe("Revisions", func() {
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationRevisionsRequest))
+<<<<<<< HEAD
 				Expect(actualParams.Query).To(Equal([]Query{query}))
+=======
+				Expect(actualParams.Query).To(ContainElement(submitQuery))
+				Expect(len(actualParams.Query)).To(Equal(1))
+>>>>>>> Refactor finding revision action to use query params rather than
 
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))

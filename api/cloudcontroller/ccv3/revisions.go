@@ -12,6 +12,7 @@ func (client *Client) GetApplicationRevisions(appGUID string, query ...Query) ([
 		RequestName:  internal.GetApplicationRevisionsRequest,
 		Query:        query,
 		URIParams:    internal.Params{"app_guid": appGUID},
+		Query:        query,
 		ResponseBody: resources.Revision{},
 		AppendToList: func(item interface{}) error {
 			revisions = append(revisions, item.(resources.Revision))

@@ -56,6 +56,8 @@ const (
 	// UsernamesFilter is a query parameter when getting a user by username
 	UsernamesFilter QueryKey = "usernames"
 	// StatesFilter is a query parameter when getting a package's droplets by state
+	VersionsFilter QueryKey = "versions"
+	// VersionsFilter is a query parameter when getting an apps revisions by version
 	StatesFilter QueryKey = "states"
 	// ServiceBrokerNamesFilter is a query parameter when getting plans or offerings according to the Service Brokers that it relates to
 	ServiceBrokerNamesFilter QueryKey = "service_broker_names"
