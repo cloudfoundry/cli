@@ -8,6 +8,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -221,6 +222,19 @@ var _ = Describe("apply-manifest Command", func() {
 						Expect(executeErr).To(MatchError(errors.New("Unable to apply manifest because its format is invalid.")))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
+					})
+				})
+
+				When("retrieving the manifest diff 500s", func() {
+					BeforeEach(func() {
+						fakeActor.DiffSpaceManifestReturns(resources.ManifestDiff{}, v7action.Warnings{}, ccerror.V3UnexpectedResponseError{})
+					})
+
+					It("reports the 500 but still applies the manifest", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Err).To(Say("Unable to generate diff."))
+						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 					})
 				})
 

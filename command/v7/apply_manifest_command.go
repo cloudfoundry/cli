@@ -3,6 +3,7 @@ package v7
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -103,7 +104,11 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 	diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, manifestBytes)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
+			cmd.UI.DisplayWarning("Unable to generate diff.")
+		} else {
+			return err
+		}
 	}
 
 	cmd.UI.DisplayNewline()
