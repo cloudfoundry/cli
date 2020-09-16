@@ -7,7 +7,7 @@ requests](https://help.github.com/articles/about-pull-requests/).
 The cf CLI follows a branching model:
 - V8 of the cf CLI is built from the [master branch](https://github.com/cloudfoundry/cli/tree/master). **This branch is for breaking changes** meant to ship in the next major revision. Please note that although this branch can be thought of as "V8", this version is still in the planning stage and has not yet been released in any form.
 - V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is under active development**.
-- V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is maintenance only** and will only be updated to patch severe security issues and defects.
+- V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is maintenance only** and will only be updated to patch CVEs and very severe blocking defects.
 
 ## Prerequisites
 Before working on a PR to the CLI code base, please:
