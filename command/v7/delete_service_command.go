@@ -19,10 +19,6 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
-
 	if !cmd.Force {
 		delete, err := cmd.displayPrompt()
 		if err != nil {
@@ -33,6 +29,10 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("Delete cancelled")
 			return nil
 		}
+	}
+
+	if err := cmd.displayEvent(); err != nil {
+		return err
 	}
 
 	state, warnings, err := cmd.Actor.DeleteServiceInstance(
@@ -53,7 +53,7 @@ func (cmd DeleteServiceCommand) Usage() string {
 	return "CF_NAME delete-service SERVICE_INSTANCE [-f] [-w]"
 }
 
-func (cmd DeleteServiceCommand) displayIntro() error {
+func (cmd DeleteServiceCommand) displayEvent() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err

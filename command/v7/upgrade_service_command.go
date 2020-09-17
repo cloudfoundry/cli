@@ -19,9 +19,6 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
 
 	if !cmd.Force {
 		upgrade, err := cmd.displayPrompt()
@@ -33,6 +30,10 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("Upgrade cancelled")
 			return nil
 		}
+	}
+
+	if err := cmd.displayEvent(); err != nil {
+		return err
 	}
 
 	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
@@ -63,7 +64,7 @@ func (cmd UpgradeServiceCommand) Usage() string {
 	return "CF_NAME upgrade-service SERVICE_INSTANCE"
 }
 
-func (cmd UpgradeServiceCommand) displayIntro() error {
+func (cmd UpgradeServiceCommand) displayEvent() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err

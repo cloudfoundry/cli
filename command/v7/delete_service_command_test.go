@@ -131,6 +131,11 @@ var _ = Describe("delete-service command", func() {
 		})
 	}
 
+	confirmYes := func() {
+		_, err := input.Write([]byte("y\n"))
+		Expect(err).NotTo(HaveOccurred())
+	}
+
 	BeforeEach(func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
@@ -167,16 +172,20 @@ var _ = Describe("delete-service command", func() {
 
 	It("prompts the user", func() {
 		Expect(testUI.Out).To(SatisfyAll(
-			Say(`Deleting service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
-			Say(`\n`),
 			Say(`Really delete the service instance %s\? \[yN\]:`, serviceInstanceName),
 		))
 	})
 
 	When("the user says yes", func() {
 		BeforeEach(func() {
-			_, err := input.Write([]byte("y\n"))
-			Expect(err).NotTo(HaveOccurred())
+			confirmYes()
+		})
+
+		It("informs the user what it is doing", func() {
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`Deleting service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+				Say(`\n`),
+			))
 		})
 
 		testActorInteractions()
@@ -224,6 +233,7 @@ var _ = Describe("delete-service command", func() {
 		When("getting the username fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+				confirmYes()
 			})
 
 			It("returns the error", func() {

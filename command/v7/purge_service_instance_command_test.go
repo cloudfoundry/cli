@@ -99,6 +99,11 @@ var _ = Describe("purge-service-instance command", func() {
 		})
 	}
 
+	confirmYes := func() {
+		_, err := input.Write([]byte("y\n"))
+		Expect(err).NotTo(HaveOccurred())
+	}
+
 	BeforeEach(func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
@@ -137,8 +142,6 @@ var _ = Describe("purge-service-instance command", func() {
 
 	It("prompts the user", func() {
 		Expect(testUI.Out).To(SatisfyAll(
-			Say(`Purging service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
-			Say(`\n`),
 			Say(`WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.\n`),
 			Say(`\n`),
 			Say(`Really purge service instance %s from Cloud Foundry\? \[yN\]:`, serviceInstanceName),
@@ -147,8 +150,14 @@ var _ = Describe("purge-service-instance command", func() {
 
 	When("the user says yes", func() {
 		BeforeEach(func() {
-			_, err := input.Write([]byte("y\n"))
-			Expect(err).NotTo(HaveOccurred())
+			confirmYes()
+		})
+
+		It("outputs the attempted operation", func() {
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`Purging service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+				Say(`\n`),
+			))
 		})
 
 		testActorInteractions()
@@ -196,6 +205,7 @@ var _ = Describe("purge-service-instance command", func() {
 		When("getting the username fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+				confirmYes()
 			})
 
 			It("returns the error", func() {
