@@ -105,7 +105,7 @@ applications:
 						session := helpers.CF("rollback", appName, "--revision", "5")
 						Eventually(session).Should(Exit(1))
 
-						Expect(session.Err).To(Say("Revision '5' not found."))
+						Expect(session.Err).To(Say("Revision \\(5\\) not found"))
 						Expect(session).To(Say("FAILED"))
 					})
 				})
@@ -144,7 +144,7 @@ applications:
 							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
 							Eventually(session).Should(Exit(0))
 
-							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", appName))
+							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
 							Expect(session).To(Say("Are you sure you want to continue?"))
 							Expect(session).To(Say("Rolling back to revision 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 							Expect(session).To(Say("OK"))
@@ -166,7 +166,7 @@ applications:
 							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
 							Eventually(session).Should(Exit(0))
 
-							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", appName))
+							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
 							Expect(session).To(Say("Are you sure you want to continue?"))
 							Expect(session).To(Say("App '%s' has not been rolled back to revision '1'", appName))
 
