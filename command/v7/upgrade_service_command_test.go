@@ -131,13 +131,6 @@ var _ = Describe("upgrade-service command", func() {
 		Expect(spaceChecked).To(BeTrue())
 	})
 
-	It("outputs the attempted operation", func() {
-		Expect(testUI.Out).To(SatisfyAll(
-			Say(`Upgrading service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
-			Say(`\n`),
-		))
-	})
-
 	It("prompts the user for confirmation", func() {
 		Expect(testUI.Out).To(SatisfyAll(
 			Say(`Warning: This operation may be long running and will block further operations on the service instance until it's completed`),
@@ -149,6 +142,13 @@ var _ = Describe("upgrade-service command", func() {
 		BeforeEach(func() {
 			_, err := input.Write([]byte("y\n"))
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("outputs the attempted operation", func() {
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`Upgrading service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+				Say(`\n`),
+			))
 		})
 
 		testActorInteractions()

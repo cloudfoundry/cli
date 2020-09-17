@@ -23,10 +23,6 @@ func (cmd PurgeServiceInstanceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := cmd.displayIntro(); err != nil {
-		return err
-	}
-
 	if !cmd.Force {
 		purge, err := cmd.displayPrompt()
 		if err != nil {
@@ -37,6 +33,10 @@ func (cmd PurgeServiceInstanceCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("Purge cancelled")
 			return nil
 		}
+	}
+
+	if err := cmd.displayEvent(); err != nil {
+		return err
 	}
 
 	state, warnings, err := cmd.Actor.PurgeServiceInstance(
@@ -60,7 +60,7 @@ func (cmd PurgeServiceInstanceCommand) Usage() string {
 	}, "\n")
 }
 
-func (cmd PurgeServiceInstanceCommand) displayIntro() error {
+func (cmd PurgeServiceInstanceCommand) displayEvent() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
