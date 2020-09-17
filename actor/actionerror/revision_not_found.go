@@ -9,7 +9,7 @@ type RevisionNotFoundError struct {
 }
 
 func (e RevisionNotFoundError) Error() string {
-	return fmt.Sprintf("Revision (%d) not found", e.Version)
+	return fmt.Sprintf("Revision '%d' not found", e.Version)
 }
 
 type RevisionAmbiguousError struct {
@@ -17,5 +17,5 @@ type RevisionAmbiguousError struct {
 }
 
 func (e RevisionAmbiguousError) Error() string {
-	return fmt.Sprintf("More than one revision (%d) found", e.Version)
+	return fmt.Sprintf("More than one revision '%d' found", e.Version)
 }

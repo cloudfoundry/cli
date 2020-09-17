@@ -105,7 +105,7 @@ applications:
 						session := helpers.CF("rollback", appName, "--revision", "5")
 						Eventually(session).Should(Exit(1))
 
-						Expect(session.Err).To(Say("Revision \\(5\\) not found"))
+						Expect(session.Err).To(Say("Revision '5' not found"))
 						Expect(session).To(Say("FAILED"))
 					})
 				})
