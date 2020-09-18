@@ -24,6 +24,23 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:200f879b6b3460f2e984224935ce6fe9e46b712ec58b4b0a5cc1dceb87521400"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "4c3168f9a1a1deba7606af027470bd7798caad42"
+  version = "v7.1.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -190,12 +207,12 @@
   revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
 
 [[projects]]
-  digest = "1:24fc51072bca32204c162b79ede835505b3c5c5cce4e2e0cd6184ff2376486c9"
+  digest = "1:94d4e646540442b5ff1787468e9cfcfad922a14587724b65ba05bf7ad75921a8"
   name = "github.com/cloudfoundry/bosh-cli"
   packages = ["director/template"]
   pruneopts = "NUT"
-  revision = "7850ac985726c614f8ecba726ae8c0d17b08ad7f"
-  version = "v5.5.1"
+  revision = "7e5d8860603c94d48b9358a86d234bf4d475603f"
+  version = "v6.4.0"
 
 [[projects]]
   branch = "master"
