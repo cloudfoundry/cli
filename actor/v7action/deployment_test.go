@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -15,22 +16,42 @@ import (
 var _ = Describe("Deployment Actions", func() {
 	var (
 		actor                     *Actor
+		executeErr                error
+		warnings                  v7action.Warnings
+		returnedDeploymentGUID    string
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 	)
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
+		fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+			"some-deployment-guid",
+			ccv3.Warnings{"create-warning-1", "create-warning-2"},
+			errors.New("create-error"),
+		)
 	})
 
 	Describe("CreateDeploymentByApplicationAndRevision", func() {
-		It("delegates to the cloud controller client", func() {
-			fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
-				"some-deployment-guid",
-				ccv3.Warnings{"create-warning-1", "create-warning-2"},
-				errors.New("create-error"),
-			)
+		JustBeforeEach(func() {
+			returnedDeploymentGUID, warnings, executeErr = actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+		})
 
-			returnedDeploymentGUID, warnings, _ := actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+		When("the client fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+					"some-deployment-guid",
+					ccv3.Warnings{"create-warning-1", "create-warning-2"},
+					errors.New("create-deployment-error"),
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).To(MatchError("create-deployment-error"))
+				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2"))
+			})
+		})
+
+		It("delegates to the cloud controller client", func() {
 
 			Expect(fakeCloudControllerClient.CreateApplicationDeploymentByRevisionCallCount()).To(Equal(1), "CreateApplicationDeploymentByRevision call count")
 			givenAppGUID, givenRevisionGUID := fakeCloudControllerClient.CreateApplicationDeploymentByRevisionArgsForCall(0)
