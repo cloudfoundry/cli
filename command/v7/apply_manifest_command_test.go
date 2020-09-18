@@ -230,10 +230,11 @@ var _ = Describe("apply-manifest Command", func() {
 						fakeActor.DiffSpaceManifestReturns(resources.ManifestDiff{}, v7action.Warnings{}, ccerror.V3UnexpectedResponseError{})
 					})
 
-					It("reports the 500 but still applies the manifest", func() {
+					It("reports the 500, does not display the diff, but still applies the manifest", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Err).To(Say("Unable to generate diff."))
+						Expect(testUI.Err).To(Say("Unable to generate diff. Continuing to apply manifest..."))
+						Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(0))
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 					})
 				})

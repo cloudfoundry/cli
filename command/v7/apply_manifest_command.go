@@ -105,18 +105,18 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
-			cmd.UI.DisplayWarning("Unable to generate diff.")
+			cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
 		} else {
 			return err
 		}
-	}
+	} else {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Updating with these attributes...")
 
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Updating with these attributes...")
-
-	err = cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
-	if err != nil {
-		return err
+		err = cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
+		if err != nil {
+			return err
+		}
 	}
 
 	warnings, err = cmd.Actor.SetSpaceManifest(spaceGUID, manifestBytes)
