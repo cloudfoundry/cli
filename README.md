@@ -77,38 +77,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 ### Installation instructions
 - [Install V6](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide)
 - [Install V7](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide)
-
-### Version Switching
-The GA'd v7 cf CLI binary is named `cf` whereas all the beta release v7 binaries were named `cf7`.
-Workflows that require switching between the v7 and v6 CLIs can be scripted to accomodate utilizing binaries of the same name on a single computer.
-
-Below you'll find instructions for each of the package managers we support.
-
-#### Switching CLI versions Using Brew
-- Assuming you've installed both the v6 and v7 CLIs as follows...
-  - `brew install cf-cli@7`
-  - `brew install cf-cli@6`
-- Switch from v6 to v7:
-  - `brew unlink cf-cli@6 && brew unlink cf-cli@7 && brew link cf-cli@7 && cf version`
-- Switch from v7 to v6:
-  - `brew unlink cf-cli@7 && brew unlink cf-cli@6 && brew link cf-cli@6 && cf version`
-
-
-
-#### Switching CLI versions Using Yum or Apt
-We're working on a robust soluiton that will faciliate more seamless switching via these package managers, but for now you must uninstall one version of the CLI and install the other version of the CLI to switch between them.
-- Currently on v6, want to switch to v7:
-  - yum: `sudo yum remove cf-cli && sudo yum install cf7-cli && cf version`
-  - apt: `sudo apt-get remove cf-cli && sudo apt-get install cf7-cli && cf version`
-- Currently on v7, want to switch to v6:
-  - yum: `sudo yum remove cf7-cli && sudo yum install cf-cli && cf version`
-  - apt: `sudo apt-get remove cf7-cli && sudo apt-get install cf-cli && cf version`
-
-#### Switching CLI Versions Pulled via GitHub or CLAW
-The following is a simple approach:
-- Download the v6 and v7 binaries into separate directories
-- Write a scipt that updates your `PATH` so it points to the binary for the version of the CLI you need to run:
-  - `export PATH=/path/to/your/v6-or-v7/binary/:$PATH`
+- [Switching Between Multiple Versions](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide)
 
 ## Known Issues
 
