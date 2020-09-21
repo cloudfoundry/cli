@@ -1921,10 +1921,11 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceInstancesForSpaceStub        func(string) ([]v7action.ServiceInstance, v7action.Warnings, error)
+	GetServiceInstancesForSpaceStub        func(string, bool) ([]v7action.ServiceInstance, v7action.Warnings, error)
 	getServiceInstancesForSpaceMutex       sync.RWMutex
 	getServiceInstancesForSpaceArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	getServiceInstancesForSpaceReturns struct {
 		result1 []v7action.ServiceInstance
@@ -11526,16 +11527,17 @@ func (fake *FakeActor) GetServiceInstanceDetailsReturnsOnCall(i int, result1 v7a
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceInstancesForSpace(arg1 string) ([]v7action.ServiceInstance, v7action.Warnings, error) {
+func (fake *FakeActor) GetServiceInstancesForSpace(arg1 string, arg2 bool) ([]v7action.ServiceInstance, v7action.Warnings, error) {
 	fake.getServiceInstancesForSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesForSpaceReturnsOnCall[len(fake.getServiceInstancesForSpaceArgsForCall)]
 	fake.getServiceInstancesForSpaceArgsForCall = append(fake.getServiceInstancesForSpaceArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetServiceInstancesForSpace", []interface{}{arg1})
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("GetServiceInstancesForSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstancesForSpaceMutex.Unlock()
 	if fake.GetServiceInstancesForSpaceStub != nil {
-		return fake.GetServiceInstancesForSpaceStub(arg1)
+		return fake.GetServiceInstancesForSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -11550,17 +11552,17 @@ func (fake *FakeActor) GetServiceInstancesForSpaceCallCount() int {
 	return len(fake.getServiceInstancesForSpaceArgsForCall)
 }
 
-func (fake *FakeActor) GetServiceInstancesForSpaceCalls(stub func(string) ([]v7action.ServiceInstance, v7action.Warnings, error)) {
+func (fake *FakeActor) GetServiceInstancesForSpaceCalls(stub func(string, bool) ([]v7action.ServiceInstance, v7action.Warnings, error)) {
 	fake.getServiceInstancesForSpaceMutex.Lock()
 	defer fake.getServiceInstancesForSpaceMutex.Unlock()
 	fake.GetServiceInstancesForSpaceStub = stub
 }
 
-func (fake *FakeActor) GetServiceInstancesForSpaceArgsForCall(i int) string {
+func (fake *FakeActor) GetServiceInstancesForSpaceArgsForCall(i int) (string, bool) {
 	fake.getServiceInstancesForSpaceMutex.RLock()
 	defer fake.getServiceInstancesForSpaceMutex.RUnlock()
 	argsForCall := fake.getServiceInstancesForSpaceArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeActor) GetServiceInstancesForSpaceReturns(result1 []v7action.ServiceInstance, result2 v7action.Warnings, result3 error) {

@@ -22,7 +22,7 @@ type planDetails struct {
 	plan, offering, broker string
 }
 
-func (actor Actor) GetServiceInstancesForSpace(spaceGUID string) ([]ServiceInstance, Warnings, error) {
+func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) ([]ServiceInstance, Warnings, error) {
 	instances, included, warnings, err := actor.CloudControllerClient.GetServiceInstances(
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 		ccv3.Query{Key: ccv3.FieldsServicePlan, Values: []string{"guid", "name", "relationships.service_offering"}},
@@ -42,10 +42,14 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string) ([]ServiceInsta
 	}
 
 	planDetailsLookup := actor.buildPlanDetailsLookup(included)
-	boundAppsLookup, bindingsWarnings, err := actor.buildBoundAppsLookup(instances)
-	warnings = append(warnings, bindingsWarnings...)
-	if err != nil {
-		return nil, Warnings(warnings), err
+	var boundAppsLookup map[string][]string
+	if !omitApps {
+		var bindingsWarnings ccv3.Warnings
+		boundAppsLookup, bindingsWarnings, err = actor.buildBoundAppsLookup(instances)
+		warnings = append(warnings, bindingsWarnings...)
+		if err != nil {
+			return nil, Warnings(warnings), err
+		}
 	}
 
 	result := make([]ServiceInstance, len(instances))

@@ -171,10 +171,15 @@ var _ = Describe("Service Instance List Action", func() {
 			serviceInstances []ServiceInstance
 			warnings         Warnings
 			executionError   error
+			omitApps         bool
 		)
 
+		BeforeEach(func() {
+			omitApps = false
+		})
+
 		JustBeforeEach(func() {
-			serviceInstances, warnings, executionError = actor.GetServiceInstancesForSpace(spaceGUID)
+			serviceInstances, warnings, executionError = actor.GetServiceInstancesForSpace(spaceGUID, omitApps)
 		})
 
 		It("makes the correct call to get service instances", func() {
@@ -201,6 +206,16 @@ var _ = Describe("Service Instance List Action", func() {
 				}},
 				ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
 			))
+		})
+
+		When("omit apps is set to true", func() {
+			BeforeEach(func() {
+				omitApps = true
+			})
+
+			It("does not get service credential bindings", func() {
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(0))
+			})
 		})
 
 		When("the cloud controller request is successful", func() {
