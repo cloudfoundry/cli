@@ -61,7 +61,7 @@ on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/89293
 
 ## Getting Started
 
-Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v7 cf CLI](./doc/installation-instructions/installation-instructions-v7.md) or the [v6 cf CLI](./doc/installation-instructions/installation-instructions-v6.md).
+Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v7 cf CLI](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide) or the [v6 cf CLI](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide).
 
 Once installed, you can log in and push an app.
 
@@ -75,8 +75,8 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 ## Downloads
 
 ### Installation instructions
-- [Install V6](./doc/installation-instructions/installation-instructions-v6.md)
-- [Install V7](./doc/installation-instructions/installation-instructions-v7.md)
+- [Install V6](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide)
+- [Install V7](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide)
 
 ### Version Switching
 The GA'd v7 cf CLI binary is named `cf` whereas all the beta release v7 binaries were named `cf7`.
