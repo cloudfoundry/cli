@@ -1,11 +1,10 @@
 package v7action
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"fmt"
 )
 
 type ServiceInstance struct {
@@ -19,6 +18,10 @@ type ServiceInstance struct {
 	UpgradeAvailable    types.OptionalBoolean         `json:"upgrade_available"`
 }
 
+type planDetails struct {
+	plan, offering, broker string
+}
+
 func (actor Actor) GetServiceInstancesForSpace(spaceGUID string) ([]ServiceInstance, Warnings, error) {
 	instances, included, warnings, err := actor.CloudControllerClient.GetServiceInstances(
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
@@ -27,7 +30,43 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string) ([]ServiceInsta
 		ccv3.Query{Key: ccv3.FieldsServicePlanServiceOfferingServiceBroker, Values: []string{"guid", "name"}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
 	)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
 
+	lastOperation := func(lo resources.LastOperation) string {
+		if lo.Type != "" && lo.State != "" {
+			return fmt.Sprintf("%s %s", lo.Type, lo.State)
+		}
+		return ""
+	}
+
+	planDetailsLookup := actor.buildPlanDetailsLookup(included)
+	boundAppsLookup, bindingsWarnings, err := actor.buildBoundAppsLookup(instances)
+	warnings = append(warnings, bindingsWarnings...)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	result := make([]ServiceInstance, len(instances))
+	for i, instance := range instances {
+		names := planDetailsLookup[instance.ServicePlanGUID]
+		result[i] = ServiceInstance{
+			Name:                instance.Name,
+			Type:                instance.Type,
+			UpgradeAvailable:    instance.UpgradeAvailable,
+			ServicePlanName:     names.plan,
+			ServiceOfferingName: names.offering,
+			ServiceBrokerName:   names.broker,
+			BoundApps:           boundAppsLookup[instance.GUID],
+			LastOperation:       lastOperation(instance.LastOperation),
+		}
+	}
+
+	return result, Warnings(warnings), nil
+}
+
+func (actor Actor) buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDetails {
 	brokerLookup := make(map[string]string)
 	for _, b := range included.ServiceBrokers {
 		brokerLookup[b.GUID] = b.Name
@@ -43,38 +82,40 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string) ([]ServiceInsta
 		}
 	}
 
-	type threeNames struct{ broker, offering, plan string }
-	planLookup := make(map[string]threeNames)
+	planLookup := make(map[string]planDetails)
 	for _, p := range included.ServicePlans {
 		names := offeringLookup[p.ServiceOfferingGUID]
-		planLookup[p.GUID] = threeNames{
+		planLookup[p.GUID] = planDetails{
 			broker:   names.broker,
 			offering: names.offering,
 			plan:     p.Name,
 		}
 	}
+	return planLookup
+}
 
-	lastOperation := func(lo resources.LastOperation) string {
-		if lo.Type != "" && lo.State != "" {
-			return fmt.Sprintf("%s %s", lo.Type, lo.State)
-		}
-		return ""
-	}
-
-	result := make([]ServiceInstance, len(instances))
+func (actor Actor) buildBoundAppsLookup(instances []resources.ServiceInstance) (map[string][]string, ccv3.Warnings, error) {
+	serviceInstanceGUIDS := make([]string, len(instances))
 	for i, instance := range instances {
-		names := planLookup[instance.ServicePlanGUID]
-		result[i] = ServiceInstance{
-			Name:                instance.Name,
-			Type:                instance.Type,
-			UpgradeAvailable:    instance.UpgradeAvailable,
-			ServicePlanName:     names.plan,
-			ServiceOfferingName: names.offering,
-			ServiceBrokerName:   names.broker,
-			BoundApps:           []string{"foo", "bar"},
-			LastOperation:       lastOperation(instance.LastOperation),
-		}
+		serviceInstanceGUIDS[i] = instance.GUID
+	}
+	bindings, included, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: serviceInstanceGUIDS},
+		ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+	)
+	if err != nil {
+		return nil, warnings, err
 	}
 
-	return result, Warnings(warnings), err
+	appLookup := make(map[string]string, len(included.Apps))
+	for _, app := range included.Apps {
+		appLookup[app.GUID] = app.Name
+	}
+	appsBoundLookup := make(map[string][]string)
+	for _, binding := range bindings {
+		if binding.Type == resources.AppBinding {
+			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], appLookup[binding.AppGUID])
+		}
+	}
+	return appsBoundLookup, warnings, nil
 }

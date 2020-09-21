@@ -650,6 +650,12 @@ var _ = Describe("shared request helpers", func() {
 							}
 						],
 						"included": {
+							"apps": [
+								{
+									"guid": "app-guid-1",
+									"name": "app-name-1"
+								}
+							],
 							"users": [
 								{
 									"guid": "user-guid-1",
@@ -775,6 +781,9 @@ var _ = Describe("shared request helpers", func() {
 					}}))
 
 					Expect(includedResources).To(Equal(IncludedResources{
+						Apps: []resources.Application{
+							{Name: "app-name-1", GUID: "app-guid-1"},
+						},
 						Users: []resources.User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},

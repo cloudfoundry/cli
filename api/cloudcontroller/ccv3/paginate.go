@@ -17,6 +17,7 @@ func (requester RealRequester) paginate(request *cloudcontroller.Request, obj in
 			return IncludedResources{}, fullWarningsList, err
 		}
 
+		includes.Apps = append(includes.Apps, wrapper.IncludedResources.Apps...)
 		includes.Users = append(includes.Users, wrapper.IncludedResources.Users...)
 		includes.Organizations = append(includes.Organizations, wrapper.IncludedResources.Organizations...)
 		includes.Spaces = append(includes.Spaces, wrapper.IncludedResources.Spaces...)
