@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"github.com/onsi/gomega/types"
 )
 
 var _ = Describe("rollback command", func() {
@@ -71,13 +72,12 @@ var _ = Describe("rollback command", func() {
 				Expect(session.Err).To(Say("App '%s' not found.", appName))
 				Expect(session).To(Say("FAILED"))
 			})
-
 		})
 
 		Describe("the app exists with revisions", func() {
-
 			When("the app is started and has 2 instances", func() {
 				var domainName string
+
 				BeforeEach(func() {
 					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -115,15 +115,10 @@ applications:
 						session := helpers.CF("rollback", appName, "--revision", "1", "-f")
 						Eventually(session).Should(Exit(0))
 
-						Expect(session).To(Say("%s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-						Expect(session).To(Say("OK"))
-
-						Expect(session).ToNot(Say("Are you sure you want to continue?"))
+						Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))
 
 						session = helpers.CF("revisions", appName)
 						Eventually(session).Should(Exit(0))
-
-						Expect(session).To(Say(`3\s+New droplet deployed.`))
 					})
 				})
 
@@ -134,7 +129,7 @@ applications:
 						buffer = NewBuffer()
 					})
 
-					When("the user confirms the prompt", func() {
+					When("the user enters y", func() {
 						BeforeEach(func() {
 							_, err := buffer.Write([]byte("y\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -144,9 +139,8 @@ applications:
 							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
 							Eventually(session).Should(Exit(0))
 
-							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
-							Expect(session).To(Say("Are you sure you want to continue?"))
-							Expect(session).To(Say("Rolling back to revision 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Expect(session).To(HaveRollbackPrompt())
+							Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))
 							Expect(session).To(Say("OK"))
 
 							session = helpers.CF("revisions", appName)
@@ -166,8 +160,7 @@ applications:
 							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
 							Eventually(session).Should(Exit(0))
 
-							Expect(session).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
-							Expect(session).To(Say("Are you sure you want to continue?"))
+							Expect(session).To(HaveRollbackPrompt())
 							Expect(session).To(Say("App '%s' has not been rolled back to revision '1'", appName))
 
 							session = helpers.CF("revisions", appName)
@@ -181,3 +174,61 @@ applications:
 		})
 	})
 })
+
+type Line struct {
+	str  string
+	args []interface{}
+}
+
+func HaveRollbackPrompt() *CLIMatcher {
+	return &CLIMatcher{Lines: []Line{
+		{"Are you sure you want to continue?", nil},
+	}}
+}
+
+func HaveRollbackOutput(appName, orgName, spaceName, userName string) *CLIMatcher {
+	return &CLIMatcher{Lines: []Line{
+		AppInOrgSpaceAsUser(appName, orgName, spaceName, userName),
+		KeyValue("name", appName),
+		KeyValue("routes", fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())),
+	}}
+}
+
+// Per-style guide: https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide#system-feedback--transparency
+func AppInOrgSpaceAsUser(appName, orgName, spaceName, userName string) Line {
+	return Line{`app %s in org %s / space %s as %s`, []interface{}{appName, orgName, spaceName, userName}}
+}
+
+// Per-style guide: https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide#keyvalue-pairs
+func KeyValue(key, value string) Line {
+	return Line{`%s:\s+%s`, []interface{}{key, value}}
+}
+
+type CLIMatcher struct {
+	Lines          []Line
+	wrappedMatcher types.GomegaMatcher
+}
+
+func (cm *CLIMatcher) Match(actual interface{}) (bool, error) {
+	for _, line := range cm.Lines {
+		cm.wrappedMatcher = types.GomegaMatcher(Say(line.str, line.args...))
+		success, err := cm.wrappedMatcher.Match(actual)
+		if err != nil {
+			return false, err
+		}
+
+		if success != true {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+func (cm CLIMatcher) FailureMessage(interface{}) string {
+	return cm.wrappedMatcher.FailureMessage(nil)
+}
+
+func (cm CLIMatcher) NegatedFailureMessage(interface{}) string {
+	return cm.wrappedMatcher.NegatedFailureMessage(nil)
+}

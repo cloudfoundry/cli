@@ -235,6 +235,14 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.RepositoryNotRegisteredError{Name: "some-repo"},
 			RepositoryNotRegisteredError{Name: "some-repo"}),
 
+		Entry("actionerror.RevisionNotFoundErrors-> RevisionNotFoundError",
+			actionerror.RevisionNotFoundError{Version: 1},
+			RevisionNotFoundError{Version: 1}),
+
+		Entry("actionerror.RevisionAmbiguousError-> RevisionAmbiguousError",
+			actionerror.RevisionAmbiguousError{Version: 1},
+			RevisionAmbiguousError{Version: 1}),
+
 		Entry("actionerror.RouteInDifferentSpaceError -> RouteInDifferentSpaceError",
 			actionerror.RouteInDifferentSpaceError{Route: "some-route"},
 			RouteInDifferentSpaceError{Route: "some-route"}),
