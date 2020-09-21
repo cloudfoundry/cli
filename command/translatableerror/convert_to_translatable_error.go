@@ -115,6 +115,10 @@ func ConvertToTranslatableError(err error) error {
 		return RepositoryNameTakenError(e)
 	case actionerror.RepositoryNotRegisteredError:
 		return RepositoryNotRegisteredError(e)
+	case actionerror.RevisionNotFoundError:
+		return RevisionNotFoundError(e)
+	case actionerror.RevisionAmbiguousError:
+		return RevisionAmbiguousError(e)
 	case actionerror.RouteInDifferentSpaceError:
 		return RouteInDifferentSpaceError(e)
 	case actionerror.RoutePathWithTCPDomainError:
