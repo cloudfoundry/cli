@@ -310,7 +310,7 @@ var _ = Describe("app stager", func() {
 
 	Context("StartApp", func() {
 		var (
-			droplet resources.Droplet
+			resourceGUID string
 		)
 
 		BeforeEach(func() {
@@ -326,9 +326,9 @@ var _ = Describe("app stager", func() {
 			appAction = constant.ApplicationRestarting
 
 			app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
-			droplet = resources.Droplet{GUID: "droplet-guid"}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
+			resourceGUID = "droplet-guid"
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"application-summary-warning-1", "application-summary-warning-2"}, nil)
@@ -338,7 +338,7 @@ var _ = Describe("app stager", func() {
 			appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
 			executeErr = appStager.StartApp(
 				app,
-				droplet,
+				resourceGUID,
 				strategy,
 				noWait,
 				space,
@@ -355,11 +355,38 @@ var _ = Describe("app stager", func() {
 					v7action.Warnings{"create-deployment-warning"},
 					nil,
 				)
+
 				fakeActor.PollStartForRollingReturns(
 					v7action.Warnings{"poll-start-warning"},
 					nil,
 				)
+			})
 
+			When("the appAction is rolling back", func() {
+				BeforeEach(func() {
+					appAction = constant.ApplicationRollingBack
+					resourceGUID = "revision-guid"
+					fakeActor.CreateDeploymentByApplicationAndRevisionReturns(
+						"some-deployment-guid",
+						v7action.Warnings{"create-deployment-warning"},
+						nil,
+					)
+				})
+
+				It("displays output for each step of rolling back", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("Creating deployment for app %s...", app.Name))
+					Expect(fakeActor.CreateDeploymentByApplicationAndRevisionCallCount()).To(Equal(1), "CreateDeployment...")
+					appGUID, revisionGUID := fakeActor.CreateDeploymentByApplicationAndRevisionArgsForCall(0)
+					Expect(appGUID).To(Equal(app.GUID))
+					Expect(revisionGUID).To(Equal("revision-guid"))
+					Expect(testUI.Err).To(Say("create-deployment-warning"))
+
+					Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
+					Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+					Expect(testUI.Err).To(Say("poll-start-warning"))
+				})
 			})
 
 			When("the app starts successfully", func() {
@@ -508,7 +535,7 @@ var _ = Describe("app stager", func() {
 
 			When("a droplet guid is not provided", func() {
 				BeforeEach(func() {
-					droplet = resources.Droplet{}
+					resourceGUID = ""
 				})
 
 				It("does not try to set the application droplet", func() {

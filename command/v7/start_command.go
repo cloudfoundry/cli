@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/resources"
 )
 
 type StartCommand struct {
@@ -75,7 +74,7 @@ func (cmd StartCommand) Execute(args []string) error {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, resources.Droplet{}, constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
+		err = cmd.Stager.StartApp(app, "", constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
 		if err != nil {
 			return err
 		}

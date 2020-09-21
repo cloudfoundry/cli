@@ -43,11 +43,11 @@ type FakeAppStager struct {
 		result1 resources.Droplet
 		result2 error
 	}
-	StartAppStub        func(resources.Application, resources.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error
+	StartAppStub        func(resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error
 	startAppMutex       sync.RWMutex
 	startAppArgsForCall []struct {
 		arg1 resources.Application
-		arg2 resources.Droplet
+		arg2 string
 		arg3 constant.DeploymentStrategy
 		arg4 bool
 		arg5 configv3.Space
@@ -195,12 +195,12 @@ func (fake *FakeAppStager) StageAppReturnsOnCall(i int, result1 resources.Drople
 	}{result1, result2}
 }
 
-func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 resources.Droplet, arg3 constant.DeploymentStrategy, arg4 bool, arg5 configv3.Space, arg6 configv3.Organization, arg7 constant.ApplicationAction) error {
+func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 string, arg3 constant.DeploymentStrategy, arg4 bool, arg5 configv3.Space, arg6 configv3.Organization, arg7 constant.ApplicationAction) error {
 	fake.startAppMutex.Lock()
 	ret, specificReturn := fake.startAppReturnsOnCall[len(fake.startAppArgsForCall)]
 	fake.startAppArgsForCall = append(fake.startAppArgsForCall, struct {
 		arg1 resources.Application
-		arg2 resources.Droplet
+		arg2 string
 		arg3 constant.DeploymentStrategy
 		arg4 bool
 		arg5 configv3.Space
@@ -225,13 +225,13 @@ func (fake *FakeAppStager) StartAppCallCount() int {
 	return len(fake.startAppArgsForCall)
 }
 
-func (fake *FakeAppStager) StartAppCalls(stub func(resources.Application, resources.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error) {
+func (fake *FakeAppStager) StartAppCalls(stub func(resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error) {
 	fake.startAppMutex.Lock()
 	defer fake.startAppMutex.Unlock()
 	fake.StartAppStub = stub
 }
 
-func (fake *FakeAppStager) StartAppArgsForCall(i int) (resources.Application, resources.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) {
+func (fake *FakeAppStager) StartAppArgsForCall(i int) (resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) {
 	fake.startAppMutex.RLock()
 	defer fake.startAppMutex.RUnlock()
 	argsForCall := fake.startAppArgsForCall[i]
