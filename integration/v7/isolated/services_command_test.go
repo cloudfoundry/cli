@@ -332,17 +332,33 @@ var _ = Describe("services command V3", func() {
 		})
 
 		It("displays all service information", func() {
-			session := helpers.CF(command)
-			Eventually(session).Should(Exit(0))
+			By("including bound apps by default", func() {
+				session := helpers.CF(command)
+				Eventually(session).Should(Exit(0))
 
-			Expect(session).To(SatisfyAll(
-				Say("Getting service instances in org %s / space %s as %s...", orgName, spaceName, userName),
-				Say(`name\s+offering\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available\n`),
-				Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, "create succeeded", broker.Name, "yes"),
-				Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, appName2, "create succeeded", broker.Name, "no"),
-				Say(`%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", appName1),
-				Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService2, "user-provided", appName1, appName2),
-			))
+				Expect(session).To(SatisfyAll(
+					Say("Getting service instances in org %s / space %s as %s...", orgName, spaceName, userName),
+					Say(`name\s+offering\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available\n`),
+					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, "create succeeded", broker.Name, "yes"),
+					Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, appName2, "create succeeded", broker.Name, "no"),
+					Say(`%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", appName1),
+					Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService2, "user-provided", appName1, appName2),
+				))
+			})
+
+			By("not showing apps when --no-apps is provided", func() {
+				session := helpers.CF(command, "--no-apps")
+				Eventually(session).Should(Exit(0))
+
+				Expect(session).To(SatisfyAll(
+					Say("Getting service instances in org %s / space %s as %s...", orgName, spaceName, userName),
+					Say(`name\s+offering\s+plan\s+last operation\s+broker\s+upgrade available\n`),
+					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "create succeeded", broker.Name, "yes"),
+					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "create succeeded", broker.Name, "no"),
+					Say(`%s\s+%s\s*\n`, userProvidedService1, "user-provided"),
+					Say(`%s\s+%s\s*\n`, userProvidedService2, "user-provided"),
+				))
+			})
 		})
 	})
 })

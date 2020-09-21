@@ -15,6 +15,7 @@ type ServicesCommand struct {
 	BaseCommand
 
 	Format          string      `long:"format" hidden:"yes"`
+	OmitApps        bool        `long:"no-apps" description:"Do not retrieve bound apps information."`
 	relatedCommands interface{} `related_commands:"create-service, marketplace"`
 }
 
@@ -27,7 +28,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		return err
 	}
 
-	instances, warnings, err := cmd.Actor.GetServiceInstancesForSpace(cmd.Config.TargetedSpace().GUID)
+	instances, warnings, err := cmd.Actor.GetServiceInstancesForSpace(cmd.Config.TargetedSpace().GUID, cmd.OmitApps)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -71,11 +72,12 @@ func (cmd ServicesCommand) displayHeritageTable(instances []v7action.ServiceInst
 		return
 	}
 
-	table := [][]string{{"name", "offering", "plan", "bound apps", "last operation", "broker", "upgrade available"}}
-	for _, i := range instances {
-		table = append(table, heritageTableLine(i))
+	table := NewServicesTable(false, cmd.OmitApps)
+
+	for _, si := range instances {
+		table.AppendRow(si)
 	}
-	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+	cmd.UI.DisplayTableWithHeader("", table.table, ui.DefaultTableSpacePadding)
 }
 
 func (cmd ServicesCommand) displaySplitTable(instances []v7action.ServiceInstance) {
@@ -94,12 +96,12 @@ func (cmd ServicesCommand) displaySplitTable(instances []v7action.ServiceInstanc
 	}
 
 	if len(managed) > 0 {
-		table := [][]string{{"name", "offering", "plan", "bound apps", "last operation", "broker", "upgrade available"}}
-		for _, i := range managed {
-			table = append(table, heritageTableLine(i))
+		table := NewServicesTable(false, cmd.OmitApps)
+		for _, si := range managed {
+			table.AppendRow(si)
 		}
 		cmd.UI.DisplayText("Managed service instances:")
-		cmd.UI.DisplayTableWithHeader("    ", table, ui.DefaultTableSpacePadding)
+		cmd.UI.DisplayTableWithHeader("    ", table.table, ui.DefaultTableSpacePadding)
 
 		if len(user) > 0 {
 			cmd.UI.DisplayNewline()
@@ -107,12 +109,13 @@ func (cmd ServicesCommand) displaySplitTable(instances []v7action.ServiceInstanc
 	}
 
 	if len(user) > 0 {
-		table := [][]string{{"name", "bound apps"}}
-		for _, i := range user {
-			table = append(table, []string{i.Name, strings.Join(i.BoundApps, ", ")})
+		table := NewServicesTable(true, cmd.OmitApps)
+		for _, si := range user {
+			table.AppendRow(si)
+			//table = append(table, []string{i.Name, strings.Join(i.BoundApps, ", ")})
 		}
 		cmd.UI.DisplayText("User-provided service instances:")
-		cmd.UI.DisplayTableWithHeader("    ", table, ui.DefaultTableSpacePadding)
+		cmd.UI.DisplayTableWithHeader("    ", table.table, ui.DefaultTableSpacePadding)
 	}
 }
 
@@ -123,18 +126,6 @@ func (cmd ServicesCommand) displayJSON(instances []v7action.ServiceInstance) {
 	}
 
 	cmd.UI.DisplayText(string(data))
-}
-
-func heritageTableLine(si v7action.ServiceInstance) []string {
-	return []string{
-		si.Name,
-		serviceOfferingName(si),
-		si.ServicePlanName,
-		strings.Join(si.BoundApps, ", "),
-		si.LastOperation,
-		si.ServiceBrokerName,
-		upgradeAvailableString(si.UpgradeAvailable),
-	}
 }
 
 func upgradeAvailableString(u types.OptionalBoolean) string {
@@ -153,4 +144,52 @@ func serviceOfferingName(si v7action.ServiceInstance) string {
 		return "user-provided"
 	}
 	return si.ServiceOfferingName
+}
+
+type ServicesTable struct {
+	table    [][]string
+	short    bool
+	showApps bool
+}
+
+func NewServicesTable(short bool, omitApps bool) *ServicesTable {
+	t := &ServicesTable{
+		short:    short,
+		showApps: !omitApps,
+	}
+
+	return t.withHeaders()
+}
+
+func (t *ServicesTable) withHeaders() *ServicesTable {
+	headers := []string{"name"}
+	if t.short {
+		if t.showApps {
+			headers = append(headers, "bound apps")
+		}
+	} else {
+		headers = append(headers, "offering", "plan")
+		if t.showApps {
+			headers = append(headers, "bound apps")
+		}
+		headers = append(headers, "last operation", "broker", "upgrade available")
+	}
+	t.table = [][]string{headers}
+	return t
+}
+
+func (t *ServicesTable) AppendRow(si v7action.ServiceInstance) {
+	row := []string{si.Name}
+	if t.short {
+		if t.showApps {
+			row = append(row, strings.Join(si.BoundApps, ", "))
+		}
+	} else {
+		row = append(row, serviceOfferingName(si), si.ServicePlanName)
+		if t.showApps {
+			row = append(row, strings.Join(si.BoundApps, ", "))
+		}
+		row = append(row, si.LastOperation, si.ServiceBrokerName, upgradeAvailableString(si.UpgradeAvailable))
+	}
+	t.table = append(t.table, row)
 }
