@@ -21,6 +21,147 @@ var _ = Describe("Service Instance List Action", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+		fakeCloudControllerClient.GetServiceInstancesReturns(
+			[]resources.ServiceInstance{
+				{
+					GUID:             "fake-guid-1",
+					Type:             resources.ManagedServiceInstance,
+					Name:             "msi1",
+					ServicePlanGUID:  "fake-plan-guid-1",
+					UpgradeAvailable: types.NewOptionalBoolean(true),
+					LastOperation: resources.LastOperation{
+						Type:  resources.CreateOperation,
+						State: resources.OperationSucceeded,
+					},
+				},
+				{
+					GUID:             "fake-guid-2",
+					Type:             resources.ManagedServiceInstance,
+					Name:             "msi2",
+					ServicePlanGUID:  "fake-plan-guid-2",
+					UpgradeAvailable: types.NewOptionalBoolean(false),
+					LastOperation: resources.LastOperation{
+						Type:  resources.UpdateOperation,
+						State: resources.OperationSucceeded,
+					},
+				},
+				{
+					GUID:            "fake-guid-3",
+					Type:            resources.ManagedServiceInstance,
+					Name:            "msi3",
+					ServicePlanGUID: "fake-plan-guid-3",
+					LastOperation: resources.LastOperation{
+						Type:  resources.CreateOperation,
+						State: resources.OperationInProgress,
+					},
+				},
+				{
+					GUID:             "fake-guid-4",
+					Type:             resources.ManagedServiceInstance,
+					Name:             "msi4",
+					ServicePlanGUID:  "fake-plan-guid-4",
+					UpgradeAvailable: types.NewOptionalBoolean(true),
+					LastOperation: resources.LastOperation{
+						Type:  resources.CreateOperation,
+						State: resources.OperationFailed,
+					},
+				},
+				{
+					GUID:             "fake-guid-5",
+					Type:             resources.ManagedServiceInstance,
+					Name:             "msi5",
+					ServicePlanGUID:  "fake-plan-guid-4",
+					UpgradeAvailable: types.NewOptionalBoolean(false),
+					LastOperation: resources.LastOperation{
+						Type:  resources.DeleteOperation,
+						State: resources.OperationInProgress,
+					},
+				},
+				{
+					GUID: "fake-guid-6",
+					Type: resources.UserProvidedServiceInstance,
+					Name: "upsi",
+				},
+			},
+			ccv3.IncludedResources{
+				ServicePlans: []resources.ServicePlan{
+					{
+						GUID:                "fake-plan-guid-1",
+						Name:                "fake-plan-1",
+						ServiceOfferingGUID: "fake-offering-guid-1",
+					},
+					{
+						GUID:                "fake-plan-guid-2",
+						Name:                "fake-plan-2",
+						ServiceOfferingGUID: "fake-offering-guid-2",
+					},
+					{
+						GUID:                "fake-plan-guid-3",
+						Name:                "fake-plan-3",
+						ServiceOfferingGUID: "fake-offering-guid-3",
+					},
+					{
+						GUID:                "fake-plan-guid-4",
+						Name:                "fake-plan-4",
+						ServiceOfferingGUID: "fake-offering-guid-3",
+					},
+				},
+				ServiceOfferings: []resources.ServiceOffering{
+					{
+						GUID:              "fake-offering-guid-1",
+						Name:              "fake-offering-1",
+						ServiceBrokerGUID: "fake-broker-guid-1",
+					},
+					{
+						GUID:              "fake-offering-guid-2",
+						Name:              "fake-offering-2",
+						ServiceBrokerGUID: "fake-broker-guid-2",
+					},
+					{
+						GUID:              "fake-offering-guid-3",
+						Name:              "fake-offering-3",
+						ServiceBrokerGUID: "fake-broker-guid-2",
+					},
+				},
+				ServiceBrokers: []resources.ServiceBroker{
+					{
+						GUID: "fake-broker-guid-1",
+						Name: "fake-broker-1",
+					},
+					{
+						GUID: "fake-broker-guid-2",
+						Name: "fake-broker-2",
+					},
+				},
+			},
+			ccv3.Warnings{"a warning"},
+			nil,
+		)
+		fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+			[]resources.ServiceCredentialBinding{
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-3", AppGUID: "app-5"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-4", AppGUID: "app-6"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-5", AppGUID: "app-6"},
+				{Type: "key", ServiceInstanceGUID: "fake-guid-1"},
+				{Type: "key", ServiceInstanceGUID: "fake-guid-2"},
+			},
+			ccv3.IncludedResources{
+				Apps: []resources.Application{
+					{GUID: "app-1", Name: "great-app-1"},
+					{GUID: "app-2", Name: "great-app-2"},
+					{GUID: "app-3", Name: "great-app-3"},
+					{GUID: "app-4", Name: "great-app-4"},
+					{GUID: "app-5", Name: "great-app-5"},
+					{GUID: "app-6", Name: "great-app-6"},
+				},
+			},
+			ccv3.Warnings{"bindings warning"},
+			nil,
+		)
 	})
 
 	Describe("GetServiceInstancesForSpace", func() {
@@ -47,129 +188,25 @@ var _ = Describe("Service Instance List Action", func() {
 			))
 		})
 
-		When("the cloud controller request is successful", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstancesReturns(
-					[]resources.ServiceInstance{
-						{
-							GUID:             "fake-guid-1",
-							Type:             resources.ManagedServiceInstance,
-							Name:             "msi1",
-							ServicePlanGUID:  "fake-plan-guid-1",
-							UpgradeAvailable: types.NewOptionalBoolean(true),
-							LastOperation: resources.LastOperation{
-								Type:  resources.CreateOperation,
-								State: resources.OperationSucceeded,
-							},
-						},
-						{
-							GUID:             "fake-guid-2",
-							Type:             resources.ManagedServiceInstance,
-							Name:             "msi2",
-							ServicePlanGUID:  "fake-plan-guid-2",
-							UpgradeAvailable: types.NewOptionalBoolean(false),
-							LastOperation: resources.LastOperation{
-								Type:  resources.UpdateOperation,
-								State: resources.OperationSucceeded,
-							},
-						},
-						{
-							GUID:            "fake-guid-3",
-							Type:            resources.ManagedServiceInstance,
-							Name:            "msi3",
-							ServicePlanGUID: "fake-plan-guid-3",
-							LastOperation: resources.LastOperation{
-								Type:  resources.CreateOperation,
-								State: resources.OperationInProgress,
-							},
-						},
-						{
-							GUID:             "fake-guid-4",
-							Type:             resources.ManagedServiceInstance,
-							Name:             "msi4",
-							ServicePlanGUID:  "fake-plan-guid-4",
-							UpgradeAvailable: types.NewOptionalBoolean(true),
-							LastOperation: resources.LastOperation{
-								Type:  resources.CreateOperation,
-								State: resources.OperationFailed,
-							},
-						},
-						{
-							GUID:             "fake-guid-5",
-							Type:             resources.ManagedServiceInstance,
-							Name:             "msi5",
-							ServicePlanGUID:  "fake-plan-guid-4",
-							UpgradeAvailable: types.NewOptionalBoolean(false),
-							LastOperation: resources.LastOperation{
-								Type:  resources.DeleteOperation,
-								State: resources.OperationInProgress,
-							},
-						},
-						{
-							GUID: "fake-guid-6",
-							Type: resources.UserProvidedServiceInstance,
-							Name: "upsi",
-						},
-					},
-					ccv3.IncludedResources{
-						ServicePlans: []resources.ServicePlan{
-							{
-								GUID:                "fake-plan-guid-1",
-								Name:                "fake-plan-1",
-								ServiceOfferingGUID: "fake-offering-guid-1",
-							},
-							{
-								GUID:                "fake-plan-guid-2",
-								Name:                "fake-plan-2",
-								ServiceOfferingGUID: "fake-offering-guid-2",
-							},
-							{
-								GUID:                "fake-plan-guid-3",
-								Name:                "fake-plan-3",
-								ServiceOfferingGUID: "fake-offering-guid-3",
-							},
-							{
-								GUID:                "fake-plan-guid-4",
-								Name:                "fake-plan-4",
-								ServiceOfferingGUID: "fake-offering-guid-3",
-							},
-						},
-						ServiceOfferings: []resources.ServiceOffering{
-							{
-								GUID:              "fake-offering-guid-1",
-								Name:              "fake-offering-1",
-								ServiceBrokerGUID: "fake-broker-guid-1",
-							},
-							{
-								GUID:              "fake-offering-guid-2",
-								Name:              "fake-offering-2",
-								ServiceBrokerGUID: "fake-broker-guid-2",
-							},
-							{
-								GUID:              "fake-offering-guid-3",
-								Name:              "fake-offering-3",
-								ServiceBrokerGUID: "fake-broker-guid-2",
-							},
-						},
-						ServiceBrokers: []resources.ServiceBroker{
-							{
-								GUID: "fake-broker-guid-1",
-								Name: "fake-broker-1",
-							},
-							{
-								GUID: "fake-broker-guid-2",
-								Name: "fake-broker-2",
-							},
-						},
-					},
-					ccv3.Warnings{"a warning"},
-					nil,
-				)
-			})
+		It("makes the correct call to get service credential bindings", func() {
+			Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(0)).To(ConsistOf(
+				ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{
+					"fake-guid-1",
+					"fake-guid-2",
+					"fake-guid-3",
+					"fake-guid-4",
+					"fake-guid-5",
+					"fake-guid-6",
+				}},
+				ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+			))
+		})
 
+		When("the cloud controller request is successful", func() {
 			It("returns a list of service instances and warnings", func() {
 				Expect(executionError).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("a warning"))
+				Expect(warnings).To(ConsistOf("a warning", "bindings warning"))
 
 				Expect(serviceInstances).To(Equal([]ServiceInstance{
 					{
@@ -179,7 +216,7 @@ var _ = Describe("Service Instance List Action", func() {
 						ServiceOfferingName: "fake-offering-1",
 						ServiceBrokerName:   "fake-broker-1",
 						UpgradeAvailable:    types.NewOptionalBoolean(true),
-						BoundApps:           []string{"foo", "bar"},
+						BoundApps:           []string{"great-app-1", "great-app-2"},
 						LastOperation:       "create succeeded",
 					},
 					{
@@ -189,7 +226,7 @@ var _ = Describe("Service Instance List Action", func() {
 						ServiceOfferingName: "fake-offering-2",
 						ServiceBrokerName:   "fake-broker-2",
 						UpgradeAvailable:    types.NewOptionalBoolean(false),
-						BoundApps:           []string{"foo", "bar"},
+						BoundApps:           []string{"great-app-3", "great-app-4"},
 						LastOperation:       "update succeeded",
 					},
 					{
@@ -198,7 +235,7 @@ var _ = Describe("Service Instance List Action", func() {
 						ServicePlanName:     "fake-plan-3",
 						ServiceOfferingName: "fake-offering-3",
 						ServiceBrokerName:   "fake-broker-2",
-						BoundApps:           []string{"foo", "bar"},
+						BoundApps:           []string{"great-app-5"},
 						LastOperation:       "create in progress",
 					},
 					{
@@ -208,7 +245,7 @@ var _ = Describe("Service Instance List Action", func() {
 						ServiceOfferingName: "fake-offering-3",
 						ServiceBrokerName:   "fake-broker-2",
 						UpgradeAvailable:    types.NewOptionalBoolean(true),
-						BoundApps:           []string{"foo", "bar"},
+						BoundApps:           []string{"great-app-6"},
 						LastOperation:       "create failed",
 					},
 					{
@@ -218,19 +255,19 @@ var _ = Describe("Service Instance List Action", func() {
 						ServiceOfferingName: "fake-offering-3",
 						ServiceBrokerName:   "fake-broker-2",
 						UpgradeAvailable:    types.NewOptionalBoolean(false),
-						BoundApps:           []string{"foo", "bar"},
+						BoundApps:           []string{"great-app-6"},
 						LastOperation:       "delete in progress",
 					},
 					{
 						Name:      "upsi",
 						Type:      resources.UserProvidedServiceInstance,
-						BoundApps: []string{"foo", "bar"},
+						BoundApps: nil,
 					},
 				}))
 			})
 		})
 
-		When("the cloud controller returns an error", func() {
+		When("the getting the service instances returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
 					[]resources.ServiceInstance{},
@@ -243,6 +280,22 @@ var _ = Describe("Service Instance List Action", func() {
 			It("returns an error and warnings", func() {
 				Expect(executionError).To(MatchError("something really awful"))
 				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
+			})
+		})
+
+		When("the getting the service credential bindings returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+					[]resources.ServiceCredentialBinding{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-service-credential-binding-warning"},
+					errors.New("something really REALLY awful"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executionError).To(MatchError("something really REALLY awful"))
+				Expect(warnings).To(ConsistOf("a warning", "some-service-credential-binding-warning"))
 			})
 		})
 	})

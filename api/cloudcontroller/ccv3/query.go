@@ -25,6 +25,8 @@ const (
 	OrganizationGUIDFilter QueryKey = "organization_guids"
 	// SequenceIDFilter is a query parameter for listing objects by sequence ID.
 	SequenceIDFilter QueryKey = "sequence_ids"
+	// ServiceInstanceGUIDFilter is a query parameter for listing objects by Service Instance GUID.
+	ServiceInstanceGUIDFilter QueryKey = "service_instance_guids"
 	// SpaceGUIDFilter is a query parameter for listing objects by Space GUID.
 	SpaceGUIDFilter QueryKey = "space_guids"
 	// StatusValueFilter is a query parameter for listing deployments by status.value

@@ -9,4 +9,5 @@ type IncludedResources struct {
 	ServiceOfferings []resources.ServiceOffering `json:"service_offerings,omitempty"`
 	ServiceBrokers   []resources.ServiceBroker   `json:"service_brokers,omitempty"`
 	ServicePlans     []resources.ServicePlan     `json:"service_plans,omitempty"`
+	Apps             []resources.Application     `json:"apps,omitempty"`
 }

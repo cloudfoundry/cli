@@ -107,6 +107,7 @@ type CloudControllerClient interface {
 	GetRunningSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetSecurityGroups(query ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetServiceBrokers(query ...ccv3.Query) ([]resources.ServiceBroker, ccv3.Warnings, error)
+	GetServiceCredentialBindings(query ...ccv3.Query) ([]resources.ServiceCredentialBinding, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetServiceInstanceParameters(serviceInstanceGUID string) (types.OptionalObject, ccv3.Warnings, error)
 	GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]resources.Space, ccv3.Warnings, error)

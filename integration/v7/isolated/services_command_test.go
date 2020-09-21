@@ -289,8 +289,8 @@ var _ = Describe("services command V3", func() {
 			managedService2      string
 			userProvidedService1 string
 			userProvidedService2 string
-			//appName1             string
-			//appName2             string
+			appName1             string
+			appName2             string
 		)
 
 		BeforeEach(func() {
@@ -312,18 +312,18 @@ var _ = Describe("services command V3", func() {
 			broker.Configure().Register()
 			helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), managedService2)
 
-			//appName1 = helpers.PrefixedRandomName("APP1")
-			//appName2 = helpers.PrefixedRandomName("APP2")
-			//helpers.WithHelloWorldApp(func(appDir string) {
-			//	Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-			//	Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-			//})
-			//Eventually(helpers.CF("bind-service", appName1, managedService1)).Should(Exit(0))
-			//Eventually(helpers.CF("bind-service", appName1, managedService2)).Should(Exit(0))
-			//Eventually(helpers.CF("bind-service", appName1, userProvidedService1)).Should(Exit(0))
-			//Eventually(helpers.CF("bind-service", appName1, userProvidedService2)).Should(Exit(0))
-			//Eventually(helpers.CF("bind-service", appName2, managedService2)).Should(Exit(0))
-			//Eventually(helpers.CF("bind-service", appName2, userProvidedService2)).Should(Exit(0))
+			appName1 = helpers.PrefixedRandomName("APP1")
+			appName2 = helpers.PrefixedRandomName("APP2")
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+				Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+			Eventually(helpers.CF("bind-service", appName1, managedService1)).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName1, managedService2)).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName1, userProvidedService1)).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName1, userProvidedService2)).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName2, managedService2)).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName2, userProvidedService2)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
@@ -338,10 +338,10 @@ var _ = Describe("services command V3", func() {
 			Expect(session).To(SatisfyAll(
 				Say("Getting service instances in org %s / space %s as %s...", orgName, spaceName, userName),
 				Say(`name\s+offering\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available\n`),
-				Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "foo", "bar", "create succeeded", broker.Name, "yes"),
-				Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "foo", "bar", "create succeeded", broker.Name, "no"),
-				Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService1, "user-provided", "foo", "bar"),
-				Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService2, "user-provided", "foo", "bar"),
+				Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, "create succeeded", broker.Name, "yes"),
+				Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, appName2, "create succeeded", broker.Name, "no"),
+				Say(`%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", appName1),
+				Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService2, "user-provided", appName1, appName2),
 			))
 		})
 	})

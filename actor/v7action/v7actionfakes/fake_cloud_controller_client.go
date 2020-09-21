@@ -1454,6 +1454,23 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetServiceCredentialBindingsStub        func(...ccv3.Query) ([]resources.ServiceCredentialBinding, ccv3.IncludedResources, ccv3.Warnings, error)
+	getServiceCredentialBindingsMutex       sync.RWMutex
+	getServiceCredentialBindingsArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getServiceCredentialBindingsReturns struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}
+	getServiceCredentialBindingsReturnsOnCall map[int]struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}
 	GetServiceInstanceByNameAndSpaceStub        func(string, string, ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)
 	getServiceInstanceByNameAndSpaceMutex       sync.RWMutex
 	getServiceInstanceByNameAndSpaceArgsForCall []struct {
@@ -8792,6 +8809,75 @@ func (fake *FakeCloudControllerClient) GetServiceBrokersReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindings(arg1 ...ccv3.Query) ([]resources.ServiceCredentialBinding, ccv3.IncludedResources, ccv3.Warnings, error) {
+	fake.getServiceCredentialBindingsMutex.Lock()
+	ret, specificReturn := fake.getServiceCredentialBindingsReturnsOnCall[len(fake.getServiceCredentialBindingsArgsForCall)]
+	fake.getServiceCredentialBindingsArgsForCall = append(fake.getServiceCredentialBindingsArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetServiceCredentialBindings", []interface{}{arg1})
+	fake.getServiceCredentialBindingsMutex.Unlock()
+	if fake.GetServiceCredentialBindingsStub != nil {
+		return fake.GetServiceCredentialBindingsStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	fakeReturns := fake.getServiceCredentialBindingsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindingsCallCount() int {
+	fake.getServiceCredentialBindingsMutex.RLock()
+	defer fake.getServiceCredentialBindingsMutex.RUnlock()
+	return len(fake.getServiceCredentialBindingsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindingsCalls(stub func(...ccv3.Query) ([]resources.ServiceCredentialBinding, ccv3.IncludedResources, ccv3.Warnings, error)) {
+	fake.getServiceCredentialBindingsMutex.Lock()
+	defer fake.getServiceCredentialBindingsMutex.Unlock()
+	fake.GetServiceCredentialBindingsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindingsArgsForCall(i int) []ccv3.Query {
+	fake.getServiceCredentialBindingsMutex.RLock()
+	defer fake.getServiceCredentialBindingsMutex.RUnlock()
+	argsForCall := fake.getServiceCredentialBindingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindingsReturns(result1 []resources.ServiceCredentialBinding, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getServiceCredentialBindingsMutex.Lock()
+	defer fake.getServiceCredentialBindingsMutex.Unlock()
+	fake.GetServiceCredentialBindingsStub = nil
+	fake.getServiceCredentialBindingsReturns = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceCredentialBindingsReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getServiceCredentialBindingsMutex.Lock()
+	defer fake.getServiceCredentialBindingsMutex.Unlock()
+	fake.GetServiceCredentialBindingsStub = nil
+	if fake.getServiceCredentialBindingsReturnsOnCall == nil {
+		fake.getServiceCredentialBindingsReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceCredentialBinding
+			result2 ccv3.IncludedResources
+			result3 ccv3.Warnings
+			result4 error
+		})
+	}
+	fake.getServiceCredentialBindingsReturnsOnCall[i] = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceInstanceByNameAndSpace(arg1 string, arg2 string, arg3 ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error) {
 	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceArgsForCall)]
@@ -13618,6 +13704,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSecurityGroupsMutex.RUnlock()
 	fake.getServiceBrokersMutex.RLock()
 	defer fake.getServiceBrokersMutex.RUnlock()
+	fake.getServiceCredentialBindingsMutex.RLock()
+	defer fake.getServiceCredentialBindingsMutex.RUnlock()
 	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
 	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
 	fake.getServiceInstanceParametersMutex.RLock()
