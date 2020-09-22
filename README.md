@@ -5,8 +5,7 @@
 # Cloud Foundry CLI
 The official command line client for [Cloud Foundry](https://cloudfoundry.org).
 
-## Announcement ==> The V7 CLI is now Generally Available!
-View the latest help for each command [here](https://cli.cloudfoundry.org/en-US/v7) (or run `cf help -a` with either version of the CLI for help on all commands available).
+View the latest help for [**The v7 CLI**](https://cli.cloudfoundry.org/en-US/v7) -OR- [**The v6 CLI**](https://cli.cloudfoundry.org/en-US/v6), or run `cf help -a` to view the help for all commands available in your currently installed version.
 
 [![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases/latest)
 [![Documentation](https://img.shields.io/badge/docs-online-ff69b4.svg)](https://docs.cloudfoundry.org/cf-cli)
@@ -44,11 +43,11 @@ Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
 If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
-
-## The initial GA of the v7 cf CLI is Opt-In  
+## Announcement ==> The V7 CLI is now Generally Available!
+### The initial GA of the v7 cf CLI is Opt-In  
 - You can pull down the GA release of the v7 cf CLI and/or the latest v6 cf CLI via our supported package managers using the same processes that were in place prior to the v7 GA (no changes are required initially)
 - If you've been pulling down the v7 CF CLI beta previously, you will notice the name of the v7 binary has changed from `cf7` to `cf`
-- See our [Version Switching](#version-switching) section for instructions on how to support workflows which require switching back and forth between v7 and v6
+- See our [Version Switching Guide](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide) for instructions on how to support workflows which require switching back and forth between v7 and v6
 
 **A Note About Support**:</br>
 Now that the v7 cf CLI is GA, all new features, enhancements, and fixes will be made on the v7 line.</br>
