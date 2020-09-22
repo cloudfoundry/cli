@@ -34,22 +34,19 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		return nil, Warnings(warnings), err
 	}
 
-	lastOperation := func(lo resources.LastOperation) string {
-		if lo.Type != "" && lo.State != "" {
-			return fmt.Sprintf("%s %s", lo.Type, lo.State)
-		}
-		return ""
-	}
-
-	planDetailsLookup := actor.buildPlanDetailsLookup(included)
+	planDetailsLookup := buildPlanDetailsLookup(included)
 	var boundAppsLookup map[string][]string
 	if !omitApps {
 		var bindingsWarnings ccv3.Warnings
-		boundAppsLookup, bindingsWarnings, err = actor.buildBoundAppsLookup(instances)
+		bindings, included, bindingsWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+			ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: instanceGUIDS(instances)},
+			ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+		)
 		warnings = append(warnings, bindingsWarnings...)
 		if err != nil {
 			return nil, Warnings(warnings), err
 		}
+		boundAppsLookup = buildBoundAppsLookup(bindings, included)
 	}
 
 	result := make([]ServiceInstance, len(instances))
@@ -70,7 +67,22 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 	return result, Warnings(warnings), nil
 }
 
-func (actor Actor) buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDetails {
+func lastOperation(lo resources.LastOperation) string {
+	if lo.Type != "" && lo.State != "" {
+		return fmt.Sprintf("%s %s", lo.Type, lo.State)
+	}
+	return ""
+}
+
+func instanceGUIDS(instances []resources.ServiceInstance) []string {
+	serviceInstanceGUIDS := make([]string, len(instances))
+	for i, instance := range instances {
+		serviceInstanceGUIDS[i] = instance.GUID
+	}
+	return serviceInstanceGUIDS
+}
+
+func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDetails {
 	brokerLookup := make(map[string]string)
 	for _, b := range included.ServiceBrokers {
 		brokerLookup[b.GUID] = b.Name
@@ -98,19 +110,7 @@ func (actor Actor) buildPlanDetailsLookup(included ccv3.IncludedResources) map[s
 	return planLookup
 }
 
-func (actor Actor) buildBoundAppsLookup(instances []resources.ServiceInstance) (map[string][]string, ccv3.Warnings, error) {
-	serviceInstanceGUIDS := make([]string, len(instances))
-	for i, instance := range instances {
-		serviceInstanceGUIDS[i] = instance.GUID
-	}
-	bindings, included, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
-		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: serviceInstanceGUIDS},
-		ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
-	)
-	if err != nil {
-		return nil, warnings, err
-	}
-
+func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding, included ccv3.IncludedResources) map[string][]string {
 	appLookup := make(map[string]string, len(included.Apps))
 	for _, app := range included.Apps {
 		appLookup[app.GUID] = app.Name
@@ -121,5 +121,5 @@ func (actor Actor) buildBoundAppsLookup(instances []resources.ServiceInstance) (
 			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], appLookup[binding.AppGUID])
 		}
 	}
-	return appsBoundLookup, warnings, nil
+	return appsBoundLookup
 }

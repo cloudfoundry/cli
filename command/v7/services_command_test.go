@@ -144,6 +144,25 @@ var _ = Describe("services command", func() {
 		))
 	})
 
+	When("omit apps is set", func() {
+		BeforeEach(func() {
+			cmd.OmitApps = true
+		})
+		It("doesn't print the bound apps table", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Err).To(Say("something silly"))
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`name\s+offering\s+plan\s+last operation\s+broker\s+upgrade available\n`),
+				Say(`msi1\s+fake-offering-1\s+fake-plan-1\s+create succeeded\s+fake-broker-1\s+yes\n`),
+				Say(`msi2\s+fake-offering-2\s+fake-plan-2\s+delete in progress\s+fake-broker-2\s+no\n`),
+				Say(`msi3\s+fake-offering-3\s+fake-plan-3\s+update failed\s+fake-broker-2\s*\n`),
+				Say(`upsi1\s+user-provided\s*\n`),
+				Say(`upsi2\s+user-provided\s*\n`),
+				Say(`upsi3\s+user-provided\s*\n`),
+			))
+		})
+	})
+
 	When("there are no service instances", func() {
 		BeforeEach(func() {
 			fakeActor.GetServiceInstancesForSpaceReturns(
