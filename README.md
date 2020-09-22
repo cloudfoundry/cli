@@ -31,10 +31,18 @@ View the latest help for each command [here](https://cli.cloudfoundry.org/en-US/
 </p>
 
 ***
+## Getting Started
+Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v7 cf CLI](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide) or the [v6 cf CLI](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide).
 
+Once installed, you can log in and push an app.
 There are now two supported versions of the cf CLI:
 1. The v7 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins which will be migrated in the next major release). See [our v7 documentation](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information.
 1. The v6 cf CLI is backed by the [v2 CC API](https://apidocs.cloudfoundry.org/13.5.0/) See [our v6 documentation](https://docs.cloudfoundry.org/cf-cli) for more information.
+
+## Contributing & Build Instructions
+Please read the [contributors' guide](.github/CONTRIBUTING.md)
+
+If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
 
 ## The initial GA of the v7 cf CLI is Opt-In  
@@ -58,12 +66,6 @@ community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
 mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  You can follow our development progress
 on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
-
-## Getting Started
-
-Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v7 cf CLI](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide) or the [v6 cf CLI](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide).
-
-Once installed, you can log in and push an app.
 
 **Need to switch back and forth between CLI versions?**
 See the [Version Switching](#version-switching) section for instructions.
@@ -107,9 +109,3 @@ information follow:
 When importing the plugin code use `import "code.cloudfoundry.org/cli/plugin"`.
 Older plugins that import `github.com/cloudfoundry/cli/plugin` will still work
 as long they vendor the plugins directory.
-
-## Contributing & Build Instructions
-
-Please read the [contributors' guide](.github/CONTRIBUTING.md)
-
-If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
