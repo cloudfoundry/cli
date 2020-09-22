@@ -60,7 +60,7 @@ var _ = Describe("service credential binding resource", func() {
 						}
 					}
 				}
-            }`,
+			}`,
 		),
 	)
 })
