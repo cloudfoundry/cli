@@ -24,6 +24,23 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:200f879b6b3460f2e984224935ce6fe9e46b712ec58b4b0a5cc1dceb87521400"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "4c3168f9a1a1deba7606af027470bd7798caad42"
+  version = "v7.1.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -248,14 +265,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4189ee6a3844f555124d9d2656fe7af02fca961c2a9bad9074789df13a0c62e0"
+  digest = "1:4c7d169280debf9f36b84a0f682094889cccc5dc0db8657f9cffc93b21975a57"
   name = "github.com/docker/distribution"
   packages = [
     "digestset",
     "reference",
   ]
   pruneopts = "NUT"
-  revision = "e5b5e44386f7964a1f010a2b8b7687d073215bbb"
+  revision = "2800ab02245e2eafc10e338939511dd1aeb5e135"
 
 [[projects]]
   branch = "master"
