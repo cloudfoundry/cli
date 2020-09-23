@@ -46,9 +46,10 @@ type ServiceInstanceDetails struct {
 	Parameters        ServiceInstanceParameters
 	SharedStatus      SharedStatus
 	UpgradeStatus     ServiceInstanceUpgradeStatus
+	BoundApps         []resources.ServiceCredentialBinding
 }
 
-func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, Warnings, error) {
+func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGUID string, omitApps bool) (ServiceInstanceDetails, Warnings, error) {
 	var serviceInstanceDetails ServiceInstanceDetails
 
 	warnings, err := railway.Sequentially(
@@ -66,6 +67,10 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			serviceInstanceDetails.UpgradeStatus, warnings, err = actor.getServiceInstanceUpgradeStatus(serviceInstanceDetails)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID, omitApps)
 			return
 		},
 	)
@@ -212,6 +217,19 @@ func (actor Actor) getServiceInstanceUpgradeStatus(serviceInstanceDetails Servic
 		}, warnings, nil
 	default:
 		return ServiceInstanceUpgradeStatus{}, warnings, err
+	}
+}
+
+func (actor Actor) getServiceInstanceBoundApps(serviceInstanceGUID string, omitApps bool) (boundApps []resources.ServiceCredentialBinding, warnings ccv3.Warnings, err error) {
+	switch omitApps {
+	case true:
+		return
+	default:
+		return actor.CloudControllerClient.GetServiceCredentialBindings(
+			ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+			ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+			ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
+		)
 	}
 }
 

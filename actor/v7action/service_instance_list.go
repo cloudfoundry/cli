@@ -1,10 +1,11 @@
 package v7action
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
-	"fmt"
 )
 
 type ServiceInstance struct {
@@ -34,11 +35,11 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		return nil, Warnings(warnings), err
 	}
 
-	planDetailsLookup := buildPlanDetailsLookup(included)
-	var boundAppsLookup map[string][]string
+	planDetailsFromPlanGUIDLookup := buildPlanDetailsLookup(included)
+	var boundAppsNamesFromInstanceGUIDLookup map[string][]string
 	if !omitApps {
 		var bindingsWarnings ccv3.Warnings
-		bindings, included, bindingsWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+		bindings, bindingsWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
 			ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: instanceGUIDS(instances)},
 			ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
 		)
@@ -46,12 +47,12 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		if err != nil {
 			return nil, Warnings(warnings), err
 		}
-		boundAppsLookup = buildBoundAppsLookup(bindings, included)
+		boundAppsNamesFromInstanceGUIDLookup = buildBoundAppsLookup(bindings)
 	}
 
 	result := make([]ServiceInstance, len(instances))
 	for i, instance := range instances {
-		names := planDetailsLookup[instance.ServicePlanGUID]
+		names := planDetailsFromPlanGUIDLookup[instance.ServicePlanGUID]
 		result[i] = ServiceInstance{
 			Name:                instance.Name,
 			Type:                instance.Type,
@@ -59,7 +60,7 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 			ServicePlanName:     names.plan,
 			ServiceOfferingName: names.offering,
 			ServiceBrokerName:   names.broker,
-			BoundApps:           boundAppsLookup[instance.GUID],
+			BoundApps:           boundAppsNamesFromInstanceGUIDLookup[instance.GUID],
 			LastOperation:       lastOperation(instance.LastOperation),
 		}
 	}
@@ -110,15 +111,11 @@ func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDeta
 	return planLookup
 }
 
-func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding, included ccv3.IncludedResources) map[string][]string {
-	appLookup := make(map[string]string, len(included.Apps))
-	for _, app := range included.Apps {
-		appLookup[app.GUID] = app.Name
-	}
+func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding) map[string][]string {
 	appsBoundLookup := make(map[string][]string)
 	for _, binding := range bindings {
 		if binding.Type == resources.AppBinding {
-			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], appLookup[binding.AppGUID])
+			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], binding.AppName)
 		}
 	}
 	return appsBoundLookup

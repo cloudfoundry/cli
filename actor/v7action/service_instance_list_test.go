@@ -1,13 +1,12 @@
 package v7action_test
 
 import (
-	"errors"
-
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -139,25 +138,15 @@ var _ = Describe("Service Instance List Action", func() {
 		)
 		fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 			[]resources.ServiceCredentialBinding{
-				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-3", AppGUID: "app-5"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-4", AppGUID: "app-6"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-5", AppGUID: "app-6"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1", AppName: "great-app-1"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2", AppName: "great-app-2"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3", AppName: "great-app-3"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4", AppName: "great-app-4"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-3", AppGUID: "app-5", AppName: "great-app-5"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-4", AppGUID: "app-6", AppName: "great-app-6"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-5", AppGUID: "app-6", AppName: "great-app-6"},
 				{Type: "key", ServiceInstanceGUID: "fake-guid-1"},
 				{Type: "key", ServiceInstanceGUID: "fake-guid-2"},
-			},
-			ccv3.IncludedResources{
-				Apps: []resources.Application{
-					{GUID: "app-1", Name: "great-app-1"},
-					{GUID: "app-2", Name: "great-app-2"},
-					{GUID: "app-3", Name: "great-app-3"},
-					{GUID: "app-4", Name: "great-app-4"},
-					{GUID: "app-5", Name: "great-app-5"},
-					{GUID: "app-6", Name: "great-app-6"},
-				},
 			},
 			ccv3.Warnings{"bindings warning"},
 			nil,
@@ -302,7 +291,6 @@ var _ = Describe("Service Instance List Action", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 					[]resources.ServiceCredentialBinding{},
-					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-service-credential-binding-warning"},
 					errors.New("something really REALLY awful"),
 				)

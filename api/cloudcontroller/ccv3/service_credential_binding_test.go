@@ -26,45 +26,50 @@ var _ = Describe("Service Instance", func() {
 
 	Describe("GetServiceCredentialBindings", func() {
 		var (
-			query      []Query
-			bindings   []resources.ServiceCredentialBinding
-			included   IncludedResources
-			warnings   Warnings
-			executeErr error
+			query        []Query
+			bindings     []resources.ServiceCredentialBinding
+			includedApps []resources.Application
+			warnings     Warnings
+			executeErr   error
 		)
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				var typeSwitch bool
-				types := map[bool]resources.ServiceCredentialBindingType{true: resources.KeyBinding, false: resources.AppBinding}
+				types := []resources.ServiceCredentialBindingType{resources.KeyBinding, resources.AppBinding}
 				for i := 1; i <= 3; i++ {
 					Expect(requestParams.AppendToList(resources.ServiceCredentialBinding{
 						GUID:                fmt.Sprintf("credential-binding-%d-guid", i),
 						Name:                fmt.Sprintf("credential-binding-%d-name", i),
 						ServiceInstanceGUID: fmt.Sprintf("si-%d-guid", i),
 						AppGUID:             fmt.Sprintf("app-%d-guid", i),
-						Type:                types[typeSwitch],
+						Type:                types[i%2],
 					})).NotTo(HaveOccurred())
-					typeSwitch = !typeSwitch
 				}
-				return IncludedResources{Apps: []resources.Application{
-					{GUID: "app-1-guid", Name: "app-1"},
-					{GUID: "app-2-guid", Name: "app-2"},
-				}}, Warnings{"warning-1", "warning-2"}, nil
+				return IncludedResources{Apps: includedApps}, Warnings{"warning-1", "warning-2"}, nil
 			})
 
+			includedApps = nil
+
 			query = []Query{
-				{Key: Include, Values: []string{"app"}},
 				{Key: ServiceInstanceGUIDFilter, Values: []string{"si-1-guid", "si-2-guid", "si-3-guid", "si-4-guid"}},
 			}
 		})
 
 		JustBeforeEach(func() {
-			bindings, included, warnings, executeErr = client.GetServiceCredentialBindings(query...)
+			bindings, warnings, executeErr = client.GetServiceCredentialBindings(query...)
 		})
 
-		It("returns a list of service instances with warnings and included resources", func() {
+		It("makes the correct call", func() {
+			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeListRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetServiceCredentialBindingsRequest))
+			Expect(actualParams.Query).To(ConsistOf(Query{Key: ServiceInstanceGUIDFilter, Values: []string{"si-1-guid", "si-2-guid", "si-3-guid", "si-4-guid"}}))
+			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceCredentialBinding{}))
+		})
+
+		It("returns a list of service credential bindings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 			Expect(bindings).To(ConsistOf(
 				resources.ServiceCredentialBinding{
@@ -89,17 +94,26 @@ var _ = Describe("Service Instance", func() {
 					Type:                resources.AppBinding,
 				},
 			))
-			Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-			Expect(included).To(Equal(IncludedResources{Apps: []resources.Application{
-				{GUID: "app-1-guid", Name: "app-1"},
-				{GUID: "app-2-guid", Name: "app-2"},
-			}}))
+		})
 
-			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
-			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetServiceCredentialBindingsRequest))
-			Expect(actualParams.Query).To(ConsistOf(query))
-			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceCredentialBinding{}))
+		When("app resources are included via the query", func() {
+			BeforeEach(func() {
+				query = append(query, Query{Key: Include, Values: []string{"app"}})
+
+				includedApps = []resources.Application{
+					{GUID: "app-1-guid", Name: "app-1"},
+					{GUID: "app-3-guid", Name: "app-3"},
+				}
+			})
+
+			It("returns the app names", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(bindings[0].AppName).To(Equal("app-1"))
+				Expect(bindings[1].AppName).To(BeEmpty())
+				Expect(bindings[2].AppName).To(Equal("app-3"))
+			})
 		})
 
 		When("the cloud controller returns errors and warnings", func() {

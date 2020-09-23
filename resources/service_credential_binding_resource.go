@@ -22,6 +22,10 @@ type ServiceCredentialBinding struct {
 	ServiceInstanceGUID string `jsonry:"relationships.service_instance.data.guid,omitempty"`
 	// AppGUID is the application that this binding is attached to
 	AppGUID string `jsonry:"relationships.app.data.guid,omitempty"`
+	// AppName is the application name. It is not part of the API response, and is here as pragmatic convenience.
+	AppName string `jsonry:"-"`
+	// LastOperation is the last operation on the service credential binding
+	LastOperation LastOperation `jsonry:"last_operation"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {
