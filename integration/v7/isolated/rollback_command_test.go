@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -175,10 +176,45 @@ applications:
 	})
 })
 
-type Line struct {
-	str  string
-	args []interface{}
+// type Line struct {
+// 	str  string
+// 	args []interface{}
+// 	matcher string
+// }
+
+type Line interface {
+	Matcher() string
+	Args() []interface{}
 }
+
+type rowValue struct {
+	cols []string
+}
+
+func (r rowValue) Matcher() string {
+	str := new(strings.Builder)
+
+	for i := range r.cols {
+		fmt.Fprint(str, `%s`)
+		if i < len(r.cols)-1 {
+			fmt.Fprint(str, `\s+`)
+		}
+	}
+
+	return str.String()
+}
+
+func (r RowValue) Args() []interface{} {
+	return nil
+}
+
+// func (l *Line ) Matcher () []interface{
+//  return l.args
+// }
+
+// func (r *RowValue ) Matcher () []interface {
+//  return l.values
+// }
 
 func HaveRollbackPrompt() *CLIMatcher {
 	return &CLIMatcher{Lines: []Line{
@@ -186,6 +222,7 @@ func HaveRollbackPrompt() *CLIMatcher {
 	}}
 }
 
+// Expect(....).To(HaveRollbackOutput(appGuid, ...)
 func HaveRollbackOutput(appName, orgName, spaceName, userName string) *CLIMatcher {
 	return &CLIMatcher{Lines: []Line{
 		AppInOrgSpaceAsUser(appName, orgName, spaceName, userName),
@@ -211,7 +248,7 @@ type CLIMatcher struct {
 
 func (cm *CLIMatcher) Match(actual interface{}) (bool, error) {
 	for _, line := range cm.Lines {
-		cm.wrappedMatcher = types.GomegaMatcher(Say(line.str, line.args...))
+		cm.wrappedMatcher = types.GomegaMatcher(Say(line.matcher, line.args))
 		success, err := cm.wrappedMatcher.Match(actual)
 		if err != nil {
 			return false, err

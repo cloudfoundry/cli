@@ -132,3 +132,22 @@ var _ = Describe("revisions command", func() {
 		})
 	})
 })
+
+func HaveRevisionsTable2() *CLIMatcher {
+	return &CLIMatcher{Lines: []Line{
+		KeyValue{Key: "foo", Value: "bar"},
+		RowValue{Cols: []string{"a", "b", "c"}},
+	}}
+}
+
+func HaveRevisionsTable() *CLIMatcher {
+	return &CLIMatcher{Lines: []Line{
+		KeyValue("foo", "bar"),
+		RowValues("1", rbitraryString(), "True", GUIDString(), TimestampString()),
+	}}
+}
+
+func RowValues(cols ...string) Line {
+	return Line{}
+	// return Line{`%s\s+%s\s+`, cols...}
+}
