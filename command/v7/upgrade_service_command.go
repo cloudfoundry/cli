@@ -84,7 +84,6 @@ func (cmd UpgradeServiceCommand) displayEvent() error {
 }
 
 func (cmd UpgradeServiceCommand) displayPrompt() (bool, error) {
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText(
 		"Warning: This operation may be long running and will block further operations " +
 			"on the service instance until it's completed",

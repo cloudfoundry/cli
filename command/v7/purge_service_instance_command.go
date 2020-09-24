@@ -80,7 +80,6 @@ func (cmd PurgeServiceInstanceCommand) displayEvent() error {
 }
 
 func (cmd PurgeServiceInstanceCommand) displayPrompt() (bool, error) {
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText(purgeServiceInstanceWarning)
 	cmd.UI.DisplayNewline()
 	delete, err := cmd.UI.DisplayBoolPrompt(

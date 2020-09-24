@@ -73,7 +73,6 @@ func (cmd DeleteServiceCommand) displayEvent() error {
 }
 
 func (cmd DeleteServiceCommand) displayPrompt() (bool, error) {
-	cmd.UI.DisplayNewline()
 	delete, err := cmd.UI.DisplayBoolPrompt(
 		false,
 		"Really delete the service instance {{.ServiceInstanceName}}?",
