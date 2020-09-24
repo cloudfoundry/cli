@@ -16,6 +16,7 @@ var _ = Describe("Service Instance List Action", func() {
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 	)
+	const spaceGUID = "some-source-space-guid"
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
@@ -138,15 +139,15 @@ var _ = Describe("Service Instance List Action", func() {
 		)
 		fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 			[]resources.ServiceCredentialBinding{
-				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1", AppName: "great-app-1"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2", AppName: "great-app-2"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3", AppName: "great-app-3"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4", AppName: "great-app-4"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-3", AppGUID: "app-5", AppName: "great-app-5"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-4", AppGUID: "app-6", AppName: "great-app-6"},
-				{Type: "app", ServiceInstanceGUID: "fake-guid-5", AppGUID: "app-6", AppName: "great-app-6"},
-				{Type: "key", ServiceInstanceGUID: "fake-guid-1"},
-				{Type: "key", ServiceInstanceGUID: "fake-guid-2"},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1", AppName: "great-app-1", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2", AppName: "great-app-2", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3", AppName: "great-app-3", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4", AppName: "great-app-4", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-3", AppGUID: "app-5", AppName: "great-app-5", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-4", AppGUID: "app-6", AppName: "great-app-6", AppSpaceGUID: spaceGUID},
+				{Type: "app", ServiceInstanceGUID: "fake-guid-5", AppGUID: "app-6", AppName: "great-app-6", AppSpaceGUID: spaceGUID},
+				{Type: "key", ServiceInstanceGUID: "fake-guid-1", AppSpaceGUID: spaceGUID},
+				{Type: "key", ServiceInstanceGUID: "fake-guid-2", AppSpaceGUID: spaceGUID},
 			},
 			ccv3.Warnings{"bindings warning"},
 			nil,
@@ -154,8 +155,6 @@ var _ = Describe("Service Instance List Action", func() {
 	})
 
 	Describe("GetServiceInstancesForSpace", func() {
-		const spaceGUID = "some-source-space-guid"
-
 		var (
 			serviceInstances []ServiceInstance
 			warnings         Warnings
@@ -299,6 +298,67 @@ var _ = Describe("Service Instance List Action", func() {
 			It("returns an error and warnings", func() {
 				Expect(executionError).To(MatchError("something really REALLY awful"))
 				Expect(warnings).To(ConsistOf("a warning", "some-service-credential-binding-warning"))
+			})
+		})
+
+		When("the service instance is shared", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstancesReturns(
+					[]resources.ServiceInstance{{
+						GUID:             "service-instance-guid",
+						Type:             resources.ManagedServiceInstance,
+						Name:             "msi1",
+						ServicePlanGUID:  "fake-plan-guid-1",
+						UpgradeAvailable: types.NewOptionalBoolean(true),
+						LastOperation: resources.LastOperation{
+							Type:  resources.CreateOperation,
+							State: resources.OperationSucceeded,
+						},
+					}},
+					ccv3.IncludedResources{
+						ServicePlans: []resources.ServicePlan{{
+							GUID:                "fake-plan-guid-1",
+							Name:                "fake-plan-1",
+							ServiceOfferingGUID: "fake-offering-guid-1",
+						}},
+						ServiceOfferings: []resources.ServiceOffering{{
+							GUID:              "fake-offering-guid-1",
+							Name:              "fake-offering-1",
+							ServiceBrokerGUID: "fake-broker-guid-1",
+						}},
+						ServiceBrokers: []resources.ServiceBroker{{
+							GUID: "fake-broker-guid-1", Name: "fake-broker-1",
+						}},
+					},
+					ccv3.Warnings{"a warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+					[]resources.ServiceCredentialBinding{{
+						Type:                "app",
+						GUID:                "some-binding-guid",
+						ServiceInstanceGUID: "service-instance-guid",
+						AppGUID:             "app-guid",
+						AppName:             "app-on-space-1",
+						AppSpaceGUID:        spaceGUID,
+					}, {
+						Type:                "app",
+						GUID:                "some-binding-guid",
+						ServiceInstanceGUID: "service-instance-guid",
+						AppGUID:             "app-guid-2",
+						AppName:             "app-on-space-2",
+						AppSpaceGUID:        "another-space-guid",
+					}},
+					nil,
+					nil,
+				)
+			})
+
+			It("should only include bound apps in the provided space", func() {
+				Expect(serviceInstances).To(HaveLen(1))
+				serviceInstance := serviceInstances[0]
+				Expect(serviceInstance.BoundApps).To(ConsistOf("app-on-space-1"))
 			})
 		})
 	})

@@ -361,4 +361,47 @@ var _ = Describe("services command V3", func() {
 			})
 		})
 	})
+
+	When("there are shared service instances", func() {
+		var (
+			managedService, appNameOnSpaceA, appNameOnSpaceB string
+		)
+
+		BeforeEach(func() {
+			orgName := helpers.NewOrgName()
+			spaceA := helpers.NewSpaceName()
+			spaceB := helpers.NewSpaceName()
+			managedService = helpers.PrefixedRandomName("MANAGED1")
+			appNameOnSpaceA = helpers.PrefixedRandomName("APP1")
+			appNameOnSpaceB = helpers.PrefixedRandomName("APP1")
+
+			helpers.SetupCF(orgName, spaceA)
+			helpers.CreateOrgAndSpace(orgName, spaceB)
+			broker := servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
+			helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), managedService)
+
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appNameOnSpaceA, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+			Eventually(helpers.CF("bind-service", appNameOnSpaceA, managedService)).Should(Exit(0))
+			helpers.CF("share-service", managedService, "-s", spaceB)
+
+			helpers.TargetOrgAndSpace(orgName, spaceB)
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appNameOnSpaceB, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+			Eventually(helpers.CF("bind-service", appNameOnSpaceB, managedService)).Should(Exit(0))
+			helpers.TargetOrgAndSpace(orgName, spaceA)
+		})
+
+		It("should not output bound apps in the shared spaces", func() {
+			session := helpers.CF(command)
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(SatisfyAll(
+				Say(managedService),
+				Say(appNameOnSpaceA),
+				Not(Say(appNameOnSpaceB)),
+			))
+		})
+	})
 })
