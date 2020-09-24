@@ -24,6 +24,8 @@ type ServiceCredentialBinding struct {
 	AppGUID string `jsonry:"relationships.app.data.guid,omitempty"`
 	// AppName is the application name. It is not part of the API response, and is here as pragmatic convenience.
 	AppName string `jsonry:"-"`
+	// AppSpaceGUID is the space guid of the app. It is not part of the API response, and is here as pragmatic convenience.
+	AppSpaceGUID string `jsonry:"-"`
 	// LastOperation is the last operation on the service credential binding
 	LastOperation LastOperation `jsonry:"last_operation"`
 }

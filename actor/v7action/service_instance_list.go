@@ -47,7 +47,7 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		if err != nil {
 			return nil, Warnings(warnings), err
 		}
-		boundAppsNamesFromInstanceGUIDLookup = buildBoundAppsLookup(bindings)
+		boundAppsNamesFromInstanceGUIDLookup = buildBoundAppsLookup(bindings, spaceGUID)
 	}
 
 	result := make([]ServiceInstance, len(instances))
@@ -111,10 +111,10 @@ func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDeta
 	return planLookup
 }
 
-func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding) map[string][]string {
+func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding, spaceGUID string) map[string][]string {
 	appsBoundLookup := make(map[string][]string)
 	for _, binding := range bindings {
-		if binding.Type == resources.AppBinding {
+		if binding.Type == resources.AppBinding && binding.AppSpaceGUID == spaceGUID {
 			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], binding.AppName)
 		}
 	}

@@ -101,8 +101,8 @@ var _ = Describe("Service Instance", func() {
 				query = append(query, Query{Key: Include, Values: []string{"app"}})
 
 				includedApps = []resources.Application{
-					{GUID: "app-1-guid", Name: "app-1"},
-					{GUID: "app-3-guid", Name: "app-3"},
+					{GUID: "app-1-guid", Name: "app-1", SpaceGUID: "space-1-guid"},
+					{GUID: "app-3-guid", Name: "app-3", SpaceGUID: "space-2-guid"},
 				}
 			})
 
@@ -111,8 +111,11 @@ var _ = Describe("Service Instance", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(bindings[0].AppName).To(Equal("app-1"))
+				Expect(bindings[0].AppSpaceGUID).To(Equal("space-1-guid"))
 				Expect(bindings[1].AppName).To(BeEmpty())
+				Expect(bindings[1].AppSpaceGUID).To(BeEmpty())
 				Expect(bindings[2].AppName).To(Equal("app-3"))
+				Expect(bindings[2].AppSpaceGUID).To(Equal("space-2-guid"))
 			})
 		})
 

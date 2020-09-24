@@ -23,13 +23,14 @@ func (client Client) GetServiceCredentialBindings(query ...Query) ([]resources.S
 	})
 
 	if len(included.Apps) > 0 {
-		appNameLookup := make(map[string]string)
+		appLookup := make(map[string]resources.Application)
 		for _, app := range included.Apps {
-			appNameLookup[app.GUID] = app.Name
+			appLookup[app.GUID] = app
 		}
 
 		for i := range result {
-			result[i].AppName = appNameLookup[result[i].AppGUID]
+			result[i].AppName = appLookup[result[i].AppGUID].Name
+			result[i].AppSpaceGUID = appLookup[result[i].AppGUID].SpaceGUID
 		}
 	}
 
