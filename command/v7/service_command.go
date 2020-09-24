@@ -1,11 +1,13 @@
 package v7
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
-	"encoding/json"
-	"fmt"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 type ServiceCommand struct {
@@ -29,7 +31,7 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
+	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -42,12 +44,14 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		return cmd.chain(
 			cmd.displayIntro,
 			cmd.displayPropertiesUserProvided,
+			cmd.displayBoundApps,
 		)
 	default:
 		return cmd.chain(
 			cmd.displayIntro,
 			cmd.displayPropertiesManaged,
 			cmd.displayLastOperation,
+			cmd.displayBoundApps,
 			cmd.displayParameters,
 			cmd.displaySharingInfo,
 			cmd.displayUpgrades,
@@ -236,6 +240,28 @@ func (cmd ServiceCommand) displayUpgrades() error {
 	}
 
 	cmd.UI.DisplayNewline()
+	return nil
+}
+
+func (cmd ServiceCommand) displayBoundApps() error {
+	cmd.UI.DisplayText("Bound apps:")
+
+	if len(cmd.serviceInstance.BoundApps) == 0 {
+		cmd.UI.DisplayText("There are no bound apps for this service instance.")
+		return nil
+	}
+
+	table := [][]string{{"name", "binding name", "status", "message"}}
+	for _, app := range cmd.serviceInstance.BoundApps {
+		table = append(table, []string{
+			app.AppName,
+			app.Name,
+			fmt.Sprintf("%s %s", app.LastOperation.Type, app.LastOperation.State),
+			app.LastOperation.Description,
+		})
+	}
+
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	return nil
 }
 

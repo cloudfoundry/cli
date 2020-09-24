@@ -53,6 +53,8 @@ const (
 	RoleTypesFilter QueryKey = "types"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
+	// TypeFiler is a query parameter for selecting binding type
+	TypeFilter QueryKey = "type"
 	// UnmappedFilter is a query parameter specifying unmapped routes
 	UnmappedFilter QueryKey = "unmapped"
 	// UserGUIDFilter is a query parameter when getting a user by GUID

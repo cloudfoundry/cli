@@ -31,9 +31,21 @@ var _ = Describe("service credential binding resource", func() {
 			ServiceCredentialBinding{ServiceInstanceGUID: "fake-instance-guid"},
 			`{ "relationships": { "service_instance": { "data": { "guid": "fake-instance-guid" } } } }`,
 		),
-		Entry("App guid",
+		Entry("app guid",
 			ServiceCredentialBinding{AppGUID: "fake-app-guid"},
 			`{ "relationships": { "app": { "data": { "guid": "fake-app-guid" } } } }`,
+		),
+		Entry(
+			"last operation",
+			ServiceCredentialBinding{
+				LastOperation: LastOperation{Type: CreateOperation, State: OperationInProgress},
+			},
+			`{
+				"last_operation": {
+					"type": "create",
+					"state": "in progress"
+				}
+			}`,
 		),
 		Entry(
 			"everything",
