@@ -70,7 +70,9 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID, omitApps)
+			if !omitApps {
+				serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID)
+			}
 			return
 		},
 	)
@@ -220,17 +222,12 @@ func (actor Actor) getServiceInstanceUpgradeStatus(serviceInstanceDetails Servic
 	}
 }
 
-func (actor Actor) getServiceInstanceBoundApps(serviceInstanceGUID string, omitApps bool) (boundApps []resources.ServiceCredentialBinding, warnings ccv3.Warnings, err error) {
-	switch omitApps {
-	case true:
-		return
-	default:
-		return actor.CloudControllerClient.GetServiceCredentialBindings(
-			ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
-			ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
-			ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
-		)
-	}
+func (actor Actor) getServiceInstanceBoundApps(serviceInstanceGUID string) ([]resources.ServiceCredentialBinding, ccv3.Warnings, error) {
+	return actor.CloudControllerClient.GetServiceCredentialBindings(
+		ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+		ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
+	)
 }
 
 func extractServicePlan(included ccv3.IncludedResources) resources.ServicePlan {
