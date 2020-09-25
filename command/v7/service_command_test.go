@@ -204,9 +204,9 @@ var _ = Describe("service command", func() {
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Bound apps:\n`),
-					Say(`name\s+binding name\s+status\s+message\n`),
-					Say(`app-1\s+named-binding\s+create succeeded\s+great\n`),
-					Say(`app-2\s+update failed\s+sorry\n`),
+					Say(`   name\s+binding name\s+status\s+message\n`),
+					Say(`   app-1\s+named-binding\s+create succeeded\s+great\n`),
+					Say(`   app-2\s+update failed\s+sorry\n`),
 				))
 			})
 		})
