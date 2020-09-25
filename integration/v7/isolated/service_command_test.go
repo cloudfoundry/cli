@@ -135,7 +135,45 @@ var _ = Describe("service command", func() {
 					Say(`tags:\s+%s\n`, tags),
 					Say(`route service url:\s+%s\n`, routeServiceURL),
 					Say(`syslog drain url:\s+%s\n`, syslogURL),
+					Say(`\n`),
+					Say(`Bound apps:\n`),
+					Say(`There are no bound apps for this service instance\.\n`),
 				))
+			})
+
+			When("bound to apps", func() {
+				var (
+					appName1     string
+					appName2     string
+					bindingName1 string
+					bindingName2 string
+				)
+
+				BeforeEach(func() {
+					appName1 = helpers.PrefixedRandomName("APP1")
+					appName2 = helpers.PrefixedRandomName("APP2")
+					bindingName1 = helpers.RandomName()
+					bindingName2 = helpers.RandomName()
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+					})
+					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+				})
+
+				It("displays the bound apps", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Bound apps:\n`),
+						Say(`name\s+binding name\s+status\s+message\n`),
+						Say(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
+						Say(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
+					))
+				})
 			})
 		})
 
@@ -191,6 +229,9 @@ var _ = Describe("service command", func() {
 						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`Bound apps:\n`),
+						Say(`There are no bound apps for this service instance\.\n`),
 						Say(`\n`),
 						Say(`No parameters are set for service instance %s.\n`, serviceInstanceName),
 						Say(`\n`),
@@ -252,6 +293,9 @@ var _ = Describe("service command", func() {
 						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`Bound apps:\n`),
+						Say(`There are no bound apps for this service instance\.\n`),
 						Say(`\n`),
 						Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
 						Say(`\n`),
@@ -455,6 +499,50 @@ var _ = Describe("service command", func() {
 							Say(`TIP: You can upgrade using 'cf upgrade-service %s'\n`, serviceInstanceName),
 						))
 					})
+				})
+			})
+
+			When("bound to apps", func() {
+				var (
+					appName1     string
+					appName2     string
+					bindingName1 string
+					bindingName2 string
+				)
+
+				BeforeEach(func() {
+					appName1 = helpers.PrefixedRandomName("APP1")
+					appName2 = helpers.PrefixedRandomName("APP2")
+					bindingName1 = helpers.RandomName()
+					bindingName2 = helpers.RandomName()
+
+					const asyncDelay = time.Minute // Forces bind to be "in progress" for predictable output
+					broker = servicebrokerstub.New().WithAsyncDelay(asyncDelay).EnableServiceAccess()
+
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					)
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+					})
+					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+				})
+
+				It("displays the bound apps", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Bound apps:\n`),
+						Say(`name\s+binding name\s+status\s+message\n`),
+						Say(`%s\s+%s\s+create in progress\s*\n`, appName1, bindingName1),
+						Say(`%s\s+%s\s+create in progress\s*\n`, appName2, bindingName2),
+					))
 				})
 			})
 		})

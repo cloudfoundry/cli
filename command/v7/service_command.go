@@ -261,7 +261,7 @@ func (cmd ServiceCommand) displayBoundApps() error {
 		})
 	}
 
-	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+	cmd.UI.DisplayTableWithHeader("   ", table, ui.DefaultTableSpacePadding)
 	return nil
 }
 
