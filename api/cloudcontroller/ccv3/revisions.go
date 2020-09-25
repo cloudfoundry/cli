@@ -20,3 +20,19 @@ func (client *Client) GetApplicationRevisions(appGUID string, query ...Query) ([
 	})
 	return revisions, warnings, err
 }
+
+// get deployed
+func (client *Client) GetApplicationRevisionsDeployed(appGUID string) ([]resources.Revision, Warnings, error) {
+	var revisions []resources.Revision
+
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetApplicationRevisionsDeployedRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: resources.Revision{},
+		AppendToList: func(item interface{}) error {
+			revisions = append(revisions, item.(resources.Revision))
+			return nil
+		},
+	})
+	return revisions, warnings, err
+}

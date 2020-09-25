@@ -99,6 +99,38 @@ var _ = Describe("Revisions", func() {
 				Expect(revisions).To(ConsistOf([]resources.Revision{{GUID: "app-guid-1"}}))
 			})
 		})
+	})
 
+	Describe("GetApplicationRevisionsDeployed", func() {
+		var (
+			revisions  []resources.Revision
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			revisions, warnings, executeErr = client.GetApplicationRevisionsDeployed("some-app-guid")
+		})
+
+		When("applications exist", func() {
+			BeforeEach(func() {
+				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+					err := requestParams.AppendToList(resources.Revision{GUID: "app-guid-1"})
+					Expect(err).NotTo(HaveOccurred())
+					return IncludedResources{}, Warnings{"this is a warning", "this is another warning"}, nil
+				})
+			})
+
+			It("returns the revisions and all warnings", func() {
+				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+				actualParams := requester.MakeListRequestArgsForCall(0)
+				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationRevisionsDeployedRequest))
+
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+
+				Expect(revisions).To(ConsistOf([]resources.Revision{{GUID: "app-guid-1"}}))
+			})
+		})
 	})
 })

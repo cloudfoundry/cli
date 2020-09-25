@@ -194,4 +194,66 @@ var _ = Describe("Revisions Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetApplicationRevisionsDeployed", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			appGUID                   string
+			fetchedRevisions          []resources.Revision
+			executeErr                error
+			warnings                  Warnings
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			fetchedRevisions, warnings, executeErr = actor.GetApplicationRevisionsDeployed(appGUID)
+		})
+
+		When("getting the app deployed revisions fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsDeployedReturns([]resources.Revision{}, ccv3.Warnings{"some-revisions-warnings"}, errors.New("some-revisions-executeError"))
+			})
+
+			It("returns an executeError", func() {
+				Expect(executeErr).To(MatchError("some-revisions-executeError"))
+				Expect(warnings).To(ConsistOf("some-revisions-warnings"))
+			})
+		})
+
+		When("getting the app revisions succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationRevisionsDeployedReturns(
+					[]resources.Revision{
+						{GUID: "3"},
+						{GUID: "2"},
+						{GUID: "1"},
+					},
+					ccv3.Warnings{"some-revisions-warnings"},
+					nil,
+				)
+			})
+
+			It("makes the API call to get the app revisions and returns all warnings and revisions in descending order", func() {
+				Expect(fakeCloudControllerClient.GetApplicationRevisionsDeployedCallCount()).To(Equal(1))
+
+				appGuidArg := fakeCloudControllerClient.GetApplicationRevisionsDeployedArgsForCall(0)
+				Expect(appGuidArg).To(Equal("some-app-guid"))
+
+				Expect(fetchedRevisions).To(Equal(
+					[]resources.Revision{
+						{GUID: "3"},
+						{GUID: "2"},
+						{GUID: "1"},
+					}))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-revisions-warnings"))
+			})
+		})
+	})
 })

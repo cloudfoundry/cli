@@ -78,6 +78,13 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		return nil
 	}
 
+	revisionsDeployed, warnings, err := cmd.Actor.GetApplicationRevisionsDeployed(appGUID)
+
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
 	table := [][]string{{
 		"revision",
 		"description",
@@ -86,8 +93,16 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"created at",
 	}}
 	for _, revision := range revisions {
+		deployed := ""
+
+		for _, revDeployed := range revisionsDeployed {
+			if revDeployed.GUID == revision.GUID {
+				deployed = "(deployed)"
+			}
+		}
+
 		table = append(table,
-			[]string{strconv.Itoa(revision.Version),
+			[]string{strconv.Itoa(revision.Version) + deployed,
 				revision.Description,
 				strconv.FormatBool(revision.Deployable),
 				revision.GUID,

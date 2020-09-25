@@ -39,6 +39,7 @@ const (
 	GetApplicationProcessRequest                                = "GetApplicationProcess"
 	GetApplicationProcessesRequest                              = "GetApplicationProcesses"
 	GetApplicationRevisionsRequest                              = "GetApplicationRevisions"
+	GetApplicationRevisionsDeployedRequest                      = "GetApplicationRevisionsDeployed"
 	GetApplicationRoutesRequest                                 = "GetApplicationRoutes"
 	GetApplicationTasksRequest                                  = "GetApplicationTasks"
 	GetApplicationsRequest                                      = "GetApplications"
@@ -179,6 +180,7 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid/processes/:type/instances/:index", Method: http.MethodDelete, Name: DeleteApplicationProcessInstanceRequest},
 	{Resource: AppsResource, Path: "/:app_guid/relationships/current_droplet", Method: http.MethodPatch, Name: PatchApplicationCurrentDropletRequest},
 	{Resource: AppsResource, Path: "/:app_guid/revisions", Method: http.MethodGet, Name: GetApplicationRevisionsRequest},
+	{Resource: AppsResource, Path: "/:app_guid/revisions/deployed", Method: http.MethodGet, Name: GetApplicationRevisionsDeployedRequest},
 	{Resource: AppsResource, Path: "/:app_guid/routes", Method: http.MethodGet, Name: GetApplicationRoutesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/ssh_enabled", Method: http.MethodGet, Name: GetSSHEnabled},
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodGet, Name: GetApplicationTasksRequest},

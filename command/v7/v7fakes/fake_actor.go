@@ -959,6 +959,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationRevisionsDeployedStub        func(string) ([]resources.Revision, v7action.Warnings, error)
+	getApplicationRevisionsDeployedMutex       sync.RWMutex
+	getApplicationRevisionsDeployedArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationRevisionsDeployedReturns struct {
+		result1 []resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationRevisionsDeployedReturnsOnCall map[int]struct {
+		result1 []resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationRoutesStub        func(string) ([]resources.Route, v7action.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
@@ -7160,6 +7175,72 @@ func (fake *FakeActor) GetApplicationProcessHealthChecksByNameAndSpaceReturnsOnC
 	}
 	fake.getApplicationProcessHealthChecksByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 []v7action.ProcessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployed(arg1 string) ([]resources.Revision, v7action.Warnings, error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	ret, specificReturn := fake.getApplicationRevisionsDeployedReturnsOnCall[len(fake.getApplicationRevisionsDeployedArgsForCall)]
+	fake.getApplicationRevisionsDeployedArgsForCall = append(fake.getApplicationRevisionsDeployedArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationRevisionsDeployed", []interface{}{arg1})
+	fake.getApplicationRevisionsDeployedMutex.Unlock()
+	if fake.GetApplicationRevisionsDeployedStub != nil {
+		return fake.GetApplicationRevisionsDeployedStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationRevisionsDeployedReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployedCallCount() int {
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
+	return len(fake.getApplicationRevisionsDeployedArgsForCall)
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployedCalls(stub func(string) ([]resources.Revision, v7action.Warnings, error)) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = stub
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployedArgsForCall(i int) string {
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
+	argsForCall := fake.getApplicationRevisionsDeployedArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployedReturns(result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = nil
+	fake.getApplicationRevisionsDeployedReturns = struct {
+		result1 []resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationRevisionsDeployedReturnsOnCall(i int, result1 []resources.Revision, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = nil
+	if fake.getApplicationRevisionsDeployedReturnsOnCall == nil {
+		fake.getApplicationRevisionsDeployedReturnsOnCall = make(map[int]struct {
+			result1 []resources.Revision
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationRevisionsDeployedReturnsOnCall[i] = struct {
+		result1 []resources.Revision
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -16481,6 +16562,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RUnlock()
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
