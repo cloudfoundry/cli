@@ -91,3 +91,14 @@ func (actor Actor) setRevisionsDeployableByDropletStateForApp(appGUID string, re
 	}
 	return revisions, Warnings(warnings), nil
 }
+
+func (actor Actor) GetApplicationRevisionsDeployed(appGUID string) ([]resources.Revision, Warnings, error) {
+
+	revisions, warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisionsDeployed(appGUID)
+
+	if apiErr != nil {
+		return []resources.Revision{}, Warnings(warnings), apiErr
+	}
+
+	return revisions, Warnings(warnings), nil
+}

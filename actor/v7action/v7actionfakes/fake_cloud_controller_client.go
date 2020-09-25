@@ -845,6 +845,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetApplicationRevisionsDeployedStub        func(string) ([]resources.Revision, ccv3.Warnings, error)
+	getApplicationRevisionsDeployedMutex       sync.RWMutex
+	getApplicationRevisionsDeployedArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationRevisionsDeployedReturns struct {
+		result1 []resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationRevisionsDeployedReturnsOnCall map[int]struct {
+		result1 []resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationRoutesStub        func(string) ([]resources.Route, ccv3.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
@@ -6039,6 +6054,72 @@ func (fake *FakeCloudControllerClient) GetApplicationRevisionsReturnsOnCall(i in
 		})
 	}
 	fake.getApplicationRevisionsReturnsOnCall[i] = struct {
+		result1 []resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployed(arg1 string) ([]resources.Revision, ccv3.Warnings, error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	ret, specificReturn := fake.getApplicationRevisionsDeployedReturnsOnCall[len(fake.getApplicationRevisionsDeployedArgsForCall)]
+	fake.getApplicationRevisionsDeployedArgsForCall = append(fake.getApplicationRevisionsDeployedArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationRevisionsDeployed", []interface{}{arg1})
+	fake.getApplicationRevisionsDeployedMutex.Unlock()
+	if fake.GetApplicationRevisionsDeployedStub != nil {
+		return fake.GetApplicationRevisionsDeployedStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationRevisionsDeployedReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployedCallCount() int {
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
+	return len(fake.getApplicationRevisionsDeployedArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployedCalls(stub func(string) ([]resources.Revision, ccv3.Warnings, error)) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployedArgsForCall(i int) string {
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
+	argsForCall := fake.getApplicationRevisionsDeployedArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployedReturns(result1 []resources.Revision, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = nil
+	fake.getApplicationRevisionsDeployedReturns = struct {
+		result1 []resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRevisionsDeployedReturnsOnCall(i int, result1 []resources.Revision, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationRevisionsDeployedMutex.Lock()
+	defer fake.getApplicationRevisionsDeployedMutex.Unlock()
+	fake.GetApplicationRevisionsDeployedStub = nil
+	if fake.getApplicationRevisionsDeployedReturnsOnCall == nil {
+		fake.getApplicationRevisionsDeployedReturnsOnCall = make(map[int]struct {
+			result1 []resources.Revision
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationRevisionsDeployedReturnsOnCall[i] = struct {
 		result1 []resources.Revision
 		result2 ccv3.Warnings
 		result3 error
@@ -12850,6 +12931,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationProcessesMutex.RUnlock()
 	fake.getApplicationRevisionsMutex.RLock()
 	defer fake.getApplicationRevisionsMutex.RUnlock()
+	fake.getApplicationRevisionsDeployedMutex.RLock()
+	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
