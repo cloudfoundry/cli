@@ -91,17 +91,10 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"revision guid",
 		"created at",
 	}}
+
 	for _, revision := range revisions {
-		deployed := ""
-
-		for _, revDeployed := range revisionsDeployed {
-			if revDeployed.GUID == revision.GUID {
-				deployed = "(deployed)"
-			}
-		}
-
 		table = append(table,
-			[]string{strconv.Itoa(revision.Version) + deployed,
+			[]string{decorateVersionWithDeployed(revision, revisionsDeployed),
 				revision.Description,
 				strconv.FormatBool(revision.Deployable),
 				revision.GUID,
@@ -112,4 +105,13 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
+}
+
+func decorateVersionWithDeployed(revision resources.Revision, deployedRevisions []resources.Revision) string {
+	for _, revDeployed := range deployedRevisions {
+		if revDeployed.GUID == revision.GUID {
+			return strconv.Itoa(revision.Version) + "(deployed)"
+		}
+	}
+	return strconv.Itoa(revision.Version)
 }
