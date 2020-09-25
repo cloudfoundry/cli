@@ -46,7 +46,7 @@ If you'd like to submit updated translations, please see the [i18n README](https
 ## Announcement ==> The V7 CLI is now Generally Available!
 ### The initial GA of the v7 cf CLI is Opt-In  
 - You can pull down the GA release of the v7 cf CLI and/or the latest v6 cf CLI via our supported package managers using the same processes that were in place prior to the v7 GA (no changes are required initially)
-- If you've been pulling down the v7 CF CLI beta previously, you will notice the name of the v7 binary has changed from `cf7` to `cf`
+- If you've been pulling down the v7 CF CLI beta previously, you will notice that there is now a symlink from `cf` to the existing `cf7` binary.
 - See our [Version Switching Guide](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide) for instructions on how to support workflows which require switching back and forth between v7 and v6
 
 **A Note About Support**:</br>
