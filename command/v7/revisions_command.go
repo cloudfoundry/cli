@@ -78,6 +78,12 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		return nil
 	}
 
+	revisionsDeployed, warnings, err := cmd.Actor.GetApplicationRevisionsDeployed(appGUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
 	table := [][]string{{
 		"revision",
 		"description",
@@ -85,9 +91,10 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		"revision guid",
 		"created at",
 	}}
+
 	for _, revision := range revisions {
 		table = append(table,
-			[]string{strconv.Itoa(revision.Version),
+			[]string{decorateVersionWithDeployed(revision, revisionsDeployed),
 				revision.Description,
 				strconv.FormatBool(revision.Deployable),
 				revision.GUID,
@@ -98,4 +105,13 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
+}
+
+func decorateVersionWithDeployed(revision resources.Revision, deployedRevisions []resources.Revision) string {
+	for _, revDeployed := range deployedRevisions {
+		if revDeployed.GUID == revision.GUID {
+			return strconv.Itoa(revision.Version) + "(deployed)"
+		}
+	}
+	return strconv.Itoa(revision.Version)
 }

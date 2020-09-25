@@ -10,6 +10,16 @@ import (
 )
 
 type FakeConfig struct {
+	APIVersionStub        func() string
+	aPIVersionMutex       sync.RWMutex
+	aPIVersionArgsForCall []struct {
+	}
+	aPIVersionReturns struct {
+		result1 string
+	}
+	aPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct {
@@ -149,6 +159,58 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConfig) APIVersion() string {
+	fake.aPIVersionMutex.Lock()
+	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
+	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("APIVersion", []interface{}{})
+	fake.aPIVersionMutex.Unlock()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.aPIVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) APIVersionCallCount() int {
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
+	return len(fake.aPIVersionArgsForCall)
+}
+
+func (fake *FakeConfig) APIVersionCalls(stub func() string) {
+	fake.aPIVersionMutex.Lock()
+	defer fake.aPIVersionMutex.Unlock()
+	fake.APIVersionStub = stub
+}
+
+func (fake *FakeConfig) APIVersionReturns(result1 string) {
+	fake.aPIVersionMutex.Lock()
+	defer fake.aPIVersionMutex.Unlock()
+	fake.APIVersionStub = nil
+	fake.aPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) APIVersionReturnsOnCall(i int, result1 string) {
+	fake.aPIVersionMutex.Lock()
+	defer fake.aPIVersionMutex.Unlock()
+	fake.APIVersionStub = nil
+	if fake.aPIVersionReturnsOnCall == nil {
+		fake.aPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.aPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) AccessToken() string {
@@ -886,6 +948,8 @@ func (fake *FakeConfig) UnsetOrganizationAndSpaceInformationCalls(stub func()) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
 	fake.dialTimeoutMutex.RLock()

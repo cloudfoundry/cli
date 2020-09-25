@@ -10,6 +10,7 @@ import (
 
 type Config interface {
 	AccessToken() string
+	APIVersion() string
 	DialTimeout() time.Duration
 	PollingInterval() time.Duration
 	RefreshToken() string
