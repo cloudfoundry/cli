@@ -104,7 +104,7 @@ var _ = Describe("rename-service command", func() {
 				session := helpers.CF("rename-service", currentName, newName)
 
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Service instance %s not found", currentName))
+				Expect(session.Err).To(Say("Service instance '%s' not found", currentName))
 			})
 		})
 

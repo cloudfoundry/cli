@@ -110,7 +110,7 @@ var _ = Describe("create-service-key command", func() {
 			It("displays FAILED and an informative error, and exits 1", func() {
 				session := helpers.CF("create-service-key", "missing-service-instance", serviceKeyName)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Service instance missing-service-instance not found"))
+				Eventually(session.Err).Should(Say("Service instance 'missing-service-instance' not found"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

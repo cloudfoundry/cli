@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
@@ -8,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"time"
 )
 
 var _ = Describe("upgrade-service command", func() {
@@ -101,7 +102,7 @@ var _ = Describe("upgrade-service command", func() {
 					))
 
 					Expect(session.Err).To(
-						Say("Service instance %s not found\n", serviceInstanceName),
+						Say("Service instance '%s' not found\n", serviceInstanceName),
 					)
 				})
 			})

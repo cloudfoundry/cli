@@ -100,7 +100,7 @@ var _ = Describe("unbind-service command", func() {
 				It("fails to unbind the service", func() {
 					session := helpers.CF("unbind-service", appName, "does-not-exist")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Service instance %s not found", "does-not-exist"))
+					Eventually(session.Err).Should(Say("Service instance '%s' not found", "does-not-exist"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -215,7 +215,7 @@ var _ = Describe("unbind-service command", func() {
 					It("fails to unbind the service", func() {
 						session := helpers.CF("unbind-service", appName, serviceInstance)
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
+						Eventually(session.Err).Should(Say("Service instance '%s' not found", serviceInstance))
 						Eventually(session).Should(Exit(1))
 					})
 				})
