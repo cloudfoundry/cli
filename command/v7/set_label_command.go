@@ -19,7 +19,6 @@ type SetLabelCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.SetLabelArgs `positional-args:"yes"`
-	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   service-plan\n   space\n   stack"`
 	relatedCommands interface{}       `related_commands:"labels, unset-label"`
 	BuildpackStack  string            `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	ServiceBroker   string            `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
@@ -63,4 +62,30 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	}
 
 	return cmd.LabelSetter.Execute(targetResource, labels)
+}
+
+func (cmd SetLabelCommand) Usage() string {
+	return `CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...`
+}
+
+func (cmd SetLabelCommand) Examples() string {
+	return `
+cf set-label app dora env=production
+cf set-label org business pci=true public-facing=false
+cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3`
+}
+
+func (cmd SetLabelCommand) Resources() string {
+	return `
+app
+buildpack
+domain
+org
+route
+service-broker
+service-instance
+service-offering
+service-plan
+space
+stack`
 }
