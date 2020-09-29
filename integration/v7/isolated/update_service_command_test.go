@@ -149,7 +149,7 @@ var _ = Describe("update-service command", func() {
 					Say("Updating service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 					Say("FAILED"),
 				))
-				Expect(session.Err).To(Say("Service instance %s not found\n", serviceInstanceName))
+				Expect(session.Err).To(Say("Service instance '%s' not found\n", serviceInstanceName))
 			})
 		})
 

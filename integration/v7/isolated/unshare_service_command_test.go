@@ -132,7 +132,7 @@ var _ = Describe("unshare-service command", func() {
 						Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstanceName, orgName, unshareFromSpaceName, username),
 						Say("FAILED"),
 					))
-					Expect(session.Err).To(Say("Service instance %s not found", serviceInstanceName))
+					Expect(session.Err).To(Say("Service instance '%s' not found", serviceInstanceName))
 				})
 			})
 

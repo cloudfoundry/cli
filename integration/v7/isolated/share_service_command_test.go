@@ -118,7 +118,7 @@ var _ = Describe("share-service command", func() {
 						Say("Sharing service instance %s into org %s / space %s as %s...", serviceInstanceName, orgName, shareToSpaceName, username),
 						Say("FAILED"),
 					))
-					Expect(session.Err).To(Say("Service instance %s not found", serviceInstanceName))
+					Expect(session.Err).To(Say("Service instance '%s' not found", serviceInstanceName))
 				})
 			})
 
