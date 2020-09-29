@@ -392,6 +392,36 @@ var _ = Describe("unset-label command", func() {
 			})
 		})
 
+		When("unsetting labels from a service-instance", func() {
+			var serviceInstanceName string
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+
+				helpers.SetupCF(orgName, spaceName)
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+
+				session := helpers.CF("set-label", "service-instance", serviceInstanceName, "some-key=some-value", "some-other-key=some-other-value", "some-third-key=other")
+				Eventually(session).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("unsets the specified labels on the service-instance", func() {
+				session := helpers.CF("unset-label", "service-instance", serviceInstanceName, "some-other-key", "some-third-key")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-instance %s in org %s / space %s as %s...`), serviceInstanceName, orgName, spaceName, username))
+				Expect(session).Should(Say("OK"))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances/%s", helpers.ServiceInstanceGUID(serviceInstanceName)), false, helpers.MetadataLabels{
+					"some-key": "some-value",
+				})
+			})
+		})
+
 		When("unsetting labels from a service-offering", func() {
 			var (
 				broker              *servicebrokerstub.ServiceBrokerStub

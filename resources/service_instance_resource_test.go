@@ -134,6 +134,25 @@ var _ = Describe("service instance resource", func() {
 			}`,
 		),
 		Entry(
+			"metadata",
+			ServiceInstance{
+				Metadata: &Metadata{
+					Labels: map[string]types.NullString{
+						"foo": types.NewNullString("bar"),
+						"baz": types.NewNullString(),
+					},
+				},
+			},
+			`{
+				"metadata": {
+					"labels": {
+						"foo": "bar",
+						"baz": null
+					}
+				}
+			}`,
+		),
+		Entry(
 			"everything",
 			ServiceInstance{
 				Type:                   UserProvidedServiceInstance,
@@ -159,6 +178,12 @@ var _ = Describe("service instance resource", func() {
 					Type:  "create",
 					State: "in progress",
 				},
+				Metadata: &Metadata{
+					Labels: map[string]types.NullString{
+						"foo": types.NewNullString("bar"),
+						"baz": types.NewNullString(),
+					},
+				},
 			},
 			`{
 				"type": "user-provided",
@@ -183,6 +208,12 @@ var _ = Describe("service instance resource", func() {
 				"last_operation": {
 					"type": "create",
 					"state": "in progress"
+				},
+				"metadata": {
+					"labels": {
+						"foo": "bar",
+						"baz": null
+					}
 				},
 				"relationships": {
 					"service_plan": {

@@ -21,6 +21,7 @@ type SetLabelActor interface {
 	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateServiceInstanceLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceBrokerLabelsByServiceBrokerName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServicePlanLabels(servicePlanName string, serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (v7action.Warnings, error)
@@ -93,18 +94,21 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.targetResource.ResourceName, cmd.labels)
-	case Space:
-		cmd.displayMessageWithOrg()
-		warnings, err = cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.targetResource.ResourceName, cmd.Config.TargetedOrganization().GUID, cmd.labels)
-	case Stack:
-		cmd.displayMessageDefault()
-		warnings, err = cmd.Actor.UpdateStackLabelsByStackName(cmd.targetResource.ResourceName, cmd.labels)
+	case ServiceInstance:
+		cmd.displayMessageWithOrgAndSpace()
+		warnings, err = cmd.Actor.UpdateServiceInstanceLabels(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 	case ServiceOffering:
 		cmd.displayMessageForServiceCommands()
 		warnings, err = cmd.Actor.UpdateServiceOfferingLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceBroker, cmd.labels)
 	case ServicePlan:
 		cmd.displayMessageForServiceCommands()
 		warnings, err = cmd.Actor.UpdateServicePlanLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceOffering, cmd.targetResource.ServiceBroker, cmd.labels)
+	case Space:
+		cmd.displayMessageWithOrg()
+		warnings, err = cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.targetResource.ResourceName, cmd.Config.TargetedOrganization().GUID, cmd.labels)
+	case Stack:
+		cmd.displayMessageDefault()
+		warnings, err = cmd.Actor.UpdateStackLabelsByStackName(cmd.targetResource.ResourceName, cmd.labels)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -118,7 +122,7 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 
 func (cmd *LabelUpdater) checkTarget() error {
 	switch ResourceType(cmd.targetResource.ResourceType) {
-	case App, Route:
+	case App, ServiceInstance, Route:
 		return cmd.SharedActor.CheckTarget(true, true)
 	case Space:
 		return cmd.SharedActor.CheckTarget(true, false)
@@ -130,7 +134,7 @@ func (cmd *LabelUpdater) checkTarget() error {
 func (cmd *LabelUpdater) validateFlags() error {
 	resourceType := ResourceType(cmd.targetResource.ResourceType)
 	switch resourceType {
-	case App, Buildpack, Domain, Org, Route, ServiceBroker, Space, Stack, ServiceOffering, ServicePlan:
+	case App, Buildpack, Domain, Org, Route, ServiceBroker, ServiceInstance, ServiceOffering, ServicePlan, Space, Stack:
 	default:
 		return errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.targetResource.ResourceType}))
 	}

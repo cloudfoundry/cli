@@ -674,6 +674,50 @@ var _ = Describe("set-label command", func() {
 			})
 		})
 
+		When("assigning label to service-instance", func() {
+			var serviceInstanceName string
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("service-instance", "Service instance", serviceInstanceName)
+			})
+
+			It("sets the specified labels on the service-instance", func() {
+				session := helpers.CF("set-label", "service-instance", serviceInstanceName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-instance %s in org %s / space %s as %s...`), serviceInstanceName, orgName, spaceName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances?names=%s", serviceInstanceName), true, helpers.MetadataLabels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "service-instance", serviceInstanceName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances?names=%s", serviceInstanceName), true, helpers.MetadataLabels{
+						"owner": "beth",
+					})
+				})
+			})
+		})
+
 		When("assigning label to service-offering", func() {
 			var (
 				broker              *servicebrokerstub.ServiceBrokerStub
