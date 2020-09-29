@@ -40,6 +40,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
 			Eventually(session).Should(Say(`\s+service-broker`))
+			Eventually(session).Should(Say(`\s+service-instance`))
 			Eventually(session).Should(Say(`\s+service-offering`))
 			Eventually(session).Should(Say(`\s+service-plan`))
 			Eventually(session).Should(Say(`\s+space`))

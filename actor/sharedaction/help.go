@@ -32,6 +32,9 @@ type CommandInfo struct {
 	// Examples is the command examples string
 	Examples string
 
+	// Resources is the types of object that the command applies to
+	Resources string
+
 	// RelatedCommands is a list of commands related to the command
 	RelatedCommands []string
 
@@ -76,6 +79,12 @@ type HasExamples interface {
 	Examples() string
 }
 
+// HasResources is an interface that commands may implement if they want to define their resources
+// text in a Resources() method, which gives them more flexibility than a struct tag.
+type HasResources interface {
+	Resources() string
+}
+
 // CommandInfoByName returns the help information for a particular commandName in
 // the commandList.
 func (Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
@@ -112,6 +121,14 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 	if commandWithExamples, hasExamples := fieldValue.Interface().(HasExamples); hasExamples {
 		cmd.Examples = strings.ReplaceAll(
 			strings.TrimSpace(commandWithExamples.Examples()),
+			"\n",
+			"\n"+CommandIndent,
+		)
+	}
+
+	if commandWithResources, hasResources := fieldValue.Interface().(HasResources); hasResources {
+		cmd.Resources = strings.ReplaceAll(
+			strings.TrimSpace(commandWithResources.Resources()),
 			"\n",
 			"\n"+CommandIndent,
 		)
