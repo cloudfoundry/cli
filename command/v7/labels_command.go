@@ -23,6 +23,7 @@ const (
 	Space           ResourceType = "space"
 	Stack           ResourceType = "stack"
 	ServiceBroker   ResourceType = "service-broker"
+	ServiceInstance ResourceType = "service-instance"
 	ServiceOffering ResourceType = "service-offering"
 	ServicePlan     ResourceType = "service-plan"
 )
@@ -78,6 +79,9 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		labels, warnings, err = cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
+	case ServiceInstance:
+		cmd.displayMessageWithOrgAndSpace()
+		labels, warnings, err = cmd.Actor.GetServiceInstanceLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 	case ServiceOffering:
 		cmd.displayMessageForServiceCommands()
 		labels, warnings, err = cmd.Actor.GetServiceOfferingLabels(cmd.RequiredArgs.ResourceName, cmd.ServiceBroker)
@@ -189,7 +193,7 @@ func (cmd LabelsCommand) validateFlags() error {
 
 func (cmd LabelsCommand) checkTarget() error {
 	switch ResourceType(cmd.RequiredArgs.ResourceType) {
-	case App, Route:
+	case App, Route, ServiceInstance:
 		return cmd.SharedActor.CheckTarget(true, true)
 	case Space:
 		return cmd.SharedActor.CheckTarget(true, false)

@@ -48,6 +48,12 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			URIParams:   internal.Params{"service_broker_guid": resourceGUID},
 			RequestBody: resources.ResourceMetadata{Metadata: &metadata},
 		}
+	case "service-instance":
+		params = RequestParams{
+			RequestName: internal.PatchServiceInstanceRequest,
+			URIParams:   internal.Params{"service_instance_guid": resourceGUID},
+			RequestBody: resources.ResourceMetadata{Metadata: &metadata},
+		}
 	case "service-offering":
 		params = RequestParams{
 			RequestName: internal.PatchServiceOfferingRequest,

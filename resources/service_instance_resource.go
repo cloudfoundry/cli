@@ -43,6 +43,8 @@ type ServiceInstance struct {
 	Parameters types.OptionalObject `jsonry:"parameters"`
 	// LastOperation is the last operation on the service instance
 	LastOperation LastOperation `jsonry:"last_operation"`
+
+	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
 func (s ServiceInstance) MarshalJSON() ([]byte, error) {

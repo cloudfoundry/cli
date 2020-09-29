@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -660,6 +661,96 @@ var _ = Describe("labels", func() {
 		})
 	})
 
+	Describe("UpdateServiceInstanceLabels", func() {
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateServiceInstanceLabels(resourceName, spaceGUID, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						GUID: "fake-si-guid",
+						Name: resourceName,
+					},
+					ccv3.IncludedResources{},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					"",
+					ccv3.Warnings{"set-si-labels-warnings"},
+					nil,
+				)
+			})
+
+			It("gets the service instance", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(resourceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(BeEmpty())
+			})
+
+			It("sets the service instance labels", func() {
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, siGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(resourceType).To(BeEquivalentTo("service-instance"))
+				Expect(siGUID).To(BeEquivalentTo("fake-si-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-si-labels-warnings"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("GetServiceInstanceByNameAndSpace fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						[]string{"warning-failure-1", "warning-failure-2"},
+						errors.New("get-si-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-si-error"))
+				})
+			})
+
+			When("UpdateResourceMetadata fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{
+							GUID: "fake-si-guid",
+							Name: resourceName,
+						},
+						ccv3.IncludedResources{},
+						[]string{"warning-1", "warning-2"},
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
+						"",
+						ccv3.Warnings{"set-app-labels-warnings"},
+						errors.New("update-si-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-app-labels-warnings"))
+					Expect(executeErr).To(MatchError("update-si-error"))
+				})
+			})
+		})
+	})
+
 	Describe("UpdateServiceOfferingLabels", func() {
 		const serviceBrokerName = "fake-service-broker"
 
@@ -1130,6 +1221,70 @@ var _ = Describe("labels", func() {
 			})
 		})
 
+	})
+
+	Describe("GetServiceInstanceLabels", func() {
+		JustBeforeEach(func() {
+			labels, warnings, executeErr = actor.GetServiceInstanceLabels(resourceName, spaceGUID)
+		})
+
+		When("does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					[]string{"warning-1", "warning-2"},
+					ccerror.ServiceInstanceNotFoundError{},
+				)
+			})
+
+			It("returns a service instance not found error and warnings", func() {
+				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					[]string{"warning"},
+					errors.New("some random error"),
+				)
+			})
+
+			It("returns error and warnings", func() {
+				Expect(executeErr).To(MatchError("some random error"))
+				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+
+		When("service instance has labels", func() {
+			var expectedLabels map[string]types.NullString
+
+			BeforeEach(func() {
+				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						GUID: "some-guid",
+						Name: resourceName,
+						Metadata: &resources.Metadata{
+							Labels: expectedLabels,
+						},
+					},
+					ccv3.IncludedResources{},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns labels associated with the service broker as well as warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(labels).To(Equal(expectedLabels))
+			})
+		})
 	})
 
 	Describe("GetServiceOfferingLabels", func() {

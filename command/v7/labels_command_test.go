@@ -139,7 +139,7 @@ var _ = Describe("labels command", func() {
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 
 				switch resourceType {
-				case "app", "route":
+				case "app", "route", "service-instance":
 					Expect(checkOrg).To(BeTrue())
 					Expect(checkSpace).To(BeTrue())
 				case "space":
@@ -832,6 +832,73 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 
+				})
+			})
+		})
+
+		Describe("for service-instances", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
+
+				setPositionalFlags(&cmd, "service-instance", "my-service-instance")
+			})
+
+			When("error fetching labels", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetServiceInstanceLabelsReturns(
+						map[string]types.NullString{},
+						[]string{"a warning"},
+						errors.New("some random error"),
+					)
+				})
+
+				It("returns an error and prints all warnings", func() {
+					Expect(executeErr).To(MatchError("some random error"))
+					Expect(testUI.Err).To(Say("a warning"))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say("Getting labels for service-instance my-service-instance in org fake-org / space fake-space as some-user..."))
+				})
+			})
+
+			When("has labels", func() {
+				var labels map[string]types.NullString
+				BeforeEach(func() {
+					labels = map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					}
+
+					fakeLabelsActor.GetServiceInstanceLabelsReturns(
+						labels,
+						[]string{"some-warning-1", "some-warning-2"},
+						nil,
+					)
+				})
+
+				It("queries the right names", func() {
+					Expect(fakeLabelsActor.GetServiceInstanceLabelsCallCount()).To(Equal(1))
+					serviceInstanceName, spaceGUID := fakeLabelsActor.GetServiceInstanceLabelsArgsForCall(0)
+					Expect(serviceInstanceName).To(Equal("my-service-instance"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say("Getting labels for service-instance my-service-instance in org fake-org / space fake-space as some-user..."))
+				})
+
+				It("retrieves the labels alphabetically", func() {
+					Expect(testUI.Out).To(Say(`key\s+value`))
+					Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+					Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+				})
+
+				It("prints all the warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
 				})
 			})
 		})
