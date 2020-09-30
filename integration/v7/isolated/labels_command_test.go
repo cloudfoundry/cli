@@ -112,7 +112,7 @@ var _ = Describe("labels command", func() {
 			When("the app does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "app", "non-existent-app")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app non-existent-app in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app non-existent-app in org %s / space %s as %s...\n"), orgName, spaceName, username))
 					Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -471,7 +471,7 @@ var _ = Describe("labels command", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "route", "non-existent-route.example.com")
 					Eventually(session).Should(Exit(1))
-					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for route non-existent-route.example.com in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for route non-existent-route.example.com in org %s / space %s as %s...\n"), orgName, spaceName, username))
 					Expect(session.Err).To(Say("Domain 'example.com' not found"))
 					Expect(session).To(Say("FAILED"))
 				})
@@ -575,7 +575,7 @@ var _ = Describe("labels command", func() {
 			When("does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "service-instance", "non-existent-app")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-instance non-existent-app in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-instance non-existent-app in org %s / space %s as %s...\n"), orgName, spaceName, username))
 					Eventually(session.Err).Should(Say("Service instance 'non-existent-app' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -642,7 +642,7 @@ var _ = Describe("labels command", func() {
 			When("the service offering does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "service-offering", "non-existent-offering")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering non-existent-offering as %s...\n\n"), username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering non-existent-offering as %s...\n"), username))
 					Eventually(session.Err).Should(Say("Service offering 'non-existent-offering' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -710,7 +710,7 @@ var _ = Describe("labels command", func() {
 			When("the service plan does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "service-plan", "non-existent-plan")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan non-existent-plan as %s...\n\n"), username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan non-existent-plan as %s...\n"), username))
 					Eventually(session.Err).Should(Say("Service plan 'non-existent-plan' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -804,7 +804,7 @@ var _ = Describe("labels command", func() {
 			When("the space does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "space", "non-existent-space")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), "non-existent-space", orgName, username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n"), "non-existent-space", orgName, username))
 					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
