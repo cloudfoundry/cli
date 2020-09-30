@@ -137,6 +137,8 @@ func (cmd LabelsCommand) canonicalResourceTypeForName() ResourceType {
 }
 
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
+	cmd.UI.DisplayNewline()
+
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
 		return
@@ -218,8 +220,6 @@ func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageWithOrg() {
@@ -228,8 +228,6 @@ func (cmd LabelsCommand) displayMessageWithOrg() {
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageWithStack() {
@@ -245,8 +243,6 @@ func (cmd LabelsCommand) displayMessageWithStack() {
 		"StackName":    cmd.BuildpackStack,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageForServiceCommands() {
@@ -275,6 +271,4 @@ func (cmd LabelsCommand) displayMessageForServiceCommands() {
 		"ServiceOffering": cmd.ServiceOffering,
 		"User":            cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
