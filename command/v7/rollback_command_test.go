@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -144,7 +145,7 @@ var _ = Describe("rollback Command", func() {
 
 	When("the first revision is set as the rollback target", func() {
 		BeforeEach(func() {
-			cmd.Version = flag.PositiveInteger{Value: 1}
+			cmd.Version = flag.Revision{NullInt: types.NullInt{Value: 1, IsSet: true}}
 		})
 
 		When("the app has at least one revision", func() {
