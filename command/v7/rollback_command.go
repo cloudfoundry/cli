@@ -14,11 +14,11 @@ import (
 type RollbackCommand struct {
 	BaseCommand
 
-	Force           bool                 `short:"f" description:"Force rollback without confirmation"`
-	RequiredArgs    flag.AppName         `positional-args:"yes"`
-	Version         flag.PositiveInteger `long:"revision" required:"true" description:"Roll back to the given app revision"`
-	relatedCommands interface{}          `related_commands:"revisions"`
-	usage           interface{}          `usage:"CF_NAME rollback APP_NAME [--revision REVISION_NUMBER] [-f]"`
+	Force           bool          `short:"f" description:"Force rollback without confirmation"`
+	RequiredArgs    flag.AppName  `positional-args:"yes"`
+	Version         flag.Revision `long:"revision" required:"true" description:"Roll back to the given app revision"`
+	relatedCommands interface{}   `related_commands:"revisions"`
+	usage           interface{}   `usage:"CF_NAME rollback APP_NAME [--revision REVISION_NUMBER] [-f]"`
 
 	LogCacheClient sharedaction.LogCacheClient
 	Stager         shared.AppStager
