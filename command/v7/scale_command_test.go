@@ -583,6 +583,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
+					Expect(fakeActor.PollStartCallCount()).To(Equal(0))
 				})
 			})
 
