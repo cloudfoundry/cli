@@ -55,9 +55,11 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayWarnings(warnings)
+	if cmd.shouldRestart() {
+		warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayWarnings(warnings)
+	}
 
 	showErr := cmd.showCurrentScale(user.Name, err)
 	if showErr != nil {
@@ -92,7 +94,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 	})
 	cmd.UI.DisplayNewline()
 
-	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
+	shouldRestart := cmd.shouldRestart()
 	if shouldRestart && !cmd.Force {
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
 			false,
@@ -197,4 +199,8 @@ func shouldShowCurrentScale(err error) bool {
 	}
 
 	return false
+}
+
+func (cmd ScaleCommand) shouldRestart() bool {
+	return cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
 }
