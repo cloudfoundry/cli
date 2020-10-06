@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
@@ -122,22 +123,58 @@ func (client *Client) UnshareServiceInstanceFromSpace(serviceInstanceGUID string
 
 // GetServiceInstanceSharedSpaces will fetch relationships between
 // a service instance and the shared-to spaces for that service.
-func (client *Client) GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]resources.Space, Warnings, error) {
-	var relationships resources.RelationshipList
-
+func (client *Client) GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]SpaceWithOrganization, Warnings, error) {
+	var responseBody resources.SharedToSpacesListWrapper
+	query := []Query{
+		{
+			Key:    FieldsSpace,
+			Values: []string{"guid", "name", "relationships.organization"},
+		},
+		{
+			Key:    FieldsSpaceOrganization,
+			Values: []string{"guid", "name"},
+		},
+	}
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
-		ResponseBody: &relationships,
+		Query:        query,
+		ResponseBody: &responseBody,
 	})
-
-	return mapRelationshipsToSpaces(relationships), warnings, err
+	return mapRelationshipsToSpaces(responseBody), warnings, err
 }
 
-func mapRelationshipsToSpaces(relationships resources.RelationshipList) []resources.Space {
-	spaces := make([]resources.Space, len(relationships.GUIDs))
-	for i, g := range relationships.GUIDs {
-		spaces[i] = resources.Space{GUID: g}
+func (client *Client) GetServiceInstanceUsageSummary(serviceInstanceGUID string) ([]resources.ServiceInstanceUsageSummary, Warnings, error) {
+	var result resources.ServiceInstanceUsageSummaryList
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceInstanceSharedSpacesUsageSummaryRequest,
+		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
+		ResponseBody: &result,
+	})
+	return result.UsageSummary, warnings, err
+}
+
+type SpaceWithOrganization struct {
+	SpaceGUID        string
+	SpaceName        string
+	OrganizationName string
+}
+
+func mapRelationshipsToSpaces(sharedToSpaces resources.SharedToSpacesListWrapper) []SpaceWithOrganization {
+	var spacesToReturn []SpaceWithOrganization
+
+	guidToOrgNameMap := make(map[string]string)
+
+	for _, o := range sharedToSpaces.Organizations {
+		guidToOrgNameMap[o.GUID] = o.Name
 	}
-	return spaces
+
+	for _, s := range sharedToSpaces.Spaces {
+		org := s.Relationships[constant.RelationshipTypeOrganization]
+		space := SpaceWithOrganization{SpaceGUID: s.GUID, SpaceName: s.Name, OrganizationName: guidToOrgNameMap[org.GUID]}
+		spacesToReturn = append(spacesToReturn, space)
+	}
+
+	return spacesToReturn
 }

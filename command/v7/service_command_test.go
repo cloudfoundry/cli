@@ -261,6 +261,7 @@ var _ = Describe("service command", func() {
 					},
 					SharedStatus: v7action.SharedStatus{
 						IsSharedToOtherSpaces: true,
+						UsageSummary:          []v7action.UsageSummaryWithSpaceAndOrg{{"shared-to-space", "some-org", 3}},
 					},
 				},
 				v7action.Warnings{"warning one", "warning two"},
@@ -305,6 +306,8 @@ var _ = Describe("service command", func() {
 				Say(`\n`),
 				Say(`%s\n`, parameters),
 				Say(`\n`),
+				Say(`Sharing:`),
+				Say(`Shared with spaces:\n`),
 				Say(`Upgrading:\n`),
 				Say(`Upgrades are not supported by this broker.\n`),
 			))
@@ -321,7 +324,9 @@ var _ = Describe("service command", func() {
 					It("shows shared information", func() {
 						Expect(testUI.Out).To(SatisfyAll(
 							Say(`Sharing:`),
-							Say(`This service instance is currently shared.`),
+							Say(`Shared with spaces:`),
+							Say(`org\s+space\s+bindings\s*\n`),
+							Say(`some-org\s+shared-to-space\s+3\s*\n`),
 						))
 					})
 				})

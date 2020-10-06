@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/jsonry"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -657,12 +658,10 @@ var _ = Describe("Service Instance", func() {
 		Describe("GetServiceInstanceSharedSpaces", func() {
 			var (
 				serviceInstanceGUID string
-				spaceGUIDs          []string
 			)
 
 			BeforeEach(func() {
 				serviceInstanceGUID = "some-service-instance-guid"
-				spaceGUIDs = []string{"some-space-guid", "some-other-space-guid"}
 			})
 
 			It("makes the right request", func() {
@@ -673,12 +672,61 @@ var _ = Describe("Service Instance", func() {
 				actualRequest := requester.MakeRequestArgsForCall(0)
 				Expect(actualRequest.RequestName).To(Equal(internal.GetServiceInstanceRelationshipsSharedSpacesRequest))
 				Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": serviceInstanceGUID}))
+				Expect(actualRequest.Query).To(ConsistOf(
+					Query{
+						Key:    FieldsSpace,
+						Values: []string{"guid", "name", "relationships.organization"},
+					},
+					Query{
+						Key:    FieldsSpaceOrganization,
+						Values: []string{"guid", "name"},
+					},
+				))
 			})
 
 			When("the request succeeds", func() {
 				BeforeEach(func() {
 					requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-						json.Unmarshal([]byte(`{"data":[{"guid":"some-space-guid"}, {"guid":"some-other-space-guid"}]}`), params.ResponseBody)
+						jsonry.Unmarshal([]byte(`{
+								   "data": [{"guid":"some-space-guid"},{"guid":"some-other-space-guid"}],
+								   "links": {
+									  "self": {
+										 "href": "https://some-url/v3/service_instances/7915bc51-8203-4758-b0e2-f77bfcdc38cb/relationships/shared_spaces"
+									  }
+								   },
+								   "included": {
+									  "spaces": [
+										 {
+											"name": "some-space-name",
+											"guid": "some-space-guid",
+											"relationships": {
+											   "organization": {
+												  "data": {
+													 "guid": "some-org-guid"
+												  }
+											   }
+											}
+										 },
+										{
+											"name": "some-other-space-name",
+											"guid": "some-other-space-guid",
+											"relationships": {
+											   "organization": {
+												  "data": {
+													 "guid": "some-org-guid"
+												  }
+											   }
+											}
+										 }
+									  ],
+									  "organizations": [
+										 {
+											"name": "some-org-name",
+											"guid": "some-org-guid"
+										 }
+									  ]
+								   }
+								}`), params.ResponseBody)
 						return "", Warnings{"fake-warning"}, nil
 					})
 				})
@@ -688,7 +736,18 @@ var _ = Describe("Service Instance", func() {
 
 					Expect(warnings).To(ConsistOf("fake-warning"))
 					Expect(err).NotTo(HaveOccurred())
-					Expect(spaces).To(Equal([]resources.Space{{GUID: spaceGUIDs[0]}, {GUID: spaceGUIDs[1]}}))
+					Expect(spaces).To(Equal([]SpaceWithOrganization{
+						{
+							SpaceGUID:        "some-space-guid",
+							SpaceName:        "some-space-name",
+							OrganizationName: "some-org-name",
+						},
+						{
+							SpaceGUID:        "some-other-space-guid",
+							SpaceName:        "some-other-space-name",
+							OrganizationName: "some-org-name",
+						},
+					}))
 				})
 			})
 
@@ -699,6 +758,84 @@ var _ = Describe("Service Instance", func() {
 
 				It("returns errors and warnings", func() {
 					_, warnings, err := client.GetServiceInstanceSharedSpaces(serviceInstanceGUID)
+
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).To(MatchError("bang"))
+				})
+			})
+		})
+
+		Describe("GetServiceInstanceUsageSummary", func() {
+			var (
+				serviceInstanceGUID string
+				spaceGUIDs          []string
+			)
+
+			BeforeEach(func() {
+				serviceInstanceGUID = "some-service-instance-guid"
+				spaceGUIDs = []string{"some-space-guid", "some-other-space-guid"}
+			})
+
+			It("makes the right request", func() {
+				client.GetServiceInstanceUsageSummary(serviceInstanceGUID)
+
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+
+				actualRequest := requester.MakeRequestArgsForCall(0)
+				Expect(actualRequest.RequestName).To(Equal(internal.GetServiceInstanceSharedSpacesUsageSummaryRequest))
+				Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": serviceInstanceGUID}))
+			})
+
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
+						jsonry.Unmarshal([]byte(`{
+							"usage_summary": [
+								{
+									"space": {
+										"guid": "some-space-guid"
+									},
+									"bound_app_count": 2
+								},
+								{
+									"space": {
+										"guid": "some-other-space-guid"
+									},
+									"bound_app_count": 1
+								}
+							],
+							"links": {
+								"self": {
+									"href": "https://api.example.org/v3/service_instances/some_instance_guid/relationships/shared_spaces/usage_summary"
+								},
+								"shared_spaces": {
+									"href": "https://api.example.org/v3/service_instances/some_instance_guid/relationships/shared_spaces"
+								},
+								"service_instance": {
+									"href": "https://api.example.org/v3/service_instances/some_instance_guid"
+								}
+							}
+						}`), params.ResponseBody)
+						return "", Warnings{"fake-warning"}, nil
+					})
+				})
+
+				It("returns warnings and no errors", func() {
+					usageSummary, warnings, err := client.GetServiceInstanceUsageSummary(serviceInstanceGUID)
+
+					Expect(warnings).To(ConsistOf("fake-warning"))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(usageSummary).To(Equal([]resources.ServiceInstanceUsageSummary{{SpaceGUID: spaceGUIDs[0], BoundAppCount: 2}, {SpaceGUID: spaceGUIDs[1], BoundAppCount: 1}}))
+				})
+			})
+
+			When("the request fails", func() {
+				BeforeEach(func() {
+					requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+				})
+
+				It("returns errors and warnings", func() {
+					_, warnings, err := client.GetServiceInstanceUsageSummary(serviceInstanceGUID)
 
 					Expect(warnings).To(ConsistOf("fake-warning"))
 					Expect(err).To(MatchError("bang"))

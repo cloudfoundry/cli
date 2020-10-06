@@ -3,6 +3,7 @@ package v7
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -113,7 +114,8 @@ func (cmd ServiceCommand) displaySharingInfo() error {
 	}
 
 	if sharedStatus.IsSharedToOtherSpaces {
-		cmd.UI.DisplayText("This service instance is currently shared.")
+		cmd.UI.DisplayText("Shared with spaces:")
+		cmd.displaySharedTo()
 	} else {
 		cmd.UI.DisplayText("This service instance is not currently being shared.")
 	}
@@ -240,6 +242,15 @@ func (cmd ServiceCommand) displayUpgrades() error {
 	}
 
 	cmd.UI.DisplayNewline()
+	return nil
+}
+
+func (cmd ServiceCommand) displaySharedTo() error {
+	table := [][]string{{"org", "space", "bindings"}}
+	for _, usageSummaryLine := range cmd.serviceInstance.SharedStatus.UsageSummary {
+		table = append(table, []string{usageSummaryLine.OrganizationName, usageSummaryLine.SpaceName, strconv.Itoa(usageSummaryLine.BoundAppCount)})
+	}
+	cmd.UI.DisplayTableWithHeader("   ", table, ui.DefaultTableSpacePadding)
 	return nil
 }
 

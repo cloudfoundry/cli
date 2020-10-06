@@ -188,7 +188,7 @@ func unmarshalIntoSlice(ctx context.Context, target reflect.Value, found bool, s
 func unmarshalIntoMap(ctx context.Context, target reflect.Value, found bool, source interface{}) error {
 	targetType := underlyingType(target)
 
-	if targetType.Key() != reflect.TypeOf("") {
+	if targetType.Key().Kind() != reflect.String {
 		return newUnsupportedKeyTypeError(ctx, targetType.Key())
 	}
 
@@ -210,7 +210,7 @@ func unmarshalIntoMap(ctx context.Context, target reflect.Value, found bool, sou
 			return err
 		}
 
-		m.SetMapIndex(reflect.ValueOf(k), targetValue)
+		m.SetMapIndex(reflect.ValueOf(k).Convert(targetType.Key()), targetValue)
 	}
 
 	return nil

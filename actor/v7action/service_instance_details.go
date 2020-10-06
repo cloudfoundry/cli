@@ -11,11 +11,18 @@ import (
 
 const featureFlagServiceInstanceSharing string = "service_instance_sharing"
 
+type ServiceInstanceBoundAppCount struct {
+	OrgName       string
+	SpaceName     string
+	BoundAppCount int
+}
+
 type SharedStatus struct {
 	FeatureFlagIsDisabled     bool
 	OfferingDisablesSharing   bool
 	IsSharedToOtherSpaces     bool
 	IsSharedFromOriginalSpace bool
+	UsageSummary              []UsageSummaryWithSpaceAndOrg
 }
 
 type ServiceInstanceParameters struct {
@@ -141,6 +148,12 @@ func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (Ser
 	return ServiceInstanceParameters{Value: params}, warnings
 }
 
+type UsageSummaryWithSpaceAndOrg struct {
+	SpaceName        string
+	OrganizationName string
+	BoundAppCount    int
+}
+
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {
 	if serviceInstanceDetails.Type != resources.ManagedServiceInstance {
 		return SharedStatus{}, nil, nil
@@ -153,7 +166,8 @@ func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails Service
 	var (
 		featureFlag             resources.FeatureFlag
 		offeringDisablesSharing bool
-		sharedSpaces            []resources.Space
+		sharedSpaces            []ccv3.SpaceWithOrganization
+		usageSummaries          []resources.ServiceInstanceUsageSummary
 	)
 
 	warnings, err := railway.Sequentially(
@@ -169,6 +183,12 @@ func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails Service
 			sharedSpaces, warnings, err = actor.CloudControllerClient.GetServiceInstanceSharedSpaces(serviceInstanceDetails.GUID)
 			return
 		},
+		func() (warnings ccv3.Warnings, err error) {
+			if len(sharedSpaces) > 0 {
+				usageSummaries, warnings, err = actor.CloudControllerClient.GetServiceInstanceUsageSummary(serviceInstanceDetails.GUID)
+			}
+			return
+		},
 	)
 	if err != nil {
 		return SharedStatus{}, warnings, err
@@ -178,6 +198,7 @@ func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails Service
 		IsSharedToOtherSpaces:   len(sharedSpaces) > 0,
 		OfferingDisablesSharing: offeringDisablesSharing,
 		FeatureFlagIsDisabled:   !featureFlag.Enabled,
+		UsageSummary:            buildUsageSummary(sharedSpaces, usageSummaries),
 	}
 
 	return sharedStatus, warnings, nil
@@ -268,4 +289,22 @@ func extractOrganizationName(included ccv3.IncludedResources) string {
 	}
 
 	return ""
+}
+
+func buildUsageSummary(sharedSpaces []ccv3.SpaceWithOrganization, usageSummaries []resources.ServiceInstanceUsageSummary) []UsageSummaryWithSpaceAndOrg {
+	var spaceGUIDToNames = make(map[string]ccv3.SpaceWithOrganization)
+	var sharedSpacesUsage []UsageSummaryWithSpaceAndOrg
+
+	for _, sharedSpace := range sharedSpaces {
+		spaceGUIDToNames[sharedSpace.SpaceGUID] = sharedSpace
+	}
+	for _, usageSummary := range usageSummaries {
+		summary := UsageSummaryWithSpaceAndOrg{
+			SpaceName:        spaceGUIDToNames[usageSummary.SpaceGUID].SpaceName,
+			OrganizationName: spaceGUIDToNames[usageSummary.SpaceGUID].OrganizationName,
+			BoundAppCount:    usageSummary.BoundAppCount,
+		}
+		sharedSpacesUsage = append(sharedSpacesUsage, summary)
+	}
+	return sharedSpacesUsage
 }
