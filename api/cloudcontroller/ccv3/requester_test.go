@@ -89,7 +89,6 @@ var _ = Describe("shared request helpers", func() {
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
-
 			When("the cloud controller returns errors and warnings", func() {
 				BeforeEach(func() {
 					response := `{

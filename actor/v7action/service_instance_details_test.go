@@ -1,8 +1,6 @@
 package v7action_test
 
 import (
-	"errors"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -10,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -315,20 +314,47 @@ var _ = Describe("Service Instance Details Action", func() {
 				When("the service instance has shared spaces", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
-							[]resources.Space{{GUID: "some-other-space-guid"}},
+							[]ccv3.SpaceWithOrganization{{SpaceGUID: "some-other-space-guid", SpaceName: "some-other-space-name", OrganizationName: "some-org-name"}},
 							ccv3.Warnings{},
 							nil,
 						)
+						fakeCloudControllerClient.GetServiceInstanceUsageSummaryReturns(
+							[]resources.ServiceInstanceUsageSummary{{SpaceGUID: "some-other-space-guid", BoundAppCount: 3}},
+							ccv3.Warnings{},
+							nil,
+						)
+
 					})
+					It("Passes the right parameters to the client", func() {
+						Expect(fakeCloudControllerClient.GetServiceInstanceSharedSpacesCallCount()).To(Equal(1))
+						serviceInstanceGUID := fakeCloudControllerClient.GetServiceInstanceSharedSpacesArgsForCall(0)
+						Expect(serviceInstanceGUID).To(Equal(serviceInstance.GUID))
+
+						Expect(fakeCloudControllerClient.GetServiceInstanceUsageSummaryCallCount()).To(Equal(1))
+						serviceInstanceGUID = fakeCloudControllerClient.GetServiceInstanceUsageSummaryArgsForCall(0)
+						Expect(serviceInstanceGUID).To(Equal(serviceInstance.GUID))
+					})
+
 					It("returns a service with a SharedStatus of IsSharedToOtherSpaces: true", func() {
 						Expect(serviceInstance.SharedStatus.IsSharedToOtherSpaces).To(BeTrue())
 					})
+					It("returns a service instance with the usage summary", func() {
+						Expect(serviceInstance.SharedStatus.IsSharedToOtherSpaces).To(BeTrue())
+						Expect(serviceInstance.SharedStatus.UsageSummary).To(Equal([]UsageSummaryWithSpaceAndOrg{
+							{
+								SpaceName:        "some-other-space-name",
+								OrganizationName: "some-org-name",
+								BoundAppCount:    3,
+							},
+						}))
+					})
+
 				})
 
 				When("the service instance does not have shared spaces", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
-							[]resources.Space{},
+							[]ccv3.SpaceWithOrganization{},
 							ccv3.Warnings{},
 							nil,
 						)
@@ -337,6 +363,12 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns a service with a SharedStatus of IsSharedToOtherSpaces: false", func() {
 						Expect(serviceInstance.SharedStatus.FeatureFlagIsDisabled).To(BeFalse())
 					})
+
+					It("does not retrieve the usage summary", func() {
+						Expect(fakeCloudControllerClient.GetServiceInstanceUsageSummaryCallCount()).To(Equal(0))
+						Expect(serviceInstance.SharedStatus.UsageSummary).To(BeNil())
+					})
+
 				})
 
 				When("the service sharing feature flag is disabled", func() {
@@ -461,7 +493,7 @@ var _ = Describe("Service Instance Details Action", func() {
 
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
-							[]resources.Space{},
+							[]ccv3.SpaceWithOrganization{},
 							ccv3.Warnings{warningMessage},
 							nil,
 						)
@@ -488,6 +520,31 @@ var _ = Describe("Service Instance Details Action", func() {
 						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
 					})
 				})
+
+				When("fetching usage summary throws an error", func() {
+					const warningMessage = "some-usage-summary-warning"
+
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetServiceInstanceSharedSpacesReturns(
+							[]ccv3.SpaceWithOrganization{{SpaceGUID: "some-other-space-guid", SpaceName: "some-other-space-name", OrganizationName: "some-org-name"}},
+							ccv3.Warnings{},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetServiceInstanceUsageSummaryReturns(
+							nil,
+							ccv3.Warnings{warningMessage},
+							errors.New("no service instance"),
+						)
+					})
+
+					It("returns an empty service instance, warnings, and the error", func() {
+						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
+						Expect(executionError).To(MatchError("no service instance"))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+					})
+				})
+
 			})
 
 			When("targeting space that service instance has been shared to", func() {
@@ -530,6 +587,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					Expect(fakeCloudControllerClient.GetFeatureFlagCallCount()).To(BeZero())
 					Expect(fakeCloudControllerClient.GetServiceOfferingByGUIDCallCount()).To(BeZero())
 					Expect(fakeCloudControllerClient.GetServiceInstanceSharedSpacesCallCount()).To(BeZero())
+					Expect(fakeCloudControllerClient.GetServiceInstanceUsageSummaryCallCount()).To(BeZero())
 				})
 			})
 		})

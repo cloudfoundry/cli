@@ -389,7 +389,9 @@ var _ = Describe("service command", func() {
 
 					Expect(session).To(SatisfyAll(
 						Say(`Sharing:\n`),
-						Say(`This service instance is currently shared.\n`),
+						Say(`Shared with spaces:\n`),
+						Say(`org\s+space\s+bindings\n`),
+						Say(`%s\s+%s\s+0\s*\n`, orgName, sharedToSpaceName),
 					))
 				})
 			})
