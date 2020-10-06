@@ -32,7 +32,29 @@ func (sink *writerSink) Log(log LogFormat) {
 	}
 
 	sink.writeL.Lock()
-	sink.writer.Write(log.ToJSON())
-	sink.writer.Write([]byte("\n"))
+	sink.writer.Write(append(log.ToJSON(), '\n'))
+	sink.writeL.Unlock()
+}
+
+type prettySink struct {
+	writer      io.Writer
+	minLogLevel LogLevel
+	writeL      sync.Mutex
+}
+
+func NewPrettySink(writer io.Writer, minLogLevel LogLevel) Sink {
+	return &prettySink{
+		writer:      writer,
+		minLogLevel: minLogLevel,
+	}
+}
+
+func (sink *prettySink) Log(log LogFormat) {
+	if log.LogLevel < sink.minLogLevel {
+		return
+	}
+
+	sink.writeL.Lock()
+	sink.writer.Write(append(log.toPrettyJSON(), '\n'))
 	sink.writeL.Unlock()
 }
