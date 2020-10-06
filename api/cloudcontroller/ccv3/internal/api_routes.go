@@ -84,6 +84,7 @@ const (
 	GetServiceInstanceParametersRequest                         = "GetServiceInstanceParameters"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceInstanceRelationshipsSharedSpacesRequest          = "GetServiceInstanceRelationshipSharedSpacesRequest"
+	GetServiceInstanceSharedSpacesUsageSummaryRequest           = "GetServiceInstanceSharedSpacesUsageSummaryRequest"
 	GetServiceOfferingRequest                                   = "GetServiceOffering"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
 	GetServicePlanRequest                                       = "GetServicePlan"
@@ -285,6 +286,7 @@ var APIRoutes = map[string]Route{
 	GetServiceInstanceParametersRequest:                         {Path: "/v3/service_instances/:service_instance_guid/parameters", Method: http.MethodGet},
 	PatchServiceInstanceRequest:                                 {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodPatch},
 	DeleteServiceInstanceRequest:                                {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodDelete},
+	GetServiceInstanceSharedSpacesUsageSummaryRequest:           {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces/usage_summary", Method: http.MethodGet},
 	GetServiceInstanceRelationshipsSharedSpacesRequest:          {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodGet},
 	PostServiceInstanceRelationshipsSharedSpacesRequest:         {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost},
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest:        {Path: "/v3/service_instances/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete},
