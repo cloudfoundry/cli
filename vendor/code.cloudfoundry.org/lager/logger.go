@@ -77,8 +77,10 @@ func (l *logger) WithData(data Data) Logger {
 }
 
 func (l *logger) Debug(action string, data ...Data) {
+	t := time.Now().UTC()
 	log := LogFormat{
-		Timestamp: currentTimestamp(),
+		time:      t,
+		Timestamp: formatTimestamp(t),
 		Source:    l.component,
 		Message:   fmt.Sprintf("%s.%s", l.task, action),
 		LogLevel:  DEBUG,
@@ -91,8 +93,10 @@ func (l *logger) Debug(action string, data ...Data) {
 }
 
 func (l *logger) Info(action string, data ...Data) {
+	t := time.Now().UTC()
 	log := LogFormat{
-		Timestamp: currentTimestamp(),
+		time:      t,
+		Timestamp: formatTimestamp(t),
 		Source:    l.component,
 		Message:   fmt.Sprintf("%s.%s", l.task, action),
 		LogLevel:  INFO,
@@ -111,8 +115,10 @@ func (l *logger) Error(action string, err error, data ...Data) {
 		logData["error"] = err.Error()
 	}
 
+	t := time.Now().UTC()
 	log := LogFormat{
-		Timestamp: currentTimestamp(),
+		time:      t,
+		Timestamp: formatTimestamp(t),
 		Source:    l.component,
 		Message:   fmt.Sprintf("%s.%s", l.task, action),
 		LogLevel:  ERROR,
@@ -138,8 +144,10 @@ func (l *logger) Fatal(action string, err error, data ...Data) {
 
 	logData["trace"] = string(stackTrace)
 
+	t := time.Now().UTC()
 	log := LogFormat{
-		Timestamp: currentTimestamp(),
+		time:      t,
+		Timestamp: formatTimestamp(t),
 		Source:    l.component,
 		Message:   fmt.Sprintf("%s.%s", l.task, action),
 		LogLevel:  FATAL,
@@ -176,6 +184,6 @@ func (l *logger) baseData(givenData ...Data) Data {
 	return data
 }
 
-func currentTimestamp() string {
-	return fmt.Sprintf("%.9f", float64(time.Now().UnixNano())/1e9)
+func formatTimestamp(t time.Time) string {
+	return fmt.Sprintf("%.9f", float64(t.UnixNano())/1e9)
 }
