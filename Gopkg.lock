@@ -24,6 +24,23 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:81f719d050d126e10640a5080f0f9d0fe1c474c232b9194cfb65e3e1a843ad1f"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "2acd15650eef815159ecd5a83d021ac456280729"
+  version = "v6.51.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -99,15 +116,16 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:412001a3e6d850b82d4109e8bbbf1795a78d2f7616d36beacd67d0b1e32ebaa0"
+  digest = "1:169fae61b7d2c020db88a2f0a1db6fa4392cfc01bf9459d04d08c10b839ff76d"
   name = "code.cloudfoundry.org/lager"
   packages = [
     ".",
+    "internal/truncate",
     "lagerctx",
     "lagertest",
   ]
   pruneopts = "NUT"
-  revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
+  revision = "55f178059589034528e56015a67dc6aa17d9675b"
 
 [[projects]]
   branch = "master"
