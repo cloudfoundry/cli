@@ -66,3 +66,5 @@ require (
 replace gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7
 
 replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.4
+
+replace golang.org/x/sys => golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6
