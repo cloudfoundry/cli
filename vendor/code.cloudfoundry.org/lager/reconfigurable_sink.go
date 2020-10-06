@@ -1,6 +1,8 @@
 package lager
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
 type ReconfigurableSink struct {
 	sink Sink

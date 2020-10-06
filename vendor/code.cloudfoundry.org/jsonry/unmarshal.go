@@ -43,7 +43,7 @@ func Unmarshal(data []byte, receiver interface{}) error {
 }
 
 func unmarshalIntoStruct(ctx context.Context, target reflect.Value, found bool, source interface{}) error {
-	if !found {
+	if !found || source == nil {
 		return nil
 	}
 
@@ -163,11 +163,7 @@ func unmarshalInfoLeaf(ctx context.Context, target reflect.Value, found bool, so
 }
 
 func unmarshalIntoSlice(ctx context.Context, target reflect.Value, found bool, source interface{}) error {
-	if !found {
-		return nil
-	}
-
-	if source == nil {
+	if !found || source == nil {
 		return nil
 	}
 
@@ -192,15 +188,11 @@ func unmarshalIntoSlice(ctx context.Context, target reflect.Value, found bool, s
 func unmarshalIntoMap(ctx context.Context, target reflect.Value, found bool, source interface{}) error {
 	targetType := underlyingType(target)
 
-	if targetType.Key() != reflect.TypeOf("") {
+	if targetType.Key().Kind() != reflect.String {
 		return newUnsupportedKeyTypeError(ctx, targetType.Key())
 	}
 
-	if !found {
-		return nil
-	}
-
-	if source == nil {
+	if !found || source == nil {
 		return nil
 	}
 
@@ -218,7 +210,7 @@ func unmarshalIntoMap(ctx context.Context, target reflect.Value, found bool, sou
 			return err
 		}
 
-		m.SetMapIndex(reflect.ValueOf(k), targetValue)
+		m.SetMapIndex(reflect.ValueOf(k).Convert(targetType.Key()), targetValue)
 	}
 
 	return nil
