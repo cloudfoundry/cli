@@ -583,7 +583,29 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
-					Expect(fakeActor.PollStartCallCount()).To(Equal(0))
+				})
+
+				When("the app is started", func() {
+					BeforeEach(func() {
+						app.State = constant.ApplicationStarted
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							app, nil, nil)
+					})
+
+					It("polls for the app being started", func() {
+						Expect(fakeActor.PollStartCallCount()).To(Equal(1))
+					})
+				})
+
+				When("the app is stopped", func() {
+					BeforeEach(func() {
+						app.State = constant.ApplicationStopped
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							app, nil, nil)
+					})
+					It("does not poll for the app being started", func() {
+						Expect(fakeActor.PollStartCallCount()).To(Equal(0))
+					})
 				})
 			})
 

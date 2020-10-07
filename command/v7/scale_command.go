@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -55,7 +56,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	if cmd.shouldRestart() {
+	if cmd.shouldRestart() || app.State == constant.ApplicationStarted {
 		warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayWarnings(warnings)
