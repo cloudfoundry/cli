@@ -8,6 +8,12 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
+type SpaceWithOrganization struct {
+	SpaceGUID        string
+	SpaceName        string
+	OrganizationName string
+}
+
 // GetServiceInstances lists service instances with optional filters.
 func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceInstance, IncludedResources, Warnings, error) {
 	var result []resources.ServiceInstance
@@ -153,12 +159,6 @@ func (client *Client) GetServiceInstanceUsageSummary(serviceInstanceGUID string)
 		ResponseBody: &result,
 	})
 	return result.UsageSummary, warnings, err
-}
-
-type SpaceWithOrganization struct {
-	SpaceGUID        string
-	SpaceName        string
-	OrganizationName string
 }
 
 func mapRelationshipsToSpaces(sharedToSpaces resources.SharedToSpacesListWrapper) []SpaceWithOrganization {
