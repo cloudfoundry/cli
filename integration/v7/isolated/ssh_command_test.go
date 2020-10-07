@@ -314,7 +314,6 @@ var _ = Describe("ssh command", func() {
 				When("the process exists", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("scale", appName, "--process", "console", "-i", "1")).Should(Exit(0))
-						Eventually(helpers.CF("restart", appName)).Should(Exit(0))
 					})
 
 					It("ssh's to the process's default index", func() {
