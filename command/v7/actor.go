@@ -63,7 +63,7 @@ type Actor interface {
 	DeleteOrphanedRoutes(spaceGUID string) (v7action.Warnings, error)
 	DeleteRoute(domainName, hostname, path string, port int) (v7action.Warnings, error)
 	DeleteSecurityGroup(securityGroupName string) (v7action.Warnings, error)
-	DeleteServiceInstance(serviceInstanceName, spaceGUID string, wait bool) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)
+	DeleteServiceInstance(serviceInstanceName, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	DeleteServiceBroker(serviceBrokerGUID string) (v7action.Warnings, error)
 	DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (v7action.Warnings, error)
 	DeleteSpaceQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)

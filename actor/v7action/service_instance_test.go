@@ -1092,18 +1092,13 @@ var _ = Describe("Service Instance Actions", func() {
 		)
 
 		var (
-			wait     bool
 			warnings Warnings
 			err      error
-			state    ServiceInstanceDeleteState
+			stream   chan PollJobEvent
 		)
 
-		BeforeEach(func() {
-			wait = false
-		})
-
 		JustBeforeEach(func() {
-			state, warnings, err = actor.DeleteServiceInstance(fakeServiceInstanceName, fakeSpaceGUID, wait)
+			stream, warnings, err = actor.DeleteServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
 		})
 
 		It("makes a request to get the service instance", func() {
@@ -1124,14 +1119,14 @@ var _ = Describe("Service Instance Actions", func() {
 				)
 			})
 
-			It("does not try to delete", func() {
-				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
+			It("returns an error", func() {
+				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName}))
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(stream).To(BeNil())
 			})
 
-			It("returns the appropriate state flag", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get warning"))
-				Expect(state).To(Equal(ServiceInstanceDidNotExist))
+			It("does not try to delete", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
 			})
 		})
 
@@ -1161,10 +1156,14 @@ var _ = Describe("Service Instance Actions", func() {
 					)
 				})
 
-				It("returns the appropriate state flag", func() {
+				It("returns a nil channel", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
-					Expect(state).To(Equal(ServiceInstanceGone))
+					Expect(stream).To(BeNil())
+				})
+
+				It("does not try to poll a job", func() {
+					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(BeZero())
 				})
 			})
 
@@ -1176,60 +1175,21 @@ var _ = Describe("Service Instance Actions", func() {
 						nil,
 					)
 
-					fakeCloudControllerClient.PollJobForStateReturns(
-						ccv3.Warnings{"poll warning"},
-						nil,
+					fakeCloudControllerClient.PollJobToEventStreamReturns(
+						make(chan ccv3.PollJobEvent),
 					)
 				})
 
 				It("polls the job", func() {
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-					actualJobURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+					actualJobURL := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
 					Expect(actualJobURL).To(BeEquivalentTo("a fake job url"))
-					Expect(actualState).To(Equal(constant.JobPolling))
 				})
 
-				It("returns the appropriate state flag", func() {
+				It("returns an open channel", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll warning"))
-					Expect(state).To(Equal(ServiceInstanceDeleteInProgress))
-				})
-
-				When("the `wait` flag is specified", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.PollJobReturns(
-							ccv3.Warnings{"poll job warning"},
-							nil,
-						)
-
-						wait = true
-					})
-
-					It("polls the job until complete", func() {
-						Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(BeEquivalentTo("a fake job url"))
-					})
-
-					It("returns the appropriate state flag", func() {
-						Expect(err).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll job warning"))
-						Expect(state).To(Equal(ServiceInstanceGone))
-					})
-				})
-
-				When("polling the job fails", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.PollJobForStateReturns(
-							ccv3.Warnings{"poll warning"},
-							errors.New("bang"),
-						)
-					})
-
-					It("return the error and warnings", func() {
-						Expect(err).To(MatchError("bang"))
-						Expect(warnings).To(ConsistOf("get warning", "delete warning", "poll warning"))
-						Expect(state).To(Equal(ServiceInstanceUnknownState))
-					})
+					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
+					Expect(stream).NotTo(BeClosed())
 				})
 			})
 
@@ -1245,7 +1205,7 @@ var _ = Describe("Service Instance Actions", func() {
 				It("return the error and warnings", func() {
 					Expect(err).To(MatchError("bong"))
 					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
-					Expect(state).To(Equal(ServiceInstanceUnknownState))
+					Expect(stream).To(BeNil())
 				})
 			})
 		})
@@ -1263,7 +1223,7 @@ var _ = Describe("Service Instance Actions", func() {
 			It("returns the error", func() {
 				Expect(err).To(MatchError("boom"))
 				Expect(warnings).To(ConsistOf("get warning"))
-				Expect(state).To(Equal(ServiceInstanceUnknownState))
+				Expect(stream).To(BeNil())
 			})
 		})
 	})

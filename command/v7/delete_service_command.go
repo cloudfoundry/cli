@@ -1,6 +1,9 @@
 package v7
 
 import (
+	"fmt"
+
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 )
@@ -35,17 +38,35 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	state, warnings, err := cmd.Actor.DeleteServiceInstance(
+	stream, warnings, err := cmd.Actor.DeleteServiceInstance(
 		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
-		cmd.Wait,
 	)
 	cmd.UI.DisplayWarnings(warnings)
+
+	switch err.(type) {
+	case nil:
+	case actionerror.ServiceInstanceNotFoundError:
+		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} did not exist.", cmd.serviceInstanceName())
+		cmd.UI.DisplayOK()
+		return nil
+	default:
+		return err
+	}
+
+	deleted, err := cmd.waitForResult(stream)
 	if err != nil {
 		return err
 	}
 
-	cmd.displayState(state)
+	switch deleted {
+	case true:
+		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} deleted.", cmd.serviceInstanceName())
+	default:
+		cmd.UI.DisplayText("Delete in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+	}
+
+	cmd.UI.DisplayOK()
 	return nil
 }
 
@@ -68,6 +89,7 @@ func (cmd DeleteServiceCommand) displayEvent() error {
 			"Username":            user.Name,
 		},
 	)
+	cmd.UI.DisplayNewline()
 
 	return nil
 }
@@ -85,17 +107,34 @@ func (cmd DeleteServiceCommand) displayPrompt() (bool, error) {
 	return delete, nil
 }
 
-func (cmd DeleteServiceCommand) displayState(state v7action.ServiceInstanceDeleteState) {
-	cmd.UI.DisplayNewline()
-	switch state {
-	case v7action.ServiceInstanceDidNotExist:
-		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} did not exist.", cmd.serviceInstanceName())
-	case v7action.ServiceInstanceGone:
-		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} deleted.", cmd.serviceInstanceName())
-	case v7action.ServiceInstanceDeleteInProgress:
-		cmd.UI.DisplayText("Delete in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+func (cmd DeleteServiceCommand) waitForResult(stream chan v7action.PollJobEvent) (bool, error) {
+	if stream == nil {
+		return true, nil
 	}
-	cmd.UI.DisplayOK()
+
+	if cmd.Wait {
+		fmt.Fprint(cmd.UI.Writer(), "Waiting for the operation to complete")
+	}
+
+	for event := range stream {
+		cmd.UI.DisplayWarnings(event.Warnings)
+		if cmd.Wait {
+			fmt.Fprint(cmd.UI.Writer(), ".")
+		}
+		if event.Err != nil {
+			return false, event.Err
+		}
+		if event.State == v7action.JobPolling && !cmd.Wait {
+			break
+		}
+	}
+
+	if cmd.Wait {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayNewline()
+		return true, nil
+	}
+	return false, nil
 }
 
 func (cmd DeleteServiceCommand) serviceInstanceName() map[string]interface{} {

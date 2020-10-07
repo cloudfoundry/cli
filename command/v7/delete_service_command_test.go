@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -36,18 +37,17 @@ var _ = Describe("delete-service command", func() {
 	testActorInteractions := func() {
 		It("delegates to the actor", func() {
 			Expect(fakeActor.DeleteServiceInstanceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID, actualWait := fakeActor.DeleteServiceInstanceArgsForCall(0)
+			actualName, actualSpaceGUID := fakeActor.DeleteServiceInstanceArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
-			Expect(actualWait).To(BeFalse())
 		})
 
 		When("the service instance did not exist", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteServiceInstanceReturns(
-					v7action.ServiceInstanceDidNotExist,
-					v7action.Warnings{"delete warning"},
 					nil,
+					v7action.Warnings{"delete warning"},
+					actionerror.ServiceInstanceNotFoundError{},
 				)
 			})
 
@@ -65,7 +65,7 @@ var _ = Describe("delete-service command", func() {
 		When("the service instance is successfully deleted", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteServiceInstanceReturns(
-					v7action.ServiceInstanceGone,
+					nil,
 					v7action.Warnings{"delete warning"},
 					nil,
 				)
@@ -84,11 +84,18 @@ var _ = Describe("delete-service command", func() {
 
 		When("the service instance deletion is in progress", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteServiceInstanceReturns(
-					v7action.ServiceInstanceDeleteInProgress,
-					v7action.Warnings{"delete warning"},
-					nil,
-				)
+				fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+					stream := make(chan v7action.PollJobEvent)
+
+					go func() {
+						stream <- v7action.PollJobEvent{
+							State: v7action.JobPolling,
+						}
+						// channel not closed
+					}()
+
+					return stream, v7action.Warnings{"delete warning"}, nil
+				})
 			})
 
 			It("succeeds with a message", func() {
@@ -100,12 +107,54 @@ var _ = Describe("delete-service command", func() {
 					Say("OK\n"),
 				))
 			})
+
+			When("there is a warning in the event stream", func() {
+				BeforeEach(func() {
+					fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+						stream := make(chan v7action.PollJobEvent)
+
+						go func() {
+							stream <- v7action.PollJobEvent{
+								Warnings: v7action.Warnings{"stream warning"},
+							}
+							close(stream)
+						}()
+
+						return stream, v7action.Warnings{"delete warning"}, nil
+					})
+				})
+
+				It("prints it", func() {
+					Expect(testUI.Err).To(Say("stream warning"))
+				})
+			})
+
+			When("there is an error in the event stream", func() {
+				BeforeEach(func() {
+					fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+						stream := make(chan v7action.PollJobEvent)
+
+						go func() {
+							stream <- v7action.PollJobEvent{
+								Err: errors.New("stream error"),
+							}
+							close(stream)
+						}()
+
+						return stream, v7action.Warnings{"delete warning"}, nil
+					})
+				})
+
+				It("returns it", func() {
+					Expect(executeErr).To(MatchError("stream error"))
+				})
+			})
 		})
 
 		When("the actor returns an error", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteServiceInstanceReturns(
-					v7action.ServiceInstanceUnknownState,
+					nil,
 					v7action.Warnings{"delete warning"},
 					errors.New("bang"),
 				)
@@ -121,12 +170,71 @@ var _ = Describe("delete-service command", func() {
 		When("the -w flag is specified", func() {
 			BeforeEach(func() {
 				setFlag(&cmd, "-w")
+
+				fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+					stream := make(chan v7action.PollJobEvent)
+
+					go func() {
+						stream <- v7action.PollJobEvent{State: v7action.JobPolling}
+						stream <- v7action.PollJobEvent{State: v7action.JobComplete}
+						close(stream)
+					}()
+
+					return stream, v7action.Warnings{"delete warning"}, nil
+				})
 			})
 
-			It("passes the wait flag to the actor", func() {
-				Expect(fakeActor.DeleteServiceInstanceCallCount()).To(Equal(1))
-				_, _, actualWait := fakeActor.DeleteServiceInstanceArgsForCall(0)
-				Expect(actualWait).To(BeTrue())
+			It("succeeds with a message", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Err).To(Say("delete warning"))
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Waiting for the operation to complete\.\.\n`),
+					Say("\n"),
+					Say(`Service instance %s deleted\.\n`, serviceInstanceName),
+					Say("OK\n"),
+				))
+			})
+
+			When("there is a warning in the event stream", func() {
+				BeforeEach(func() {
+					fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+						stream := make(chan v7action.PollJobEvent)
+
+						go func() {
+							stream <- v7action.PollJobEvent{
+								Warnings: v7action.Warnings{"stream warning"},
+							}
+							close(stream)
+						}()
+
+						return stream, v7action.Warnings{"delete warning"}, nil
+					})
+				})
+
+				It("prints it", func() {
+					Expect(testUI.Err).To(Say("stream warning"))
+				})
+			})
+
+			When("there is an error in the event stream", func() {
+				BeforeEach(func() {
+					fakeActor.DeleteServiceInstanceCalls(func(name, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+						stream := make(chan v7action.PollJobEvent)
+
+						go func() {
+							stream <- v7action.PollJobEvent{
+								Err: errors.New("stream error"),
+							}
+							close(stream)
+						}()
+
+						return stream, v7action.Warnings{"delete warning"}, nil
+					})
+				})
+
+				It("returns it", func() {
+					Expect(executeErr).To(MatchError("stream error"))
+				})
 			})
 		})
 	}

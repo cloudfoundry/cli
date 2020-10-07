@@ -198,7 +198,7 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 	))
 }
 
-func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, wait bool) (ServiceInstanceDeleteState, Warnings, error) {
+func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string) (chan PollJobEvent, Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance
 		jobURL          ccv3.JobURL
@@ -213,23 +213,22 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string, 
 			jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceInstance(serviceInstance.GUID)
 			return
 		},
-		func() (ccv3.Warnings, error) {
-			return actor.pollJob(jobURL, wait)
-		},
 	)
 
 	switch err.(type) {
 	case nil:
 	case ccerror.ServiceInstanceNotFoundError:
-		return ServiceInstanceDidNotExist, Warnings(warnings), nil
+		return nil, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
-		return ServiceInstanceUnknownState, Warnings(warnings), err
+		return nil, Warnings(warnings), err
 	}
 
-	if jobURL != "" && !wait {
-		return ServiceInstanceDeleteInProgress, Warnings(warnings), nil
+	switch jobURL {
+	case "":
+		return nil, Warnings(warnings), nil
+	default:
+		return actor.PollJobToEventStream(jobURL), Warnings(warnings), nil
 	}
-	return ServiceInstanceGone, Warnings(warnings), nil
 }
 
 func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (ServiceInstanceDeleteState, Warnings, error) {
