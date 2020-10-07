@@ -194,6 +194,51 @@ var _ = Describe("Job", func() {
 			fakeClock         *ccv3fakes.FakeClock
 		)
 
+		appendHandler := func(state string, warnings Warnings) {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/some-job-location"),
+					RespondWith(http.StatusAccepted, fmt.Sprintf(`
+						{
+							"guid": "job-guid",
+							"created_at": "2016-06-08T16:41:27Z",
+							"updated_at": "2016-06-08T16:41:27Z",
+							"operation": "app.delete",
+							"state": "%s",
+							"links": {
+								"self": {
+									"href": "/v3/jobs/job-guid"
+								}
+							}
+						}`, state), http.Header{"X-Cf-Warnings": warnings}),
+				),
+			)
+		}
+
+		appendFailureHandler := func(message string, code constant.JobErrorCode, warnings Warnings) {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/some-job-location"),
+					RespondWith(http.StatusOK, fmt.Sprintf(`{
+							"guid": "job-guid",
+							"created_at": "2016-06-08T16:41:27Z",
+							"updated_at": "2016-06-08T16:41:27Z",
+							"operation": "app.delete",
+							"state": "FAILED",
+							"errors": [ {
+								"detail": "%s",
+								"code": %d
+							} ],
+							"links": {
+								"self": {
+									"href": "/v3/jobs/job-guid"
+								}
+							}
+						}`, message, code), http.Header{"X-Cf-Warnings": warnings}),
+				),
+			)
+		}
+
 		itSkipsEmptyURLs := func() {
 			When("the job URL is empty", func() {
 				BeforeEach(func() {
@@ -210,56 +255,9 @@ var _ = Describe("Job", func() {
 		itFinishesWhenCompleteOrFailed := func() {
 			When("the job starts queued and then finishes successfully", func() {
 				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "COMPLETE",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-3, warning-4"}}),
-						))
+					appendHandler("PROCESSING", Warnings{"warning-1"})
+					appendHandler("PROCESSING", Warnings{"warning-2"})
+					appendHandler("COMPLETE", Warnings{"warning-3", "warning-4"})
 				})
 
 				It("should poll until completion", func() {
@@ -270,60 +268,9 @@ var _ = Describe("Job", func() {
 
 			When("the job starts queued and then fails", func() {
 				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-2, warning-3"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusOK, fmt.Sprintf(`{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "FAILED",
-							"errors": [ {
-								"detail": "%s",
-								"code": %d
-							} ],
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, "some-message", constant.JobErrorCodeBuildpackAlreadyExistsForStack), http.Header{"X-Cf-Warnings": {"warning-4"}}),
-						))
+					appendHandler("PROCESSING", Warnings{"warning-1"})
+					appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
+					appendFailureHandler("some-message", constant.JobErrorCodeBuildpackAlreadyExistsForStack, Warnings{"warning-4"})
 				})
 
 				It("returns the first error", func() {
@@ -350,56 +297,9 @@ var _ = Describe("Job", func() {
 						fakeClock.NowReturnsOnCall(2, clockTime.Add(60*time.Millisecond))
 						fakeClock.NowReturnsOnCall(3, clockTime.Add(60*time.Millisecond*2))
 
-						server.AppendHandlers(
-							CombineHandlers(
-								VerifyRequest(http.MethodGet, "/some-job-location"),
-								RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-							))
-
-						server.AppendHandlers(
-							CombineHandlers(
-								VerifyRequest(http.MethodGet, "/some-job-location"),
-								RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-2, warning-3"}}),
-							))
-
-						server.AppendHandlers(
-							CombineHandlers(
-								VerifyRequest(http.MethodGet, "/some-job-location"),
-								RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "FINISHED",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-4"}}),
-							))
+						appendHandler("PROCESSING", Warnings{"warning-1"})
+						appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
+						appendHandler("FINISHED", Warnings{"warning-4"})
 					})
 
 					It("raises a JobTimeoutError", func() {
@@ -455,61 +355,135 @@ var _ = Describe("Job", func() {
 
 			When("Job reaches the required state", func() {
 				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "PROCESSING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						))
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/some-job-location"),
-							RespondWith(http.StatusAccepted, `{
-							"guid": "job-guid",
-							"created_at": "2016-06-08T16:41:27Z",
-							"updated_at": "2016-06-08T16:41:27Z",
-							"operation": "app.delete",
-							"state": "POLLING",
-							"links": {
-								"self": {
-									"href": "/v3/jobs/job-guid"
-								}
-							}
-						}`, http.Header{"X-Cf-Warnings": {"warning-3"}}),
-						))
+					appendHandler("PROCESSING", Warnings{"warning-1"})
+					appendHandler("PROCESSING", Warnings{"warning-2"})
+					appendHandler("POLLING", Warnings{"warning-3"})
 				})
 
 				It("should poll until the desired state", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
+				})
+			})
+		})
+
+		Describe("PollJobToEventStream", func() {
+			var stream chan PollJobEvent
+
+			JustBeforeEach(func() {
+				startTime = time.Now()
+				stream = client.PollJobToEventStream(jobLocation)
+			})
+
+			When("the job URL is empty", func() {
+				BeforeEach(func() {
+					jobLocation = ""
+				})
+
+				It("closes the channel without events", func() {
+					Consistently(stream).ShouldNot(Receive())
+					Eventually(stream).Should(BeClosed())
+				})
+			})
+
+			When("the job starts queued and then finishes successfully", func() {
+				BeforeEach(func() {
+					appendHandler("PROCESSING", Warnings{"warning-1"})
+					appendHandler("PROCESSING", Warnings{"warning-2"})
+					appendHandler("COMPLETE", Warnings{"warning-3", "warning-4"})
+				})
+
+				It("should poll until completion", func() {
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobProcessing,
+						Err:      nil,
+						Warnings: Warnings{"warning-1"},
+					})))
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobProcessing,
+						Err:      nil,
+						Warnings: Warnings{"warning-2"},
+					})))
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobComplete,
+						Err:      nil,
+						Warnings: Warnings{"warning-3", "warning-4"},
+					})))
+					Eventually(stream).Should(BeClosed())
+				})
+			})
+
+			When("the job starts queued and then fails", func() {
+				BeforeEach(func() {
+					appendHandler("PROCESSING", Warnings{"warning-1"})
+					appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
+					appendFailureHandler("some-message", constant.JobErrorCodeBuildpackAlreadyExistsForStack, Warnings{"warning-4"})
+				})
+
+				It("returns the first error", func() {
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobProcessing,
+						Err:      nil,
+						Warnings: Warnings{"warning-1"},
+					})))
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobProcessing,
+						Err:      nil,
+						Warnings: Warnings{"warning-2", "warning-3"},
+					})))
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    constant.JobFailed,
+						Err:      ccerror.BuildpackAlreadyExistsForStackError{Message: "some-message"},
+						Warnings: Warnings{"warning-4"},
+					})))
+					Eventually(stream).Should(BeClosed())
+				})
+			})
+
+			Context("polling timeouts", func() {
+				When("the job runs longer than the OverallPollingTimeout", func() {
+					BeforeEach(func() {
+						jobPollingTimeout = 100 * time.Millisecond
+						client, fakeClock = NewTestClient(Config{
+							JobPollingTimeout: jobPollingTimeout,
+						})
+
+						clockTime := time.Now()
+						fakeClock.NowReturnsOnCall(0, clockTime)
+						fakeClock.NowReturnsOnCall(1, clockTime)
+						fakeClock.NowReturnsOnCall(2, clockTime.Add(60*time.Millisecond))
+						fakeClock.NowReturnsOnCall(3, clockTime.Add(60*time.Millisecond*2))
+
+						appendHandler("PROCESSING", Warnings{"warning-1"})
+						appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
+						appendHandler("PROCESSING", Warnings{"warning-4"})
+					})
+
+					It("returns a JobTimeoutError", func() {
+						Eventually(stream).Should(Receive(Equal(PollJobEvent{
+							State: constant.JobProcessing,
+							Err: ccerror.JobTimeoutError{
+								Timeout: jobPollingTimeout,
+								JobGUID: "job-guid",
+							},
+							Warnings: Warnings{"warning-4"},
+						})))
+						Eventually(stream).Should(BeClosed())
+					})
+
+					// Fuzzy test to ensure that the overall function time isn't [far]
+					// greater than the OverallPollingTimeout. Since this is partially
+					// dependent on the speed of the system, the expectation is that the
+					// function *should* never exceed three times the timeout.
+					It("does not run [too much] longer than the timeout", func() {
+						Eventually(stream).Should(BeClosed())
+						endTime := time.Now()
+
+						// If the jobPollingTimeout is less than the PollingInterval,
+						// then the margin may be too small, we should not allow the
+						// jobPollingTimeout to be set to less than the PollingInterval
+						Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
+					})
 				})
 			})
 		})

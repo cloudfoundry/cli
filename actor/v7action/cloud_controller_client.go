@@ -136,6 +136,7 @@ type CloudControllerClient interface {
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	PollJobForState(jobURL ccv3.JobURL, state constant.JobState) (ccv3.Warnings, error)
+	PollJobToEventStream(jobURL ccv3.JobURL) chan ccv3.PollJobEvent
 	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)
 	ResourceMatch(resources []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)

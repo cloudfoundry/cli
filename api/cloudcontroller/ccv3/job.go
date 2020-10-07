@@ -140,3 +140,55 @@ func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (W
 		Timeout: client.jobPollingTimeout,
 	}
 }
+
+type PollJobEvent struct {
+	State    constant.JobState
+	Err      error
+	Warnings Warnings
+}
+
+func (client *Client) PollJobToEventStream(jobURL JobURL) chan PollJobEvent {
+	stream := make(chan PollJobEvent)
+
+	if jobURL == "" {
+		close(stream)
+		return stream
+	}
+
+	go func() {
+		var end bool
+
+		startTime := client.clock.Now()
+		for !end {
+			job, warnings, err := client.GetJob(jobURL)
+			event := PollJobEvent{
+				State:    job.State,
+				Err:      err,
+				Warnings: warnings,
+			}
+
+			switch {
+			case event.Err != nil:
+				end = true
+			case job.IsComplete():
+				end = true
+			case job.HasFailed():
+				event.Err = job.Errors()[0]
+				end = true
+			case client.clock.Now().Sub(startTime) > client.jobPollingTimeout:
+				event.Err = ccerror.JobTimeoutError{
+					JobGUID: job.GUID,
+					Timeout: client.jobPollingTimeout,
+				}
+				end = true
+			}
+
+			stream <- event
+			time.Sleep(client.jobPollingInterval)
+		}
+
+		close(stream)
+	}()
+
+	return stream
+}
