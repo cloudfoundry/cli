@@ -17,6 +17,12 @@ type ServiceInstanceBoundAppCount struct {
 	BoundAppCount int
 }
 
+type UsageSummaryWithSpaceAndOrg struct {
+	SpaceName        string
+	OrganizationName string
+	BoundAppCount    int
+}
+
 type SharedStatus struct {
 	FeatureFlagIsDisabled     bool
 	OfferingDisablesSharing   bool
@@ -146,12 +152,6 @@ func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (Ser
 	}
 
 	return ServiceInstanceParameters{Value: params}, warnings
-}
-
-type UsageSummaryWithSpaceAndOrg struct {
-	SpaceName        string
-	OrganizationName string
-	BoundAppCount    int
 }
 
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {

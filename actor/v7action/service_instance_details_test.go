@@ -338,8 +338,8 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns a service with a SharedStatus of IsSharedToOtherSpaces: true", func() {
 						Expect(serviceInstance.SharedStatus.IsSharedToOtherSpaces).To(BeTrue())
 					})
+
 					It("returns a service instance with the usage summary", func() {
-						Expect(serviceInstance.SharedStatus.IsSharedToOtherSpaces).To(BeTrue())
 						Expect(serviceInstance.SharedStatus.UsageSummary).To(Equal([]UsageSummaryWithSpaceAndOrg{
 							{
 								SpaceName:        "some-other-space-name",
