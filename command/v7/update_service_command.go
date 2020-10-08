@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -17,12 +18,20 @@ type UpdateServiceCommand struct {
 	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Plan         flag.OptionalString           `short:"p" description:"Change service plan for a service instance"`
 	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
+	Wait         bool                          `short:"w" long:"wait" description:"Wait for the update operation to complete"`
 	Upgrade      bool                          `long:"upgrade" hidden:"true"`
 
 	relatedCommands interface{} `related_commands:"rename-service, services, update-user-provided-service"`
 }
 
 func (cmd UpdateServiceCommand) Execute(args []string) error {
+	if cmd.Upgrade {
+		return fmt.Errorf(
+			`Upgrading is no longer supported via updates, please run "cf upgrade-service %s" instead.`,
+			cmd.RequiredArgs.ServiceInstance,
+		)
+	}
+
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
@@ -31,20 +40,13 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if cmd.Upgrade {
-		return fmt.Errorf(
-			`Upgrading is no longer supported via updates, please run "cf upgrade-service %s" instead.`,
-			cmd.RequiredArgs.ServiceInstance,
-		)
-	}
-
 	if cmd.noFlagsProvided() {
 		cmd.UI.DisplayText("No flags specified. No changes were made.")
 		cmd.UI.DisplayOK()
 		return nil
 	}
 
-	noop, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
+	stream, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
 		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 		v7action.ServiceInstanceUpdateManagedParams{
@@ -53,19 +55,28 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 			ServicePlanName: types.OptionalString(cmd.Plan),
 		},
 	)
-
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+	case actionerror.ServiceInstanceUpdateIsNoop:
+		cmd.UI.DisplayText("No changes were made.")
+		cmd.UI.DisplayOK()
+		return nil
+	default:
 		return err
 	}
 
-	cmd.UI.DisplayOK()
-	if noop {
-		cmd.UI.DisplayText("No changes were made.")
-	} else {
-		cmd.displayUpdateInProgressMessage()
+	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	switch {
+	case err != nil:
+		return err
+	case complete:
+		cmd.UI.DisplayTextWithFlavor("Update of service instance {{.ServiceInstance}} complete.", cmd.serviceInstanceName())
+	default:
+		cmd.UI.DisplayTextWithFlavor("Update in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.", cmd.serviceInstanceName())
 	}
 
+	cmd.UI.DisplayOK()
 	return nil
 }
 
@@ -127,9 +138,8 @@ func (cmd UpdateServiceCommand) noFlagsProvided() bool {
 	return !(cmd.Tags.IsSet || cmd.Parameters.IsSet || cmd.Plan.IsSet)
 }
 
-func (cmd UpdateServiceCommand) displayUpdateInProgressMessage() {
-	cmd.UI.DisplayTextWithFlavor("Update in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
-		map[string]interface{}{
-			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
-		})
+func (cmd UpdateServiceCommand) serviceInstanceName() map[string]interface{} {
+	return map[string]interface{}{
+		"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+	}
 }

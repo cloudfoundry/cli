@@ -46,6 +46,7 @@ var _ = Describe("update-service command", func() {
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.\n`),
 			Say(`\s+-p\s+Change service plan for a service instance\n`),
 			Say(`\s+-t\s+User provided tags\n`),
+			Say(`\s+--wait, -w\s+Wait for the update operation to complete\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+rename-service, services, update-user-provided-service\n`),
 		)
@@ -182,10 +183,10 @@ var _ = Describe("update-service command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session.Out).To(SatisfyAll(
-					Say("Updating service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`OK`),
-					Say(`Update in progress`),
+					Say(`Update in progress\. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+					Say(`OK\n`),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
@@ -276,9 +277,37 @@ var _ = Describe("update-service command", func() {
 					It("displays a message and exits 0", func() {
 						session := helpers.CF(command, serviceInstanceName, "-p", broker.Services[0].Plans[0].Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).Should(Say("OK"))
-						Expect(session.Out).To(Say("No changes were made."))
+						Expect(session.Out).To(SatisfyAll(
+							Say(`No changes were made\.\n`),
+							Say(`OK\n`),
+						))
 					})
+				})
+			})
+
+			When("the --wait flag is specified", func() {
+				BeforeEach(func() {
+					broker.WithAsyncDelay(5 * time.Second)
+				})
+
+				It("waits for the update to complete", func() {
+					session := helpers.CF(command, serviceInstanceName, "-c", `{"funky":"chicken"}`, "--wait")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`\n`),
+						Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
+						Say(`OK\n`),
+					))
+
+					Expect(string(session.Err.Contents())).To(BeEmpty())
+					waitUntilUpdateComplete(serviceInstanceName)
+					session = helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session.Out).To(Say(`status:\s+update succeeded`))
 				})
 			})
 		})

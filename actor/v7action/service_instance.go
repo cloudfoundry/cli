@@ -94,7 +94,7 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 	return actor.PollJobToEventStream(jobURL), allWarnings, err
 }
 
-func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (bool, Warnings, error) {
+func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (chan PollJobEvent, Warnings, error) {
 	var (
 		jobURL                ccv3.JobURL
 		allWarnings           Warnings
@@ -110,23 +110,14 @@ func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID s
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			if serviceInstanceUpdate.isNoop {
-				return
-			}
 			jobURL, warnings, err = actor.CloudControllerClient.UpdateServiceInstance(serviceInstanceUpdate.serviceInstanceGUID, serviceInstanceUpdate.updateRequest)
 			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
-			if serviceInstanceUpdate.isNoop {
-				return
-			}
-			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
 	))
 
 	allWarnings = append(allWarnings, warnings...)
 
-	return serviceInstanceUpdate.isNoop, allWarnings, err
+	return actor.PollJobToEventStream(jobURL), allWarnings, err
 }
 
 func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
@@ -313,6 +304,11 @@ func (v *managedServiceInstanceValidator) validateManagedInstanceUpdate(serviceI
 	if err != nil {
 		return managedServiceInstanceUpdate{}, warnings, err
 	}
+
+	if m.isNoop {
+		err = actionerror.ServiceInstanceUpdateIsNoop{}
+	}
+
 	return *m, warnings, err
 }
 
