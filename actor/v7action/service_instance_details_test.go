@@ -93,10 +93,9 @@ var _ = Describe("Service Instance Details Action", func() {
 			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 				[]resources.ServiceCredentialBinding{
 					{
-						Type:         resources.AppBinding,
-						Name:         "binding-1",
-						AppName:      "app-1",
-						AppSpaceGUID: spaceGUID,
+						Type:    resources.AppBinding,
+						Name:    "binding-1",
+						AppName: "app-1",
 						LastOperation: resources.LastOperation{
 							Type:        resources.CreateOperation,
 							State:       resources.OperationSucceeded,
@@ -104,21 +103,9 @@ var _ = Describe("Service Instance Details Action", func() {
 						},
 					},
 					{
-						Type:         resources.AppBinding,
-						Name:         "binding-2",
-						AppName:      "app-2",
-						AppSpaceGUID: spaceGUID,
-						LastOperation: resources.LastOperation{
-							Type:        resources.UpdateOperation,
-							State:       resources.OperationInProgress,
-							Description: "please wait",
-						},
-					},
-					{
-						Type:         resources.AppBinding,
-						Name:         "binding-3",
-						AppName:      "app-3",
-						AppSpaceGUID: "another-space-guid",
+						Type:    resources.AppBinding,
+						Name:    "binding-2",
+						AppName: "app-2",
 						LastOperation: resources.LastOperation{
 							Type:        resources.UpdateOperation,
 							State:       resources.OperationInProgress,
@@ -172,10 +159,9 @@ var _ = Describe("Service Instance Details Action", func() {
 					},
 					BoundApps: []resources.ServiceCredentialBinding{
 						{
-							Type:         resources.AppBinding,
-							Name:         "binding-1",
-							AppName:      "app-1",
-							AppSpaceGUID: spaceGUID,
+							Type:    resources.AppBinding,
+							Name:    "binding-1",
+							AppName: "app-1",
 							LastOperation: resources.LastOperation{
 								Type:        resources.CreateOperation,
 								State:       resources.OperationSucceeded,
@@ -183,10 +169,9 @@ var _ = Describe("Service Instance Details Action", func() {
 							},
 						},
 						{
-							Type:         resources.AppBinding,
-							Name:         "binding-2",
-							AppName:      "app-2",
-							AppSpaceGUID: spaceGUID,
+							Type:    resources.AppBinding,
+							Name:    "binding-2",
+							AppName: "app-2",
 							LastOperation: resources.LastOperation{
 								Type:        resources.UpdateOperation,
 								State:       resources.OperationInProgress,

@@ -84,7 +84,7 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			if !omitApps {
-				serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID, spaceGUID)
+				serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID)
 			}
 			return
 		},
@@ -243,25 +243,12 @@ func (actor Actor) getServiceInstanceUpgradeStatus(serviceInstanceDetails Servic
 	}
 }
 
-func (actor Actor) getServiceInstanceBoundApps(serviceInstanceGUID, spaceGUID string) ([]resources.ServiceCredentialBinding, ccv3.Warnings, error) {
-	bindings, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+func (actor Actor) getServiceInstanceBoundApps(serviceInstanceGUID string) ([]resources.ServiceCredentialBinding, ccv3.Warnings, error) {
+	return actor.CloudControllerClient.GetServiceCredentialBindings(
 		ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
 		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
 		ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
 	)
-
-	if err != nil {
-		return bindings, warnings, err
-	}
-
-	var spaceBindings []resources.ServiceCredentialBinding
-	for _, binding := range bindings {
-		if binding.AppSpaceGUID == spaceGUID {
-			spaceBindings = append(spaceBindings, binding)
-		}
-	}
-
-	return spaceBindings, warnings, err
 }
 
 func extractServicePlan(included ccv3.IncludedResources) resources.ServicePlan {
