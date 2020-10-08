@@ -1237,11 +1237,10 @@ var _ = Describe("Service Instance Actions", func() {
 		var (
 			warnings Warnings
 			err      error
-			state    ServiceInstanceDeleteState
 		)
 
 		JustBeforeEach(func() {
-			state, warnings, err = actor.PurgeServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
+			warnings, err = actor.PurgeServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
 		})
 
 		It("makes a request to get the service instance", func() {
@@ -1262,14 +1261,13 @@ var _ = Describe("Service Instance Actions", func() {
 				)
 			})
 
-			It("does not try to purge", func() {
-				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
+			It("returns the appropriate error", func() {
+				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName}))
+				Expect(warnings).To(ConsistOf("get warning"))
 			})
 
-			It("returns the appropriate state flag", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get warning"))
-				Expect(state).To(Equal(ServiceInstanceDidNotExist))
+			It("does not try to purge", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
 			})
 		})
 
@@ -1298,10 +1296,9 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(actualQuery).To(ConsistOf(ccv3.Query{Key: ccv3.Purge, Values: []string{"true"}}))
 			})
 
-			It("returns the appropriate state flag", func() {
+			It("returns warnings", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get warning", "purge warning"))
-				Expect(state).To(Equal(ServiceInstanceGone))
 			})
 
 			When("the purge responds with failure", func() {
@@ -1316,7 +1313,6 @@ var _ = Describe("Service Instance Actions", func() {
 				It("return the error and warnings", func() {
 					Expect(err).To(MatchError("bong"))
 					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
-					Expect(state).To(Equal(ServiceInstanceUnknownState))
 				})
 			})
 		})
@@ -1334,7 +1330,6 @@ var _ = Describe("Service Instance Actions", func() {
 			It("returns the error", func() {
 				Expect(err).To(MatchError("boom"))
 				Expect(warnings).To(ConsistOf("get warning"))
-				Expect(state).To(Equal(ServiceInstanceUnknownState))
 			})
 		})
 	})

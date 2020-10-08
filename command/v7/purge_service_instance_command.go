@@ -3,8 +3,7 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -39,16 +38,23 @@ func (cmd PurgeServiceInstanceCommand) Execute(args []string) error {
 		return err
 	}
 
-	state, warnings, err := cmd.Actor.PurgeServiceInstance(
+	warnings, err := cmd.Actor.PurgeServiceInstance(
 		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+	cmd.UI.DisplayNewline()
+
+	switch err.(type) {
+	case nil:
+		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} purged.", cmd.serviceInstanceName())
+	case actionerror.ServiceInstanceNotFoundError:
+		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} did not exist.", cmd.serviceInstanceName())
+	default:
 		return err
 	}
 
-	cmd.displayState(state)
+	cmd.UI.DisplayOK()
 	return nil
 }
 
@@ -92,17 +98,6 @@ func (cmd PurgeServiceInstanceCommand) displayPrompt() (bool, error) {
 	}
 
 	return delete, nil
-}
-
-func (cmd PurgeServiceInstanceCommand) displayState(state v7action.ServiceInstanceDeleteState) {
-	cmd.UI.DisplayNewline()
-	switch state {
-	case v7action.ServiceInstanceDidNotExist:
-		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} did not exist.", cmd.serviceInstanceName())
-	default:
-		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} purged.", cmd.serviceInstanceName())
-	}
-	cmd.UI.DisplayOK()
 }
 
 func (cmd PurgeServiceInstanceCommand) serviceInstanceName() map[string]interface{} {

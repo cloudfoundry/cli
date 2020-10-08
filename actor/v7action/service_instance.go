@@ -26,15 +26,6 @@ type ManagedServiceInstanceParams struct {
 	Parameters          types.OptionalObject
 }
 
-type ServiceInstanceDeleteState int
-
-const (
-	ServiceInstanceUnknownState ServiceInstanceDeleteState = iota
-	ServiceInstanceDidNotExist
-	ServiceInstanceGone
-	ServiceInstanceDeleteInProgress
-)
-
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
 	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	switch e := err.(type) {
@@ -231,7 +222,7 @@ func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string) 
 	}
 }
 
-func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (ServiceInstanceDeleteState, Warnings, error) {
+func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (Warnings, error) {
 	var serviceInstance resources.ServiceInstance
 
 	warnings, err := railway.Sequentially(
@@ -250,11 +241,11 @@ func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (
 
 	switch err.(type) {
 	case nil:
-		return ServiceInstanceGone, Warnings(warnings), nil
+		return Warnings(warnings), nil
 	case ccerror.ServiceInstanceNotFoundError:
-		return ServiceInstanceDidNotExist, Warnings(warnings), nil
+		return Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	default:
-		return ServiceInstanceUnknownState, Warnings(warnings), err
+		return Warnings(warnings), err
 	}
 }
 

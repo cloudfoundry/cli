@@ -2403,21 +2403,19 @@ type FakeActor struct {
 		result1 string
 		result2 error
 	}
-	PurgeServiceInstanceStub        func(string, string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)
+	PurgeServiceInstanceStub        func(string, string) (v7action.Warnings, error)
 	purgeServiceInstanceMutex       sync.RWMutex
 	purgeServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	purgeServiceInstanceReturns struct {
-		result1 v7action.ServiceInstanceDeleteState
-		result2 v7action.Warnings
-		result3 error
+		result1 v7action.Warnings
+		result2 error
 	}
 	purgeServiceInstanceReturnsOnCall map[int]struct {
-		result1 v7action.ServiceInstanceDeleteState
-		result2 v7action.Warnings
-		result3 error
+		result1 v7action.Warnings
+		result2 error
 	}
 	PurgeServiceOfferingByNameAndBrokerStub        func(string, string) (v7action.Warnings, error)
 	purgeServiceOfferingByNameAndBrokerMutex       sync.RWMutex
@@ -13628,7 +13626,7 @@ func (fake *FakeActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, 
 	}{result1, result2}
 }
 
-func (fake *FakeActor) PurgeServiceInstance(arg1 string, arg2 string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error) {
+func (fake *FakeActor) PurgeServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.purgeServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.purgeServiceInstanceReturnsOnCall[len(fake.purgeServiceInstanceArgsForCall)]
 	fake.purgeServiceInstanceArgsForCall = append(fake.purgeServiceInstanceArgsForCall, struct {
@@ -13641,10 +13639,10 @@ func (fake *FakeActor) PurgeServiceInstance(arg1 string, arg2 string) (v7action.
 		return fake.PurgeServiceInstanceStub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.purgeServiceInstanceReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeActor) PurgeServiceInstanceCallCount() int {
@@ -13653,7 +13651,7 @@ func (fake *FakeActor) PurgeServiceInstanceCallCount() int {
 	return len(fake.purgeServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) PurgeServiceInstanceCalls(stub func(string, string) (v7action.ServiceInstanceDeleteState, v7action.Warnings, error)) {
+func (fake *FakeActor) PurgeServiceInstanceCalls(stub func(string, string) (v7action.Warnings, error)) {
 	fake.purgeServiceInstanceMutex.Lock()
 	defer fake.purgeServiceInstanceMutex.Unlock()
 	fake.PurgeServiceInstanceStub = stub
@@ -13666,33 +13664,30 @@ func (fake *FakeActor) PurgeServiceInstanceArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) PurgeServiceInstanceReturns(result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) PurgeServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
 	fake.purgeServiceInstanceMutex.Lock()
 	defer fake.purgeServiceInstanceMutex.Unlock()
 	fake.PurgeServiceInstanceStub = nil
 	fake.purgeServiceInstanceReturns = struct {
-		result1 v7action.ServiceInstanceDeleteState
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeActor) PurgeServiceInstanceReturnsOnCall(i int, result1 v7action.ServiceInstanceDeleteState, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) PurgeServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.purgeServiceInstanceMutex.Lock()
 	defer fake.purgeServiceInstanceMutex.Unlock()
 	fake.PurgeServiceInstanceStub = nil
 	if fake.purgeServiceInstanceReturnsOnCall == nil {
 		fake.purgeServiceInstanceReturnsOnCall = make(map[int]struct {
-			result1 v7action.ServiceInstanceDeleteState
-			result2 v7action.Warnings
-			result3 error
+			result1 v7action.Warnings
+			result2 error
 		})
 	}
 	fake.purgeServiceInstanceReturnsOnCall[i] = struct {
-		result1 v7action.ServiceInstanceDeleteState
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) PurgeServiceOfferingByNameAndBroker(arg1 string, arg2 string) (v7action.Warnings, error) {
