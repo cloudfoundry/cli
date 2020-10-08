@@ -177,8 +177,12 @@ out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
 	rm rsrc.syso
 
 rsrc.syso:
+	@# 'Temporarily' using GOMODULE111 hack: see
+	@# [#27643](https://github.com/golang/go/issues/27643)
+	@# [#30515](https://github.com/golang/go/issues/30515)
+	@# [#40276](https://github.com/golang/go/issues/40276)
 	@# Software for windows icon
-	go get github.com/akavel/rsrc
+	GOMODULE111=off go get github.com/akavel/rsrc
 	@# Generates icon file
 	rsrc -ico cf.ico
 
