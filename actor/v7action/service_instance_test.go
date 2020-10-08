@@ -339,7 +339,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("makes the right calls and returns all warnings", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
+				stream, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{
@@ -348,9 +348,10 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 				)
 
-				By("returning warnings and no error", func() {
-					Expect(err).NotTo(HaveOccurred())
+				By("returning a nil stream, warnings and no error", func() {
+					Expect(stream).To(BeNil())
 					Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				By("getting the service instance", func() {
@@ -372,8 +373,8 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				By("specifying an empty job URL", func() {
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-					actualURL, _ := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+					actualURL := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
 					Expect(actualURL).To(BeEmpty())
 				})
 			})
@@ -397,14 +398,20 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from update"},
 					nil,
 				)
-				fakeCloudControllerClient.PollJobForStateReturns(
-					ccv3.Warnings{"warning from poll"},
-					nil,
-				)
+
+				fakeStream := make(chan ccv3.PollJobEvent)
+				fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+				go func() {
+					fakeStream <- ccv3.PollJobEvent{
+						State:    constant.JobPolling,
+						Err:      nil,
+						Warnings: ccv3.Warnings{"warning from poll"},
+					}
+				}()
 			})
 
 			It("makes the right calls and returns all warnings", func() {
-				noop, warnings, err := actor.UpdateManagedServiceInstance(
+				stream, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{
@@ -413,10 +420,9 @@ var _ = Describe("Service Instance Actions", func() {
 					},
 				)
 
-				By("returning noop flag, warnings and no error", func() {
-					Expect(noop).To(BeFalse())
+				By("returning warnings", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
+					Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
 				})
 
 				By("getting the service instance", func() {
@@ -438,10 +444,15 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				By("polling the job", func() {
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-					actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+					actualURL := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
 					Expect(actualURL).To(Equal(jobURL))
-					Expect(actualState).To(Equal(constant.JobPolling))
+
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    JobPolling,
+						Err:      nil,
+						Warnings: Warnings{"warning from poll"},
+					})))
 				})
 			})
 		})
@@ -554,7 +565,6 @@ var _ = Describe("Service Instance Actions", func() {
 				err                 error
 				fakeServicePlanName string
 				fakeServicePlanGUID string
-				noop                bool
 				params              ServiceInstanceUpdateManagedParams
 			)
 
@@ -564,8 +574,7 @@ var _ = Describe("Service Instance Actions", func() {
 			)
 
 			JustBeforeEach(func() {
-
-				noop, warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
+				_, warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
 			})
 
 			BeforeEach(func() {
@@ -595,7 +604,8 @@ var _ = Describe("Service Instance Actions", func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
 					[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
 					ccv3.Warnings{"warning from getServicePlan"},
-					nil)
+					nil,
+				)
 			})
 
 			It("makes the right call to fetch the plan", func() {
@@ -635,10 +645,8 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(updates.ServicePlanGUID).To(Equal(fakeServicePlanGUID))
 			})
 
-			It("returns all warnings and noop flag", func() {
+			It("returns all warnings", func() {
 				Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-				Expect(noop).To(BeFalse())
-
 			})
 
 			Context("errors getting the plan", func() {
@@ -677,7 +685,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("noop flag", func() {
+			Context("detecting no-op updates", func() {
 				When("plan is the current plan", func() {
 					BeforeEach(func() {
 						fakeServicePlanGUID = "current-plan-guid"
@@ -685,13 +693,13 @@ var _ = Describe("Service Instance Actions", func() {
 						fakeCloudControllerClient.GetServicePlansReturns(
 							[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
 							ccv3.Warnings{"warning from getServicePlan"},
-							nil)
+							nil,
+						)
 					})
 
-					It("returns all warnings and noop flag", func() {
+					It("returns a no-op error and all warnings", func() {
+						Expect(err).To(MatchError(actionerror.ServiceInstanceUpdateIsNoop{}))
 						Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-						Expect(noop).To(BeTrue())
-
 					})
 
 					When("tags are passed", func() {
@@ -709,10 +717,8 @@ var _ = Describe("Service Instance Actions", func() {
 							}
 						})
 
-						It("returns all warnings and noop flag", func() {
+						It("returns all warnings", func() {
 							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-							Expect(noop).To(BeFalse())
-
 						})
 					})
 
@@ -731,10 +737,8 @@ var _ = Describe("Service Instance Actions", func() {
 							}
 						})
 
-						It("returns all warnings and noop flag", func() {
+						It("returns all warnings", func() {
 							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-							Expect(noop).To(BeFalse())
-
 						})
 					})
 				})
@@ -759,20 +763,32 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from update"},
 					nil,
 				)
-				fakeCloudControllerClient.PollJobForStateReturns(
-					ccv3.Warnings{"warning from poll"},
-					errors.New("boom"),
-				)
+
+				fakeStream := make(chan ccv3.PollJobEvent)
+				fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+				go func() {
+					fakeStream <- ccv3.PollJobEvent{
+						State:    constant.JobFailed,
+						Err:      errors.New("boom"),
+						Warnings: ccv3.Warnings{"warning from poll"},
+					}
+				}()
 			})
 
-			It("returns warnings and an error", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
+			It("returns warnings and an error in the stream", func() {
+				stream, warnings, err := actor.UpdateManagedServiceInstance(
 					serviceInstanceName,
 					spaceGUID,
 					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
 				)
-				Expect(warnings).To(ConsistOf("warning from get", "warning from update", "warning from poll"))
-				Expect(err).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(stream).Should(Receive(Equal(PollJobEvent{
+					State:    JobFailed,
+					Err:      errors.New("boom"),
+					Warnings: Warnings{"warning from poll"},
+				})))
 			})
 		})
 	})

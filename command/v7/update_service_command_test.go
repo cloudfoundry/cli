@@ -62,8 +62,10 @@ var _ = Describe("update-service command", func() {
 		})
 		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
 
+		fakeStream := make(chan v7action.PollJobEvent)
+		close(fakeStream)
 		fakeActor.UpdateManagedServiceInstanceReturns(
-			false,
+			fakeStream,
 			v7action.Warnings{"actor warning"},
 			nil,
 		)
@@ -120,9 +122,8 @@ var _ = Describe("update-service command", func() {
 			Expect(testUI.Out).To(SatisfyAll(
 				Say(`Updating service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
 				Say(`\n`),
-				Say(`OK\n`),
-				Say(`\n`),
 				Say("Update in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstanceName),
+				Say(`OK\n`),
 			))
 
 			Expect(testUI.Err).To(Say("actor warning"))
@@ -140,17 +141,90 @@ var _ = Describe("update-service command", func() {
 			}))
 		})
 
+		When("error in event stream", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--wait")
+
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpdateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobFailed,
+						Warnings: v7action.Warnings{"failed warning"},
+						Err:      errors.New("boom"),
+					}
+				}()
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("boom"))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("poll warning"),
+					Say("failed warning"),
+				))
+			})
+		})
+
+		When("--wait flag specified", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--wait")
+
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpdateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobComplete,
+						Warnings: v7action.Warnings{"failed warning"},
+					}
+					close(fakeStream)
+				}()
+			})
+
+			It("prints messages and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Updating service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Waiting for the operation to complete\.\.\n`),
+					Say(`\n`),
+					Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("a warning"),
+					Say("poll warning"),
+					Say("failed warning"),
+				))
+			})
+		})
+
 		When("plan is current plan", func() {
-			const (
-				currentPlan = "current-plan"
-			)
+			const currentPlan = "current-plan"
 
 			BeforeEach(func() {
 				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: currentPlan})
 				fakeActor.UpdateManagedServiceInstanceReturns(
-					true,
-					v7action.Warnings{"actor warning"},
 					nil,
+					v7action.Warnings{"actor warning"},
+					actionerror.ServiceInstanceUpdateIsNoop{},
 				)
 			})
 
@@ -174,7 +248,7 @@ var _ = Describe("update-service command", func() {
 		When("the actor reports the service instance was not found", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
-					false,
+					nil,
 					v7action.Warnings{"actor warning"},
 					actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
@@ -196,7 +270,7 @@ var _ = Describe("update-service command", func() {
 			BeforeEach(func() {
 				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: invalidPlan})
 				fakeActor.UpdateManagedServiceInstanceReturns(
-					false,
+					nil,
 					v7action.Warnings{"actor warning"},
 					actionerror.ServicePlanNotFoundError{PlanName: invalidPlan, ServiceBrokerName: "the-broker", OfferingName: "the-offering"},
 				)
@@ -215,7 +289,7 @@ var _ = Describe("update-service command", func() {
 		When("the actor fails with an unexpected error", func() {
 			BeforeEach(func() {
 				fakeActor.UpdateManagedServiceInstanceReturns(
-					false,
+					nil,
 					v7action.Warnings{"actor warning"},
 					errors.New("boof"),
 				)
