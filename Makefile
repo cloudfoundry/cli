@@ -188,7 +188,7 @@ rsrc.syso:
 	@# [#30515](https://github.com/golang/go/issues/30515)
 	@# [#40276](https://github.com/golang/go/issues/40276)
 	@# Software for windows icon
-	GOMODULE111=off go get github.com/akavel/rsrc
+	GOFLAGS="" GOMODULE111=off go get github.com/akavel/rsrc
 	@# Generates icon file
 	rsrc -ico cf.ico
 
