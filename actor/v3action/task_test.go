@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +29,7 @@ var _ = Describe("Task Actions", func() {
 		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationTaskReturns(
-					ccv3.Task{
+					resources.Task{
 						SequenceID: 3,
 					},
 					ccv3.Warnings{
@@ -40,7 +41,7 @@ var _ = Describe("Task Actions", func() {
 			})
 
 			It("creates and returns the task and all warnings", func() {
-				expectedTask := Task{
+				expectedTask := resources.Task{
 					Command:    "some command",
 					Name:       "some-task-name",
 					MemoryInMB: 123,
@@ -49,7 +50,7 @@ var _ = Describe("Task Actions", func() {
 				task, warnings, err := actor.RunTask("some-app-guid", expectedTask)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(task).To(Equal(Task{
+				Expect(task).To(Equal(resources.Task{
 					SequenceID: 3,
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -57,7 +58,7 @@ var _ = Describe("Task Actions", func() {
 				Expect(fakeCloudControllerClient.CreateApplicationTaskCallCount()).To(Equal(1))
 				appGUIDArg, taskArg := fakeCloudControllerClient.CreateApplicationTaskArgsForCall(0)
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
-				Expect(taskArg).To(Equal(ccv3.Task(expectedTask)))
+				Expect(taskArg).To(Equal(resources.Task(expectedTask)))
 			})
 		})
 
@@ -67,14 +68,14 @@ var _ = Describe("Task Actions", func() {
 			var expectedErr error
 
 			JustBeforeEach(func() {
-				_, warnings, err = actor.RunTask("some-app-guid", Task{Command: "some command"})
+				_, warnings, err = actor.RunTask("some-app-guid", resources.Task{Command: "some command"})
 			})
 
 			When("the cloud controller error is generic", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a CloudControllerClient Error")
 					fakeCloudControllerClient.CreateApplicationTaskReturns(
-						ccv3.Task{},
+						resources.Task{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						expectedErr,
 					)
@@ -89,7 +90,7 @@ var _ = Describe("Task Actions", func() {
 			When("the error is a TaskWorkersUnavailableError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateApplicationTaskReturns(
-						ccv3.Task{},
+						resources.Task{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						ccerror.TaskWorkersUnavailableError{Message: "banana babans"},
 					)
@@ -107,13 +108,13 @@ var _ = Describe("Task Actions", func() {
 		When("the application exists", func() {
 			When("there are associated tasks", func() {
 				var (
-					task1 ccv3.Task
-					task2 ccv3.Task
-					task3 ccv3.Task
+					task1 resources.Task
+					task2 resources.Task
+					task3 resources.Task
 				)
 
 				BeforeEach(func() {
-					task1 = ccv3.Task{
+					task1 = resources.Task{
 						GUID:       "task-1-guid",
 						SequenceID: 1,
 						Name:       "task-1",
@@ -121,7 +122,7 @@ var _ = Describe("Task Actions", func() {
 						CreatedAt:  "some-time",
 						Command:    "some-command",
 					}
-					task2 = ccv3.Task{
+					task2 = resources.Task{
 						GUID:       "task-2-guid",
 						SequenceID: 2,
 						Name:       "task-2",
@@ -129,7 +130,7 @@ var _ = Describe("Task Actions", func() {
 						CreatedAt:  "some-time",
 						Command:    "some-command",
 					}
-					task3 = ccv3.Task{
+					task3 = resources.Task{
 						GUID:       "task-3-guid",
 						SequenceID: 3,
 						Name:       "task-3",
@@ -138,7 +139,7 @@ var _ = Describe("Task Actions", func() {
 						Command:    "some-command",
 					}
 					fakeCloudControllerClient.GetApplicationTasksReturns(
-						[]ccv3.Task{task3, task1, task2},
+						[]resources.Task{task3, task1, task2},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -148,13 +149,13 @@ var _ = Describe("Task Actions", func() {
 					tasks, warnings, err := actor.GetApplicationTasks("some-app-guid", Descending)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(tasks).To(Equal([]Task{Task(task3), Task(task2), Task(task1)}))
+					Expect(tasks).To(Equal([]resources.Task{resources.Task(task3), resources.Task(task2), resources.Task(task1)}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 					tasks, warnings, err = actor.GetApplicationTasks("some-app-guid", Ascending)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(tasks).To(Equal([]Task{Task(task1), Task(task2), Task(task3)}))
+					Expect(tasks).To(Equal([]resources.Task{resources.Task(task1), resources.Task(task2), resources.Task(task3)}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 					Expect(fakeCloudControllerClient.GetApplicationTasksCallCount()).To(Equal(2))
@@ -167,7 +168,7 @@ var _ = Describe("Task Actions", func() {
 			When("there are no associated tasks", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationTasksReturns(
-						[]ccv3.Task{},
+						[]resources.Task{},
 						nil,
 						nil,
 					)
@@ -187,7 +188,7 @@ var _ = Describe("Task Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetApplicationTasksReturns(
-					[]ccv3.Task{},
+					[]resources.Task{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					expectedErr,
 				)
@@ -204,15 +205,15 @@ var _ = Describe("Task Actions", func() {
 	Describe("GetTaskBySequenceIDAndApplication", func() {
 		When("the cloud controller client does not return an error", func() {
 			When("the task is found", func() {
-				var task1 ccv3.Task
+				var task1 resources.Task
 
 				BeforeEach(func() {
-					task1 = ccv3.Task{
+					task1 = resources.Task{
 						GUID:       "task-1-guid",
 						SequenceID: 1,
 					}
 					fakeCloudControllerClient.GetApplicationTasksReturns(
-						[]ccv3.Task{task1},
+						[]resources.Task{task1},
 						ccv3.Warnings{"get-task-warning-1"},
 						nil,
 					)
@@ -221,7 +222,7 @@ var _ = Describe("Task Actions", func() {
 				It("returns the task and warnings", func() {
 					task, warnings, err := actor.GetTaskBySequenceIDAndApplication(1, "some-app-guid")
 					Expect(err).ToNot(HaveOccurred())
-					Expect(task).To(Equal(Task(task1)))
+					Expect(task).To(Equal(resources.Task(task1)))
 					Expect(warnings).To(ConsistOf("get-task-warning-1"))
 				})
 			})
@@ -229,7 +230,7 @@ var _ = Describe("Task Actions", func() {
 			When("the task is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationTasksReturns(
-						[]ccv3.Task{},
+						[]resources.Task{},
 						ccv3.Warnings{"get-task-warning-1"},
 						nil,
 					)
@@ -249,7 +250,7 @@ var _ = Describe("Task Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("generic-error")
 				fakeCloudControllerClient.GetApplicationTasksReturns(
-					[]ccv3.Task{},
+					[]resources.Task{},
 					ccv3.Warnings{"get-task-warning-1"},
 					expectedErr,
 				)
@@ -265,10 +266,10 @@ var _ = Describe("Task Actions", func() {
 
 	Describe("TerminateTask", func() {
 		When("the task exists", func() {
-			var returnedTask ccv3.Task
+			var returnedTask resources.Task
 
 			BeforeEach(func() {
-				returnedTask = ccv3.Task{
+				returnedTask = resources.Task{
 					GUID:       "some-task-guid",
 					SequenceID: 1,
 				}
@@ -282,7 +283,7 @@ var _ = Describe("Task Actions", func() {
 				task, warnings, err := actor.TerminateTask("some-task-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("update-task-warning"))
-				Expect(task).To(Equal(Task(returnedTask)))
+				Expect(task).To(Equal(resources.Task(returnedTask)))
 			})
 		})
 
@@ -292,7 +293,7 @@ var _ = Describe("Task Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("cc-error")
 				fakeCloudControllerClient.UpdateTaskCancelReturns(
-					ccv3.Task{},
+					resources.Task{},
 					ccv3.Warnings{"update-task-warning"},
 					expectedErr)
 			})

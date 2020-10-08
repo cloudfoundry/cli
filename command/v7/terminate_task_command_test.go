@@ -126,11 +126,11 @@ var _ = Describe("terminate-task Command", func() {
 						v7action.Warnings{"get-application-warning"},
 						nil)
 					fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-						v7action.Task{GUID: "some-task-guid"},
+						resources.Task{GUID: "some-task-guid"},
 						v7action.Warnings{"get-task-warning"},
 						nil)
 					fakeActor.TerminateTaskReturns(
-						v7action.Task{},
+						resources.Task{},
 						v7action.Warnings{"terminate-task-warning"},
 						nil)
 				})
@@ -192,7 +192,7 @@ var _ = Describe("terminate-task Command", func() {
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v7action.Task{},
+								resources.Task{},
 								nil,
 								returnedErr)
 						})
@@ -209,11 +209,11 @@ var _ = Describe("terminate-task Command", func() {
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v7action.Task{GUID: "some-task-guid"},
+								resources.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v7action.Task{GUID: "some-task-guid"},
+								resources.Task{GUID: "some-task-guid"},
 								nil,
 								returnedErr)
 						})
@@ -254,7 +254,7 @@ var _ = Describe("terminate-task Command", func() {
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v7action.Task{},
+								resources.Task{},
 								v7action.Warnings{"get-task-warning-1", "get-task-warning-2"},
 								expectedErr)
 						})
@@ -274,11 +274,11 @@ var _ = Describe("terminate-task Command", func() {
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v7action.Task{GUID: "some-task-guid"},
+								resources.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v7action.Task{},
+								resources.Task{},
 								v7action.Warnings{"terminate-task-warning-1", "terminate-task-warning-2"},
 								expectedErr)
 						})

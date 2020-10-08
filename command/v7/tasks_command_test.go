@@ -112,7 +112,7 @@ var _ = Describe("tasks Command", func() {
 						v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 						nil)
 					fakeActor.GetApplicationTasksReturns(
-						[]v7action.Task{
+						[]resources.Task{
 							{
 								GUID:       "task-3-guid",
 								SequenceID: 3,
@@ -169,7 +169,7 @@ var _ = Describe("tasks Command", func() {
 				When("the tasks' command fields are returned as empty strings", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns(
-							[]v7action.Task{
+							[]resources.Task{
 								{
 									GUID:       "task-2-guid",
 									SequenceID: 2,
@@ -201,7 +201,7 @@ var _ = Describe("tasks Command", func() {
 
 				When("there are no tasks associated with the application", func() {
 					BeforeEach(func() {
-						fakeActor.GetApplicationTasksReturns([]v7action.Task{}, nil, nil)
+						fakeActor.GetApplicationTasksReturns([]resources.Task{}, nil, nil)
 					})
 
 					It("outputs an empty table", func() {
@@ -245,7 +245,7 @@ var _ = Describe("tasks Command", func() {
 								nil,
 								nil)
 							fakeActor.GetApplicationTasksReturns(
-								[]v7action.Task{},
+								[]resources.Task{},
 								nil,
 								returnedErr)
 						})
