@@ -299,18 +299,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateManagedServiceInstanceStub        func(v7action.ManagedServiceInstanceParams) (v7action.Warnings, error)
+	CreateManagedServiceInstanceStub        func(v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	createManagedServiceInstanceMutex       sync.RWMutex
 	createManagedServiceInstanceArgsForCall []struct {
 		arg1 v7action.ManagedServiceInstanceParams
 	}
 	createManagedServiceInstanceReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	createManagedServiceInstanceReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	CreateOrgRoleStub        func(constanta.RoleType, string, string, string, bool) (v7action.Warnings, error)
 	createOrgRoleMutex       sync.RWMutex
@@ -4587,7 +4589,7 @@ func (fake *FakeActor) CreateIsolationSegmentByNameReturnsOnCall(i int, result1 
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.ManagedServiceInstanceParams) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.createManagedServiceInstanceReturnsOnCall[len(fake.createManagedServiceInstanceArgsForCall)]
 	fake.createManagedServiceInstanceArgsForCall = append(fake.createManagedServiceInstanceArgsForCall, struct {
@@ -4599,10 +4601,10 @@ func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.ManagedService
 		return fake.CreateManagedServiceInstanceStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.createManagedServiceInstanceReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeActor) CreateManagedServiceInstanceCallCount() int {
@@ -4611,7 +4613,7 @@ func (fake *FakeActor) CreateManagedServiceInstanceCallCount() int {
 	return len(fake.createManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(v7action.ManagedServiceInstanceParams) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	defer fake.createManagedServiceInstanceMutex.Unlock()
 	fake.CreateManagedServiceInstanceStub = stub
@@ -4624,30 +4626,33 @@ func (fake *FakeActor) CreateManagedServiceInstanceArgsForCall(i int) v7action.M
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) CreateManagedServiceInstanceReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	defer fake.createManagedServiceInstanceMutex.Unlock()
 	fake.CreateManagedServiceInstanceStub = nil
 	fake.createManagedServiceInstanceReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) CreateManagedServiceInstanceReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	defer fake.createManagedServiceInstanceMutex.Unlock()
 	fake.CreateManagedServiceInstanceStub = nil
 	if fake.createManagedServiceInstanceReturnsOnCall == nil {
 		fake.createManagedServiceInstanceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.createManagedServiceInstanceReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) CreateOrgRole(arg1 constanta.RoleType, arg2 string, arg3 string, arg4 string, arg5 bool) (v7action.Warnings, error) {

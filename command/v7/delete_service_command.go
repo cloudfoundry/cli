@@ -1,11 +1,9 @@
 package v7
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 type DeleteServiceCommand struct {
@@ -54,7 +52,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	deleted, err := cmd.waitForResult(stream)
+	deleted, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	if err != nil {
 		return err
 	}
@@ -105,36 +103,6 @@ func (cmd DeleteServiceCommand) displayPrompt() (bool, error) {
 	}
 
 	return delete, nil
-}
-
-func (cmd DeleteServiceCommand) waitForResult(stream chan v7action.PollJobEvent) (bool, error) {
-	if stream == nil {
-		return true, nil
-	}
-
-	if cmd.Wait {
-		fmt.Fprint(cmd.UI.Writer(), "Waiting for the operation to complete")
-	}
-
-	for event := range stream {
-		cmd.UI.DisplayWarnings(event.Warnings)
-		if cmd.Wait {
-			fmt.Fprint(cmd.UI.Writer(), ".")
-		}
-		if event.Err != nil {
-			return false, event.Err
-		}
-		if event.State == v7action.JobPolling && !cmd.Wait {
-			break
-		}
-	}
-
-	if cmd.Wait {
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayNewline()
-		return true, nil
-	}
-	return false, nil
 }
 
 func (cmd DeleteServiceCommand) serviceInstanceName() map[string]interface{} {

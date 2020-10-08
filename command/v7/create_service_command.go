@@ -1,11 +1,13 @@
 package v7
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
-	"strings"
 )
 
 type CreateServiceCommand struct {
@@ -15,6 +17,7 @@ type CreateServiceCommand struct {
 	ServiceBroker    string                        `short:"b" description:"Create a service instance from a particular broker. Required when service offering name is ambiguous"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Tags             flag.Tags                     `short:"t" description:"User provided tags"`
+	Wait             bool                          `short:"w" long:"wait" description:"Wait for the create operation to complete"`
 	relatedCommands  interface{}                   `related_commands:"bind-service, create-user-provided-service, marketplace, services"`
 }
 
@@ -69,7 +72,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	warnings, err := cmd.Actor.CreateManagedServiceInstance(
+	stream, warnings, err := cmd.Actor.CreateManagedServiceInstance(
 		v7action.ManagedServiceInstanceParams{
 			ServiceOfferingName: cmd.RequiredArgs.Service,
 			ServicePlanName:     cmd.RequiredArgs.ServicePlan,
@@ -81,28 +84,29 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		if _, nameTakenError := err.(ccerror.ServiceInstanceNameTakenError); nameTakenError {
-			cmd.UI.DisplayOK()
-			cmd.UI.DisplayTextWithFlavor("Service {{.ServiceInstance}} already exists",
-				map[string]interface{}{
-					"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
-				})
-			return nil
-		}
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceNameTakenError:
+		cmd.UI.DisplayOK()
+		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} already exists", cmd.serviceInstanceName())
+		return nil
+	default:
 		return err
 	}
 
-	cmd.UI.DisplayOK()
-	cmd.displayCreateInProgressMessage()
-	return nil
-}
+	cmd.UI.DisplayNewline()
+	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	switch {
+	case err != nil:
+		return err
+	case complete:
+		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} created.", cmd.serviceInstanceName())
+	default:
+		cmd.UI.DisplayTextWithFlavor("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+	}
 
-func (cmd CreateServiceCommand) displayCreateInProgressMessage() {
-	cmd.UI.DisplayTextWithFlavor("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
-		map[string]interface{}{
-			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
-		})
+	cmd.UI.DisplayOK()
+	return nil
 }
 
 func (cmd CreateServiceCommand) displayCreatingMessage() error {
@@ -121,4 +125,10 @@ func (cmd CreateServiceCommand) displayCreatingMessage() error {
 	)
 
 	return nil
+}
+
+func (cmd CreateServiceCommand) serviceInstanceName() map[string]interface{} {
+	return map[string]interface{}{
+		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+	}
 }

@@ -1,15 +1,17 @@
 package isolated
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 const serviceCommand = "v3-service"
@@ -49,9 +51,10 @@ var _ = Describe("create-service command", func() {
 			Say(`ALIAS:`),
 			Say(`\s+cs`),
 			Say(`OPTIONS:`),
-			Say(`\s+-b      Create a service instance from a particular broker\. Required when service offering name is ambiguous`),
-			Say(`\s+-c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`),
-			Say(`\s+-t      User provided tags`),
+			Say(`\s+-b\s+Create a service instance from a particular broker\. Required when service offering name is ambiguous`),
+			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`),
+			Say(`\s+-t\s+User provided tags`),
+			Say(`\s+--wait, -w\s+Wait for the create operation to complete`),
 			Say(`SEE ALSO:`),
 			Say(`\s+bind-service, create-user-provided-service, marketplace, services`),
 		)
@@ -162,7 +165,8 @@ var _ = Describe("create-service command", func() {
 			})
 
 			When("creating with valid params json", func() {
-				parametersJSON := `{"valid":"json"}`
+				const parametersJSON = `{"valid":"json"}`
+
 				It("displays an informative success message, and creates the instance with parameters", func() {
 					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-c", parametersJSON)
 					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
@@ -177,8 +181,8 @@ var _ = Describe("create-service command", func() {
 			})
 
 			When("creating with valid params json in a file", func() {
+				const parametersJSON = `{"valid":"json"}`
 				var tempFilePath string
-				parametersJSON := `{"valid":"json"}`
 
 				BeforeEach(func() {
 					tempFilePath = helpers.TempFileWithContent(parametersJSON)
@@ -201,6 +205,28 @@ var _ = Describe("create-service command", func() {
 				})
 			})
 
+			When("creating with --wait flag", func() {
+				BeforeEach(func() {
+					broker1.WithAsyncDelay(5 * time.Second)
+				})
+
+				It("displays a message, OK and creates the instance", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "--wait")
+					Eventually(session).Should(Exit(0))
+					assertCreateMessage(session)
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Service instance %s created\.\n`, serviceInstanceName),
+						Say(`OK\n`),
+					))
+
+					session = helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(SatisfyAll(
+						Say(`name:\s+%s`, serviceInstanceName),
+						Say(`status:\s+create succeeded`),
+					))
+				})
+			})
 		})
 
 		When("there are two offerings with the same name from different brokers", func() {
@@ -235,6 +261,7 @@ var _ = Describe("create-service command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
+
 		When("there are no plans matching", func() {
 			var (
 				serviceOffering string
@@ -258,6 +285,7 @@ var _ = Describe("create-service command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
+
 		When("invalid arguments are passed", func() {
 			When("with an invalid json for -c", func() {
 				It("displays an informative error message, exits 1", func() {
