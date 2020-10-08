@@ -3,8 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -45,9 +45,8 @@ var _ = Describe("purge-service-instance command", func() {
 		When("the service instance did not exist", func() {
 			BeforeEach(func() {
 				fakeActor.PurgeServiceInstanceReturns(
-					v7action.ServiceInstanceDidNotExist,
 					v7action.Warnings{"purge warning"},
-					nil,
+					actionerror.ServiceInstanceNotFoundError{},
 				)
 			})
 
@@ -65,7 +64,6 @@ var _ = Describe("purge-service-instance command", func() {
 		When("the service instance is successfully purged", func() {
 			BeforeEach(func() {
 				fakeActor.PurgeServiceInstanceReturns(
-					v7action.ServiceInstanceGone,
 					v7action.Warnings{"purge warning"},
 					nil,
 				)
@@ -85,7 +83,6 @@ var _ = Describe("purge-service-instance command", func() {
 		When("the actor returns an error", func() {
 			BeforeEach(func() {
 				fakeActor.PurgeServiceInstanceReturns(
-					v7action.ServiceInstanceUnknownState,
 					v7action.Warnings{"purge warning"},
 					errors.New("bang"),
 				)
