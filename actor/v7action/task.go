@@ -8,36 +8,34 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Task represents a V3 actor Task.
-type Task ccv3.Task
-
-// RunTask runs the provided command in the application environment associated
+// Run resources.Task runs the provided command in the application environment associated
 // with the provided application GUID.
-func (actor Actor) RunTask(appGUID string, task Task) (Task, Warnings, error) {
-	createdTask, warnings, err := actor.CloudControllerClient.CreateApplicationTask(appGUID, ccv3.Task(task))
+func (actor Actor) RunTask(appGUID string, task resources.Task) (resources.Task, Warnings, error) {
+	createdTask, warnings, err := actor.CloudControllerClient.CreateApplicationTask(appGUID, resources.Task(task))
 	if err != nil {
 		if e, ok := err.(ccerror.TaskWorkersUnavailableError); ok {
-			return Task{}, Warnings(warnings), actionerror.TaskWorkersUnavailableError{Message: e.Error()}
+			return resources.Task{}, Warnings(warnings), actionerror.TaskWorkersUnavailableError{Message: e.Error()}
 		}
 	}
 
-	return Task(createdTask), Warnings(warnings), err
+	return resources.Task(createdTask), Warnings(warnings), err
 }
 
 // GetApplicationTasks returns a list of tasks associated with the provided
 // appplication GUID.
-func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]Task, Warnings, error) {
+func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]resources.Task, Warnings, error) {
 	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID)
 	actorWarnings := Warnings(warnings)
 	if err != nil {
 		return nil, actorWarnings, err
 	}
 
-	allTasks := []Task{}
+	allTasks := []resources.Task{}
 	for _, task := range tasks {
-		allTasks = append(allTasks, Task(task))
+		allTasks = append(allTasks, resources.Task(task))
 	}
 
 	if sortOrder == Descending {
@@ -49,23 +47,23 @@ func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]T
 	return allTasks, actorWarnings, nil
 }
 
-func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (Task, Warnings, error) {
+func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (resources.Task, Warnings, error) {
 	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(
 		appGUID,
 		ccv3.Query{Key: ccv3.SequenceIDFilter, Values: []string{strconv.Itoa(sequenceID)}},
 	)
 	if err != nil {
-		return Task{}, Warnings(warnings), err
+		return resources.Task{}, Warnings(warnings), err
 	}
 
 	if len(tasks) == 0 {
-		return Task{}, Warnings(warnings), actionerror.TaskNotFoundError{SequenceID: sequenceID}
+		return resources.Task{}, Warnings(warnings), actionerror.TaskNotFoundError{SequenceID: sequenceID}
 	}
 
-	return Task(tasks[0]), Warnings(warnings), nil
+	return resources.Task(tasks[0]), Warnings(warnings), nil
 }
 
-func (actor Actor) TerminateTask(taskGUID string) (Task, Warnings, error) {
+func (actor Actor) TerminateTask(taskGUID string) (resources.Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.UpdateTaskCancel(taskGUID)
-	return Task(task), Warnings(warnings), err
+	return resources.Task(task), Warnings(warnings), err
 }

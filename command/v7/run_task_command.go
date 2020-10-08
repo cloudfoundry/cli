@@ -3,9 +3,8 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type RunTaskCommand struct {
@@ -47,7 +46,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	inputTask := v7action.Task{
+	inputTask := resources.Task{
 		Command: cmd.Command,
 	}
 
@@ -70,8 +69,8 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 			return err
 		}
 
-		inputTask.Template = &ccv3.TaskTemplate{
-			Process: ccv3.TaskProcessTemplate{
+		inputTask.Template = &resources.TaskTemplate{
+			Process: resources.TaskProcessTemplate{
 				Guid: process.GUID,
 			},
 		}

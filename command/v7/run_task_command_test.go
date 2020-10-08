@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -119,7 +118,7 @@ var _ = Describe("run-task Command", func() {
 				When("the task name is not provided", func() {
 					BeforeEach(func() {
 						fakeActor.RunTaskReturns(
-							v7action.Task{
+							resources.Task{
 								Name:       "31337ddd",
 								SequenceID: 3,
 							},
@@ -138,7 +137,7 @@ var _ = Describe("run-task Command", func() {
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v7action.Task{Command: "some command"}))
+						Expect(task).To(Equal(resources.Task{Command: "some command"}))
 
 						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
 						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
@@ -159,7 +158,7 @@ var _ = Describe("run-task Command", func() {
 						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 321, IsSet: true}}
 						cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 123, IsSet: true}}
 						fakeActor.RunTaskReturns(
-							v7action.Task{
+							resources.Task{
 								Name:       "some-task-name",
 								SequenceID: 3,
 							},
@@ -178,7 +177,7 @@ var _ = Describe("run-task Command", func() {
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v7action.Task{
+						Expect(task).To(Equal(resources.Task{
 							Command:    "some command",
 							Name:       "some-task-name",
 							DiskInMB:   321,
@@ -204,7 +203,7 @@ var _ = Describe("run-task Command", func() {
 						cmd.Process = "process-template-name"
 						cmd.Command = ""
 						fakeActor.RunTaskReturns(
-							v7action.Task{
+							resources.Task{
 								Name:       "some-task-name",
 								SequenceID: 3,
 							},
@@ -224,11 +223,11 @@ var _ = Describe("run-task Command", func() {
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v7action.Task{
+						Expect(task).To(Equal(resources.Task{
 							Command: "",
 							Name:    "some-task-name",
-							Template: &ccv3.TaskTemplate{
-								Process: ccv3.TaskProcessTemplate{Guid: "some-process-guid"},
+							Template: &resources.TaskTemplate{
+								Process: resources.TaskProcessTemplate{Guid: "some-process-guid"},
 							},
 						}))
 
@@ -251,7 +250,7 @@ var _ = Describe("run-task Command", func() {
 						cmd.Name = "some-task-name"
 						cmd.Command = ""
 						fakeActor.RunTaskReturns(
-							v7action.Task{
+							resources.Task{
 								Name:       "some-task-name",
 								SequenceID: 3,
 							},
@@ -275,11 +274,11 @@ var _ = Describe("run-task Command", func() {
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v7action.Task{
+						Expect(task).To(Equal(resources.Task{
 							Command: "",
 							Name:    "some-task-name",
-							Template: &ccv3.TaskTemplate{
-								Process: ccv3.TaskProcessTemplate{Guid: "some-process-guid"},
+							Template: &resources.TaskTemplate{
+								Process: resources.TaskProcessTemplate{Guid: "some-process-guid"},
 							},
 						}))
 
@@ -330,7 +329,7 @@ var _ = Describe("run-task Command", func() {
 								nil,
 								nil)
 							fakeActor.RunTaskReturns(
-								v7action.Task{},
+								resources.Task{},
 								nil,
 								returnedErr)
 						})
@@ -371,7 +370,7 @@ var _ = Describe("run-task Command", func() {
 								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								nil)
 							fakeActor.RunTaskReturns(
-								v7action.Task{},
+								resources.Task{},
 								v7action.Warnings{"run-task-warning-1", "run-task-warning-2"},
 								expectedErr)
 						})

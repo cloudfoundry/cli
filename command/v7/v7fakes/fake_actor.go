@@ -1040,19 +1040,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationTasksStub        func(string, v7action.SortOrder) ([]v7action.Task, v7action.Warnings, error)
+	GetApplicationTasksStub        func(string, v7action.SortOrder) ([]resources.Task, v7action.Warnings, error)
 	getApplicationTasksMutex       sync.RWMutex
 	getApplicationTasksArgsForCall []struct {
 		arg1 string
 		arg2 v7action.SortOrder
 	}
 	getApplicationTasksReturns struct {
-		result1 []v7action.Task
+		result1 []resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationTasksReturnsOnCall map[int]struct {
-		result1 []v7action.Task
+		result1 []resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2197,19 +2197,19 @@ type FakeActor struct {
 		result4 v7action.Warnings
 		result5 error
 	}
-	GetTaskBySequenceIDAndApplicationStub        func(int, string) (v7action.Task, v7action.Warnings, error)
+	GetTaskBySequenceIDAndApplicationStub        func(int, string) (resources.Task, v7action.Warnings, error)
 	getTaskBySequenceIDAndApplicationMutex       sync.RWMutex
 	getTaskBySequenceIDAndApplicationArgsForCall []struct {
 		arg1 int
 		arg2 string
 	}
 	getTaskBySequenceIDAndApplicationReturns struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
 	getTaskBySequenceIDAndApplicationReturnsOnCall map[int]struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2578,19 +2578,19 @@ type FakeActor struct {
 	revokeAccessAndRefreshTokensReturnsOnCall map[int]struct {
 		result1 error
 	}
-	RunTaskStub        func(string, v7action.Task) (v7action.Task, v7action.Warnings, error)
+	RunTaskStub        func(string, resources.Task) (resources.Task, v7action.Warnings, error)
 	runTaskMutex       sync.RWMutex
 	runTaskArgsForCall []struct {
 		arg1 string
-		arg2 v7action.Task
+		arg2 resources.Task
 	}
 	runTaskReturns struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
 	runTaskReturnsOnCall map[int]struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2844,18 +2844,18 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	TerminateTaskStub        func(string) (v7action.Task, v7action.Warnings, error)
+	TerminateTaskStub        func(string) (resources.Task, v7action.Warnings, error)
 	terminateTaskMutex       sync.RWMutex
 	terminateTaskArgsForCall []struct {
 		arg1 string
 	}
 	terminateTaskReturns struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
 	terminateTaskReturnsOnCall map[int]struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -7806,7 +7806,7 @@ func (fake *FakeActor) GetApplicationRoutesReturnsOnCall(i int, result1 []resour
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetApplicationTasks(arg1 string, arg2 v7action.SortOrder) ([]v7action.Task, v7action.Warnings, error) {
+func (fake *FakeActor) GetApplicationTasks(arg1 string, arg2 v7action.SortOrder) ([]resources.Task, v7action.Warnings, error) {
 	fake.getApplicationTasksMutex.Lock()
 	ret, specificReturn := fake.getApplicationTasksReturnsOnCall[len(fake.getApplicationTasksArgsForCall)]
 	fake.getApplicationTasksArgsForCall = append(fake.getApplicationTasksArgsForCall, struct {
@@ -7831,7 +7831,7 @@ func (fake *FakeActor) GetApplicationTasksCallCount() int {
 	return len(fake.getApplicationTasksArgsForCall)
 }
 
-func (fake *FakeActor) GetApplicationTasksCalls(stub func(string, v7action.SortOrder) ([]v7action.Task, v7action.Warnings, error)) {
+func (fake *FakeActor) GetApplicationTasksCalls(stub func(string, v7action.SortOrder) ([]resources.Task, v7action.Warnings, error)) {
 	fake.getApplicationTasksMutex.Lock()
 	defer fake.getApplicationTasksMutex.Unlock()
 	fake.GetApplicationTasksStub = stub
@@ -7844,30 +7844,30 @@ func (fake *FakeActor) GetApplicationTasksArgsForCall(i int) (string, v7action.S
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetApplicationTasksReturns(result1 []v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetApplicationTasksReturns(result1 []resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationTasksMutex.Lock()
 	defer fake.getApplicationTasksMutex.Unlock()
 	fake.GetApplicationTasksStub = nil
 	fake.getApplicationTasksReturns = struct {
-		result1 []v7action.Task
+		result1 []resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetApplicationTasksReturnsOnCall(i int, result1 []v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetApplicationTasksReturnsOnCall(i int, result1 []resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationTasksMutex.Lock()
 	defer fake.getApplicationTasksMutex.Unlock()
 	fake.GetApplicationTasksStub = nil
 	if fake.getApplicationTasksReturnsOnCall == nil {
 		fake.getApplicationTasksReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Task
+			result1 []resources.Task
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationTasksReturnsOnCall[i] = struct {
-		result1 []v7action.Task
+		result1 []resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -12719,7 +12719,7 @@ func (fake *FakeActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall
 	}{result1, result2, result3, result4, result5}
 }
 
-func (fake *FakeActor) GetTaskBySequenceIDAndApplication(arg1 int, arg2 string) (v7action.Task, v7action.Warnings, error) {
+func (fake *FakeActor) GetTaskBySequenceIDAndApplication(arg1 int, arg2 string) (resources.Task, v7action.Warnings, error) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
 	ret, specificReturn := fake.getTaskBySequenceIDAndApplicationReturnsOnCall[len(fake.getTaskBySequenceIDAndApplicationArgsForCall)]
 	fake.getTaskBySequenceIDAndApplicationArgsForCall = append(fake.getTaskBySequenceIDAndApplicationArgsForCall, struct {
@@ -12744,7 +12744,7 @@ func (fake *FakeActor) GetTaskBySequenceIDAndApplicationCallCount() int {
 	return len(fake.getTaskBySequenceIDAndApplicationArgsForCall)
 }
 
-func (fake *FakeActor) GetTaskBySequenceIDAndApplicationCalls(stub func(int, string) (v7action.Task, v7action.Warnings, error)) {
+func (fake *FakeActor) GetTaskBySequenceIDAndApplicationCalls(stub func(int, string) (resources.Task, v7action.Warnings, error)) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
 	defer fake.getTaskBySequenceIDAndApplicationMutex.Unlock()
 	fake.GetTaskBySequenceIDAndApplicationStub = stub
@@ -12757,30 +12757,30 @@ func (fake *FakeActor) GetTaskBySequenceIDAndApplicationArgsForCall(i int) (int,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetTaskBySequenceIDAndApplicationReturns(result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetTaskBySequenceIDAndApplicationReturns(result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
 	defer fake.getTaskBySequenceIDAndApplicationMutex.Unlock()
 	fake.GetTaskBySequenceIDAndApplicationStub = nil
 	fake.getTaskBySequenceIDAndApplicationReturns = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetTaskBySequenceIDAndApplicationReturnsOnCall(i int, result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetTaskBySequenceIDAndApplicationReturnsOnCall(i int, result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
 	defer fake.getTaskBySequenceIDAndApplicationMutex.Unlock()
 	fake.GetTaskBySequenceIDAndApplicationStub = nil
 	if fake.getTaskBySequenceIDAndApplicationReturnsOnCall == nil {
 		fake.getTaskBySequenceIDAndApplicationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Task
+			result1 resources.Task
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getTaskBySequenceIDAndApplicationReturnsOnCall[i] = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -14399,12 +14399,12 @@ func (fake *FakeActor) RevokeAccessAndRefreshTokensReturnsOnCall(i int, result1 
 	}{result1}
 }
 
-func (fake *FakeActor) RunTask(arg1 string, arg2 v7action.Task) (v7action.Task, v7action.Warnings, error) {
+func (fake *FakeActor) RunTask(arg1 string, arg2 resources.Task) (resources.Task, v7action.Warnings, error) {
 	fake.runTaskMutex.Lock()
 	ret, specificReturn := fake.runTaskReturnsOnCall[len(fake.runTaskArgsForCall)]
 	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
 		arg1 string
-		arg2 v7action.Task
+		arg2 resources.Task
 	}{arg1, arg2})
 	fake.recordInvocation("RunTask", []interface{}{arg1, arg2})
 	fake.runTaskMutex.Unlock()
@@ -14424,43 +14424,43 @@ func (fake *FakeActor) RunTaskCallCount() int {
 	return len(fake.runTaskArgsForCall)
 }
 
-func (fake *FakeActor) RunTaskCalls(stub func(string, v7action.Task) (v7action.Task, v7action.Warnings, error)) {
+func (fake *FakeActor) RunTaskCalls(stub func(string, resources.Task) (resources.Task, v7action.Warnings, error)) {
 	fake.runTaskMutex.Lock()
 	defer fake.runTaskMutex.Unlock()
 	fake.RunTaskStub = stub
 }
 
-func (fake *FakeActor) RunTaskArgsForCall(i int) (string, v7action.Task) {
+func (fake *FakeActor) RunTaskArgsForCall(i int) (string, resources.Task) {
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
 	argsForCall := fake.runTaskArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) RunTaskReturns(result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) RunTaskReturns(result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.runTaskMutex.Lock()
 	defer fake.runTaskMutex.Unlock()
 	fake.RunTaskStub = nil
 	fake.runTaskReturns = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) RunTaskReturnsOnCall(i int, result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) RunTaskReturnsOnCall(i int, result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.runTaskMutex.Lock()
 	defer fake.runTaskMutex.Unlock()
 	fake.RunTaskStub = nil
 	if fake.runTaskReturnsOnCall == nil {
 		fake.runTaskReturnsOnCall = make(map[int]struct {
-			result1 v7action.Task
+			result1 resources.Task
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.runTaskReturnsOnCall[i] = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -15579,7 +15579,7 @@ func (fake *FakeActor) StopApplicationReturnsOnCall(i int, result1 v7action.Warn
 	}{result1, result2}
 }
 
-func (fake *FakeActor) TerminateTask(arg1 string) (v7action.Task, v7action.Warnings, error) {
+func (fake *FakeActor) TerminateTask(arg1 string) (resources.Task, v7action.Warnings, error) {
 	fake.terminateTaskMutex.Lock()
 	ret, specificReturn := fake.terminateTaskReturnsOnCall[len(fake.terminateTaskArgsForCall)]
 	fake.terminateTaskArgsForCall = append(fake.terminateTaskArgsForCall, struct {
@@ -15603,7 +15603,7 @@ func (fake *FakeActor) TerminateTaskCallCount() int {
 	return len(fake.terminateTaskArgsForCall)
 }
 
-func (fake *FakeActor) TerminateTaskCalls(stub func(string) (v7action.Task, v7action.Warnings, error)) {
+func (fake *FakeActor) TerminateTaskCalls(stub func(string) (resources.Task, v7action.Warnings, error)) {
 	fake.terminateTaskMutex.Lock()
 	defer fake.terminateTaskMutex.Unlock()
 	fake.TerminateTaskStub = stub
@@ -15616,30 +15616,30 @@ func (fake *FakeActor) TerminateTaskArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) TerminateTaskReturns(result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) TerminateTaskReturns(result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.terminateTaskMutex.Lock()
 	defer fake.terminateTaskMutex.Unlock()
 	fake.TerminateTaskStub = nil
 	fake.terminateTaskReturns = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) TerminateTaskReturnsOnCall(i int, result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) TerminateTaskReturnsOnCall(i int, result1 resources.Task, result2 v7action.Warnings, result3 error) {
 	fake.terminateTaskMutex.Lock()
 	defer fake.terminateTaskMutex.Unlock()
 	fake.TerminateTaskStub = nil
 	if fake.terminateTaskReturnsOnCall == nil {
 		fake.terminateTaskReturnsOnCall = make(map[int]struct {
-			result1 v7action.Task
+			result1 resources.Task
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.terminateTaskReturnsOnCall[i] = struct {
-		result1 v7action.Task
+		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
