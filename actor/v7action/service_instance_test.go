@@ -942,6 +942,7 @@ var _ = Describe("Service Instance Actions", func() {
 			fakeTags              types.OptionalStringSlice
 			warnings              Warnings
 			err                   error
+			stream                chan PollJobEvent
 			fakeJobURL            ccv3.JobURL
 			fakeParams            types.OptionalObject
 		)
@@ -958,7 +959,16 @@ var _ = Describe("Service Instance Actions", func() {
 				nil,
 			)
 			fakeCloudControllerClient.CreateServiceInstanceReturns(fakeJobURL, ccv3.Warnings{"fake-warning"}, nil)
-			fakeCloudControllerClient.PollJobForStateReturns(ccv3.Warnings{"job-warning"}, nil)
+
+			fakeStream := make(chan ccv3.PollJobEvent)
+			go func() {
+				fakeStream <- ccv3.PollJobEvent{
+					State:    constant.JobPolling,
+					Err:      errors.New("fake error"),
+					Warnings: ccv3.Warnings{"fake warning"},
+				}
+			}()
+			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
 		})
 
 		JustBeforeEach(func() {
@@ -971,8 +981,7 @@ var _ = Describe("Service Instance Actions", func() {
 				Tags:                fakeTags,
 				Parameters:          fakeParams,
 			}
-			warnings, err = actor.CreateManagedServiceInstance(params)
-
+			stream, warnings, err = actor.CreateManagedServiceInstance(params)
 		})
 
 		It("gets the service plan", func() {
@@ -998,16 +1007,20 @@ var _ = Describe("Service Instance Actions", func() {
 			}))
 		})
 
-		It("polls the job until is in polling state", func() {
-			Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-			jobUrl, status := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
+		It("polls the job", func() {
+			Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+			jobUrl := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
 			Expect(jobUrl).To(Equal(fakeJobURL))
-			Expect(status).To(Equal(constant.JobPolling))
 		})
 
-		It("returns all warnings", func() {
-			Expect(warnings).To(ConsistOf("plan-warning", "fake-warning", "job-warning"))
+		It("returns an event stream and warnings", func() {
 			Expect(err).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("plan-warning", "fake-warning"))
+			Eventually(stream).Should(Receive(Equal(PollJobEvent{
+				State:    JobPolling,
+				Err:      errors.New("fake error"),
+				Warnings: Warnings{"fake warning"},
+			})))
 		})
 
 		Context("error scenarios", func() {
@@ -1022,10 +1035,11 @@ var _ = Describe("Service Instance Actions", func() {
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: fakeServicePlanName, OfferingName: fakeServiceOfferingName, ServiceBrokerName: fakeServiceBrokerName}))
+					Expect(stream).To(BeNil())
 				})
 			})
 
-			When("more than a plan found", func() {
+			When("more than one plan found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServicePlansReturns(
 						[]resources.ServicePlan{{GUID: "a-guid"}, {GUID: "another-guid"}},
@@ -1041,6 +1055,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError(actionerror.DuplicateServicePlanError{Name: fakeServicePlanName, ServiceOfferingName: fakeServiceOfferingName, ServiceBrokerName: ""}))
+					Expect(stream).To(BeNil())
 				})
 			})
 
@@ -1056,10 +1071,11 @@ var _ = Describe("Service Instance Actions", func() {
 
 					Expect(warnings).To(ConsistOf("be warned"))
 					Expect(err).To(MatchError("boom"))
+					Expect(stream).To(BeNil())
 				})
 			})
 
-			When("there is an error creating the job", func() {
+			When("there is an error creating the service instance", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateServiceInstanceReturns("", ccv3.Warnings{"fake-warning"}, errors.New("bang"))
 				})
@@ -1069,17 +1085,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 					Expect(warnings).To(ConsistOf("plan-warning", "fake-warning"))
 					Expect(err).To(MatchError("bang"))
-				})
-			})
-
-			When("there are job errors", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.PollJobForStateReturns(ccv3.Warnings{"job-warning"}, errors.New("bad job"))
-				})
-
-				It("returns warnings and an error", func() {
-					Expect(warnings).To(ConsistOf("plan-warning", "fake-warning", "job-warning"))
-					Expect(err).To(MatchError("bad job"))
+					Expect(stream).To(BeNil())
 				})
 			})
 		})
@@ -1107,27 +1113,6 @@ var _ = Describe("Service Instance Actions", func() {
 			Expect(actualName).To(Equal(fakeServiceInstanceName))
 			Expect(actualSpace).To(Equal(fakeSpaceGUID))
 			Expect(actualQuery).To(BeEmpty())
-		})
-
-		When("the service instance does not exist", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"get warning"},
-					ccerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName},
-				)
-			})
-
-			It("returns an error", func() {
-				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName}))
-				Expect(warnings).To(ConsistOf("get warning"))
-				Expect(stream).To(BeNil())
-			})
-
-			It("does not try to delete", func() {
-				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
-			})
 		})
 
 		When("the service instance exists", func() {
@@ -1175,9 +1160,15 @@ var _ = Describe("Service Instance Actions", func() {
 						nil,
 					)
 
-					fakeCloudControllerClient.PollJobToEventStreamReturns(
-						make(chan ccv3.PollJobEvent),
-					)
+					fakeStream := make(chan ccv3.PollJobEvent)
+					go func() {
+						fakeStream <- ccv3.PollJobEvent{
+							State:    constant.JobPolling,
+							Err:      errors.New("fake error"),
+							Warnings: ccv3.Warnings{"fake warning"},
+						}
+					}()
+					fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
 				})
 
 				It("polls the job", func() {
@@ -1186,10 +1177,14 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(actualJobURL).To(BeEquivalentTo("a fake job url"))
 				})
 
-				It("returns an open channel", func() {
+				It("returns an event stream and warnings", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get warning", "delete warning"))
-					Expect(stream).NotTo(BeClosed())
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    JobPolling,
+						Err:      errors.New("fake error"),
+						Warnings: Warnings{"fake warning"},
+					})))
 				})
 			})
 
@@ -1210,6 +1205,27 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
+		When("the service instance does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get warning"},
+					ccerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName},
+				)
+			})
+
+			It("returns an error", func() {
+				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: fakeServiceInstanceName}))
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(stream).To(BeNil())
+			})
+
+			It("does not try to delete", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
+			})
+		})
+
 		When("getting the service instance fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
@@ -1224,6 +1240,10 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(err).To(MatchError("boom"))
 				Expect(warnings).To(ConsistOf("get warning"))
 				Expect(stream).To(BeNil())
+			})
+
+			It("does not try to delete", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceInstanceCallCount()).To(BeZero())
 			})
 		})
 	})

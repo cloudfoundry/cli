@@ -79,7 +79,7 @@ var _ = Describe("create-service Command", func() {
 		})
 	})
 
-	Context("When logged in and targeting a space", func() {
+	When("logged in and targeting a space", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: fakeSpaceName,
@@ -91,17 +91,9 @@ var _ = Describe("create-service Command", func() {
 			})
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
-
 		})
 
-		It("prints a message and warnings", func() {
-			Expect(testUI.Out).To(SatisfyAll(
-				Say("Creating service instance %s in org %s / space %s as %s...", requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
-				Say("OK"),
-			))
-		})
-
-		It("Calls the actor with the right arguments", func() {
+		It("calls the actor with the right arguments", func() {
 			Expect(fakeActor.CreateManagedServiceInstanceCallCount()).To(Equal(1))
 			params := fakeActor.CreateManagedServiceInstanceArgsForCall(0)
 			Expect(params.ServicePlanName).To(Equal(requestedPlanName))
@@ -176,21 +168,125 @@ var _ = Describe("create-service Command", func() {
 			})
 		})
 
-		When("Creation is successful", func() {
+		When("actor responds synchronously", func() {
 			BeforeEach(func() {
 				fakeActor.CreateManagedServiceInstanceReturns(
-					v7action.Warnings{"be warned", "take care"},
+					nil,
+					v7action.Warnings{"a warning"},
 					nil,
 				)
 			})
 
 			It("prints a message and warnings", func() {
-				Expect(testUI.Err).To(SatisfyAll(
-					Say("be warned"),
-					Say("take care"),
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Creating service instance %s in org %s / space %s as %s\.\.\.\n`, requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
+					Say(`\n`),
+					Say(`Service instance %s created\.\n`, requestedServiceInstanceName),
+					Say(`OK`),
 				))
-				Expect(testUI.Out).To(Say("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", requestedServiceInstanceName))
 
+				Expect(testUI.Err).To(Say("a warning"))
+			})
+		})
+
+		When("actor responds asynchronously", func() {
+			BeforeEach(func() {
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.CreateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"stream warning"},
+					}
+				}()
+			})
+
+			It("prints a message and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Creating service instance %s in org %s / space %s as %s\.\.\.\n`, requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
+					Say(`\n`),
+					Say(`Create in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, requestedServiceInstanceName),
+					Say(`OK`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("a warning"),
+					Say("stream warning"),
+				))
+			})
+		})
+
+		When("error in event stream", func() {
+			BeforeEach(func() {
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.CreateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobFailed,
+						Warnings: v7action.Warnings{"stream warning"},
+						Err:      errors.New("bad thing"),
+					}
+				}()
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("bad thing"))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("a warning"),
+					Say("stream warning"),
+				))
+			})
+		})
+
+		When("the --wait flag is specified", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--wait")
+
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.CreateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobComplete,
+						Warnings: v7action.Warnings{"complete warning"},
+					}
+					close(fakeStream)
+				}()
+			})
+
+			It("prints a message and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Creating service instance %s in org %s / space %s as %s\.\.\.\n`, requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
+					Say(`\n`),
+					Say(`Waiting for the operation to complete\.\.\n`),
+					Say(`\n`),
+					Say(`Service instance %s created\.\n`, requestedServiceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("poll warning"),
+					Say("complete warning"),
+				))
 			})
 		})
 
@@ -208,6 +304,7 @@ var _ = Describe("create-service Command", func() {
 			BeforeEach(func() {
 				expectedError = actionerror.ServicePlanNotFoundError{PlanName: requestedPlanName}
 				fakeActor.CreateManagedServiceInstanceReturns(
+					nil,
 					v7action.Warnings{"warning one", "warning two"},
 					expectedError,
 				)
@@ -230,7 +327,11 @@ var _ = Describe("create-service Command", func() {
 
 			When("the service instance name is taken", func() {
 				BeforeEach(func() {
-					fakeActor.CreateManagedServiceInstanceReturns([]string{"a-warning", "another-warning"}, ccerror.ServiceInstanceNameTakenError{})
+					fakeActor.CreateManagedServiceInstanceReturns(
+						nil,
+						[]string{"a-warning", "another-warning"},
+						ccerror.ServiceInstanceNameTakenError{},
+					)
 				})
 
 				It("succeeds, displaying warnings, 'OK' and an informative message", func() {
@@ -239,7 +340,7 @@ var _ = Describe("create-service Command", func() {
 					Expect(testUI.Err).To(Say("a-warning"))
 					Expect(testUI.Err).To(Say("another-warning"))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say("Service %s already exists", requestedServiceInstanceName))
+					Expect(testUI.Out).To(Say("Service instance %s already exists", requestedServiceInstanceName))
 				})
 			})
 		})

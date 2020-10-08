@@ -63,7 +63,7 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 	return Warnings(warnings), err
 }
 
-func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (Warnings, error) {
+func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstanceParams) (chan PollJobEvent, Warnings, error) {
 	allWarnings := Warnings{}
 
 	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
@@ -73,7 +73,7 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
 	serviceInstance := resources.ServiceInstance{
@@ -88,14 +88,10 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
 	allWarnings = append(allWarnings, clientWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
-	clientWarnings, err = actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
-	allWarnings = append(allWarnings, clientWarnings...)
-
-	return allWarnings, err
-
+	return actor.PollJobToEventStream(jobURL), allWarnings, err
 }
 
 func (actor Actor) UpdateManagedServiceInstance(serviceInstanceName, spaceGUID string, serviceInstanceUpdates ServiceInstanceUpdateManagedParams) (bool, Warnings, error) {
