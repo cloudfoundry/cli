@@ -33,6 +33,7 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20200809112317-0581fc3aee2d // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20200809112317-0581fc3aee2d // indirect
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
+	github.com/gofrs/flock v0.8.0
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/gorilla/websocket v1.2.1-0.20171201014301-b89020ee79b8 // indirect
