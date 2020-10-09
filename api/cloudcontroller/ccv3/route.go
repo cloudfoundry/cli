@@ -115,7 +115,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 }
 
 func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
-	var responseBody Build
+	var responseBody resources.Build
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.UnmapRouteRequest,
