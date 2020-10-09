@@ -26,7 +26,7 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 		defer close(warningsStream)
 		defer close(errorStream)
 
-		build := ccv3.Build{PackageGUID: packageGUID}
+		build := resources.Build{PackageGUID: packageGUID}
 		build, allWarnings, err := actor.CloudControllerClient.CreateBuild(build)
 		warningsStream <- Warnings(allWarnings)
 
@@ -79,19 +79,19 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 	return dropletStream, warningsStream, errorStream
 }
 
-func (actor Actor) StageApplicationPackage(packageGUID string) (Build, Warnings, error) {
+func (actor Actor) StageApplicationPackage(packageGUID string) (resources.Build, Warnings, error) {
 	var allWarnings Warnings
 
-	build := ccv3.Build{PackageGUID: packageGUID}
+	build := resources.Build{PackageGUID: packageGUID}
 	build, warnings, err := actor.CloudControllerClient.CreateBuild(build)
 	log.Debug("created build")
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Build{}, allWarnings, err
+		return resources.Build{}, allWarnings, err
 	}
 
 	log.Debug("no errors creating build")
-	return Build{GUID: build.GUID}, allWarnings, nil
+	return resources.Build{GUID: build.GUID}, allWarnings, nil
 }
 
 func (actor Actor) PollBuild(buildGUID string, appName string) (Droplet, Warnings, error) {

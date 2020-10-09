@@ -36,7 +36,7 @@ type V7Actor interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	SetApplicationManifest(appGUID string, rawManifest []byte) (v7action.Warnings, error)
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
-	StageApplicationPackage(pkgGUID string) (v7action.Build, v7action.Warnings, error)
+	StageApplicationPackage(pkgGUID string) (resources.Build, v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, v7action.Warnings, error)

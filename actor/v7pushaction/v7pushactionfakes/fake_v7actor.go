@@ -395,18 +395,18 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	StageApplicationPackageStub        func(string) (v7action.Build, v7action.Warnings, error)
+	StageApplicationPackageStub        func(string) (resources.Build, v7action.Warnings, error)
 	stageApplicationPackageMutex       sync.RWMutex
 	stageApplicationPackageArgsForCall []struct {
 		arg1 string
 	}
 	stageApplicationPackageReturns struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}
 	stageApplicationPackageReturnsOnCall map[int]struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2174,7 +2174,7 @@ func (fake *FakeV7Actor) SetSpaceManifestReturnsOnCall(i int, result1 v7action.W
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (v7action.Build, v7action.Warnings, error) {
+func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (resources.Build, v7action.Warnings, error) {
 	fake.stageApplicationPackageMutex.Lock()
 	ret, specificReturn := fake.stageApplicationPackageReturnsOnCall[len(fake.stageApplicationPackageArgsForCall)]
 	fake.stageApplicationPackageArgsForCall = append(fake.stageApplicationPackageArgsForCall, struct {
@@ -2198,7 +2198,7 @@ func (fake *FakeV7Actor) StageApplicationPackageCallCount() int {
 	return len(fake.stageApplicationPackageArgsForCall)
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageCalls(stub func(string) (v7action.Build, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) StageApplicationPackageCalls(stub func(string) (resources.Build, v7action.Warnings, error)) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = stub
@@ -2211,30 +2211,30 @@ func (fake *FakeV7Actor) StageApplicationPackageArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageReturns(result1 v7action.Build, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) StageApplicationPackageReturns(result1 resources.Build, result2 v7action.Warnings, result3 error) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = nil
 	fake.stageApplicationPackageReturns = struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 v7action.Build, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 resources.Build, result2 v7action.Warnings, result3 error) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = nil
 	if fake.stageApplicationPackageReturnsOnCall == nil {
 		fake.stageApplicationPackageReturnsOnCall = make(map[int]struct {
-			result1 v7action.Build
+			result1 resources.Build
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.stageApplicationPackageReturnsOnCall[i] = struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

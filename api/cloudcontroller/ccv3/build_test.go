@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -44,11 +45,11 @@ var _ = Describe("Build", func() {
 			})
 
 			It("returns the created build and warnings", func() {
-				build, warnings, err := client.CreateBuild(Build{PackageGUID: "some-package-guid"})
+				build, warnings, err := client.CreateBuild(resources.Build{PackageGUID: "some-package-guid"})
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(build).To(Equal(Build{
+				Expect(build).To(Equal(resources.Build{
 					GUID:        "some-build-guid",
 					State:       constant.BuildStaging,
 					DropletGUID: "some-droplet-guid",
@@ -81,7 +82,7 @@ var _ = Describe("Build", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateBuild(Build{PackageGUID: "some-package-guid"})
+				_, warnings, err := client.CreateBuild(resources.Build{PackageGUID: "some-package-guid"})
 				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{
@@ -126,7 +127,7 @@ var _ = Describe("Build", func() {
 				build, warnings, err := client.GetBuild("some-build-guid")
 				Expect(err).NotTo(HaveOccurred())
 
-				expectedBuild := Build{
+				expectedBuild := resources.Build{
 					CreatedAt:   "some-time",
 					GUID:        "some-build-guid",
 					State:       constant.BuildFailed,

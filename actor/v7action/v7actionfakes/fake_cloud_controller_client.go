@@ -172,18 +172,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateBuildStub        func(ccv3.Build) (ccv3.Build, ccv3.Warnings, error)
+	CreateBuildStub        func(resources.Build) (resources.Build, ccv3.Warnings, error)
 	createBuildMutex       sync.RWMutex
 	createBuildArgsForCall []struct {
-		arg1 ccv3.Build
+		arg1 resources.Build
 	}
 	createBuildReturns struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createBuildReturnsOnCall map[int]struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -895,18 +895,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetBuildStub        func(string) (ccv3.Build, ccv3.Warnings, error)
+	GetBuildStub        func(string) (resources.Build, ccv3.Warnings, error)
 	getBuildMutex       sync.RWMutex
 	getBuildArgsForCall []struct {
 		arg1 string
 	}
 	getBuildReturns struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getBuildReturnsOnCall map[int]struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3243,11 +3243,11 @@ func (fake *FakeCloudControllerClient) CreateApplicationTaskReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateBuild(arg1 ccv3.Build) (ccv3.Build, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateBuild(arg1 resources.Build) (resources.Build, ccv3.Warnings, error) {
 	fake.createBuildMutex.Lock()
 	ret, specificReturn := fake.createBuildReturnsOnCall[len(fake.createBuildArgsForCall)]
 	fake.createBuildArgsForCall = append(fake.createBuildArgsForCall, struct {
-		arg1 ccv3.Build
+		arg1 resources.Build
 	}{arg1})
 	fake.recordInvocation("CreateBuild", []interface{}{arg1})
 	fake.createBuildMutex.Unlock()
@@ -3267,43 +3267,43 @@ func (fake *FakeCloudControllerClient) CreateBuildCallCount() int {
 	return len(fake.createBuildArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildCalls(stub func(ccv3.Build) (ccv3.Build, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateBuildCalls(stub func(resources.Build) (resources.Build, ccv3.Warnings, error)) {
 	fake.createBuildMutex.Lock()
 	defer fake.createBuildMutex.Unlock()
 	fake.CreateBuildStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildArgsForCall(i int) ccv3.Build {
+func (fake *FakeCloudControllerClient) CreateBuildArgsForCall(i int) resources.Build {
 	fake.createBuildMutex.RLock()
 	defer fake.createBuildMutex.RUnlock()
 	argsForCall := fake.createBuildArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildReturns(result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateBuildReturns(result1 resources.Build, result2 ccv3.Warnings, result3 error) {
 	fake.createBuildMutex.Lock()
 	defer fake.createBuildMutex.Unlock()
 	fake.CreateBuildStub = nil
 	fake.createBuildReturns = struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 resources.Build, result2 ccv3.Warnings, result3 error) {
 	fake.createBuildMutex.Lock()
 	defer fake.createBuildMutex.Unlock()
 	fake.CreateBuildStub = nil
 	if fake.createBuildReturnsOnCall == nil {
 		fake.createBuildReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Build
+			result1 resources.Build
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createBuildReturnsOnCall[i] = struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -6415,7 +6415,7 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetBuild(arg1 string) (ccv3.Build, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetBuild(arg1 string) (resources.Build, ccv3.Warnings, error) {
 	fake.getBuildMutex.Lock()
 	ret, specificReturn := fake.getBuildReturnsOnCall[len(fake.getBuildArgsForCall)]
 	fake.getBuildArgsForCall = append(fake.getBuildArgsForCall, struct {
@@ -6439,7 +6439,7 @@ func (fake *FakeCloudControllerClient) GetBuildCallCount() int {
 	return len(fake.getBuildArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetBuildCalls(stub func(string) (ccv3.Build, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetBuildCalls(stub func(string) (resources.Build, ccv3.Warnings, error)) {
 	fake.getBuildMutex.Lock()
 	defer fake.getBuildMutex.Unlock()
 	fake.GetBuildStub = stub
@@ -6452,30 +6452,30 @@ func (fake *FakeCloudControllerClient) GetBuildArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetBuildReturns(result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetBuildReturns(result1 resources.Build, result2 ccv3.Warnings, result3 error) {
 	fake.getBuildMutex.Lock()
 	defer fake.getBuildMutex.Unlock()
 	fake.GetBuildStub = nil
 	fake.getBuildReturns = struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetBuildReturnsOnCall(i int, result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetBuildReturnsOnCall(i int, result1 resources.Build, result2 ccv3.Warnings, result3 error) {
 	fake.getBuildMutex.Lock()
 	defer fake.getBuildMutex.Unlock()
 	fake.GetBuildStub = nil
 	if fake.getBuildReturnsOnCall == nil {
 		fake.getBuildReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Build
+			result1 resources.Build
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getBuildReturnsOnCall[i] = struct {
-		result1 ccv3.Build
+		result1 resources.Build
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
