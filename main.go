@@ -16,6 +16,9 @@ import (
 )
 
 func main() {
+	fmt.Println("*******************************")
+	fmt.Println("WARNING: THIS IS A DEV BUILD OF THE CF CLI. IT IS NOT INTENDED FOR PRODUCTION USE.")
+	fmt.Println("*******************************")
 	var exitCode int
 	defer panichandler.HandlePanic()
 
