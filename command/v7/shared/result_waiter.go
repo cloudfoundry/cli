@@ -14,6 +14,11 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 
 	if waitForCompletion {
 		fmt.Fprint(ui.Writer(), "Waiting for the operation to complete")
+
+		defer func() {
+			ui.DisplayNewline()
+			ui.DisplayNewline()
+		}()
 	}
 
 	for event := range stream {
@@ -29,10 +34,5 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 		}
 	}
 
-	if waitForCompletion {
-		ui.DisplayNewline()
-		ui.DisplayNewline()
-		return true, nil
-	}
-	return false, nil
+	return waitForCompletion, nil
 }
