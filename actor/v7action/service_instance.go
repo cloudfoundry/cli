@@ -73,6 +73,11 @@ func (actor Actor) CreateManagedServiceInstance(params ManagedServiceInstancePar
 	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
+		if duplicateErr, ok := err.(actionerror.DuplicateServicePlanError); ok {
+			return nil, allWarnings, actionerror.ServiceBrokerNameRequiredError{
+				ServiceOfferingName: duplicateErr.ServiceOfferingName,
+			}
+		}
 		return nil, allWarnings, err
 	}
 
