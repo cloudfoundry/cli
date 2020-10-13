@@ -24,12 +24,12 @@ var _ = Describe("create-service command", func() {
 			Say(`\s+create-service - Create a service instance\n`),
 			Say(`\n`),
 			Say(`USAGE:\n`),
-			Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE \[-b SERVICE_BROKER\] \[-c JSON_PARAMS\] \[-t TAGS\]\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE \[-b SERVICE_BROKER\] \[-c JSON_PARAMS\] \[-t TAGS\]\n`),
 			Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n`),
-			Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n`),
 			Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.\n`),
 			Say(`\s+The path to the parameters file can be an absolute or relative path to a file:\n`),
-			Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n`),
 			Say(`\s+Example of valid JSON object:`),
 			Say(`\s+{`),
 			Say(`\s+\"cluster_nodes\": {`),
@@ -79,7 +79,7 @@ var _ = Describe("create-service command", func() {
 			It("displays a warning, the help text, and exits 1", func() {
 				session := helpers.CF("create-service")
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `SERVICE`, `SERVICE_PLAN` and `SERVICE_INSTANCE` were not provided"))
+				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `SERVICE_OFFERING`, `SERVICE_PLAN` and `SERVICE_INSTANCE` were not provided"))
 				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
