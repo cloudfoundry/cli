@@ -193,7 +193,7 @@ type CopySourceArgs struct {
 }
 
 type CreateServiceArgs struct {
-	Service         string `positional-arg-name:"SERVICE" required:"true" description:"The service offering"`
+	ServiceOffering string `positional-arg-name:"SERVICE_OFFERING" required:"true" description:"The service offering"`
 	ServicePlan     string `positional-arg-name:"SERVICE_PLAN" required:"true" description:"The service plan that the service instance will use"`
 	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance"`
 }

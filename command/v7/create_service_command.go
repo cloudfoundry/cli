@@ -23,16 +23,16 @@ type CreateServiceCommand struct {
 
 func (cmd CreateServiceCommand) Usage() string {
 	return `
-CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-b SERVICE_BROKER] [-c JSON_PARAMS] [-t TAGS]
+CF_NAME create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE [-b SERVICE_BROKER] [-c JSON_PARAMS] [-t TAGS]
 
 Optionally provide service-specific configuration parameters in a valid JSON object in-line:
 
-CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+CF_NAME create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
 
 Optionally provide a file containing service-specific configuration parameters in a valid JSON object.
 The path to the parameters file can be an absolute or relative path to a file:
 
-CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE
+CF_NAME create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c PATH_TO_FILE
 
 Example of valid JSON object:
 {
@@ -74,7 +74,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 
 	stream, warnings, err := cmd.Actor.CreateManagedServiceInstance(
 		v7action.ManagedServiceInstanceParams{
-			ServiceOfferingName: cmd.RequiredArgs.Service,
+			ServiceOfferingName: cmd.RequiredArgs.ServiceOffering,
 			ServicePlanName:     cmd.RequiredArgs.ServicePlan,
 			ServiceInstanceName: cmd.RequiredArgs.ServiceInstance,
 			ServiceBrokerName:   cmd.ServiceBroker,
