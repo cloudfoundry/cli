@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -63,11 +64,6 @@ func GetCFConfig() (*Config, error) {
 //   2. HOMEDRIVE\HOMEPATH\.cf if HOMEDRIVE or HOMEPATH is set
 //   3. USERPROFILE\.cf as the default
 func LoadConfig(flags ...FlagOverride) (*Config, error) {
-	err := removeOldTempConfigFiles()
-	if err != nil {
-		return nil, err
-	}
-
 	configFilePath := ConfigFilePath()
 
 	config := Config{
@@ -84,9 +80,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	var jsonError error
 
-	if _, err = os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
+	if _, err := os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
 		var file []byte
-		file, err = ioutil.ReadFile(configFilePath)
+		file, err = lockedfile.Read(configFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -134,7 +130,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		LCAll:            os.Getenv("LC_ALL"),
 	}
 
-	err = config.loadPluginConfig()
+	err := config.loadPluginConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -167,20 +163,4 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	return &config, jsonError
-}
-
-func removeOldTempConfigFiles() error {
-	oldTempFileNames, err := filepath.Glob(filepath.Join(configDirectory(), "temp-config?*"))
-	if err != nil {
-		return err
-	}
-
-	for _, oldTempFileName := range oldTempFileNames {
-		err = os.Remove(oldTempFileName)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
