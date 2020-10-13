@@ -59,7 +59,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 
 	switch deleted {
 	case true:
-		cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} deleted.", cmd.serviceInstanceName())
+		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} deleted.", cmd.serviceInstanceName())
 	default:
 		cmd.UI.DisplayText("Delete in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
 	}
