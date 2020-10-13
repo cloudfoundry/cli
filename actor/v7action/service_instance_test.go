@@ -1070,7 +1070,9 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
 
 					Expect(warnings).To(ConsistOf("be warned"))
-					Expect(err).To(MatchError(actionerror.DuplicateServicePlanError{Name: fakeServicePlanName, ServiceOfferingName: fakeServiceOfferingName, ServiceBrokerName: ""}))
+					Expect(err).To(MatchError(actionerror.ServiceBrokerNameRequiredError{
+						ServiceOfferingName: fakeServiceOfferingName,
+					}))
 					Expect(stream).To(BeNil())
 				})
 			})

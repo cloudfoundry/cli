@@ -256,7 +256,7 @@ var _ = Describe("create-service command", func() {
 			It("displays an error message prompting to disambiguate", func() {
 				session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName)
 				assertCreateMessage(session)
-				Eventually(session.Err).Should(Say("Service plan '%s' is provided by multiple service offerings. Service offering '%s' is provided by multiple service brokers. Specify a broker name by using the '-b' flag.", servicePlan, serviceOffering))
+				Eventually(session.Err).Should(Say("Service offering '%s' is provided by multiple service brokers. Specify a broker name by using the '-b' flag.", serviceOffering))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
