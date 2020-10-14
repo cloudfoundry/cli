@@ -141,7 +141,7 @@ type commandList struct {
 	ServiceAccess                      v7.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
 	ServiceBrokers                     v7.ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
 	ServiceKey                         v6.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
-	ServiceKeys                        v6.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
+	ServiceKeys                        v7.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
 	Services                           v6.ServicesCommand                           `command:"services" alias:"s" description:"List all service instances in the target space"`
 	ServicesV3                         v7.ServicesCommand                           `command:"v3-services" alias:"s" description:"List all service instances in the target space"`
 	SetDroplet                         v7.SetDropletCommand                         `command:"set-droplet" description:"Set the droplet used to run an app"`
