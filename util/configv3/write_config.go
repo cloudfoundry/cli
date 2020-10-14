@@ -2,10 +2,13 @@ package configv3
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/rogpeppe/go-internal/lockedfile"
 )
 
 // WriteConfig creates the .cf directory and then writes the config.json. The
@@ -30,21 +33,47 @@ func (c *Config) WriteConfig() error {
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
 	defer signal.Stop(sig)
 
-	tempConfigFile, err := ioutil.TempFile(dir, "temp-config")
+	tempConfigFileName, err := writeTempConfig(dir, rawConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("writing temp config: %w", err)
 	}
-	tempConfigFile.Close()
-	tempConfigFileName := tempConfigFile.Name()
 
 	go catchSignal(sig, tempConfigFileName)
 
-	err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
+	// err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
+	// if err != nil {
+	// 	return err
+	// }
+
+	tempf, err := lockedfile.OpenFile(tempConfigFileName, os.O_RDWR, 0600)
 	if err != nil {
 		return err
 	}
+	defer tempf.Close()
+	realf, err := lockedfile.OpenFile(ConfigFilePath(), os.O_RDWR, 0600)
+	if err != nil {
+		return err
+	}
+	defer realf.Close()
+
+	fmt.Println("Renaming...")
 
 	return os.Rename(tempConfigFileName, ConfigFilePath())
+}
+
+func writeTempConfig(dir string, rawConfig []byte) (string, error) {
+	tempConfigFile, err := ioutil.TempFile(dir, "temp-config")
+	if err != nil {
+		return "", err
+	}
+
+	defer tempConfigFile.Close()
+	_, err = tempConfigFile.Write(rawConfig)
+	if err != nil {
+		return "", err
+	}
+
+	return tempConfigFile.Name(), nil
 }
 
 // catchSignal tries to catch SIGHUP, SIGINT, SIGKILL, SIGQUIT and SIGTERM, and
