@@ -15,7 +15,7 @@ type ServiceCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
-	ShowGUID        bool                 `long:"guid" description:"Retrieve and display the given service's guid. All other output for the service is suppressed."`
+	ShowGUID        bool                 `long:"guid" description:"Retrieve and display the given service instances's guid. All other output is suppressed."`
 	usage           interface{}          `usage:"CF_NAME service SERVICE_INSTANCE"`
 	relatedCommands interface{}          `related_commands:"bind-service, rename-service, update-service"`
 

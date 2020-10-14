@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -56,9 +55,9 @@ var _ = Describe("enable-service-access command", func() {
 	DescribeTable(
 		"message text",
 		func(plan, org, broker, expected string) {
-			cmd.RequiredArgs = flag.Service{ServiceOffering: "fake-service"}
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
+			setPositionalFlags(&cmd, "fake-service")
 			setFlag(&cmd, "-p", plan)
 			setFlag(&cmd, "-o", org)
 			setFlag(&cmd, "-b", broker)
