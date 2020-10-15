@@ -393,6 +393,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	CreateRouteBindingStub        func(v7action.CreateRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	createRouteBindingMutex       sync.RWMutex
+	createRouteBindingArgsForCall []struct {
+		arg1 v7action.CreateRouteBindingParams
+	}
+	createRouteBindingReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	createRouteBindingReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	CreateSecurityGroupStub        func(string, string) (v7action.Warnings, error)
 	createSecurityGroupMutex       sync.RWMutex
 	createSecurityGroupArgsForCall []struct {
@@ -4997,6 +5012,72 @@ func (fake *FakeActor) CreateRouteReturnsOnCall(i int, result1 resources.Route, 
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
 		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateRouteBinding(arg1 v7action.CreateRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.createRouteBindingMutex.Lock()
+	ret, specificReturn := fake.createRouteBindingReturnsOnCall[len(fake.createRouteBindingArgsForCall)]
+	fake.createRouteBindingArgsForCall = append(fake.createRouteBindingArgsForCall, struct {
+		arg1 v7action.CreateRouteBindingParams
+	}{arg1})
+	fake.recordInvocation("CreateRouteBinding", []interface{}{arg1})
+	fake.createRouteBindingMutex.Unlock()
+	if fake.CreateRouteBindingStub != nil {
+		return fake.CreateRouteBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createRouteBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) CreateRouteBindingCallCount() int {
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
+	return len(fake.createRouteBindingArgsForCall)
+}
+
+func (fake *FakeActor) CreateRouteBindingCalls(stub func(v7action.CreateRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = stub
+}
+
+func (fake *FakeActor) CreateRouteBindingArgsForCall(i int) v7action.CreateRouteBindingParams {
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
+	argsForCall := fake.createRouteBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) CreateRouteBindingReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = nil
+	fake.createRouteBindingReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateRouteBindingReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = nil
+	if fake.createRouteBindingReturnsOnCall == nil {
+		fake.createRouteBindingReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createRouteBindingReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -18004,6 +18085,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createPrivateDomainMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
 	fake.createSecurityGroupMutex.RLock()
 	defer fake.createSecurityGroupMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()

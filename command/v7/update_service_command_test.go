@@ -122,7 +122,7 @@ var _ = Describe("update-service command", func() {
 			Expect(testUI.Out).To(SatisfyAll(
 				Say(`Updating service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
 				Say(`\n`),
-				Say("Update in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstanceName),
+				Say(`Update of service instance %s complete\.`, serviceInstanceName),
 				Say(`OK\n`),
 			))
 
@@ -139,6 +139,38 @@ var _ = Describe("update-service command", func() {
 				Parameters:      types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
 				ServicePlanName: types.NewOptionalString("some-plan"),
 			}))
+		})
+
+		When("stream goes to polling", func() {
+			BeforeEach(func() {
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpdateManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"actor warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+				}()
+			})
+
+			It("prints messages and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Updating service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Update in progress. Use 'cf services' or 'cf service %s' to check operation status\.`, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("actor warning"),
+					Say("poll warning"),
+				))
+			})
 		})
 
 		When("error in event stream", func() {

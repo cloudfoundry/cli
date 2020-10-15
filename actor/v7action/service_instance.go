@@ -27,13 +27,8 @@ type ManagedServiceInstanceParams struct {
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
-	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
-	switch e := err.(type) {
-	case ccerror.ServiceInstanceNotFoundError:
-		return serviceInstance, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: e.Name}
-	default:
-		return serviceInstance, Warnings(warnings), err
-	}
+	serviceInstance, warnings, err := actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+	return serviceInstance, Warnings(warnings), err
 }
 
 func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.ServiceInstance) (Warnings, error) {
@@ -130,9 +125,9 @@ func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spa
 	var servicePlan resources.ServicePlan
 	var jobURL ccv3.JobURL
 
-	return handleServiceInstanceErrors(railway.Sequentially(
+	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			serviceInstance, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -154,7 +149,9 @@ func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spa
 		func() (warnings ccv3.Warnings, err error) {
 			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
-	))
+	)
+
+	return Warnings(warnings), err
 }
 
 func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
@@ -163,9 +160,9 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 		jobURL          ccv3.JobURL
 	)
 
-	return handleServiceInstanceErrors(railway.Sequentially(
+	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(currentServiceInstanceName, spaceGUID)
+			serviceInstance, warnings, err = actor.getServiceInstanceByNameAndSpace(currentServiceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -178,7 +175,9 @@ func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, 
 		func() (warnings ccv3.Warnings, err error) {
 			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
-	))
+	)
+
+	return Warnings(warnings), err
 }
 
 func (actor Actor) DeleteServiceInstance(serviceInstanceName, spaceGUID string) (chan PollJobEvent, Warnings, error) {
@@ -367,6 +366,16 @@ func (v *managedServiceInstanceValidator) getTargetServicePlan(servicePlanName t
 		targetPlanGUID = plan.GUID
 	}
 	return targetPlanGUID, ccv3.Warnings(actorWarnings), err
+}
+
+func (actor Actor) getServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, ccv3.Warnings, error) {
+	serviceInstance, _, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+	switch e := err.(type) {
+	case ccerror.ServiceInstanceNotFoundError:
+		return serviceInstance, warnings, actionerror.ServiceInstanceNotFoundError{Name: e.Name}
+	default:
+		return serviceInstance, warnings, err
+	}
 }
 
 func assertServiceInstanceType(requiredType resources.ServiceInstanceType, instance resources.ServiceInstance) error {

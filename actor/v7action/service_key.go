@@ -12,9 +12,9 @@ func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUI
 		keys            []resources.ServiceCredentialBinding
 	)
 
-	warnings, err := handleServiceInstanceErrors(railway.Sequentially(
+	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, _, warnings, err = actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			serviceInstance, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -28,12 +28,12 @@ func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUI
 			}...)
 			return
 		},
-	))
+	)
 
 	var result []string
 	for _, k := range keys {
 		result = append(result, k.Name)
 	}
 
-	return result, warnings, err
+	return result, Warnings(warnings), err
 }

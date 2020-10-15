@@ -45,6 +45,7 @@ type Actor interface {
 	CreateOrganizationQuota(name string, limits v7action.QuotaLimits) (v7action.Warnings, error)
 	CreatePrivateDomain(domainName string, orgName string) (v7action.Warnings, error)
 	CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
+	CreateRouteBinding(params v7action.CreateRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateSecurityGroup(name, filePath string) (v7action.Warnings, error)
 	CreateServiceBroker(model resources.ServiceBroker) (v7action.Warnings, error)
 	CreateSharedDomain(domainName string, internal bool, routerGroupName string) (v7action.Warnings, error)
