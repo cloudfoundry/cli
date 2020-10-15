@@ -46,7 +46,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 				fakeCloudControllerClient.GetApplicationProcessesReturnsOnCall(
 					0,
-					[]ccv3.Process{
+					[]resources.Process{
 						{
 							GUID: "some-process-guid-1",
 							Type: "some-process-type-1",
@@ -61,7 +61,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 				)
 				fakeCloudControllerClient.GetApplicationProcessesReturnsOnCall(
 					1,
-					[]ccv3.Process{
+					[]resources.Process{
 						{
 							GUID: "some-process-guid-3",
 							Type: "some-process-type-3",
@@ -103,11 +103,11 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
-								Process:         Process{GUID: "some-process-guid-1", Type: "some-process-type-1"},
+								Process:         resources.Process{GUID: "some-process-guid-1", Type: "some-process-type-1"},
 								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
 							},
 							{
-								Process:         Process{GUID: "some-process-guid-2", Type: "some-process-type-2"},
+								Process:         resources.Process{GUID: "some-process-guid-2", Type: "some-process-type-2"},
 								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
 							},
 						},
@@ -120,7 +120,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
-								Process:         Process{GUID: "some-process-guid-3", Type: "some-process-type-3"},
+								Process:         resources.Process{GUID: "some-process-guid-3", Type: "some-process-type-3"},
 								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceDown}},
 							},
 						},
@@ -162,7 +162,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					[]ccv3.Process{},
+					[]resources.Process{},
 					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)
@@ -192,7 +192,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					[]ccv3.Process{
+					[]resources.Process{
 						{
 							GUID: "some-process-guid",
 							Type: "some-type",

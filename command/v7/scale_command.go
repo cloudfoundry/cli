@@ -2,11 +2,11 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type ScaleCommand struct {
@@ -112,7 +112,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 		cmd.UI.DisplayNewline()
 	}
 
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v7action.Process{
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, resources.Process{
 		Type:       cmd.ProcessType,
 		Instances:  cmd.Instances.NullInt,
 		MemoryInMB: cmd.MemoryLimit.NullUint64,

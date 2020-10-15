@@ -191,7 +191,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	setWarnings, err := actor.UpdateProcessByTypeAndApplication(
 		processType,
 		app.GUID,
-		Process{
+		resources.Process{
 			HealthCheckType:              healthCheckType,
 			HealthCheckEndpoint:          httpEndpoint,
 			HealthCheckInvocationTimeout: invocationTimeout,
@@ -264,7 +264,7 @@ func (actor Actor) PollStart(app resources.Application, noWait bool, handleInsta
 		return allWarnings, err
 	}
 
-	var filteredProcesses []ccv3.Process
+	var filteredProcesses []resources.Process
 	if noWait {
 		for _, process := range processes {
 			if process.Type == constant.ProcessTypeWeb {
@@ -299,8 +299,8 @@ func (actor Actor) PollStart(app resources.Application, noWait bool, handleInsta
 // they have failed or been canceled during polling.
 func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var (
-		deployment  ccv3.Deployment
-		processes   []ccv3.Process
+		deployment  resources.Deployment
+		processes   []resources.Process
 		allWarnings Warnings
 	)
 
@@ -340,12 +340,12 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 	}
 }
 
-func isDeployed(d ccv3.Deployment) bool {
+func isDeployed(d resources.Deployment) bool {
 	return d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
 }
 
 // PollProcesses - return true if there's no need to keep polling
-func (actor Actor) PollProcesses(processes []ccv3.Process, handleInstanceDetails func(string)) (bool, Warnings, error) {
+func (actor Actor) PollProcesses(processes []resources.Process, handleInstanceDetails func(string)) (bool, Warnings, error) {
 	numProcesses := len(processes)
 	numStableProcesses := 0
 	var allWarnings Warnings
@@ -394,7 +394,7 @@ func (actor Actor) UpdateApplication(app resources.Application) (resources.Appli
 	return updatedApp, Warnings(warnings), nil
 }
 
-func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnings, error) {
+func (actor Actor) getDeployment(deploymentGUID string) (resources.Deployment, Warnings, error) {
 	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
 	if err != nil {
 		return deployment, Warnings(warnings), err
@@ -412,7 +412,7 @@ func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnin
 	return deployment, Warnings(warnings), err
 }
 
-func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWait bool) ([]ccv3.Process, Warnings, error) {
+func (actor Actor) getProcesses(deployment resources.Deployment, appGUID string, noWait bool) ([]resources.Process, Warnings, error) {
 	if noWait {
 		// these are only web processes for now so we can just use these
 		return deployment.NewProcesses, nil, nil

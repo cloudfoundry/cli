@@ -1,85 +1,10 @@
 package ccv3
 
 import (
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
-
-type Deployment struct {
-	GUID          string
-	State         constant.DeploymentState
-	StatusValue   constant.DeploymentStatusValue
-	StatusReason  constant.DeploymentStatusReason
-	RevisionGUID  string
-	DropletGUID   string
-	CreatedAt     string
-	UpdatedAt     string
-	Relationships resources.Relationships
-	NewProcesses  []Process
-}
-
-// MarshalJSON converts a Deployment into a Cloud Controller Deployment.
-func (d Deployment) MarshalJSON() ([]byte, error) {
-	type Revision struct {
-		GUID string `json:"guid,omitempty"`
-	}
-	type Droplet struct {
-		GUID string `json:"guid,omitempty"`
-	}
-
-	var ccDeployment struct {
-		Droplet       *Droplet                `json:"droplet,omitempty"`
-		Revision      *Revision               `json:"revision,omitempty"`
-		Relationships resources.Relationships `json:"relationships,omitempty"`
-	}
-
-	if d.DropletGUID != "" {
-		ccDeployment.Droplet = &Droplet{d.DropletGUID}
-	}
-
-	if d.RevisionGUID != "" {
-		ccDeployment.Revision = &Revision{d.RevisionGUID}
-	}
-
-	ccDeployment.Relationships = d.Relationships
-
-	return json.Marshal(ccDeployment)
-}
-
-// UnmarshalJSON helps unmarshal a Cloud Controller Deployment response.
-func (d *Deployment) UnmarshalJSON(data []byte) error {
-	var ccDeployment struct {
-		GUID          string                   `json:"guid,omitempty"`
-		CreatedAt     string                   `json:"created_at,omitempty"`
-		Relationships resources.Relationships  `json:"relationships,omitempty"`
-		State         constant.DeploymentState `json:"state,omitempty"`
-		Status        struct {
-			Value  constant.DeploymentStatusValue  `json:"value"`
-			Reason constant.DeploymentStatusReason `json:"reason"`
-		} `json:"status"`
-		Droplet      resources.Droplet `json:"droplet,omitempty"`
-		NewProcesses []Process         `json:"new_processes,omitempty"`
-	}
-	err := cloudcontroller.DecodeJSON(data, &ccDeployment)
-	if err != nil {
-		return err
-	}
-
-	d.GUID = ccDeployment.GUID
-	d.CreatedAt = ccDeployment.CreatedAt
-	d.Relationships = ccDeployment.Relationships
-	d.State = ccDeployment.State
-	d.StatusValue = ccDeployment.Status.Value
-	d.StatusReason = ccDeployment.Status.Reason
-	d.DropletGUID = ccDeployment.Droplet.GUID
-	d.NewProcesses = ccDeployment.NewProcesses
-
-	return nil
-}
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
@@ -91,12 +16,12 @@ func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) 
 }
 
 func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID string) (string, Warnings, error) {
-	dep := Deployment{
+	dep := resources.Deployment{
 		DropletGUID:   dropletGUID,
 		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID}},
 	}
 
-	var responseBody Deployment
+	var responseBody resources.Deployment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationDeploymentRequest,
@@ -108,12 +33,12 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 }
 
 func (client *Client) CreateApplicationDeploymentByRevision(appGUID string, revisionGUID string) (string, Warnings, error) {
-	dep := Deployment{
+	dep := resources.Deployment{
 		RevisionGUID:  revisionGUID,
 		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID}},
 	}
 
-	var responseBody Deployment
+	var responseBody resources.Deployment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationDeploymentRequest,
@@ -124,8 +49,8 @@ func (client *Client) CreateApplicationDeploymentByRevision(appGUID string, revi
 	return responseBody.GUID, warnings, err
 }
 
-func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings, error) {
-	var responseBody Deployment
+func (client *Client) GetDeployment(deploymentGUID string) (resources.Deployment, Warnings, error) {
+	var responseBody resources.Deployment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDeploymentRequest,
@@ -136,18 +61,18 @@ func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings
 	return responseBody, warnings, err
 }
 
-func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, error) {
-	var resources []Deployment
+func (client *Client) GetDeployments(query ...Query) ([]resources.Deployment, Warnings, error) {
+	var deployments []resources.Deployment
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetDeploymentsRequest,
 		Query:        query,
-		ResponseBody: Deployment{},
+		ResponseBody: resources.Deployment{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Deployment))
+			deployments = append(deployments, item.(resources.Deployment))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return deployments, warnings, err
 }

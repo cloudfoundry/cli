@@ -210,7 +210,7 @@ var _ = Describe("run-task Command", func() {
 							v7action.Warnings{"get-application-warning-3"},
 							nil)
 						fakeActor.GetProcessByTypeAndApplicationReturns(
-							v7action.Process{
+							resources.Process{
 								GUID: "some-process-guid",
 							},
 							v7action.Warnings{"get-process-warning"},
@@ -257,7 +257,7 @@ var _ = Describe("run-task Command", func() {
 							v7action.Warnings{"get-application-warning-3"},
 							nil)
 						fakeActor.GetProcessByTypeAndApplicationReturns(
-							v7action.Process{
+							resources.Process{
 								GUID: "some-process-guid",
 							},
 							v7action.Warnings{"get-process-warning"},

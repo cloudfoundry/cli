@@ -796,7 +796,7 @@ var _ = Describe("Application Actions", func() {
 		When("getting the application process succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					[]ccv3.Process{
+					[]resources.Process{
 						{GUID: "process1", Type: "web"},
 					},
 					ccv3.Warnings{"get-app-warning-1"},
@@ -819,7 +819,7 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					noWait = true
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{
+						[]resources.Process{
 							{GUID: "process1", Type: "web"},
 							{GUID: "process2", Type: "worker"},
 						},
@@ -966,7 +966,7 @@ var _ = Describe("Application Actions", func() {
 				When("it is because the deployment was cancelled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetDeploymentReturns(
-							ccv3.Deployment{
+							resources.Deployment{
 								StatusValue:  constant.DeploymentStatusValueFinalized,
 								StatusReason: constant.DeploymentStatusReasonCanceled,
 							},
@@ -999,7 +999,7 @@ var _ = Describe("Application Actions", func() {
 				When("it is because the deployment was superseded", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetDeploymentReturns(
-							ccv3.Deployment{
+							resources.Deployment{
 								StatusValue:  constant.DeploymentStatusValueFinalized,
 								StatusReason: constant.DeploymentStatusReasonSuperseded,
 							},
@@ -1032,7 +1032,7 @@ var _ = Describe("Application Actions", func() {
 				When("it is because of an API error", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetDeploymentReturns(
-							ccv3.Deployment{},
+							resources.Deployment{},
 							ccv3.Warnings{"get-deployment-warning"},
 							errors.New("get-deployment-error"),
 						)
@@ -1064,7 +1064,7 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					// get processes requires the deployment to be deployed so we need this to indirectly test the error case
 					fakeCloudControllerClient.GetDeploymentReturns(
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
+						resources.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
 					)
@@ -1074,7 +1074,7 @@ var _ = Describe("Application Actions", func() {
 				When("getting the processes fails", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							[]ccv3.Process{},
+							[]resources.Process{},
 							ccv3.Warnings{"get-processes-warning"},
 							errors.New("get-processes-error"),
 						)
@@ -1104,7 +1104,7 @@ var _ = Describe("Application Actions", func() {
 				When("getting the processes succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							[]ccv3.Process{{GUID: "process-guid"}},
+							[]resources.Process{{GUID: "process-guid"}},
 							ccv3.Warnings{"get-processes-warning"},
 							nil,
 						)
@@ -1156,7 +1156,7 @@ var _ = Describe("Application Actions", func() {
 			When("the deployment never deploys", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDeploymentReturns(
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueActive},
+						resources.Deployment{StatusValue: constant.DeploymentStatusValueActive},
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
 					)
@@ -1182,13 +1182,13 @@ var _ = Describe("Application Actions", func() {
 			When("the processes dont become healthy", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDeploymentReturns(
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
+						resources.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
 					)
 
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{{GUID: "process-guid"}},
+						[]resources.Process{{GUID: "process-guid"}},
 						ccv3.Warnings{"get-processes-warning"},
 						nil,
 					)
@@ -1229,9 +1229,9 @@ var _ = Describe("Application Actions", func() {
 
 					// Always return deploying as a way to check we respect no wait
 					fakeCloudControllerClient.GetDeploymentReturns(
-						ccv3.Deployment{
+						resources.Deployment{
 							StatusValue:  constant.DeploymentStatusValueActive,
-							NewProcesses: []ccv3.Process{{GUID: "new-deployment-process"}},
+							NewProcesses: []resources.Process{{GUID: "new-deployment-process"}},
 						},
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
@@ -1295,21 +1295,21 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
 					fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueActive},
+						resources.Deployment{StatusValue: constant.DeploymentStatusValueActive},
 						ccv3.Warnings{"get-deployment-warning-1"},
 						nil,
 					)
 
 					// Poll the deployment twice to make sure we are polling (one in the above before each)
 					fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
+						resources.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
 						ccv3.Warnings{"get-deployment-warning-2"},
 						nil,
 					)
 
 					// then we get the processes. This should only be called once
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{{GUID: "process-guid"}},
+						[]resources.Process{{GUID: "process-guid"}},
 						ccv3.Warnings{"get-processes-warning"},
 						nil,
 					)
@@ -1444,7 +1444,7 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"some-process-warning"},
 						expectedErr,
 					)
@@ -1459,13 +1459,13 @@ var _ = Describe("Application Actions", func() {
 			When("application process exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{GUID: "some-process-guid"},
+						resources.Process{GUID: "some-process-guid"},
 						ccv3.Warnings{"some-process-warning"},
 						nil,
 					)
 
 					fakeCloudControllerClient.UpdateProcessReturns(
-						ccv3.Process{GUID: "some-process-guid"},
+						resources.Process{GUID: "some-process-guid"},
 						ccv3.Warnings{"some-health-check-warning"},
 						nil,
 					)
@@ -1648,7 +1648,7 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollProcesses", func() {
 		var (
-			processes               []ccv3.Process
+			processes               []resources.Process
 			handleInstanceDetails   func(string)
 			reportedInstanceDetails []string
 
@@ -1663,7 +1663,7 @@ var _ = Describe("Application Actions", func() {
 				reportedInstanceDetails = append(reportedInstanceDetails, instanceDetails)
 			}
 
-			processes = []ccv3.Process{
+			processes = []resources.Process{
 				{GUID: "process-1"},
 				{GUID: "process-2"},
 			}

@@ -1277,18 +1277,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetLatestActiveDeploymentForAppStub        func(string) (v7action.Deployment, v7action.Warnings, error)
+	GetLatestActiveDeploymentForAppStub        func(string) (resources.Deployment, v7action.Warnings, error)
 	getLatestActiveDeploymentForAppMutex       sync.RWMutex
 	getLatestActiveDeploymentForAppArgsForCall []struct {
 		arg1 string
 	}
 	getLatestActiveDeploymentForAppReturns struct {
-		result1 v7action.Deployment
+		result1 resources.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}
 	getLatestActiveDeploymentForAppReturnsOnCall map[int]struct {
-		result1 v7action.Deployment
+		result1 resources.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1482,19 +1482,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetProcessByTypeAndApplicationStub        func(string, string) (v7action.Process, v7action.Warnings, error)
+	GetProcessByTypeAndApplicationStub        func(string, string) (resources.Process, v7action.Warnings, error)
 	getProcessByTypeAndApplicationMutex       sync.RWMutex
 	getProcessByTypeAndApplicationArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getProcessByTypeAndApplicationReturns struct {
-		result1 v7action.Process
+		result1 resources.Process
 		result2 v7action.Warnings
 		result3 error
 	}
 	getProcessByTypeAndApplicationReturnsOnCall map[int]struct {
-		result1 v7action.Process
+		result1 resources.Process
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2399,11 +2399,11 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
+	ScaleProcessByApplicationStub        func(string, resources.Process) (v7action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}
 	scaleProcessByApplicationReturns struct {
 		result1 v7action.Warnings
@@ -2852,12 +2852,12 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateProcessByTypeAndApplicationStub        func(string, string, v7action.Process) (v7action.Warnings, error)
+	UpdateProcessByTypeAndApplicationStub        func(string, string, resources.Process) (v7action.Warnings, error)
 	updateProcessByTypeAndApplicationMutex       sync.RWMutex
 	updateProcessByTypeAndApplicationArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}
 	updateProcessByTypeAndApplicationReturns struct {
 		result1 v7action.Warnings
@@ -8546,7 +8546,7 @@ func (fake *FakeActor) GetIsolationSegmentsByOrganizationReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetLatestActiveDeploymentForApp(arg1 string) (v7action.Deployment, v7action.Warnings, error) {
+func (fake *FakeActor) GetLatestActiveDeploymentForApp(arg1 string) (resources.Deployment, v7action.Warnings, error) {
 	fake.getLatestActiveDeploymentForAppMutex.Lock()
 	ret, specificReturn := fake.getLatestActiveDeploymentForAppReturnsOnCall[len(fake.getLatestActiveDeploymentForAppArgsForCall)]
 	fake.getLatestActiveDeploymentForAppArgsForCall = append(fake.getLatestActiveDeploymentForAppArgsForCall, struct {
@@ -8570,7 +8570,7 @@ func (fake *FakeActor) GetLatestActiveDeploymentForAppCallCount() int {
 	return len(fake.getLatestActiveDeploymentForAppArgsForCall)
 }
 
-func (fake *FakeActor) GetLatestActiveDeploymentForAppCalls(stub func(string) (v7action.Deployment, v7action.Warnings, error)) {
+func (fake *FakeActor) GetLatestActiveDeploymentForAppCalls(stub func(string) (resources.Deployment, v7action.Warnings, error)) {
 	fake.getLatestActiveDeploymentForAppMutex.Lock()
 	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
 	fake.GetLatestActiveDeploymentForAppStub = stub
@@ -8583,30 +8583,30 @@ func (fake *FakeActor) GetLatestActiveDeploymentForAppArgsForCall(i int) string 
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetLatestActiveDeploymentForAppReturns(result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetLatestActiveDeploymentForAppReturns(result1 resources.Deployment, result2 v7action.Warnings, result3 error) {
 	fake.getLatestActiveDeploymentForAppMutex.Lock()
 	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
 	fake.GetLatestActiveDeploymentForAppStub = nil
 	fake.getLatestActiveDeploymentForAppReturns = struct {
-		result1 v7action.Deployment
+		result1 resources.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetLatestActiveDeploymentForAppReturnsOnCall(i int, result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetLatestActiveDeploymentForAppReturnsOnCall(i int, result1 resources.Deployment, result2 v7action.Warnings, result3 error) {
 	fake.getLatestActiveDeploymentForAppMutex.Lock()
 	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
 	fake.GetLatestActiveDeploymentForAppStub = nil
 	if fake.getLatestActiveDeploymentForAppReturnsOnCall == nil {
 		fake.getLatestActiveDeploymentForAppReturnsOnCall = make(map[int]struct {
-			result1 v7action.Deployment
+			result1 resources.Deployment
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getLatestActiveDeploymentForAppReturnsOnCall[i] = struct {
-		result1 v7action.Deployment
+		result1 resources.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9442,7 +9442,7 @@ func (fake *FakeActor) GetOrganizationsReturnsOnCall(i int, result1 []resources.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetProcessByTypeAndApplication(arg1 string, arg2 string) (v7action.Process, v7action.Warnings, error) {
+func (fake *FakeActor) GetProcessByTypeAndApplication(arg1 string, arg2 string) (resources.Process, v7action.Warnings, error) {
 	fake.getProcessByTypeAndApplicationMutex.Lock()
 	ret, specificReturn := fake.getProcessByTypeAndApplicationReturnsOnCall[len(fake.getProcessByTypeAndApplicationArgsForCall)]
 	fake.getProcessByTypeAndApplicationArgsForCall = append(fake.getProcessByTypeAndApplicationArgsForCall, struct {
@@ -9467,7 +9467,7 @@ func (fake *FakeActor) GetProcessByTypeAndApplicationCallCount() int {
 	return len(fake.getProcessByTypeAndApplicationArgsForCall)
 }
 
-func (fake *FakeActor) GetProcessByTypeAndApplicationCalls(stub func(string, string) (v7action.Process, v7action.Warnings, error)) {
+func (fake *FakeActor) GetProcessByTypeAndApplicationCalls(stub func(string, string) (resources.Process, v7action.Warnings, error)) {
 	fake.getProcessByTypeAndApplicationMutex.Lock()
 	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
 	fake.GetProcessByTypeAndApplicationStub = stub
@@ -9480,30 +9480,30 @@ func (fake *FakeActor) GetProcessByTypeAndApplicationArgsForCall(i int) (string,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetProcessByTypeAndApplicationReturns(result1 v7action.Process, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetProcessByTypeAndApplicationReturns(result1 resources.Process, result2 v7action.Warnings, result3 error) {
 	fake.getProcessByTypeAndApplicationMutex.Lock()
 	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
 	fake.GetProcessByTypeAndApplicationStub = nil
 	fake.getProcessByTypeAndApplicationReturns = struct {
-		result1 v7action.Process
+		result1 resources.Process
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetProcessByTypeAndApplicationReturnsOnCall(i int, result1 v7action.Process, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetProcessByTypeAndApplicationReturnsOnCall(i int, result1 resources.Process, result2 v7action.Warnings, result3 error) {
 	fake.getProcessByTypeAndApplicationMutex.Lock()
 	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
 	fake.GetProcessByTypeAndApplicationStub = nil
 	if fake.getProcessByTypeAndApplicationReturnsOnCall == nil {
 		fake.getProcessByTypeAndApplicationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Process
+			result1 resources.Process
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getProcessByTypeAndApplicationReturnsOnCall[i] = struct {
-		result1 v7action.Process
+		result1 resources.Process
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -13373,12 +13373,12 @@ func (fake *FakeActor) RunTaskReturnsOnCall(i int, result1 resources.Task, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) ScaleProcessByApplication(arg1 string, arg2 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeActor) ScaleProcessByApplication(arg1 string, arg2 resources.Process) (v7action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
 	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}{arg1, arg2})
 	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
 	fake.scaleProcessByApplicationMutex.Unlock()
@@ -13398,13 +13398,13 @@ func (fake *FakeActor) ScaleProcessByApplicationCallCount() int {
 	return len(fake.scaleProcessByApplicationArgsForCall)
 }
 
-func (fake *FakeActor) ScaleProcessByApplicationCalls(stub func(string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeActor) ScaleProcessByApplicationCalls(stub func(string, resources.Process) (v7action.Warnings, error)) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	defer fake.scaleProcessByApplicationMutex.Unlock()
 	fake.ScaleProcessByApplicationStub = stub
 }
 
-func (fake *FakeActor) ScaleProcessByApplicationArgsForCall(i int) (string, v7action.Process) {
+func (fake *FakeActor) ScaleProcessByApplicationArgsForCall(i int) (string, resources.Process) {
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	argsForCall := fake.scaleProcessByApplicationArgsForCall[i]
@@ -15384,13 +15384,13 @@ func (fake *FakeActor) UpdateOrganizationQuotaReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeActor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 resources.Process) (v7action.Warnings, error) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	ret, specificReturn := fake.updateProcessByTypeAndApplicationReturnsOnCall[len(fake.updateProcessByTypeAndApplicationArgsForCall)]
 	fake.updateProcessByTypeAndApplicationArgsForCall = append(fake.updateProcessByTypeAndApplicationArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}{arg1, arg2, arg3})
 	fake.recordInvocation("UpdateProcessByTypeAndApplication", []interface{}{arg1, arg2, arg3})
 	fake.updateProcessByTypeAndApplicationMutex.Unlock()
@@ -15410,13 +15410,13 @@ func (fake *FakeActor) UpdateProcessByTypeAndApplicationCallCount() int {
 	return len(fake.updateProcessByTypeAndApplicationArgsForCall)
 }
 
-func (fake *FakeActor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeActor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, resources.Process) (v7action.Warnings, error)) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	defer fake.updateProcessByTypeAndApplicationMutex.Unlock()
 	fake.UpdateProcessByTypeAndApplicationStub = stub
 }
 
-func (fake *FakeActor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, v7action.Process) {
+func (fake *FakeActor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, resources.Process) {
 	fake.updateProcessByTypeAndApplicationMutex.RLock()
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
 	argsForCall := fake.updateProcessByTypeAndApplicationArgsForCall[i]

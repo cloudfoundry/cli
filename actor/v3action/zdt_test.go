@@ -38,7 +38,7 @@ var _ = Describe("v3-zdt-push", func() {
 		BeforeEach(func() {
 			app = resources.Application{GUID: "app-guid"}
 			fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{app}, ccv3.Warnings{"getapp-warning"}, nil)
-			fakeCloudControllerClient.GetDeploymentsReturns([]ccv3.Deployment{{GUID: "deployment-guid"}}, ccv3.Warnings{"getdep-warning"}, nil)
+			fakeCloudControllerClient.GetDeploymentsReturns([]resources.Deployment{{GUID: "deployment-guid"}}, ccv3.Warnings{"getdep-warning"}, nil)
 			fakeCloudControllerClient.CancelDeploymentReturns(ccv3.Warnings{"cancel-warning"}, nil)
 		})
 
@@ -60,7 +60,7 @@ var _ = Describe("v3-zdt-push", func() {
 
 		Context("when no deployments are found", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetDeploymentsReturns([]ccv3.Deployment{}, nil, nil)
+				fakeCloudControllerClient.GetDeploymentsReturns([]resources.Deployment{}, nil, nil)
 			})
 
 			It("errors appropriately", func() {
@@ -129,7 +129,7 @@ var _ = Describe("v3-zdt-push", func() {
 		Context("when there is no error", func() {
 
 			BeforeEach(func() {
-				resultDeployment := ccv3.Deployment{State: constant.DeploymentDeploying}
+				resultDeployment := resources.Deployment{State: constant.DeploymentDeploying}
 				fakeCloudControllerClient.GetDeploymentReturns(resultDeployment, ccv3.Warnings{"create-deployment-warning"}, nil)
 			})
 
@@ -171,14 +171,14 @@ var _ = Describe("v3-zdt-push", func() {
 			BeforeEach(func() {
 				getDeploymentCallCount := 0
 
-				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (ccv3.Deployment, ccv3.Warnings, error) {
+				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (resources.Deployment, ccv3.Warnings, error) {
 					defer func() { getDeploymentCallCount++ }()
 					if getDeploymentCallCount == 0 {
-						return ccv3.Deployment{State: constant.DeploymentDeploying},
+						return resources.Deployment{State: constant.DeploymentDeploying},
 							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
 							nil
 					} else {
-						return ccv3.Deployment{State: constant.DeploymentDeployed},
+						return resources.Deployment{State: constant.DeploymentDeployed},
 							ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", getDeploymentCallCount+2)},
 							nil
 					}
@@ -196,14 +196,14 @@ var _ = Describe("v3-zdt-push", func() {
 			BeforeEach(func() {
 				getDeploymentCallCount := 0
 
-				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (ccv3.Deployment, ccv3.Warnings, error) {
+				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (resources.Deployment, ccv3.Warnings, error) {
 					defer func() { getDeploymentCallCount++ }()
 					if getDeploymentCallCount == 0 {
-						return ccv3.Deployment{State: constant.DeploymentDeploying},
+						return resources.Deployment{State: constant.DeploymentDeploying},
 							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
 							nil
 					} else {
-						return ccv3.Deployment{State: constant.DeploymentCanceled},
+						return resources.Deployment{State: constant.DeploymentCanceled},
 							ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", getDeploymentCallCount+2)},
 							nil
 					}
@@ -222,7 +222,7 @@ var _ = Describe("v3-zdt-push", func() {
 			BeforeEach(func() {
 				fakeConfig.StartupTimeoutReturns(time.Millisecond)
 				fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
-				fakeCloudControllerClient.GetDeploymentReturns(ccv3.Deployment{State: constant.DeploymentDeploying}, ccv3.Warnings{"some-deployment-warning"}, nil)
+				fakeCloudControllerClient.GetDeploymentReturns(resources.Deployment{State: constant.DeploymentDeploying}, ccv3.Warnings{"some-deployment-warning"}, nil)
 			})
 
 			It("Throws a timeout error", func() {
@@ -269,12 +269,12 @@ var _ = Describe("v3-zdt-push", func() {
 		})
 
 		Context("when getting the application processes succeeds", func() {
-			var processes []ccv3.Process
+			var processes []resources.Process
 
 			BeforeEach(func() {
 				fakeConfig.StartupTimeoutReturns(time.Second)
 				fakeConfig.PollingIntervalReturns(0)
-				processes = []ccv3.Process{
+				processes = []resources.Process{
 					{GUID: "web-guid", Type: "web"},
 					{GUID: "web-ish-guid", Type: "web-deployment-efg456"},
 				}
@@ -427,7 +427,7 @@ var _ = Describe("v3-zdt-push", func() {
 					BeforeEach(func() {
 						fakeConfig.StartupTimeoutReturns(time.Second)
 						fakeConfig.PollingIntervalReturns(0)
-						processes = []ccv3.Process{
+						processes = []resources.Process{
 							{GUID: "web-guid", Type: "web"},
 							{GUID: "worker-guid", Type: "worker"},
 						}

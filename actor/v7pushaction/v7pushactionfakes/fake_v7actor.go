@@ -339,11 +339,11 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
+	ScaleProcessByApplicationStub        func(string, resources.Process) (v7action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}
 	scaleProcessByApplicationReturns struct {
 		result1 v7action.Warnings
@@ -452,12 +452,12 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	UpdateProcessByTypeAndApplicationStub        func(string, string, v7action.Process) (v7action.Warnings, error)
+	UpdateProcessByTypeAndApplicationStub        func(string, string, resources.Process) (v7action.Warnings, error)
 	updateProcessByTypeAndApplicationMutex       sync.RWMutex
 	updateProcessByTypeAndApplicationArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}
 	updateProcessByTypeAndApplicationReturns struct {
 		result1 v7action.Warnings
@@ -1908,12 +1908,12 @@ func (fake *FakeV7Actor) RestartApplicationReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 resources.Process) (v7action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
 	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}{arg1, arg2})
 	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
 	fake.scaleProcessByApplicationMutex.Unlock()
@@ -1933,13 +1933,13 @@ func (fake *FakeV7Actor) ScaleProcessByApplicationCallCount() int {
 	return len(fake.scaleProcessByApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplicationCalls(stub func(string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) ScaleProcessByApplicationCalls(stub func(string, resources.Process) (v7action.Warnings, error)) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	defer fake.scaleProcessByApplicationMutex.Unlock()
 	fake.ScaleProcessByApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplicationArgsForCall(i int) (string, v7action.Process) {
+func (fake *FakeV7Actor) ScaleProcessByApplicationArgsForCall(i int) (string, resources.Process) {
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	argsForCall := fake.scaleProcessByApplicationArgsForCall[i]
@@ -2433,13 +2433,13 @@ func (fake *FakeV7Actor) UpdateApplicationReturnsOnCall(i int, result1 resources
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 resources.Process) (v7action.Warnings, error) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	ret, specificReturn := fake.updateProcessByTypeAndApplicationReturnsOnCall[len(fake.updateProcessByTypeAndApplicationArgsForCall)]
 	fake.updateProcessByTypeAndApplicationArgsForCall = append(fake.updateProcessByTypeAndApplicationArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}{arg1, arg2, arg3})
 	fake.recordInvocation("UpdateProcessByTypeAndApplication", []interface{}{arg1, arg2, arg3})
 	fake.updateProcessByTypeAndApplicationMutex.Unlock()
@@ -2459,13 +2459,13 @@ func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCallCount() int {
 	return len(fake.updateProcessByTypeAndApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, resources.Process) (v7action.Warnings, error)) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	defer fake.updateProcessByTypeAndApplicationMutex.Unlock()
 	fake.UpdateProcessByTypeAndApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, v7action.Process) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, resources.Process) {
 	fake.updateProcessByTypeAndApplicationMutex.RLock()
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
 	argsForCall := fake.updateProcessByTypeAndApplicationArgsForCall[i]

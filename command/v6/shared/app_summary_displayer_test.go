@@ -12,6 +12,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v6/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -68,7 +69,7 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -86,7 +87,7 @@ var _ = Describe("app summary displayer", func() {
 								},
 							},
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},

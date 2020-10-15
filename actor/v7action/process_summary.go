@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
 
 // ProcessSummary represents a process with instance details.
 type ProcessSummary struct {
-	Process
+	resources.Process
 
 	Sidecars []Sidecar
 
@@ -85,7 +86,7 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 
 	var processSummaries ProcessSummaries
 	for _, ccv3Process := range ccv3Processes {
-		process := Process(ccv3Process)
+		process := resources.Process(ccv3Process)
 		if withObfuscatedValues {
 			fullProcess, warnings, err := actor.GetProcess(ccv3Process.GUID)
 			allWarnings = append(allWarnings, warnings...)
@@ -108,7 +109,7 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 	return processSummaries, allWarnings, nil
 }
 
-func (actor Actor) getProcessSummary(process Process) (ProcessSummary, Warnings, error) {
+func (actor Actor) getProcessSummary(process resources.Process) (ProcessSummary, Warnings, error) {
 	sidecars, warnings, err := actor.CloudControllerClient.GetProcessSidecars(process.GUID)
 	allWarnings := Warnings(warnings)
 	if err != nil {

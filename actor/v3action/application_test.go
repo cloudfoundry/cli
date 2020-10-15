@@ -499,7 +499,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		When("getting the application processes succeeds", func() {
-			var processes []ccv3.Process
+			var processes []resources.Process
 
 			BeforeEach(func() {
 				fakeConfig.StartupTimeoutReturns(time.Second)
@@ -514,7 +514,7 @@ var _ = Describe("Application Actions", func() {
 
 			When("there is a single process", func() {
 				BeforeEach(func() {
-					processes = []ccv3.Process{{GUID: "abc123"}}
+					processes = []resources.Process{{GUID: "abc123"}}
 				})
 
 				When("the polling times out", func() {
@@ -702,7 +702,7 @@ var _ = Describe("Application Actions", func() {
 
 				When("none of the processes are ready", func() {
 					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "bad-2"}}
+						processes = []resources.Process{{GUID: "bad-1"}, {GUID: "bad-2"}}
 					})
 
 					It("returns the timeout error", func() {
@@ -713,7 +713,7 @@ var _ = Describe("Application Actions", func() {
 
 				When("some of the processes are ready", func() {
 					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "good-1"}}
+						processes = []resources.Process{{GUID: "bad-1"}, {GUID: "good-1"}}
 					})
 
 					It("returns the timeout error", func() {
@@ -723,7 +723,7 @@ var _ = Describe("Application Actions", func() {
 
 				When("all of the processes are ready", func() {
 					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "good-1"}, {GUID: "good-2"}}
+						processes = []resources.Process{{GUID: "good-1"}, {GUID: "good-2"}}
 					})
 
 					It("returns nil", func() {

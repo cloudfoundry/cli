@@ -70,7 +70,7 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 		}
 
 		processSummary := ProcessSummary{
-			Process:         Process(process),
+			Process:         resources.Process(process),
 			InstanceDetails: instanceDetails,
 		}
 

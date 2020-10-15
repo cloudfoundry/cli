@@ -100,7 +100,7 @@ var _ = Describe("Application Summary Actions", func() {
 					nil,
 				)
 
-				listedProcesses := []ccv3.Process{
+				listedProcesses := []resources.Process{
 					{
 						GUID:       "some-process-guid",
 						Type:       "some-type",
@@ -195,7 +195,7 @@ var _ = Describe("Application Summary Actions", func() {
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
-								Process: Process{
+								Process: resources.Process{
 									GUID:       "some-process-web-guid",
 									Type:       "web",
 									Command:    *types.NewFilteredString("[Redacted Value]"),
@@ -215,7 +215,7 @@ var _ = Describe("Application Summary Actions", func() {
 								},
 							},
 							{
-								Process: Process{
+								Process: resources.Process{
 									GUID:       "some-process-guid",
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									Type:       "some-type",
@@ -362,7 +362,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			When("getting the process information is successful", func() {
 				BeforeEach(func() {
-					listedProcesses := []ccv3.Process{
+					listedProcesses := []resources.Process{
 						{
 							GUID:       "some-process-guid",
 							Type:       "some-type",
@@ -467,7 +467,7 @@ var _ = Describe("Application Summary Actions", func() {
 									},
 									ProcessSummaries: []ProcessSummary{
 										{
-											Process: Process{
+											Process: resources.Process{
 												GUID:       "some-process-web-guid",
 												Type:       "web",
 												Command:    *types.NewFilteredString("[Redacted Value]"),
@@ -493,7 +493,7 @@ var _ = Describe("Application Summary Actions", func() {
 											},
 										},
 										{
-											Process: Process{
+											Process: resources.Process{
 												GUID:       "some-process-guid",
 												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 												Type:       "some-type",
@@ -611,7 +611,7 @@ var _ = Describe("Application Summary Actions", func() {
 								},
 								ProcessSummaries: []ProcessSummary{
 									{
-										Process: Process{
+										Process: resources.Process{
 											GUID:       "some-process-web-guid",
 											Type:       "web",
 											Command:    *types.NewFilteredString("[Redacted Value]"),
@@ -637,7 +637,7 @@ var _ = Describe("Application Summary Actions", func() {
 										},
 									},
 									{
-										Process: Process{
+										Process: resources.Process{
 											GUID:       "some-process-guid",
 											MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 											Type:       "some-type",
@@ -714,7 +714,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{
+						[]resources.Process{
 							{
 								GUID: "some-process-guid",
 								Type: "some-type",
@@ -725,7 +725,7 @@ var _ = Describe("Application Summary Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetProcessReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"get-process-warning"},
 						nil,
 					)
