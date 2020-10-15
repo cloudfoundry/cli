@@ -4,9 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-type Deployment ccv3.Deployment
 
 func (actor Actor) CreateDeploymentByApplicationAndDroplet(appGUID string, dropletGUID string) (string, Warnings, error) {
 	deploymentGUID, warnings, err := actor.CloudControllerClient.CreateApplicationDeployment(appGUID, dropletGUID)
@@ -20,7 +19,7 @@ func (actor Actor) CreateDeploymentByApplicationAndRevision(appGUID string, revi
 	return deploymentGUID, Warnings(warnings), err
 }
 
-func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (Deployment, Warnings, error) {
+func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (resources.Deployment, Warnings, error) {
 	ccDeployments, warnings, err := actor.CloudControllerClient.GetDeployments(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
 		ccv3.Query{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueActive)}},
@@ -29,14 +28,14 @@ func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (Deployment, 
 	)
 
 	if err != nil {
-		return Deployment{}, Warnings(warnings), err
+		return resources.Deployment{}, Warnings(warnings), err
 	}
 
 	if len(ccDeployments) == 0 {
-		return Deployment{}, Warnings(warnings), actionerror.ActiveDeploymentNotFoundError{}
+		return resources.Deployment{}, Warnings(warnings), actionerror.ActiveDeploymentNotFoundError{}
 	}
 
-	return Deployment(ccDeployments[0]), Warnings(warnings), nil
+	return resources.Deployment(ccDeployments[0]), Warnings(warnings), nil
 }
 
 func (actor Actor) CancelDeployment(deploymentGUID string) (Warnings, error) {

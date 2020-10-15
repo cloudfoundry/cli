@@ -118,7 +118,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{},
+						[]resources.Process{},
 						ccv3.Warnings{"some-process-warning"},
 						expectedErr,
 					)
@@ -133,7 +133,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			When("application has processes", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{
+						[]resources.Process{
 							{
 								GUID:                         "process-guid-1",
 								Type:                         "process-type-1",

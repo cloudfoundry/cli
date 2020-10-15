@@ -3,6 +3,7 @@ package v7action_test
 import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -40,7 +41,7 @@ var _ = Describe("Process Actions", func() {
 		BeforeEach(func() {
 			summaries = ProcessSummaries{
 				{
-					Process: Process{
+					Process: resources.Process{
 						Type: "worker",
 					},
 					InstanceDetails: []ProcessInstance{
@@ -49,7 +50,7 @@ var _ = Describe("Process Actions", func() {
 					},
 				},
 				{
-					Process: Process{
+					Process: resources.Process{
 						Type: "console",
 					},
 					InstanceDetails: []ProcessInstance{
@@ -57,7 +58,7 @@ var _ = Describe("Process Actions", func() {
 					},
 				},
 				{
-					Process: Process{
+					Process: resources.Process{
 						Type: constant.ProcessTypeWeb,
 					},
 					Sidecars: []Sidecar{

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -86,8 +87,8 @@ var _ = Describe("Application Summary Actions", func() {
 							GUID: "some-app-guid",
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
-							{Process: v3action.Process{Type: "console"}},
-							{Process: v3action.Process{Type: constant.ProcessTypeWeb}},
+							{Process: resources.Process{Type: "console"}},
+							{Process: resources.Process{Type: constant.ProcessTypeWeb}},
 						},
 					}
 					fakeV3Actor.GetApplicationSummaryByNameAndSpaceReturns(v3Summary, v3action.Warnings{"v3-summary-warning"}, nil)
@@ -101,8 +102,8 @@ var _ = Describe("Application Summary Actions", func() {
 							GUID: "some-app-guid",
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
-							{Process: v3action.Process{Type: constant.ProcessTypeWeb}},
-							{Process: v3action.Process{Type: "console"}},
+							{Process: resources.Process{Type: constant.ProcessTypeWeb}},
+							{Process: resources.Process{Type: "console"}},
 						},
 					}))
 

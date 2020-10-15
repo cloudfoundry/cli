@@ -202,7 +202,7 @@ func (Actor) convertCCToActorApplication(app resources.Application) Application 
 	}
 }
 
-func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
+func (actor Actor) processStatus(process resources.Process, warningsChannel chan<- Warnings) (bool, error) {
 	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
 	warningsChannel <- Warnings(warnings)
 	if err != nil {

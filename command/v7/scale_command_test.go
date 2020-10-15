@@ -153,7 +153,7 @@ var _ = Describe("scale Command", func() {
 					ApplicationSummary: v7action.ApplicationSummary{
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -189,7 +189,7 @@ var _ = Describe("scale Command", func() {
 								},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -439,7 +439,7 @@ var _ = Describe("scale Command", func() {
 								Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 								appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 								Expect(appGUIDArg).To(Equal("some-app-guid"))
-								Expect(scaleProcess).To(Equal(v7action.Process{
+								Expect(scaleProcess).To(Equal(resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									Instances:  types.NullInt{Value: 2, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
@@ -576,7 +576,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v7action.Process{
+					Expect(scaleProcess).To(Equal(resources.Process{
 						Type:      constant.ProcessTypeWeb,
 						Instances: types.NullInt{Value: 3, IsSet: true},
 					}))
@@ -645,7 +645,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v7action.Process{
+					Expect(scaleProcess).To(Equal(resources.Process{
 						Type:       constant.ProcessTypeWeb,
 						MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
 					}))
@@ -697,7 +697,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v7action.Process{
+					Expect(scaleProcess).To(Equal(resources.Process{
 						Type:     constant.ProcessTypeWeb,
 						DiskInMB: types.NullUint64{Value: 1025, IsSet: true},
 					}))
@@ -745,7 +745,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v7action.Process{
+					Expect(scaleProcess).To(Equal(resources.Process{
 						Type:      "some-process-type",
 						Instances: types.NullInt{Value: 2, IsSet: true},
 					}))

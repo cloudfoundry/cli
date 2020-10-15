@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -13,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Task", func() {
+var _ = Describe("Deployment", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -22,7 +23,7 @@ var _ = Describe("Task", func() {
 
 	Describe("GetDeployments", func() {
 		var (
-			deployments []Deployment
+			deployments []resources.Deployment
 			warnings    Warnings
 			executeErr  error
 		)
@@ -82,8 +83,8 @@ var _ = Describe("Task", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning"))
 				Expect(deployments).To(ConsistOf(
-					Deployment{GUID: "newest-deployment-guid", CreatedAt: "2018-05-25T22:42:10Z"},
-					Deployment{GUID: "oldest-deployment-guid", CreatedAt: "2018-04-25T22:42:10Z"},
+					resources.Deployment{GUID: "newest-deployment-guid", CreatedAt: "2018-05-25T22:42:10Z"},
+					resources.Deployment{GUID: "oldest-deployment-guid", CreatedAt: "2018-04-25T22:42:10Z"},
 				))
 			})
 

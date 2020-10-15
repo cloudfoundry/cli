@@ -64,14 +64,14 @@ var _ = Describe("Application Summary Actions", func() {
 
 			When("retrieving the process information is successful", func() {
 				BeforeEach(func() {
-					listedProcess := ccv3.Process{
+					listedProcess := resources.Process{
 						GUID:       "some-process-guid",
 						Type:       "some-type",
 						Command:    *types.NewFilteredString("[Redacted Value]"),
 						MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 					}
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{listedProcess},
+						[]resources.Process{listedProcess},
 						ccv3.Warnings{"some-process-warning"},
 						nil,
 					)
@@ -138,7 +138,7 @@ var _ = Describe("Application Summary Actions", func() {
 							},
 							ProcessSummaries: []ProcessSummary{
 								{
-									Process: Process{
+									Process: resources.Process{
 										GUID:       "some-process-guid",
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										Type:       "some-type",
@@ -220,7 +220,7 @@ var _ = Describe("Application Summary Actions", func() {
 							},
 							ProcessSummaries: []ProcessSummary{
 								{
-									Process: Process{
+									Process: resources.Process{
 										GUID:       "some-process-guid",
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										Type:       "some-type",
@@ -271,7 +271,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{
+						[]resources.Process{
 							{
 								GUID: "some-process-guid",
 								Type: "some-type",
@@ -282,7 +282,7 @@ var _ = Describe("Application Summary Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"get-process-by-type-warning"},
 						nil,
 					)
@@ -320,7 +320,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					[]ccv3.Process{{Type: constant.ProcessTypeWeb}},
+					[]resources.Process{{Type: constant.ProcessTypeWeb}},
 					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)

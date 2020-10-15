@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 func (actor Actor) CancelDeploymentByAppNameAndSpace(appName string, spaceGUID string) (Warnings, error) {
@@ -114,7 +115,7 @@ func (actor Actor) ZeroDowntimePollStart(appGUID string, warningsChannel chan<- 
 	return actionerror.StartupTimeoutError{}
 }
 
-func getDeployingProcess(processes []ccv3.Process) *ccv3.Process {
+func getDeployingProcess(processes []resources.Process) *resources.Process {
 	deployingMatcher, _ := regexp.Compile("web-deployment-.*")
 	for _, process := range processes {
 		if deployingMatcher.MatchString(process.Type) {

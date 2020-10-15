@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,7 +31,7 @@ var _ = Describe("Process Actions", func() {
 		var (
 			processGUID string
 
-			process  Process
+			process  resources.Process
 			warnings Warnings
 			err      error
 		)
@@ -46,7 +47,7 @@ var _ = Describe("Process Actions", func() {
 		When("getting the process is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetProcessReturns(
-					ccv3.Process{
+					resources.Process{
 						GUID: "some-process-guid",
 					},
 					ccv3.Warnings{"some-process-warning"},
@@ -57,7 +58,7 @@ var _ = Describe("Process Actions", func() {
 			It("returns the process and warnings", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-process-warning"))
-				Expect(process).To(Equal(Process{
+				Expect(process).To(Equal(resources.Process{
 					GUID: "some-process-guid",
 				}))
 
@@ -73,7 +74,7 @@ var _ = Describe("Process Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetProcessReturns(
-					ccv3.Process{},
+					resources.Process{},
 					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)
@@ -91,7 +92,7 @@ var _ = Describe("Process Actions", func() {
 			processType string
 			appGUID     string
 
-			process  Process
+			process  resources.Process
 			warnings Warnings
 			err      error
 		)
@@ -108,7 +109,7 @@ var _ = Describe("Process Actions", func() {
 		When("getting the application process is succesful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-					ccv3.Process{
+					resources.Process{
 						GUID: "some-process-guid",
 					},
 					ccv3.Warnings{"some-process-warning"},
@@ -119,7 +120,7 @@ var _ = Describe("Process Actions", func() {
 			It("returns the process and warnings", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-process-warning"))
-				Expect(process).To(Equal(Process{
+				Expect(process).To(Equal(resources.Process{
 					GUID: "some-process-guid",
 				}))
 
@@ -136,7 +137,7 @@ var _ = Describe("Process Actions", func() {
 			When("the api returns a ProcessNotFoundError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"some-process-warning"},
 						ccerror.ProcessNotFoundError{},
 					)
@@ -152,7 +153,7 @@ var _ = Describe("Process Actions", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"some-process-warning"},
 						expectedErr,
 					)
@@ -168,13 +169,13 @@ var _ = Describe("Process Actions", func() {
 
 	Describe("ScaleProcessByApplication", func() {
 		var (
-			passedProcess Process
+			passedProcess resources.Process
 			warnings      Warnings
 			executeErr    error
 		)
 
 		BeforeEach(func() {
-			passedProcess = Process{
+			passedProcess = resources.Process{
 				Type:       constant.ProcessTypeWeb,
 				Instances:  types.NullInt{Value: 2, IsSet: true},
 				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
@@ -189,7 +190,7 @@ var _ = Describe("Process Actions", func() {
 		When("no errors are encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{GUID: "some-process-guid"},
+					resources.Process{GUID: "some-process-guid"},
 					ccv3.Warnings{"scale-process-warning"},
 					nil)
 			})
@@ -201,7 +202,7 @@ var _ = Describe("Process Actions", func() {
 				Expect(fakeCloudControllerClient.CreateApplicationProcessScaleCallCount()).To(Equal(1))
 				appGUIDArg, processArg := fakeCloudControllerClient.CreateApplicationProcessScaleArgsForCall(0)
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
-				Expect(processArg).To(Equal(ccv3.Process{
+				Expect(processArg).To(Equal(resources.Process{
 					Type:       constant.ProcessTypeWeb,
 					Instances:  passedProcess.Instances,
 					MemoryInMB: passedProcess.MemoryInMB,
@@ -216,7 +217,7 @@ var _ = Describe("Process Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("scale process error")
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{GUID: "some-process-guid"},
+					resources.Process{GUID: "some-process-guid"},
 					ccv3.Warnings{"scale-process-warning"},
 					expectedErr)
 			})
@@ -230,7 +231,7 @@ var _ = Describe("Process Actions", func() {
 		When("a ProcessNotFoundError error is encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{GUID: "some-process-guid"},
+					resources.Process{GUID: "some-process-guid"},
 					ccv3.Warnings{"scale-process-warning"},
 					ccerror.ProcessNotFoundError{},
 				)
@@ -247,7 +248,7 @@ var _ = Describe("Process Actions", func() {
 		var (
 			processType  string
 			appGUID      string
-			inputProcess Process
+			inputProcess resources.Process
 
 			warnings Warnings
 			err      error
@@ -256,7 +257,7 @@ var _ = Describe("Process Actions", func() {
 		BeforeEach(func() {
 			processType = "web"
 			appGUID = "some-app-guid"
-			inputProcess = Process{}
+			inputProcess = resources.Process{}
 		})
 
 		JustBeforeEach(func() {
@@ -281,7 +282,7 @@ var _ = Describe("Process Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-					ccv3.Process{},
+					resources.Process{},
 					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)
@@ -296,7 +297,7 @@ var _ = Describe("Process Actions", func() {
 		When("application process exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-					ccv3.Process{
+					resources.Process{
 						GUID: "some-process-guid",
 					},
 					ccv3.Warnings{"some-process-warning"},
@@ -313,7 +314,7 @@ var _ = Describe("Process Actions", func() {
 
 					expectedErr = errors.New("some-error")
 					fakeCloudControllerClient.UpdateProcessReturns(
-						ccv3.Process{},
+						resources.Process{},
 						ccv3.Warnings{"some-health-check-warning"},
 						expectedErr,
 					)
@@ -328,7 +329,7 @@ var _ = Describe("Process Actions", func() {
 			When("update the process is successful", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateProcessReturns(
-						ccv3.Process{GUID: "some-process-guid"},
+						resources.Process{GUID: "some-process-guid"},
 						ccv3.Warnings{"some-health-check-warning"},
 						nil,
 					)

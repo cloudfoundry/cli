@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -52,7 +53,7 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v3action.ProcessSummaries{
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -90,7 +91,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:       "console",
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -165,7 +166,7 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v3action.ProcessSummaries{
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -183,7 +184,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:       "console",
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -208,7 +209,7 @@ var _ = Describe("app summary displayer", func() {
 						ApplicationSummary: v3action.ApplicationSummary{
 							ProcessSummaries: []v3action.ProcessSummary{
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									},
@@ -235,19 +236,19 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v3action.ProcessSummaries{
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:    constant.ProcessTypeWeb,
 										Command: *types.NewFilteredString("some-command-1"),
 									},
 								},
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type:    "console",
 										Command: *types.NewFilteredString("some-command-2"),
 									},
 								},
 								{
-									Process: v3action.Process{
+									Process: resources.Process{
 										Type: "random",
 									},
 								},
@@ -295,14 +296,14 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
 							},
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -340,12 +341,12 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
 							},
 							{
-								Process: v3action.Process{
+								Process: resources.Process{
 									Type: "console",
 								},
 							},

@@ -53,7 +53,7 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -92,7 +92,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       "console",
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -163,7 +163,7 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -182,7 +182,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       "console",
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -213,7 +213,7 @@ var _ = Describe("app summary displayer", func() {
 						ApplicationSummary: v7action.ApplicationSummary{
 							ProcessSummaries: []v7action.ProcessSummary{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									},
@@ -241,21 +241,21 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:    constant.ProcessTypeWeb,
 										Command: *types.NewFilteredString("some-command-1"),
 									},
 									Sidecars: []v7action.Sidecar{},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:    "console",
 										Command: *types.NewFilteredString("some-command-2"),
 									},
 									Sidecars: []v7action.Sidecar{},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type: "random",
 									},
 									Sidecars: []v7action.Sidecar{},
@@ -307,7 +307,7 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -315,7 +315,7 @@ var _ = Describe("app summary displayer", func() {
 								Sidecars: []v7action.Sidecar{},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
@@ -356,7 +356,7 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
@@ -394,13 +394,13 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
 								Sidecars: []v7action.Sidecar{},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: "console",
 								},
 								Sidecars: []v7action.Sidecar{},

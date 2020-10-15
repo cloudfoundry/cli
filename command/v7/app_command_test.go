@@ -189,13 +189,13 @@ var _ = Describe("app Command", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:    constant.ProcessTypeWeb,
 									Command: *types.NewFilteredString("some-command-1"),
 								},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:    "console",
 									Command: *types.NewFilteredString("some-command-2"),
 								},

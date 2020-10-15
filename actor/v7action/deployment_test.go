@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -86,7 +87,7 @@ var _ = Describe("Deployment Actions", func() {
 		var (
 			executeErr error
 			warnings   Warnings
-			deployment Deployment
+			deployment resources.Deployment
 
 			appGUID string
 		)
@@ -114,7 +115,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("the cc client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{},
+					[]resources.Deployment{},
 					ccv3.Warnings{"get-deployments-warning"},
 					errors.New("get-deployments-error"),
 				)
@@ -129,7 +130,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("there are no deployments returned", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{},
+					[]resources.Deployment{},
 					ccv3.Warnings{"get-deployments-warning"},
 					nil,
 				)
@@ -145,7 +146,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("everything succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{{GUID: "dep-guid"}},
+					[]resources.Deployment{{GUID: "dep-guid"}},
 					ccv3.Warnings{"get-deployments-warning"},
 					nil,
 				)
@@ -154,7 +155,7 @@ var _ = Describe("Deployment Actions", func() {
 			It("returns a deployment not found error and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-deployments-warning"))
-				Expect(deployment).To(Equal(Deployment{GUID: "dep-guid"}))
+				Expect(deployment).To(Equal(resources.Deployment{GUID: "dep-guid"}))
 			})
 
 		})

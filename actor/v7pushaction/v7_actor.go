@@ -32,7 +32,7 @@ type V7Actor interface {
 	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
-	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
+	ScaleProcessByApplication(appGUID string, process resources.Process) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	SetApplicationManifest(appGUID string, rawManifest []byte) (v7action.Warnings, error)
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
@@ -40,7 +40,7 @@ type V7Actor interface {
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, v7action.Warnings, error)
-	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess v7action.Process) (v7action.Warnings, error)
+	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess resources.Process) (v7action.Warnings, error)
 	UploadBitsPackage(pkg v7action.Package, matchedResources []sharedaction.V3Resource, newResources io.Reader, newResourcesLength int64) (v7action.Package, v7action.Warnings, error)
 	UploadDroplet(dropletGUID string, dropletPath string, progressReader io.Reader, fileSize int64) (v7action.Warnings, error)
 }
