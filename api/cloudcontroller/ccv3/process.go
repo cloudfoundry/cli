@@ -178,7 +178,7 @@ func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) 
 func (client Client) GetProcesses(query ...Query) ([]Process, Warnings, error) {
 	var resources []Process
 
-	_, warnings, err := client.MakeListRequest(RequestParams{
+	_, warnings, err := client.MakeListRequestWithPaginatedQuery(RequestParams{
 		RequestName:  internal.GetProcessesRequest,
 		Query:        query,
 		ResponseBody: Process{},

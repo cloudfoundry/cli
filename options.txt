@@ -1,0 +1,32 @@
+Options
+1. Attempt to paginate through the app_guids in the query.
+First make the call with the first 50 app_guids. Then query capi with guids 61-100, etc.
+Note that we already paginate, so this is double pagination. The first query with 50 app guids may return multiple pages.
+
+Downsides: This will potentially change the sorting order that results are returned in.
+We'd either have to re-sort things client-side or accept that results in a list are out of order.
+Technically complex
+See spike
+ Sorting issues
+ What if > one query param has too many values?
+ Should we make this apply to all list requests or allow-list specific ones?
+
+2. Find processes and routes by space_guid instead of by app_guids.
+Since there is only one space_guid, then this avoids the long URL.
+
+Pro: very simple solution
+Con: If user filters by a label, we inefficiently fetch all the processes and routes in the space, rather than only the processes/routes that belong to apps with that label.
+Con: unfortunately there is no analog for our network policies github issue, so it will be inconsistent.
+
+3. Filter by either app_guids array or space_guid depending on the number of app_guids returned.
+Only fall back to filtering by space_guid if there is > 100 app_guids.
+
+Pro: somewhat simple
+Con: branching logic ; filtering in 2 different ways
+
+-----------------
+Network Policies
+1. Paginate. Note that this does not use the pagination from the first story because it's not a capi endpoint.
+Docs here: https://github.com/cloudfoundry/cf-networking-release/blob/develop/docs/policy-server-external-api.md
+
+2. Look for network policies in a space (not supported). :(

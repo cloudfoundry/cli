@@ -109,8 +109,9 @@ const (
 // Query is additional settings that can be passed to some requests that can
 // filter, sort, etc. the results.
 type Query struct {
-	Key    QueryKey
-	Values []string
+	Key        QueryKey
+	Values     []string
+	Splittable bool
 }
 
 // FormatQueryParameters converts a Query object into a collection that

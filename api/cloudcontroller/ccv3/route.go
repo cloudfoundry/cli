@@ -69,7 +69,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]resources.RouteDe
 func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, error) {
 	var routes []resources.Route
 
-	_, warnings, err := client.MakeListRequest(RequestParams{
+	_, warnings, err := client.MakeListRequestWithPaginatedQuery(RequestParams{
 		RequestName:  internal.GetRoutesRequest,
 		Query:        query,
 		ResponseBody: resources.Route{},

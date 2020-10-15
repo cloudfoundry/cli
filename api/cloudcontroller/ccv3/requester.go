@@ -13,6 +13,8 @@ import (
 
 //go:generate counterfeiter . Requester
 
+const MAX_QUERY_LENGTH = 100
+
 type RequestParams struct {
 	RequestName    string
 	URIParams      internal.Params
@@ -30,6 +32,7 @@ type Requester interface {
 	InitializeRouter(resources map[string]string)
 
 	MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error)
+	MakeListRequestWithPaginatedQuery(requestParams RequestParams) (IncludedResources, Warnings, error)
 
 	MakeRequest(requestParams RequestParams) (JobURL, Warnings, error)
 
@@ -89,6 +92,56 @@ func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (In
 	}
 
 	return requester.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
+}
+
+// note: this only paginates one query param
+func queryParamToPaginate(requestParams RequestParams) (bool, int, []string) {
+	for i, query := range requestParams.Query {
+		if len(query.Values) > MAX_QUERY_LENGTH {
+			return true, i, query.Values
+		}
+	}
+	return false, 0, nil
+}
+
+func appendIncludedResources(includes IncludedResources, results IncludedResources) IncludedResources {
+	includes.Users = append(includes.Users, results.Users...)
+	includes.Organizations = append(includes.Organizations, results.Organizations...)
+	includes.Spaces = append(includes.Spaces, results.Spaces...)
+	includes.ServiceOfferings = append(includes.ServiceOfferings, results.ServiceOfferings...)
+	includes.ServiceBrokers = append(includes.ServiceBrokers, results.ServiceBrokers...)
+	return includes
+}
+
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func (requester *RealRequester) MakeListRequestWithPaginatedQuery(requestParams RequestParams) (IncludedResources, Warnings, error) {
+	var includes, warnings, batch = IncludedResources{}, Warnings{}, []string{}
+	paginateQueryParams, idxToPaginate, queryParamVals := queryParamToPaginate(requestParams)
+	if !paginateQueryParams {
+		return requester.MakeListRequest(requestParams)
+	}
+
+	for len(queryParamVals) > 0 {
+		nextBatchIdx := min(len(queryParamVals), MAX_QUERY_LENGTH)
+		batch, queryParamVals = queryParamVals[:nextBatchIdx-1], queryParamVals[nextBatchIdx:]
+
+		requestParams.Query[idxToPaginate].Values = batch
+		results, listWarnings, err := requester.MakeListRequest(requestParams)
+		if err != nil {
+			return IncludedResources{}, nil, err
+		}
+		if warnings != nil {
+			warnings = append(warnings, listWarnings...)
+		}
+		appendIncludedResources(includes, results)
+	}
+	return includes, warnings, nil
 }
 
 func (requester *RealRequester) MakeRequest(requestParams RequestParams) (JobURL, Warnings, error) {
