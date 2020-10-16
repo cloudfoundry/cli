@@ -24,7 +24,7 @@ var _ = Describe("Route Binding Action", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
-	Describe("GetServiceKeysByServiceInstance", func() {
+	Describe("CreateRouteBinding", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
 			serviceInstanceGUID = "fake-service-instance-guid"
@@ -294,6 +294,25 @@ var _ = Describe("Route Binding Action", func() {
 					ServiceInstanceGUID: serviceInstanceGUID,
 					RouteGUID:           routeGUID,
 				}))
+			})
+
+			When("binding already exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateRouteBindingReturns(
+						"",
+						ccv3.Warnings{"create binding warning"},
+						ccerror.ResourceAlreadyExistsError{
+							Message: "The route and service instance are already bound.",
+						},
+					)
+				})
+
+				It("returns an actionerror and warnings", func() {
+					Expect(warnings).To(ContainElement("create binding warning"))
+					Expect(executionError).To(MatchError(actionerror.ResourceAlreadyExistsError{
+						Message: "The route and service instance are already bound.",
+					}))
+				})
 			})
 
 			When("fails", func() {

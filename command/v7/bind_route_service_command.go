@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -34,7 +35,12 @@ func (cmd BindRouteServiceCommand) Execute(args []string) error {
 		Path:                cmd.Path.Path,
 	})
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+	case actionerror.ResourceAlreadyExistsError:
+		cmd.displayAlreadyExists()
+		return nil
+	default:
 		return err
 	}
 
@@ -87,4 +93,15 @@ func (cmd BindRouteServiceCommand) displayIntro() error {
 	cmd.UI.DisplayNewline()
 
 	return nil
+}
+
+func (cmd BindRouteServiceCommand) displayAlreadyExists() {
+	cmd.UI.DisplayText(
+		"Route {{.URL}} is already bound to service instance {{.ServiceInstance}}.",
+		map[string]interface{}{
+			"URL":             desiredURL(cmd.RequiredArgs.Domain, cmd.Hostname, cmd.Path.Path, 0),
+			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
+		},
+	)
+	cmd.UI.DisplayOK()
 }
