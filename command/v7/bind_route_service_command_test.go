@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -95,11 +96,11 @@ var _ = Describe("bind-route-service Command", func() {
 		}))
 	})
 
-	It("prints an intro, warnings, and OK", func() {
-		Expect(executeErr).NotTo(HaveOccurred())
-		Expect(testUI.Err).To(Say("fake warning"))
-		Expect(testUI.Out).To(SatisfyAll(
-			Say(
+	Describe("intro message", func() {
+		It("prints an intro and warnings", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Err).To(Say("fake warning"))
+			Expect(testUI.Out).To(Say(
 				`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`,
 				fakeHostname,
 				fakeDomainName,
@@ -108,13 +109,64 @@ var _ = Describe("bind-route-service Command", func() {
 				fakeOrgName,
 				fakeSpaceName,
 				fakeUserName,
-			),
-			Say(`\n`),
-			Say(`OK\n`),
-		))
+			))
+		})
+
+		When("no hostname", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--hostname", "")
+			})
+
+			It("prints an appropriate intro", func() {
+				Expect(testUI.Out).To(Say(
+					`Binding route %s/%s to service instance`,
+					fakeDomainName,
+					fakePath,
+				))
+			})
+		})
+
+		When("no path", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--path", "")
+			})
+
+			It("prints an appropriate intro", func() {
+				Expect(testUI.Out).To(Say(
+					`Binding route %s.%s to service instance`,
+					fakeHostname,
+					fakeDomainName,
+				))
+			})
+		})
 	})
 
-	Describe("processing the response", func() {
+	When("binding already exists", func() {
+		BeforeEach(func() {
+			fakeActor.CreateRouteBindingReturns(
+				nil,
+				v7action.Warnings{"fake warning"},
+				actionerror.ResourceAlreadyExistsError{},
+			)
+		})
+
+		It("prints a message and warnings", func() {
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(
+					`Route %s.%s/%s is already bound to service instance %s\.\n`,
+					fakeHostname,
+					fakeDomainName,
+					fakePath,
+					fakeServiceInstanceName,
+				),
+				Say(`OK\n`),
+			))
+
+			Expect(testUI.Err).To(Say("fake warning"))
+		})
+	})
+
+	Describe("processing the response stream", func() {
 		Context("nil stream", func() {
 			It("prints a message and warnings", func() {
 				Expect(testUI.Out).To(SatisfyAll(
@@ -269,34 +321,6 @@ var _ = Describe("bind-route-service Command", func() {
 				))
 
 			})
-		})
-	})
-
-	When("no hostname", func() {
-		BeforeEach(func() {
-			setFlag(&cmd, "--hostname", "")
-		})
-
-		It("prints an appropriate intro", func() {
-			Expect(testUI.Out).To(Say(
-				`Binding route %s/%s to service instance`,
-				fakeDomainName,
-				fakePath,
-			))
-		})
-	})
-
-	When("no path", func() {
-		BeforeEach(func() {
-			setFlag(&cmd, "--path", "")
-		})
-
-		It("prints an appropriate intro", func() {
-			Expect(testUI.Out).To(Say(
-				`Binding route %s.%s to service instance`,
-				fakeHostname,
-				fakeDomainName,
-			))
 		})
 	})
 

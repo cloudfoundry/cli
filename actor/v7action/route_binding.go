@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/railway"
@@ -38,10 +39,7 @@ func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan Pol
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.CloudControllerClient.CreateRouteBinding(resources.RouteBinding{
-				ServiceInstanceGUID: serviceInstance.GUID,
-				RouteGUID:           route.GUID,
-			})
+			jobURL, warnings, err = actor.createRouteBinding(serviceInstance.GUID, route.GUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -51,6 +49,21 @@ func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan Pol
 	)
 
 	return stream, Warnings(warnings), err
+}
+
+func (actor Actor) createRouteBinding(serviceInstanceGUID, routeGUID string) (ccv3.JobURL, ccv3.Warnings, error) {
+	jobURL, warnings, err := actor.CloudControllerClient.CreateRouteBinding(resources.RouteBinding{
+		ServiceInstanceGUID: serviceInstanceGUID,
+		RouteGUID:           routeGUID,
+	})
+	switch err.(type) {
+	case nil:
+		return jobURL, warnings, nil
+	case ccerror.ResourceAlreadyExistsError:
+		return "", warnings, actionerror.ResourceAlreadyExistsError{Message: err.Error()}
+	default:
+		return "", warnings, err
+	}
 }
 
 func (actor Actor) getRouteForBinding(params CreateRouteBindingParams, domain resources.Domain) (resources.Route, ccv3.Warnings, error) {

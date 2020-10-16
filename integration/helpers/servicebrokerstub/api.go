@@ -163,6 +163,11 @@ func (s *ServiceBrokerStub) WithMaintenanceInfo(version string, description ...s
 	return s
 }
 
+func (s *ServiceBrokerStub) WithRouteService() *ServiceBrokerStub {
+	s.Services[0].Requires = []string{"route_forwarding"}
+	return s
+}
+
 func (s *ServiceBrokerStub) FirstServiceOfferingName() string {
 	return s.Services[0].Name
 }

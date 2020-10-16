@@ -174,6 +174,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Ensure the space is bound to this security group."):
 		return ccerror.SecurityGroupNotBound{Message: err.Message}
+	case errorResponse.Title == "CF-ServiceInstanceAlreadyBoundToSameRoute":
+		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
 	default:
 		return err
 	}

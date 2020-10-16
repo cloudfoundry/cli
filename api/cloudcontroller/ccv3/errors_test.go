@@ -108,6 +108,7 @@ var _ = Describe("Error Wrapper", func() {
 
 					})
 				})
+
 				Context("(401) Unauthorized", func() {
 					BeforeEach(func() {
 						serverResponseCode = http.StatusUnauthorized
@@ -454,6 +455,27 @@ var _ = Describe("Error Wrapper", func() {
 
 						It("returns an InvalidStartError", func() {
 							Expect(makeError).To(MatchError(ccerror.InvalidStartError{}))
+						})
+					})
+
+					When("a route binding already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 130008,
+      "detail": "The route and service instance are already bound.",
+      "title": "CF-ServiceInstanceAlreadyBoundToSameRoute"
+    }
+  ]
+}`
+						})
+
+						It("returns an ResourceAlreadyExistsError", func() {
+							Expect(makeError).To(MatchError(ccerror.ResourceAlreadyExistsError{
+								Message: "The route and service instance are already bound.",
+							}))
 						})
 					})
 

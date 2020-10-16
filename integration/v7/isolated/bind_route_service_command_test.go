@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,7 +16,7 @@ var _ = Describe("bind-route-service command", func() {
 	Describe("help", func() {
 		matchHelpMessage := SatisfyAll(
 			Say(`NAME:\n`),
-			Say(`\s+v3-bind-route-service - Bind a service instance to an HTTP route\n`),
+			Say(`\s+%s - Bind a service instance to an HTTP route\n`, command),
 			Say(`\n`),
 			Say(`USAGE:\n`),
 			Say(`\s+cf bind-route-service DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] SERVICE_INSTANCE \[-c PARAMETERS_AS_JSON\]\n`),
@@ -82,31 +83,17 @@ var _ = Describe("bind-route-service command", func() {
 		})
 	})
 
-	Context("user-provided route service", func() {
+	When("targeting a space", func() {
 		var (
-			orgName             string
-			spaceName           string
-			routeServiceURL     string
-			serviceInstanceName string
-			domain              string
-			hostname            string
-			path                string
-			username            string
+			orgName   string
+			spaceName string
+			username  string
 		)
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
-
-			routeServiceURL = helpers.RandomURL()
-			serviceInstanceName = helpers.NewServiceInstanceName()
-			Eventually(helpers.CF("cups", serviceInstanceName, "-r", routeServiceURL)).Should(Exit(0))
-
-			domain = helpers.DefaultSharedDomain()
-			hostname = helpers.NewHostName()
-			path = helpers.PrefixedRandomName("path")
-			Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
 
 			username, _ = helpers.GetCredentials()
 		})
@@ -115,24 +102,128 @@ var _ = Describe("bind-route-service command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		It("creates a route binding", func() {
-			session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
-			Eventually(session).Should(Exit(0))
+		Context("user-provided route service", func() {
+			var (
+				routeServiceURL     string
+				serviceInstanceName string
+				domain              string
+				hostname            string
+				path                string
+			)
 
-			Expect(session.Out).To(SatisfyAll(
-				Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-				Say(`\n`),
-				Say(`Route binding created\.\n`),
-				Say(`OK\n`),
-			))
+			BeforeEach(func() {
+				routeServiceURL = helpers.RandomURL()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName, "-r", routeServiceURL)).Should(Exit(0))
 
-			Expect(string(session.Err.Contents())).To(BeEmpty())
+				domain = helpers.DefaultSharedDomain()
+				hostname = helpers.NewHostName()
+				path = helpers.PrefixedRandomName("path")
+				Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
+			})
 
-			var receiver struct {
-				Resources []resources.RouteBinding `json:"resources"`
-			}
-			helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
-			Expect(receiver.Resources).To(HaveLen(1))
+			It("creates a route binding", func() {
+				session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Route binding created\.\n`),
+					Say(`OK\n`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				var receiver struct {
+					Resources []resources.RouteBinding `json:"resources"`
+				}
+				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
+				Expect(receiver.Resources).To(HaveLen(1))
+			})
+		})
+
+		Context("managed route service with synchronous broker response", func() {
+			var (
+				broker              *servicebrokerstub.ServiceBrokerStub
+				serviceInstanceName string
+				domain              string
+				hostname            string
+				path                string
+			)
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithRouteService().EnableServiceAccess()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+				domain = helpers.DefaultSharedDomain()
+				hostname = helpers.NewHostName()
+				path = helpers.PrefixedRandomName("path")
+				Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("creates a route binding", func() {
+				session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Route binding created\.\n`),
+					Say(`OK\n`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				var receiver struct {
+					Resources []resources.RouteBinding `json:"resources"`
+				}
+				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
+				Expect(receiver.Resources).To(HaveLen(1))
+			})
+		})
+
+		Context("route binding already exists", func() {
+			var (
+				routeServiceURL     string
+				serviceInstanceName string
+				domain              string
+				hostname            string
+				path                string
+			)
+
+			BeforeEach(func() {
+				routeServiceURL = helpers.RandomURL()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName, "-r", routeServiceURL)).Should(Exit(0))
+
+				domain = helpers.DefaultSharedDomain()
+				hostname = helpers.NewHostName()
+				path = helpers.PrefixedRandomName("path")
+				Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
+
+				session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("says OK", func() {
+				session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Route %s.%s/%s is already bound to service instance %s\.\n`, hostname, domain, path, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+			})
 		})
 	})
 })
