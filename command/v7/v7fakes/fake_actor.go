@@ -299,10 +299,10 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateManagedServiceInstanceStub        func(v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	CreateManagedServiceInstanceStub        func(v7action.CreateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	createManagedServiceInstanceMutex       sync.RWMutex
 	createManagedServiceInstanceArgsForCall []struct {
-		arg1 v7action.ManagedServiceInstanceParams
+		arg1 v7action.CreateManagedServiceInstanceParams
 	}
 	createManagedServiceInstanceReturns struct {
 		result1 chan v7action.PollJobEvent
@@ -3071,12 +3071,10 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateManagedServiceInstanceStub        func(string, string, v7action.ServiceInstanceUpdateManagedParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	UpdateManagedServiceInstanceStub        func(v7action.UpdateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	updateManagedServiceInstanceMutex       sync.RWMutex
 	updateManagedServiceInstanceArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 v7action.ServiceInstanceUpdateManagedParams
+		arg1 v7action.UpdateManagedServiceInstanceParams
 	}
 	updateManagedServiceInstanceReturns struct {
 		result1 chan v7action.PollJobEvent
@@ -4620,11 +4618,11 @@ func (fake *FakeActor) CreateIsolationSegmentByNameReturnsOnCall(i int, result1 
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.CreateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.createManagedServiceInstanceReturnsOnCall[len(fake.createManagedServiceInstanceArgsForCall)]
 	fake.createManagedServiceInstanceArgsForCall = append(fake.createManagedServiceInstanceArgsForCall, struct {
-		arg1 v7action.ManagedServiceInstanceParams
+		arg1 v7action.CreateManagedServiceInstanceParams
 	}{arg1})
 	fake.recordInvocation("CreateManagedServiceInstance", []interface{}{arg1})
 	fake.createManagedServiceInstanceMutex.Unlock()
@@ -4644,13 +4642,13 @@ func (fake *FakeActor) CreateManagedServiceInstanceCallCount() int {
 	return len(fake.createManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(v7action.ManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateManagedServiceInstanceCalls(stub func(v7action.CreateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.createManagedServiceInstanceMutex.Lock()
 	defer fake.createManagedServiceInstanceMutex.Unlock()
 	fake.CreateManagedServiceInstanceStub = stub
 }
 
-func (fake *FakeActor) CreateManagedServiceInstanceArgsForCall(i int) v7action.ManagedServiceInstanceParams {
+func (fake *FakeActor) CreateManagedServiceInstanceArgsForCall(i int) v7action.CreateManagedServiceInstanceParams {
 	fake.createManagedServiceInstanceMutex.RLock()
 	defer fake.createManagedServiceInstanceMutex.RUnlock()
 	argsForCall := fake.createManagedServiceInstanceArgsForCall[i]
@@ -16592,18 +16590,16 @@ func (fake *FakeActor) UpdateDomainLabelsByDomainNameReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstance(arg1 string, arg2 string, arg3 v7action.ServiceInstanceUpdateManagedParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+func (fake *FakeActor) UpdateManagedServiceInstance(arg1 v7action.UpdateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.updateManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.updateManagedServiceInstanceReturnsOnCall[len(fake.updateManagedServiceInstanceArgsForCall)]
 	fake.updateManagedServiceInstanceArgsForCall = append(fake.updateManagedServiceInstanceArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 v7action.ServiceInstanceUpdateManagedParams
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("UpdateManagedServiceInstance", []interface{}{arg1, arg2, arg3})
+		arg1 v7action.UpdateManagedServiceInstanceParams
+	}{arg1})
+	fake.recordInvocation("UpdateManagedServiceInstance", []interface{}{arg1})
 	fake.updateManagedServiceInstanceMutex.Unlock()
 	if fake.UpdateManagedServiceInstanceStub != nil {
-		return fake.UpdateManagedServiceInstanceStub(arg1, arg2, arg3)
+		return fake.UpdateManagedServiceInstanceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -16618,17 +16614,17 @@ func (fake *FakeActor) UpdateManagedServiceInstanceCallCount() int {
 	return len(fake.updateManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstanceCalls(stub func(string, string, v7action.ServiceInstanceUpdateManagedParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+func (fake *FakeActor) UpdateManagedServiceInstanceCalls(stub func(v7action.UpdateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.updateManagedServiceInstanceMutex.Lock()
 	defer fake.updateManagedServiceInstanceMutex.Unlock()
 	fake.UpdateManagedServiceInstanceStub = stub
 }
 
-func (fake *FakeActor) UpdateManagedServiceInstanceArgsForCall(i int) (string, string, v7action.ServiceInstanceUpdateManagedParams) {
+func (fake *FakeActor) UpdateManagedServiceInstanceArgsForCall(i int) v7action.UpdateManagedServiceInstanceParams {
 	fake.updateManagedServiceInstanceMutex.RLock()
 	defer fake.updateManagedServiceInstanceMutex.RUnlock()
 	argsForCall := fake.updateManagedServiceInstanceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1
 }
 
 func (fake *FakeActor) UpdateManagedServiceInstanceReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {

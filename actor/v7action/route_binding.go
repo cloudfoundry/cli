@@ -29,7 +29,7 @@ func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan Pol
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, warnings, err = actor.getServiceInstanceByNameAndSpace(params.ServiceInstanceName, params.SpaceGUID)
+			serviceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(params.ServiceInstanceName, params.SpaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {

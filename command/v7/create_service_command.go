@@ -73,7 +73,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 	}
 
 	stream, warnings, err := cmd.Actor.CreateManagedServiceInstance(
-		v7action.ManagedServiceInstanceParams{
+		v7action.CreateManagedServiceInstanceParams{
 			ServiceOfferingName: cmd.RequiredArgs.ServiceOffering,
 			ServicePlanName:     cmd.RequiredArgs.ServicePlan,
 			ServiceInstanceName: cmd.RequiredArgs.ServiceInstance,
