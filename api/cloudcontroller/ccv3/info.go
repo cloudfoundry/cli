@@ -5,33 +5,34 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type InfoLinks struct {
 	// AppSSH is the link for application ssh info.
-	AppSSH APILink `json:"app_ssh"`
+	AppSSH resources.APILink `json:"app_ssh"`
 
 	// CCV3 is the link to the Cloud Controller V3 API.
-	CCV3 APILink `json:"cloud_controller_v3"`
+	CCV3 resources.APILink `json:"cloud_controller_v3"`
 
 	// Logging is the link to the Logging API.
-	Logging APILink `json:"logging"`
+	Logging resources.APILink `json:"logging"`
 
 	// Logging is the link to the Logging API.
-	LogCache APILink `json:"log_cache"`
+	LogCache resources.APILink `json:"log_cache"`
 
 	// NetworkPolicyV1 is the link to the Container to Container Networking
 	// API.
-	NetworkPolicyV1 APILink `json:"network_policy_v1"`
+	NetworkPolicyV1 resources.APILink `json:"network_policy_v1"`
 
 	// Routing is the link to the routing API
-	Routing APILink `json:"routing"`
+	Routing resources.APILink `json:"routing"`
 
 	// UAA is the link to the UAA API.
-	UAA APILink `json:"uaa"`
+	UAA resources.APILink `json:"uaa"`
 
 	// Login is the link to the Login API.
-	Login APILink `json:"login"`
+	Login resources.APILink `json:"login"`
 }
 
 // Info represents a GET response from the '/' endpoint of the cloud
@@ -99,12 +100,12 @@ func (info Info) ccV3Link() string {
 }
 
 // ResourceLinks represents the information returned back from /v3.
-type ResourceLinks map[string]APILink
+type ResourceLinks map[string]resources.APILink
 
 // UnmarshalJSON helps unmarshal a Cloud Controller /v3 response.
-func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
+func (links ResourceLinks) UnmarshalJSON(data []byte) error {
 	var ccResourceLinks struct {
-		Links map[string]APILink `json:"links"`
+		Links map[string]resources.APILink `json:"links"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccResourceLinks)
 	if err != nil {
@@ -112,7 +113,7 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 	}
 
 	for key, val := range ccResourceLinks.Links {
-		resources[key] = val
+		links[key] = val
 	}
 
 	return nil

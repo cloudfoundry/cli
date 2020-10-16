@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -35,7 +36,7 @@ var _ = Describe("LogCacheURL", func() {
 				configuredLogcacheURL = "https://log-cache.up-to-date-logging.com"
 				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 					Links: ccv3.InfoLinks{
-						LogCache: ccv3.APILink{
+						LogCache: resources.APILink{
 							HREF: configuredLogcacheURL,
 						}}}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
 			})

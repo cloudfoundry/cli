@@ -35,7 +35,7 @@ type Package struct {
 	GUID string
 
 	// Links are links to related resources.
-	Links APILinks
+	Links resources.APILinks
 
 	// Relationships are a list of relationships to other resources.
 	Relationships resources.Relationships
@@ -57,7 +57,7 @@ func (p Package) MarshalJSON() ([]byte, error) {
 	var ccPackage struct {
 		GUID          string                  `json:"guid,omitempty"`
 		CreatedAt     string                  `json:"created_at,omitempty"`
-		Links         APILinks                `json:"links,omitempty"`
+		Links         resources.APILinks      `json:"links,omitempty"`
 		Relationships resources.Relationships `json:"relationships,omitempty"`
 		State         constant.PackageState   `json:"state,omitempty"`
 		Type          constant.PackageType    `json:"type,omitempty"`
@@ -86,7 +86,7 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 	var ccPackage struct {
 		GUID          string                  `json:"guid,omitempty"`
 		CreatedAt     string                  `json:"created_at,omitempty"`
-		Links         APILinks                `json:"links,omitempty"`
+		Links         resources.APILinks      `json:"links,omitempty"`
 		Relationships resources.Relationships `json:"relationships,omitempty"`
 		State         constant.PackageState   `json:"state,omitempty"`
 		Type          constant.PackageType    `json:"type,omitempty"`
@@ -143,19 +143,19 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 
 // GetPackages returns the list of packages.
 func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
-	var resources []Package
+	var packages []Package
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetPackagesRequest,
 		Query:        query,
 		ResponseBody: Package{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Package))
+			packages = append(packages, item.(Package))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return packages, warnings, err
 }
 
 // UploadBitsPackage uploads the newResources and a list of existing resources

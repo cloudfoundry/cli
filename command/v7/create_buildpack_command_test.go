@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -111,7 +112,7 @@ var _ = Describe("create buildpack Command", func() {
 			When("creating the buildpack fails", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(
-						v7action.Buildpack{},
+						resources.Buildpack{},
 						v7action.Warnings{"warning-1"},
 						actionerror.BuildpackNameTakenError{Name: "this-error-occurred"},
 					)
@@ -125,7 +126,7 @@ var _ = Describe("create buildpack Command", func() {
 			When("The disabled flag is set", func() {
 				BeforeEach(func() {
 					cmd.Disable = true
-					buildpack := v7action.Buildpack{
+					buildpack := resources.Buildpack{
 						Name:    buildpackName,
 						Enabled: types.NullBool{Value: false, IsSet: true},
 					}
@@ -141,7 +142,7 @@ var _ = Describe("create buildpack Command", func() {
 
 			When("creating buildpack succeeds", func() {
 				BeforeEach(func() {
-					buildpack := v7action.Buildpack{
+					buildpack := resources.Buildpack{
 						Name:     buildpackName,
 						Position: types.NullInt{Value: 1, IsSet: true},
 						Enabled:  types.NullBool{Value: true, IsSet: true},

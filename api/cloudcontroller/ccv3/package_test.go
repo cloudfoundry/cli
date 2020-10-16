@@ -107,8 +107,8 @@ var _ = Describe("Package", func() {
 						GUID:  "some-pkg-guid",
 						Type:  constant.PackageTypeDocker,
 						State: constant.PackageProcessingUpload,
-						Links: map[string]APILink{
-							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+						Links: map[string]resources.APILink{
+							"upload": resources.APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 						},
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
@@ -165,8 +165,8 @@ var _ = Describe("Package", func() {
 						GUID:  "some-pkg-guid",
 						Type:  constant.PackageTypeBits,
 						State: constant.PackageProcessingUpload,
-						Links: map[string]APILink{
-							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+						Links: map[string]resources.APILink{
+							"upload": resources.APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 						},
 					}
 					Expect(pkg).To(Equal(expectedPackage))
@@ -257,8 +257,8 @@ var _ = Describe("Package", func() {
 				expectedPackage := Package{
 					GUID:  "some-pkg-guid",
 					State: constant.PackageProcessingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+					Links: map[string]resources.APILink{
+						"upload": resources.APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 					},
 				}
 				Expect(pkg).To(Equal(expectedPackage))
@@ -369,8 +369,8 @@ var _ = Describe("Package", func() {
 						Type:      constant.PackageTypeBits,
 						State:     constant.PackageProcessingUpload,
 						CreatedAt: "2017-08-14T21:16:12Z",
-						Links: map[string]APILink{
-							"upload": APILink{HREF: "some-pkg-upload-url-1", Method: http.MethodPost},
+						Links: map[string]resources.APILink{
+							"upload": resources.APILink{HREF: "some-pkg-upload-url-1", Method: http.MethodPost},
 						},
 					},
 					{
@@ -378,8 +378,8 @@ var _ = Describe("Package", func() {
 						Type:      constant.PackageTypeBits,
 						State:     constant.PackageReady,
 						CreatedAt: "2017-08-14T21:20:13Z",
-						Links: map[string]APILink{
-							"upload": APILink{HREF: "some-pkg-upload-url-2", Method: http.MethodPost},
+						Links: map[string]resources.APILink{
+							"upload": resources.APILink{HREF: "some-pkg-upload-url-2", Method: http.MethodPost},
 						},
 					},
 				}))
@@ -760,8 +760,8 @@ var _ = Describe("Package", func() {
 				expectedPackage := Package{
 					GUID:  "some-pkg-guid",
 					State: constant.PackageProcessingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+					Links: map[string]resources.APILink{
+						"upload": resources.APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 					},
 				}
 				Expect(pkg).To(Equal(expectedPackage))
