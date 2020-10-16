@@ -132,18 +132,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateIsolationSegmentStub        func(ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
+	CreateIsolationSegmentStub        func(resources.IsolationSegment) (resources.IsolationSegment, ccv3.Warnings, error)
 	createIsolationSegmentMutex       sync.RWMutex
 	createIsolationSegmentArgsForCall []struct {
-		arg1 ccv3.IsolationSegment
+		arg1 resources.IsolationSegment
 	}
 	createIsolationSegmentReturns struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createIsolationSegmentReturnsOnCall map[int]struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -416,18 +416,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetIsolationSegmentStub        func(string) (ccv3.IsolationSegment, ccv3.Warnings, error)
+	GetIsolationSegmentStub        func(string) (resources.IsolationSegment, ccv3.Warnings, error)
 	getIsolationSegmentMutex       sync.RWMutex
 	getIsolationSegmentArgsForCall []struct {
 		arg1 string
 	}
 	getIsolationSegmentReturns struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getIsolationSegmentReturnsOnCall map[int]struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -446,18 +446,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetIsolationSegmentsStub        func(...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)
+	GetIsolationSegmentsStub        func(...ccv3.Query) ([]resources.IsolationSegment, ccv3.Warnings, error)
 	getIsolationSegmentsMutex       sync.RWMutex
 	getIsolationSegmentsArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getIsolationSegmentsReturns struct {
-		result1 []ccv3.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getIsolationSegmentsReturnsOnCall map[int]struct {
-		result1 []ccv3.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1395,11 +1395,11 @@ func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateIsolationSegment(arg1 ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateIsolationSegment(arg1 resources.IsolationSegment) (resources.IsolationSegment, ccv3.Warnings, error) {
 	fake.createIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.createIsolationSegmentReturnsOnCall[len(fake.createIsolationSegmentArgsForCall)]
 	fake.createIsolationSegmentArgsForCall = append(fake.createIsolationSegmentArgsForCall, struct {
-		arg1 ccv3.IsolationSegment
+		arg1 resources.IsolationSegment
 	}{arg1})
 	fake.recordInvocation("CreateIsolationSegment", []interface{}{arg1})
 	fake.createIsolationSegmentMutex.Unlock()
@@ -1419,43 +1419,43 @@ func (fake *FakeCloudControllerClient) CreateIsolationSegmentCallCount() int {
 	return len(fake.createIsolationSegmentArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateIsolationSegmentCalls(stub func(ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateIsolationSegmentCalls(stub func(resources.IsolationSegment) (resources.IsolationSegment, ccv3.Warnings, error)) {
 	fake.createIsolationSegmentMutex.Lock()
 	defer fake.createIsolationSegmentMutex.Unlock()
 	fake.CreateIsolationSegmentStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateIsolationSegmentArgsForCall(i int) ccv3.IsolationSegment {
+func (fake *FakeCloudControllerClient) CreateIsolationSegmentArgsForCall(i int) resources.IsolationSegment {
 	fake.createIsolationSegmentMutex.RLock()
 	defer fake.createIsolationSegmentMutex.RUnlock()
 	argsForCall := fake.createIsolationSegmentArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateIsolationSegmentReturns(result1 ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateIsolationSegmentReturns(result1 resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.createIsolationSegmentMutex.Lock()
 	defer fake.createIsolationSegmentMutex.Unlock()
 	fake.CreateIsolationSegmentStub = nil
 	fake.createIsolationSegmentReturns = struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateIsolationSegmentReturnsOnCall(i int, result1 ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateIsolationSegmentReturnsOnCall(i int, result1 resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.createIsolationSegmentMutex.Lock()
 	defer fake.createIsolationSegmentMutex.Unlock()
 	fake.CreateIsolationSegmentStub = nil
 	if fake.createIsolationSegmentReturnsOnCall == nil {
 		fake.createIsolationSegmentReturnsOnCall = make(map[int]struct {
-			result1 ccv3.IsolationSegment
+			result1 resources.IsolationSegment
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createIsolationSegmentReturnsOnCall[i] = struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -2643,7 +2643,7 @@ func (fake *FakeCloudControllerClient) GetInfoReturnsOnCall(i int, result1 ccv3.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegment(arg1 string) (ccv3.IsolationSegment, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegment(arg1 string) (resources.IsolationSegment, ccv3.Warnings, error) {
 	fake.getIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentReturnsOnCall[len(fake.getIsolationSegmentArgsForCall)]
 	fake.getIsolationSegmentArgsForCall = append(fake.getIsolationSegmentArgsForCall, struct {
@@ -2667,7 +2667,7 @@ func (fake *FakeCloudControllerClient) GetIsolationSegmentCallCount() int {
 	return len(fake.getIsolationSegmentArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentCalls(stub func(string) (ccv3.IsolationSegment, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentCalls(stub func(string) (resources.IsolationSegment, ccv3.Warnings, error)) {
 	fake.getIsolationSegmentMutex.Lock()
 	defer fake.getIsolationSegmentMutex.Unlock()
 	fake.GetIsolationSegmentStub = stub
@@ -2680,30 +2680,30 @@ func (fake *FakeCloudControllerClient) GetIsolationSegmentArgsForCall(i int) str
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentReturns(result1 ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentReturns(result1 resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.getIsolationSegmentMutex.Lock()
 	defer fake.getIsolationSegmentMutex.Unlock()
 	fake.GetIsolationSegmentStub = nil
 	fake.getIsolationSegmentReturns = struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentReturnsOnCall(i int, result1 ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentReturnsOnCall(i int, result1 resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.getIsolationSegmentMutex.Lock()
 	defer fake.getIsolationSegmentMutex.Unlock()
 	fake.GetIsolationSegmentStub = nil
 	if fake.getIsolationSegmentReturnsOnCall == nil {
 		fake.getIsolationSegmentReturnsOnCall = make(map[int]struct {
-			result1 ccv3.IsolationSegment
+			result1 resources.IsolationSegment
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getIsolationSegmentReturnsOnCall[i] = struct {
-		result1 ccv3.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -2775,7 +2775,7 @@ func (fake *FakeCloudControllerClient) GetIsolationSegmentOrganizationsReturnsOn
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegments(arg1 ...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegments(arg1 ...ccv3.Query) ([]resources.IsolationSegment, ccv3.Warnings, error) {
 	fake.getIsolationSegmentsMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentsReturnsOnCall[len(fake.getIsolationSegmentsArgsForCall)]
 	fake.getIsolationSegmentsArgsForCall = append(fake.getIsolationSegmentsArgsForCall, struct {
@@ -2799,7 +2799,7 @@ func (fake *FakeCloudControllerClient) GetIsolationSegmentsCallCount() int {
 	return len(fake.getIsolationSegmentsArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentsCalls(stub func(...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentsCalls(stub func(...ccv3.Query) ([]resources.IsolationSegment, ccv3.Warnings, error)) {
 	fake.getIsolationSegmentsMutex.Lock()
 	defer fake.getIsolationSegmentsMutex.Unlock()
 	fake.GetIsolationSegmentsStub = stub
@@ -2812,30 +2812,30 @@ func (fake *FakeCloudControllerClient) GetIsolationSegmentsArgsForCall(i int) []
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentsReturns(result1 []ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentsReturns(result1 []resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.getIsolationSegmentsMutex.Lock()
 	defer fake.getIsolationSegmentsMutex.Unlock()
 	fake.GetIsolationSegmentsStub = nil
 	fake.getIsolationSegmentsReturns = struct {
-		result1 []ccv3.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetIsolationSegmentsReturnsOnCall(i int, result1 []ccv3.IsolationSegment, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetIsolationSegmentsReturnsOnCall(i int, result1 []resources.IsolationSegment, result2 ccv3.Warnings, result3 error) {
 	fake.getIsolationSegmentsMutex.Lock()
 	defer fake.getIsolationSegmentsMutex.Unlock()
 	fake.GetIsolationSegmentsStub = nil
 	if fake.getIsolationSegmentsReturnsOnCall == nil {
 		fake.getIsolationSegmentsReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.IsolationSegment
+			result1 []resources.IsolationSegment
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getIsolationSegmentsReturnsOnCall[i] = struct {
-		result1 []ccv3.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

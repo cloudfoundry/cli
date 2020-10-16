@@ -167,7 +167,7 @@ var _ = Describe("org Command", func() {
 				When("something", func() {
 					BeforeEach(func() {
 						fakeActor.GetIsolationSegmentsByOrganizationReturns(
-							[]v7action.IsolationSegment{
+							[]resources.IsolationSegment{
 								{
 									Name: "isolation-segment-1",
 									GUID: "default-isolation-segment-guid",

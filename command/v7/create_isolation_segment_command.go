@@ -2,8 +2,8 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreateIsolationSegmentCommand struct {
@@ -29,7 +29,7 @@ func (cmd CreateIsolationSegmentCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.CreateIsolationSegmentByName(v7action.IsolationSegment{
+	warnings, err := cmd.Actor.CreateIsolationSegmentByName(resources.IsolationSegment{
 		Name: cmd.RequiredArgs.IsolationSegmentName,
 	})
 	cmd.UI.DisplayWarnings(warnings)

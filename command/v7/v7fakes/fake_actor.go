@@ -286,10 +286,10 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateIsolationSegmentByNameStub        func(v7action.IsolationSegment) (v7action.Warnings, error)
+	CreateIsolationSegmentByNameStub        func(resources.IsolationSegment) (v7action.Warnings, error)
 	createIsolationSegmentByNameMutex       sync.RWMutex
 	createIsolationSegmentByNameArgsForCall []struct {
-		arg1 v7action.IsolationSegment
+		arg1 resources.IsolationSegment
 	}
 	createIsolationSegmentByNameReturns struct {
 		result1 v7action.Warnings
@@ -1195,19 +1195,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetEffectiveIsolationSegmentBySpaceStub        func(string, string) (v7action.IsolationSegment, v7action.Warnings, error)
+	GetEffectiveIsolationSegmentBySpaceStub        func(string, string) (resources.IsolationSegment, v7action.Warnings, error)
 	getEffectiveIsolationSegmentBySpaceMutex       sync.RWMutex
 	getEffectiveIsolationSegmentBySpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getEffectiveIsolationSegmentBySpaceReturns struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
 	getEffectiveIsolationSegmentBySpaceReturnsOnCall map[int]struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1299,18 +1299,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetIsolationSegmentByNameStub        func(string) (v7action.IsolationSegment, v7action.Warnings, error)
+	GetIsolationSegmentByNameStub        func(string) (resources.IsolationSegment, v7action.Warnings, error)
 	getIsolationSegmentByNameMutex       sync.RWMutex
 	getIsolationSegmentByNameArgsForCall []struct {
 		arg1 string
 	}
 	getIsolationSegmentByNameReturns struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
 	getIsolationSegmentByNameReturnsOnCall map[int]struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1328,18 +1328,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetIsolationSegmentsByOrganizationStub        func(string) ([]v7action.IsolationSegment, v7action.Warnings, error)
+	GetIsolationSegmentsByOrganizationStub        func(string) ([]resources.IsolationSegment, v7action.Warnings, error)
 	getIsolationSegmentsByOrganizationMutex       sync.RWMutex
 	getIsolationSegmentsByOrganizationArgsForCall []struct {
 		arg1 string
 	}
 	getIsolationSegmentsByOrganizationReturns struct {
-		result1 []v7action.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
 	getIsolationSegmentsByOrganizationReturnsOnCall map[int]struct {
-		result1 []v7action.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -4557,11 +4557,11 @@ func (fake *FakeActor) CreateDockerPackageByApplicationNameAndSpaceReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateIsolationSegmentByName(arg1 v7action.IsolationSegment) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateIsolationSegmentByName(arg1 resources.IsolationSegment) (v7action.Warnings, error) {
 	fake.createIsolationSegmentByNameMutex.Lock()
 	ret, specificReturn := fake.createIsolationSegmentByNameReturnsOnCall[len(fake.createIsolationSegmentByNameArgsForCall)]
 	fake.createIsolationSegmentByNameArgsForCall = append(fake.createIsolationSegmentByNameArgsForCall, struct {
-		arg1 v7action.IsolationSegment
+		arg1 resources.IsolationSegment
 	}{arg1})
 	fake.recordInvocation("CreateIsolationSegmentByName", []interface{}{arg1})
 	fake.createIsolationSegmentByNameMutex.Unlock()
@@ -4581,13 +4581,13 @@ func (fake *FakeActor) CreateIsolationSegmentByNameCallCount() int {
 	return len(fake.createIsolationSegmentByNameArgsForCall)
 }
 
-func (fake *FakeActor) CreateIsolationSegmentByNameCalls(stub func(v7action.IsolationSegment) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateIsolationSegmentByNameCalls(stub func(resources.IsolationSegment) (v7action.Warnings, error)) {
 	fake.createIsolationSegmentByNameMutex.Lock()
 	defer fake.createIsolationSegmentByNameMutex.Unlock()
 	fake.CreateIsolationSegmentByNameStub = stub
 }
 
-func (fake *FakeActor) CreateIsolationSegmentByNameArgsForCall(i int) v7action.IsolationSegment {
+func (fake *FakeActor) CreateIsolationSegmentByNameArgsForCall(i int) resources.IsolationSegment {
 	fake.createIsolationSegmentByNameMutex.RLock()
 	defer fake.createIsolationSegmentByNameMutex.RUnlock()
 	argsForCall := fake.createIsolationSegmentByNameArgsForCall[i]
@@ -8507,7 +8507,7 @@ func (fake *FakeActor) GetDomainLabelsReturnsOnCall(i int, result1 map[string]ty
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetEffectiveIsolationSegmentBySpace(arg1 string, arg2 string) (v7action.IsolationSegment, v7action.Warnings, error) {
+func (fake *FakeActor) GetEffectiveIsolationSegmentBySpace(arg1 string, arg2 string) (resources.IsolationSegment, v7action.Warnings, error) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
 	ret, specificReturn := fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall[len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)]
 	fake.getEffectiveIsolationSegmentBySpaceArgsForCall = append(fake.getEffectiveIsolationSegmentBySpaceArgsForCall, struct {
@@ -8532,7 +8532,7 @@ func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceCallCount() int {
 	return len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)
 }
 
-func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceCalls(stub func(string, string) (v7action.IsolationSegment, v7action.Warnings, error)) {
+func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceCalls(stub func(string, string) (resources.IsolationSegment, v7action.Warnings, error)) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	fake.GetEffectiveIsolationSegmentBySpaceStub = stub
@@ -8545,30 +8545,30 @@ func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceArgsForCall(i int) (st
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceReturns(result1 v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceReturns(result1 resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
 	fake.getEffectiveIsolationSegmentBySpaceReturns = struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceReturnsOnCall(i int, result1 v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetEffectiveIsolationSegmentBySpaceReturnsOnCall(i int, result1 resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
 	if fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall == nil {
 		fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.IsolationSegment
+			result1 resources.IsolationSegment
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall[i] = struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -8947,7 +8947,7 @@ func (fake *FakeActor) GetGlobalStagingSecurityGroupsReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetIsolationSegmentByName(arg1 string) (v7action.IsolationSegment, v7action.Warnings, error) {
+func (fake *FakeActor) GetIsolationSegmentByName(arg1 string) (resources.IsolationSegment, v7action.Warnings, error) {
 	fake.getIsolationSegmentByNameMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentByNameReturnsOnCall[len(fake.getIsolationSegmentByNameArgsForCall)]
 	fake.getIsolationSegmentByNameArgsForCall = append(fake.getIsolationSegmentByNameArgsForCall, struct {
@@ -8971,7 +8971,7 @@ func (fake *FakeActor) GetIsolationSegmentByNameCallCount() int {
 	return len(fake.getIsolationSegmentByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetIsolationSegmentByNameCalls(stub func(string) (v7action.IsolationSegment, v7action.Warnings, error)) {
+func (fake *FakeActor) GetIsolationSegmentByNameCalls(stub func(string) (resources.IsolationSegment, v7action.Warnings, error)) {
 	fake.getIsolationSegmentByNameMutex.Lock()
 	defer fake.getIsolationSegmentByNameMutex.Unlock()
 	fake.GetIsolationSegmentByNameStub = stub
@@ -8984,30 +8984,30 @@ func (fake *FakeActor) GetIsolationSegmentByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetIsolationSegmentByNameReturns(result1 v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetIsolationSegmentByNameReturns(result1 resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getIsolationSegmentByNameMutex.Lock()
 	defer fake.getIsolationSegmentByNameMutex.Unlock()
 	fake.GetIsolationSegmentByNameStub = nil
 	fake.getIsolationSegmentByNameReturns = struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetIsolationSegmentByNameReturnsOnCall(i int, result1 v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetIsolationSegmentByNameReturnsOnCall(i int, result1 resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getIsolationSegmentByNameMutex.Lock()
 	defer fake.getIsolationSegmentByNameMutex.Unlock()
 	fake.GetIsolationSegmentByNameStub = nil
 	if fake.getIsolationSegmentByNameReturnsOnCall == nil {
 		fake.getIsolationSegmentByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.IsolationSegment
+			result1 resources.IsolationSegment
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getIsolationSegmentByNameReturnsOnCall[i] = struct {
-		result1 v7action.IsolationSegment
+		result1 resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9071,7 +9071,7 @@ func (fake *FakeActor) GetIsolationSegmentSummariesReturnsOnCall(i int, result1 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetIsolationSegmentsByOrganization(arg1 string) ([]v7action.IsolationSegment, v7action.Warnings, error) {
+func (fake *FakeActor) GetIsolationSegmentsByOrganization(arg1 string) ([]resources.IsolationSegment, v7action.Warnings, error) {
 	fake.getIsolationSegmentsByOrganizationMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentsByOrganizationReturnsOnCall[len(fake.getIsolationSegmentsByOrganizationArgsForCall)]
 	fake.getIsolationSegmentsByOrganizationArgsForCall = append(fake.getIsolationSegmentsByOrganizationArgsForCall, struct {
@@ -9095,7 +9095,7 @@ func (fake *FakeActor) GetIsolationSegmentsByOrganizationCallCount() int {
 	return len(fake.getIsolationSegmentsByOrganizationArgsForCall)
 }
 
-func (fake *FakeActor) GetIsolationSegmentsByOrganizationCalls(stub func(string) ([]v7action.IsolationSegment, v7action.Warnings, error)) {
+func (fake *FakeActor) GetIsolationSegmentsByOrganizationCalls(stub func(string) ([]resources.IsolationSegment, v7action.Warnings, error)) {
 	fake.getIsolationSegmentsByOrganizationMutex.Lock()
 	defer fake.getIsolationSegmentsByOrganizationMutex.Unlock()
 	fake.GetIsolationSegmentsByOrganizationStub = stub
@@ -9108,30 +9108,30 @@ func (fake *FakeActor) GetIsolationSegmentsByOrganizationArgsForCall(i int) stri
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetIsolationSegmentsByOrganizationReturns(result1 []v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetIsolationSegmentsByOrganizationReturns(result1 []resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getIsolationSegmentsByOrganizationMutex.Lock()
 	defer fake.getIsolationSegmentsByOrganizationMutex.Unlock()
 	fake.GetIsolationSegmentsByOrganizationStub = nil
 	fake.getIsolationSegmentsByOrganizationReturns = struct {
-		result1 []v7action.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetIsolationSegmentsByOrganizationReturnsOnCall(i int, result1 []v7action.IsolationSegment, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetIsolationSegmentsByOrganizationReturnsOnCall(i int, result1 []resources.IsolationSegment, result2 v7action.Warnings, result3 error) {
 	fake.getIsolationSegmentsByOrganizationMutex.Lock()
 	defer fake.getIsolationSegmentsByOrganizationMutex.Unlock()
 	fake.GetIsolationSegmentsByOrganizationStub = nil
 	if fake.getIsolationSegmentsByOrganizationReturnsOnCall == nil {
 		fake.getIsolationSegmentsByOrganizationReturnsOnCall = make(map[int]struct {
-			result1 []v7action.IsolationSegment
+			result1 []resources.IsolationSegment
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getIsolationSegmentsByOrganizationReturnsOnCall[i] = struct {
-		result1 []v7action.IsolationSegment
+		result1 []resources.IsolationSegment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

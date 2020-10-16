@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -88,7 +89,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
 				Expect(fakeActor.CreateIsolationSegmentByNameCallCount()).To(Equal(1))
-				Expect(fakeActor.CreateIsolationSegmentByNameArgsForCall(0)).To(Equal(v7action.IsolationSegment{Name: isolationSegment}))
+				Expect(fakeActor.CreateIsolationSegmentByNameArgsForCall(0)).To(Equal(resources.IsolationSegment{Name: isolationSegment}))
 			})
 		})
 
