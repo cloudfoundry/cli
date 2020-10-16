@@ -27,7 +27,7 @@ var _ = Describe("service command", func() {
 			Say(`\s+cf service SERVICE_INSTANCE\n`),
 			Say(`\n`),
 			Say(`OPTIONS:\n`),
-			Say(`\s+--guid\s+Retrieve and display the given service's guid. All other output for the service is suppressed.\n`),
+			Say(`\s+--guid\s+Retrieve and display the given service instances's guid. All other output is suppressed.\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+bind-service, rename-service, update-service\n`),

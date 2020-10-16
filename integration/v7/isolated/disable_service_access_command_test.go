@@ -11,20 +11,24 @@ import (
 
 var _ = Describe("disable service access command", func() {
 	Describe("help", func() {
+		matchHelpMessage := SatisfyAll(
+			Say("NAME:"),
+			Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"),
+			Say("USAGE:"),
+			Say("\\s+cf disable-service-access SERVICE_OFFERING \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"),
+			Say("OPTIONS:"),
+			Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"),
+			Say("\\s+\\-o\\s+Disable access for a specified organization"),
+			Say("\\s+\\-p\\s+Disable access to a specified service plan"),
+			Say("SEE ALSO:"),
+			Say("\\s+enable-service-access, marketplace, service-access, service-brokers"),
+		)
+
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("disable-service-access", "--help")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
-				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+enable-service-access, marketplace, service-access, service-brokers"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 
@@ -32,17 +36,8 @@ var _ = Describe("disable service access command", func() {
 			It("displays a warning, the help text, and exits 1", func() {
 				session := helpers.CF("disable-service-access")
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
-				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+enable-service-access, marketplace, service-access, service-brokers"))
+				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE_OFFERING` was not provided"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 
@@ -50,18 +45,9 @@ var _ = Describe("disable service access command", func() {
 			It("displays an error, and exits 1", func() {
 				session := helpers.CF("disable-service-access", "a-service", "extra-arg")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
 				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "extra-arg"`))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
-				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+enable-service-access, marketplace, service-access, service-brokers"))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 	})
