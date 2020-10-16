@@ -106,12 +106,9 @@ var _ = Describe("update-service command", func() {
 
 	Describe("updates", func() {
 		BeforeEach(func() {
-			setFlag(&cmd, "-t", flag.Tags{IsSet: true, Value: []string{"foo", "bar"}})
-			setFlag(&cmd, "-c", flag.JSONOrFileWithValidation{
-				IsSet: true,
-				Value: map[string]interface{}{"baz": "quz"},
-			})
-			setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: "some-plan"})
+			setFlag(&cmd, "-t", `foo,bar`)
+			setFlag(&cmd, "-c", `{"baz": "quz"}`)
+			setFlag(&cmd, "-p", "some-plan")
 		})
 
 		It("does not return an error", func() {
@@ -131,13 +128,13 @@ var _ = Describe("update-service command", func() {
 
 		It("delegates to the actor", func() {
 			Expect(fakeActor.UpdateManagedServiceInstanceCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID, actualUpdates := fakeActor.UpdateManagedServiceInstanceArgsForCall(0)
-			Expect(actualName).To(Equal(serviceInstanceName))
-			Expect(actualSpaceGUID).To(Equal(spaceGUID))
-			Expect(actualUpdates).To(Equal(v7action.ServiceInstanceUpdateManagedParams{
-				Tags:            types.NewOptionalStringSlice("foo", "bar"),
-				Parameters:      types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
-				ServicePlanName: types.NewOptionalString("some-plan"),
+			actualUpdates := fakeActor.UpdateManagedServiceInstanceArgsForCall(0)
+			Expect(actualUpdates).To(Equal(v7action.UpdateManagedServiceInstanceParams{
+				ServiceInstanceName: serviceInstanceName,
+				SpaceGUID:           spaceGUID,
+				Tags:                types.NewOptionalStringSlice("foo", "bar"),
+				Parameters:          types.NewOptionalObject(map[string]interface{}{"baz": "quz"}),
+				ServicePlanName:     "some-plan",
 			}))
 		})
 
@@ -252,7 +249,7 @@ var _ = Describe("update-service command", func() {
 			const currentPlan = "current-plan"
 
 			BeforeEach(func() {
-				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: currentPlan})
+				setFlag(&cmd, "-p", currentPlan)
 				fakeActor.UpdateManagedServiceInstanceReturns(
 					nil,
 					v7action.Warnings{"actor warning"},
@@ -300,7 +297,7 @@ var _ = Describe("update-service command", func() {
 			)
 
 			BeforeEach(func() {
-				setFlag(&cmd, "-p", flag.OptionalString{IsSet: true, Value: invalidPlan})
+				setFlag(&cmd, "-p", invalidPlan)
 				fakeActor.UpdateManagedServiceInstanceReturns(
 					nil,
 					v7action.Warnings{"actor warning"},

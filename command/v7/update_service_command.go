@@ -16,7 +16,7 @@ type UpdateServiceCommand struct {
 
 	RequiredArgs flag.ServiceInstance          `positional-args:"yes"`
 	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	Plan         flag.OptionalString           `short:"p" description:"Change service plan for a service instance"`
+	Plan         string                        `short:"p" description:"Change service plan for a service instance"`
 	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
 	Wait         bool                          `short:"w" long:"wait" description:"Wait for the update operation to complete"`
 	Upgrade      bool                          `long:"upgrade" hidden:"true"`
@@ -47,12 +47,12 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 	}
 
 	stream, warnings, err := cmd.Actor.UpdateManagedServiceInstance(
-		string(cmd.RequiredArgs.ServiceInstance),
-		cmd.Config.TargetedSpace().GUID,
-		v7action.ServiceInstanceUpdateManagedParams{
-			Tags:            types.OptionalStringSlice(cmd.Tags),
-			Parameters:      types.OptionalObject(cmd.Parameters),
-			ServicePlanName: types.OptionalString(cmd.Plan),
+		v7action.UpdateManagedServiceInstanceParams{
+			ServiceInstanceName: string(cmd.RequiredArgs.ServiceInstance),
+			ServicePlanName:     cmd.Plan,
+			SpaceGUID:           cmd.Config.TargetedSpace().GUID,
+			Tags:                types.OptionalStringSlice(cmd.Tags),
+			Parameters:          types.OptionalObject(cmd.Parameters),
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -135,7 +135,7 @@ func (cmd UpdateServiceCommand) displayIntro() error {
 }
 
 func (cmd UpdateServiceCommand) noFlagsProvided() bool {
-	return !(cmd.Tags.IsSet || cmd.Parameters.IsSet || cmd.Plan.IsSet)
+	return !cmd.Tags.IsSet && !cmd.Parameters.IsSet && cmd.Plan == ""
 }
 
 func (cmd UpdateServiceCommand) serviceInstanceName() map[string]interface{} {

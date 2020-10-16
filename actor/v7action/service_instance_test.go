@@ -315,301 +315,101 @@ var _ = Describe("Service Instance Actions", func() {
 	Describe("UpdateManagedServiceInstance", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
-			guid                = "fake-service-instance-guid"
+			serviceInstanceGUID = "fake-service-instance-guid"
+			servicePlanGUID     = "fake-service-plan-guid"
+			serviceOfferingName = "fake-service-offering-name"
+			serviceOfferingGUID = "fake-service-offering-guid"
+			serviceBrokerName   = "fake-service-broker-name"
 			spaceGUID           = "fake-space-guid"
+			newServicePlanGUID  = "fake-new-service-plan-guid"
+			newServicePlanName  = "fake-new-service-plan-name"
+			fakeJobURL          = ccv3.JobURL("fake-job-url")
 		)
 
-		When("the service instance is successfully updated synchronously", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type:            resources.ManagedServiceInstance,
-						GUID:            guid,
-						ServicePlanGUID: "some-plan-guid",
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					nil,
-				)
-				fakeCloudControllerClient.UpdateServiceInstanceReturns(
-					"",
-					ccv3.Warnings{"warning from update"},
-					nil,
-				)
-			})
+		var (
+			warnings      Warnings
+			executeErr    error
+			stream        chan PollJobEvent
+			params        UpdateManagedServiceInstanceParams
+			newTags       types.OptionalStringSlice
+			newParameters types.OptionalObject
+		)
 
-			It("makes the right calls and returns all warnings", func() {
-				stream, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{
-						Tags:       types.NewOptionalStringSlice("foo", "bar"),
-						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
-					},
-				)
+		BeforeEach(func() {
+			newTags = types.NewOptionalStringSlice("foo")
+			newParameters = types.NewOptionalObject(map[string]interface{}{"foo": "bar"})
+			params = UpdateManagedServiceInstanceParams{
+				ServiceInstanceName: serviceInstanceName,
+				SpaceGUID:           spaceGUID,
+				ServicePlanName:     newServicePlanName,
+				Tags:                newTags,
+				Parameters:          newParameters,
+			}
 
-				By("returning a nil stream, warnings and no error", func() {
-					Expect(stream).To(BeNil())
-					Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				By("getting the service instance", func() {
-					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-					actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-					Expect(actualName).To(Equal(serviceInstanceName))
-					Expect(actualSpaceGUID).To(Equal(spaceGUID))
-					Expect(actualQuery).To(BeEmpty())
-				})
-
-				By("updating the service instance", func() {
-					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-					Expect(actualGUID).To(Equal(guid))
-					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
-						Tags:       types.NewOptionalStringSlice("foo", "bar"),
-						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
-					}))
-				})
-
-				By("specifying an empty job URL", func() {
-					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
-					actualURL := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
-					Expect(actualURL).To(BeEmpty())
-				})
-			})
-		})
-
-		When("the service instance is successfully updated asynchronously", func() {
-			const jobURL = ccv3.JobURL("fake-job-url")
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type: resources.ManagedServiceInstance,
-						GUID: guid,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					nil,
-				)
-				fakeCloudControllerClient.UpdateServiceInstanceReturns(
-					jobURL,
-					ccv3.Warnings{"warning from update"},
-					nil,
-				)
-
-				fakeStream := make(chan ccv3.PollJobEvent)
-				fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
-				go func() {
-					fakeStream <- ccv3.PollJobEvent{
-						State:    constant.JobPolling,
-						Err:      nil,
-						Warnings: ccv3.Warnings{"warning from poll"},
-					}
-				}()
-			})
-
-			It("makes the right calls and returns all warnings", func() {
-				stream, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{
-						Tags:       types.NewOptionalStringSlice("foo", "bar"),
-						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
-					},
-				)
-
-				By("returning warnings", func() {
-					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
-				})
-
-				By("getting the service instance", func() {
-					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-					actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-					Expect(actualName).To(Equal(serviceInstanceName))
-					Expect(actualSpaceGUID).To(Equal(spaceGUID))
-					Expect(actualQuery).To(BeEmpty())
-				})
-
-				By("updating the service instance", func() {
-					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
-					actualGUID, actualServiceInstance := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-					Expect(actualGUID).To(Equal(guid))
-					Expect(actualServiceInstance).To(Equal(resources.ServiceInstance{
-						Tags:       types.NewOptionalStringSlice("foo", "bar"),
-						Parameters: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
-					}))
-				})
-
-				By("polling the job", func() {
-					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
-					actualURL := fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)
-					Expect(actualURL).To(Equal(jobURL))
-
-					Eventually(stream).Should(Receive(Equal(PollJobEvent{
-						State:    JobPolling,
-						Err:      nil,
-						Warnings: Warnings{"warning from poll"},
-					})))
-				})
-			})
-		})
-
-		When("the service instance is not managed", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type: resources.UserProvidedServiceInstance,
-						Name: serviceInstanceName,
-						GUID: guid,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					nil,
-				)
-			})
-
-			It("fails with warnings", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
-				)
-				Expect(warnings).To(ConsistOf("warning from get"))
-
-				Expect(err).To(MatchError(actionerror.ServiceInstanceTypeError{
-					Name:         serviceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				}))
-			})
-		})
-
-		When("the service instance is not found", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
-				)
-			})
-
-			It("returns warnings and an actionerror", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
-				)
-				Expect(warnings).To(ConsistOf("warning from get"))
-				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{
-					Name: serviceInstanceName,
-				}))
-			})
-		})
-
-		When("there is an error getting the service instance", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					errors.New("bang"),
-				)
-			})
-
-			It("returns warnings and an error", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
-				)
-				Expect(warnings).To(ConsistOf("warning from get"))
-				Expect(err).To(MatchError("bang"))
-			})
-		})
-
-		When("there is an error updating the service instance", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type: resources.ManagedServiceInstance,
-						GUID: guid,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					nil,
-				)
-				fakeCloudControllerClient.UpdateServiceInstanceReturns(
-					"",
-					ccv3.Warnings{"warning from update"},
-					errors.New("boom"),
-				)
-			})
-
-			It("returns warnings and an error", func() {
-				_, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
-				)
-				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
-				Expect(err).To(MatchError("boom"))
-			})
-		})
-
-		Context("updating the plan", func() {
-			var (
-				warnings            Warnings
-				err                 error
-				fakeServicePlanName string
-				fakeServicePlanGUID string
-				params              ServiceInstanceUpdateManagedParams
+			fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					Type:            resources.ManagedServiceInstance,
+					GUID:            serviceInstanceGUID,
+					Name:            serviceInstanceName,
+					ServicePlanGUID: servicePlanGUID,
+				},
+				ccv3.IncludedResources{
+					ServiceBrokers: []resources.ServiceBroker{{
+						Name: serviceBrokerName,
+					}},
+					ServiceOfferings: []resources.ServiceOffering{{
+						Name: serviceOfferingName,
+						GUID: serviceOfferingGUID,
+					}},
+				},
+				ccv3.Warnings{"fake get service instance warning"},
+				nil,
 			)
 
-			const (
-				fakeServiceOfferingName = "my-service-offering"
-				fakeServiceBrokerName   = "my-broker"
+			fakeCloudControllerClient.GetServicePlansReturns(
+				[]resources.ServicePlan{{
+					GUID: newServicePlanGUID,
+					Name: newServicePlanName,
+				}},
+				ccv3.Warnings{"fake get service plan warning"},
+				nil,
 			)
 
-			JustBeforeEach(func() {
-				_, warnings, err = actor.UpdateManagedServiceInstance(serviceInstanceName, spaceGUID, params)
-			})
+			fakeCloudControllerClient.UpdateServiceInstanceReturns(
+				fakeJobURL,
+				ccv3.Warnings{"fake update service instance warning"},
+				nil,
+			)
 
-			BeforeEach(func() {
-				fakeServicePlanName = "some-plan"
-
-				params = ServiceInstanceUpdateManagedParams{
-					ServicePlanName: types.NewOptionalString(fakeServicePlanName),
+			fakeStream := make(chan ccv3.PollJobEvent)
+			go func() {
+				fakeStream <- ccv3.PollJobEvent{
+					State:    constant.JobProcessing,
+					Warnings: ccv3.Warnings{"stream warning"},
 				}
+			}()
+			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+		})
 
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type:                resources.ManagedServiceInstance,
-						GUID:                guid,
-						ServicePlanGUID:     "current-plan-guid",
-						ServiceOfferingGUID: "something",
-					},
-					ccv3.IncludedResources{
-						ServiceOfferings: []resources.ServiceOffering{{Name: fakeServiceOfferingName}},
-						ServiceBrokers:   []resources.ServiceBroker{{Name: fakeServiceBrokerName}},
-					},
-					ccv3.Warnings{"warning from getServiceInstance"},
-					nil,
-				)
+		JustBeforeEach(func() {
+			stream, warnings, executeErr = actor.UpdateManagedServiceInstance(params)
+		})
 
-				fakeServicePlanGUID = "plan-guid"
+		It("returns a stream, warnings, and no error", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf(
+				"fake get service instance warning",
+				"fake get service plan warning",
+				"fake update service instance warning",
+			))
+			Eventually(stream).Should(Receive(Equal(PollJobEvent{
+				State:    JobProcessing,
+				Warnings: Warnings{"stream warning"},
+			})))
+		})
 
-				fakeCloudControllerClient.GetServicePlansReturns(
-					[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
-					ccv3.Warnings{"warning from getServicePlan"},
-					nil,
-				)
-			})
-
-			It("makes the right call to fetch the plan", func() {
-				By("Getting the service offering and broker when retrieving the instance")
+		Describe("getting the service instance", func() {
+			It("makes the right call", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
 				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
 				Expect(actualName).To(Equal(serviceInstanceName))
@@ -618,7 +418,7 @@ var _ = Describe("Service Instance Actions", func() {
 					[]ccv3.Query{
 						{
 							Key:    ccv3.FieldsServicePlanServiceOffering,
-							Values: []string{"name"},
+							Values: []string{"name", "guid"},
 						},
 						{
 							Key:    ccv3.FieldsServicePlanServiceOfferingServiceBroker,
@@ -626,169 +426,272 @@ var _ = Describe("Service Instance Actions", func() {
 						},
 					},
 				))
+			})
 
-				By("Passing the right query to get the plan")
+			When("not updating the plan", func() {
+				BeforeEach(func() {
+					params.ServicePlanName = ""
+				})
+
+				It("does not include the offering and broker", func() {
+					Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+					_, _, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+
+					Expect(actualQuery).To(BeEmpty())
+				})
+			})
+
+			When("not a managed service instance", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{
+							Type: resources.UserProvidedServiceInstance,
+							Name: serviceInstanceName,
+							GUID: serviceInstanceGUID,
+						},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"warning from get"},
+						nil,
+					)
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(warnings).To(ConsistOf("warning from get"))
+					Expect(executeErr).To(MatchError(actionerror.ServiceInstanceTypeError{
+						Name:         serviceInstanceName,
+						RequiredType: resources.ManagedServiceInstance,
+					}))
+				})
+			})
+
+			When("not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"warning from get"},
+						ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
+					)
+				})
+
+				It("returns warnings and an actionerror", func() {
+					Expect(warnings).To(ConsistOf("warning from get"))
+					Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{
+						Name: serviceInstanceName,
+					}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"warning from get"},
+						errors.New("bang"),
+					)
+				})
+
+				It("returns warnings and an error", func() {
+					//Expect(warnings).To(ContainElement("warning from get"))
+					Expect(executeErr).To(MatchError("bang"))
+				})
+			})
+		})
+
+		Describe("checking the new plan", func() {
+			It("gets the plan", func() {
 				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
-				query := fakeCloudControllerClient.GetServicePlansArgsForCall(0)
-				Expect(query[0].Key).To(Equal(ccv3.NameFilter))
-				Expect(query[0].Values[0]).To(Equal(fakeServicePlanName))
-				Expect(query[1].Key).To(Equal(ccv3.ServiceBrokerNamesFilter))
-				Expect(query[1].Values[0]).To(Equal(fakeServiceBrokerName))
-				Expect(query[2].Key).To(Equal(ccv3.ServiceOfferingNamesFilter))
-				Expect(query[2].Values[0]).To(Equal(fakeServiceOfferingName))
-
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.ServiceOfferingGUIDsFilter, Values: []string{serviceOfferingGUID}},
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{newServicePlanName}},
+				))
 			})
 
-			It("sends the plan guid in the update request", func() {
-				guid, updates := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
-				Expect(guid).To(Equal(guid))
-				Expect(updates.ServicePlanGUID).To(Equal(fakeServicePlanGUID))
-			})
-
-			It("returns all warnings", func() {
-				Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-			})
-
-			Context("errors getting the plan", func() {
-				When("no plan found", func() {
-					fakeServicePlanName = "invalid-plan"
-
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"warning from getServicePlan"}, nil)
-					})
-
-					It("returns with warnings and an error", func() {
-						Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
-
-						Expect(warnings).To(ConsistOf("warning from getServiceInstance", "warning from getServicePlan"))
-						Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{
-							PlanName:          fakeServicePlanName,
-							ServiceBrokerName: fakeServiceBrokerName,
-							OfferingName:      fakeServiceOfferingName,
-						}))
-					})
+			When("no plan change requested", func() {
+				BeforeEach(func() {
+					params.ServicePlanName = ""
 				})
 
-				When("client error when getting the plan", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetServicePlansReturns([]resources.ServicePlan{}, ccv3.Warnings{"warning from getServicePlan"}, errors.New("boom"))
-					})
-
-					It("returns warnings and an error", func() {
-						Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(0))
-
-						Expect(warnings).To(ConsistOf("warning from getServiceInstance", "warning from getServicePlan"))
-						Expect(err).To(MatchError("boom"))
-					})
+				It("does not get the plan", func() {
+					Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(BeZero())
 				})
 			})
 
-			Context("detecting no-op updates", func() {
-				When("plan is the current plan", func() {
+			When("no plan found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]resources.ServicePlan{},
+						ccv3.Warnings{"fake get service plan warning"},
+						nil,
+					)
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(executeErr).To(MatchError(actionerror.ServicePlanNotFoundError{
+						PlanName:          newServicePlanName,
+						OfferingName:      serviceOfferingName,
+						ServiceBrokerName: serviceBrokerName,
+					}))
+
+					Expect(warnings).To(ConsistOf(
+						"fake get service instance warning",
+						"fake get service plan warning",
+					))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]resources.ServicePlan{},
+						ccv3.Warnings{"fake get service plan warning"},
+						errors.New("bang"),
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError("bang"))
+
+					Expect(warnings).To(ConsistOf(
+						"fake get service instance warning",
+						"fake get service plan warning",
+					))
+				})
+			})
+
+		})
+
+		Describe("detecting no-op updates", func() {
+			When("no updates are requested", func() {
+				BeforeEach(func() {
+					params.ServicePlanName = ""
+					params.Tags = types.OptionalStringSlice{}
+					params.Parameters = types.OptionalObject{}
+				})
+
+				It("returns a no-op error", func() {
+					Expect(executeErr).To(MatchError(actionerror.ServiceInstanceUpdateIsNoop{}))
+				})
+			})
+
+			When("the new plan is the same as the old plan", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]resources.ServicePlan{{
+							GUID: servicePlanGUID,
+						}},
+						ccv3.Warnings{"fake get service plan warning"},
+						nil,
+					)
+				})
+
+				Context("and no other updates are requested", func() {
 					BeforeEach(func() {
-						fakeServicePlanGUID = "current-plan-guid"
-
-						fakeCloudControllerClient.GetServicePlansReturns(
-							[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
-							ccv3.Warnings{"warning from getServicePlan"},
-							nil,
-						)
+						params.Tags = types.OptionalStringSlice{}
+						params.Parameters = types.OptionalObject{}
 					})
 
-					It("returns a no-op error and all warnings", func() {
-						Expect(err).To(MatchError(actionerror.ServiceInstanceUpdateIsNoop{}))
-						Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
+					It("returns a no-op error", func() {
+						Expect(executeErr).To(MatchError(actionerror.ServiceInstanceUpdateIsNoop{}))
+					})
+				})
+
+				Context("and a tag change is requested", func() {
+					BeforeEach(func() {
+						params.Parameters = types.OptionalObject{}
 					})
 
-					When("tags are passed", func() {
-						BeforeEach(func() {
-							fakeServicePlanGUID = "current-plan-guid"
+					It("does not return a no-op error", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+					})
+				})
 
-							fakeCloudControllerClient.GetServicePlansReturns(
-								[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
-								ccv3.Warnings{"warning from getServicePlan"},
-								nil)
-
-							params = ServiceInstanceUpdateManagedParams{
-								ServicePlanName: types.NewOptionalString(fakeServicePlanName),
-								Tags:            types.NewOptionalStringSlice("a-tag"),
-							}
-						})
-
-						It("returns all warnings", func() {
-							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-						})
+				Context("and a parameter change is requested", func() {
+					BeforeEach(func() {
+						params.Tags = types.OptionalStringSlice{}
 					})
 
-					When("params are passed", func() {
-						BeforeEach(func() {
-							fakeServicePlanGUID = "current-plan-guid"
-
-							fakeCloudControllerClient.GetServicePlansReturns(
-								[]resources.ServicePlan{{GUID: fakeServicePlanGUID}},
-								ccv3.Warnings{"warning from getServicePlan"},
-								nil)
-
-							params = ServiceInstanceUpdateManagedParams{
-								ServicePlanName: types.NewOptionalString(fakeServicePlanName),
-								Parameters:      types.NewOptionalObject(map[string]interface{}{"some-param": "a-param"}),
-							}
-						})
-
-						It("returns all warnings", func() {
-							Expect(warnings).To(ConsistOf("warning from getServicePlan", "warning from getServiceInstance"))
-						})
+					It("does not return a no-op error", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
 					})
 				})
 			})
 		})
 
-		When("there is an error polling the job", func() {
-			const jobURL = ccv3.JobURL("fake-job-url")
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Type: resources.ManagedServiceInstance,
-						GUID: guid,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"warning from get"},
-					nil,
-				)
-				fakeCloudControllerClient.UpdateServiceInstanceReturns(
-					jobURL,
-					ccv3.Warnings{"warning from update"},
-					nil,
-				)
-
-				fakeStream := make(chan ccv3.PollJobEvent)
-				fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
-				go func() {
-					fakeStream <- ccv3.PollJobEvent{
-						State:    constant.JobFailed,
-						Err:      errors.New("boom"),
-						Warnings: ccv3.Warnings{"warning from poll"},
-					}
-				}()
+		Describe("initiating the update", func() {
+			It("makes the right call", func() {
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+				actualServiceInstanceGUID, actualUpdateResource := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+				Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+				Expect(actualUpdateResource).To(Equal(resources.ServiceInstance{
+					ServicePlanGUID: newServicePlanGUID,
+					Tags:            newTags,
+					Parameters:      newParameters,
+				}))
 			})
 
-			It("returns warnings and an error in the stream", func() {
-				stream, warnings, err := actor.UpdateManagedServiceInstance(
-					serviceInstanceName,
-					spaceGUID,
-					ServiceInstanceUpdateManagedParams{Tags: types.NewOptionalStringSlice("foo", "bar")},
-				)
-				Expect(warnings).To(ConsistOf("warning from get", "warning from update"))
-				Expect(err).NotTo(HaveOccurred())
+			When("just changing tags", func() {
+				BeforeEach(func() {
+					params.ServicePlanName = ""
+					params.Parameters = types.OptionalObject{}
+				})
 
-				Eventually(stream).Should(Receive(Equal(PollJobEvent{
-					State:    JobFailed,
-					Err:      errors.New("boom"),
-					Warnings: Warnings{"warning from poll"},
-				})))
+				It("makes the right call", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+					actualServiceInstanceGUID, actualUpdateResource := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+					Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+					Expect(actualUpdateResource).To(Equal(resources.ServiceInstance{
+						Tags: newTags,
+					}))
+				})
+			})
+
+			When("just changing parameters", func() {
+				BeforeEach(func() {
+					params.ServicePlanName = ""
+					params.Tags = types.OptionalStringSlice{}
+				})
+
+				It("makes the right call", func() {
+					Expect(fakeCloudControllerClient.UpdateServiceInstanceCallCount()).To(Equal(1))
+					actualServiceInstanceGUID, actualUpdateResource := fakeCloudControllerClient.UpdateServiceInstanceArgsForCall(0)
+					Expect(actualServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+					Expect(actualUpdateResource).To(Equal(resources.ServiceInstance{
+						Parameters: newParameters,
+					}))
+				})
+
+				When("just changing plan", func() {
+
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateServiceInstanceReturns(
+						"",
+						ccv3.Warnings{"fake update service instance warning"},
+						errors.New("boom"),
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(stream).To(BeNil())
+					Expect(warnings).To(ConsistOf(
+						"fake get service instance warning",
+						"fake get service plan warning",
+						"fake update service instance warning",
+					))
+					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+		})
+
+		Describe("polling the job", func() {
+			It("polls the job", func() {
+				Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)).To(Equal(fakeJobURL))
 			})
 		})
 	})
@@ -988,7 +891,7 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			params := ManagedServiceInstanceParams{
+			params := CreateManagedServiceInstanceParams{
 				ServiceOfferingName: fakeServiceOfferingName,
 				ServicePlanName:     fakeServicePlanName,
 				ServiceInstanceName: fakeServiceInstanceName,
