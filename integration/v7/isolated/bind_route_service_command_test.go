@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("bind-route-service command", func() {
-	const command = "v3-bind-route-service"
+	const command = "bind-route-service"
 
 	Describe("help", func() {
 		matchHelpMessage := SatisfyAll(
