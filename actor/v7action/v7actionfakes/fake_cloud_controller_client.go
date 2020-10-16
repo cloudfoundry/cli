@@ -322,6 +322,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateRouteBindingStub        func(resources.RouteBinding) (ccv3.JobURL, ccv3.Warnings, error)
+	createRouteBindingMutex       sync.RWMutex
+	createRouteBindingArgsForCall []struct {
+		arg1 resources.RouteBinding
+	}
+	createRouteBindingReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createRouteBindingReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateSecurityGroupStub        func(resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
 	createSecurityGroupMutex       sync.RWMutex
 	createSecurityGroupArgsForCall []struct {
@@ -3898,6 +3913,72 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 r
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
 		result1 resources.Route
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBinding(arg1 resources.RouteBinding) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.createRouteBindingMutex.Lock()
+	ret, specificReturn := fake.createRouteBindingReturnsOnCall[len(fake.createRouteBindingArgsForCall)]
+	fake.createRouteBindingArgsForCall = append(fake.createRouteBindingArgsForCall, struct {
+		arg1 resources.RouteBinding
+	}{arg1})
+	fake.recordInvocation("CreateRouteBinding", []interface{}{arg1})
+	fake.createRouteBindingMutex.Unlock()
+	if fake.CreateRouteBindingStub != nil {
+		return fake.CreateRouteBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createRouteBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBindingCallCount() int {
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
+	return len(fake.createRouteBindingArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBindingCalls(stub func(resources.RouteBinding) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBindingArgsForCall(i int) resources.RouteBinding {
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
+	argsForCall := fake.createRouteBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBindingReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = nil
+	fake.createRouteBindingReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateRouteBindingReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.createRouteBindingMutex.Lock()
+	defer fake.createRouteBindingMutex.Unlock()
+	fake.CreateRouteBindingStub = nil
+	if fake.createRouteBindingReturnsOnCall == nil {
+		fake.createRouteBindingReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createRouteBindingReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -13782,6 +13863,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createRoleMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.createRouteBindingMutex.RLock()
+	defer fake.createRouteBindingMutex.RUnlock()
 	fake.createSecurityGroupMutex.RLock()
 	defer fake.createSecurityGroupMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()

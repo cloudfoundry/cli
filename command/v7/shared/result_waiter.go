@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (complete bool, err error) {
+func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, error) {
 	if stream == nil {
 		return true, nil
 	}
@@ -30,9 +30,9 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 			return false, event.Err
 		}
 		if event.State == v7action.JobPolling && !waitForCompletion {
-			break
+			return false, nil
 		}
 	}
 
-	return waitForCompletion, nil
+	return true, nil
 }
