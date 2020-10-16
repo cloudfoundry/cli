@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -34,7 +35,7 @@ var _ = Describe("Buildpacks", func() {
 		var (
 			query Query
 
-			buildpacks []Buildpack
+			buildpacks []resources.Buildpack
 			warnings   Warnings
 			executeErr error
 		)
@@ -268,12 +269,12 @@ var _ = Describe("Buildpacks", func() {
 					Locked:   types.NullBool{Value: false, IsSet: true},
 					State:    constant.BuildpackAwaitingUpload,
 					Position: types.NullInt{Value: 42, IsSet: true},
-					Links: APILinks{
-						"upload": APILink{
+					Links: resources.APILinks{
+						"upload": resources.APILink{
 							Method: "POST",
 							HREF:   "/v3/buildpacks/some-bp-guid/upload",
 						},
-						"self": APILink{
+						"self": resources.APILink{
 							HREF: "/v3/buildpacks/some-bp-guid",
 						},
 					},
@@ -284,7 +285,7 @@ var _ = Describe("Buildpacks", func() {
 
 		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
-				inputBuildpack = Buildpack{}
+				inputBuildpack = resources.Buildpack{}
 				response := ` {
   "errors": [
     {
@@ -509,9 +510,9 @@ var _ = Describe("Buildpacks", func() {
 
 	Describe("UpdateBuildpack", func() {
 		var (
-			inputBuildpack Buildpack
+			inputBuildpack resources.Buildpack
 
-			bp         Buildpack
+			bp         resources.Buildpack
 			warnings   Warnings
 			executeErr error
 		)
@@ -522,7 +523,7 @@ var _ = Describe("Buildpacks", func() {
 
 		When("the buildpack is successfully created", func() {
 			BeforeEach(func() {
-				inputBuildpack = Buildpack{
+				inputBuildpack = resources.Buildpack{
 					Name:   "some-buildpack",
 					GUID:   "some-bp-guid",
 					Stack:  "some-stack",
@@ -568,7 +569,7 @@ var _ = Describe("Buildpacks", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				expectedBuildpack := Buildpack{
+				expectedBuildpack := resources.Buildpack{
 					GUID:     "some-bp-guid",
 					Name:     "some-buildpack",
 					Stack:    "some-stack",
@@ -577,12 +578,12 @@ var _ = Describe("Buildpacks", func() {
 					Locked:   types.NullBool{Value: true, IsSet: true},
 					State:    constant.BuildpackAwaitingUpload,
 					Position: types.NullInt{Value: 42, IsSet: true},
-					Links: APILinks{
-						"upload": APILink{
+					Links: resources.APILinks{
+						"upload": resources.APILink{
 							Method: "POST",
 							HREF:   "/v3/buildpacks/some-bp-guid/upload",
 						},
-						"self": APILink{
+						"self": resources.APILink{
 							HREF: "/v3/buildpacks/some-bp-guid",
 						},
 					},
@@ -593,7 +594,7 @@ var _ = Describe("Buildpacks", func() {
 
 		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
-				inputBuildpack = Buildpack{
+				inputBuildpack = resources.Buildpack{
 					GUID: "some-bp-guid",
 				}
 				response := ` {

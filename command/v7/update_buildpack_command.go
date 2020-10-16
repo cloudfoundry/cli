@@ -11,13 +11,14 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/download"
 )
 
 type UpdateBuildpackActor interface {
-	UpdateBuildpackByNameAndStack(buildpackName string, buildpackStack string, buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
+	UpdateBuildpackByNameAndStack(buildpackName string, buildpackStack string, buildpack resources.Buildpack) (resources.Buildpack, v7action.Warnings, error)
 	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (ccv3.JobURL, v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
 	PollUploadBuildpackJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
@@ -104,8 +105,8 @@ func (cmd UpdateBuildpackCommand) prepareBuildpackBits() (string, string, error)
 	return buildpackBits, tmpDirPath, err
 }
 
-func (cmd UpdateBuildpackCommand) updateBuildpack() (v7action.Buildpack, error) {
-	var desiredBuildpack v7action.Buildpack
+func (cmd UpdateBuildpackCommand) updateBuildpack() (resources.Buildpack, error) {
+	var desiredBuildpack resources.Buildpack
 
 	desiredBuildpack.Enabled = types.NullBool{IsSet: cmd.Enable || cmd.Disable, Value: cmd.Enable}
 	desiredBuildpack.Locked = types.NullBool{IsSet: cmd.Lock || cmd.Unlock, Value: cmd.Lock}
@@ -133,7 +134,7 @@ func (cmd UpdateBuildpackCommand) updateBuildpack() (v7action.Buildpack, error) 
 	return updatedBuildpack, nil
 }
 
-func (cmd UpdateBuildpackCommand) uploadBits(user configv3.User, updatedBuildpack v7action.Buildpack, buildpackBitsPath string) error {
+func (cmd UpdateBuildpackCommand) uploadBits(user configv3.User, updatedBuildpack resources.Buildpack, buildpackBitsPath string) error {
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,
 		"Username":  user.Name,

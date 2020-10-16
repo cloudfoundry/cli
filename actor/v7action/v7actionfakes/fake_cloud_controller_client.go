@@ -187,18 +187,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateBuildpackStub        func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
+	CreateBuildpackStub        func(resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error)
 	createBuildpackMutex       sync.RWMutex
 	createBuildpackArgsForCall []struct {
-		arg1 ccv3.Buildpack
+		arg1 resources.Buildpack
 	}
 	createBuildpackReturns struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createBuildpackReturnsOnCall map[int]struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -925,18 +925,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetBuildpacksStub        func(...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)
+	GetBuildpacksStub        func(...ccv3.Query) ([]resources.Buildpack, ccv3.Warnings, error)
 	getBuildpacksMutex       sync.RWMutex
 	getBuildpacksArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getBuildpacksReturns struct {
-		result1 []ccv3.Buildpack
+		result1 []resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getBuildpacksReturnsOnCall map[int]struct {
-		result1 []ccv3.Buildpack
+		result1 []resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2210,18 +2210,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateBuildpackStub        func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
+	UpdateBuildpackStub        func(resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error)
 	updateBuildpackMutex       sync.RWMutex
 	updateBuildpackArgsForCall []struct {
-		arg1 ccv3.Buildpack
+		arg1 resources.Buildpack
 	}
 	updateBuildpackReturns struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateBuildpackReturnsOnCall map[int]struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3324,11 +3324,11 @@ func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildpack(arg1 ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateBuildpack(arg1 resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error) {
 	fake.createBuildpackMutex.Lock()
 	ret, specificReturn := fake.createBuildpackReturnsOnCall[len(fake.createBuildpackArgsForCall)]
 	fake.createBuildpackArgsForCall = append(fake.createBuildpackArgsForCall, struct {
-		arg1 ccv3.Buildpack
+		arg1 resources.Buildpack
 	}{arg1})
 	fake.recordInvocation("CreateBuildpack", []interface{}{arg1})
 	fake.createBuildpackMutex.Unlock()
@@ -3348,43 +3348,43 @@ func (fake *FakeCloudControllerClient) CreateBuildpackCallCount() int {
 	return len(fake.createBuildpackArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildpackCalls(stub func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateBuildpackCalls(stub func(resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error)) {
 	fake.createBuildpackMutex.Lock()
 	defer fake.createBuildpackMutex.Unlock()
 	fake.CreateBuildpackStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildpackArgsForCall(i int) ccv3.Buildpack {
+func (fake *FakeCloudControllerClient) CreateBuildpackArgsForCall(i int) resources.Buildpack {
 	fake.createBuildpackMutex.RLock()
 	defer fake.createBuildpackMutex.RUnlock()
 	argsForCall := fake.createBuildpackArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildpackReturns(result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateBuildpackReturns(result1 resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.createBuildpackMutex.Lock()
 	defer fake.createBuildpackMutex.Unlock()
 	fake.CreateBuildpackStub = nil
 	fake.createBuildpackReturns = struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateBuildpackReturnsOnCall(i int, result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateBuildpackReturnsOnCall(i int, result1 resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.createBuildpackMutex.Lock()
 	defer fake.createBuildpackMutex.Unlock()
 	fake.CreateBuildpackStub = nil
 	if fake.createBuildpackReturnsOnCall == nil {
 		fake.createBuildpackReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Buildpack
+			result1 resources.Buildpack
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createBuildpackReturnsOnCall[i] = struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -6562,7 +6562,7 @@ func (fake *FakeCloudControllerClient) GetBuildReturnsOnCall(i int, result1 reso
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetBuildpacks(arg1 ...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetBuildpacks(arg1 ...ccv3.Query) ([]resources.Buildpack, ccv3.Warnings, error) {
 	fake.getBuildpacksMutex.Lock()
 	ret, specificReturn := fake.getBuildpacksReturnsOnCall[len(fake.getBuildpacksArgsForCall)]
 	fake.getBuildpacksArgsForCall = append(fake.getBuildpacksArgsForCall, struct {
@@ -6586,7 +6586,7 @@ func (fake *FakeCloudControllerClient) GetBuildpacksCallCount() int {
 	return len(fake.getBuildpacksArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetBuildpacksCalls(stub func(...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetBuildpacksCalls(stub func(...ccv3.Query) ([]resources.Buildpack, ccv3.Warnings, error)) {
 	fake.getBuildpacksMutex.Lock()
 	defer fake.getBuildpacksMutex.Unlock()
 	fake.GetBuildpacksStub = stub
@@ -6599,30 +6599,30 @@ func (fake *FakeCloudControllerClient) GetBuildpacksArgsForCall(i int) []ccv3.Qu
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetBuildpacksReturns(result1 []ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetBuildpacksReturns(result1 []resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.getBuildpacksMutex.Lock()
 	defer fake.getBuildpacksMutex.Unlock()
 	fake.GetBuildpacksStub = nil
 	fake.getBuildpacksReturns = struct {
-		result1 []ccv3.Buildpack
+		result1 []resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetBuildpacksReturnsOnCall(i int, result1 []ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetBuildpacksReturnsOnCall(i int, result1 []resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.getBuildpacksMutex.Lock()
 	defer fake.getBuildpacksMutex.Unlock()
 	fake.GetBuildpacksStub = nil
 	if fake.getBuildpacksReturnsOnCall == nil {
 		fake.getBuildpacksReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Buildpack
+			result1 []resources.Buildpack
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getBuildpacksReturnsOnCall[i] = struct {
-		result1 []ccv3.Buildpack
+		result1 []resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -12202,11 +12202,11 @@ func (fake *FakeCloudControllerClient) UpdateApplicationStopReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateBuildpack(arg1 ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateBuildpack(arg1 resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error) {
 	fake.updateBuildpackMutex.Lock()
 	ret, specificReturn := fake.updateBuildpackReturnsOnCall[len(fake.updateBuildpackArgsForCall)]
 	fake.updateBuildpackArgsForCall = append(fake.updateBuildpackArgsForCall, struct {
-		arg1 ccv3.Buildpack
+		arg1 resources.Buildpack
 	}{arg1})
 	fake.recordInvocation("UpdateBuildpack", []interface{}{arg1})
 	fake.updateBuildpackMutex.Unlock()
@@ -12226,43 +12226,43 @@ func (fake *FakeCloudControllerClient) UpdateBuildpackCallCount() int {
 	return len(fake.updateBuildpackArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateBuildpackCalls(stub func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateBuildpackCalls(stub func(resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error)) {
 	fake.updateBuildpackMutex.Lock()
 	defer fake.updateBuildpackMutex.Unlock()
 	fake.UpdateBuildpackStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateBuildpackArgsForCall(i int) ccv3.Buildpack {
+func (fake *FakeCloudControllerClient) UpdateBuildpackArgsForCall(i int) resources.Buildpack {
 	fake.updateBuildpackMutex.RLock()
 	defer fake.updateBuildpackMutex.RUnlock()
 	argsForCall := fake.updateBuildpackArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) UpdateBuildpackReturns(result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateBuildpackReturns(result1 resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.updateBuildpackMutex.Lock()
 	defer fake.updateBuildpackMutex.Unlock()
 	fake.UpdateBuildpackStub = nil
 	fake.updateBuildpackReturns = struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateBuildpackReturnsOnCall(i int, result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateBuildpackReturnsOnCall(i int, result1 resources.Buildpack, result2 ccv3.Warnings, result3 error) {
 	fake.updateBuildpackMutex.Lock()
 	defer fake.updateBuildpackMutex.Unlock()
 	fake.UpdateBuildpackStub = nil
 	if fake.updateBuildpackReturnsOnCall == nil {
 		fake.updateBuildpackReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Buildpack
+			result1 resources.Buildpack
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateBuildpackReturnsOnCall[i] = struct {
-		result1 ccv3.Buildpack
+		result1 resources.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

@@ -94,7 +94,7 @@ var _ = Describe("SSH Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 					Links: ccv3.InfoLinks{
-						AppSSH: ccv3.APILink{HREF: ""},
+						AppSSH: resources.APILink{HREF: ""},
 					},
 				}, nil, nil)
 			})
@@ -108,7 +108,7 @@ var _ = Describe("SSH Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 					Links: ccv3.InfoLinks{
-						AppSSH: ccv3.APILink{HREF: "some-app-ssh-endpoint"},
+						AppSSH: resources.APILink{HREF: "some-app-ssh-endpoint"},
 					},
 				}, nil, nil)
 			})
@@ -122,9 +122,9 @@ var _ = Describe("SSH Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 					Links: ccv3.InfoLinks{
-						AppSSH: ccv3.APILink{
+						AppSSH: resources.APILink{
 							HREF: "some-app-ssh-endpoint",
-							Meta: ccv3.APILinkMeta{HostKeyFingerprint: "some-app-ssh-fingerprint"},
+							Meta: resources.APILinkMeta{HostKeyFingerprint: "some-app-ssh-fingerprint"},
 						},
 					},
 				}, nil, nil)

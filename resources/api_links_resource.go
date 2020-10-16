@@ -1,4 +1,4 @@
-package ccv3
+package resources
 
 // APILink represents a generic link from a response object.
 type APILink struct {

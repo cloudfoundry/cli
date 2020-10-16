@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/download"
 )
@@ -58,7 +59,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(v7action.Buildpack{
+	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(resources.Buildpack{
 		Name:     cmd.RequiredArgs.Buildpack,
 		Position: types.NullInt{IsSet: true, Value: cmd.RequiredArgs.Position},
 		Enabled:  types.NullBool{IsSet: true, Value: !cmd.Disable},
