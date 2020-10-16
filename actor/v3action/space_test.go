@@ -62,7 +62,7 @@ var _ = Describe("Space", func() {
 					resources.Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
-					ccv3.IsolationSegment{Name: "some-iso-name"},
+					resources.IsolationSegment{Name: "some-iso-name"},
 					ccv3.Warnings{"warning-5", "warning-6"}, nil)
 			})
 
@@ -137,7 +137,7 @@ var _ = Describe("Space", func() {
 					resources.Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
-					ccv3.IsolationSegment{Name: "some-iso-name"},
+					resources.IsolationSegment{Name: "some-iso-name"},
 					ccv3.Warnings{"warning-5", "warning-6"}, expectedErr)
 			})
 

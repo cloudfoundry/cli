@@ -2,21 +2,14 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-// IsolationSegment represents a Cloud Controller Isolation Segment.
-type IsolationSegment struct {
-	//GUID is the unique ID of the isolation segment.
-	GUID string `json:"guid,omitempty"`
-	//Name is the name of the isolation segment.
-	Name string `json:"name"`
-}
 
 // CreateIsolationSegment will create an Isolation Segment on the Cloud
 // Controller. Note: This will not validate that the placement tag exists in
 // the diego cluster.
-func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) (IsolationSegment, Warnings, error) {
-	var responseBody IsolationSegment
+func (client *Client) CreateIsolationSegment(isolationSegment resources.IsolationSegment) (resources.IsolationSegment, Warnings, error) {
+	var responseBody resources.IsolationSegment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostIsolationSegmentsRequest,
@@ -41,8 +34,8 @@ func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 
 // GetIsolationSegment returns back the requested isolation segment that
 // matches the GUID.
-func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnings, error) {
-	var responseBody IsolationSegment
+func (client *Client) GetIsolationSegment(guid string) (resources.IsolationSegment, Warnings, error) {
+	var responseBody resources.IsolationSegment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetIsolationSegmentRequest,
@@ -54,18 +47,18 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 }
 
 // GetIsolationSegments lists isolation segments with optional filters.
-func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
-	var resources []IsolationSegment
+func (client *Client) GetIsolationSegments(query ...Query) ([]resources.IsolationSegment, Warnings, error) {
+	var isolationSegments []resources.IsolationSegment
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetIsolationSegmentsRequest,
 		Query:        query,
-		ResponseBody: IsolationSegment{},
+		ResponseBody: resources.IsolationSegment{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(IsolationSegment))
+			isolationSegments = append(isolationSegments, item.(resources.IsolationSegment))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return isolationSegments, warnings, err
 }

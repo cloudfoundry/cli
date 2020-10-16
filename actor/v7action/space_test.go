@@ -125,7 +125,7 @@ var _ = Describe("Space", func() {
 					resources.Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
-					ccv3.IsolationSegment{Name: "some-iso-name"},
+					resources.IsolationSegment{Name: "some-iso-name"},
 					ccv3.Warnings{"warning-5", "warning-6"}, nil)
 			})
 
@@ -200,7 +200,7 @@ var _ = Describe("Space", func() {
 					resources.Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
-					ccv3.IsolationSegment{Name: "some-iso-name"},
+					resources.IsolationSegment{Name: "some-iso-name"},
 					ccv3.Warnings{"warning-5", "warning-6"}, expectedErr)
 			})
 
@@ -801,7 +801,7 @@ var _ = Describe("Space", func() {
 				)
 
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
-					ccv3.IsolationSegment{GUID: "iso-seg-guid", Name: "some-iso-seg"},
+					resources.IsolationSegment{GUID: "iso-seg-guid", Name: "some-iso-seg"},
 					ccv3.Warnings{"get-iso-seg-warning"},
 					nil,
 				)
@@ -815,7 +815,7 @@ var _ = Describe("Space", func() {
 			When("getting isolation segment info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetIsolationSegmentReturns(
-						ccv3.IsolationSegment{},
+						resources.IsolationSegment{},
 						ccv3.Warnings{"get-iso-seg-warning"},
 						errors.New("iso-seg-error"),
 					)
