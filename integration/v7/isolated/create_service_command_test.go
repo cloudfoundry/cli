@@ -134,24 +134,24 @@ var _ = Describe("create-service command", func() {
 			var (
 				serviceOffering string
 				servicePlan     string
-				broker1         *servicebrokerstub.ServiceBrokerStub
+				broker          *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
-				broker1 = servicebrokerstub.EnableServiceAccess()
-				serviceOffering = broker1.FirstServiceOfferingName()
-				servicePlan = broker1.FirstServicePlanName()
+				broker = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 			})
 
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
-				broker1.Forget()
+				broker.Forget()
 			})
 
 			It("displays a message, OK and creates the instance", func() {
 				session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-t", "a-tag,another-tag")
 				assertCreateMessage(session)
-				Eventually(session).Should(Say("Create in progress. Use 'cf services' or 'cf service my-service' to check operation status."))
+				Eventually(session).Should(Say(`Service instance %s created\.\n`, serviceInstanceName))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF(serviceCommand, serviceInstanceName)
@@ -161,7 +161,6 @@ var _ = Describe("create-service command", func() {
 					Say(`type:\s+%s`, "managed"),
 					Say(`tags:\s+a-tag,\s*another-tag`),
 				))
-
 			})
 
 			When("creating with valid params json", func() {
@@ -205,9 +204,31 @@ var _ = Describe("create-service command", func() {
 				})
 			})
 
+			When("the service broker responds asynchronously", func() {
+				BeforeEach(func() {
+					broker.WithAsyncDelay(time.Second).Configure()
+				})
+
+				It("displays a message, OK and creates the instance", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-t", "a-tag,another-tag")
+					assertCreateMessage(session)
+					Eventually(session).Should(Say("Create in progress. Use 'cf services' or 'cf service my-service' to check operation status."))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(SatisfyAll(
+						Say(`name:\s+%s`, serviceInstanceName),
+						Say(`type:\s+%s`, "managed"),
+						Say(`tags:\s+a-tag,\s*another-tag`),
+					))
+
+				})
+			})
+
 			When("creating with --wait flag", func() {
 				BeforeEach(func() {
-					broker1.WithAsyncDelay(5 * time.Second)
+					broker.WithAsyncDelay(5 * time.Second).Configure()
 				})
 
 				It("displays a message, OK and creates the instance", func() {

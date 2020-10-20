@@ -124,10 +124,6 @@ var _ = Describe("update-service command", func() {
 			serviceInstanceName string
 		)
 
-		waitUntilUpdateComplete := func(serviceInstanceName string) {
-			Eventually(helpers.CF("service", serviceInstanceName)).Should(Say(`status:\s+update succeeded`))
-		}
-
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
@@ -162,7 +158,7 @@ var _ = Describe("update-service command", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = servicebrokerstub.New().WithPlans(2).WithAsyncDelay(time.Microsecond).EnableServiceAccess()
+				broker = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 				helpers.CreateManagedServiceInstance(
 					broker.FirstServiceOfferingName(),
 					broker.FirstServicePlanName(),
@@ -178,23 +174,52 @@ var _ = Describe("update-service command", func() {
 				broker.Forget()
 			})
 
-			It("can update tags", func() {
-				session := helpers.CF(command, serviceInstanceName, "-t", newTags)
+			It("can update tags, parameters and plan", func() {
+				By("performing the update")
+				newPlanName := broker.Services[0].Plans[1].Name
+				session := helpers.CF(command, serviceInstanceName, "-t", newTags, "-p", newPlanName, "-c", `{"foo":"bar"}`)
 				Eventually(session).Should(Exit(0))
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`Update in progress\. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+					Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
 					Say(`OK\n`),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
 
-				waitUntilUpdateComplete(serviceInstanceName)
-				session = helpers.CF("service", serviceInstanceName)
+				By("checking that the update changed things")
+				session = helpers.CF(serviceCommand, serviceInstanceName)
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say(`tags:\s+%s`, newTags))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`plan:\s+%s`, newPlanName),
+					Say(`tags:\s+%s`, newTags),
+					Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
+					Say(`\n`),
+					Say(`%s\n`, `{"foo":"bar"}`),
+				))
+			})
+
+			Describe("updating tags", func() {
+				It("can update tags alone", func() {
+					session := helpers.CF(command, serviceInstanceName, "-t", newTags)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
+						Say(`OK\n`),
+					))
+
+					Expect(string(session.Err.Contents())).To(BeEmpty())
+
+					session = helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session.Out).To(Say(`tags:\s+%s`, newTags))
+				})
 			})
 
 			Describe("updating parameters", func() {
@@ -217,7 +242,6 @@ var _ = Describe("update-service command", func() {
 					session := helpers.CF(command, serviceInstanceName, "-c", validParams)
 					Eventually(session).Should(Exit(0))
 
-					waitUntilUpdateComplete(serviceInstanceName)
 					checkParams()
 				})
 
@@ -235,7 +259,6 @@ var _ = Describe("update-service command", func() {
 					session := helpers.CF(command, serviceInstanceName, "-c", path, "-v")
 					Eventually(session).Should(Exit(0))
 
-					waitUntilUpdateComplete(serviceInstanceName)
 					checkParams()
 				})
 
@@ -255,6 +278,7 @@ var _ = Describe("update-service command", func() {
 					newPlanName := broker.Services[0].Plans[1].Name
 					session := helpers.CF(command, serviceInstanceName, "-p", newPlanName)
 					Eventually(session).Should(Exit(0))
+
 					Eventually(helpers.CF("service", serviceInstanceName)).Should(
 						SatisfyAll(
 							Say(`plan:\s+%s`, newPlanName),
@@ -285,12 +309,25 @@ var _ = Describe("update-service command", func() {
 				})
 			})
 
-			When("the --wait flag is specified", func() {
+			When("the broker responds asynchronously", func() {
 				BeforeEach(func() {
-					broker.WithAsyncDelay(5 * time.Second)
+					broker.WithAsyncDelay(time.Second).Configure()
 				})
 
-				It("waits for the update to complete", func() {
+				It("says that the operation is in progress", func() {
+					newPlanName := broker.Services[0].Plans[1].Name
+					session := helpers.CF(command, serviceInstanceName, "-p", newPlanName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`Update in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+						Say(`OK\n`),
+					))
+				})
+
+				It("accepts the --wait flag to wait for completion", func() {
 					session := helpers.CF(command, serviceInstanceName, "-c", `{"funky":"chicken"}`, "--wait")
 					Eventually(session).Should(Exit(0))
 
@@ -304,8 +341,7 @@ var _ = Describe("update-service command", func() {
 					))
 
 					Expect(string(session.Err.Contents())).To(BeEmpty())
-					waitUntilUpdateComplete(serviceInstanceName)
-					session = helpers.CF("service", serviceInstanceName)
+					session = helpers.CF(serviceCommand, serviceInstanceName)
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(Say(`status:\s+update succeeded`))
 				})

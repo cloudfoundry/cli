@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
@@ -137,11 +139,57 @@ var _ = Describe("delete-service command", func() {
 			})
 		})
 
-		When("the service instance is managed", func() {
+		When("the service instance is managed by a synchronous broker", func() {
 			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
 				broker = servicebrokerstub.EnableServiceAccess()
+				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("prints a message and exits successfully", func() {
+				session := helpers.CF(command, "-f", serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+					Say("\n"),
+					Say(`Service instance %s deleted\.\n`, serviceInstanceName),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+			})
+
+			When("the wait flag is specified", func() {
+				It("waits for the delete operation", func() {
+					session := helpers.CF(command, "-f", "-w", serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
+						Say("\n"),
+						Say("Waiting for the operation to complete."),
+						Say("\n"),
+						Say("Service instance %s deleted.\n", serviceInstanceName),
+					))
+
+					Expect(string(session.Err.Contents())).To(BeEmpty())
+
+					session = helpers.CF("services").Wait()
+					Expect(session.Out).NotTo(Say(serviceInstanceName))
+				})
+			})
+		})
+
+		When("the service instance is managed by an asynchronous broker", func() {
+			var broker *servicebrokerstub.ServiceBrokerStub
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithAsyncDelay(time.Second).EnableServiceAccess()
 				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
 			})
 
