@@ -136,8 +136,9 @@ integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
 integration-tests-full-ci: integration-cleanup
-	$(ginkgo_int) -r -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/push
-	$(ginkgo_int) -r -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
+	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
+		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
+	$(ginkgo_int) -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
 lint: custom-lint ## Runs all linters and formatters
 	@echo "Running linters..."
