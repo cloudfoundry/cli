@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	"code.cloudfoundry.org/cli/resources"
@@ -75,6 +77,28 @@ var _ = Describe("bind-route-service command", func() {
 				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
+
+		When("-c is provided with invalid JSON", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF(command, "-c", `{"not":json"}`)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("-c is provided with invalid JSON file", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				filename := helpers.TempFileWithContent(`{"not":json"}`)
+				defer os.Remove(filename)
+
+				session := helpers.CF(command, "-c", filename)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+
+		})
 	})
 
 	When("the environment is not setup correctly", func() {
@@ -141,6 +165,21 @@ var _ = Describe("bind-route-service command", func() {
 				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
 				Expect(receiver.Resources).To(HaveLen(1))
 			})
+
+			When("parameters are specified", func() {
+				It("fails with an error returned by the CC", func() {
+					session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName, "-c", `{"foo":"bar"}`)
+					Eventually(session).Should(Exit(1))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`FAILED\n`),
+					))
+
+					Expect(session.Err).To(Say(`Binding parameters are not supported for user-provided service instances\n`))
+				})
+			})
 		})
 
 		Context("managed route service with synchronous broker response", func() {
@@ -185,6 +224,24 @@ var _ = Describe("bind-route-service command", func() {
 				}
 				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
 				Expect(receiver.Resources).To(HaveLen(1))
+			})
+
+			When("parameters are specified", func() {
+				It("sends the parameters to the broker", func() {
+					session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName, "-c", `{"foo":"bar"}`)
+					Eventually(session).Should(Exit(0))
+
+					// Unfortunately the V3 endpoint for this isn't finished yet
+					var parametersReceiver map[string]interface{}
+					helpers.Curl(
+						&parametersReceiver,
+						`/v2/service_instances/%s/routes/%s/parameters`,
+						helpers.ServiceInstanceGUID(serviceInstanceName),
+						helpers.NewRoute("", domain, hostname, path).GUID(),
+					)
+
+					Expect(parametersReceiver).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
 			})
 		})
 

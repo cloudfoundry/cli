@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
@@ -14,6 +15,7 @@ type CreateRouteBindingParams struct {
 	DomainName          string
 	Hostname            string
 	Path                string
+	Parameters          types.OptionalObject
 }
 
 func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan PollJobEvent, Warnings, error) {
@@ -39,7 +41,7 @@ func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan Pol
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.createRouteBinding(serviceInstance.GUID, route.GUID)
+			jobURL, warnings, err = actor.createRouteBinding(serviceInstance.GUID, route.GUID, params.Parameters)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -51,10 +53,11 @@ func (actor Actor) CreateRouteBinding(params CreateRouteBindingParams) (chan Pol
 	return stream, Warnings(warnings), err
 }
 
-func (actor Actor) createRouteBinding(serviceInstanceGUID, routeGUID string) (ccv3.JobURL, ccv3.Warnings, error) {
+func (actor Actor) createRouteBinding(serviceInstanceGUID, routeGUID string, parameters types.OptionalObject) (ccv3.JobURL, ccv3.Warnings, error) {
 	jobURL, warnings, err := actor.CloudControllerClient.CreateRouteBinding(resources.RouteBinding{
 		ServiceInstanceGUID: serviceInstanceGUID,
 		RouteGUID:           routeGUID,
+		Parameters:          parameters,
 	})
 	switch err.(type) {
 	case nil:

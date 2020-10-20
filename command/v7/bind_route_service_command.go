@@ -5,17 +5,18 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type BindRouteServiceCommand struct {
 	BaseCommand
 
-	RequiredArgs     flag.RouteServiceArgs `positional-args:"yes"`
-	ParametersAsJSON flag.Path             `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	Hostname         string                `long:"hostname" short:"n" description:"Hostname used in combination with DOMAIN to specify the route to bind"`
-	Path             flag.V7RoutePath      `long:"path" description:"Path used in combination with HOSTNAME and DOMAIN to specify the route to bind"`
-	Wait             bool                  `short:"w" long:"wait" description:"Wait for the bind operation to complete"`
-	relatedCommands  interface{}           `related_commands:"routes, services"`
+	RequiredArgs    flag.RouteServiceArgs         `positional-args:"yes"`
+	Parameters      flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
+	Hostname        string                        `long:"hostname" short:"n" description:"Hostname used in combination with DOMAIN to specify the route to bind"`
+	Path            flag.V7RoutePath              `long:"path" description:"Path used in combination with HOSTNAME and DOMAIN to specify the route to bind"`
+	Wait            bool                          `short:"w" long:"wait" description:"Wait for the bind operation to complete"`
+	relatedCommands interface{}                   `related_commands:"routes, services"`
 }
 
 func (cmd BindRouteServiceCommand) Execute(args []string) error {
@@ -33,6 +34,7 @@ func (cmd BindRouteServiceCommand) Execute(args []string) error {
 		DomainName:          cmd.RequiredArgs.Domain,
 		Hostname:            cmd.Hostname,
 		Path:                cmd.Path.Path,
+		Parameters:          types.OptionalObject(cmd.Parameters),
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	switch err.(type) {

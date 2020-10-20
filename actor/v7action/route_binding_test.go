@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -92,6 +93,9 @@ var _ = Describe("Route Binding Action", func() {
 				SpaceGUID:           spaceGUID,
 				ServiceInstanceName: serviceInstanceName,
 				DomainName:          domainName,
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"foo": "bar",
+				}),
 			}
 		})
 
@@ -293,6 +297,9 @@ var _ = Describe("Route Binding Action", func() {
 				Expect(fakeCloudControllerClient.CreateRouteBindingArgsForCall(0)).To(Equal(resources.RouteBinding{
 					ServiceInstanceGUID: serviceInstanceGUID,
 					RouteGUID:           routeGUID,
+					Parameters: types.NewOptionalObject(map[string]interface{}{
+						"foo": "bar",
+					}),
 				}))
 			})
 

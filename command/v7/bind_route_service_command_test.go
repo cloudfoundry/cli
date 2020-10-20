@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -70,6 +71,7 @@ var _ = Describe("bind-route-service Command", func() {
 		setPositionalFlags(&cmd, fakeDomainName, fakeServiceInstanceName)
 		setFlag(&cmd, "--hostname", fakeHostname)
 		setFlag(&cmd, "--path", fakePath)
+		setFlag(&cmd, "-c", `{"foo": "bar"}`)
 	})
 
 	JustBeforeEach(func() {
@@ -93,6 +95,7 @@ var _ = Describe("bind-route-service Command", func() {
 			DomainName:          fakeDomainName,
 			Hostname:            fakeHostname,
 			Path:                fmt.Sprintf("/%s", fakePath),
+			Parameters:          types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
 		}))
 	})
 

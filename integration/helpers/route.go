@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"path"
 	"regexp"
+	"strings"
 
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -108,4 +110,35 @@ func (r Route) String() string {
 	}
 
 	return routeString
+}
+
+func (r Route) GUID() string {
+	var domainReceiver struct {
+		Domains []resources.Domain `json:"resources"`
+	}
+	Curl(&domainReceiver, "/v3/domains?names=%s", r.Domain)
+	Expect(domainReceiver.Domains).To(HaveLen(1))
+
+	query := []string{fmt.Sprintf("domain_guids=%s", domainReceiver.Domains[0].GUID)}
+	if r.Host != "" {
+		query = append(query, fmt.Sprintf("hosts=%s", r.Host))
+	}
+	if r.Path != "" {
+		path := r.Path
+		if !strings.HasPrefix(path, "/") {
+			path = "/" + path
+		}
+		query = append(query, fmt.Sprintf("paths=%s", path))
+	}
+	if r.Port != 0 {
+		query = append(query, fmt.Sprintf("ports=%d", r.Port))
+	}
+
+	var routeReceiver struct {
+		Routes []resources.Route `json:"resources"`
+	}
+	Curl(&routeReceiver, "/v3/routes?%s", strings.Join(query, "&"))
+	Expect(routeReceiver.Routes).To(HaveLen(1))
+
+	return routeReceiver.Routes[0].GUID
 }
