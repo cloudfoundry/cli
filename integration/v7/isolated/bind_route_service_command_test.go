@@ -231,15 +231,14 @@ var _ = Describe("bind-route-service command", func() {
 					session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName, "-c", `{"foo":"bar"}`)
 					Eventually(session).Should(Exit(0))
 
-					// Unfortunately the V3 endpoint for this isn't finished yet
-					var parametersReceiver map[string]interface{}
-					helpers.Curl(
-						&parametersReceiver,
-						`/v2/service_instances/%s/routes/%s/parameters`,
-						helpers.ServiceInstanceGUID(serviceInstanceName),
-						helpers.NewRoute("", domain, hostname, path).GUID(),
-					)
+					var receiver struct {
+						Resources []resources.RouteBinding `json:"resources"`
+					}
+					helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
+					Expect(receiver.Resources).To(HaveLen(1))
 
+					var parametersReceiver map[string]interface{}
+					helpers.Curl(&parametersReceiver, `/v3/service_route_bindings/%s/parameters`, receiver.Resources[0].GUID)
 					Expect(parametersReceiver).To(Equal(map[string]interface{}{"foo": "bar"}))
 				})
 			})
