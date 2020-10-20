@@ -137,7 +137,7 @@ integration-tests-full: build integration-cleanup integration-isolated integrati
 
 integration-tests-full-ci: integration-cleanup
 	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
-		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
+		integration/shared/isolated integration/v7/isolated integration/shared/experimental integration/v7/experimental integration/v7/push
 	$(ginkgo_int) -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
 lint: custom-lint ## Runs all linters and formatters
