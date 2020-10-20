@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
@@ -10,9 +11,10 @@ import (
 func App() *mux.Router {
 	s := store.New()
 
-	handle := func(handler func(s *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error) func(w http.ResponseWriter, r *http.Request) {
+	handle := func(handler func(s *store.Store, w http.ResponseWriter, r *http.Request) error) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if err := handler(s, w, r); err != nil {
+				fmt.Printf("error: %s\n", err)
 				handleError(w, r, err)
 			}
 		}
@@ -27,12 +29,12 @@ func App() *mux.Router {
 	r.HandleFunc("/config/{broker_guid}", handle(configUpdateBroker)).Methods("PUT")
 
 	r.HandleFunc("/broker/{broker_guid}/v2/catalog", handle(brokerCatalog)).Methods("GET")
-	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerProvision)).Methods("PUT")
-	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerUpdate)).Methods("PATCH")
-	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerDeprovision)).Methods("DELETE")
-	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerRetrieve)).Methods("GET")
-
+	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerProvisionInstance)).Methods("PUT")
+	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerUpdateInstance)).Methods("PATCH")
+	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerDeprovisionInstance)).Methods("DELETE")
+	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}", handle(brokerRetrieveInstance)).Methods("GET")
 	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}/last_operation", handle(brokerLastOperation)).Methods("GET")
+
 	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}/service_bindings/{binding_guid}", handle(brokerBind)).Methods("PUT")
 	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}/service_bindings/{binding_guid}", handle(brokerGetBinding)).Methods("GET")
 	r.HandleFunc("/broker/{broker_guid}/v2/service_instances/{instance_guid}/service_bindings/{binding_guid}", handle(brokerUnbind)).Methods("DELETE")

@@ -5,3 +5,7 @@ type ServiceInstanceDetails struct {
 	PlanID     string                 `json:"plan_id"`
 	Parameters map[string]interface{} `json:"parameters"`
 }
+
+type BindingDetails struct {
+	Parameters map[string]interface{} `json:"parameters"`
+}

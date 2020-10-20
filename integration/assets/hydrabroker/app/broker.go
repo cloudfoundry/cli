@@ -15,18 +15,18 @@ import (
 )
 
 type requestGUIDs struct {
-	brokerGUID          string
-	serviceInstanceGUID string
-	bindingGUID         string
+	brokerGUID          store.BrokerID
+	serviceInstanceGUID store.InstanceID
+	bindingGUID         store.BindingID
 }
 
-func brokerParseHeaders(store *store.BrokerConfigurationStore, r *http.Request) (config.BrokerConfiguration, requestGUIDs, error) {
+func brokerParseHeaders(store *store.Store, r *http.Request) (config.BrokerConfiguration, requestGUIDs, error) {
 	guids, err := readGUIDs(r)
 	if err != nil {
 		return config.BrokerConfiguration{}, requestGUIDs{}, err
 	}
 
-	cfg, ok := store.GetBrokerConfiguration(guids.brokerGUID)
+	cfg, ok := store.RetrieveBroker(guids.brokerGUID)
 	if !ok {
 		return config.BrokerConfiguration{}, requestGUIDs{}, notFoundError{}
 	}
@@ -45,7 +45,7 @@ func brokerParseHeaders(store *store.BrokerConfigurationStore, r *http.Request) 
 	return cfg, guids, nil
 }
 
-func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerCatalog(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	config, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
@@ -114,11 +114,12 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 	return respondWithJSON(w, apiresponses.CatalogResponse{Services: services})
 }
 
-func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerProvisionInstance(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`provisioning service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.ProvisionResponse != 0 {
 		w.WriteHeader(config.ProvisionResponse)
@@ -130,7 +131,7 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 		return newBadRequestError("invalid JSON", err)
 	}
 
-	if err := store.CreateServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
+	if err := store.CreateInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
 		return err
 	}
 
@@ -147,13 +148,14 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 	}
 }
 
-func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerRetrieveInstance(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	_, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`retrieving service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
 
-	details, err := store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	details, err := store.RetrieveInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
 		return notFoundError{}
 	}
@@ -171,18 +173,19 @@ func brokerRetrieve(store *store.BrokerConfigurationStore, w http.ResponseWriter
 	return respondWithJSON(w, response)
 }
 
-func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerUpdateInstance(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`updating service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.UpdateResponse != 0 {
 		w.WriteHeader(config.UpdateResponse)
 		return nil
 	}
 
-	_, err = store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	_, err = store.RetrieveInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
 		return notFoundError{}
 	}
@@ -192,7 +195,7 @@ func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 		return newBadRequestError("invalid JSON", err)
 	}
 
-	if err := store.CreateServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
+	if err := store.UpdateInstance(guids.brokerGUID, guids.serviceInstanceGUID, details); err != nil {
 		return err
 	}
 
@@ -205,17 +208,22 @@ func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 	}
 }
 
-func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, _, err := brokerParseHeaders(store, r)
+func brokerDeprovisionInstance(store *store.Store, w http.ResponseWriter, r *http.Request) error {
+	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`deprovisioning service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.DeprovisionResponse != 0 {
 		w.WriteHeader(config.DeprovisionResponse)
 		return nil
 	}
 
+	if err := store.DeleteInstance(guids.brokerGUID, guids.serviceInstanceGUID); err != nil {
+		return err
+	}
+
 	switch config.AsyncResponseDelay {
 	case 0:
 		w.WriteHeader(http.StatusOK)
@@ -225,21 +233,31 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 	}
 }
 
-func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerBind(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`creating binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.BindResponse != 0 {
 		w.WriteHeader(config.BindResponse)
 		return nil
 	}
 
-	_, err = store.RetrieveServiceInstance(guids.brokerGUID, guids.serviceInstanceGUID)
+	_, err = store.RetrieveInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return nil
+	}
+
+	var details resources.BindingDetails
+	if err := json.NewDecoder(r.Body).Decode(&details); err != nil {
+		return newBadRequestError("invalid JSON", err)
+	}
+
+	if err := store.CreateBinding(guids.brokerGUID, guids.serviceInstanceGUID, guids.bindingGUID, details); err != nil {
+		return err
 	}
 
 	switch config.AsyncResponseDelay {
@@ -251,29 +269,40 @@ func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r 
 	}
 }
 
-func brokerGetBinding(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, _, err := brokerParseHeaders(store, r)
+func brokerGetBinding(store *store.Store, w http.ResponseWriter, r *http.Request) error {
+	config, guids, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(`retrieving binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.GetBindingResponse != 0 {
 		w.WriteHeader(config.GetBindingResponse)
 		return nil
 	}
 
-	return respondWithJSON(w, map[string]interface{}{})
-}
-
-func brokerUnbind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	config, _, err := brokerParseHeaders(store, r)
+	details, err := store.RetrieveBinding(guids.brokerGUID, guids.serviceInstanceGUID, guids.bindingGUID)
 	if err != nil {
 		return err
 	}
 
+	return respondWithJSON(w, details)
+}
+
+func brokerUnbind(store *store.Store, w http.ResponseWriter, r *http.Request) error {
+	config, guids, err := brokerParseHeaders(store, r)
+	if err != nil {
+		return err
+	}
+	fmt.Printf(`deleting binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
+
 	if config.UnbindResponse != 0 {
 		w.WriteHeader(config.UnbindResponse)
 		return nil
+	}
+
+	if err := store.DeleteBinding(guids.brokerGUID, guids.serviceInstanceGUID, guids.bindingGUID); err != nil {
+		return err
 	}
 
 	switch config.AsyncResponseDelay {
@@ -300,7 +329,7 @@ func brokerAsyncResponse(w http.ResponseWriter, r *http.Request, duration time.D
 	return respondWithJSON(w, params)
 }
 
-func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerLastOperation(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	_, _, err := brokerParseHeaders(store, r)
 	if err != nil {
 		return err

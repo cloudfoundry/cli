@@ -12,7 +12,7 @@ import (
 
 var validate = validator.New()
 
-func configCreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configCreateBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	c, err := configParse(r.Body)
 	if err != nil {
 		return err
@@ -21,10 +21,10 @@ func configCreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWr
 	guid := store.CreateBroker(c)
 
 	w.WriteHeader(http.StatusCreated)
-	return respondWithJSON(w, config.NewBrokerResponse{GUID: guid})
+	return respondWithJSON(w, config.NewBrokerResponse{GUID: string(guid)})
 }
 
-func configUpdateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configUpdateBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	c, err := configParse(r.Body)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func configUpdateBroker(store *store.BrokerConfigurationStore, w http.ResponseWr
 	return nil
 }
 
-func configDeleteBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configDeleteBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	guid, err := readGUIDs(r)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func configDeleteBroker(store *store.BrokerConfigurationStore, w http.ResponseWr
 	return nil
 }
 
-func configListBrokers(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configListBrokers(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	guids := store.ListBrokers()
 	return respondWithJSON(w, guids)
 }
