@@ -15,9 +15,9 @@ LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
+export GOFLAGS := -mod=vendor
 
 TARGET = v6
-export GOFLAGS =
 SLOW_SPEC_THRESHOLD=60
 LINT_FLAGS =
 
@@ -133,6 +133,14 @@ integration-tests: build integration-cleanup integration-isolated integration-pu
 i: integration-tests-full
 integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
+integration-tests-full-ci: integration-cleanup
+	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
+    integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
+	$(ginkgo_int) -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v6/global
+
+integration-tests-experimental-ci: integration-cleanup
+	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
+	integration/shared/experimental integration/v6/experimental
 
 lint: custom-lint ## Runs all linters and formatters
 	@echo "Running linters..."
