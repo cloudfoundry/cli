@@ -4,6 +4,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -55,6 +56,7 @@ func brokerCatalog(store *store.Store, w http.ResponseWriter, r *http.Request) e
 		w.WriteHeader(config.CatalogResponse)
 		return nil
 	}
+	log.Printf("presenting catalog")
 
 	var services []domain.Service
 	for _, ser := range config.Services {
@@ -119,7 +121,7 @@ func brokerProvisionInstance(store *store.Store, w http.ResponseWriter, r *http.
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`provisioning service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("provisioning service instance %s for broker %s", guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.ProvisionResponse != 0 {
 		w.WriteHeader(config.ProvisionResponse)
@@ -153,7 +155,7 @@ func brokerRetrieveInstance(store *store.Store, w http.ResponseWriter, r *http.R
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`retrieving service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("retrieving service instance %s for broker %s", guids.serviceInstanceGUID, guids.brokerGUID)
 
 	details, err := store.RetrieveInstance(guids.brokerGUID, guids.serviceInstanceGUID)
 	if err != nil {
@@ -178,7 +180,7 @@ func brokerUpdateInstance(store *store.Store, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`updating service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("updating service instance %s for broker %s", guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.UpdateResponse != 0 {
 		w.WriteHeader(config.UpdateResponse)
@@ -213,7 +215,7 @@ func brokerDeprovisionInstance(store *store.Store, w http.ResponseWriter, r *htt
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`deprovisioning service instance %s for broker %s\n`, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("deprovisioning service instance %s for broker %s", guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.DeprovisionResponse != 0 {
 		w.WriteHeader(config.DeprovisionResponse)
@@ -238,7 +240,7 @@ func brokerBind(store *store.Store, w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`creating binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("creating binding %s for service instance %s for broker %s", guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.BindResponse != 0 {
 		w.WriteHeader(config.BindResponse)
@@ -274,7 +276,7 @@ func brokerGetBinding(store *store.Store, w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`retrieving binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("retrieving binding %s for service instance %s for broker %s", guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.GetBindingResponse != 0 {
 		w.WriteHeader(config.GetBindingResponse)
@@ -286,7 +288,16 @@ func brokerGetBinding(store *store.Store, w http.ResponseWriter, r *http.Request
 		return err
 	}
 
-	return respondWithJSON(w, details)
+	parameters := details.Parameters
+	if parameters == nil { // Ensure response contains `{}` rather than `null`
+		parameters = make(map[string]interface{})
+	}
+
+	response := map[string]interface{}{
+		"parameters": parameters,
+	}
+
+	return respondWithJSON(w, response)
 }
 
 func brokerUnbind(store *store.Store, w http.ResponseWriter, r *http.Request) error {
@@ -294,7 +305,7 @@ func brokerUnbind(store *store.Store, w http.ResponseWriter, r *http.Request) er
 	if err != nil {
 		return err
 	}
-	fmt.Printf(`deleting binding %s for service instance %s for broker %s\n`, guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
+	log.Printf("deleting binding %s for service instance %s for broker %s", guids.bindingGUID, guids.serviceInstanceGUID, guids.brokerGUID)
 
 	if config.UnbindResponse != 0 {
 		w.WriteHeader(config.UnbindResponse)
@@ -339,6 +350,7 @@ func brokerLastOperation(store *store.Store, w http.ResponseWriter, r *http.Requ
 	if err := when.UnmarshalJSON([]byte(`"` + r.FormValue("operation") + `"`)); err != nil {
 		return err
 	}
+	log.Printf("providing last operation status for: %s", when)
 
 	result := apiresponses.LastOperationResponse{
 		Description: "very happy service",
