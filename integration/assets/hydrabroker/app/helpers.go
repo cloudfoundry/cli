@@ -3,11 +3,10 @@ package app
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
-
 	"github.com/gorilla/mux"
 	uuid "github.com/nu7hatch/gouuid"
 )
@@ -18,7 +17,7 @@ func respondWithJSON(w http.ResponseWriter, data interface{}) error {
 		return err
 	}
 
-	fmt.Printf(`responding with JSON: %s\n`, string(bytes))
+	log.Printf("responding with JSON: %s", string(bytes))
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(bytes)
 	return err

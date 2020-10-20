@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	port := port()
-	fmt.Printf("Listening on port: %s\n", port)
+	log.Printf("Listening on port: %s", port)
 	http.Handle("/", app.App())
 	http.ListenAndServe(port, nil)
 }

@@ -225,6 +225,17 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 				var r resources.BindingDetails
 				fromJSON(response.Body, &r)
 				Expect(r).To(Equal(details))
+
+				By("making sure that empty parameters is {} rather than null")
+				newBindingGUID := randomString()
+				response = httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+newBindingGUID, toJSON(resources.BindingDetails{}))
+				expectStatusCode(response, http.StatusCreated)
+
+				response = httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+newBindingGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+				var s interface{}
+				fromJSON(response.Body, &s)
+				Expect(s).To(Equal(map[string]interface{}{"parameters": map[string]interface{}{}}))
 			})
 
 			It("allows a binding to be deleted", func() {
