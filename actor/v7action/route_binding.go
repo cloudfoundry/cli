@@ -70,15 +70,11 @@ func (actor Actor) createRouteBinding(serviceInstanceGUID, routeGUID string, par
 }
 
 func (actor Actor) getRouteForBinding(params CreateRouteBindingParams, domain resources.Domain) (resources.Route, ccv3.Warnings, error) {
-	query := []ccv3.Query{{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}}}
-	if params.Hostname != "" {
-		query = append(query, ccv3.Query{Key: ccv3.HostsFilter, Values: []string{params.Hostname}})
-	}
-	if params.Path != "" {
-		query = append(query, ccv3.Query{Key: ccv3.PathsFilter, Values: []string{params.Path}})
-	}
-
-	routes, warnings, err := actor.CloudControllerClient.GetRoutes(query...)
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(
+		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
+		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{params.Hostname}},
+		ccv3.Query{Key: ccv3.PathsFilter, Values: []string{params.Path}},
+	)
 	switch {
 	case err != nil:
 		return resources.Route{}, warnings, err
