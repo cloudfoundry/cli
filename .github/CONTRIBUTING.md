@@ -54,20 +54,13 @@ The CF CLI requires the following development tools in order to run our test:
 - [golangci-lint](https://github.com/golangci/golangci-lint) - Comprehensive linting tool
 - [counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
   fakes/mocks for testing. Currently using version `6.*`.
-- [dep](https://github.com/golang/dep) - `vendor` dependency management tool
 - [make](https://www.gnu.org/software/make/) - tool for building the CLI and
   running its tests.
 
 ## Git Checkout
 
-The CF CLI should **not** be checked out under `src/github.com`, instead it
-should be checked out under `src/code.cloudfoundry.org`. While they resolve to
-the same thing on checkout, Golang will be unable to _correctly_ resolve them at
-build time.
-
+Clone the repository.
 ```bash
-mkdir -p $GOPATH/src/code.cloudfoundry.org
-cd $GOPATH/src/code.cloudfoundry.org
 git clone https://github.com/cloudfoundry/cli.git
 ```
 
@@ -75,9 +68,9 @@ git clone https://github.com/cloudfoundry/cli.git
 
 Build the binary for the **current architecture** and adding it to the `PATH`:
 ```bash
-cd $GOPATH/src/code.cloudfoundry.org/cli
+cd cli
 make build
-export PATH=$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH # Puts the built CLI first in your PATH
+export PATH=<path-to-cli-directory>/out:$PATH # Puts the built CLI first in your PATH
 ```
 
 ### Compiling for Other Operating Systems and Architectures
@@ -99,7 +92,7 @@ how to cross compile binaries for other architectures.
 
 To run the unit tests:
 ```bash
-cd $GOPATH/src/code.cloudfoundry.org/cli
+cd cli
 make units-full # will run all unit tests
 make units # runs all non-cf directory unit tests
 ```
@@ -161,9 +154,9 @@ where `<package>` contains the package with the changed interface.
 
 ## Vendoring Dependencies
 
-The CLI uses [`dep`](https://github.com/golang/dep) to manage vendored
-dependencies. Refer to the [`dep`
-documentation](https://golang.github.io/dep/docs/daily-dep.html) for managing
+The CLI uses [`go modules`](https://golang.org/ref/mod) to manage
+dependencies. Refer to the [`vendoring section`
+documentation](https://golang.org/ref/mod#vendoring) for managing
 dependencies.
 
 If you are vendoring a new dependency, please read [License and Notice
