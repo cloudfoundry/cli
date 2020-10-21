@@ -375,8 +375,8 @@ var _ = Describe("services command V3", func() {
 			appNameOnSpaceA = helpers.PrefixedRandomName("APP1")
 			appNameOnSpaceB = helpers.PrefixedRandomName("APP1")
 
-			helpers.SetupCF(orgName, spaceA)
 			helpers.CreateOrgAndSpace(orgName, spaceB)
+			helpers.SetupCF(orgName, spaceA)
 			broker := servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 			helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), managedService)
 
@@ -384,7 +384,7 @@ var _ = Describe("services command V3", func() {
 				Eventually(helpers.CF("push", appNameOnSpaceA, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 			})
 			Eventually(helpers.CF("bind-service", appNameOnSpaceA, managedService)).Should(Exit(0))
-			helpers.CF("share-service", managedService, "-s", spaceB)
+			Eventually(helpers.CF("share-service", managedService, "-s", spaceB)).Should(Exit(0))
 
 			helpers.TargetOrgAndSpace(orgName, spaceB)
 			helpers.WithHelloWorldApp(func(appDir string) {
