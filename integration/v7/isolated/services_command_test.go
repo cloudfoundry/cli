@@ -375,8 +375,8 @@ var _ = Describe("services command V3", func() {
 			appNameOnSpaceA = helpers.PrefixedRandomName("APP1")
 			appNameOnSpaceB = helpers.PrefixedRandomName("APP1")
 
-			helpers.CreateOrgAndSpace(orgName, spaceB)
 			helpers.SetupCF(orgName, spaceA)
+			helpers.CreateOrgAndSpace(orgName, spaceB)
 			broker := servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 			helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), managedService)
 
