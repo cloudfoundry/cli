@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 type SecurityGroupSummary struct {
@@ -336,15 +337,8 @@ func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpac
 			return securityGroupSpaces, warnings, err
 		}
 
-		orgsByGuid := make(map[string]resources.Organization)
-		for _, org := range includes.Organizations {
-			orgsByGuid[org.GUID] = org
-		}
-
-		spacesByGuid := make(map[string]resources.Space)
-		for _, space := range spaces {
-			spacesByGuid[space.GUID] = space
-		}
+		orgsByGuid := lookuptable.OrgFromGUID(includes.Organizations)
+		spacesByGuid := lookuptable.SpaceFromGUID(spaces)
 
 		for _, runningSpaceGUID := range runningSpaceGUIDs {
 			space := spacesByGuid[runningSpaceGUID]

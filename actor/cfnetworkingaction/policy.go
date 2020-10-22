@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 type Policy struct {
@@ -196,10 +197,7 @@ func (actor Actor) orgNamesBySpaceGUID(spaces []resources.Space) (map[string]str
 		return nil, warnings, err
 	}
 
-	orgNamesByGUID := make(map[string]string, len(orgs))
-	for _, org := range orgs {
-		orgNamesByGUID[org.GUID] = org.Name
-	}
+	orgNamesByGUID := lookuptable.NameFromGUID(orgs)
 
 	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
 	for _, space := range spaces {
@@ -249,10 +247,7 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		return []Policy{}, allWarnings, err
 	}
 
-	spaceNamesByGUID := make(map[string]string, len(spaces))
-	for _, destSpace := range spaces {
-		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
-	}
+	spaceNamesByGUID := lookuptable.NameFromGUID(spaces)
 
 	orgNamesBySpaceGUID, warnings, err := actor.orgNamesBySpaceGUID(spaces)
 	allWarnings = append(allWarnings, warnings...)
@@ -260,10 +255,7 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		return []Policy{}, allWarnings, err
 	}
 
-	appByGUID := map[string]resources.Application{}
-	for _, app := range applications {
-		appByGUID[app.GUID] = app
-	}
+	appByGUID := lookuptable.AppFromGUID(applications)
 
 	var policies []Policy
 	for _, v1Policy := range v1Policies {

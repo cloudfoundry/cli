@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
@@ -98,10 +99,7 @@ func instanceGUIDS(instances []resources.ServiceInstance) []string {
 }
 
 func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDetails {
-	brokerLookup := make(map[string]string)
-	for _, b := range included.ServiceBrokers {
-		brokerLookup[b.GUID] = b.Name
-	}
+	brokerLookup := lookuptable.NameFromGUID(included.ServiceBrokers)
 
 	type twoNames struct{ broker, offering string }
 	offeringLookup := make(map[string]twoNames)

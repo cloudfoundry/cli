@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 type SpaceWithOrganization struct {
@@ -164,15 +165,11 @@ func (client *Client) GetServiceInstanceUsageSummary(serviceInstanceGUID string)
 func mapRelationshipsToSpaces(sharedToSpaces resources.SharedToSpacesListWrapper) []SpaceWithOrganization {
 	var spacesToReturn []SpaceWithOrganization
 
-	guidToOrgNameMap := make(map[string]string)
-
-	for _, o := range sharedToSpaces.Organizations {
-		guidToOrgNameMap[o.GUID] = o.Name
-	}
+	guidToOrgNameLookup := lookuptable.NameFromGUID(sharedToSpaces.Organizations)
 
 	for _, s := range sharedToSpaces.Spaces {
 		org := s.Relationships[constant.RelationshipTypeOrganization]
-		space := SpaceWithOrganization{SpaceGUID: s.GUID, SpaceName: s.Name, OrganizationName: guidToOrgNameMap[org.GUID]}
+		space := SpaceWithOrganization{SpaceGUID: s.GUID, SpaceName: s.Name, OrganizationName: guidToOrgNameLookup[org.GUID]}
 		spacesToReturn = append(spacesToReturn, space)
 	}
 

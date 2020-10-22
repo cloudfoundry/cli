@@ -3,6 +3,7 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 // GetServiceCredentialBindings queries the CC API with the specified query
@@ -23,10 +24,7 @@ func (client Client) GetServiceCredentialBindings(query ...Query) ([]resources.S
 	})
 
 	if len(included.Apps) > 0 {
-		appLookup := make(map[string]resources.Application)
-		for _, app := range included.Apps {
-			appLookup[app.GUID] = app
-		}
+		appLookup := lookuptable.AppFromGUID(included.Apps)
 
 		for i := range result {
 			result[i].AppName = appLookup[result[i].AppGUID].Name

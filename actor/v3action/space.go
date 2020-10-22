@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 type Space struct {
@@ -92,10 +93,7 @@ func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) 
 	}
 
 	var filteredSpaces []resources.Space
-	guidToSpaces := map[string]resources.Space{}
-	for _, space := range spaces {
-		guidToSpaces[space.GUID] = space
-	}
+	guidToSpaces := lookuptable.SpaceFromGUID(spaces)
 
 	for _, guid := range guids {
 		filteredSpaces = append(filteredSpaces, guidToSpaces[guid])

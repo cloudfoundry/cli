@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 func (client *Client) GetServicePlanByGUID(guid string) (resources.ServicePlan, Warnings, error) {
@@ -138,10 +139,7 @@ func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOff
 		return i
 	}
 
-	brokerNameLookup := make(map[string]string)
-	for _, b := range included.ServiceBrokers {
-		brokerNameLookup[b.GUID] = b.Name
-	}
+	brokerNameLookup := lookuptable.NameFromGUID(included.ServiceBrokers)
 
 	for _, p := range plans {
 		i := indexOfOffering(p.ServiceOfferingGUID)
@@ -159,10 +157,7 @@ func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOff
 }
 
 func computeSpaceDetailsTable(included IncludedResources) map[string]planSpaceDetails {
-	orgNameFromGUID := make(map[string]string)
-	for _, org := range included.Organizations {
-		orgNameFromGUID[org.GUID] = org.Name
-	}
+	orgNameFromGUID := lookuptable.NameFromGUID(included.Organizations)
 
 	spaceDetailsFromGUID := make(map[string]planSpaceDetails)
 	for _, space := range included.Spaces {
