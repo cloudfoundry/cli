@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/railway"
 )
 
 type ServiceInstance struct {
@@ -24,31 +25,39 @@ type planDetails struct {
 }
 
 func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) ([]ServiceInstance, Warnings, error) {
-	instances, included, warnings, err := actor.CloudControllerClient.GetServiceInstances(
-		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
-		ccv3.Query{Key: ccv3.FieldsServicePlan, Values: []string{"guid", "name", "relationships.service_offering"}},
-		ccv3.Query{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"guid", "name", "relationships.service_broker"}},
-		ccv3.Query{Key: ccv3.FieldsServicePlanServiceOfferingServiceBroker, Values: []string{"guid", "name"}},
-		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+	var (
+		instances []resources.ServiceInstance
+		bindings  []resources.ServiceCredentialBinding
+		included  ccv3.IncludedResources
+	)
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			instances, included, warnings, err = actor.CloudControllerClient.GetServiceInstances(
+				ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				ccv3.Query{Key: ccv3.FieldsServicePlan, Values: []string{"guid", "name", "relationships.service_offering"}},
+				ccv3.Query{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"guid", "name", "relationships.service_broker"}},
+				ccv3.Query{Key: ccv3.FieldsServicePlanServiceOfferingServiceBroker, Values: []string{"guid", "name"}},
+				ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+			)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			if !omitApps {
+				bindings, warnings, err = actor.CloudControllerClient.GetServiceCredentialBindings(
+					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: instanceGUIDS(instances)},
+					ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+				)
+			}
+			return
+		},
 	)
 	if err != nil {
 		return nil, Warnings(warnings), err
 	}
 
 	planDetailsFromPlanGUIDLookup := buildPlanDetailsLookup(included)
-	var boundAppsNamesFromInstanceGUIDLookup map[string][]string
-	if !omitApps {
-		var bindingsWarnings ccv3.Warnings
-		bindings, bindingsWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
-			ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: instanceGUIDS(instances)},
-			ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
-		)
-		warnings = append(warnings, bindingsWarnings...)
-		if err != nil {
-			return nil, Warnings(warnings), err
-		}
-		boundAppsNamesFromInstanceGUIDLookup = buildBoundAppsLookup(bindings, spaceGUID)
-	}
+	boundAppsNamesFromInstanceGUIDLookup := buildBoundAppsLookup(bindings, spaceGUID)
 
 	result := make([]ServiceInstance, len(instances))
 	for i, instance := range instances {
