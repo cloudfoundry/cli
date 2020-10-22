@@ -93,6 +93,8 @@ var _ = Describe("Route Binding Action", func() {
 				SpaceGUID:           spaceGUID,
 				ServiceInstanceName: serviceInstanceName,
 				DomainName:          domainName,
+				Hostname:            hostname,
+				Path:                path,
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
@@ -206,51 +208,9 @@ var _ = Describe("Route Binding Action", func() {
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 				))
-			})
-
-			When("hostname specified", func() {
-				BeforeEach(func() {
-					params.Hostname = hostname
-				})
-
-				It("makes the correct call", func() {
-					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					))
-				})
-			})
-
-			When("path specified", func() {
-				BeforeEach(func() {
-					params.Path = path
-				})
-
-				It("makes the correct call", func() {
-					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-					))
-				})
-			})
-
-			When("hostname and path specified", func() {
-				BeforeEach(func() {
-					params.Hostname = hostname
-					params.Path = path
-				})
-
-				It("makes the correct call", func() {
-					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-					))
-				})
 			})
 
 			When("not found", func() {
