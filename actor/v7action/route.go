@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
@@ -228,9 +229,14 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 		}
 	}
 
-	spaces, _, ccv3Warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: uniqueSpaceGUIDs,
+	var spaces []resources.Space
+	ccv3Warnings, err := batcher.RequestByGUID(uniqueSpaceGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, _, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+			Key:    ccv3.GUIDFilter,
+			Values: guids,
+		})
+		spaces = append(spaces, batch...)
+		return warnings, err
 	})
 	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {

@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -714,6 +714,78 @@ var _ = Describe("Route Actions", func() {
 			It("returns the error and any warnings", func() {
 				Expect(executeErr).To(Equal(err))
 				Expect(warnings).To(ConsistOf("get-apps-warning"))
+			})
+		})
+
+		When("there are many routes", func() {
+			const batches = 10
+
+			BeforeEach(func() {
+				var (
+					manySpaces []resources.Space
+					manyApps   []resources.Application
+				)
+
+				routes = nil
+
+				for i := 0; i < batcher.BatchSize*batches; i++ {
+					routes = append(routes, resources.Route{
+						GUID: fmt.Sprintf("route-guid-%d", i),
+						Destinations: []resources.RouteDestination{
+							{
+								App: resources.RouteDestinationApp{
+									GUID: fmt.Sprintf("fake-app-guid-%d", i),
+								},
+							},
+						},
+						SpaceGUID: fmt.Sprintf("fake-space-guid-%d", i),
+						URL:       fmt.Sprintf("fake-url-%d/fake-path-%d:%d", i, i, i),
+						Host:      fmt.Sprintf("fake-host-%d", i),
+						Path:      fmt.Sprintf("fake-path-%d", i),
+						Port:      i,
+					})
+
+					manySpaces = append(manySpaces, resources.Space{
+						GUID: fmt.Sprintf("fake-space-guid-%d", i),
+						Name: fmt.Sprintf("fake-space-name-%d", i),
+					})
+
+					manyApps = append(manyApps, resources.Application{
+						GUID: fmt.Sprintf("fake-app-guid-%d", i),
+						Name: fmt.Sprintf("fake-app-name-%d", i),
+					})
+				}
+
+				for b := 0; b < batches; b++ {
+					fakeCloudControllerClient.GetSpacesReturnsOnCall(
+						b,
+						manySpaces[:batcher.BatchSize],
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"get-space-warning"},
+						nil,
+					)
+					manySpaces = manySpaces[batcher.BatchSize:]
+
+					fakeCloudControllerClient.GetApplicationsReturnsOnCall(
+						b,
+						manyApps[:batcher.BatchSize],
+						ccv3.Warnings{"get-apps-warning"},
+						nil,
+					)
+					manyApps = manyApps[batcher.BatchSize:]
+				}
+			})
+
+			It("makes multiple different calls to get spaces", func() {
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetSpacesArgsForCall(1)))
+			})
+
+			It("makes multiple different calls to get apps", func() {
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetApplicationsArgsForCall(1)))
 			})
 		})
 	})
