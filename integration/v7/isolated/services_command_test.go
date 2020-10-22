@@ -12,9 +12,7 @@ import (
 )
 
 var _ = Describe("services command", func() {
-	var (
-		userName string
-	)
+	var userName string
 
 	BeforeEach(func() {
 		userName, _ = helpers.GetCredentials()
