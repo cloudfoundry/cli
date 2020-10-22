@@ -2,6 +2,7 @@ package v7action_test
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -12,8 +13,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/batcher"
 	"code.cloudfoundry.org/clock/fakeclock"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -327,6 +328,45 @@ var _ = Describe("Application Actions", func() {
 				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid"})
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(expectedError))
+			})
+		})
+
+		When("there are many guids", func() {
+			const batches = 10
+			var guids []string
+
+			BeforeEach(func() {
+				var apps []resources.Application
+
+				for i := 0; i < batcher.BatchSize*batches; i++ {
+					guids = append(guids, fmt.Sprintf("app-%d-guid", i))
+					apps = append(apps, resources.Application{
+						Name: fmt.Sprintf("app-%d-name", i),
+						GUID: fmt.Sprintf("app-%d-guid", i),
+					})
+				}
+
+				for b := 0; b < batches; b++ {
+					fakeCloudControllerClient.GetApplicationsReturnsOnCall(
+						b,
+						apps[:batcher.BatchSize],
+						ccv3.Warnings{"some-warning"},
+						nil,
+					)
+					apps = apps[batcher.BatchSize:]
+				}
+			})
+
+			It("makes many calls", func() {
+				apps, warnings, err := actor.GetApplicationsByGUIDs(guids)
+				Expect(len(apps)).To(Equal(500))
+				Expect(apps).To(HaveLen(batcher.BatchSize * 10))
+				Expect(warnings).To(HaveLen(10))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetApplicationsArgsForCall(1)))
 			})
 		})
 	})
