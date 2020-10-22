@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/batcher"
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
@@ -44,10 +45,14 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			if !omitApps {
-				bindings, warnings, err = actor.CloudControllerClient.GetServiceCredentialBindings(
-					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: instanceGUIDS(instances)},
-					ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
-				)
+				return batcher.RequestByGUID(instanceGUIDS(instances), func(guids []string) (ccv3.Warnings, error) {
+					batch, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+						ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: guids},
+						ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+					)
+					bindings = append(bindings, batch...)
+					return warnings, err
+				})
 			}
 			return
 		},

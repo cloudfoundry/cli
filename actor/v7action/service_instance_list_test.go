@@ -1,12 +1,15 @@
 package v7action_test
 
 import (
+	"errors"
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
+	"code.cloudfoundry.org/cli/util/batcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -203,6 +206,25 @@ var _ = Describe("Service Instance List Action", func() {
 
 			It("does not get service credential bindings", func() {
 				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(0))
+			})
+		})
+
+		When("the list of service instances is long", func() {
+			BeforeEach(func() {
+				var longList []resources.ServiceInstance
+				for i := 0; i < batcher.BatchSize*10; i++ {
+					longList = append(longList, resources.ServiceInstance{GUID: fmt.Sprintf("fake-guid-%d", i)})
+				}
+				fakeCloudControllerClient.GetServiceInstancesReturns(
+					longList,
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("makes multiple requests to get the service credential bindings", func() {
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(10))
 			})
 		})
 
