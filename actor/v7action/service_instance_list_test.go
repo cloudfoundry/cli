@@ -223,8 +223,10 @@ var _ = Describe("Service Instance List Action", func() {
 				)
 			})
 
-			It("makes multiple requests to get the service credential bindings", func() {
+			It("makes multiple different requests to get the service credential bindings", func() {
 				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(1)))
 			})
 		})
 

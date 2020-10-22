@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 )
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
@@ -87,9 +88,14 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Applic
 		uniqueAppGUIDs[appGUID] = true
 	}
 
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(
-		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},
-	)
+	var apps []resources.Application
+	warnings, err := batcher.RequestByGUID(appGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetApplications(
+			ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+		)
+		apps = append(apps, batch...)
+		return warnings, err
+	})
 
 	if err != nil {
 		return nil, Warnings(warnings), err
