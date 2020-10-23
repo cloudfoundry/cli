@@ -61,39 +61,45 @@ func (actor Actor) UpdateUserProvidedServiceInstance(serviceInstanceName, spaceG
 }
 
 func (actor Actor) CreateManagedServiceInstance(params CreateManagedServiceInstanceParams) (chan PollJobEvent, Warnings, error) {
-	allWarnings := Warnings{}
-
-	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(
-		params.ServicePlanName,
-		params.ServiceOfferingName,
-		params.ServiceBrokerName,
+	var (
+		servicePlan resources.ServicePlan
+		jobURL      ccv3.JobURL
 	)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		if duplicateErr, ok := err.(actionerror.DuplicateServicePlanError); ok {
-			return nil, allWarnings, actionerror.ServiceBrokerNameRequiredError{
-				ServiceOfferingName: duplicateErr.ServiceOfferingName,
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			var v7Warnings Warnings
+			servicePlan, v7Warnings, err = actor.GetServicePlanByNameOfferingAndBroker(
+				params.ServicePlanName,
+				params.ServiceOfferingName,
+				params.ServiceBrokerName,
+			)
+			return ccv3.Warnings(v7Warnings), err
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance := resources.ServiceInstance{
+				Type:            resources.ManagedServiceInstance,
+				Name:            params.ServiceInstanceName,
+				ServicePlanGUID: servicePlan.GUID,
+				SpaceGUID:       params.SpaceGUID,
+				Tags:            params.Tags,
+				Parameters:      params.Parameters,
 			}
+
+			jobURL, warnings, err = actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
+			return
+		},
+	)
+	switch e := err.(type) {
+	case nil:
+		return actor.PollJobToEventStream(jobURL), Warnings(warnings), nil
+	case actionerror.DuplicateServicePlanError:
+		return nil, Warnings(warnings), actionerror.ServiceBrokerNameRequiredError{
+			ServiceOfferingName: e.ServiceOfferingName,
 		}
-		return nil, allWarnings, err
+	default:
+		return nil, Warnings(warnings), err
 	}
-
-	serviceInstance := resources.ServiceInstance{
-		Type:            resources.ManagedServiceInstance,
-		Name:            params.ServiceInstanceName,
-		ServicePlanGUID: servicePlan.GUID,
-		SpaceGUID:       params.SpaceGUID,
-		Tags:            params.Tags,
-		Parameters:      params.Parameters,
-	}
-
-	jobURL, clientWarnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
-	allWarnings = append(allWarnings, clientWarnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	return actor.PollJobToEventStream(jobURL), allWarnings, err
 }
 
 func (actor Actor) UpdateManagedServiceInstance(params UpdateManagedServiceInstanceParams) (chan PollJobEvent, Warnings, error) {

@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/extract"
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
@@ -133,9 +134,9 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 		ServiceInstance:   serviceInstance,
 		ServicePlan:       extractServicePlan(included),
 		ServiceOffering:   extractServiceOffering(included),
-		ServiceBrokerName: extractServiceBrokerName(included),
-		SpaceName:         extractSpaceName(included),
-		OrganizationName:  extractOrganizationName(included),
+		ServiceBrokerName: extract.First("Name", included.ServiceBrokers),
+		SpaceName:         extract.First("Name", included.Spaces),
+		OrganizationName:  extract.First("Name", included.Organizations),
 	}
 
 	return result, warnings, nil
@@ -259,36 +260,12 @@ func extractServicePlan(included ccv3.IncludedResources) resources.ServicePlan {
 	return resources.ServicePlan{}
 }
 
-func extractServiceBrokerName(included ccv3.IncludedResources) string {
-	if len(included.ServiceBrokers) == 1 {
-		return included.ServiceBrokers[0].Name
-	}
-
-	return ""
-}
-
 func extractServiceOffering(included ccv3.IncludedResources) resources.ServiceOffering {
 	if len(included.ServiceOfferings) == 1 {
 		return included.ServiceOfferings[0]
 	}
 
 	return resources.ServiceOffering{}
-}
-
-func extractSpaceName(included ccv3.IncludedResources) string {
-	if len(included.Spaces) == 1 {
-		return included.Spaces[0].Name
-	}
-
-	return ""
-}
-
-func extractOrganizationName(included ccv3.IncludedResources) string {
-	if len(included.Organizations) == 1 {
-		return included.Organizations[0].Name
-	}
-
-	return ""
 }
 
 func buildUsageSummary(sharedSpaces []ccv3.SpaceWithOrganization, usageSummaries []resources.ServiceInstanceUsageSummary) []UsageSummaryWithSpaceAndOrg {
