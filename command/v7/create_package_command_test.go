@@ -11,6 +11,7 @@ import (
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -90,7 +91,7 @@ var _ = Describe("create-package Command", func() {
 		When("no flags are set", func() {
 			When("the create is successful", func() {
 				BeforeEach(func() {
-					myPackage := v7action.Package{GUID: "1234"}
+					myPackage := resources.Package{GUID: "1234"}
 					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(myPackage, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
 				})
 
@@ -118,7 +119,7 @@ var _ = Describe("create-package Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am an error")
-					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v7action.Package{}, v7action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(resources.Package{}, v7action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
 				})
 
 				It("displays the header and error", func() {
@@ -135,7 +136,7 @@ var _ = Describe("create-package Command", func() {
 		When("the docker image is provided", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
-				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v7action.Package{GUID: "1234"}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(resources.Package{GUID: "1234"}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("creates the docker package", func() {
@@ -160,7 +161,7 @@ var _ = Describe("create-package Command", func() {
 		When("the path is provided", func() {
 			BeforeEach(func() {
 				cmd.AppPath = "some-app-path"
-				fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v7action.Package{GUID: "1234"}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(resources.Package{GUID: "1234"}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("creates the package using the specified directory", func() {

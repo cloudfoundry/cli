@@ -35,7 +35,7 @@ var _ = Describe("copy-source Command", func() {
 		sourceApp     resources.Application
 		targetApp     resources.Application
 		actorError    error
-		targetPackage v7action.Package
+		targetPackage resources.Package
 	)
 
 	BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("copy-source Command", func() {
 			Name: "target-app-name",
 			GUID: "target-app-guid",
 		}
-		targetPackage = v7action.Package{
+		targetPackage = resources.Package{
 			GUID: "target-package-guid",
 		}
 
@@ -316,7 +316,7 @@ var _ = Describe("copy-source Command", func() {
 	When("copying the package fails", func() {
 		BeforeEach(func() {
 			actorError = errors.New("copy-package-error")
-			fakeActor.CopyPackageReturns(v7action.Package{}, v7action.Warnings{}, actorError)
+			fakeActor.CopyPackageReturns(resources.Package{}, v7action.Warnings{}, actorError)
 		})
 
 		It("returns an error", func() {

@@ -66,7 +66,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 		When("creating the package is successful", func() {
 			BeforeEach(func() {
 				fakeV7Actor.CreateDockerPackageByApplicationReturns(
-					v7action.Package{GUID: "some-package-guid"},
+					resources.Package{GUID: "some-package-guid"},
 					v7action.Warnings{"some-package-warnings"},
 					nil)
 			})
@@ -98,7 +98,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 
 			BeforeEach(func() {
 				someErr = errors.New("I AM A BANANA")
-				fakeV7Actor.CreateDockerPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"some-package-warnings"}, someErr)
+				fakeV7Actor.CreateDockerPackageByApplicationReturns(resources.Package{}, v7action.Warnings{"some-package-warnings"}, someErr)
 			})
 
 			It("returns errors and warnings", func() {
@@ -112,7 +112,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 	Describe("polling package", func() {
 		When("the the polling is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.PollPackageReturns(v7action.Package{GUID: "some-package-guid"}, v7action.Warnings{"some-poll-package-warning"}, nil)
+				fakeV7Actor.PollPackageReturns(resources.Package{GUID: "some-package-guid"}, v7action.Warnings{"some-poll-package-warning"}, nil)
 			})
 
 			It("returns warnings", func() {
@@ -130,7 +130,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 
 			BeforeEach(func() {
 				someErr = errors.New("I AM A BANANA")
-				fakeV7Actor.PollPackageReturns(v7action.Package{}, v7action.Warnings{"some-poll-package-warning"}, someErr)
+				fakeV7Actor.PollPackageReturns(resources.Package{}, v7action.Warnings{"some-poll-package-warning"}, someErr)
 			})
 
 			It("returns errors and warnings", func() {
