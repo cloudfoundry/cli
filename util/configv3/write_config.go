@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 // WriteConfig creates the .cf directory and then writes the config.json. The
@@ -42,6 +43,14 @@ func (c *Config) WriteConfig() error {
 	err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
 	if err != nil {
 		return err
+	}
+
+	for i := 0; i < 5; i++ {
+		if err := os.Rename(tempConfigFileName, ConfigFilePath()); err == nil {
+			return nil
+		}
+
+		time.Sleep(50 * time.Millisecond)
 	}
 
 	return os.Rename(tempConfigFileName, ConfigFilePath())
