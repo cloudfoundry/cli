@@ -13,6 +13,14 @@ func UniqueList(expr string, input interface{}) []string {
 	return unique.StringSlice(List(expr, input))
 }
 
+func First(expr string, input interface{}) string {
+	l := List(expr, input)
+	if len(l) > 0 {
+		return l[0]
+	}
+	return ""
+}
+
 func List(expr string, input interface{}) []string {
 	var result []string
 	app := func(v string) {

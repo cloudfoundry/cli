@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/extract"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 	"code.cloudfoundry.org/cli/util/railway"
 )
@@ -46,14 +47,17 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			if !omitApps {
-				return batcher.RequestByGUID(instanceGUIDS(instances), func(guids []string) (ccv3.Warnings, error) {
-					batch, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
-						ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: guids},
-						ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
-					)
-					bindings = append(bindings, batch...)
-					return warnings, err
-				})
+				return batcher.RequestByGUID(
+					extract.UniqueList("GUID", instances),
+					func(guids []string) (ccv3.Warnings, error) {
+						batch, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+							ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: guids},
+							ccv3.Query{Key: ccv3.Include, Values: []string{"app"}},
+						)
+						bindings = append(bindings, batch...)
+						return warnings, err
+					},
+				)
 			}
 			return
 		},
@@ -88,14 +92,6 @@ func lastOperation(lo resources.LastOperation) string {
 		return fmt.Sprintf("%s %s", lo.Type, lo.State)
 	}
 	return ""
-}
-
-func instanceGUIDS(instances []resources.ServiceInstance) []string {
-	serviceInstanceGUIDS := make([]string, len(instances))
-	for i, instance := range instances {
-		serviceInstanceGUIDS[i] = instance.GUID
-	}
-	return serviceInstanceGUIDS
 }
 
 func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDetails {
