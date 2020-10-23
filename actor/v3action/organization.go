@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 // Organization represents a V3 actor organization.
@@ -36,10 +37,7 @@ func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, War
 		return []Organization{}, Warnings(warnings), err
 	}
 
-	guidToOrg := make(map[string]resources.Organization)
-	for _, org := range orgs {
-		guidToOrg[org.GUID] = org
-	}
+	guidToOrg := lookuptable.OrgFromGUID(orgs)
 
 	filteredOrgs := make([]resources.Organization, 0)
 	for _, guid := range guids {
