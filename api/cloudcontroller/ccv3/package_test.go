@@ -447,7 +447,7 @@ var _ = Describe("Package", func() {
 
 		When("the upload is successful", func() {
 			var (
-				inputResources           []Resource
+				inputResources      []Resource
 				readerBody          []byte
 				verifyHeaderAndBody func(http.ResponseWriter, *http.Request)
 			)
