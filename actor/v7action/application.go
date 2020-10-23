@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/unique"
 )
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
@@ -83,10 +84,7 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 }
 
 func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Application, Warnings, error) {
-	uniqueAppGUIDs := map[string]bool{}
-	for _, appGUID := range appGUIDs {
-		uniqueAppGUIDs[appGUID] = true
-	}
+	uniqueAppGUIDs := unique.StringSlice(appGUIDs)
 
 	var apps []resources.Application
 	warnings, err := batcher.RequestByGUID(appGUIDs, func(guids []string) (ccv3.Warnings, error) {
@@ -109,10 +107,7 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Applic
 }
 
 func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, Warnings, error) {
-	uniqueAppNames := map[string]bool{}
-	for _, appName := range appNames {
-		uniqueAppNames[appName] = true
-	}
+	uniqueAppNames := unique.StringSlice(appNames)
 
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.NameFilter, Values: appNames},
