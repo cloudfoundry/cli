@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/extract"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 	"code.cloudfoundry.org/cli/util/railway"
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -214,7 +215,7 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 	warnings, err := railway.Sequentially(
 		func() (ccv3.Warnings, error) {
 			return batcher.RequestByGUID(
-				extractUniqueSpaceGUIDsFromRoutes(routes),
+				extract.UniqueList("SpaceGUID", routes),
 				func(guids []string) (ccv3.Warnings, error) {
 					batch, _, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
 						Key:    ccv3.GUIDFilter,
@@ -227,12 +228,12 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			var v7Warning Warnings
-			apps, v7Warning, err = actor.GetApplicationsByGUIDs(extractUniqueAppGUIDsFromRoutes(routes))
+			apps, v7Warning, err = actor.GetApplicationsByGUIDs(extract.UniqueList("Destinations.App.GUID", routes))
 			return ccv3.Warnings(v7Warning), err
 		},
 		func() (warnings ccv3.Warnings, err error) {
 			return batcher.RequestByGUID(
-				extractUniqueRouteGUIDs(routes),
+				extract.UniqueList("GUID", routes),
 				func(guids []string) (ccv3.Warnings, error) {
 					batch, included, warnings, err := actor.CloudControllerClient.GetRouteBindings(
 						ccv3.Query{Key: ccv3.Include, Values: []string{"service_instance"}},
@@ -406,48 +407,4 @@ func getDomainName(fullURL, host, path string, port int) string {
 	}
 
 	return domainWithoutPath
-}
-
-func extractUniqueSpaceGUIDsFromRoutes(routes []resources.Route) []string {
-	var uniqueSpaceGUIDs []string
-	seen := make(map[string]struct{})
-
-	for _, route := range routes {
-		if _, ok := seen[route.SpaceGUID]; !ok {
-			seen[route.SpaceGUID] = struct{}{}
-			uniqueSpaceGUIDs = append(uniqueSpaceGUIDs, route.SpaceGUID)
-		}
-	}
-
-	return uniqueSpaceGUIDs
-}
-
-func extractUniqueAppGUIDsFromRoutes(routes []resources.Route) []string {
-	var uniqueAppGUIDs []string
-	seen := make(map[string]struct{})
-
-	for _, route := range routes {
-		for _, destination := range route.Destinations {
-			if _, ok := seen[destination.App.GUID]; !ok {
-				seen[destination.App.GUID] = struct{}{}
-				uniqueAppGUIDs = append(uniqueAppGUIDs, destination.App.GUID)
-			}
-		}
-	}
-
-	return uniqueAppGUIDs
-}
-
-func extractUniqueRouteGUIDs(routes []resources.Route) []string {
-	var uniqueRouteGUIDs []string
-	seen := make(map[string]struct{})
-
-	for _, route := range routes {
-		if _, ok := seen[route.GUID]; !ok {
-			seen[route.GUID] = struct{}{}
-			uniqueRouteGUIDs = append(uniqueRouteGUIDs, route.GUID)
-		}
-	}
-
-	return uniqueRouteGUIDs
 }
