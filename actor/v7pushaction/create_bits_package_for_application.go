@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,7 +26,7 @@ func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStrea
 	return pushPlan, append(warnings, pollWarnings...), err
 }
 
-func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (v7action.Package, Warnings, error) {
+func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (resources.Package, Warnings, error) {
 	log.WithField("Path", pushPlan.BitsPath).Info("creating archive")
 
 	var (
@@ -50,7 +51,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 		matchedResources, unmatchedResources, warnings, err = actor.MatchResources(pushPlan.AllResources)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
-			return v7action.Package{}, allWarnings, err
+			return resources.Package{}, allWarnings, err
 		}
 	} else {
 		matchedResources = []sharedaction.V3Resource{}
@@ -62,14 +63,14 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 	pkg, createPackageWarnings, err := actor.V7Actor.CreateBitsPackageByApplication(pushPlan.Application.GUID)
 	allWarnings = append(allWarnings, createPackageWarnings...)
 	if err != nil {
-		return v7action.Package{}, allWarnings, err
+		return resources.Package{}, allWarnings, err
 	}
 
 	if len(unmatchedResources) > 0 {
 		eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingArchive}
 		archivePath, archiveErr := actor.CreateAndReturnArchivePath(pushPlan, unmatchedResources)
 		if archiveErr != nil {
-			return v7action.Package{}, allWarnings, archiveErr
+			return resources.Package{}, allWarnings, archiveErr
 		}
 		defer os.RemoveAll(archivePath)
 
@@ -79,7 +80,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 			log.WithField("GUID", pushPlan.Application.GUID).Info("reading archive")
 			file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
 			if readErr != nil {
-				return v7action.Package{}, allWarnings, readErr
+				return resources.Package{}, allWarnings, readErr
 			}
 			defer file.Close()
 
@@ -98,9 +99,9 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 
 		if err != nil {
 			if e, ok := err.(ccerror.PipeSeekError); ok {
-				return v7action.Package{}, allWarnings, actionerror.UploadFailedError{Err: e.Err}
+				return resources.Package{}, allWarnings, actionerror.UploadFailedError{Err: e.Err}
 			}
-			return v7action.Package{}, allWarnings, err
+			return resources.Package{}, allWarnings, err
 		}
 
 		eventStream <- &PushEvent{Plan: pushPlan, Event: UploadWithArchiveComplete}
@@ -110,7 +111,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 		pkg, uploadWarnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, nil, 0)
 		allWarnings = append(allWarnings, uploadWarnings...)
 		if err != nil {
-			return v7action.Package{}, allWarnings, err
+			return resources.Package{}, allWarnings, err
 		}
 	}
 

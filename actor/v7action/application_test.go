@@ -1805,7 +1805,7 @@ var _ = Describe("Application Actions", func() {
 		When("There are no packages on the app", func() {
 			When("getting the packages succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
+					fakeCloudControllerClient.GetPackagesReturns([]resources.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
 				})
 
 				It("checks for packages", func() {
@@ -1843,7 +1843,7 @@ var _ = Describe("Application Actions", func() {
 		When("there are packages", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
+					[]resources.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
 					ccv3.Warnings{"get-packages-warning"},
 					nil)
 			})

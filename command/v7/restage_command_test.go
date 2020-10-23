@@ -69,7 +69,7 @@ var _ = Describe("restage Command", func() {
 			nil,
 		)
 		fakeActor.GetNewestReadyPackageForApplicationReturns(
-			v7action.Package{GUID: "earliest-package-guid"},
+			resources.Package{GUID: "earliest-package-guid"},
 			v7action.Warnings{"get-package-warning"},
 			nil,
 		)
@@ -152,7 +152,7 @@ var _ = Describe("restage Command", func() {
 	When("getting the package fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetNewestReadyPackageForApplicationReturns(
-				v7action.Package{},
+				resources.Package{},
 				v7action.Warnings{"get-package-warning"},
 				errors.New("get-package-error"),
 			)

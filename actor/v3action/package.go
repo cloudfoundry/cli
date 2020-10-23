@@ -18,7 +18,7 @@ const (
 	DefaultArchiveFilePermissions = 0744
 )
 
-type Package ccv3.Package
+type Package resources.Package
 
 type DockerImageCredentials struct {
 	Path     string
@@ -31,7 +31,7 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 	if err != nil {
 		return Package{}, allWarnings, err
 	}
-	inputPackage := ccv3.Package{
+	inputPackage := resources.Package{
 		Type: constant.PackageTypeDocker,
 		Relationships: resources.Relationships{
 			constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID},
@@ -90,7 +90,7 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	}
 	defer os.RemoveAll(archivePath)
 
-	inputPackage := ccv3.Package{
+	inputPackage := resources.Package{
 		Type: constant.PackageTypeBits,
 		Relationships: resources.Relationships{
 			constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID},
@@ -154,7 +154,7 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 }
 
 func (actor Actor) CreateBitsPackageByApplication(appGUID string) (Package, Warnings, error) {
-	inputPackage := ccv3.Package{
+	inputPackage := resources.Package{
 		Type: constant.PackageTypeBits,
 		Relationships: resources.Relationships{
 			constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
@@ -176,7 +176,7 @@ func (actor Actor) UploadBitsPackage(pkg Package, existingResources []sharedacti
 		apiResources = append(apiResources, ccv3.Resource(resource.ToV3Resource()))
 	}
 
-	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(ccv3.Package(pkg), apiResources, newResources, newResourcesLength)
+	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(resources.Package(pkg), apiResources, newResources, newResourcesLength)
 	return Package(appPkg), Warnings(warnings), err
 }
 

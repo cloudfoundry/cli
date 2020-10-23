@@ -48,7 +48,7 @@ var _ = Describe("Package Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{
+					[]resources.Package{
 						{
 							GUID:      "some-package-guid-1",
 							State:     constant.PackageReady,
@@ -70,7 +70,7 @@ var _ = Describe("Package Actions", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-packages-warning"))
-				Expect(packages).To(Equal([]Package{
+				Expect(packages).To(Equal([]resources.Package{
 					{
 						GUID:      "some-package-guid-1",
 						State:     constant.PackageReady,
@@ -133,7 +133,7 @@ var _ = Describe("Package Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
+					[]resources.Package{},
 					ccv3.Warnings{"get-application-packages-warning"},
 					expectedErr,
 				)
@@ -167,7 +167,7 @@ var _ = Describe("Package Actions", func() {
 			When("the cloud controller finds a package", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetPackagesReturns(
-						[]ccv3.Package{
+						[]resources.Package{
 							{
 								GUID:      "some-package-guid-1",
 								State:     constant.PackageReady,
@@ -195,7 +195,7 @@ var _ = Describe("Package Actions", func() {
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-application-packages-warning"))
-					Expect(expectedPackage).To(Equal(Package{
+					Expect(expectedPackage).To(Equal(resources.Package{
 						GUID:      "some-package-guid-1",
 						State:     constant.PackageReady,
 						CreatedAt: "2017-08-14T21:16:42Z",
@@ -207,7 +207,7 @@ var _ = Describe("Package Actions", func() {
 			When("the cloud controller does not find any packages", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetPackagesReturns(
-						[]ccv3.Package{},
+						[]resources.Package{},
 						ccv3.Warnings{"get-application-packages-warning"},
 						nil,
 					)
@@ -231,7 +231,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("get-packages-error")
 
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
+					[]resources.Package{},
 					ccv3.Warnings{"get-packages-warning"},
 					expectedErr,
 				)
@@ -248,7 +248,7 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("CreateDockerPackageByApplicationNameAndSpace", func() {
 		var (
-			dockerPackage Package
+			dockerPackage resources.Package
 			warnings      Warnings
 			executeErr    error
 		)
@@ -289,7 +289,7 @@ var _ = Describe("Package Actions", func() {
 			When("creating the package fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreatePackageReturns(
-						ccv3.Package{},
+						resources.Package{},
 						ccv3.Warnings{"some-create-package-warning"},
 						errors.New("some-create-package-error"),
 					)
@@ -302,7 +302,7 @@ var _ = Describe("Package Actions", func() {
 
 			When("creating the package succeeds", func() {
 				BeforeEach(func() {
-					createdPackage := ccv3.Package{
+					createdPackage := resources.Package{
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
@@ -326,7 +326,7 @@ var _ = Describe("Package Actions", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("some-app-warning", "some-create-package-warning"))
 
-					expectedPackage := ccv3.Package{
+					expectedPackage := resources.Package{
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
@@ -338,7 +338,7 @@ var _ = Describe("Package Actions", func() {
 							},
 						},
 					}
-					Expect(dockerPackage).To(Equal(Package(expectedPackage)))
+					Expect(dockerPackage).To(Equal(resources.Package(expectedPackage)))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
@@ -347,7 +347,7 @@ var _ = Describe("Package Actions", func() {
 					))
 
 					Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
+					Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(resources.Package{
 						Type:           constant.PackageTypeDocker,
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
@@ -364,20 +364,20 @@ var _ = Describe("Package Actions", func() {
 	Describe("CreateAndUploadBitsPackageByApplicationNameAndSpace", func() {
 		var (
 			bitsPath   string
-			pkg        Package
+			pkg        resources.Package
 			warnings   Warnings
 			executeErr error
 		)
 
 		BeforeEach(func() {
 			bitsPath = ""
-			pkg = Package{}
+			pkg = resources.Package{}
 			warnings = nil
 			executeErr = nil
 
 			// putting this here so the tests don't hang on polling
 			fakeCloudControllerClient.GetPackageReturns(
-				ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageReady},
+				resources.Package{GUID: "some-pkg-guid", State: constant.PackageReady},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -470,7 +470,7 @@ var _ = Describe("Package Actions", func() {
 						When("creating the package fails", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.CreatePackageReturns(
-									ccv3.Package{},
+									resources.Package{},
 									ccv3.Warnings{"create-package-warning"},
 									errors.New("some-create-error"),
 								)
@@ -483,10 +483,10 @@ var _ = Describe("Package Actions", func() {
 						})
 
 						When("creating the package succeeds", func() {
-							var createdPackage ccv3.Package
+							var createdPackage resources.Package
 
 							BeforeEach(func() {
-								createdPackage = ccv3.Package{
+								createdPackage = resources.Package{
 									GUID:  "some-pkg-guid",
 									State: constant.PackageAwaitingUpload,
 									Relationships: resources.Relationships{
@@ -512,7 +512,7 @@ var _ = Describe("Package Actions", func() {
 							When("uploading fails", func() {
 								BeforeEach(func() {
 									fakeCloudControllerClient.UploadPackageReturns(
-										ccv3.Package{},
+										resources.Package{},
 										ccv3.Warnings{"upload-package-warning"},
 										errors.New("some-error"),
 									)
@@ -527,7 +527,7 @@ var _ = Describe("Package Actions", func() {
 							When("uploading succeeds", func() {
 								BeforeEach(func() {
 									fakeCloudControllerClient.UploadPackageReturns(
-										ccv3.Package{},
+										resources.Package{},
 										ccv3.Warnings{"upload-package-warning"},
 										nil,
 									)
@@ -539,7 +539,7 @@ var _ = Describe("Package Actions", func() {
 									BeforeEach(func() {
 										expectedErr = errors.New("Fake error during polling")
 										fakeCloudControllerClient.GetPackageReturns(
-											ccv3.Package{},
+											resources.Package{},
 											ccv3.Warnings{"some-get-pkg-warning"},
 											expectedErr,
 										)
@@ -572,7 +572,7 @@ var _ = Describe("Package Actions", func() {
 
 										Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 										inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
-										Expect(inputPackage).To(Equal(ccv3.Package{
+										Expect(inputPackage).To(Equal(resources.Package{
 											Type: constant.PackageTypeBits,
 											Relationships: resources.Relationships{
 												constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
@@ -583,11 +583,11 @@ var _ = Describe("Package Actions", func() {
 									It("returns the package", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										expectedPackage := ccv3.Package{
+										expectedPackage := resources.Package{
 											GUID:  "some-pkg-guid",
 											State: constant.PackageReady,
 										}
-										Expect(pkg).To(Equal(Package(expectedPackage)))
+										Expect(pkg).To(Equal(resources.Package(expectedPackage)))
 
 										Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(1))
 										Expect(fakeCloudControllerClient.GetPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
@@ -596,13 +596,13 @@ var _ = Describe("Package Actions", func() {
 									DescribeTable("polls until terminal state is reached",
 										func(finalState constant.PackageState, expectedErr error) {
 											fakeCloudControllerClient.GetPackageReturns(
-												ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
+												resources.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
 												ccv3.Warnings{"poll-package-warning"},
 												nil,
 											)
 											fakeCloudControllerClient.GetPackageReturnsOnCall(
 												2,
-												ccv3.Package{State: finalState},
+												resources.Package{State: finalState},
 												ccv3.Warnings{"poll-package-warning"},
 												nil,
 											)
@@ -814,7 +814,7 @@ var _ = Describe("Package Actions", func() {
 		var (
 			appGUID string
 
-			pkg        Package
+			pkg        resources.Package
 			executeErr error
 			warnings   Warnings
 		)
@@ -826,7 +826,7 @@ var _ = Describe("Package Actions", func() {
 		When("creating the package fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreatePackageReturns(
-					ccv3.Package{},
+					resources.Package{},
 					ccv3.Warnings{"create-package-warning"},
 					errors.New("some-create-error"),
 				)
@@ -839,10 +839,10 @@ var _ = Describe("Package Actions", func() {
 		})
 
 		When("creating the package succeeds", func() {
-			var createdPackage ccv3.Package
+			var createdPackage resources.Package
 
 			BeforeEach(func() {
-				createdPackage = ccv3.Package{GUID: "some-pkg-guid"}
+				createdPackage = resources.Package{GUID: "some-pkg-guid"}
 				fakeCloudControllerClient.CreatePackageReturns(
 					createdPackage,
 					ccv3.Warnings{"create-package-warning"},
@@ -854,7 +854,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
+				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(resources.Package{
 					Type: constant.PackageTypeBits,
 					Relationships: resources.Relationships{
 						constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
@@ -871,18 +871,18 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("UploadBitsPackage", func() {
 		var (
-			pkg              Package
+			pkg              resources.Package
 			matchedResources []sharedaction.V3Resource
 			reader           io.Reader
 			readerLength     int64
 
-			appPkg     Package
+			appPkg     resources.Package
 			warnings   Warnings
 			executeErr error
 		)
 
 		BeforeEach(func() {
-			pkg = Package{GUID: "some-package-guid"}
+			pkg = resources.Package{GUID: "some-package-guid"}
 
 			matchedResources = []sharedaction.V3Resource{{FilePath: "some-resource"}, {FilePath: "another-resource"}}
 			someString := "who reads these days"
@@ -896,17 +896,17 @@ var _ = Describe("Package Actions", func() {
 
 		When("the upload is successful", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.UploadBitsPackageReturns(ccv3.Package{GUID: "some-package-guid"}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+				fakeCloudControllerClient.UploadBitsPackageReturns(resources.Package{GUID: "some-package-guid"}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
 			})
 
 			It("returns all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
-				Expect(appPkg).To(Equal(Package{GUID: "some-package-guid"}))
+				Expect(appPkg).To(Equal(resources.Package{GUID: "some-package-guid"}))
 
 				Expect(fakeCloudControllerClient.UploadBitsPackageCallCount()).To(Equal(1))
 				passedPackage, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadBitsPackageArgsForCall(0)
-				Expect(passedPackage).To(Equal(ccv3.Package(appPkg)))
+				Expect(passedPackage).To(Equal(resources.Package(appPkg)))
 				Expect(passedExistingResources).To(ConsistOf(ccv3.Resource{FilePath: "some-resource"}, ccv3.Resource{FilePath: "another-resource"}))
 				Expect(passedReader).To(Equal(reader))
 				Expect(passedReaderLength).To(Equal(readerLength))
@@ -918,7 +918,7 @@ var _ = Describe("Package Actions", func() {
 
 			BeforeEach(func() {
 				err = errors.New("some-error")
-				fakeCloudControllerClient.UploadBitsPackageReturns(ccv3.Package{}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, err)
+				fakeCloudControllerClient.UploadBitsPackageReturns(resources.Package{}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, err)
 			})
 
 			It("returns the error", func() {
@@ -931,15 +931,15 @@ var _ = Describe("Package Actions", func() {
 	Describe("PollPackage", func() {
 		Context("Polling Behavior", func() {
 			var (
-				pkg Package
+				pkg resources.Package
 
-				appPkg     Package
+				appPkg     resources.Package
 				warnings   Warnings
 				executeErr error
 			)
 
 			BeforeEach(func() {
-				pkg = Package{
+				pkg = resources.Package{
 					GUID: "some-pkg-guid",
 				}
 
@@ -948,7 +948,7 @@ var _ = Describe("Package Actions", func() {
 
 				// putting this here so the tests don't hang on polling
 				fakeCloudControllerClient.GetPackageReturns(
-					ccv3.Package{
+					resources.Package{
 						GUID:  "some-pkg-guid",
 						State: constant.PackageReady,
 					},
@@ -967,7 +967,7 @@ var _ = Describe("Package Actions", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("Fake error during polling")
 					fakeCloudControllerClient.GetPackageReturns(
-						ccv3.Package{},
+						resources.Package{},
 						ccv3.Warnings{"some-get-pkg-warning"},
 						expectedErr,
 					)
@@ -983,12 +983,12 @@ var _ = Describe("Package Actions", func() {
 				It("returns the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					expectedPackage := ccv3.Package{
+					expectedPackage := resources.Package{
 						GUID:  "some-pkg-guid",
 						State: constant.PackageReady,
 					}
 
-					Expect(appPkg).To(Equal(Package(expectedPackage)))
+					Expect(appPkg).To(Equal(resources.Package(expectedPackage)))
 					Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
 				})
@@ -998,19 +998,19 @@ var _ = Describe("Package Actions", func() {
 		DescribeTable("Polling states",
 			func(finalState constant.PackageState, expectedErr error) {
 				fakeCloudControllerClient.GetPackageReturns(
-					ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
+					resources.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
 					ccv3.Warnings{"poll-package-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetPackageReturnsOnCall(
 					1,
-					ccv3.Package{State: finalState},
+					resources.Package{State: finalState},
 					ccv3.Warnings{"poll-package-warning"},
 					nil,
 				)
 
-				_, tableWarnings, err := actor.PollPackage(Package{
+				_, tableWarnings, err := actor.PollPackage(resources.Package{
 					GUID: "some-pkg-guid",
 				})
 
@@ -1036,7 +1036,7 @@ var _ = Describe("Package Actions", func() {
 		var (
 			sourceApp  resources.Application
 			targetApp  resources.Application
-			pkg        Package
+			pkg        resources.Package
 			warnings   Warnings
 			executeErr error
 		)
@@ -1048,24 +1048,24 @@ var _ = Describe("Package Actions", func() {
 			}
 
 			fakeCloudControllerClient.GetPackagesReturns(
-				[]ccv3.Package{{GUID: "source-package-guid"}},
+				[]resources.Package{{GUID: "source-package-guid"}},
 				ccv3.Warnings{"get-source-package-warning"},
 				nil,
 			)
 
 			fakeCloudControllerClient.CopyPackageReturns(
-				ccv3.Package{GUID: "target-package-guid"},
+				resources.Package{GUID: "target-package-guid"},
 				ccv3.Warnings{"copy-package-warning"},
 				nil,
 			)
 
 			fakeCloudControllerClient.GetPackageReturnsOnCall(0,
-				ccv3.Package{State: constant.PackageCopying, GUID: "target-package-guid"},
+				resources.Package{State: constant.PackageCopying, GUID: "target-package-guid"},
 				ccv3.Warnings{"get-package-warning-copying"},
 				nil,
 			)
 			fakeCloudControllerClient.GetPackageReturnsOnCall(1,
-				ccv3.Package{State: constant.PackageReady, GUID: "target-package-guid"},
+				resources.Package{State: constant.PackageReady, GUID: "target-package-guid"},
 				ccv3.Warnings{"get-package-warning-ready"},
 				nil,
 			)
@@ -1081,7 +1081,7 @@ var _ = Describe("Package Actions", func() {
 			BeforeEach(func() {
 				err = errors.New("get-package-error")
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
+					[]resources.Package{},
 					ccv3.Warnings{"get-source-package-warning"},
 					err,
 				)
@@ -1115,7 +1115,7 @@ var _ = Describe("Package Actions", func() {
 			BeforeEach(func() {
 				err = errors.New("copy-package-error")
 				fakeCloudControllerClient.CopyPackageReturns(
-					ccv3.Package{GUID: "target-package-guid"},
+					resources.Package{GUID: "target-package-guid"},
 					ccv3.Warnings{"copy-package-warning"},
 					err,
 				)
@@ -1139,7 +1139,7 @@ var _ = Describe("Package Actions", func() {
 		When("the package fails to copy while polling the package", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetPackageReturnsOnCall(0,
-					ccv3.Package{State: constant.PackageFailed},
+					resources.Package{State: constant.PackageFailed},
 					ccv3.Warnings{"get-package-warning-copying"},
 					nil,
 				)
@@ -1154,7 +1154,7 @@ var _ = Describe("Package Actions", func() {
 		It("returns all warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(warnings).To(ConsistOf("get-source-package-warning", "copy-package-warning", "get-package-warning-copying", "get-package-warning-ready"))
-			Expect(pkg).To(Equal(Package{State: constant.PackageReady, GUID: "target-package-guid"}))
+			Expect(pkg).To(Equal(resources.Package{State: constant.PackageReady, GUID: "target-package-guid"}))
 		})
 	})
 })

@@ -169,7 +169,7 @@ var _ = Describe("stage-package Command", func() {
 				nil)
 
 			fakeActor.GetNewestReadyPackageForApplicationReturns(
-				v7action.Package{GUID: newestPackageGUID},
+				resources.Package{GUID: newestPackageGUID},
 				v7action.Warnings{"newest-pkg-warning"},
 				nil)
 		})

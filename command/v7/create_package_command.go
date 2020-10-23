@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreatePackageCommand struct {
@@ -44,7 +45,7 @@ func (cmd CreatePackageCommand) Execute(args []string) error {
 	}
 
 	var (
-		pkg      v7action.Package
+		pkg      resources.Package
 		warnings v7action.Warnings
 	)
 	if isDockerImage {

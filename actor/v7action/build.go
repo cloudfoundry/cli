@@ -167,7 +167,7 @@ func (actor Actor) PollBuild(buildGUID string, appName string) (resources.Drople
 	}
 }
 
-func packageInPackages(targetPkgGUID string, pkgs []ccv3.Package) bool {
+func packageInPackages(targetPkgGUID string, pkgs []resources.Package) bool {
 	for i := range pkgs {
 		if pkgs[i].GUID == targetPkgGUID {
 			return true
