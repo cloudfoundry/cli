@@ -103,7 +103,7 @@ type CloudControllerClient interface {
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
 	GetProcessSidecars(processGUID string) ([]ccv3.Sidecar, ccv3.Warnings, error)
 	GetRoles(query ...ccv3.Query) ([]resources.Role, ccv3.IncludedResources, ccv3.Warnings, error)
-	RootResponse() (ccv3.Info, ccv3.Warnings, error)
+	GetRouteBindings(query ...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetRouteDestinations(routeGUID string) ([]resources.RouteDestination, ccv3.Warnings, error)
 	GetRoutes(query ...ccv3.Query) ([]resources.Route, ccv3.Warnings, error)
 	GetRunningSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
@@ -141,6 +141,7 @@ type CloudControllerClient interface {
 	PollJobToEventStream(jobURL ccv3.JobURL) chan ccv3.PollJobEvent
 	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)
 	ResourceMatch(resources []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
+	RootResponse() (ccv3.Info, ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)
 	SharePrivateDomainToOrgs(domainGuid string, sharedOrgs ccv3.SharedOrgs) (ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)

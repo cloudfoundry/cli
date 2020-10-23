@@ -680,6 +680,12 @@ var _ = Describe("shared request helpers", func() {
 									"name": "broker-name-1"
 								}
 							],
+							"service_instances": [
+								{
+									"guid": "service-instance-guid-1",
+									"name": "service-instance-name-1"
+								}
+							],
 							"service_offerings": [
 								{
 									"guid": "offering-guid-1",
@@ -734,6 +740,12 @@ var _ = Describe("shared request helpers", func() {
 								{
 									"guid": "broker-guid-2",
 									"name": "broker-name-2"
+								}
+							],
+							"service_instances": [
+								{
+									"guid": "service-instance-guid-2",
+									"name": "service-instance-name-2"
 								}
 							],
 							"service_offerings": [
@@ -798,6 +810,10 @@ var _ = Describe("shared request helpers", func() {
 						ServiceBrokers: []ServiceBroker{
 							{Name: "broker-name-1", GUID: "broker-guid-1"},
 							{Name: "broker-name-2", GUID: "broker-guid-2"},
+						},
+						ServiceInstances: []resources.ServiceInstance{
+							{Name: "service-instance-name-1", GUID: "service-instance-guid-1"},
+							{Name: "service-instance-name-2", GUID: "service-instance-guid-2"},
 						},
 						ServiceOfferings: []ServiceOffering{
 							{Name: "offering-name-1", GUID: "offering-guid-1"},

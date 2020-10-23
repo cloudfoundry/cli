@@ -71,7 +71,8 @@ var _ = Describe("routes command", func() {
 				domainName string
 				domain     helpers.Domain
 
-				otherSpaceName string
+				otherSpaceName      string
+				serviceInstanceName string
 			)
 
 			BeforeEach(func() {
@@ -87,6 +88,11 @@ var _ = Describe("routes command", func() {
 				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1a")).Should(Exit(0))
 				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1b")).Should(Exit(0))
 				Eventually(helpers.CF("set-label", "route", "route1b."+domainName, "env=prod")).Should(Exit(0))
+
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				routeServiceURL := helpers.RandomURL()
+				Eventually(helpers.CF("cups", serviceInstanceName, "-r", routeServiceURL)).Should(Exit(0))
+				Eventually(helpers.CF("bind-route-service", domainName, "--hostname", "route1", serviceInstanceName, "--wait")).Should(Exit(0))
 
 				helpers.SetupCF(orgName, otherSpaceName)
 				appName2 = helpers.NewAppName()
@@ -106,31 +112,31 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`))
-				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).To(Say(`%s\s+route1a\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s`, spaceName, domainName, appName2))
+				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
+				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
+				Expect(session).To(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName2))
 			})
 
 			It("lists all the routes by label", func() {
 				session := helpers.CF("routes", "--labels", "env in (prod)")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`))
-				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s`, spaceName, domainName, appName2))
+				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
+				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
+				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName2))
 			})
 
 			When("fetching routes by org", func() {
 				It("lists all the routes in the org", func() {
 					session := helpers.CF("routes", "--org-level")
 					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
-					Eventually(session).Should(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`))
-					Eventually(session).Should(Say(`%s\s+route1\s+%s\s+http\s+%s`, spaceName, domainName, appName1))
-					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+http\s+%s`, otherSpaceName, domainName, appName2))
+					Eventually(session).Should(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
+					Eventually(session).Should(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
+					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+http\s+%s\s+\n`, otherSpaceName, domainName, appName2))
 					Eventually(session).Should(Exit(0))
 				})
 			})

@@ -11,15 +11,17 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 	"code.cloudfoundry.org/cli/util/railway"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 type RouteSummary struct {
 	resources.Route
-	AppNames   []string
-	DomainName string
-	SpaceName  string
+	AppNames            []string
+	DomainName          string
+	SpaceName           string
+	ServiceInstanceName string
 }
 
 func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, Warnings, error) {
@@ -203,8 +205,10 @@ func (actor Actor) GetRoutesByOrg(orgGUID string, labelSelector string) ([]resou
 
 func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, Warnings, error) {
 	var (
-		spaces []resources.Space
-		apps   []resources.Application
+		spaces           []resources.Space
+		apps             []resources.Application
+		routeBindings    []resources.RouteBinding
+		serviceInstances []resources.ServiceInstance
 	)
 
 	warnings, err := railway.Sequentially(
@@ -226,20 +230,33 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 			apps, v7Warning, err = actor.GetApplicationsByGUIDs(extractUniqueAppGUIDsFromRoutes(routes))
 			return ccv3.Warnings(v7Warning), err
 		},
+		func() (warnings ccv3.Warnings, err error) {
+			return batcher.RequestByGUID(
+				extractUniqueRouteGUIDs(routes),
+				func(guids []string) (ccv3.Warnings, error) {
+					batch, included, warnings, err := actor.CloudControllerClient.GetRouteBindings(
+						ccv3.Query{Key: ccv3.Include, Values: []string{"service_instance"}},
+						ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: guids},
+					)
+					routeBindings = append(routeBindings, batch...)
+					serviceInstances = append(serviceInstances, included.ServiceInstances...)
+					return warnings, err
+				},
+			)
+		},
 	)
 
 	if err != nil {
 		return nil, Warnings(warnings), err
 	}
 
-	spaceNamesByGUID := make(map[string]string)
-	for _, space := range spaces {
-		spaceNamesByGUID[space.GUID] = space.Name
-	}
+	spaceNamesByGUID := lookuptable.NameFromGUID(spaces)
+	appNamesByGUID := lookuptable.NameFromGUID(apps)
+	serviceInstanceNameByGUID := lookuptable.NameFromGUID(serviceInstances)
 
-	appNamesByGUID := make(map[string]string)
-	for _, app := range apps {
-		appNamesByGUID[app.GUID] = app.Name
+	serviceInstanceNameByRouteGUID := make(map[string]string)
+	for _, routeBinding := range routeBindings {
+		serviceInstanceNameByRouteGUID[routeBinding.RouteGUID] = serviceInstanceNameByGUID[routeBinding.ServiceInstanceGUID]
 	}
 
 	var routeSummaries []RouteSummary
@@ -251,10 +268,11 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 		}
 
 		routeSummaries = append(routeSummaries, RouteSummary{
-			Route:      route,
-			AppNames:   appNames,
-			SpaceName:  spaceNamesByGUID[route.SpaceGUID],
-			DomainName: getDomainName(route.URL, route.Host, route.Path, route.Port),
+			Route:               route,
+			AppNames:            appNames,
+			SpaceName:           spaceNamesByGUID[route.SpaceGUID],
+			DomainName:          getDomainName(route.URL, route.Host, route.Path, route.Port),
+			ServiceInstanceName: serviceInstanceNameByRouteGUID[route.GUID],
 		})
 	}
 
@@ -418,4 +436,18 @@ func extractUniqueAppGUIDsFromRoutes(routes []resources.Route) []string {
 	}
 
 	return uniqueAppGUIDs
+}
+
+func extractUniqueRouteGUIDs(routes []resources.Route) []string {
+	var uniqueRouteGUIDs []string
+	seen := make(map[string]struct{})
+
+	for _, route := range routes {
+		if _, ok := seen[route.GUID]; !ok {
+			seen[route.GUID] = struct{}{}
+			uniqueRouteGUIDs = append(uniqueRouteGUIDs, route.GUID)
+		}
+	}
+
+	return uniqueRouteGUIDs
 }

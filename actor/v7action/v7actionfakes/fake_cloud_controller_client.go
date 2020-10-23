@@ -1393,6 +1393,23 @@ type FakeCloudControllerClient struct {
 		result3 ccv3.Warnings
 		result4 error
 	}
+	GetRouteBindingsStub        func(...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error)
+	getRouteBindingsMutex       sync.RWMutex
+	getRouteBindingsArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getRouteBindingsReturns struct {
+		result1 []resources.RouteBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}
+	getRouteBindingsReturnsOnCall map[int]struct {
+		result1 []resources.RouteBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}
 	GetRouteDestinationsStub        func(string) ([]resources.RouteDestination, ccv3.Warnings, error)
 	getRouteDestinationsMutex       sync.RWMutex
 	getRouteDestinationsArgsForCall []struct {
@@ -8598,6 +8615,75 @@ func (fake *FakeCloudControllerClient) GetRolesReturnsOnCall(i int, result1 []re
 	}{result1, result2, result3, result4}
 }
 
+func (fake *FakeCloudControllerClient) GetRouteBindings(arg1 ...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error) {
+	fake.getRouteBindingsMutex.Lock()
+	ret, specificReturn := fake.getRouteBindingsReturnsOnCall[len(fake.getRouteBindingsArgsForCall)]
+	fake.getRouteBindingsArgsForCall = append(fake.getRouteBindingsArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetRouteBindings", []interface{}{arg1})
+	fake.getRouteBindingsMutex.Unlock()
+	if fake.GetRouteBindingsStub != nil {
+		return fake.GetRouteBindingsStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	fakeReturns := fake.getRouteBindingsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeCloudControllerClient) GetRouteBindingsCallCount() int {
+	fake.getRouteBindingsMutex.RLock()
+	defer fake.getRouteBindingsMutex.RUnlock()
+	return len(fake.getRouteBindingsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetRouteBindingsCalls(stub func(...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error)) {
+	fake.getRouteBindingsMutex.Lock()
+	defer fake.getRouteBindingsMutex.Unlock()
+	fake.GetRouteBindingsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetRouteBindingsArgsForCall(i int) []ccv3.Query {
+	fake.getRouteBindingsMutex.RLock()
+	defer fake.getRouteBindingsMutex.RUnlock()
+	argsForCall := fake.getRouteBindingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetRouteBindingsReturns(result1 []resources.RouteBinding, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getRouteBindingsMutex.Lock()
+	defer fake.getRouteBindingsMutex.Unlock()
+	fake.GetRouteBindingsStub = nil
+	fake.getRouteBindingsReturns = struct {
+		result1 []resources.RouteBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeCloudControllerClient) GetRouteBindingsReturnsOnCall(i int, result1 []resources.RouteBinding, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getRouteBindingsMutex.Lock()
+	defer fake.getRouteBindingsMutex.Unlock()
+	fake.GetRouteBindingsStub = nil
+	if fake.getRouteBindingsReturnsOnCall == nil {
+		fake.getRouteBindingsReturnsOnCall = make(map[int]struct {
+			result1 []resources.RouteBinding
+			result2 ccv3.IncludedResources
+			result3 ccv3.Warnings
+			result4 error
+		})
+	}
+	fake.getRouteBindingsReturnsOnCall[i] = struct {
+		result1 []resources.RouteBinding
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
 func (fake *FakeCloudControllerClient) GetRouteDestinations(arg1 string) ([]resources.RouteDestination, ccv3.Warnings, error) {
 	fake.getRouteDestinationsMutex.Lock()
 	ret, specificReturn := fake.getRouteDestinationsReturnsOnCall[len(fake.getRouteDestinationsArgsForCall)]
@@ -14005,6 +14091,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getProcessesMutex.RUnlock()
 	fake.getRolesMutex.RLock()
 	defer fake.getRolesMutex.RUnlock()
+	fake.getRouteBindingsMutex.RLock()
+	defer fake.getRouteBindingsMutex.RUnlock()
 	fake.getRouteDestinationsMutex.RLock()
 	defer fake.getRouteDestinationsMutex.RUnlock()
 	fake.getRoutesMutex.RLock()
