@@ -29,7 +29,7 @@ var _ = Describe("routes Command", func() {
 		binaryName      string
 	)
 
-	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance`
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
@@ -86,7 +86,7 @@ var _ = Describe("routes Command", func() {
 		})
 	})
 
-	Context("When the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -133,9 +133,10 @@ var _ = Describe("routes Command", func() {
 				BeforeEach(func() {
 					routeSummaries = []v7action.RouteSummary{
 						{
-							DomainName: "domain1",
-							SpaceName:  "space-1",
-							Route:      resources.Route{GUID: "route-guid-1"},
+							DomainName:          "domain1",
+							SpaceName:           "space-1",
+							Route:               resources.Route{GUID: "route-guid-1"},
+							ServiceInstanceName: "si-1",
 						},
 						{
 							DomainName: "domain2",
@@ -143,10 +144,11 @@ var _ = Describe("routes Command", func() {
 							Route:      resources.Route{GUID: "route-guid-2", Host: "host-3", Path: "/path/2"},
 						},
 						{
-							DomainName: "domain3",
-							SpaceName:  "space-3",
-							Route:      resources.Route{GUID: "route-guid-3", Host: "host-1"},
-							AppNames:   []string{"app1", "app2"},
+							DomainName:          "domain3",
+							SpaceName:           "space-3",
+							Route:               resources.Route{GUID: "route-guid-3", Host: "host-1"},
+							AppNames:            []string{"app1", "app2"},
+							ServiceInstanceName: "si-3",
 						},
 						{
 							DomainName: "tcp.domain",
@@ -170,9 +172,9 @@ var _ = Describe("routes Command", func() {
 					Expect(testUI.Err).To(Say("actor-warning-2"))
 
 					Expect(testUI.Out).To(Say(tableHeaders))
-					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+`))
+					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+si-1\s+`))
 					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
-					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1, app2`))
+					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1, app2\s+si-3`))
 					Expect(testUI.Out).To(Say(`space-3\s+tcp\.domain\s+1024\s+app1, app2`))
 				})
 			})

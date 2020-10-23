@@ -76,6 +76,7 @@ const (
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
 	GetRolesRequest                                             = "GetRoles"
+	GetRouteBindingsRequest                                     = "GetRouteBindings"
 	GetRouteDestinationsRequest                                 = "GetRouteDestinations"
 	GetRoutesRequest                                            = "GetRoutes"
 	GetSecurityGroupsRequest                                    = "GetSecurityGroups"
@@ -301,7 +302,8 @@ var APIRoutes = map[string]Route{
 	GetServicePlanVisibilityRequest:                             {Path: "/v3/service_plans/:service_plan_guid/visibility", Method: http.MethodGet},
 	PostServicePlanVisibilityRequest:                            {Path: "/v3/service_plans/:service_plan_guid/visibility", Method: http.MethodPost},
 	DeleteServicePlanVisibilityRequest:                          {Path: "/v3/service_plans/:service_plan_guid/visibility/:organization_guid", Method: http.MethodDelete},
-	PostRouteBindingRequest:                                     {Path: "/v3/service_route_bindings/", Method: http.MethodPost},
+	GetRouteBindingsRequest:                                     {Path: "/v3/service_route_bindings", Method: http.MethodGet},
+	PostRouteBindingRequest:                                     {Path: "/v3/service_route_bindings", Method: http.MethodPost},
 	GetSpacesRequest:                                            {Path: "/v3/spaces", Method: http.MethodGet},
 	PostSpaceRequest:                                            {Path: "/v3/spaces", Method: http.MethodPost},
 	DeleteSpaceRequest:                                          {Path: "/v3/spaces/:space_guid", Method: http.MethodDelete},

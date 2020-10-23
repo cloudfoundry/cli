@@ -11,3 +11,19 @@ func (client *Client) CreateRouteBinding(binding resources.RouteBinding) (JobURL
 		RequestBody: binding,
 	})
 }
+
+func (client Client) GetRouteBindings(query ...Query) ([]resources.RouteBinding, IncludedResources, Warnings, error) {
+	var result []resources.RouteBinding
+
+	included, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetRouteBindingsRequest,
+		Query:        query,
+		ResponseBody: resources.RouteBinding{},
+		AppendToList: func(item interface{}) error {
+			result = append(result, item.(resources.RouteBinding))
+			return nil
+		},
+	})
+
+	return result, included, warnings, err
+}

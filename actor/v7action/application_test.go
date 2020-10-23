@@ -359,7 +359,7 @@ var _ = Describe("Application Actions", func() {
 
 			It("makes many calls", func() {
 				apps, warnings, err := actor.GetApplicationsByGUIDs(guids)
-				Expect(len(apps)).To(Equal(500))
+				Expect(len(apps)).To(Equal(batches * batcher.BatchSize))
 				Expect(apps).To(HaveLen(batcher.BatchSize * 10))
 				Expect(warnings).To(HaveLen(10))
 				Expect(err).NotTo(HaveOccurred())

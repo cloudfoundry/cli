@@ -672,6 +672,21 @@ var _ = Describe("Route Actions", func() {
 				ccv3.Warnings{"get-apps-warning"},
 				nil,
 			)
+
+			fakeCloudControllerClient.GetRouteBindingsReturns(
+				[]resources.RouteBinding{
+					{RouteGUID: "route-guid-1", ServiceInstanceGUID: "si-guid-1"},
+					{RouteGUID: "route-guid-2", ServiceInstanceGUID: "si-guid-2"},
+				},
+				ccv3.IncludedResources{
+					ServiceInstances: []resources.ServiceInstance{
+						{GUID: "si-guid-1", Name: "foo"},
+						{GUID: "si-guid-2", Name: "bar"},
+					},
+				},
+				ccv3.Warnings{"get-route-bindings-warning"},
+				nil,
+			)
 		})
 
 		JustBeforeEach(func() {
@@ -692,6 +707,14 @@ var _ = Describe("Route Actions", func() {
 			))
 		})
 
+		It("gets the route bindings", func() {
+			Expect(fakeCloudControllerClient.GetRouteBindingsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetRouteBindingsArgsForCall(0)).To(ConsistOf(
+				ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{"route-guid-1", "route-guid-2", "route-guid-3"}},
+				ccv3.Query{Key: ccv3.Include, Values: []string{"service_instance"}},
+			))
+		})
+
 		It("returns the routes summaries and warnings", func() {
 			Expect(routeSummaries).To(Equal([]RouteSummary{
 				{
@@ -708,9 +731,10 @@ var _ = Describe("Route Actions", func() {
 						Path:      "fake-path-1",
 						Port:      1,
 					},
-					AppNames:   []string{"app-name-1"},
-					DomainName: "fake-url-1/fake-path-1",
-					SpaceName:  "fake-space-1",
+					AppNames:            []string{"app-name-1"},
+					DomainName:          "fake-url-1/fake-path-1",
+					SpaceName:           "fake-space-1",
+					ServiceInstanceName: "foo",
 				},
 				{
 					Route: resources.Route{
@@ -729,9 +753,10 @@ var _ = Describe("Route Actions", func() {
 						Path:      "fake-path-2",
 						Port:      2,
 					},
-					AppNames:   []string{"app-name-1", "app-name-2"},
-					DomainName: "fake-url-2/fake-path-2",
-					SpaceName:  "fake-space-1",
+					AppNames:            []string{"app-name-1", "app-name-2"},
+					DomainName:          "fake-url-2/fake-path-2",
+					SpaceName:           "fake-space-1",
+					ServiceInstanceName: "bar",
 				},
 				{
 					Route: resources.Route{
@@ -749,7 +774,11 @@ var _ = Describe("Route Actions", func() {
 					SpaceName:  "fake-space-2",
 				},
 			}))
-			Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning"))
+			Expect(warnings).To(ConsistOf(
+				"get-apps-warning",
+				"get-space-warning",
+				"get-route-bindings-warning",
+			))
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
@@ -790,19 +819,40 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
+		When("getting route bindings fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteBindingsReturns(
+					nil,
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-route-bindings-warning"},
+					errors.New("failed to get route bindings"),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(MatchError("failed to get route bindings"))
+				Expect(warnings).To(ContainElement("get-route-bindings-warning"))
+			})
+		})
+
 		When("there are many routes", func() {
 			const batches = 10
 
+			var manyResults []RouteSummary
+
 			BeforeEach(func() {
 				var (
-					manySpaces []resources.Space
-					manyApps   []resources.Application
+					manySpaces           []resources.Space
+					manyApps             []resources.Application
+					manyRouteBindings    []resources.RouteBinding
+					manyServiceInstances []resources.ServiceInstance
 				)
 
 				routes = nil
 
 				for i := 0; i < batcher.BatchSize*batches; i++ {
-					routes = append(routes, resources.Route{
+					port := i + 1000
+					route := resources.Route{
 						GUID: fmt.Sprintf("route-guid-%d", i),
 						Destinations: []resources.RouteDestination{
 							{
@@ -812,11 +862,13 @@ var _ = Describe("Route Actions", func() {
 							},
 						},
 						SpaceGUID: fmt.Sprintf("fake-space-guid-%d", i),
-						URL:       fmt.Sprintf("fake-url-%d/fake-path-%d:%d", i, i, i),
+						URL:       fmt.Sprintf("fake-url-%d/fake-path-%d:%d", i, i, port),
 						Host:      fmt.Sprintf("fake-host-%d", i),
 						Path:      fmt.Sprintf("fake-path-%d", i),
-						Port:      i,
-					})
+						Port:      port,
+					}
+
+					routes = append(routes, route)
 
 					manySpaces = append(manySpaces, resources.Space{
 						GUID: fmt.Sprintf("fake-space-guid-%d", i),
@@ -826,6 +878,24 @@ var _ = Describe("Route Actions", func() {
 					manyApps = append(manyApps, resources.Application{
 						GUID: fmt.Sprintf("fake-app-guid-%d", i),
 						Name: fmt.Sprintf("fake-app-name-%d", i),
+					})
+
+					manyRouteBindings = append(manyRouteBindings, resources.RouteBinding{
+						RouteGUID:           fmt.Sprintf("route-guid-%d", i),
+						ServiceInstanceGUID: fmt.Sprintf("service-instance-guid-%d", i),
+					})
+
+					manyServiceInstances = append(manyServiceInstances, resources.ServiceInstance{
+						Name: fmt.Sprintf("service-instance-name-%d", i),
+						GUID: fmt.Sprintf("service-instance-guid-%d", i),
+					})
+
+					manyResults = append(manyResults, RouteSummary{
+						Route:               route,
+						AppNames:            []string{fmt.Sprintf("fake-app-name-%d", i)},
+						DomainName:          fmt.Sprintf("fake-url-%d/fake-path-%d", i, i),
+						SpaceName:           fmt.Sprintf("fake-space-name-%d", i),
+						ServiceInstanceName: fmt.Sprintf("service-instance-name-%d", i),
 					})
 				}
 
@@ -846,19 +916,44 @@ var _ = Describe("Route Actions", func() {
 						nil,
 					)
 					manyApps = manyApps[batcher.BatchSize:]
+
+					fakeCloudControllerClient.GetRouteBindingsReturnsOnCall(
+						b,
+						manyRouteBindings[:batcher.BatchSize],
+						ccv3.IncludedResources{
+							ServiceInstances: manyServiceInstances[:batcher.BatchSize],
+						},
+						ccv3.Warnings{"get-route-binding-warning"},
+						nil,
+					)
+					manyRouteBindings = manyRouteBindings[batcher.BatchSize:]
+					manyServiceInstances = manyServiceInstances[batcher.BatchSize:]
+				}
+			})
+
+			It("constructs the correct result", func() {
+				Expect(routeSummaries).To(HaveLen(len(manyResults)))
+				for _, result := range manyResults {
+					Expect(routeSummaries).To(ContainElement(result))
 				}
 			})
 
 			It("makes multiple different calls to get spaces", func() {
-				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
 					NotTo(Equal(fakeCloudControllerClient.GetSpacesArgsForCall(1)))
 			})
 
 			It("makes multiple different calls to get apps", func() {
-				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(10))
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(batches))
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).
 					NotTo(Equal(fakeCloudControllerClient.GetApplicationsArgsForCall(1)))
+			})
+
+			It("makes multiple different calls to get route bindings", func() {
+				Expect(fakeCloudControllerClient.GetRouteBindingsCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetRouteBindingsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetRouteBindingsArgsForCall(1)))
 			})
 		})
 	})
