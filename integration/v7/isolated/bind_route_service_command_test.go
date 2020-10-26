@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"os"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
@@ -114,6 +115,16 @@ var _ = Describe("bind-route-service command", func() {
 			username  string
 		)
 
+		routeBindingStateForSI := func(serviceInstanceName string) string {
+			var receiver struct {
+				Resources []resources.RouteBinding `json:"resources"`
+			}
+			helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
+			Expect(receiver.Resources).To(HaveLen(1))
+
+			return string(receiver.Resources[0].LastOperation.State)
+		}
+
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
@@ -159,11 +170,7 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
 
-				var receiver struct {
-					Resources []resources.RouteBinding `json:"resources"`
-				}
-				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
-				Expect(receiver.Resources).To(HaveLen(1))
+				Expect(routeBindingStateForSI(serviceInstanceName)).To(Equal("succeeded"))
 			})
 
 			When("parameters are specified", func() {
@@ -219,11 +226,7 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
 
-				var receiver struct {
-					Resources []resources.RouteBinding `json:"resources"`
-				}
-				helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
-				Expect(receiver.Resources).To(HaveLen(1))
+				Expect(routeBindingStateForSI(serviceInstanceName)).To(Equal("succeeded"))
 			})
 
 			When("parameters are specified", func() {
@@ -240,6 +243,67 @@ var _ = Describe("bind-route-service command", func() {
 					var parametersReceiver map[string]interface{}
 					helpers.Curl(&parametersReceiver, `/v3/service_route_bindings/%s/parameters`, receiver.Resources[0].GUID)
 					Expect(parametersReceiver).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
+			})
+		})
+
+		Context("managed route service with asynchronous broker response", func() {
+			var (
+				broker              *servicebrokerstub.ServiceBrokerStub
+				serviceInstanceName string
+				domain              string
+				hostname            string
+				path                string
+			)
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithRouteService().WithAsyncDelay(time.Second).EnableServiceAccess()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+				domain = helpers.DefaultSharedDomain()
+				hostname = helpers.NewHostName()
+				path = helpers.PrefixedRandomName("path")
+				Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("starts to create a route binding", func() {
+				session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Create in progress\.\n`),
+					Say(`OK\n`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				Expect(routeBindingStateForSI(serviceInstanceName)).To(Equal("in progress"))
+			})
+
+			When("--wait flag specified", func() {
+				It("waits for completion", func() {
+					session := helpers.CF(command, domain, "--hostname", hostname, "--path", path, serviceInstanceName, "--wait")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`\n`),
+						Say(`Route binding created\.\n`),
+						Say(`OK\n`),
+					))
+
+					Expect(string(session.Err.Contents())).To(BeEmpty())
+
+					Expect(routeBindingStateForSI(serviceInstanceName)).To(Equal("succeeded"))
 				})
 			})
 		})
