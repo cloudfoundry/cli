@@ -38,6 +38,13 @@ There are now two supported versions of the cf CLI:
 1. The v7 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins which will be migrated in the next major release). See [our v7 documentation](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information.
 1. The v6 cf CLI is backed by the [v2 CC API](https://apidocs.cloudfoundry.org/13.5.0/) See [our v6 documentation](https://docs.cloudfoundry.org/cf-cli) for more information.
 
+If you have any questions, ask away on the #cli channel in [our Slack
+community](https://slack.cloudfoundry.org/) and the
+[cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
+mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  
+You can follow our development progress
+on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
+
 ## Contributing & Build Instructions
 Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
@@ -53,12 +60,6 @@ At some point in the future, the v2 CC API endpoint will be deprecated by CAPI (
 Until the v2 CC API is deprecated, you can expect the v6 CLI to be fully functional, however, the CLI team's CI/CD resources are now focused on the v7 CLI so the v6 CLIs official **_maximum supported version_** of the CC APIs are now capped at `v2.149.0` and `v3.84.0` (published in [CAPI release v1.94.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.94.0)), and the V6 CLIs official **_maximum supported version_** of the CF-Deployment is now capped at [`v13.4.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.4.0).
  
 The v6 CLI's _minimum supported version_ of the CF-Deployment is [`v7.0.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v7.0.0). If you are on an older version of CF Deployment, we recommend you upgrade to CF-Deployment v7.0.0+.
-
-If you have any questions, ask away on the #cli channel in [our Slack
-community](https://slack.cloudfoundry.org/) and the
-[cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
-mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  You can follow our development progress
-on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
 
 **Need to switch back and forth between CLI versions?**
 See the [Version Switching](#version-switching) section for instructions.
