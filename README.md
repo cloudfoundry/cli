@@ -38,6 +38,8 @@ There are now two supported versions of the cf CLI:
 1. The v7 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins which will be migrated in the next major release). See [our v7 documentation](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information.
 1. The v6 cf CLI is backed by the [v2 CC API](https://apidocs.cloudfoundry.org/13.5.0/) See [our v6 documentation](https://docs.cloudfoundry.org/cf-cli) for more information.
 
+View our [CLI v6 & v7 Versioning and Support Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-and-Support-Policy) documentation.
+
 If you have any questions, ask away on the #cli channel in [our Slack
 community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
