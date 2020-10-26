@@ -849,6 +849,7 @@ var _ = Describe("Route Actions", func() {
 				)
 
 				routes = nil
+				manyResults = nil
 
 				for i := 0; i < batcher.BatchSize*batches; i++ {
 					port := i + 1000
