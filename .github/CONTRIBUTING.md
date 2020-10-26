@@ -1,7 +1,10 @@
 # Contributing to CLI
 
 The Cloud Foundry team uses GitHub and accepts code contributions via [pull
-requests](https://help.github.com/articles/about-pull-requests/).
+requests](https://help.github.com/articles/about-pull-requests/). If you have any questions, ask away on the #cli channel in [our Slack
+community](https://slack.cloudfoundry.org/) and the
+[cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
+mailing list.
 
 ## CLI Versions
 The cf CLI follows a branching model:
