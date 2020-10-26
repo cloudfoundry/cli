@@ -52,17 +52,6 @@ Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
 If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
-**A Note About Support**:</br>
-Now that the v7 cf CLI is GA, all new features, enhancements, and fixes will be made on the v7 line.</br>
-The v7 CLI's _minimum supported version_ of the CC API is `v3.85.0` (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)).</br>
-The v7 CLI's _minimum supported version_ of the CF-Deployment is [`v13.5.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.5.0).
-
-Going forward, the v6 CLI will _only_ be updated to resolve the most severe defects and/or security issues.
-At some point in the future, the v2 CC API endpoint will be deprecated by CAPI (see the [v2 CC API deprecation plan](https://docs.google.com/document/d/1KFZogeeexOqFf13oKHloe2QAorLh9OqwQHp8JvBl9lY/edit?usp=sharing)) and the v6 CLI will be incompatible CAPI once a `capi-release` that deprecates the v2 endpoint has been published.
-Until the v2 CC API is deprecated, you can expect the v6 CLI to be fully functional, however, the CLI team's CI/CD resources are now focused on the v7 CLI so the v6 CLIs official **_maximum supported version_** of the CC APIs are now capped at `v2.149.0` and `v3.84.0` (published in [CAPI release v1.94.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.94.0)), and the V6 CLIs official **_maximum supported version_** of the CF-Deployment is now capped at [`v13.4.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v13.4.0).
- 
-The v6 CLI's _minimum supported version_ of the CF-Deployment is [`v7.0.0`](https://github.com/cloudfoundry/cf-deployment/releases/tag/v7.0.0). If you are on an older version of CF Deployment, we recommend you upgrade to CF-Deployment v7.0.0+.
-
 **Need to switch back and forth between CLI versions?**
 See the [Version Switching](#version-switching) section for instructions.
 
