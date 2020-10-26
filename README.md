@@ -43,12 +43,6 @@ Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
 If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
-## Announcement ==> The V7 CLI is now Generally Available!
-### The initial GA of the v7 cf CLI is Opt-In  
-- You can pull down the GA release of the v7 cf CLI and/or the latest v6 cf CLI via our supported package managers using the same processes that were in place prior to the v7 GA (no changes are required initially)
-- If you've been pulling down the v7 CF CLI beta previously, you will notice that there is now a symlink from `cf` to the existing `cf7` binary.
-- See our [Version Switching Guide](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide) for instructions on how to support workflows which require switching back and forth between v7 and v6
-
 **A Note About Support**:</br>
 Now that the v7 cf CLI is GA, all new features, enhancements, and fixes will be made on the v7 line.</br>
 The v7 CLI's _minimum supported version_ of the CC API is `v3.85.0` (published in [CAPI release v1.95.0](https://github.com/cloudfoundry/capi-release/releases/tag/1.95.0)).</br>
