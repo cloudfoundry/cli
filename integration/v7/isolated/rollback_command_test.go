@@ -32,10 +32,10 @@ var _ = Describe("rollback command", func() {
 				Expect(session).To(Say("NAME:"))
 				Expect(session).To(Say("rollback - Rollback to the specified revision of an app"))
 				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say(`cf rollback APP_NAME \[--revision REVISION_NUMBER\]`))
+				Expect(session).To(Say(`cf rollback APP_NAME \[--version VERSION\]`))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("-f              Force rollback without confirmation"))
-				Expect(session).To(Say("--revision      Roll back to the given app revision"))
+				Expect(session).To(Say("-f             Force rollback without confirmation"))
+				Expect(session).To(Say("--version      Roll back to the specified revision"))
 				Expect(session).To(Say("SEE ALSO:"))
 				Expect(session).To(Say("revisions"))
 			})
@@ -64,7 +64,7 @@ var _ = Describe("rollback command", func() {
 
 		Describe("the app does not exist", func() {
 			It("errors with app not found", func() {
-				session := helpers.CF("rollback", appName, "--revision", "1")
+				session := helpers.CF("rollback", appName, "--version", "1")
 				Eventually(session).Should(Exit(1))
 
 				Expect(session).ToNot(Say("Are you sure you want to continue?"))
@@ -102,7 +102,7 @@ applications:
 
 				When("the desired revision does not exist", func() {
 					It("errors with 'revision not found'", func() {
-						session := helpers.CF("rollback", appName, "--revision", "5")
+						session := helpers.CF("rollback", appName, "--version", "5")
 						Eventually(session).Should(Exit(1))
 
 						Expect(session.Err).To(Say("Revision '5' not found"))
@@ -112,7 +112,7 @@ applications:
 
 				When("the -f flag is provided", func() {
 					It("does not prompt the user, and just rolls back", func() {
-						session := helpers.CF("rollback", appName, "--revision", "1", "-f")
+						session := helpers.CF("rollback", appName, "--version", "1", "-f")
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))
@@ -136,7 +136,7 @@ applications:
 						})
 
 						It("prompts the user to rollback, then successfully rolls back", func() {
-							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
+							session := helpers.CFWithStdin(buffer, "rollback", appName, "--version", "1")
 							Eventually(session).Should(Exit(0))
 
 							Expect(session).To(HaveRollbackPrompt())
@@ -157,7 +157,7 @@ applications:
 						})
 
 						It("prompts the user to rollback, then does not rollback", func() {
-							session := helpers.CFWithStdin(buffer, "rollback", appName, "--revision", "1")
+							session := helpers.CFWithStdin(buffer, "rollback", appName, "--version", "1")
 							Eventually(session).Should(Exit(0))
 
 							Expect(session).To(HaveRollbackPrompt())

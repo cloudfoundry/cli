@@ -16,9 +16,9 @@ type RollbackCommand struct {
 
 	Force           bool          `short:"f" description:"Force rollback without confirmation"`
 	RequiredArgs    flag.AppName  `positional-args:"yes"`
-	Version         flag.Revision `long:"revision" required:"true" description:"Roll back to the given app revision"`
+	Version         flag.Revision `long:"version" required:"true" description:"Roll back to the specified revision"`
 	relatedCommands interface{}   `related_commands:"revisions"`
-	usage           interface{}   `usage:"CF_NAME rollback APP_NAME [--revision REVISION_NUMBER] [-f]"`
+	usage           interface{}   `usage:"CF_NAME rollback APP_NAME [--version VERSION] [-f]"`
 
 	LogCacheClient sharedaction.LogCacheClient
 	Stager         shared.AppStager
