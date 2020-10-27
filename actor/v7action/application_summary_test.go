@@ -2,6 +2,7 @@ package v7action_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -294,6 +295,48 @@ var _ = Describe("Application Summary Actions", func() {
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
 						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
 					))
+				})
+			})
+			When("there is long list of app guids", func() {
+				BeforeEach(func() {
+					lotsOfApps := []resources.Application{}
+					for i := 0; i < 600; i++ {
+						lotsOfApps = append(lotsOfApps, resources.Application{
+							Name:  "some-app-name",
+							GUID:  fmt.Sprintf("some-app-guid-%d", i),
+							State: constant.ApplicationStarted,
+						})
+					}
+					fakeCloudControllerClient.GetApplicationsReturns(
+						lotsOfApps,
+						ccv3.Warnings{"get-apps-warning"},
+						nil,
+					)
+				})
+
+				It("batches the calls to the API for processes", func() {
+					Expect(fakeCloudControllerClient.GetProcessesCallCount()).To(Equal(3))
+
+					getProcessesArgs := fakeCloudControllerClient.GetProcessesArgsForCall(0)
+					Expect(len(getProcessesArgs[0].Values)).To(Equal(200))
+					getProcessesArgs = fakeCloudControllerClient.GetProcessesArgsForCall(1)
+					Expect(len(getProcessesArgs[0].Values)).To(Equal(200))
+					getProcessesArgs = fakeCloudControllerClient.GetProcessesArgsForCall(2)
+					Expect(len(getProcessesArgs[0].Values)).To(Equal(200))
+
+					Expect(len(summaries)).To(Equal(600))
+				})
+				It("batches the calls to the API for routes", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(3))
+
+					getArgs := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(len(getArgs[0].Values)).To(Equal(200))
+					getArgs = fakeCloudControllerClient.GetRoutesArgsForCall(1)
+					Expect(len(getArgs[0].Values)).To(Equal(200))
+					getArgs = fakeCloudControllerClient.GetRoutesArgsForCall(2)
+					Expect(len(getArgs[0].Values)).To(Equal(200))
+
+					Expect(len(summaries)).To(Equal(600))
 				})
 			})
 		})
