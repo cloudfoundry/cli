@@ -277,15 +277,11 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetProcessesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetProcessesArgsForCall(0)).To(ConsistOf(
-					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 				))
 
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
-
-				Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
-					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
-				))
 			})
 
 			When("there is no label selector", func() {

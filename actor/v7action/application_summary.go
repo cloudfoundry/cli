@@ -49,7 +49,7 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	}
 
 	processes, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
-		Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID},
+		Key: ccv3.AppGUIDFilter, Values: toAppGUIDs(apps),
 	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -78,7 +78,7 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	}
 
 	routes, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
-		Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID},
+		Key: ccv3.AppGUIDFilter, Values: toAppGUIDs(apps),
 	})
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
@@ -168,4 +168,14 @@ func (actor Actor) addDroplet(summary ApplicationSummary) (DetailedApplicationSu
 		ApplicationSummary: summary,
 		CurrentDroplet:     droplet,
 	}, allWarnings, nil
+}
+
+func toAppGUIDs(apps []resources.Application) []string {
+	guids := make([]string, len(apps))
+
+	for i, app := range apps {
+		guids[i] = app.GUID
+	}
+
+	return guids
 }
