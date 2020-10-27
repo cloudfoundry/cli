@@ -2,7 +2,7 @@ package batcher
 
 import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
-const BatchSize = 50
+const BatchSize = 200
 
 type callback func(guids []string) (ccv3.Warnings, error)
 

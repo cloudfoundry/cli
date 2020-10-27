@@ -60,12 +60,12 @@ var _ = Describe("Batcher", func() {
 
 	When("the guids list exceeds the batch size", func() {
 		It("calls the callback multiple times", func() {
-			batcher.RequestByGUID(spreadGuids(0, 120), fakeCallback)
+			batcher.RequestByGUID(spreadGuids(0, 520), fakeCallback)
 
 			Expect(calls).To(HaveLen(3))
-			Expect(calls[0]).To(Equal(spreadGuids(0, 50)))
-			Expect(calls[1]).To(Equal(spreadGuids(50, 100)))
-			Expect(calls[2]).To(Equal(spreadGuids(100, 120)))
+			Expect(calls[0]).To(Equal(spreadGuids(0, 200)))
+			Expect(calls[1]).To(Equal(spreadGuids(200, 400)))
+			Expect(calls[2]).To(Equal(spreadGuids(400, 520)))
 		})
 	})
 
@@ -80,7 +80,7 @@ var _ = Describe("Batcher", func() {
 		})
 
 		It("returns all the accumulated warnings", func() {
-			warnings, _ := batcher.RequestByGUID(spreadGuids(0, 160), fakeCallback)
+			warnings, _ := batcher.RequestByGUID(spreadGuids(0, 960), fakeCallback)
 
 			Expect(warnings).To(ConsistOf("one", "two", "three", "four", "five"))
 		})
@@ -104,7 +104,7 @@ var _ = Describe("Batcher", func() {
 		})
 
 		It("returns the error and accumulated warnings", func() {
-			warnings, err := batcher.RequestByGUID(spreadGuids(0, 160), fakeCallback)
+			warnings, err := batcher.RequestByGUID(spreadGuids(0, 960), fakeCallback)
 
 			Expect(calls).To(HaveLen(3))
 			Expect(warnings).To(ConsistOf("one", "two", "three", "four", "five"))

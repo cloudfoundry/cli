@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
@@ -227,9 +228,15 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
-	destApplications, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: destAppGUIDs,
+	var destApplications []resources.Application
+
+	warnings, err := batcher.RequestByGUID(destAppGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
+			Key:    ccv3.GUIDFilter,
+			Values: guids,
+		})
+		destApplications = append(destApplications, batch...)
+		return warnings, err
 	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
