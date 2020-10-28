@@ -158,7 +158,7 @@ func (cmd ServiceCommand) displayParameters() error {
 	switch {
 	case cmd.serviceInstance.Parameters.MissingReason != "":
 		cmd.displayParametersMissingReason()
-	case len(cmd.serviceInstance.Parameters.Value.Value) > 0:
+	case len(cmd.serviceInstance.Parameters.Value) > 0:
 		cmd.displayParametersData()
 	default:
 		cmd.displayParametersEmpty()

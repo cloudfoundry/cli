@@ -2,6 +2,10 @@ package types
 
 import "encoding/json"
 
+// OptionalObject is for situations where we want to differentiate between an
+// empty object, and the object not having been set. An example would be an
+// optional command line option where we want to tell the difference between
+// it being set to an empty object, and it not being specified at all.
 type OptionalObject struct {
 	IsSet bool
 	Value map[string]interface{}

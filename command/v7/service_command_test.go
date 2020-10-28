@@ -257,7 +257,7 @@ var _ = Describe("service command", func() {
 					ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 					ServiceBrokerName: serviceBrokerName,
 					Parameters: v7action.ServiceInstanceParameters{
-						Value: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+						Value: types.JSONObject{"foo": "bar"},
 					},
 					SharedStatus: v7action.SharedStatus{
 						IsSharedToOtherSpaces: true,
@@ -653,7 +653,7 @@ var _ = Describe("service command", func() {
 							ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 							ServiceBrokerName: serviceBrokerName,
 							Parameters: v7action.ServiceInstanceParameters{
-								Value: types.NewOptionalObject(map[string]interface{}{}),
+								Value: types.JSONObject{},
 							},
 						},
 						v7action.Warnings{"warning one", "warning two"},
@@ -697,7 +697,7 @@ var _ = Describe("service command", func() {
 						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
 						Parameters: v7action.ServiceInstanceParameters{
-							Value: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+							Value: types.JSONObject{"foo": "bar"},
 						},
 						SharedStatus: v7action.SharedStatus{
 							IsSharedToOtherSpaces: true,

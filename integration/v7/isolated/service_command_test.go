@@ -518,8 +518,7 @@ var _ = Describe("service command", func() {
 					bindingName1 = helpers.RandomName()
 					bindingName2 = helpers.RandomName()
 
-					const asyncDelay = time.Minute // Forces bind to be "in progress" for predictable output
-					broker = servicebrokerstub.New().WithAsyncDelay(asyncDelay).EnableServiceAccess()
+					broker = servicebrokerstub.New().EnableServiceAccess()
 
 					helpers.CreateManagedServiceInstance(
 						broker.FirstServiceOfferingName(),
@@ -531,6 +530,9 @@ var _ = Describe("service command", func() {
 						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
+
+					const asyncDelay = time.Minute // Forces bind to be "in progress" for predictable output
+					broker.WithAsyncDelay(asyncDelay).Configure()
 					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
 					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
 				})

@@ -33,7 +33,7 @@ type SharedStatus struct {
 }
 
 type ServiceInstanceParameters struct {
-	Value         types.OptionalObject
+	Value         types.JSONObject
 	MissingReason string
 }
 

@@ -1,6 +1,8 @@
 package v7action_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -8,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -73,7 +74,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			)
 
 			fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-				types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+				types.JSONObject{"foo": "bar"},
 				ccv3.Warnings{"some-parameters-warning"},
 				nil,
 			)
@@ -155,7 +156,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					ServiceBrokerName: serviceBrokerName,
 					SharedStatus:      SharedStatus{},
 					Parameters: ServiceInstanceParameters{
-						Value: types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
+						Value: types.JSONObject{"foo": "bar"},
 					},
 					BoundApps: []resources.ServiceCredentialBinding{
 						{
@@ -271,7 +272,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			When("getting the parameters fails with an expected error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.OptionalObject{},
+						types.JSONObject{},
 						ccv3.Warnings{"some-parameters-warning"},
 						ccerror.V3UnexpectedResponseError{
 							V3ErrorResponse: ccerror.V3ErrorResponse{
@@ -295,7 +296,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			When("getting the parameters fails with an another error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.OptionalObject{},
+						types.JSONObject{},
 						ccv3.Warnings{"some-parameters-warning"},
 						errors.New("not expected"),
 					)
