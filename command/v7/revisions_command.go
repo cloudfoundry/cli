@@ -90,6 +90,11 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 		return err
 	}
 
+	if len(revisionsDeployed) > 1 {
+		cmd.UI.DisplayText("Info: this app is in the middle of a rolling deployment. More than one revision is deployed.")
+		cmd.UI.DisplayNewline()
+	}
+
 	table := [][]string{{
 		"revision",
 		"description",
@@ -117,6 +122,35 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 
 	return nil
 }
+
+// func generateRevisionTable(revisions []resources.Revision, revisionsDeployed []resources.Revision) [][]string {
+// 	table := [][]string{{
+// 		"revision",
+// 		"description",
+// 		"deployable",
+// 		"revision guid",
+// 		"created at",
+// 	}}
+
+// 	for _, revision := range revisions {
+// 		table = append(table,
+// 			[]string{decorateVersionWithDeployed(revision, revisionsDeployed),
+// 				revision.Description,
+// 				strconv.FormatBool(revision.Deployable),
+// 				revision.GUID,
+// 				revision.CreatedAt,
+// 			})
+// 	}
+
+// 	if len(revisionsDeployed) > 1 {
+// 		cmd.UI.DisplayText("Info: this app is in the middle of a deployment. More than one revision is deployed.")
+// 		cmd.UI.DisplayNewline()
+// 	}
+
+// 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+
+// 	return nil
+// }
 
 func decorateVersionWithDeployed(revision resources.Revision, deployedRevisions []resources.Revision) string {
 	for _, revDeployed := range deployedRevisions {
