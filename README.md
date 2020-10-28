@@ -13,6 +13,10 @@ View the latest help for [**The v7 CLI**](https://cli.cloudfoundry.org/en-US/v7)
 [![Slack](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
 
+CF CLI Binary Download Server's uptime:
+
+[![Downloads Uptime](https://uptime.com/devices/services/widget/560101/972a26d103045900/service?light)](https://uptime.com/devices/services/560101/3f1b79532117a224)
+
 ***
 <p align="left">
 <b>Sections: </b>
