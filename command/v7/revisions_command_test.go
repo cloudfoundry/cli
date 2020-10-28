@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -189,6 +190,24 @@ var _ = Describe("revisions Command", func() {
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 					})
 
+					When("the app is in the STOPPED state", func() {
+						BeforeEach(func() {
+							fakeApp := resources.Application{
+								GUID:  "fake-guid",
+								Name:  "app-name",
+								State: constant.ApplicationStopped,
+							}
+							fakeActor.GetApplicationByNameAndSpaceReturns(fakeApp, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+						})
+
+						It("displays the revisions with an info message about being unable to determine the deployed revision", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say(`Getting revisions for app some-app in org some-org / space some-space as banana\.\.\.`))
+							Expect(testUI.Out).To(Say(`Info: this app is in a stopped state. It is not possible to determine which revision is currently deployed.`))
+						})
+
+					})
 				})
 
 				When("Application Revisions deployed call fails", func() {

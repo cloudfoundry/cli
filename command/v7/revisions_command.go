@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -60,6 +61,11 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 			map[string]interface{}{
 				"AppName": appName,
 			})
+	}
+
+	if app.Stopped() {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText(fmt.Sprintf("Info: this app is in a stopped state. It is not possible to determine which revision is currently deployed."))
 	}
 
 	cmd.UI.DisplayNewline()
