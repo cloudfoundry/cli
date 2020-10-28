@@ -15,7 +15,7 @@ View the latest help for [**The v7 CLI**](https://cli.cloudfoundry.org/en-US/v7)
 
 CF CLI Binary Download Server's uptime:
 
-[![Downloads Uptime](https://uptime.com/devices/services/widget/560101/972a26d103045900/service?light)](https://uptime.com/devices/services/560101/3f1b79532117a224)
+[![Downloads Uptime](https://uptime.com/devices/services/widget/689896/c6d4bb7ddd16186d/service?light)](https://uptime.com/devices/services/689896/01026e1a663caab4)
 
 ***
 <p align="left">
