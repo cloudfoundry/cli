@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -9,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -136,6 +138,85 @@ var _ = Describe("Service Instance", func() {
 
 				requester.MakeListRequestReturns(
 					IncludedResources{},
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetServiceCredentialBindingDetails", func() {
+		const guid = "fake-guid"
+
+		var (
+			details    resources.ServiceCredentialBindingDetails
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
+				json.Unmarshal([]byte(`{"credentials":{"foo":"bar"}}`), params.ResponseBody)
+				return "", Warnings{"warning-1", "warning-2"}, nil
+			})
+		})
+
+		JustBeforeEach(func() {
+			details, warnings, executeErr = client.GetServiceCredentialBindingDetails(guid)
+		})
+
+		It("makes the correct call", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetServiceCredentialBindingDetailsRequest))
+			Expect(actualParams.URIParams).To(HaveKeyWithValue("service_credential_binding_guid", guid))
+			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(&resources.ServiceCredentialBindingDetails{}))
+		})
+
+		It("returns details of service credential bindings", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			Expect(details).To(Equal(resources.ServiceCredentialBindingDetails{
+				Credentials: types.JSONObject{"foo": "bar"},
+			}))
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				errors := []ccerror.V3Error{
+					{
+						Code:   42424,
+						Detail: "Some detailed error message",
+						Title:  "CF-SomeErrorTitle",
+					},
+					{
+						Code:   11111,
+						Detail: "Some other detailed error message",
+						Title:  "CF-SomeOtherErrorTitle",
+					},
+				}
+
+				requester.MakeRequestReturns(
+					"",
 					Warnings{"this is a warning"},
 					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
 				)
