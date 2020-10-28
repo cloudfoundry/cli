@@ -111,7 +111,7 @@ type CloudControllerClient interface {
 	GetServiceBrokers(query ...ccv3.Query) ([]resources.ServiceBroker, ccv3.Warnings, error)
 	GetServiceCredentialBindings(query ...ccv3.Query) ([]resources.ServiceCredentialBinding, ccv3.Warnings, error)
 	GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)
-	GetServiceInstanceParameters(serviceInstanceGUID string) (types.OptionalObject, ccv3.Warnings, error)
+	GetServiceInstanceParameters(serviceInstanceGUID string) (types.JSONObject, ccv3.Warnings, error)
 	GetServiceInstanceSharedSpaces(serviceInstanceGUID string) ([]ccv3.SpaceWithOrganization, ccv3.Warnings, error)
 	GetServiceInstanceUsageSummary(serviceInstanceGUID string) ([]resources.ServiceInstanceUsageSummary, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error)

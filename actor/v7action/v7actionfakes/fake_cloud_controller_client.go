@@ -1535,18 +1535,18 @@ type FakeCloudControllerClient struct {
 		result3 ccv3.Warnings
 		result4 error
 	}
-	GetServiceInstanceParametersStub        func(string) (types.OptionalObject, ccv3.Warnings, error)
+	GetServiceInstanceParametersStub        func(string) (types.JSONObject, ccv3.Warnings, error)
 	getServiceInstanceParametersMutex       sync.RWMutex
 	getServiceInstanceParametersArgsForCall []struct {
 		arg1 string
 	}
 	getServiceInstanceParametersReturns struct {
-		result1 types.OptionalObject
+		result1 types.JSONObject
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getServiceInstanceParametersReturnsOnCall map[int]struct {
-		result1 types.OptionalObject
+		result1 types.JSONObject
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -9218,7 +9218,7 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceByNameAndSpaceReturnsOn
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceInstanceParameters(arg1 string) (types.OptionalObject, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetServiceInstanceParameters(arg1 string) (types.JSONObject, ccv3.Warnings, error) {
 	fake.getServiceInstanceParametersMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceParametersReturnsOnCall[len(fake.getServiceInstanceParametersArgsForCall)]
 	fake.getServiceInstanceParametersArgsForCall = append(fake.getServiceInstanceParametersArgsForCall, struct {
@@ -9242,7 +9242,7 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceParametersCallCount() i
 	return len(fake.getServiceInstanceParametersArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetServiceInstanceParametersCalls(stub func(string) (types.OptionalObject, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetServiceInstanceParametersCalls(stub func(string) (types.JSONObject, ccv3.Warnings, error)) {
 	fake.getServiceInstanceParametersMutex.Lock()
 	defer fake.getServiceInstanceParametersMutex.Unlock()
 	fake.GetServiceInstanceParametersStub = stub
@@ -9255,30 +9255,30 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceParametersArgsForCall(i
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetServiceInstanceParametersReturns(result1 types.OptionalObject, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetServiceInstanceParametersReturns(result1 types.JSONObject, result2 ccv3.Warnings, result3 error) {
 	fake.getServiceInstanceParametersMutex.Lock()
 	defer fake.getServiceInstanceParametersMutex.Unlock()
 	fake.GetServiceInstanceParametersStub = nil
 	fake.getServiceInstanceParametersReturns = struct {
-		result1 types.OptionalObject
+		result1 types.JSONObject
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceInstanceParametersReturnsOnCall(i int, result1 types.OptionalObject, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetServiceInstanceParametersReturnsOnCall(i int, result1 types.JSONObject, result2 ccv3.Warnings, result3 error) {
 	fake.getServiceInstanceParametersMutex.Lock()
 	defer fake.getServiceInstanceParametersMutex.Unlock()
 	fake.GetServiceInstanceParametersStub = nil
 	if fake.getServiceInstanceParametersReturnsOnCall == nil {
 		fake.getServiceInstanceParametersReturnsOnCall = make(map[int]struct {
-			result1 types.OptionalObject
+			result1 types.JSONObject
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceInstanceParametersReturnsOnCall[i] = struct {
-		result1 types.OptionalObject
+		result1 types.JSONObject
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

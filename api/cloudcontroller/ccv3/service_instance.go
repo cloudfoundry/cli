@@ -63,20 +63,14 @@ func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, q
 	return instances[0], included, warnings, nil
 }
 
-func (client Client) GetServiceInstanceParameters(serviceInstanceGUID string) (types.OptionalObject, Warnings, error) {
-	var receiver map[string]interface{}
-
-	_, warnings, err := client.MakeRequest(RequestParams{
+func (client Client) GetServiceInstanceParameters(serviceInstanceGUID string) (parameters types.JSONObject, warnings Warnings, err error) {
+	_, warnings, err = client.MakeRequest(RequestParams{
 		RequestName:  internal.GetServiceInstanceParametersRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
-		ResponseBody: &receiver,
+		ResponseBody: &parameters,
 	})
 
-	if err != nil {
-		return types.OptionalObject{}, warnings, err
-	}
-
-	return types.NewOptionalObject(receiver), warnings, nil
+	return
 }
 
 func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {
