@@ -161,6 +161,40 @@ var _ = Describe("revisions Command", func() {
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 
+				It("does not display an informative message", func() {
+					Expect(testUI.Out).NotTo(Say("Info: this app is in the middle of a rolling deployment. More than one revision is deployed."))
+				})
+
+				When("there is more than one revision deployed", func() {
+					BeforeEach(func() {
+						deployedRevisions := []resources.Revision{
+							{
+								Version:     2,
+								GUID:        "A89F8259-D32B-491A-ABD6-F100AC42D74C",
+								Description: "Something else",
+								CreatedAt:   "2020-03-08T12:43:30Z",
+								Deployable:  true,
+							},
+							{
+								Version:     3,
+								GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+								Description: "On a different note",
+								CreatedAt:   "2020-03-10T17:11:58Z",
+								Deployable:  true,
+							},
+						}
+						fakeActor.GetApplicationRevisionsDeployedReturns(deployedRevisions, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+					})
+
+					It("marks both as deployed", func() {
+						Expect(testUI.Out).To(Say("3\\(deployed\\)   On a different note   true         A68F13F7-7E5E-4411-88E8-1FAC54F73F50   2020-03-10T17:11:58Z"))
+						Expect(testUI.Out).To(Say("2\\(deployed\\)   Something else        true         A89F8259-D32B-491A-ABD6-F100AC42D74C   2020-03-08T12:43:30Z"))
+					})
+					It("displays an informative message", func() {
+						Expect(testUI.Out).To(Say("Info: this app is in the middle of a rolling deployment. More than one revision is deployed."))
+					})
+				})
+
 				When("the revisions feature is disabled on the app", func() {
 					BeforeEach(func() {
 						revisionsFeature := resources.ApplicationFeature{
