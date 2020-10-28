@@ -162,13 +162,8 @@ func brokerRetrieveInstance(store *store.Store, w http.ResponseWriter, r *http.R
 		return notFoundError{}
 	}
 
-	parameters := details.Parameters
-	if parameters == nil { // Ensure response contains `{}` rather than `null`
-		parameters = make(map[string]interface{})
-	}
-
 	response := map[string]interface{}{
-		"parameters": parameters,
+		"parameters": details.Parameters,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -262,10 +257,17 @@ func brokerBind(store *store.Store, w http.ResponseWriter, r *http.Request) erro
 		return err
 	}
 
+	response := resources.JSONObject{
+		"credentials": resources.JSONObject{
+			"username": config.Username,
+			"password": config.Password,
+		},
+	}
+
 	switch config.AsyncResponseDelay {
 	case 0:
 		w.WriteHeader(http.StatusCreated)
-		return respondWithJSON(w, map[string]interface{}{})
+		return respondWithJSON(w, response)
 	default:
 		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, nil)
 	}
@@ -288,16 +290,12 @@ func brokerGetBinding(store *store.Store, w http.ResponseWriter, r *http.Request
 		return err
 	}
 
-	parameters := details.Parameters
-	if parameters == nil { // Ensure response contains `{}` rather than `null`
-		parameters = make(map[string]interface{})
+	details.Credentials = resources.JSONObject{
+		"username": config.Username,
+		"password": config.Password,
 	}
 
-	response := map[string]interface{}{
-		"parameters": parameters,
-	}
-
-	return respondWithJSON(w, response)
+	return respondWithJSON(w, details)
 }
 
 func brokerUnbind(store *store.Store, w http.ResponseWriter, r *http.Request) error {

@@ -1985,6 +1985,40 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceKeyByServiceInstanceAndNameStub        func(string, string, string) (resources.ServiceCredentialBinding, v7action.Warnings, error)
+	getServiceKeyByServiceInstanceAndNameMutex       sync.RWMutex
+	getServiceKeyByServiceInstanceAndNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getServiceKeyByServiceInstanceAndNameReturns struct {
+		result1 resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceKeyByServiceInstanceAndNameReturnsOnCall map[int]struct {
+		result1 resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetServiceKeyDetailsByServiceInstanceAndNameStub        func(string, string, string) (resources.ServiceCredentialBindingDetails, v7action.Warnings, error)
+	getServiceKeyDetailsByServiceInstanceAndNameMutex       sync.RWMutex
+	getServiceKeyDetailsByServiceInstanceAndNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getServiceKeyDetailsByServiceInstanceAndNameReturns struct {
+		result1 resources.ServiceCredentialBindingDetails
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall map[int]struct {
+		result1 resources.ServiceCredentialBindingDetails
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceKeysByServiceInstanceStub        func(string, string) ([]string, v7action.Warnings, error)
 	getServiceKeysByServiceInstanceMutex       sync.RWMutex
 	getServiceKeysByServiceInstanceArgsForCall []struct {
@@ -11871,6 +11905,142 @@ func (fake *FakeActor) GetServiceInstancesForSpaceReturnsOnCall(i int, result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndName(arg1 string, arg2 string, arg3 string) (resources.ServiceCredentialBinding, v7action.Warnings, error) {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.Lock()
+	ret, specificReturn := fake.getServiceKeyByServiceInstanceAndNameReturnsOnCall[len(fake.getServiceKeyByServiceInstanceAndNameArgsForCall)]
+	fake.getServiceKeyByServiceInstanceAndNameArgsForCall = append(fake.getServiceKeyByServiceInstanceAndNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServiceKeyByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
+	fake.getServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	if fake.GetServiceKeyByServiceInstanceAndNameStub != nil {
+		return fake.GetServiceKeyByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServiceKeyByServiceInstanceAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndNameCallCount() int {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.RUnlock()
+	return len(fake.getServiceKeyByServiceInstanceAndNameArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndNameCalls(stub func(string, string, string) (resources.ServiceCredentialBinding, v7action.Warnings, error)) {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyByServiceInstanceAndNameStub = stub
+}
+
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndNameArgsForCall(i int) (string, string, string) {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.RUnlock()
+	argsForCall := fake.getServiceKeyByServiceInstanceAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndNameReturns(result1 resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyByServiceInstanceAndNameStub = nil
+	fake.getServiceKeyByServiceInstanceAndNameReturns = struct {
+		result1 resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceKeyByServiceInstanceAndNameReturnsOnCall(i int, result1 resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.getServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyByServiceInstanceAndNameStub = nil
+	if fake.getServiceKeyByServiceInstanceAndNameReturnsOnCall == nil {
+		fake.getServiceKeyByServiceInstanceAndNameReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceCredentialBinding
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceKeyByServiceInstanceAndNameReturnsOnCall[i] = struct {
+		result1 resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndName(arg1 string, arg2 string, arg3 string) (resources.ServiceCredentialBindingDetails, v7action.Warnings, error) {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Lock()
+	ret, specificReturn := fake.getServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall[len(fake.getServiceKeyDetailsByServiceInstanceAndNameArgsForCall)]
+	fake.getServiceKeyDetailsByServiceInstanceAndNameArgsForCall = append(fake.getServiceKeyDetailsByServiceInstanceAndNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServiceKeyDetailsByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Unlock()
+	if fake.GetServiceKeyDetailsByServiceInstanceAndNameStub != nil {
+		return fake.GetServiceKeyDetailsByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServiceKeyDetailsByServiceInstanceAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameCallCount() int {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RUnlock()
+	return len(fake.getServiceKeyDetailsByServiceInstanceAndNameArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameCalls(stub func(string, string, string) (resources.ServiceCredentialBindingDetails, v7action.Warnings, error)) {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyDetailsByServiceInstanceAndNameStub = stub
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameArgsForCall(i int) (string, string, string) {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RUnlock()
+	argsForCall := fake.getServiceKeyDetailsByServiceInstanceAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameReturns(result1 resources.ServiceCredentialBindingDetails, result2 v7action.Warnings, result3 error) {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyDetailsByServiceInstanceAndNameStub = nil
+	fake.getServiceKeyDetailsByServiceInstanceAndNameReturns = struct {
+		result1 resources.ServiceCredentialBindingDetails
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall(i int, result1 resources.ServiceCredentialBindingDetails, result2 v7action.Warnings, result3 error) {
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Lock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Unlock()
+	fake.GetServiceKeyDetailsByServiceInstanceAndNameStub = nil
+	if fake.getServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall == nil {
+		fake.getServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceCredentialBindingDetails
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall[i] = struct {
+		result1 resources.ServiceCredentialBindingDetails
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServiceKeysByServiceInstance(arg1 string, arg2 string) ([]string, v7action.Warnings, error) {
 	fake.getServiceKeysByServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.getServiceKeysByServiceInstanceReturnsOnCall[len(fake.getServiceKeysByServiceInstanceArgsForCall)]
@@ -18291,6 +18461,10 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getServiceInstanceLabelsMutex.RUnlock()
 	fake.getServiceInstancesForSpaceMutex.RLock()
 	defer fake.getServiceInstancesForSpaceMutex.RUnlock()
+	fake.getServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyByServiceInstanceAndNameMutex.RUnlock()
+	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RLock()
+	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RUnlock()
 	fake.getServiceKeysByServiceInstanceMutex.RLock()
 	defer fake.getServiceKeysByServiceInstanceMutex.RUnlock()
 	fake.getServiceOfferingLabelsMutex.RLock()

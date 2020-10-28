@@ -34,3 +34,13 @@ func (client Client) GetServiceCredentialBindings(query ...Query) ([]resources.S
 
 	return result, warnings, err
 }
+
+func (client Client) GetServiceCredentialBindingDetails(guid string) (details resources.ServiceCredentialBindingDetails, warnings Warnings, err error) {
+	_, warnings, err = client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceCredentialBindingDetailsRequest,
+		URIParams:    internal.Params{"service_credential_binding_guid": guid},
+		ResponseBody: &details,
+	})
+
+	return
+}
