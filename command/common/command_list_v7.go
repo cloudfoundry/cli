@@ -120,6 +120,7 @@ type commandList struct {
 	ResetOrgDefaultIsolationSegment    v7.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v7.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v7.RestageCommand                            `command:"restage" alias:"rg" description:"Stage the app's latest package into a droplet and restart the app with this new droplet and updated configuration (environment variables, service bindings, buildpack, stack, etc.)."`
+	Revision                           v7.RevisionCommand                           `command:"revision" description:"Show details for a specific app revision"`
 	Revisions                          v7.RevisionsCommand                          `command:"revisions" description:"List revisions of an app"`
 	Rollback                           v7.RollbackCommand                           `command:"rollback" description:"Rollback to the specified revision of an app"`
 	StagePackage                       v7.StagePackageCommand                       `command:"stage-package" alias:"stage" description:"Stage a package into a droplet"`
