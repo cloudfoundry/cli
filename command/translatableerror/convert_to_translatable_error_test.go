@@ -339,6 +339,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),
 
+		Entry("ccerror.JobFailedNoErrorError -> JobFailedNoErrorError",
+			ccerror.JobFailedNoErrorError{JobGUID: "some-job-guid"},
+			JobFailedNoErrorError{JobGUID: "some-job-guid"}),
+
 		Entry("ccerror.MultiError -> MultiError",
 			ccerror.MultiError{ResponseCode: 418, Errors: []ccerror.V3Error{
 				{

@@ -274,10 +274,14 @@ var _ = Describe("Job", func() {
 						}`, http.Header{"X-Cf-Warnings": {"warning-2, warning-3"}}),
 					))
 
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/some-job-location"),
-						RespondWith(http.StatusOK, fmt.Sprintf(`{
+			})
+
+			Context("job fails with an error", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/some-job-location"),
+							RespondWith(http.StatusOK, fmt.Sprintf(`{
 							"guid": "job-guid",
 							"created_at": "2016-06-08T16:41:27Z",
 							"updated_at": "2016-06-08T16:41:27Z",
@@ -293,15 +297,43 @@ var _ = Describe("Job", func() {
 								}
 							}
 						}`, "some-message", constant.JobErrorCodeBuildpackAlreadyExistsForStack), http.Header{"X-Cf-Warnings": {"warning-4"}}),
-					))
+						))
+				})
+				It("returns the first error", func() {
+					Expect(executeErr).To(MatchError(ccerror.BuildpackAlreadyExistsForStackError{
+						Message: "some-message",
+					}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+				})
+			})
+			Context("job fails with no error", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/some-job-location"),
+							RespondWith(http.StatusOK, `{
+							"guid": "job-guid",
+							"created_at": "2016-06-08T16:41:27Z",
+							"updated_at": "2016-06-08T16:41:27Z",
+							"operation": "app.delete",
+							"state": "FAILED",
+							"errors": null,
+							"links": {
+								"self": {
+									"href": "/v3/jobs/job-guid"
+								}
+							}
+						}`, http.Header{"X-Cf-Warnings": {"warning-4"}}),
+						))
+				})
+				It("returns JobFailedNoErrorError", func() {
+					Expect(executeErr).To(MatchError(ccerror.JobFailedNoErrorError{
+						JobGUID: "job-guid",
+					}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+				})
 			})
 
-			It("returns the first error", func() {
-				Expect(executeErr).To(MatchError(ccerror.BuildpackAlreadyExistsForStackError{
-					Message: "some-message",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
-			})
 		})
 
 		Context("polling timeouts", func() {

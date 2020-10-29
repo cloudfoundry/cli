@@ -106,8 +106,14 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		}
 
 		if job.HasFailed() {
-			firstError := job.Errors()[0]
-			return allWarnings, firstError
+			if len(job.Errors()) > 0 {
+				firstError := job.Errors()[0]
+				return allWarnings, firstError
+			} else {
+				return allWarnings, ccerror.JobFailedNoErrorError{
+					JobGUID: job.GUID,
+				}
+			}
 		}
 
 		if job.IsComplete() {
