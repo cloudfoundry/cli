@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("revision command", func() {
+var _ = Describe("revision command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("appears in cf help -a", func() {
