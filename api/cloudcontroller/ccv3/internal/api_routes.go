@@ -15,22 +15,22 @@ const (
 	DeleteDomainRequest                                         = "DeleteDomainRequest"
 	DeleteIsolationSegmentRelationshipOrganizationRequest       = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                               = "DeleteIsolationSegment"
-	DeleteOrganizationRequest                                   = "DeleteOrganization"
 	DeleteOrganizationQuotaRequest                              = "DeleteOrganizationQuota"
+	DeleteOrganizationRequest                                   = "DeleteOrganization"
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
-	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
+	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteSecurityGroupRequest                                  = "DeleteSecurityGroup"
-	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
 	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
+	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteServiceOfferingRequest                                = "DeleteServiceOffering"
 	DeleteServicePlanVisibilityRequest                          = "DeleteServicePlanVisibility"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
+	DeleteSpaceQuotaFromSpaceRequest                            = "DeleteSpaceQuotaFromSpace"
 	DeleteSpaceQuotaRequest                                     = "DeleteSpaceQuota"
 	DeleteSpaceRequest                                          = "DeleteSpace"
-	DeleteSpaceQuotaFromSpaceRequest                            = "DeleteSpaceQuotaFromSpace"
 	DeleteUserRequest                                           = "DeleteUser"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
@@ -38,8 +38,8 @@ const (
 	GetApplicationManifestRequest                               = "GetApplicationManifest"
 	GetApplicationProcessRequest                                = "GetApplicationProcess"
 	GetApplicationProcessesRequest                              = "GetApplicationProcesses"
-	GetApplicationRevisionsRequest                              = "GetApplicationRevisions"
 	GetApplicationRevisionsDeployedRequest                      = "GetApplicationRevisionsDeployed"
+	GetApplicationRevisionsRequest                              = "GetApplicationRevisions"
 	GetApplicationRoutesRequest                                 = "GetApplicationRoutes"
 	GetApplicationTasksRequest                                  = "GetApplicationTasks"
 	GetApplicationsRequest                                      = "GetApplications"
@@ -51,10 +51,11 @@ const (
 	GetDomainRequest                                            = "GetDomain"
 	GetDomainRouteReservationsRequest                           = "GetDomainRouteReservations"
 	GetDomainsRequest                                           = "GetDomains"
+	GetDropletBitsRequest                                       = "GetDropletBits"
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
-	GetDropletBitsRequest                                       = "GetDropletBits"
 	GetEnvironmentVariableGroupRequest                          = "GetEnvironmentVariableGroup"
+	GetEnvironmentVariablesByRevision                           = "GetEnvironmentVariablesByRevision"
 	GetEventsRequest                                            = "GetEvents"
 	GetFeatureFlagRequest                                       = "GetFeatureFlag"
 	GetFeatureFlagsRequest                                      = "GetFeatureFlags"
@@ -62,60 +63,60 @@ const (
 	GetIsolationSegmentRequest                                  = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                                 = "GetIsolationSegments"
 	GetOrganizationDomainsRequest                               = "GetOrganizationDomains"
-	GetOrganizationQuotasRequest                                = "GetOrganizationQuotas"
 	GetOrganizationQuotaRequest                                 = "GetOrganizationQuota"
+	GetOrganizationQuotasRequest                                = "GetOrganizationQuotas"
 	GetOrganizationRelationshipDefaultIsolationSegmentRequest   = "GetOrganizationRelationshipDefaultIsolationSegment"
 	GetOrganizationRequest                                      = "GetOrganization"
 	GetOrganizationsRequest                                     = "GetOrganizations"
+	GetPackageDropletsRequest                                   = "GetPackageDroplets"
 	GetPackageRequest                                           = "GetPackage"
 	GetPackagesRequest                                          = "GetPackages"
-	GetPackageDropletsRequest                                   = "GetPackageDroplets"
 	GetProcessRequest                                           = "GetProcess"
-	GetProcessesRequest                                         = "GetProcesses"
-	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
+	GetProcessStatsRequest                                      = "GetProcessStats"
+	GetProcessesRequest                                         = "GetProcesses"
 	GetRolesRequest                                             = "GetRoles"
 	GetRouteDestinationsRequest                                 = "GetRouteDestinations"
 	GetRoutesRequest                                            = "GetRoutes"
+	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetSecurityGroupsRequest                                    = "GetSecurityGroups"
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
-	GetServicePlansRequest                                      = "GetServicePlans"
 	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
+	GetServicePlansRequest                                      = "GetServicePlans"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
-	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
-	GetSpaceRunningSecurityGroupsRequest                        = "GetSpaceRunningSecurityGroups"
-	GetSpacesRequest                                            = "GetSpaces"
 	GetSpaceQuotaRequest                                        = "GetSpaceQuota"
 	GetSpaceQuotasRequest                                       = "GetSpaceQuotas"
+	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
+	GetSpaceRunningSecurityGroupsRequest                        = "GetSpaceRunningSecurityGroups"
 	GetSpaceStagingSecurityGroupsRequest                        = "GetSpaceStagingSecurityGroups"
-	GetSSHEnabled                                               = "GetSSHEnabled"
+	GetSpacesRequest                                            = "GetSpaces"
 	GetStacksRequest                                            = "GetStacks"
 	GetUserRequest                                              = "GetUser"
 	GetUsersRequest                                             = "GetUsers"
 	MapRouteRequest                                             = "MapRoute"
 	PatchApplicationCurrentDropletRequest                       = "PatchApplicationCurrentDroplet"
 	PatchApplicationEnvironmentVariablesRequest                 = "PatchApplicationEnvironmentVariables"
-	PatchApplicationRequest                                     = "PatchApplication"
 	PatchApplicationFeaturesRequest                             = "PatchApplicationFeatures"
-	PatchEnvironmentVariableGroupRequest                        = "PatchEnvironmentVariableGroup"
+	PatchApplicationRequest                                     = "PatchApplication"
 	PatchBuildpackRequest                                       = "PatchBuildpack"
 	PatchDomainRequest                                          = "PatchDomain"
+	PatchEnvironmentVariableGroupRequest                        = "PatchEnvironmentVariableGroup"
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
+	PatchOrganizationQuotaRequest                               = "PatchOrganizationQuota"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchOrganizationRequest                                    = "PatchOrganization"
-	PatchOrganizationQuotaRequest                               = "PatchOrganizationQuota"
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchRouteRequest                                           = "PatchRoute"
 	PatchSecurityGroupRequest                                   = "PatchSecurityGroup"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
 	PatchServiceOfferingRequest                                 = "PatchServiceOfferingRequest"
 	PatchServicePlanRequest                                     = "PatchServicePlanRequest"
-	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
-	PatchSpaceRequest                                           = "PatchSpace"
 	PatchSpaceFeaturesRequest                                   = "PatchSpaceFeatures"
 	PatchSpaceQuotaRequest                                      = "PatchSpaceQuota"
+	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
+	PatchSpaceRequest                                           = "PatchSpace"
 	PatchStackRequest                                           = "PatchStack"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
@@ -134,24 +135,24 @@ const (
 	PostDropletRequest                                          = "PostDroplet"
 	PostIsolationSegmentRelationshipOrganizationsRequest        = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
-	PostOrganizationRequest                                     = "PostOrganization"
-	PostOrganizationQuotaRequest                                = "PostOrganizationQuota"
 	PostOrganizationQuotaApplyRequest                           = "PostOrganizationQuotaApply"
-	PostPackageRequest                                          = "PostPackage"
+	PostOrganizationQuotaRequest                                = "PostOrganizationQuota"
+	PostOrganizationRequest                                     = "PostOrganization"
 	PostPackageBitsRequest                                      = "PostPackageBits"
+	PostPackageRequest                                          = "PostPackage"
 	PostResourceMatchesRequest                                  = "PostResourceMatches"
 	PostRoleRequest                                             = "PostRole"
 	PostRouteRequest                                            = "PostRoute"
 	PostSecurityGroupRequest                                    = "PostSecurityGroup"
-	PostSecurityGroupStagingSpaceRequest                        = "PostSecurityGroupStagingSpace"
 	PostSecurityGroupRunningSpaceRequest                        = "PostSecurityGroupRunningSpace"
+	PostSecurityGroupStagingSpaceRequest                        = "PostSecurityGroupStagingSpace"
 	PostServiceBrokerRequest                                    = "PostServiceBroker"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostServicePlanVisibilityRequest                            = "PostServicePlanVisibility"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
-	PostSpaceRequest                                            = "PostSpace"
-	PostSpaceQuotaRequest                                       = "PostSpaceQuota"
 	PostSpaceQuotaRelationshipsRequest                          = "PostSpaceQuotaRelationships"
+	PostSpaceQuotaRequest                                       = "PostSpaceQuota"
+	PostSpaceRequest                                            = "PostSpace"
 	PostUserRequest                                             = "PostUser"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
@@ -164,8 +165,6 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/", Method: http.MethodPost, Name: PostApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodDelete, Name: DeleteApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodPatch, Name: PatchApplicationRequest},
-	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodPatch, Name: PatchApplicationFeaturesRequest},
-	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodGet, Name: GetApplicationFeaturesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostApplicationActionApplyManifest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/restart", Method: http.MethodPost, Name: PostApplicationActionRestartRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationActionStartRequest},
@@ -173,6 +172,8 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid/droplets/current", Method: http.MethodGet, Name: GetApplicationDropletCurrentRequest},
 	{Resource: AppsResource, Path: "/:app_guid/env", Method: http.MethodGet, Name: GetApplicationEnvRequest},
 	{Resource: AppsResource, Path: "/:app_guid/environment_variables", Method: http.MethodPatch, Name: PatchApplicationEnvironmentVariablesRequest},
+	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodGet, Name: GetApplicationFeaturesRequest},
+	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodPatch, Name: PatchApplicationFeaturesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/manifest", Method: http.MethodGet, Name: GetApplicationManifestRequest},
 	{Resource: AppsResource, Path: "/:app_guid/processes", Method: http.MethodGet, Name: GetApplicationProcessesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessRequest},
@@ -207,8 +208,8 @@ var APIRoutes = []Route{
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodPost, Name: PostDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
-	{Resource: DropletsResource, Path: "/:droplet_guid/upload", Method: http.MethodPost, Name: PostDropletBitsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid/download", Method: http.MethodGet, Name: GetDropletBitsRequest},
+	{Resource: DropletsResource, Path: "/:droplet_guid/upload", Method: http.MethodPost, Name: PostDropletBitsRequest},
 	{Resource: EnvironmentVariableGroupsResource, Path: "/:group_name", Method: http.MethodGet, Name: GetEnvironmentVariableGroupRequest},
 	{Resource: EnvironmentVariableGroupsResource, Path: "/:group_name", Method: http.MethodPatch, Name: PatchEnvironmentVariableGroupRequest},
 	{Resource: EventsResource, Path: "/", Method: http.MethodGet, Name: GetEventsRequest},
@@ -222,6 +223,12 @@ var APIRoutes = []Route{
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/relationships/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest},
+	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationQuotasRequest},
+	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodPost, Name: PostOrganizationQuotaRequest},
+	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteOrganizationQuotaRequest},
+	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaRequest},
+	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchOrganizationQuotaRequest},
+	{Resource: OrgQuotasResource, Path: "/:quota_guid/relationships/organizations", Method: http.MethodPost, Name: PostOrganizationQuotaApplyRequest},
 	{Resource: OrgsResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationsRequest},
 	{Resource: OrgsResource, Path: "/", Method: http.MethodPost, Name: PostOrganizationRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid", Method: http.MethodGet, Name: GetOrganizationRequest},
@@ -231,25 +238,21 @@ var APIRoutes = []Route{
 	{Resource: OrgsResource, Path: "/:organization_guid/domains/default", Method: http.MethodGet, Name: GetDefaultDomainRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationRelationshipDefaultIsolationSegmentRequest},
-	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchOrganizationQuotaRequest},
-	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodPost, Name: PostOrganizationQuotaRequest},
-	{Resource: OrgQuotasResource, Path: "/:quota_guid/relationships/organizations", Method: http.MethodPost, Name: PostOrganizationQuotaApplyRequest},
-	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaRequest},
-	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationQuotasRequest},
-	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteOrganizationQuotaRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodPost, Name: PostPackageRequest},
 	{Resource: PackagesResource, Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest},
-	{Resource: PackagesResource, Path: "/:package_guid/upload", Method: http.MethodPost, Name: PostPackageBitsRequest},
 	{Resource: PackagesResource, Path: "/:package_guid/droplets", Method: http.MethodGet, Name: GetPackageDropletsRequest},
-	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},
+	{Resource: PackagesResource, Path: "/:package_guid/upload", Method: http.MethodPost, Name: PostPackageBitsRequest},
 	{Resource: ProcessesResource, Path: "/", Method: http.MethodGet, Name: GetProcessesRequest},
+	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodPatch, Name: PatchProcessRequest},
-	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},
+	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},
+	{Resource: RevisionsResource, Path: "/:revision_guid/environment_variables", Method: http.MethodGet, Name: GetEnvironmentVariablesByRevision},
 	{Resource: RolesResource, Path: "/", Method: http.MethodGet, Name: GetRolesRequest},
 	{Resource: RolesResource, Path: "/", Method: http.MethodPost, Name: PostRoleRequest},
+	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodPost, Name: PostRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
@@ -257,15 +260,14 @@ var APIRoutes = []Route{
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodGet, Name: GetRouteDestinationsRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodPost, Name: MapRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations/:destination_guid", Method: http.MethodDelete, Name: UnmapRouteRequest},
-	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodPost, Name: PostSecurityGroupRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRequest},
-	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
-	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
-	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
-	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRunningSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodPatch, Name: PatchSecurityGroupRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodDelete, Name: DeleteServiceBrokerRequest},
@@ -274,37 +276,37 @@ var APIRoutes = []Route{
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: ServiceOfferingsResource, Path: "/", Method: http.MethodGet, Name: GetServiceOfferingsRequest},
-	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodPatch, Name: PatchServiceOfferingRequest},
 	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodDelete, Name: DeleteServiceOfferingRequest},
+	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodPatch, Name: PatchServiceOfferingRequest},
 	{Resource: ServicePlansResource, Path: "/", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodGet, Name: GetServicePlanVisibilityRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodPost, Name: PostServicePlanVisibilityRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility/:organization_guid", Method: http.MethodDelete, Name: DeleteServicePlanVisibilityRequest},
+	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodGet, Name: GetSpaceQuotasRequest},
+	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces", Method: http.MethodPost, Name: PostSpaceQuotaRelationshipsRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaFromSpaceRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodPost, Name: PostSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodPatch, Name: PatchSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostSpaceActionApplyManifestRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodGet, Name: GetSpaceFeatureRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodPatch, Name: PatchSpaceFeaturesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/routes", Method: http.MethodDelete, Name: DeleteOrphanedRoutesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/running_security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
-	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodPatch, Name: PatchSpaceFeaturesRequest},
-	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodGet, Name: GetSpaceFeatureRequest},
-	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},
-	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaRequest},
-	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaRequest},
-	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces", Method: http.MethodPost, Name: PostSpaceQuotaRelationshipsRequest},
-	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodGet, Name: GetSpaceQuotasRequest},
-	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchSpaceQuotaRequest},
-	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaFromSpaceRequest},
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodGet, Name: GetUsersRequest},
-	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodGet, Name: GetUserRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodPost, Name: PostUserRequest},
 	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodDelete, Name: DeleteUserRequest},
+	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodGet, Name: GetUserRequest},
 }

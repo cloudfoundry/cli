@@ -163,6 +163,15 @@ var _ = Describe("revision Command", func() {
 					Expect(testUI.Out).To(Say(`droplet GUID:    droplet-guid`))
 					Expect(testUI.Out).To(Say(`created on:      2020-03-10T17:11:58Z`))
 
+					// Expect(testUI.Out).To(Say(`labels:`))
+					// Expect(testUI.Out).To(Say(`label: foo3`))
+
+					// Expect(testUI.Out).To(Say(`annotations:`))
+					// Expect(testUI.Out).To(Say(`annotation: foo3`))
+
+					Expect(testUI.Out).To(Say(`application environment variables:`))
+					Expect(testUI.Out).To(Say(`env: foo3`))
+
 					Expect(fakeActor.GetRevisionsByApplicationNameAndSpaceCallCount()).To(Equal(1))
 					appName, spaceGUID := fakeActor.GetRevisionsByApplicationNameAndSpaceArgsForCall(0)
 					Expect(appName).To(Equal("some-app"))
