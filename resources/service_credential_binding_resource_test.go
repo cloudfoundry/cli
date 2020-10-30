@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	. "code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -48,6 +49,19 @@ var _ = Describe("service credential binding resource", func() {
 			}`,
 		),
 		Entry(
+			"parameters",
+			ServiceCredentialBinding{
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"foo": "bar",
+				}),
+			},
+			`{
+				"parameters": {
+					"foo": "bar"
+				}
+			}`,
+		),
+		Entry(
 			"everything",
 			ServiceCredentialBinding{
 				Type:                AppBinding,
@@ -55,6 +69,9 @@ var _ = Describe("service credential binding resource", func() {
 				Name:                "fake-name",
 				AppGUID:             "fake-app-guid",
 				ServiceInstanceGUID: "fake-service-instance-guid",
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"foo": "bar",
+				}),
 			},
 			`{
 				"type": "app",
@@ -71,6 +88,9 @@ var _ = Describe("service credential binding resource", func() {
 							"guid": "fake-app-guid"
 						}
 					}
+				},
+				"parameters": {
+					"foo": "bar"
 				}
 			}`,
 		),

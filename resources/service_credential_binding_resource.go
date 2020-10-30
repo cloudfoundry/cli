@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/jsonry"
 )
 
@@ -28,6 +29,8 @@ type ServiceCredentialBinding struct {
 	AppSpaceGUID string `jsonry:"-"`
 	// LastOperation is the last operation on the service credential binding
 	LastOperation LastOperation `jsonry:"last_operation"`
+	// Parameters can be specified when creating a binding
+	Parameters types.OptionalObject `jsonry:"parameters"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {

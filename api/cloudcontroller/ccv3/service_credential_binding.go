@@ -6,6 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
+func (client *Client) CreateServiceCredentialBinding(binding resources.ServiceCredentialBinding) (JobURL, Warnings, error) {
+	return client.MakeRequest(RequestParams{
+		RequestName: internal.PostServiceCredentialBindingRequest,
+		RequestBody: binding,
+	})
+}
+
 // GetServiceCredentialBindings queries the CC API with the specified query
 // and returns a slice of ServiceCredentialBindings. Additionally if Apps are
 // included in the API response (by having `include=app` in the query) then the

@@ -176,6 +176,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		return ccerror.SecurityGroupNotBound{Message: err.Message}
 	case errorResponse.Title == "CF-ServiceInstanceAlreadyBoundToSameRoute":
 		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
+	case strings.Contains(errorString,
+		"The app is already bound to the service instance"):
+		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
 	default:
 		return err
 	}

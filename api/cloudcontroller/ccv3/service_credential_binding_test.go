@@ -2,6 +2,7 @@ package ccv3_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -24,6 +25,43 @@ var _ = Describe("Service Instance", func() {
 	BeforeEach(func() {
 		requester = new(ccv3fakes.FakeRequester)
 		client, _ = NewFakeRequesterTestClient(requester)
+	})
+
+	Describe("CreateServiceCredentialBinding", func() {
+		When("the request succeeds", func() {
+			It("returns warnings and no errors", func() {
+				requester.MakeRequestReturns("fake-job-url", Warnings{"fake-warning"}, nil)
+
+				binding := resources.ServiceCredentialBinding{
+					ServiceInstanceGUID: "fake-service-instance-guid",
+					AppGUID:             "fake-app-guid",
+				}
+
+				jobURL, warnings, err := client.CreateServiceCredentialBinding(binding)
+
+				Expect(jobURL).To(Equal(JobURL("fake-job-url")))
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+					RequestName: internal.PostServiceCredentialBindingRequest,
+					RequestBody: binding,
+				}))
+			})
+		})
+
+		When("the request fails", func() {
+			It("returns errors and warnings", func() {
+				requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+
+				jobURL, warnings, err := client.CreateServiceCredentialBinding(resources.ServiceCredentialBinding{})
+
+				Expect(jobURL).To(BeEmpty())
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
 	})
 
 	Describe("GetServiceCredentialBindings", func() {

@@ -518,7 +518,7 @@ var _ = Describe("service command", func() {
 					bindingName1 = helpers.RandomName()
 					bindingName2 = helpers.RandomName()
 
-					broker = servicebrokerstub.New().EnableServiceAccess()
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
 
 					helpers.CreateManagedServiceInstance(
 						broker.FirstServiceOfferingName(),
@@ -531,10 +531,8 @@ var _ = Describe("service command", func() {
 						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 
-					const asyncDelay = time.Minute // Forces bind to be "in progress" for predictable output
-					broker.WithAsyncDelay(asyncDelay).Configure()
-					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
-					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1, "--wait")).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2, "--wait")).Should(Exit(0))
 				})
 
 				It("displays the bound apps", func() {
@@ -544,8 +542,8 @@ var _ = Describe("service command", func() {
 					Expect(session).To(SatisfyAll(
 						Say(`Bound apps:\n`),
 						Say(`name\s+binding name\s+status\s+message\n`),
-						Say(`%s\s+%s\s+create in progress\s*\n`, appName1, bindingName1),
-						Say(`%s\s+%s\s+create in progress\s*\n`, appName2, bindingName2),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName1, bindingName1),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName2, bindingName2),
 					))
 				})
 			})

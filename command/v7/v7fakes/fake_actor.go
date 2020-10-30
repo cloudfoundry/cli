@@ -422,6 +422,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	CreateServiceAppBindingStub        func(v7action.CreateServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	createServiceAppBindingMutex       sync.RWMutex
+	createServiceAppBindingArgsForCall []struct {
+		arg1 v7action.CreateServiceAppBindingParams
+	}
+	createServiceAppBindingReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	createServiceAppBindingReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	CreateServiceBrokerStub        func(resources.ServiceBroker) (v7action.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
@@ -5177,6 +5192,72 @@ func (fake *FakeActor) CreateSecurityGroupReturnsOnCall(i int, result1 v7action.
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) CreateServiceAppBinding(arg1 v7action.CreateServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.createServiceAppBindingMutex.Lock()
+	ret, specificReturn := fake.createServiceAppBindingReturnsOnCall[len(fake.createServiceAppBindingArgsForCall)]
+	fake.createServiceAppBindingArgsForCall = append(fake.createServiceAppBindingArgsForCall, struct {
+		arg1 v7action.CreateServiceAppBindingParams
+	}{arg1})
+	fake.recordInvocation("CreateServiceAppBinding", []interface{}{arg1})
+	fake.createServiceAppBindingMutex.Unlock()
+	if fake.CreateServiceAppBindingStub != nil {
+		return fake.CreateServiceAppBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createServiceAppBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) CreateServiceAppBindingCallCount() int {
+	fake.createServiceAppBindingMutex.RLock()
+	defer fake.createServiceAppBindingMutex.RUnlock()
+	return len(fake.createServiceAppBindingArgsForCall)
+}
+
+func (fake *FakeActor) CreateServiceAppBindingCalls(stub func(v7action.CreateServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.createServiceAppBindingMutex.Lock()
+	defer fake.createServiceAppBindingMutex.Unlock()
+	fake.CreateServiceAppBindingStub = stub
+}
+
+func (fake *FakeActor) CreateServiceAppBindingArgsForCall(i int) v7action.CreateServiceAppBindingParams {
+	fake.createServiceAppBindingMutex.RLock()
+	defer fake.createServiceAppBindingMutex.RUnlock()
+	argsForCall := fake.createServiceAppBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) CreateServiceAppBindingReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createServiceAppBindingMutex.Lock()
+	defer fake.createServiceAppBindingMutex.Unlock()
+	fake.CreateServiceAppBindingStub = nil
+	fake.createServiceAppBindingReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateServiceAppBindingReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createServiceAppBindingMutex.Lock()
+	defer fake.createServiceAppBindingMutex.Unlock()
+	fake.CreateServiceAppBindingStub = nil
+	if fake.createServiceAppBindingReturnsOnCall == nil {
+		fake.createServiceAppBindingReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createServiceAppBindingReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) CreateServiceBroker(arg1 resources.ServiceBroker) (v7action.Warnings, error) {
@@ -18255,6 +18336,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createRouteBindingMutex.RUnlock()
 	fake.createSecurityGroupMutex.RLock()
 	defer fake.createSecurityGroupMutex.RUnlock()
+	fake.createServiceAppBindingMutex.RLock()
+	defer fake.createServiceAppBindingMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	fake.createSharedDomainMutex.RLock()
