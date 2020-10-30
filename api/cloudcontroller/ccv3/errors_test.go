@@ -497,6 +497,27 @@ var _ = Describe("Error Wrapper", func() {
 							Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
 						})
 					})
+
+					When("a service app binding already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The app is already bound to the service instance",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns an ResourceAlreadyExistsError", func() {
+							Expect(makeError).To(MatchError(ccerror.ResourceAlreadyExistsError{
+								Message: "The app is already bound to the service instance",
+							}))
+						})
+					})
 				})
 			})
 

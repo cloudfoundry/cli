@@ -47,6 +47,7 @@ type Actor interface {
 	CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
 	CreateRouteBinding(params v7action.CreateRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateSecurityGroup(name, filePath string) (v7action.Warnings, error)
+	CreateServiceAppBinding(params v7action.CreateServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateServiceBroker(model resources.ServiceBroker) (v7action.Warnings, error)
 	CreateSharedDomain(domainName string, internal bool, routerGroupName string) (v7action.Warnings, error)
 	CreateSpace(spaceName, orgGUID string) (resources.Space, v7action.Warnings, error)

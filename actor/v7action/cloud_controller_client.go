@@ -36,6 +36,7 @@ type CloudControllerClient interface {
 	CreateRoute(route resources.Route) (resources.Route, ccv3.Warnings, error)
 	CreateRouteBinding(binding resources.RouteBinding) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateServiceBroker(serviceBroker resources.ServiceBroker) (ccv3.JobURL, ccv3.Warnings, error)
+	CreateServiceCredentialBinding(binding resources.ServiceCredentialBinding) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateServiceInstance(serviceInstance resources.ServiceInstance) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
 	CreateSpace(space resources.Space) (resources.Space, ccv3.Warnings, error)
