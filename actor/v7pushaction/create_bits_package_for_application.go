@@ -1,12 +1,7 @@
 package v7pushaction
 
 import (
-	"os"
-
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,89 +25,15 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 	log.WithField("Path", pushPlan.BitsPath).Info("creating archive")
 
 	var (
-		allWarnings        Warnings
-		matchedResources   []sharedaction.V3Resource
-		unmatchedResources []sharedaction.V3Resource
+		allWarnings Warnings
 	)
-
-	// check if all source files are empty
-	shouldResourceMatch := false
-	for _, resource := range pushPlan.AllResources {
-		if resource.SizeInBytes != 0 {
-			shouldResourceMatch = true
-		}
-	}
-
-	if shouldResourceMatch {
-		eventStream <- &PushEvent{Plan: pushPlan, Event: ResourceMatching}
-		var warnings Warnings
-		var err error
-
-		matchedResources, unmatchedResources, warnings, err = actor.MatchResources(pushPlan.AllResources)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return resources.Package{}, allWarnings, err
-		}
-	} else {
-		matchedResources = []sharedaction.V3Resource{}
-		unmatchedResources = pushPlan.AllResources
-	}
 
 	eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingPackage}
 	log.WithField("GUID", pushPlan.Application.GUID).Info("creating package")
-	pkg, createPackageWarnings, err := actor.V7Actor.CreateBitsPackageByApplication(pushPlan.Application.GUID)
+	pkg, createPackageWarnings, err := actor.V7Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(pushPlan.Application.Name, pushPlan.SpaceGUID, pushPlan.BitsPath)
 	allWarnings = append(allWarnings, createPackageWarnings...)
 	if err != nil {
 		return resources.Package{}, allWarnings, err
-	}
-
-	if len(unmatchedResources) > 0 {
-		eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingArchive}
-		archivePath, archiveErr := actor.CreateAndReturnArchivePath(pushPlan, unmatchedResources)
-		if archiveErr != nil {
-			return resources.Package{}, allWarnings, archiveErr
-		}
-		defer os.RemoveAll(archivePath)
-
-		// Uploading package/app bits
-		for count := 0; count < PushRetries; count++ {
-			eventStream <- &PushEvent{Plan: pushPlan, Event: ReadingArchive}
-			log.WithField("GUID", pushPlan.Application.GUID).Info("reading archive")
-			file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
-			if readErr != nil {
-				return resources.Package{}, allWarnings, readErr
-			}
-			defer file.Close()
-
-			eventStream <- &PushEvent{Plan: pushPlan, Event: UploadingApplicationWithArchive}
-			progressReader := progressBar.NewProgressBarWrapper(file, size)
-			var uploadWarnings v7action.Warnings
-			pkg, uploadWarnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, progressReader, size)
-			allWarnings = append(allWarnings, uploadWarnings...)
-
-			if _, ok := err.(ccerror.PipeSeekError); ok {
-				eventStream <- &PushEvent{Plan: pushPlan, Event: RetryUpload}
-				continue
-			}
-			break
-		}
-
-		if err != nil {
-			if e, ok := err.(ccerror.PipeSeekError); ok {
-				return resources.Package{}, allWarnings, actionerror.UploadFailedError{Err: e.Err}
-			}
-			return resources.Package{}, allWarnings, err
-		}
-
-		eventStream <- &PushEvent{Plan: pushPlan, Event: UploadWithArchiveComplete}
-	} else {
-		eventStream <- &PushEvent{Plan: pushPlan, Event: UploadingApplication}
-		var uploadWarnings v7action.Warnings
-		pkg, uploadWarnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, nil, 0)
-		allWarnings = append(allWarnings, uploadWarnings...)
-		if err != nil {
-			return resources.Package{}, allWarnings, err
-		}
 	}
 
 	return pkg, allWarnings, nil
