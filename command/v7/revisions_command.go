@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -25,6 +26,9 @@ type RevisionsCommand struct {
 }
 
 func (cmd RevisionsCommand) Execute(_ []string) error {
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
