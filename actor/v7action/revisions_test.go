@@ -5,11 +5,13 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -392,6 +394,64 @@ var _ = Describe("Revisions Actions", func() {
 					}))
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-revisions-warnings"))
+			})
+		})
+	})
+
+	Describe("GetEnvironmentVariableGroupByRevision", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			fakeConfig                *v7actionfakes.FakeConfig
+			revisionGUID              string
+			executeErr                error
+			environmentVariablesGroup v7action.EnvironmentVariableGroup
+			warnings                  Warnings
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			fakeConfig = new(v7actionfakes.FakeConfig)
+			actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, nil)
+			revisionGUID = "revision-guid"
+			fakeConfig.APIVersionReturns("3.86.0")
+		})
+
+		JustBeforeEach(func() {
+			environmentVariablesGroup, warnings, executeErr = actor.GetEnvironmentVariableGroupByRevision(revisionGUID)
+		})
+
+		When("finding the environment variables fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetEnvironmentVariablesByRevisionReturns(
+					nil,
+					ccv3.Warnings{"get-env-vars-warning-1"},
+					errors.New("get-env-vars-error-1"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-env-vars-error-1"))
+				Expect(warnings).To(ConsistOf("get-env-vars-warning-1"))
+			})
+		})
+
+		When("finding the environment variables succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetEnvironmentVariablesByRevisionReturns(
+					ccv3.EnvironmentVariables{"foo": *types.NewFilteredString("bar")},
+					ccv3.Warnings{"get-env-vars-warning-1"},
+					nil,
+				)
+			})
+
+			It("returns the environment variables and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionArgsForCall(0)).To(Equal("revision-guid"))
+				Expect(warnings).To(ConsistOf("get-env-vars-warning-1"))
+				Expect(len(environmentVariablesGroup)).To(Equal(1))
+				Expect(environmentVariablesGroup["foo"].Value).To(Equal("bar"))
 			})
 		})
 	})
