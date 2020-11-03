@@ -38,6 +38,7 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 		"Username":  user.Name,
 		"Version":   cmd.Version.Value,
 	})
+	cmd.UI.DisplayNewline()
 
 	app, _, _ := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
 	deployedRevisions, _, _ := cmd.Actor.GetApplicationRevisionsDeployed(app.GUID)

@@ -95,6 +95,7 @@ type Actor interface {
 	GetDomainLabels(domainName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (resources.IsolationSegment, v7action.Warnings, error)
 	GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (v7action.EnvironmentVariableGroup, v7action.Warnings, error)
+	GetEnvironmentVariableGroupByRevision(revisionGUID string) (v7action.EnvironmentVariableGroup, v7action.Warnings, error)
 	GetEnvironmentVariablesByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.EnvironmentVariableGroups, v7action.Warnings, error)
 	GetFeatureFlagByName(featureFlagName string) (v7action.FeatureFlag, v7action.Warnings, error)
 	GetFeatureFlags() ([]v7action.FeatureFlag, v7action.Warnings, error)

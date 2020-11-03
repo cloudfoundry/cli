@@ -37,12 +37,12 @@ func (client *Client) GetApplicationRevisionsDeployed(appGUID string) ([]resourc
 }
 
 func (client *Client) GetEnvironmentVariablesByRevision(revisionGUID string) (EnvironmentVariables, Warnings, error) {
-	var environmentVariables EnvironmentVariables
+	environmentVariables := make(EnvironmentVariables)
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetEnvironmentVariablesByRevision,
 		URIParams:    internal.Params{"revision_guid": revisionGUID},
-		ResponseBody: environmentVariables,
+		ResponseBody: &environmentVariables,
 	})
 
 	return environmentVariables, warnings, err
