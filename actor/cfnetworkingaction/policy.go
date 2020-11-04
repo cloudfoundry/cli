@@ -217,7 +217,17 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		srcAppGUIDs = append(srcAppGUIDs, app.GUID)
 	}
 
-	v1Policies, err := actor.NetworkingClient.ListPolicies(srcAppGUIDs...)
+	v1Policies := []cfnetv1.Policy{}
+
+	_, err := batcher.RequestByGUID(srcAppGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, err := actor.NetworkingClient.ListPolicies(guids...)
+		if err != nil {
+			return nil, err
+		}
+		v1Policies = append(v1Policies, batch...)
+		return nil, err
+	})
+
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}

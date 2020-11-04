@@ -609,7 +609,8 @@ var _ = Describe("Policy", func() {
 					expectedPolicies = append(expectedPolicies, expectedPolicy)
 				}
 
-				fakeNetworkingClient.ListPoliciesReturnsOnCall(0, policies, nil)
+				fakeNetworkingClient.ListPoliciesReturnsOnCall(0, policies[0:batcher.BatchSize], nil)
+				fakeNetworkingClient.ListPoliciesReturnsOnCall(1, policies[batcher.BatchSize:batcher.BatchSize*2], nil)
 
 				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, srcApps, []string{}, nil)
 				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, destApps[0:batcher.BatchSize], []string{}, nil)
@@ -643,7 +644,7 @@ var _ = Describe("Policy", func() {
 				Expect(warnings).To(BeEmpty())
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
+				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(2))
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(3))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
