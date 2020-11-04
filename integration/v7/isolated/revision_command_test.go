@@ -65,6 +65,8 @@ var _ = Describe("revision command", func() {
 		When("the requested app and revision both exist", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+					Eventually(helpers.CF("set-env", appName, "foo", "bar1")).Should(Exit(0))
 					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 				})
@@ -73,6 +75,7 @@ var _ = Describe("revision command", func() {
 			FIt("shows details about the revision", func() {
 				session := helpers.CF("revision", appName, "--version", "1")
 				Eventually(session).Should(Exit(0))
+
 				Expect(session).Should(Say(
 					fmt.Sprintf("Showing revision 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, username),
 				))
@@ -80,9 +83,9 @@ var _ = Describe("revision command", func() {
 				Expect(session).Should(Say(`deployed:        false`))
 				Expect(session).Should(Say(`description:     Initial revision`))
 				Expect(session).Should(Say(`deployable:      true`))
-				// Expect(session).Should(MatchRegexp(`revision GUID:   \w+\n`))
-				// Expect(session).Should(MatchRegexp(`droplet GUID:    \w+\n`))
-				// Expect(session).Should(MatchRegexp(`created on:      \w+\n`))
+				Expect(session).Should(Say(`revision GUID:   \S+\n`))
+				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
+				Expect(session).Should(Say(`created on:      \S+\n`))
 
 				// Expect(session).Should(Say(`labels:`))
 				// Expect(session).Should(Say(`label: foo1`))
@@ -91,7 +94,7 @@ var _ = Describe("revision command", func() {
 				// Expect(session).Should(Say(`annotation: foo1`))
 
 				Expect(session).Should(Say(`application environment variables:`))
-				Expect(session).Should(Say(`env: foo1`))
+				Expect(session).Should(Say(`foo:   bar1`))
 
 				session = helpers.CF("revision", appName, "--version", "2")
 				Eventually(session).Should(Exit(0))
@@ -102,18 +105,18 @@ var _ = Describe("revision command", func() {
 				Expect(session).Should(Say(`deployed:        true`))
 				Expect(session).Should(Say(`description:     New droplet deployed`))
 				Expect(session).Should(Say(`deployable:      true`))
-				// Expect(session).Should(MatchRegexp(`revision GUID:   \w+\n`))
-				// Expect(session).Should(MatchRegexp(`droplet GUID:    \w+\n`))
-				// Expect(session).Should(MatchRegexp(`created on:      \w+\n`))
-
-				Expect(session).Should(Say(`labels:`))
-				Expect(session).Should(Say(`label: foo2`))
-
-				Expect(session).Should(Say(`annotations:`))
-				Expect(session).Should(Say(`annotation: foo2`))
+				Expect(session).Should(Say(`revision GUID:   \S+\n`))
+				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
+				Expect(session).Should(Say(`created on:      \S+\n`))
 
 				Expect(session).Should(Say(`application environment variables:`))
-				Expect(session).Should(Say(`env: foo2`))
+				Expect(session).Should(Say(`foo:   bar1`))
+
+				// Expect(session).Should(Say(`labels:`))
+				// Expect(session).Should(Say(`label: foo2`))
+
+				// Expect(session).Should(Say(`annotations:`))
+				// Expect(session).Should(Say(`annotation: foo2`))
 			})
 		})
 	})
