@@ -140,7 +140,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 			When("updating the app environment variables fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
+					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(resources.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
 				})
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("some-env-var-error"))
@@ -151,7 +151,7 @@ var _ = Describe("Environment Variable Actions", func() {
 			When("updating the app environment variables succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
-						ccv3.EnvironmentVariables{
+						resources.EnvironmentVariables{
 							"my-var": {Value: "my-val", IsSet: true},
 						},
 						ccv3.Warnings{"some-env-var-warnings"},
@@ -169,7 +169,7 @@ var _ = Describe("Environment Variable Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesCallCount()).To(Equal(1))
 					appGUIDArg, envVarsArg := fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
+					Expect(envVarsArg).To(Equal(resources.EnvironmentVariables{
 						"my-var": {Value: "my-val", IsSet: true},
 					}))
 					Expect(executeErr).ToNot(HaveOccurred())
@@ -254,7 +254,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 				When("updating the app environment variables fails", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-patch-env-var-warnings"}, errors.New("some-env-var-error"))
+						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(resources.EnvironmentVariables{}, ccv3.Warnings{"some-patch-env-var-warnings"}, errors.New("some-env-var-error"))
 					})
 					It("returns an error", func() {
 						Expect(executeErr).To(MatchError("some-env-var-error"))
@@ -265,7 +265,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				When("updating the app environment variables succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
-							ccv3.EnvironmentVariables{
+							resources.EnvironmentVariables{
 								"my-var": {Value: "my-val", IsSet: true},
 							},
 							ccv3.Warnings{"some-patch-env-var-warnings"},
@@ -282,7 +282,7 @@ var _ = Describe("Environment Variable Actions", func() {
 						Expect(fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesCallCount()).To(Equal(1))
 						appGUIDArg, envVarsArg := fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesArgsForCall(0)
 						Expect(appGUIDArg).To(Equal("some-app-guid"))
-						Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
+						Expect(envVarsArg).To(Equal(resources.EnvironmentVariables{
 							"my-var": {Value: "", IsSet: false},
 						}))
 

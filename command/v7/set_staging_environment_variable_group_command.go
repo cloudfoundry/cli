@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type SetStagingEnvironmentVariableGroupCommand struct {
@@ -33,7 +33,7 @@ func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) erro
 		"Username": user.Name,
 	})
 
-	var envVars ccv3.EnvironmentVariables
+	var envVars resources.EnvironmentVariables
 	err = json.Unmarshal([]byte(fmt.Sprintf(`{"var":%s}`, cmd.RequiredArgs.EnvVarGroupJson)), &envVars)
 	if err != nil {
 		return errors.New("Invalid environment variable group provided. Please provide a valid JSON object.")

@@ -2781,11 +2781,11 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	SetEnvironmentVariableGroupStub        func(constanta.EnvironmentVariableGroupName, ccv3.EnvironmentVariables) (v7action.Warnings, error)
+	SetEnvironmentVariableGroupStub        func(constanta.EnvironmentVariableGroupName, resources.EnvironmentVariables) (v7action.Warnings, error)
 	setEnvironmentVariableGroupMutex       sync.RWMutex
 	setEnvironmentVariableGroupArgsForCall []struct {
 		arg1 constanta.EnvironmentVariableGroupName
-		arg2 ccv3.EnvironmentVariables
+		arg2 resources.EnvironmentVariables
 	}
 	setEnvironmentVariableGroupReturns struct {
 		result1 v7action.Warnings
@@ -15342,12 +15342,12 @@ func (fake *FakeActor) SetEnvironmentVariableByApplicationNameAndSpaceReturnsOnC
 	}{result1, result2}
 }
 
-func (fake *FakeActor) SetEnvironmentVariableGroup(arg1 constanta.EnvironmentVariableGroupName, arg2 ccv3.EnvironmentVariables) (v7action.Warnings, error) {
+func (fake *FakeActor) SetEnvironmentVariableGroup(arg1 constanta.EnvironmentVariableGroupName, arg2 resources.EnvironmentVariables) (v7action.Warnings, error) {
 	fake.setEnvironmentVariableGroupMutex.Lock()
 	ret, specificReturn := fake.setEnvironmentVariableGroupReturnsOnCall[len(fake.setEnvironmentVariableGroupArgsForCall)]
 	fake.setEnvironmentVariableGroupArgsForCall = append(fake.setEnvironmentVariableGroupArgsForCall, struct {
 		arg1 constanta.EnvironmentVariableGroupName
-		arg2 ccv3.EnvironmentVariables
+		arg2 resources.EnvironmentVariables
 	}{arg1, arg2})
 	fake.recordInvocation("SetEnvironmentVariableGroup", []interface{}{arg1, arg2})
 	fake.setEnvironmentVariableGroupMutex.Unlock()
@@ -15367,13 +15367,13 @@ func (fake *FakeActor) SetEnvironmentVariableGroupCallCount() int {
 	return len(fake.setEnvironmentVariableGroupArgsForCall)
 }
 
-func (fake *FakeActor) SetEnvironmentVariableGroupCalls(stub func(constanta.EnvironmentVariableGroupName, ccv3.EnvironmentVariables) (v7action.Warnings, error)) {
+func (fake *FakeActor) SetEnvironmentVariableGroupCalls(stub func(constanta.EnvironmentVariableGroupName, resources.EnvironmentVariables) (v7action.Warnings, error)) {
 	fake.setEnvironmentVariableGroupMutex.Lock()
 	defer fake.setEnvironmentVariableGroupMutex.Unlock()
 	fake.SetEnvironmentVariableGroupStub = stub
 }
 
-func (fake *FakeActor) SetEnvironmentVariableGroupArgsForCall(i int) (constanta.EnvironmentVariableGroupName, ccv3.EnvironmentVariables) {
+func (fake *FakeActor) SetEnvironmentVariableGroupArgsForCall(i int) (constanta.EnvironmentVariableGroupName, resources.EnvironmentVariables) {
 	fake.setEnvironmentVariableGroupMutex.RLock()
 	defer fake.setEnvironmentVariableGroupMutex.RUnlock()
 	argsForCall := fake.setEnvironmentVariableGroupArgsForCall[i]

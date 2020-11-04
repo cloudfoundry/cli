@@ -3,6 +3,7 @@ package v3action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // EnvironmentVariableGroups represents all environment variables for application
@@ -39,7 +40,7 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 
 	_, v3Warnings, apiErr := actor.CloudControllerClient.UpdateApplicationEnvironmentVariables(
 		app.GUID,
-		ccv3.EnvironmentVariables{
+		resources.EnvironmentVariables{
 			envPair.Key: {Value: envPair.Value, IsSet: true},
 		})
 	warnings = append(warnings, v3Warnings...)
@@ -66,7 +67,7 @@ func (actor *Actor) UnsetEnvironmentVariableByApplicationNameAndSpace(appName st
 
 	_, patchWarnings, patchErr := actor.CloudControllerClient.UpdateApplicationEnvironmentVariables(
 		app.GUID,
-		ccv3.EnvironmentVariables{
+		resources.EnvironmentVariables{
 			environmentVariableName: {Value: "", IsSet: false},
 		})
 	warnings = append(warnings, patchWarnings...)
