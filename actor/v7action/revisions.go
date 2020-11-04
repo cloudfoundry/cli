@@ -75,8 +75,8 @@ func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVe
 	return revisions[0], Warnings(warnings), nil
 }
 
-func (actor Actor) GetEnvironmentVariableGroupByRevision(revisionGUID string) (EnvironmentVariableGroup, Warnings, error) {
-	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByRevision(revisionGUID)
+func (actor Actor) GetEnvironmentVariableGroupByRevision(url string) (EnvironmentVariableGroup, Warnings, error) {
+	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByRevision(url)
 	if err != nil {
 		return EnvironmentVariableGroup{}, Warnings(warnings), err
 	}

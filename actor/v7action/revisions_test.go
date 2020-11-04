@@ -403,7 +403,7 @@ var _ = Describe("Revisions Actions", func() {
 			actor                     *Actor
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeConfig                *v7actionfakes.FakeConfig
-			revisionGUID              string
+			url                       string
 			executeErr                error
 			environmentVariablesGroup v7action.EnvironmentVariableGroup
 			warnings                  Warnings
@@ -413,12 +413,12 @@ var _ = Describe("Revisions Actions", func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 			fakeConfig = new(v7actionfakes.FakeConfig)
 			actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, nil)
-			revisionGUID = "revision-guid"
+			url = "url"
 			fakeConfig.APIVersionReturns("3.86.0")
 		})
 
 		JustBeforeEach(func() {
-			environmentVariablesGroup, warnings, executeErr = actor.GetEnvironmentVariableGroupByRevision(revisionGUID)
+			environmentVariablesGroup, warnings, executeErr = actor.GetEnvironmentVariableGroupByRevision(url)
 		})
 
 		When("finding the environment variables fails", func() {
@@ -448,7 +448,7 @@ var _ = Describe("Revisions Actions", func() {
 			It("returns the environment variables and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionArgsForCall(0)).To(Equal("revision-guid"))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionArgsForCall(0)).To(Equal("url"))
 				Expect(warnings).To(ConsistOf("get-env-vars-warning-1"))
 				Expect(len(environmentVariablesGroup)).To(Equal(1))
 				Expect(environmentVariablesGroup["foo"].Value).To(Equal("bar"))

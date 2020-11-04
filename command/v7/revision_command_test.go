@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -116,6 +117,11 @@ var _ = Describe("revision Command", func() {
 							Droplet: resources.Droplet{
 								GUID: "droplet-guid",
 							},
+							Links: resources.APILinks{
+								"environment_variables": resources.APILink{
+									HREF: "revision-environment-variables-link-3",
+								},
+							},
 						},
 						{
 							Version:     2,
@@ -136,6 +142,15 @@ var _ = Describe("revision Command", func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "app-guid"}, nil, nil)
 					fakeActor.GetApplicationRevisionsDeployedReturns(revisions[0:1], nil, nil)
 
+					environmentVariableGroup := v7action.EnvironmentVariableGroup{
+						"foo": *types.NewFilteredString("bar3"),
+					}
+					fakeActor.GetEnvironmentVariableGroupByRevisionReturns(
+						environmentVariableGroup,
+						nil,
+						nil,
+					)
+
 					cmd.Version = flag.Revision{NullInt: types.NullInt{Value: 3, IsSet: true}}
 				})
 
@@ -146,9 +161,23 @@ var _ = Describe("revision Command", func() {
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 
+				It("retrives all revisions for the app", func() {
+					Expect(fakeActor.GetRevisionsByApplicationNameAndSpaceCallCount()).To(Equal(1))
+					appName, spaceGUID := fakeActor.GetRevisionsByApplicationNameAndSpaceArgsForCall(0)
+					Expect(appName).To(Equal("some-app"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+
 				It("retrieves the deployed revisions", func() {
 					Expect(fakeActor.GetApplicationRevisionsDeployedCallCount()).To(Equal(1))
 					Expect(fakeActor.GetApplicationRevisionsDeployedArgsForCall(0)).To(Equal("app-guid"))
+				})
+
+				It("retrieves the environment variables for the revision", func() {
+					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionCallCount()).To(Equal(1))
+					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionArgsForCall(0)).To(Equal(
+						"revision-environment-variables-link-3",
+					))
 				})
 
 				It("displays the revision", func() {
@@ -163,19 +192,40 @@ var _ = Describe("revision Command", func() {
 					Expect(testUI.Out).To(Say(`droplet GUID:    droplet-guid`))
 					Expect(testUI.Out).To(Say(`created on:      2020-03-10T17:11:58Z`))
 
+					Expect(testUI.Out).To(Say(`application environment variables:`))
+					Expect(testUI.Out).To(Say(`foo:   bar3`))
+
 					// Expect(testUI.Out).To(Say(`labels:`))
 					// Expect(testUI.Out).To(Say(`label: foo3`))
 
 					// Expect(testUI.Out).To(Say(`annotations:`))
 					// Expect(testUI.Out).To(Say(`annotation: foo3`))
+				})
 
-					Expect(testUI.Out).To(Say(`application environment variables:`))
-					Expect(testUI.Out).To(Say(`env: foo3`))
+				When("there is not a environment_variables link provided", func() {
+					BeforeEach(func() {
+						revisions = []resources.Revision{
+							{
+								Version:     3,
+								GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+								Description: "No env var link",
+								CreatedAt:   "2020-03-10T17:11:58Z",
+								Deployable:  true,
+								Droplet: resources.Droplet{
+									GUID: "droplet-guid",
+								},
+								Links: resources.APILinks{},
+							},
+						}
+						fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(revisions, nil, nil)
+						fakeActor.GetApplicationRevisionsDeployedReturns(revisions[0:1], nil, nil)
+					})
 
-					Expect(fakeActor.GetRevisionsByApplicationNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetRevisionsByApplicationNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					It("warns the user it will not display env vars ", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Unable to retrieve environment variables for revision"))
+						Expect(testUI.Out).ToNot(Say("application environment variables:"))
+					})
 				})
 
 				When("revision is not deployed", func() {

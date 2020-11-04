@@ -1160,6 +1160,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetEnvironmentVariableGroupByRevisionStub        func(string) (v7action.EnvironmentVariableGroup, v7action.Warnings, error)
+	getEnvironmentVariableGroupByRevisionMutex       sync.RWMutex
+	getEnvironmentVariableGroupByRevisionArgsForCall []struct {
+		arg1 string
+	}
+	getEnvironmentVariableGroupByRevisionReturns struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 v7action.Warnings
+		result3 error
+	}
+	getEnvironmentVariableGroupByRevisionReturnsOnCall map[int]struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetEnvironmentVariablesByApplicationNameAndSpaceStub        func(string, string) (v7action.EnvironmentVariableGroups, v7action.Warnings, error)
 	getEnvironmentVariablesByApplicationNameAndSpaceMutex       sync.RWMutex
 	getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall []struct {
@@ -8043,6 +8058,72 @@ func (fake *FakeActor) GetEnvironmentVariableGroupReturnsOnCall(i int, result1 v
 		})
 	}
 	fake.getEnvironmentVariableGroupReturnsOnCall[i] = struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevision(arg1 string) (v7action.EnvironmentVariableGroup, v7action.Warnings, error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	ret, specificReturn := fake.getEnvironmentVariableGroupByRevisionReturnsOnCall[len(fake.getEnvironmentVariableGroupByRevisionArgsForCall)]
+	fake.getEnvironmentVariableGroupByRevisionArgsForCall = append(fake.getEnvironmentVariableGroupByRevisionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetEnvironmentVariableGroupByRevision", []interface{}{arg1})
+	fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	if fake.GetEnvironmentVariableGroupByRevisionStub != nil {
+		return fake.GetEnvironmentVariableGroupByRevisionStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getEnvironmentVariableGroupByRevisionReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionCallCount() int {
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
+	return len(fake.getEnvironmentVariableGroupByRevisionArgsForCall)
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionCalls(stub func(string) (v7action.EnvironmentVariableGroup, v7action.Warnings, error)) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = stub
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionArgsForCall(i int) string {
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
+	argsForCall := fake.getEnvironmentVariableGroupByRevisionArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionReturns(result1 v7action.EnvironmentVariableGroup, result2 v7action.Warnings, result3 error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = nil
+	fake.getEnvironmentVariableGroupByRevisionReturns = struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionReturnsOnCall(i int, result1 v7action.EnvironmentVariableGroup, result2 v7action.Warnings, result3 error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = nil
+	if fake.getEnvironmentVariableGroupByRevisionReturnsOnCall == nil {
+		fake.getEnvironmentVariableGroupByRevisionReturnsOnCall = make(map[int]struct {
+			result1 v7action.EnvironmentVariableGroup
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getEnvironmentVariableGroupByRevisionReturnsOnCall[i] = struct {
 		result1 v7action.EnvironmentVariableGroup
 		result2 v7action.Warnings
 		result3 error
@@ -16588,6 +16669,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
 	fake.getEnvironmentVariableGroupMutex.RLock()
 	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
 	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
 	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getFeatureFlagByNameMutex.RLock()

@@ -46,22 +46,55 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 		appName,
 		cmd.Config.TargetedSpace().GUID,
 	)
+	revision, _ := cmd.getSelectedRevision(revisions)
+	deployed := revisionDeployed(revision, deployedRevisions)
+
+	cmd.displayRevision(revision, deployed)
+	return nil
+}
+
+func (cmd RevisionCommand) getSelectedRevision(revisions []resources.Revision) (resources.Revision, error) {
 	for _, revision := range revisions {
 		if revision.Version == cmd.Version.Value {
-			deployed := revisionDeployed(revision, deployedRevisions)
-			keyValueTable := [][]string{
-				{"revision:", fmt.Sprintf("%d", cmd.Version.Value)},
-				{"deployed:", strconv.FormatBool(deployed)},
-				{"description:", revision.Description},
-				{"deployable:", strconv.FormatBool(revision.Deployable)},
-				{"revision GUID:", revision.GUID},
-				{"droplet GUID:", revision.Droplet.GUID},
-				{"created on:", revision.CreatedAt},
-			}
-			cmd.UI.DisplayKeyValueTable("", keyValueTable, 3)
+			return revision, nil
 		}
 	}
-	return nil
+	return resources.Revision{}, nil
+}
+
+func (cmd RevisionCommand) displayRevision(revision resources.Revision, deployed bool) {
+	cmd.displayBasicRevisionInfo(revision, deployed)
+	cmd.UI.DisplayNewline()
+	cmd.displayEnvVarGroupForRevision(revision)
+	cmd.UI.DisplayNewline()
+}
+
+func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision, deployed bool) {
+	keyValueTable := [][]string{
+		{"revision:", fmt.Sprintf("%d", cmd.Version.Value)},
+		{"deployed:", strconv.FormatBool(deployed)},
+		{"description:", revision.Description},
+		{"deployable:", strconv.FormatBool(revision.Deployable)},
+		{"revision GUID:", revision.GUID},
+		{"droplet GUID:", revision.Droplet.GUID},
+		{"created on:", revision.CreatedAt},
+	}
+	cmd.UI.DisplayKeyValueTable("", keyValueTable, 3)
+}
+
+func (cmd RevisionCommand) displayEnvVarGroupForRevision(revision resources.Revision) {
+	envVarsURL, present := revision.Links["environment_variables"]
+	if present == true {
+		envVarGroup, _, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(envVarsURL.HREF)
+		envVarTable := [][]string{}
+		for k, v := range envVarGroup {
+			envVarTable = append(envVarTable, []string{fmt.Sprintf("%s:", k), v.Value})
+		}
+		cmd.UI.DisplayText("application environment variables:")
+		cmd.UI.DisplayKeyValueTable("", envVarTable, 3)
+	} else {
+		cmd.UI.DisplayWarning("Unable to retrieve environment variables for revision.")
+	}
 }
 
 func revisionDeployed(revision resources.Revision, deployedRevisions []resources.Revision) bool {

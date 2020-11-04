@@ -84,11 +84,11 @@ var _ = Describe("revision command", func() {
 				// Expect(session).Should(MatchRegexp(`droplet GUID:    \w+\n`))
 				// Expect(session).Should(MatchRegexp(`created on:      \w+\n`))
 
-				Expect(session).Should(Say(`labels:`))
-				Expect(session).Should(Say(`label: foo1`))
+				// Expect(session).Should(Say(`labels:`))
+				// Expect(session).Should(Say(`label: foo1`))
 
-				Expect(session).Should(Say(`annotations:`))
-				Expect(session).Should(Say(`annotation: foo1`))
+				// Expect(session).Should(Say(`annotations:`))
+				// Expect(session).Should(Say(`annotation: foo1`))
 
 				Expect(session).Should(Say(`application environment variables:`))
 				Expect(session).Should(Say(`env: foo1`))

@@ -144,7 +144,7 @@ var _ = Describe("Revisions", func() {
 		)
 
 		JustBeforeEach(func() {
-			environmentVariables, warnings, executeErr = client.GetEnvironmentVariablesByRevision("revision-guid")
+			environmentVariables, warnings, executeErr = client.GetEnvironmentVariablesByRevision("url")
 		})
 
 		When("the cloud controller returns errors and warnings", func() {
@@ -163,7 +163,7 @@ var _ = Describe("Revisions", func() {
 				}
 
 				requester.MakeRequestReturns(
-					"job-url",
+					"url",
 					Warnings{"this is a warning"},
 					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
 				)
@@ -193,15 +193,14 @@ var _ = Describe("Revisions", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
 					(*requestParams.ResponseBody.(*ccv3.EnvironmentVariables))["foo"] = *types.NewFilteredString("bar")
-					return "job-url", Warnings{"this is a warning"}, nil
+					return "url", Warnings{"this is a warning"}, nil
 				})
 			})
 
 			It("returns the environment variables and all warnings", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.GetEnvironmentVariablesByRevision))
-				Expect(actualParams.URIParams).To(Equal(internal.Params{"revision_guid": "revision-guid"}))
+				Expect(actualParams.URL).To(Equal("url"))
 
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
