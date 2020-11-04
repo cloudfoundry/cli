@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . NetworkPoliciesActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NetworkPoliciesActor
 
 type NetworkPoliciesActor interface {
 	NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)

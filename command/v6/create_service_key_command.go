@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . CreateServiceKeyActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CreateServiceKeyActor
 
 type CreateServiceKeyActor interface {
 	CreateServiceKey(serviceInstanceName, keyName, spaceGUID string, parameters map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error)

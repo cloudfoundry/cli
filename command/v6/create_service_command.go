@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . CreateServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CreateServiceActor
 
 type CreateServiceActor interface {
 	CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName, brokerName string, params map[string]interface{}, tags []string) (v2action.ServiceInstance, v2action.Warnings, error)

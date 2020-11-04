@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-//go:generate counterfeiter . SetLabelActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SetLabelActor
 
 type SetLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)

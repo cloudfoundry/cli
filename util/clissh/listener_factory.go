@@ -2,7 +2,7 @@ package clissh
 
 import "net"
 
-//go:generate counterfeiter . ListenerFactory
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ListenerFactory
 
 type ListenerFactory interface {
 	Listen(network, address string) (net.Listener, error)

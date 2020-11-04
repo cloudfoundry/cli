@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . OrgRoleSetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OrgRoleSetter
 
 type OrgRoleSetter interface {
 	commandregistry.Command

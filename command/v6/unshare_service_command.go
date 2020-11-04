@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . UnshareServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UnshareServiceActor
 
 type UnshareServiceActor interface {
 	UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace(sharedToOrgName string, sharedToSpaceName string, serviceInstanceName string, currentlyTargetedSpaceGUID string) (v2v3action.Warnings, error)

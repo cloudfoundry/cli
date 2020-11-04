@@ -88,7 +88,7 @@ type ServiceOfferingSummary struct {
 	Version  string
 }
 
-//go:generate counterfeiter . ServiceSummaryRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceSummaryRepository
 
 type ServiceSummaryRepository interface {
 	GetSummariesInCurrentSpace() ([]models.ServiceInstance, error)

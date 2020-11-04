@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
-//go:generate counterfeiter . ColorLogger
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ColorLogger
 type ColorLogger interface {
 	LogSysHeaderColor(string) string
 	LogStdoutColor(string) string

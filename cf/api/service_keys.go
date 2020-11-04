@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServiceKeyRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceKeyRepository
 
 type ServiceKeyRepository interface {
 	CreateServiceKey(serviceKeyGUID string, keyName string, params map[string]interface{}) error

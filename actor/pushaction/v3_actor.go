@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
-//go:generate counterfeiter . V3Actor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3Actor
 
 type V3Actor interface {
 	CloudControllerAPIVersion() string

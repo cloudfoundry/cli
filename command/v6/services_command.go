@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
-//go:generate counterfeiter . ServiceInstancesActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceInstancesActor
 
 type ServiceInstancesActor interface {
 	CloudControllerAPIVersion() string

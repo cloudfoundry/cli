@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/plugin/shared"
 )
 
-//go:generate counterfeiter . AddPluginRepoActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AddPluginRepoActor
 
 type AddPluginRepoActor interface {
 	AddPluginRepository(repoName string, repoURL string) error

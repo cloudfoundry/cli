@@ -15,7 +15,7 @@ import (
 
 type JobURL ccv3.JobURL
 
-//go:generate counterfeiter . Downloader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Downloader
 
 type Downloader interface {
 	Download(url string, tmpDirPath string) (string, error)

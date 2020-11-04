@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter . V3Actor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3Actor
 
 type V3Actor interface {
 	ManifestV3Actor

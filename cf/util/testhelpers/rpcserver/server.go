@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin/models"
 )
 
-//go:generate counterfeiter . Handlers
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Handlers
 
 type Handlers interface {
 	IsMinCliVersion(args string, retVal *bool) error

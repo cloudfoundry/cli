@@ -1,6 +1,6 @@
 package command
 
-//go:generate counterfeiter . SharedActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SharedActor
 
 type SharedActor interface {
 	IsLoggedIn() bool

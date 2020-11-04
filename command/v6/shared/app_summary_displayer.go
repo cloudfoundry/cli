@@ -21,14 +21,14 @@ type AppSummaryDisplayer struct {
 	AppName    string
 }
 
-//go:generate counterfeiter . V2AppActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V2AppActor
 
 type V2AppActor interface {
 	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
 	GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 }
 
-//go:generate counterfeiter . V3AppSummaryActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3AppSummaryActor
 
 type V3AppSummaryActor interface {
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v3action.ApplicationSummary, v3action.Warnings, error)

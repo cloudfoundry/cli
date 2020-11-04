@@ -6,7 +6,7 @@ import (
 	"github.com/moby/moby/pkg/term"
 )
 
-//go:generate counterfeiter . TerminalHelper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalHelper
 
 type TerminalHelper interface {
 	GetFdInfo(in interface{}) (fd uintptr, isTerminal bool)

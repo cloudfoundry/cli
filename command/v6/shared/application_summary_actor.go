@@ -2,7 +2,7 @@ package shared
 
 import "code.cloudfoundry.org/cli/actor/v2v3action"
 
-//go:generate counterfeiter . ApplicationSummaryActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ApplicationSummaryActor
 
 type ApplicationSummaryActor interface {
 	CloudControllerV3APIVersion() string

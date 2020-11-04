@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter . V7Actor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V7Actor
 
 type V7Actor interface {
 	CreateApplicationDroplet(appGUID string) (resources.Droplet, v7action.Warnings, error)

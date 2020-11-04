@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . FeatureFlagRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FeatureFlagRepository
 
 type FeatureFlagRepository interface {
 	List() ([]models.FeatureFlag, error)

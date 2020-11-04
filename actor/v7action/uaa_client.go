@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 )
 
-//go:generate counterfeiter . UAAClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient
 
 type UAAClient interface {
 	APIVersion() string

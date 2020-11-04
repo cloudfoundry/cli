@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . OrganizationRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OrganizationRepository
 
 type OrganizationRepository interface {
 	ListOrgs(limit int) ([]models.Organization, error)

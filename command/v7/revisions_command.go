@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . RevisionsActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RevisionsActor
 
 type RevisionsActor interface {
 	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) ([]resources.Revision, v7action.Warnings, error)

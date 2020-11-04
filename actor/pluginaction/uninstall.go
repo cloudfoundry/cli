@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 )
 
-//go:generate counterfeiter . PluginUninstaller
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginUninstaller
 
 type PluginUninstaller interface {
 	Run(pluginPath string, command string) error

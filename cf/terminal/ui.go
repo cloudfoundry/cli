@@ -23,7 +23,7 @@ func NotLoggedInText() string {
 		"CFLoginCommandSSO": CommandColor(cf.Name + " " + "login --sso")}))
 }
 
-//go:generate counterfeiter . UI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UI
 type UI interface {
 	PrintPaginator(rows []string, err error)
 	Say(message string, args ...interface{})

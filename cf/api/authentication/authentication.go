@@ -17,7 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/util"
 )
 
-//go:generate counterfeiter . TokenRefresher
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TokenRefresher
 
 const accessTokenExpirationMargin = time.Minute
 
@@ -25,7 +25,7 @@ type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 }
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	net.RequestDumperInterface

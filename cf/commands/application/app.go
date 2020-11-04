@@ -21,7 +21,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/uihelpers"
 )
 
-//go:generate counterfeiter . Displayer
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Displayer
 
 type Displayer interface {
 	ShowApp(app models.Application, orgName string, spaceName string) error

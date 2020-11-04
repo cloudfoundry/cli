@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . UnbindServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UnbindServiceActor
 
 type UnbindServiceActor interface {
 	UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error)

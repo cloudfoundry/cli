@@ -15,7 +15,7 @@ type WarningsCollector struct {
 	warningProducers []WarningProducer
 }
 
-//go:generate counterfeiter . WarningProducer
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WarningProducer
 
 type WarningProducer interface {
 	Warnings() []string

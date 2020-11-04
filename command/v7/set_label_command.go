@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-//go:generate counterfeiter . LabelSetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LabelSetter
 
 type LabelSetter interface {
 	Execute(resource TargetResource, labels map[string]types.NullString) error

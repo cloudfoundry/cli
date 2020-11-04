@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . PluginsActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginsActor
 
 type PluginsActor interface {
 	GetOutdatedPlugins() ([]pluginaction.OutdatedPlugin, error)

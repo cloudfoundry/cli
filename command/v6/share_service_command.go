@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . ShareServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ShareServiceActor
 
 type ShareServiceActor interface {
 	ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(sharedToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string) (v2v3action.Warnings, error)

@@ -6,28 +6,28 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
-//go:generate counterfeiter . ServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceActor
 
 type ServiceActor interface {
 	GetServicesWithPlans(filters ...v2action.Filter) (v2action.ServicesWithPlans, v2action.Warnings, error)
 	ServiceExistsWithName(serviceName string) (bool, v2action.Warnings, error)
 }
 
-//go:generate counterfeiter . BrokerActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BrokerActor
 
 type BrokerActor interface {
 	GetServiceBrokerByName(brokerName string) (v2action.ServiceBroker, v2action.Warnings, error)
 	GetServiceBrokers() ([]v2action.ServiceBroker, v2action.Warnings, error)
 }
 
-//go:generate counterfeiter . OrganizationActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OrganizationActor
 
 type OrganizationActor interface {
 	GetOrganization(organizationGUID string) (v2action.Organization, v2action.Warnings, error)
 	OrganizationExistsWithName(organizationName string) (bool, v2action.Warnings, error)
 }
 
-//go:generate counterfeiter . VisibilityActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VisibilityActor
 
 type VisibilityActor interface {
 	GetServicePlanVisibilities(planGUID string) ([]v2action.ServicePlanVisibility, v2action.Warnings, error)

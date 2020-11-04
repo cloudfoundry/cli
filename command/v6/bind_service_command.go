@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . BindServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BindServiceActor
 
 type BindServiceActor interface {
 	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.ServiceBinding, v2action.Warnings, error)

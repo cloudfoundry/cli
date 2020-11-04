@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . RouteServiceBindingRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RouteServiceBindingRepository
 
 type RouteServiceBindingRepository interface {
 	Bind(instanceGUID, routeGUID string, userProvided bool, parameters string) error

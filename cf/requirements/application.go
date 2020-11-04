@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 )
 
-//go:generate counterfeiter . ApplicationRequirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ApplicationRequirement
 
 type ApplicationRequirement interface {
 	Requirement

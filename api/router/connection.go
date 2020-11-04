@@ -1,7 +1,7 @@
 // Package router contains utilities to make call to the router API
 package router
 
-//go:generate counterfeiter . Connection
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Connection
 
 // Connection creates and executes http requests
 type Connection interface {

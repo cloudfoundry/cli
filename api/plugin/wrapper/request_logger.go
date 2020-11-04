@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/plugin"
 )
 
-//go:generate counterfeiter . RequestLoggerOutput
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RequestLoggerOutput
 
 // RequestLoggerOutput is the interface for displaying logs
 type RequestLoggerOutput interface {

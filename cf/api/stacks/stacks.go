@@ -13,7 +13,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
-//go:generate counterfeiter . StackRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . StackRepository
 
 type StackRepository interface {
 	FindByName(name string) (stack models.Stack, apiErr error)

@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . HelpActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . HelpActor
 
 // HelpActor handles the business logic of the help command
 type HelpActor interface {

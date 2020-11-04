@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServiceBrokerRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceBrokerRepository
 
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error

@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 )
 
-//go:generate counterfeiter . DomainRequirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DomainRequirement
 
 type DomainRequirement interface {
 	Requirement

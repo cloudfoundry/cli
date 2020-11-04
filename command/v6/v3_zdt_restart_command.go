@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . V3ZeroDowntimeRestartActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3ZeroDowntimeRestartActor
 
 type V3ZeroDowntimeRestartActor interface {
 	ZeroDowntimePollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error

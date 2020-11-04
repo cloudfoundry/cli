@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . UpdateServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UpdateServiceActor
 
 type UpdateServiceActor interface {
 	CloudControllerAPIVersion() string

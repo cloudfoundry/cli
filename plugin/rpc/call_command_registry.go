@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 )
 
-//go:generate counterfeiter . CommandRunner
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CommandRunner
 
 type CommandRunner interface {
 	Command([]string, commandregistry.Dependency, bool) error

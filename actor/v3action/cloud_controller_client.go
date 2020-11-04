@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter . CloudControllerClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CloudControllerClient
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
