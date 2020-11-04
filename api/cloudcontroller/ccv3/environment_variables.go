@@ -1,58 +1,17 @@
 package ccv3
 
 import (
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // EnvironmentVariables represents the environment variables that can be set on
 // an application by the user.
-type EnvironmentVariables map[string]types.FilteredString
-
-func (variables EnvironmentVariables) MarshalJSON() ([]byte, error) {
-	ccEnvVars := struct {
-		Var map[string]types.FilteredString `json:"var"`
-	}{
-		Var: variables,
-	}
-
-	return json.Marshal(ccEnvVars)
-}
-
-func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
-	var ccEnvVars struct {
-		Var map[string]types.FilteredInterface `json:"var"`
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccEnvVars)
-
-	*variables = EnvironmentVariables{}
-
-	for envVarName, envVarValue := range ccEnvVars.Var {
-		var valueAsString string
-		if str, ok := envVarValue.Value.(string); ok {
-			valueAsString = str
-		} else {
-			bytes, err := json.Marshal(envVarValue.Value)
-			if err != nil {
-				return err
-			}
-			valueAsString = string(bytes)
-		}
-
-		(*variables)[envVarName] = types.FilteredString{Value: valueAsString, IsSet: true}
-	}
-
-	return err
-}
 
 // GetEnvironmentVariableGroup gets the values of a particular environment variable group.
-func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariables, Warnings, error) {
-	var responseBody EnvironmentVariables
+func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (resources.EnvironmentVariables, Warnings, error) {
+	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetEnvironmentVariableGroupRequest,
@@ -66,8 +25,8 @@ func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVari
 // UpdateApplicationEnvironmentVariables adds/updates the user provided
 // environment variables on an application. A restart is required for changes
 // to take effect.
-func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
-	var responseBody EnvironmentVariables
+func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars resources.EnvironmentVariables) (resources.EnvironmentVariables, Warnings, error) {
+	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationEnvironmentVariablesRequest,
@@ -79,8 +38,8 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 	return responseBody, warnings, err
 }
 
-func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
-	var responseBody EnvironmentVariables
+func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars resources.EnvironmentVariables) (resources.EnvironmentVariables, Warnings, error) {
+	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchEnvironmentVariableGroupRequest,

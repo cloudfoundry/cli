@@ -57,7 +57,7 @@ type CloudControllerClient interface {
 	TargetCF(settings ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
-	UpdateApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	UpdateApplicationEnvironmentVariables(appGUID string, envVars resources.EnvironmentVariables) (resources.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateApplicationRestart(appGUID string) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationStart(appGUID string) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationStop(appGUID string) (resources.Application, ccv3.Warnings, error)

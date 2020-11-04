@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -11,7 +12,7 @@ import (
 type EnvironmentVariableGroups ccv3.Environment
 
 // EnvironmentVariableGroup represents a CC environment variable group (e.g. staging or running)
-type EnvironmentVariableGroup ccv3.EnvironmentVariables
+type EnvironmentVariableGroup resources.EnvironmentVariables
 
 // EnvironmentVariablePair represents an environment variable and its value
 // on an application
@@ -50,7 +51,7 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 
 	_, v3Warnings, apiErr := actor.CloudControllerClient.UpdateApplicationEnvironmentVariables(
 		app.GUID,
-		ccv3.EnvironmentVariables{
+		resources.EnvironmentVariables{
 			envPair.Key: {Value: envPair.Value, IsSet: true},
 		})
 	warnings = append(warnings, v3Warnings...)
@@ -60,7 +61,7 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 // SetEnvironmentVariableGroup sets a given environment variable group according to the given
 // keys and values. Any existing variables that are not present in the given set of variables
 // will be unset.
-func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, newEnvVars ccv3.EnvironmentVariables) (Warnings, error) {
+func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, newEnvVars resources.EnvironmentVariables) (Warnings, error) {
 	var allWarnings Warnings
 
 	existingEnvVars, warnings, err := actor.CloudControllerClient.GetEnvironmentVariableGroup(group)
@@ -101,7 +102,7 @@ func (actor *Actor) UnsetEnvironmentVariableByApplicationNameAndSpace(appName st
 
 	_, patchWarnings, patchErr := actor.CloudControllerClient.UpdateApplicationEnvironmentVariables(
 		app.GUID,
-		ccv3.EnvironmentVariables{
+		resources.EnvironmentVariables{
 			environmentVariableName: {Value: "", IsSet: false},
 		})
 	warnings = append(warnings, patchWarnings...)

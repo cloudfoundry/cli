@@ -184,7 +184,7 @@ type Actor interface {
 	SetApplicationManifest(appGUID string, rawManifest []byte) (v7action.Warnings, error)
 	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int64) (resources.Application, v7action.Warnings, error)
 	SetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, envPair v7action.EnvironmentVariablePair) (v7action.Warnings, error)
-	SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (v7action.Warnings, error)
+	SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars resources.EnvironmentVariables) (v7action.Warnings, error)
 	SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (v7action.Warnings, error)
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
 	SetTarget(settings v7action.TargetSettings) (v7action.Warnings, error)
