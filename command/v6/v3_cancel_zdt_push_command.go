@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . V3CancelZdtPushActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3CancelZdtPushActor
 
 type V3CancelZdtPushActor interface {
 	CancelDeploymentByAppNameAndSpace(appName string, spaceGUID string) (v3action.Warnings, error)

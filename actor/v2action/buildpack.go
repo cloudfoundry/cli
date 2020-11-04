@@ -25,13 +25,13 @@ func (buildpack Buildpack) NoStack() bool {
 	return len(buildpack.Stack) == 0
 }
 
-//go:generate counterfeiter . Downloader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Downloader
 
 type Downloader interface {
 	Download(url string, tmpDirPath string) (string, error)
 }
 
-//go:generate counterfeiter . SimpleProgressBar
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SimpleProgressBar
 
 type SimpleProgressBar interface {
 	Initialize(path string) (io.Reader, int64, error)

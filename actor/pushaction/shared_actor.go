@@ -6,8 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
-//go:generate counterfeiter io.ReadCloser
-//go:generate counterfeiter . SharedActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 io.ReadCloser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SharedActor
 
 type SharedActor interface {
 	GatherArchiveResources(archivePath string) ([]sharedaction.Resource, error)

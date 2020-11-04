@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-//go:generate counterfeiter . LabelUnsetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LabelUnsetter
 
 type LabelUnsetter interface {
 	Execute(resource TargetResource, labels map[string]types.NullString) error

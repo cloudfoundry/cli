@@ -2,7 +2,7 @@ package v3action
 
 import "github.com/cloudfoundry/sonde-go/events"
 
-//go:generate counterfeiter . NOAAClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NOAAClient
 
 // NOAAClient is a client for getting logs.
 type NOAAClient interface {

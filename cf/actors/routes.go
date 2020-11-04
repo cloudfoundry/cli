@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/util/randomword"
 )
 
-//go:generate counterfeiter . RouteActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RouteActor
 
 const tcp = "tcp"
 

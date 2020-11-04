@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-//go:generate counterfeiter . SecureSession
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureSession
 
 type SecureSession interface {
 	RequestPty(term string, height, width int, termModes ssh.TerminalModes) error

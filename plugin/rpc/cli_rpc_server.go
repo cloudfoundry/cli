@@ -49,13 +49,13 @@ type CliRpcCmd struct {
 	stdout               io.Writer
 }
 
-//go:generate counterfeiter . TerminalOutputSwitch
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalOutputSwitch
 
 type TerminalOutputSwitch interface {
 	DisableTerminalOutput(bool)
 }
 
-//go:generate counterfeiter . OutputCapture
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OutputCapture
 
 type OutputCapture interface {
 	SetOutputBucket(io.Writer)

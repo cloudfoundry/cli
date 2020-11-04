@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . ServiceActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceActor
 
 type ServiceActor interface {
 	GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)

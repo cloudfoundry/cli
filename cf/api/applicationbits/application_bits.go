@@ -21,7 +21,7 @@ const (
 	DefaultAppUploadBitsTimeout = 15 * time.Minute
 )
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error)

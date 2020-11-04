@@ -2,7 +2,7 @@ package v2action
 
 import "code.cloudfoundry.org/cli/api/router"
 
-//go:generate counterfeiter . RouterClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RouterClient
 
 // RouterClient is a Router API client.
 type RouterClient interface {

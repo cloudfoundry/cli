@@ -4,14 +4,14 @@ package noaabridge
 
 import "code.cloudfoundry.org/cli/api/uaa"
 
-//go:generate counterfeiter . UAAClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 }
 
-//go:generate counterfeiter . TokenCache
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TokenCache
 
 // TokenCache is where the UAA token information is stored.
 type TokenCache interface {

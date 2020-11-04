@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-//go:generate counterfeiter . Requester
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester
 
 type RequestParams struct {
 	RequestName  string

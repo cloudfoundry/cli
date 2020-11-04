@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . RouteServiceUnbinder
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RouteServiceUnbinder
 
 type RouteServiceUnbinder interface {
 	UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error

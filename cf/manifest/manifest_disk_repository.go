@@ -13,7 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	ReadManifest(string) (*Manifest, error)

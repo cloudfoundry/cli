@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . DEAApplicationRequirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DEAApplicationRequirement
 
 type DEAApplicationRequirement interface {
 	Requirement

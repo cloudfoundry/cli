@@ -14,7 +14,7 @@ import (
 	securejoin "github.com/cyphar/filepath-securejoin"
 )
 
-//go:generate counterfeiter . Zipper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Zipper
 
 type Zipper interface {
 	Zip(dirToZip string, targetFile *os.File) (err error)

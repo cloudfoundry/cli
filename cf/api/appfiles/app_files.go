@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	ListFiles(appGUID string, instance int, path string) (files string, apiErr error)

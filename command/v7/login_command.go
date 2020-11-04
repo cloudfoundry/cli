@@ -21,7 +21,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . ActorReloader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ActorReloader
 
 type ActorReloader interface {
 	Reload(command.Config, command.UI) (Actor, error)

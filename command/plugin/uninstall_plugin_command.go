@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-//go:generate counterfeiter . UninstallPluginActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UninstallPluginActor
 
 type UninstallPluginActor interface {
 	UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error

@@ -10,7 +10,7 @@ type Plugin interface {
 	GetMetadata() PluginMetadata
 }
 
-//go:generate counterfeiter . CliConnection
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CliConnection
 /**
 	List of commands available to CliConnection variable passed into run
 **/

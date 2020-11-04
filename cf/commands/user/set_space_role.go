@@ -16,7 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . SpaceRoleSetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SpaceRoleSetter
 
 type SpaceRoleSetter interface {
 	commandregistry.Command

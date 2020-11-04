@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 )
 
-//go:generate counterfeiter . ServicePlanActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServicePlanActor
 
 type ServicePlanActor interface {
 	FindServiceAccess(string, string) (ServiceAccess, error)

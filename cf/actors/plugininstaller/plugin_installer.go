@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/util"
 )
 
-//go:generate counterfeiter . PluginInstaller
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginInstaller
 
 type PluginInstaller interface {
 	Install(inputSourceFilepath string) string

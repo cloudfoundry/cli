@@ -13,7 +13,7 @@ type routingAPIRepository struct {
 	gateway net.Gateway
 }
 
-//go:generate counterfeiter . RoutingAPIRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RoutingAPIRepository
 
 type RoutingAPIRepository interface {
 	ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error)

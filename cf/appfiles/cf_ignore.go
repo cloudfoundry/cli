@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/util/glob"
 )
 
-//go:generate counterfeiter . CfIgnore
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CfIgnore
 
 type CfIgnore interface {
 	FileShouldBeIgnored(path string) bool

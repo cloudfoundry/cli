@@ -26,7 +26,7 @@ import (
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
-//go:generate counterfeiter . BuildpackBitsRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BuildpackBitsRepository
 
 type BuildpackBitsRepository interface {
 	UploadBuildpack(buildpack models.Buildpack, buildpackFile *os.File, zipFileName string) error

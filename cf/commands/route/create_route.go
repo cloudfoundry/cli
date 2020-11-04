@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . Creator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Creator
 
 type Creator interface {
 	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)

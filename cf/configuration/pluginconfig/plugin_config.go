@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration"
 )
 
-//go:generate counterfeiter . PluginConfiguration
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginConfiguration
 
 type PluginConfiguration interface {
 	Plugins() map[string]PluginMetadata

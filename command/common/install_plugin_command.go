@@ -20,7 +20,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//go:generate counterfeiter . InstallPluginActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . InstallPluginActor
 
 type InstallPluginActor interface {
 	CreateExecutableCopy(path string, tempPluginDir string) (string, error)

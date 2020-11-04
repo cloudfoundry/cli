@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter io.Reader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 io.Reader
 
 // CreatePackage creates a package with the given settings, Type and the
 // ApplicationRelationship must be set.

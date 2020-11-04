@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
-//go:generate counterfeiter . ManifestParser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestParser
 
 type ManifestParser interface {
 	AppNames() []string

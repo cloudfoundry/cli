@@ -2,7 +2,7 @@ package cfnetworkingaction
 
 import "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 
-//go:generate counterfeiter . NetworkingClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NetworkingClient
 
 type NetworkingClient interface {
 	CreatePolicies(policies []cfnetv1.Policy) error

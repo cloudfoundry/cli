@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-//go:generate counterfeiter . SecureClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureClient
 
 type SecureClient interface {
 	NewSession() (SecureSession, error)

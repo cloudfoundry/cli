@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . Config
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Config
 
 type Config interface {
 	AccessToken() string

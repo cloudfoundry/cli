@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . QuotaRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . QuotaRepository
 
 type QuotaRepository interface {
 	FindAll() (quotas []models.QuotaFields, apiErr error)

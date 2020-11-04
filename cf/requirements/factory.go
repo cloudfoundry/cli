@@ -6,7 +6,7 @@ import (
 	"github.com/blang/semver"
 )
 
-//go:generate counterfeiter . Factory
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Factory
 
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement

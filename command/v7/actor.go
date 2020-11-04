@@ -17,7 +17,7 @@ import (
 	"github.com/SermoDigital/jose/jwt"
 )
 
-//go:generate counterfeiter . Actor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Actor
 
 type Actor interface {
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)

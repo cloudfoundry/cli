@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . SpaceRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SpaceRepository
 
 type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error

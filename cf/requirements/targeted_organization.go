@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . TargetedOrgRequirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TargetedOrgRequirement
 
 type TargetedOrgRequirement interface {
 	Requirement

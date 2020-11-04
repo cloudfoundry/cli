@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . RemoveNetworkPolicyActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoveNetworkPolicyActor
 
 type RemoveNetworkPolicyActor interface {
 	RemoveNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)

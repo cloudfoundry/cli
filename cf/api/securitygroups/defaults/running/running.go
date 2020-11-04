@@ -10,7 +10,7 @@ import (
 
 const urlPath = "/v2/config/running_security_groups"
 
-//go:generate counterfeiter . SecurityGroupsRepo
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecurityGroupsRepo
 
 type SecurityGroupsRepo interface {
 	BindToRunningSet(string) error

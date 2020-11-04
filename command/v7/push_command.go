@@ -25,7 +25,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//go:generate counterfeiter . ProgressBar
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ProgressBar
 
 type ProgressBar interface {
 	v7pushaction.ProgressBar
@@ -33,7 +33,7 @@ type ProgressBar interface {
 	Ready()
 }
 
-//go:generate counterfeiter . PushActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PushActor
 
 type PushActor interface {
 	HandleFlagOverrides(baseManifest manifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
@@ -42,7 +42,7 @@ type PushActor interface {
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
 }
 
-//go:generate counterfeiter . V7ActorForPush
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V7ActorForPush
 
 type V7ActorForPush interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (resources.Application, v7action.Warnings, error)
@@ -52,7 +52,7 @@ type V7ActorForPush interface {
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
-//go:generate counterfeiter . ManifestParser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestParser
 
 type ManifestParser interface {
 	InterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error)
@@ -60,13 +60,13 @@ type ManifestParser interface {
 	MarshalManifest(manifest manifestparser.Manifest) ([]byte, error)
 }
 
-//go:generate counterfeiter . ManifestLocator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestLocator
 
 type ManifestLocator interface {
 	Path(filepathOrDirectory string) (string, bool, error)
 }
 
-//go:generate counterfeiter . DiffDisplayer
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DiffDisplayer
 
 type DiffDisplayer interface {
 	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error

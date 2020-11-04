@@ -1,6 +1,6 @@
 package translatableerror
 
-//go:generate counterfeiter . TranslatableError
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TranslatableError
 
 // TranslatableError it wraps the error interface adding a way to set the
 // translation function on the error

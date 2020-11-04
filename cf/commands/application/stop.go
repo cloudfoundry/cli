@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . Stopper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Stopper
 
 type Stopper interface {
 	commandregistry.Command

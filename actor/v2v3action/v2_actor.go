@@ -2,7 +2,7 @@ package v2v3action
 
 import "code.cloudfoundry.org/cli/actor/v2action"
 
-//go:generate counterfeiter . V2Actor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V2Actor
 
 type V2Actor interface {
 	ManifestV2Actor

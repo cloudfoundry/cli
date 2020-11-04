@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . DomainRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DomainRepository
 
 type DomainRepository interface {
 	ListDomainsForOrg(orgGUID string, cb func(models.DomainFields) bool) error

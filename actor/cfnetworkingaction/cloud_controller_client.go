@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter . CloudControllerClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CloudControllerClient
 
 type CloudControllerClient interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error)

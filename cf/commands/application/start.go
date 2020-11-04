@@ -31,13 +31,13 @@ const (
 
 const LogMessageTypeStaging = "STG"
 
-//go:generate counterfeiter . StagingWatcher
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . StagingWatcher
 
 type StagingWatcher interface {
 	WatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-//go:generate counterfeiter . Starter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Starter
 
 type Starter interface {
 	commandregistry.Command

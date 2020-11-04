@@ -28,7 +28,7 @@ var realInteract interactorFunc = func(prompt string, choices ...interact.Choice
 	}
 }
 
-//go:generate counterfeiter . Interactor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Interactor
 
 // Interactor hides interact.NewInteraction for testing purposes
 type Interactor interface {
@@ -53,7 +53,7 @@ func (w *interactionWrapper) SetOut(o io.Writer) {
 	w.Output = o
 }
 
-//go:generate counterfeiter . Exiter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Exiter
 
 // Exiter hides os.Exit for testing purposes
 type Exiter interface {

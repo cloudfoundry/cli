@@ -10,7 +10,7 @@ import (
 
 const urlPath = "/v2/config/staging_security_groups"
 
-//go:generate counterfeiter . SecurityGroupsRepo
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecurityGroupsRepo
 
 type SecurityGroupsRepo interface {
 	BindToStagingSet(string) error

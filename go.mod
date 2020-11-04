@@ -43,6 +43,7 @@ require (
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/moby/moby v1.4.2-0.20171120205147-9de84a78d76e
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.14.1

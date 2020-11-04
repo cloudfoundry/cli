@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ClientRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ClientRepository
 
 type ClientRepository interface {
 	ClientExists(clientID string) (exists bool, apiErr error)

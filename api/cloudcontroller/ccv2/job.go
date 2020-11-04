@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-//go:generate counterfeiter . Reader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Reader
 
 // Reader is an io.Reader.
 type Reader interface {
