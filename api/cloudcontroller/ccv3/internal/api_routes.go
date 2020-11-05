@@ -23,6 +23,7 @@ const (
 	DeleteSecurityGroupRequest                                  = "DeleteSecurityGroup"
 	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
 	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
+	DeleteServiceCredentialBindingRequest                       = "DeleteServiceCredentialBinding"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteServiceInstanceRequest                                = "DeleteServiceInstance"
@@ -286,6 +287,7 @@ var APIRoutes = map[string]Route{
 	PatchServiceBrokerRequest:                                   {Path: "/v3/service_brokers/:service_broker_guid", Method: http.MethodPatch},
 	PostServiceCredentialBindingRequest:                         {Path: "/v3/service_credential_bindings", Method: http.MethodPost},
 	GetServiceCredentialBindingsRequest:                         {Path: "/v3/service_credential_bindings", Method: http.MethodGet},
+	DeleteServiceCredentialBindingRequest:                       {Path: "/v3/service_credential_bindings/:service_credential_binding_guid", Method: http.MethodDelete},
 	GetServiceCredentialBindingDetailsRequest:                   {Path: "/v3/service_credential_bindings/:service_credential_binding_guid/details", Method: http.MethodGet},
 	GetServiceInstancesRequest:                                  {Path: "/v3/service_instances", Method: http.MethodGet},
 	PostServiceInstanceRequest:                                  {Path: "/v3/service_instances", Method: http.MethodPost},

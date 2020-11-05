@@ -714,6 +714,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DeleteServiceAppBindingStub        func(v7action.DeleteServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	deleteServiceAppBindingMutex       sync.RWMutex
+	deleteServiceAppBindingArgsForCall []struct {
+		arg1 v7action.DeleteServiceAppBindingParams
+	}
+	deleteServiceAppBindingReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	deleteServiceAppBindingReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	DeleteServiceBrokerStub        func(string) (v7action.Warnings, error)
 	deleteServiceBrokerMutex       sync.RWMutex
 	deleteServiceBrokerArgsForCall []struct {
@@ -6487,6 +6502,72 @@ func (fake *FakeActor) DeleteSecurityGroupReturnsOnCall(i int, result1 v7action.
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteServiceAppBinding(arg1 v7action.DeleteServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.deleteServiceAppBindingMutex.Lock()
+	ret, specificReturn := fake.deleteServiceAppBindingReturnsOnCall[len(fake.deleteServiceAppBindingArgsForCall)]
+	fake.deleteServiceAppBindingArgsForCall = append(fake.deleteServiceAppBindingArgsForCall, struct {
+		arg1 v7action.DeleteServiceAppBindingParams
+	}{arg1})
+	fake.recordInvocation("DeleteServiceAppBinding", []interface{}{arg1})
+	fake.deleteServiceAppBindingMutex.Unlock()
+	if fake.DeleteServiceAppBindingStub != nil {
+		return fake.DeleteServiceAppBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteServiceAppBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) DeleteServiceAppBindingCallCount() int {
+	fake.deleteServiceAppBindingMutex.RLock()
+	defer fake.deleteServiceAppBindingMutex.RUnlock()
+	return len(fake.deleteServiceAppBindingArgsForCall)
+}
+
+func (fake *FakeActor) DeleteServiceAppBindingCalls(stub func(v7action.DeleteServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.deleteServiceAppBindingMutex.Lock()
+	defer fake.deleteServiceAppBindingMutex.Unlock()
+	fake.DeleteServiceAppBindingStub = stub
+}
+
+func (fake *FakeActor) DeleteServiceAppBindingArgsForCall(i int) v7action.DeleteServiceAppBindingParams {
+	fake.deleteServiceAppBindingMutex.RLock()
+	defer fake.deleteServiceAppBindingMutex.RUnlock()
+	argsForCall := fake.deleteServiceAppBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) DeleteServiceAppBindingReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceAppBindingMutex.Lock()
+	defer fake.deleteServiceAppBindingMutex.Unlock()
+	fake.DeleteServiceAppBindingStub = nil
+	fake.deleteServiceAppBindingReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteServiceAppBindingReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceAppBindingMutex.Lock()
+	defer fake.deleteServiceAppBindingMutex.Unlock()
+	fake.DeleteServiceAppBindingStub = nil
+	if fake.deleteServiceAppBindingReturnsOnCall == nil {
+		fake.deleteServiceAppBindingReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceAppBindingReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteServiceBroker(arg1 string) (v7action.Warnings, error) {
@@ -18376,6 +18457,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteRouteMutex.RUnlock()
 	fake.deleteSecurityGroupMutex.RLock()
 	defer fake.deleteSecurityGroupMutex.RUnlock()
+	fake.deleteServiceAppBindingMutex.RLock()
+	defer fake.deleteServiceAppBindingMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()
 	defer fake.deleteServiceBrokerMutex.RUnlock()
 	fake.deleteServiceInstanceMutex.RLock()

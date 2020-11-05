@@ -385,7 +385,7 @@ var _ = Describe("bind-service command", func() {
 			})
 
 			It("displays FAILED and app not found", func() {
-				session := helpers.CF("bind-service", "does-not-exist", serviceInstanceName)
+				session := helpers.CF(command, "does-not-exist", serviceInstanceName)
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
 				Expect(session.Err).To(Say("App 'does-not-exist' not found"))
@@ -403,7 +403,7 @@ var _ = Describe("bind-service command", func() {
 			})
 
 			It("displays FAILED and service not found", func() {
-				session := helpers.CF("bind-service", appName, "does-not-exist")
+				session := helpers.CF(command, appName, "does-not-exist")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
 				Expect(session.Err).To(Say("Service instance 'does-not-exist' not found"))
