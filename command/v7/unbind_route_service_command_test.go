@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -17,9 +17,10 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("bind-route-service Command", func() {
+var _ = Describe("unbind-route-service Command", func() {
 	var (
-		cmd             v7.BindRouteServiceCommand
+		cmd             v7.UnbindRouteServiceCommand
+		input           *Buffer
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -39,12 +40,13 @@ var _ = Describe("bind-route-service Command", func() {
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		input = NewBuffer()
+		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 
-		cmd = v7.BindRouteServiceCommand{
+		cmd = v7.UnbindRouteServiceCommand{
 			BaseCommand: v7.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -62,7 +64,7 @@ var _ = Describe("bind-route-service Command", func() {
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
-		fakeActor.CreateRouteBindingReturns(
+		fakeActor.DeleteRouteBindingReturns(
 			nil,
 			v7action.Warnings{"fake warning"},
 			nil,
@@ -71,16 +73,18 @@ var _ = Describe("bind-route-service Command", func() {
 		setPositionalFlags(&cmd, fakeDomainName, fakeServiceInstanceName)
 		setFlag(&cmd, "--hostname", fakeHostname)
 		setFlag(&cmd, "--path", fakePath)
-		setFlag(&cmd, "-c", `{"foo": "bar"}`)
+		setFlag(&cmd, "-f")
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	It("checks the user is logged in, and targeting an org and space", func() {
+	It("succeeds", func() {
 		Expect(executeErr).NotTo(HaveOccurred())
+	})
 
+	It("checks the user is logged in, and targeting an org and space", func() {
 		Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 		actualOrg, actualSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 		Expect(actualOrg).To(BeTrue())
@@ -88,15 +92,39 @@ var _ = Describe("bind-route-service Command", func() {
 	})
 
 	It("delegates to the actor", func() {
-		Expect(fakeActor.CreateRouteBindingCallCount()).To(Equal(1))
-		Expect(fakeActor.CreateRouteBindingArgsForCall(0)).To(Equal(v7action.CreateRouteBindingParams{
+		Expect(fakeActor.DeleteRouteBindingCallCount()).To(Equal(1))
+		Expect(fakeActor.DeleteRouteBindingArgsForCall(0)).To(Equal(v7action.DeleteRouteBindingParams{
 			SpaceGUID:           fakeSpaceGUID,
 			ServiceInstanceName: fakeServiceInstanceName,
 			DomainName:          fakeDomainName,
 			Hostname:            fakeHostname,
 			Path:                fmt.Sprintf("/%s", fakePath),
-			Parameters:          types.NewOptionalObject(map[string]interface{}{"foo": "bar"}),
 		}))
+	})
+
+	When("binding does not exist", func() {
+		BeforeEach(func() {
+			fakeActor.DeleteRouteBindingReturns(
+				nil,
+				v7action.Warnings{"fake warning"},
+				actionerror.RouteBindingNotFoundError{},
+			)
+		})
+
+		It("prints a message and warnings", func() {
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(
+					`Route %s.%s/%s was not bound to service instance %s\.\n`,
+					fakeHostname,
+					fakeDomainName,
+					fakePath,
+					fakeServiceInstanceName,
+				),
+				Say(`OK\n`),
+			))
+
+			Expect(testUI.Err).To(Say("fake warning"))
+		})
 	})
 
 	Describe("intro message", func() {
@@ -104,7 +132,7 @@ var _ = Describe("bind-route-service Command", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Err).To(Say("fake warning"))
 			Expect(testUI.Out).To(Say(
-				`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`,
+				`Unbinding route %s.%s/%s from service instance %s in org %s / space %s as %s\.\.\.\n`,
 				fakeHostname,
 				fakeDomainName,
 				fakePath,
@@ -122,7 +150,7 @@ var _ = Describe("bind-route-service Command", func() {
 
 			It("prints an appropriate intro", func() {
 				Expect(testUI.Out).To(Say(
-					`Binding route %s/%s to service instance`,
+					`Unbinding route %s/%s from service instance`,
 					fakeDomainName,
 					fakePath,
 				))
@@ -136,36 +164,113 @@ var _ = Describe("bind-route-service Command", func() {
 
 			It("prints an appropriate intro", func() {
 				Expect(testUI.Out).To(Say(
-					`Binding route %s.%s to service instance`,
+					`Unbinding route %s.%s from service instance`,
 					fakeHostname,
+					fakeDomainName,
+				))
+			})
+		})
+
+		When("no hostname or path", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--path", "")
+				setFlag(&cmd, "--hostname", "")
+			})
+
+			It("prints an appropriate intro", func() {
+				Expect(testUI.Out).To(Say(
+					`Unbinding route %s from service instance`,
 					fakeDomainName,
 				))
 			})
 		})
 	})
 
-	When("binding already exists", func() {
+	Describe("prompting the user", func() {
 		BeforeEach(func() {
-			fakeActor.CreateRouteBindingReturns(
-				nil,
-				v7action.Warnings{"fake warning"},
-				actionerror.ResourceAlreadyExistsError{},
-			)
+			setFlag(&cmd, "-f", false)
 		})
 
-		It("prints a message and warnings", func() {
-			Expect(testUI.Out).To(SatisfyAll(
-				Say(
-					`Route %s.%s/%s is already bound to service instance %s\.\n`,
-					fakeHostname,
+		It("prompts the user", func() {
+			Expect(testUI.Out).To(Say(
+				`Really unbind route %s.%s/%s from service instance %s\? \[yN\]:`,
+				fakeHostname,
+				fakeDomainName,
+				fakePath,
+				fakeServiceInstanceName,
+			))
+		})
+
+		When("no hostname", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--hostname", "")
+			})
+
+			It("prompts the user", func() {
+				Expect(testUI.Out).To(Say(
+					`Really unbind route %s/%s from service instance %s\? \[yN\]:`,
 					fakeDomainName,
 					fakePath,
 					fakeServiceInstanceName,
-				),
-				Say(`OK\n`),
-			))
+				))
+			})
+		})
 
-			Expect(testUI.Err).To(Say("fake warning"))
+		When("no path", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--path", "")
+			})
+
+			It("prompts the user", func() {
+				Expect(testUI.Out).To(Say(
+					`Really unbind route %s.%s from service instance %s\? \[yN\]:`,
+					fakeHostname,
+					fakeDomainName,
+					fakeServiceInstanceName,
+				))
+			})
+		})
+
+		When("no hostname or path", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--hostname", "")
+				setFlag(&cmd, "--path", "")
+			})
+
+			It("prompts the user", func() {
+				Expect(testUI.Out).To(Say(
+					`Really unbind route %s from service instance %s\? \[yN\]:`,
+					fakeDomainName,
+					fakeServiceInstanceName,
+				))
+			})
+		})
+
+		When("user says no", func() {
+			BeforeEach(func() {
+				_, err := input.Write([]byte("n\n"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("does not call the actor", func() {
+				Expect(fakeActor.DeleteRouteBindingCallCount()).To(BeZero())
+			})
+
+			It("says the unbind was cancelled", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say("Unbind cancelled\n"))
+			})
+		})
+
+		When("user says yes", func() {
+			BeforeEach(func() {
+				_, err := input.Write([]byte("y\n"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("calls the actor", func() {
+				Expect(fakeActor.DeleteRouteBindingCallCount()).To(Equal(1))
+			})
 		})
 	})
 
@@ -192,7 +297,7 @@ var _ = Describe("bind-route-service Command", func() {
 					close(eventStream)
 				}()
 
-				fakeActor.CreateRouteBindingReturns(
+				fakeActor.DeleteRouteBindingReturns(
 					eventStream,
 					v7action.Warnings{"fake warning"},
 					nil,
@@ -224,7 +329,7 @@ var _ = Describe("bind-route-service Command", func() {
 					}
 				}()
 
-				fakeActor.CreateRouteBindingReturns(
+				fakeActor.DeleteRouteBindingReturns(
 					eventStream,
 					v7action.Warnings{"fake warning"},
 					nil,
@@ -235,7 +340,7 @@ var _ = Describe("bind-route-service Command", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`OK\n`),
 					Say(`\n`),
-					Say(`Binding in progress\.\n`),
+					Say(`Unbinding in progress\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
@@ -257,7 +362,7 @@ var _ = Describe("bind-route-service Command", func() {
 					}
 				}()
 
-				fakeActor.CreateRouteBindingReturns(
+				fakeActor.DeleteRouteBindingReturns(
 					eventStream,
 					v7action.Warnings{"fake warning"},
 					nil,
@@ -293,7 +398,7 @@ var _ = Describe("bind-route-service Command", func() {
 					close(eventStream)
 				}()
 
-				fakeActor.CreateRouteBindingReturns(
+				fakeActor.DeleteRouteBindingReturns(
 					eventStream,
 					v7action.Warnings{"fake warning"},
 					nil,
@@ -319,38 +424,40 @@ var _ = Describe("bind-route-service Command", func() {
 		})
 	})
 
-	When("checking the target returns an error", func() {
-		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(errors.New("explode"))
+	Describe("error scenarios", func() {
+		When("checking the target returns an error", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(errors.New("explode"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("explode"))
+			})
 		})
 
-		It("returns the error", func() {
-			Expect(executeErr).To(MatchError("explode"))
-		})
-	})
+		When("actor returns error", func() {
+			BeforeEach(func() {
+				fakeActor.DeleteRouteBindingReturns(
+					nil,
+					v7action.Warnings{"fake warning"},
+					errors.New("boom"),
+				)
+			})
 
-	When("actor returns error", func() {
-		BeforeEach(func() {
-			fakeActor.CreateRouteBindingReturns(
-				nil,
-				v7action.Warnings{"fake warning"},
-				errors.New("boom"),
-			)
-		})
-
-		It("prints warnings and returns the error", func() {
-			Expect(testUI.Err).To(Say("fake warning"))
-			Expect(executeErr).To(MatchError("boom"))
-		})
-	})
-
-	When("getting the username returns an error", func() {
-		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bad thing"))
+			It("prints warnings and returns the error", func() {
+				Expect(testUI.Err).To(Say("fake warning"))
+				Expect(executeErr).To(MatchError("boom"))
+			})
 		})
 
-		It("returns the error", func() {
-			Expect(executeErr).To(MatchError("bad thing"))
+		When("getting the username returns an error", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bad thing"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("bad thing"))
+			})
 		})
 	})
 })

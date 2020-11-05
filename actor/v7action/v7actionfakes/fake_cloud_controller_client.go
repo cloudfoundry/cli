@@ -604,6 +604,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteRouteBindingStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteRouteBindingMutex       sync.RWMutex
+	deleteRouteBindingArgsForCall []struct {
+		arg1 string
+	}
+	deleteRouteBindingReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteRouteBindingReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteSecurityGroupStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteSecurityGroupMutex       sync.RWMutex
 	deleteSecurityGroupArgsForCall []struct {
@@ -5222,6 +5237,72 @@ func (fake *FakeCloudControllerClient) DeleteRouteReturnsOnCall(i int, result1 c
 		})
 	}
 	fake.deleteRouteReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBinding(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteRouteBindingMutex.Lock()
+	ret, specificReturn := fake.deleteRouteBindingReturnsOnCall[len(fake.deleteRouteBindingArgsForCall)]
+	fake.deleteRouteBindingArgsForCall = append(fake.deleteRouteBindingArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteRouteBinding", []interface{}{arg1})
+	fake.deleteRouteBindingMutex.Unlock()
+	if fake.DeleteRouteBindingStub != nil {
+		return fake.DeleteRouteBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteRouteBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBindingCallCount() int {
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
+	return len(fake.deleteRouteBindingArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBindingCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBindingArgsForCall(i int) string {
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
+	argsForCall := fake.deleteRouteBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBindingReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = nil
+	fake.deleteRouteBindingReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteBindingReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = nil
+	if fake.deleteRouteBindingReturnsOnCall == nil {
+		fake.deleteRouteBindingReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteRouteBindingReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -14230,6 +14311,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteRoleMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
 	fake.deleteSecurityGroupMutex.RLock()
 	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()

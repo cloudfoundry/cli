@@ -18,8 +18,9 @@ const (
 	DeleteOrganizationRequest                                   = "DeleteOrganization"
 	DeleteOrganizationQuotaRequest                              = "DeleteOrganizationQuota"
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
-	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
+	DeleteRouteRequest                                          = "DeleteRouteRequest"
+	DeleteRouteBindingRequest                                   = "DeleteRouteBinding"
 	DeleteSecurityGroupRequest                                  = "DeleteSecurityGroup"
 	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
 	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
@@ -308,8 +309,9 @@ var APIRoutes = map[string]Route{
 	GetServicePlanVisibilityRequest:                             {Path: "/v3/service_plans/:service_plan_guid/visibility", Method: http.MethodGet},
 	PostServicePlanVisibilityRequest:                            {Path: "/v3/service_plans/:service_plan_guid/visibility", Method: http.MethodPost},
 	DeleteServicePlanVisibilityRequest:                          {Path: "/v3/service_plans/:service_plan_guid/visibility/:organization_guid", Method: http.MethodDelete},
-	GetRouteBindingsRequest:                                     {Path: "/v3/service_route_bindings", Method: http.MethodGet},
 	PostRouteBindingRequest:                                     {Path: "/v3/service_route_bindings", Method: http.MethodPost},
+	GetRouteBindingsRequest:                                     {Path: "/v3/service_route_bindings", Method: http.MethodGet},
+	DeleteRouteBindingRequest:                                   {Path: "/v3/service_route_bindings/:route_binding_guid", Method: http.MethodDelete},
 	GetSpacesRequest:                                            {Path: "/v3/spaces", Method: http.MethodGet},
 	PostSpaceRequest:                                            {Path: "/v3/spaces", Method: http.MethodPost},
 	DeleteSpaceRequest:                                          {Path: "/v3/spaces/:space_guid", Method: http.MethodDelete},
