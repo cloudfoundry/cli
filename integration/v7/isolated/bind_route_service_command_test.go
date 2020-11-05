@@ -164,7 +164,6 @@ var _ = Describe("bind-route-service command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`Route binding created\.\n`),
 					Say(`OK\n`),
 				))
 
@@ -220,7 +219,6 @@ var _ = Describe("bind-route-service command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`Route binding created\.\n`),
 					Say(`OK\n`),
 				))
 
@@ -278,8 +276,9 @@ var _ = Describe("bind-route-service command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`Create in progress\.\n`),
 					Say(`OK\n`),
+					Say(`\n`),
+					Say(`Binding in progress\.\n`),
 				))
 
 				Expect(string(session.Err.Contents())).To(BeEmpty())
@@ -297,7 +296,6 @@ var _ = Describe("bind-route-service command", func() {
 						Say(`\n`),
 						Say(`Waiting for the operation to complete\.+\n`),
 						Say(`\n`),
-						Say(`Route binding created\.\n`),
 						Say(`OK\n`),
 					))
 
