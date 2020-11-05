@@ -136,7 +136,7 @@ var _ = Describe("Revisions", func() {
 		})
 	})
 
-	Describe("GetEnvironmentVariablesByRevision", func() {
+	Describe("GetEnvironmentVariablesByURL", func() {
 		var (
 			warnings             Warnings
 			executeErr           error
@@ -144,7 +144,7 @@ var _ = Describe("Revisions", func() {
 		)
 
 		JustBeforeEach(func() {
-			environmentVariables, warnings, executeErr = client.GetEnvironmentVariablesByRevision("url")
+			environmentVariables, warnings, executeErr = client.GetEnvironmentVariablesByURL("url")
 		})
 
 		When("the cloud controller returns errors and warnings", func() {

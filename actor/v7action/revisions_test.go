@@ -401,11 +401,12 @@ var _ = Describe("Revisions Actions", func() {
 	Describe("GetEnvironmentVariableGroupByRevision", func() {
 		var (
 			actor                     *Actor
+			environmentVariablesGroup v7action.EnvironmentVariableGroup
+			executeErr                error
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeConfig                *v7actionfakes.FakeConfig
-			url                       string
-			executeErr                error
-			environmentVariablesGroup v7action.EnvironmentVariableGroup
+			isPresent                 bool
+			revision                  resources.Revision
 			warnings                  Warnings
 		)
 
@@ -413,17 +414,35 @@ var _ = Describe("Revisions Actions", func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 			fakeConfig = new(v7actionfakes.FakeConfig)
 			actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, nil)
-			url = "url"
+			revision = resources.Revision{
+				Links: resources.APILinks{
+					"environment_variables": resources.APILink{
+						HREF: "url",
+					},
+				},
+			}
 			fakeConfig.APIVersionReturns("3.86.0")
 		})
 
 		JustBeforeEach(func() {
-			environmentVariablesGroup, warnings, executeErr = actor.GetEnvironmentVariableGroupByRevision(url)
+			environmentVariablesGroup, isPresent, warnings, executeErr = actor.GetEnvironmentVariableGroupByRevision(revision)
+		})
+
+		When("the revision does not provide HREF", func() {
+			BeforeEach(func() {
+				revision = resources.Revision{}
+			})
+
+			It("returns as not present", func() {
+				Expect(executeErr).To(Not(HaveOccurred()))
+				Expect(warnings).To(ConsistOf("Unable to retrieve environment variables for revision."))
+				Expect(isPresent).To(Equal(false))
+			})
 		})
 
 		When("finding the environment variables fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetEnvironmentVariablesByRevisionReturns(
+				fakeCloudControllerClient.GetEnvironmentVariablesByURLReturns(
 					nil,
 					ccv3.Warnings{"get-env-vars-warning-1"},
 					errors.New("get-env-vars-error-1"),
@@ -438,7 +457,7 @@ var _ = Describe("Revisions Actions", func() {
 
 		When("finding the environment variables succeeds", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetEnvironmentVariablesByRevisionReturns(
+				fakeCloudControllerClient.GetEnvironmentVariablesByURLReturns(
 					ccv3.EnvironmentVariables{"foo": *types.NewFilteredString("bar")},
 					ccv3.Warnings{"get-env-vars-warning-1"},
 					nil,
@@ -447,8 +466,8 @@ var _ = Describe("Revisions Actions", func() {
 
 			It("returns the environment variables and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByRevisionArgsForCall(0)).To(Equal("url"))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByURLCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariablesByURLArgsForCall(0)).To(Equal("url"))
 				Expect(warnings).To(ConsistOf("get-env-vars-warning-1"))
 				Expect(len(environmentVariablesGroup)).To(Equal(1))
 				Expect(environmentVariablesGroup["foo"].Value).To(Equal("bar"))

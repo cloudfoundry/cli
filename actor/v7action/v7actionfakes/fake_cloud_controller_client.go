@@ -1056,17 +1056,17 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetEnvironmentVariablesByRevisionStub        func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
-	getEnvironmentVariablesByRevisionMutex       sync.RWMutex
-	getEnvironmentVariablesByRevisionArgsForCall []struct {
+	GetEnvironmentVariablesByURLStub        func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	getEnvironmentVariablesByURLMutex       sync.RWMutex
+	getEnvironmentVariablesByURLArgsForCall []struct {
 		arg1 string
 	}
-	getEnvironmentVariablesByRevisionReturns struct {
+	getEnvironmentVariablesByURLReturns struct {
 		result1 ccv3.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}
-	getEnvironmentVariablesByRevisionReturnsOnCall map[int]struct {
+	getEnvironmentVariablesByURLReturnsOnCall map[int]struct {
 		result1 ccv3.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
@@ -7000,66 +7000,66 @@ func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupReturnsOnCall(
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevision(arg1 string) (ccv3.EnvironmentVariables, ccv3.Warnings, error) {
-	fake.getEnvironmentVariablesByRevisionMutex.Lock()
-	ret, specificReturn := fake.getEnvironmentVariablesByRevisionReturnsOnCall[len(fake.getEnvironmentVariablesByRevisionArgsForCall)]
-	fake.getEnvironmentVariablesByRevisionArgsForCall = append(fake.getEnvironmentVariablesByRevisionArgsForCall, struct {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURL(arg1 string) (ccv3.EnvironmentVariables, ccv3.Warnings, error) {
+	fake.getEnvironmentVariablesByURLMutex.Lock()
+	ret, specificReturn := fake.getEnvironmentVariablesByURLReturnsOnCall[len(fake.getEnvironmentVariablesByURLArgsForCall)]
+	fake.getEnvironmentVariablesByURLArgsForCall = append(fake.getEnvironmentVariablesByURLArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("GetEnvironmentVariablesByRevision", []interface{}{arg1})
-	fake.getEnvironmentVariablesByRevisionMutex.Unlock()
-	if fake.GetEnvironmentVariablesByRevisionStub != nil {
-		return fake.GetEnvironmentVariablesByRevisionStub(arg1)
+	fake.recordInvocation("GetEnvironmentVariablesByURL", []interface{}{arg1})
+	fake.getEnvironmentVariablesByURLMutex.Unlock()
+	if fake.GetEnvironmentVariablesByURLStub != nil {
+		return fake.GetEnvironmentVariablesByURLStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getEnvironmentVariablesByRevisionReturns
+	fakeReturns := fake.getEnvironmentVariablesByURLReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevisionCallCount() int {
-	fake.getEnvironmentVariablesByRevisionMutex.RLock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.RUnlock()
-	return len(fake.getEnvironmentVariablesByRevisionArgsForCall)
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLCallCount() int {
+	fake.getEnvironmentVariablesByURLMutex.RLock()
+	defer fake.getEnvironmentVariablesByURLMutex.RUnlock()
+	return len(fake.getEnvironmentVariablesByURLArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevisionCalls(stub func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)) {
-	fake.getEnvironmentVariablesByRevisionMutex.Lock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.Unlock()
-	fake.GetEnvironmentVariablesByRevisionStub = stub
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLCalls(stub func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)) {
+	fake.getEnvironmentVariablesByURLMutex.Lock()
+	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
+	fake.GetEnvironmentVariablesByURLStub = stub
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevisionArgsForCall(i int) string {
-	fake.getEnvironmentVariablesByRevisionMutex.RLock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.RUnlock()
-	argsForCall := fake.getEnvironmentVariablesByRevisionArgsForCall[i]
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLArgsForCall(i int) string {
+	fake.getEnvironmentVariablesByURLMutex.RLock()
+	defer fake.getEnvironmentVariablesByURLMutex.RUnlock()
+	argsForCall := fake.getEnvironmentVariablesByURLArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevisionReturns(result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
-	fake.getEnvironmentVariablesByRevisionMutex.Lock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.Unlock()
-	fake.GetEnvironmentVariablesByRevisionStub = nil
-	fake.getEnvironmentVariablesByRevisionReturns = struct {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturns(result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.getEnvironmentVariablesByURLMutex.Lock()
+	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
+	fake.GetEnvironmentVariablesByURLStub = nil
+	fake.getEnvironmentVariablesByURLReturns = struct {
 		result1 ccv3.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByRevisionReturnsOnCall(i int, result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
-	fake.getEnvironmentVariablesByRevisionMutex.Lock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.Unlock()
-	fake.GetEnvironmentVariablesByRevisionStub = nil
-	if fake.getEnvironmentVariablesByRevisionReturnsOnCall == nil {
-		fake.getEnvironmentVariablesByRevisionReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturnsOnCall(i int, result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.getEnvironmentVariablesByURLMutex.Lock()
+	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
+	fake.GetEnvironmentVariablesByURLStub = nil
+	if fake.getEnvironmentVariablesByURLReturnsOnCall == nil {
+		fake.getEnvironmentVariablesByURLReturnsOnCall = make(map[int]struct {
 			result1 ccv3.EnvironmentVariables
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
-	fake.getEnvironmentVariablesByRevisionReturnsOnCall[i] = struct {
+	fake.getEnvironmentVariablesByURLReturnsOnCall[i] = struct {
 		result1 ccv3.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
@@ -13040,8 +13040,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getDropletsMutex.RUnlock()
 	fake.getEnvironmentVariableGroupMutex.RLock()
 	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
-	fake.getEnvironmentVariablesByRevisionMutex.RLock()
-	defer fake.getEnvironmentVariablesByRevisionMutex.RUnlock()
+	fake.getEnvironmentVariablesByURLMutex.RLock()
+	defer fake.getEnvironmentVariablesByURLMutex.RUnlock()
 	fake.getEventsMutex.RLock()
 	defer fake.getEventsMutex.RUnlock()
 	fake.getFeatureFlagMutex.RLock()

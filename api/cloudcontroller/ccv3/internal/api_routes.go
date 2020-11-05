@@ -55,7 +55,6 @@ const (
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
 	GetEnvironmentVariableGroupRequest                          = "GetEnvironmentVariableGroup"
-	GetEnvironmentVariablesByRevision                           = "GetEnvironmentVariablesByRevision"
 	GetEventsRequest                                            = "GetEvents"
 	GetFeatureFlagRequest                                       = "GetFeatureFlag"
 	GetFeatureFlagsRequest                                      = "GetFeatureFlags"
@@ -249,7 +248,6 @@ var APIRoutes = []Route{
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},
-	{Resource: RevisionsResource, Path: "/:revision_guid/environment_variables", Method: http.MethodGet, Name: GetEnvironmentVariablesByRevision},
 	{Resource: RolesResource, Path: "/", Method: http.MethodGet, Name: GetRolesRequest},
 	{Resource: RolesResource, Path: "/", Method: http.MethodPost, Name: PostRoleRequest},
 	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},

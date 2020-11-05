@@ -147,6 +147,7 @@ var _ = Describe("revision Command", func() {
 					}
 					fakeActor.GetEnvironmentVariableGroupByRevisionReturns(
 						environmentVariableGroup,
+						true,
 						nil,
 						nil,
 					)
@@ -176,7 +177,7 @@ var _ = Describe("revision Command", func() {
 				It("retrieves the environment variables for the revision", func() {
 					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionCallCount()).To(Equal(1))
 					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionArgsForCall(0)).To(Equal(
-						"revision-environment-variables-link-3",
+						revisions[0],
 					))
 				})
 
@@ -219,11 +220,12 @@ var _ = Describe("revision Command", func() {
 						}
 						fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(revisions, nil, nil)
 						fakeActor.GetApplicationRevisionsDeployedReturns(revisions[0:1], nil, nil)
+						fakeActor.GetEnvironmentVariableGroupByRevisionReturns(nil, false, v7action.Warnings{"warn-env-var"}, nil)
 					})
 
 					It("warns the user it will not display env vars ", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Err).To(Say("Unable to retrieve environment variables for revision"))
+						Expect(testUI.Err).To(Say("warn-env-var"))
 						Expect(testUI.Out).ToNot(Say("application environment variables:"))
 					})
 				})

@@ -75,13 +75,18 @@ func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVe
 	return revisions[0], Warnings(warnings), nil
 }
 
-func (actor Actor) GetEnvironmentVariableGroupByRevision(url string) (EnvironmentVariableGroup, Warnings, error) {
-	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByRevision(url)
-	if err != nil {
-		return EnvironmentVariableGroup{}, Warnings(warnings), err
+func (actor Actor) GetEnvironmentVariableGroupByRevision(revision resources.Revision) (EnvironmentVariableGroup, bool, Warnings, error) {
+	envVarApiLink, isPresent := revision.Links["environment_variables"]
+	if !isPresent {
+		return EnvironmentVariableGroup{}, isPresent, Warnings{"Unable to retrieve environment variables for revision."}, nil
 	}
 
-	return EnvironmentVariableGroup(environmentVariables), Warnings(warnings), nil
+	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByURL(envVarApiLink.HREF)
+	if err != nil {
+		return EnvironmentVariableGroup{}, false, Warnings(warnings), err
+	}
+
+	return EnvironmentVariableGroup(environmentVariables), true, Warnings(warnings), nil
 }
 
 func (actor Actor) setRevisionsDeployableByDropletStateForApp(appGUID string, revisions []resources.Revision) ([]resources.Revision, Warnings, error) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
@@ -47,9 +48,19 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 		cmd.Config.TargetedSpace().GUID,
 	)
 	revision, _ := cmd.getSelectedRevision(revisions)
-	deployed := revisionDeployed(revision, deployedRevisions)
+	isDeployed := revisionDeployed(revision, deployedRevisions)
 
-	cmd.displayRevision(revision, deployed)
+	envVars, isPresent, warnings, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
+	cmd.UI.DisplayWarnings(warnings)
+
+	cmd.displayBasicRevisionInfo(revision, isDeployed)
+	cmd.UI.DisplayNewline()
+
+	if isPresent {
+		cmd.displayEnvVarGroup(envVars)
+		cmd.UI.DisplayNewline()
+	}
+
 	return nil
 }
 
@@ -62,17 +73,10 @@ func (cmd RevisionCommand) getSelectedRevision(revisions []resources.Revision) (
 	return resources.Revision{}, nil
 }
 
-func (cmd RevisionCommand) displayRevision(revision resources.Revision, deployed bool) {
-	cmd.displayBasicRevisionInfo(revision, deployed)
-	cmd.UI.DisplayNewline()
-	cmd.displayEnvVarGroupForRevision(revision)
-	cmd.UI.DisplayNewline()
-}
-
-func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision, deployed bool) {
+func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision, isDeployed bool) {
 	keyValueTable := [][]string{
 		{"revision:", fmt.Sprintf("%d", cmd.Version.Value)},
-		{"deployed:", strconv.FormatBool(deployed)},
+		{"deployed:", strconv.FormatBool(isDeployed)},
 		{"description:", revision.Description},
 		{"deployable:", strconv.FormatBool(revision.Deployable)},
 		{"revision GUID:", revision.GUID},
@@ -82,19 +86,13 @@ func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision,
 	cmd.UI.DisplayKeyValueTable("", keyValueTable, 3)
 }
 
-func (cmd RevisionCommand) displayEnvVarGroupForRevision(revision resources.Revision) {
-	envVarsURL, present := revision.Links["environment_variables"]
-	if present == true {
-		envVarGroup, _, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(envVarsURL.HREF)
-		envVarTable := [][]string{}
-		for k, v := range envVarGroup {
-			envVarTable = append(envVarTable, []string{fmt.Sprintf("%s:", k), v.Value})
-		}
-		cmd.UI.DisplayText("application environment variables:")
-		cmd.UI.DisplayKeyValueTable("", envVarTable, 3)
-	} else {
-		cmd.UI.DisplayWarning("Unable to retrieve environment variables for revision.")
+func (cmd RevisionCommand) displayEnvVarGroup(envVarGroup v7action.EnvironmentVariableGroup) {
+	envVarTable := [][]string{}
+	for k, v := range envVarGroup {
+		envVarTable = append(envVarTable, []string{fmt.Sprintf("%s:", k), v.Value})
 	}
+	cmd.UI.DisplayText("application environment variables:")
+	cmd.UI.DisplayKeyValueTable("", envVarTable, 3)
 }
 
 func revisionDeployed(revision resources.Revision, deployedRevisions []resources.Revision) bool {

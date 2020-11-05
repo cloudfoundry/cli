@@ -81,7 +81,7 @@ type CloudControllerClient interface {
 	GetDroplet(guid string) (resources.Droplet, ccv3.Warnings, error)
 	GetDroplets(query ...ccv3.Query) ([]resources.Droplet, ccv3.Warnings, error)
 	GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
-	GetEnvironmentVariablesByRevision(url string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	GetEnvironmentVariablesByURL(url string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
 	GetEvents(query ...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error)
 	GetFeatureFlag(featureFlagName string) (ccv3.FeatureFlag, ccv3.Warnings, error)
 	GetFeatureFlags() ([]ccv3.FeatureFlag, ccv3.Warnings, error)
