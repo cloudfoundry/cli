@@ -634,6 +634,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteServiceCredentialBindingStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteServiceCredentialBindingMutex       sync.RWMutex
+	deleteServiceCredentialBindingArgsForCall []struct {
+		arg1 string
+	}
+	deleteServiceCredentialBindingReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteServiceCredentialBindingReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteServiceInstanceStub        func(string, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteServiceInstanceMutex       sync.RWMutex
 	deleteServiceInstanceArgsForCall []struct {
@@ -5339,6 +5354,72 @@ func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturnsOnCall(i int, r
 		})
 	}
 	fake.deleteServiceBrokerReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBinding(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteServiceCredentialBindingMutex.Lock()
+	ret, specificReturn := fake.deleteServiceCredentialBindingReturnsOnCall[len(fake.deleteServiceCredentialBindingArgsForCall)]
+	fake.deleteServiceCredentialBindingArgsForCall = append(fake.deleteServiceCredentialBindingArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteServiceCredentialBinding", []interface{}{arg1})
+	fake.deleteServiceCredentialBindingMutex.Unlock()
+	if fake.DeleteServiceCredentialBindingStub != nil {
+		return fake.DeleteServiceCredentialBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteServiceCredentialBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBindingCallCount() int {
+	fake.deleteServiceCredentialBindingMutex.RLock()
+	defer fake.deleteServiceCredentialBindingMutex.RUnlock()
+	return len(fake.deleteServiceCredentialBindingArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBindingCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteServiceCredentialBindingMutex.Lock()
+	defer fake.deleteServiceCredentialBindingMutex.Unlock()
+	fake.DeleteServiceCredentialBindingStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBindingArgsForCall(i int) string {
+	fake.deleteServiceCredentialBindingMutex.RLock()
+	defer fake.deleteServiceCredentialBindingMutex.RUnlock()
+	argsForCall := fake.deleteServiceCredentialBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBindingReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceCredentialBindingMutex.Lock()
+	defer fake.deleteServiceCredentialBindingMutex.Unlock()
+	fake.DeleteServiceCredentialBindingStub = nil
+	fake.deleteServiceCredentialBindingReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCredentialBindingReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceCredentialBindingMutex.Lock()
+	defer fake.deleteServiceCredentialBindingMutex.Unlock()
+	fake.DeleteServiceCredentialBindingStub = nil
+	if fake.deleteServiceCredentialBindingReturnsOnCall == nil {
+		fake.deleteServiceCredentialBindingReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceCredentialBindingReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -14153,6 +14234,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()
 	defer fake.deleteServiceBrokerMutex.RUnlock()
+	fake.deleteServiceCredentialBindingMutex.RLock()
+	defer fake.deleteServiceCredentialBindingMutex.RUnlock()
 	fake.deleteServiceInstanceMutex.RLock()
 	defer fake.deleteServiceInstanceMutex.RUnlock()
 	fake.deleteServicePlanVisibilityMutex.RLock()

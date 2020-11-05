@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Service Instance", func() {
+var _ = Describe("Service Credential Bindings", func() {
 	var (
 		requester *ccv3fakes.FakeRequester
 		client    *Client
@@ -198,6 +198,51 @@ var _ = Describe("Service Instance", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("DeleteServiceCredentialBinding", func() {
+		const (
+			guid   = "fake-service-credential-binding-guid"
+			jobURL = JobURL("fake-job-url")
+		)
+
+		It("makes the right request", func() {
+			client.DeleteServiceCredentialBinding(guid)
+
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+				RequestName: internal.DeleteServiceCredentialBindingRequest,
+				URIParams:   internal.Params{"service_credential_binding_guid": guid},
+			}))
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+			})
+
+			It("returns warnings and no errors", func() {
+				job, warnings, err := client.DeleteServiceCredentialBinding(guid)
+
+				Expect(job).To(Equal(jobURL))
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the request fails", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+			})
+
+			It("returns errors and warnings", func() {
+				jobURL, warnings, err := client.DeleteServiceCredentialBinding(guid)
+
+				Expect(jobURL).To(BeEmpty())
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
 			})
 		})
 	})
