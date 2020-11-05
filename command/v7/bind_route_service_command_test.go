@@ -172,11 +172,7 @@ var _ = Describe("bind-route-service Command", func() {
 	Describe("processing the response stream", func() {
 		Context("nil stream", func() {
 			It("prints a message and warnings", func() {
-				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Route binding created\.\n`),
-					Say(`OK\n`),
-				))
-
+				Expect(testUI.Out).To(Say(`OK\n`))
 				Expect(testUI.Err).To(Say("fake warning"))
 			})
 		})
@@ -204,10 +200,7 @@ var _ = Describe("bind-route-service Command", func() {
 			})
 
 			It("prints a message and warnings", func() {
-				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Route binding created\.\n`),
-					Say(`OK\n`),
-				))
+				Expect(testUI.Out).To(Say(`OK\n`))
 
 				Expect(testUI.Err).To(SatisfyAll(
 					Say("fake warning"),
@@ -240,8 +233,9 @@ var _ = Describe("bind-route-service Command", func() {
 
 			It("prints a message and warnings", func() {
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Create in progress\.\n`),
 					Say(`OK\n`),
+					Say(`\n`),
+					Say(`Binding in progress\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
@@ -312,7 +306,6 @@ var _ = Describe("bind-route-service Command", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Waiting for the operation to complete\.\.\.\n`),
 					Say(`\n`),
-					Say(`Route binding created\.\n`),
 					Say(`OK\n`),
 				))
 

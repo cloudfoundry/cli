@@ -51,12 +51,11 @@ func (cmd BindRouteServiceCommand) Execute(args []string) error {
 	case err != nil:
 		return err
 	case completed:
-		cmd.UI.DisplayText("Route binding created.")
 		cmd.UI.DisplayOK()
 		return nil
 	default:
-		cmd.UI.DisplayText("Create in progress.")
 		cmd.UI.DisplayOK()
+		cmd.UI.DisplayText("Binding in progress.")
 		return nil
 	}
 }
