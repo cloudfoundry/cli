@@ -43,11 +43,10 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 
 	app, _, _ := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
 	deployedRevisions, _, _ := cmd.Actor.GetApplicationRevisionsDeployed(app.GUID)
-	revisions, _, _ := cmd.Actor.GetRevisionsByApplicationNameAndSpace(
-		appName,
-		cmd.Config.TargetedSpace().GUID,
+	revision, _, _ := cmd.Actor.GetRevisionByApplicationAndVersion(
+		app.GUID,
+		cmd.Version.Value,
 	)
-	revision, _ := cmd.getSelectedRevision(revisions)
 	isDeployed := revisionDeployed(revision, deployedRevisions)
 
 	envVars, isPresent, warnings, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
@@ -62,15 +61,6 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	}
 
 	return nil
-}
-
-func (cmd RevisionCommand) getSelectedRevision(revisions []resources.Revision) (resources.Revision, error) {
-	for _, revision := range revisions {
-		if revision.Version == cmd.Version.Value {
-			return revision, nil
-		}
-	}
-	return resources.Revision{}, nil
 }
 
 func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision, isDeployed bool) {

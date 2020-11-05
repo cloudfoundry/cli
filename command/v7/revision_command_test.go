@@ -99,7 +99,7 @@ var _ = Describe("revision Command", func() {
 			})
 
 			When("when the requested app and revision exist", func() {
-				var revisions []resources.Revision
+				var revision resources.Revision
 				BeforeEach(func() {
 					fakeApp := resources.Application{
 						GUID: "fake-guid",
@@ -107,40 +107,24 @@ var _ = Describe("revision Command", func() {
 					}
 					fakeActor.GetApplicationByNameAndSpaceReturns(fakeApp, nil, nil)
 
-					revisions = []resources.Revision{
-						{
-							Version:     3,
-							GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
-							Description: "On a different note",
-							CreatedAt:   "2020-03-10T17:11:58Z",
-							Deployable:  true,
-							Droplet: resources.Droplet{
-								GUID: "droplet-guid",
-							},
-							Links: resources.APILinks{
-								"environment_variables": resources.APILink{
-									HREF: "revision-environment-variables-link-3",
-								},
-							},
+					revision = resources.Revision{
+						Version:     3,
+						GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+						Description: "On a different note",
+						CreatedAt:   "2020-03-10T17:11:58Z",
+						Deployable:  true,
+						Droplet: resources.Droplet{
+							GUID: "droplet-guid",
 						},
-						{
-							Version:     2,
-							GUID:        "A89F8259-D32B-491A-ABD6-F100AC42D74C",
-							Description: "Something else",
-							CreatedAt:   "2020-03-08T12:43:30Z",
-							Deployable:  true,
-						},
-						{
-							Version:     1,
-							GUID:        "17E0E587-0E53-4A6E-B6AE-82073159F910",
-							Description: "Something",
-							CreatedAt:   "2020-03-04T13:23:32Z",
-							Deployable:  false,
+						Links: resources.APILinks{
+							"environment_variables": resources.APILink{
+								HREF: "revision-environment-variables-link-3",
+							},
 						},
 					}
-					fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(revisions, nil, nil)
+					fakeActor.GetRevisionByApplicationAndVersionReturns(revision, nil, nil)
 					fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "app-guid"}, nil, nil)
-					fakeActor.GetApplicationRevisionsDeployedReturns(revisions[0:1], nil, nil)
+					fakeActor.GetApplicationRevisionsDeployedReturns([]resources.Revision{revision}, nil, nil)
 
 					environmentVariableGroup := v7action.EnvironmentVariableGroup{
 						"foo": *types.NewFilteredString("bar3"),
@@ -162,11 +146,11 @@ var _ = Describe("revision Command", func() {
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 
-				It("retrives all revisions for the app", func() {
-					Expect(fakeActor.GetRevisionsByApplicationNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetRevisionsByApplicationNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+				It("retrieves the requested revision for the app", func() {
+					Expect(fakeActor.GetRevisionByApplicationAndVersionCallCount()).To(Equal(1))
+					appGUID, version := fakeActor.GetRevisionByApplicationAndVersionArgsForCall(0)
+					Expect(appGUID).To(Equal("app-guid"))
+					Expect(version).To(Equal(3))
 				})
 
 				It("retrieves the deployed revisions", func() {
@@ -177,7 +161,7 @@ var _ = Describe("revision Command", func() {
 				It("retrieves the environment variables for the revision", func() {
 					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionCallCount()).To(Equal(1))
 					Expect(fakeActor.GetEnvironmentVariableGroupByRevisionArgsForCall(0)).To(Equal(
-						revisions[0],
+						revision,
 					))
 				})
 
@@ -205,21 +189,19 @@ var _ = Describe("revision Command", func() {
 
 				When("there is not a environment_variables link provided", func() {
 					BeforeEach(func() {
-						revisions = []resources.Revision{
-							{
-								Version:     3,
-								GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
-								Description: "No env var link",
-								CreatedAt:   "2020-03-10T17:11:58Z",
-								Deployable:  true,
-								Droplet: resources.Droplet{
-									GUID: "droplet-guid",
-								},
-								Links: resources.APILinks{},
+						revision = resources.Revision{
+							Version:     3,
+							GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+							Description: "No env var link",
+							CreatedAt:   "2020-03-10T17:11:58Z",
+							Deployable:  true,
+							Droplet: resources.Droplet{
+								GUID: "droplet-guid",
 							},
+							Links: resources.APILinks{},
 						}
-						fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(revisions, nil, nil)
-						fakeActor.GetApplicationRevisionsDeployedReturns(revisions[0:1], nil, nil)
+						fakeActor.GetRevisionByApplicationAndVersionReturns(revision, nil, nil)
+						fakeActor.GetApplicationRevisionsDeployedReturns([]resources.Revision{revision}, nil, nil)
 						fakeActor.GetEnvironmentVariableGroupByRevisionReturns(nil, false, v7action.Warnings{"warn-env-var"}, nil)
 					})
 
@@ -232,7 +214,17 @@ var _ = Describe("revision Command", func() {
 
 				When("revision is not deployed", func() {
 					BeforeEach(func() {
-						fakeActor.GetApplicationRevisionsDeployedReturns(revisions[1:2], nil, nil)
+						revisionDeployed := resources.Revision{
+							Version:     12345,
+							GUID:        "Fake-guid",
+							Description: "derployed and definitely not your revision",
+							CreatedAt:   "2020-03-10T17:11:58Z",
+							Deployable:  true,
+							Droplet: resources.Droplet{
+								GUID: "droplet-guid",
+							},
+						}
+						fakeActor.GetApplicationRevisionsDeployedReturns([]resources.Revision{revisionDeployed}, nil, nil)
 					})
 
 					It("displays deployed field correctly", func() {
