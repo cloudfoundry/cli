@@ -91,7 +91,6 @@ func (cmd BindRouteServiceCommand) displayIntro() error {
 			"Org":             cmd.Config.TargetedOrganization().Name,
 		},
 	)
-	cmd.UI.DisplayNewline()
 
 	return nil
 }

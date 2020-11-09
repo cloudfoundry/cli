@@ -64,6 +64,7 @@ type Actor interface {
 	DeleteOrganizationQuota(quotaName string) (v7action.Warnings, error)
 	DeleteOrphanedRoutes(spaceGUID string) (v7action.Warnings, error)
 	DeleteRoute(domainName, hostname, path string, port int) (v7action.Warnings, error)
+	DeleteRouteBinding(params v7action.DeleteRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	DeleteSecurityGroup(securityGroupName string) (v7action.Warnings, error)
 	DeleteServiceAppBinding(params v7action.DeleteServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	DeleteServiceInstance(serviceInstanceName, spaceGUID string) (chan v7action.PollJobEvent, v7action.Warnings, error)

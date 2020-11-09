@@ -185,4 +185,49 @@ var _ = Describe("RouteBinding", func() {
 			})
 		})
 	})
+
+	Describe("DeleteRouteBinding", func() {
+		const (
+			guid   = "fake-route-binding-guid"
+			jobURL = JobURL("fake-job-url")
+		)
+
+		It("makes the right request", func() {
+			client.DeleteRouteBinding(guid)
+
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
+				RequestName: internal.DeleteRouteBindingRequest,
+				URIParams:   internal.Params{"route_binding_guid": guid},
+			}))
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns(jobURL, Warnings{"fake-warning"}, nil)
+			})
+
+			It("returns warnings and no errors", func() {
+				job, warnings, err := client.DeleteRouteBinding(guid)
+
+				Expect(job).To(Equal(jobURL))
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the request fails", func() {
+			BeforeEach(func() {
+				requester.MakeRequestReturns("", Warnings{"fake-warning"}, errors.New("bang"))
+			})
+
+			It("returns errors and warnings", func() {
+				jobURL, warnings, err := client.DeleteRouteBinding(guid)
+
+				Expect(jobURL).To(BeEmpty())
+				Expect(warnings).To(ConsistOf("fake-warning"))
+				Expect(err).To(MatchError("bang"))
+			})
+		})
+	})
 })

@@ -701,6 +701,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DeleteRouteBindingStub        func(v7action.DeleteRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	deleteRouteBindingMutex       sync.RWMutex
+	deleteRouteBindingArgsForCall []struct {
+		arg1 v7action.DeleteRouteBindingParams
+	}
+	deleteRouteBindingReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	deleteRouteBindingReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	DeleteSecurityGroupStub        func(string) (v7action.Warnings, error)
 	deleteSecurityGroupMutex       sync.RWMutex
 	deleteSecurityGroupArgsForCall []struct {
@@ -6439,6 +6454,72 @@ func (fake *FakeActor) DeleteRouteReturnsOnCall(i int, result1 v7action.Warnings
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteRouteBinding(arg1 v7action.DeleteRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.deleteRouteBindingMutex.Lock()
+	ret, specificReturn := fake.deleteRouteBindingReturnsOnCall[len(fake.deleteRouteBindingArgsForCall)]
+	fake.deleteRouteBindingArgsForCall = append(fake.deleteRouteBindingArgsForCall, struct {
+		arg1 v7action.DeleteRouteBindingParams
+	}{arg1})
+	fake.recordInvocation("DeleteRouteBinding", []interface{}{arg1})
+	fake.deleteRouteBindingMutex.Unlock()
+	if fake.DeleteRouteBindingStub != nil {
+		return fake.DeleteRouteBindingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteRouteBindingReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) DeleteRouteBindingCallCount() int {
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
+	return len(fake.deleteRouteBindingArgsForCall)
+}
+
+func (fake *FakeActor) DeleteRouteBindingCalls(stub func(v7action.DeleteRouteBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = stub
+}
+
+func (fake *FakeActor) DeleteRouteBindingArgsForCall(i int) v7action.DeleteRouteBindingParams {
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
+	argsForCall := fake.deleteRouteBindingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) DeleteRouteBindingReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = nil
+	fake.deleteRouteBindingReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteRouteBindingReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteRouteBindingMutex.Lock()
+	defer fake.deleteRouteBindingMutex.Unlock()
+	fake.DeleteRouteBindingStub = nil
+	if fake.deleteRouteBindingReturnsOnCall == nil {
+		fake.deleteRouteBindingReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.deleteRouteBindingReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteSecurityGroup(arg1 string) (v7action.Warnings, error) {
@@ -18455,6 +18536,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteOrphanedRoutesMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
+	fake.deleteRouteBindingMutex.RLock()
+	defer fake.deleteRouteBindingMutex.RUnlock()
 	fake.deleteSecurityGroupMutex.RLock()
 	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceAppBindingMutex.RLock()

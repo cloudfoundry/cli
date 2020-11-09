@@ -12,7 +12,7 @@ func (client *Client) CreateRouteBinding(binding resources.RouteBinding) (JobURL
 	})
 }
 
-func (client Client) GetRouteBindings(query ...Query) ([]resources.RouteBinding, IncludedResources, Warnings, error) {
+func (client *Client) GetRouteBindings(query ...Query) ([]resources.RouteBinding, IncludedResources, Warnings, error) {
 	var result []resources.RouteBinding
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
@@ -26,4 +26,11 @@ func (client Client) GetRouteBindings(query ...Query) ([]resources.RouteBinding,
 	})
 
 	return result, included, warnings, err
+}
+
+func (client *Client) DeleteRouteBinding(guid string) (JobURL, Warnings, error) {
+	return client.MakeRequest(RequestParams{
+		RequestName: internal.DeleteRouteBindingRequest,
+		URIParams:   internal.Params{"route_binding_guid": guid},
+	})
 }

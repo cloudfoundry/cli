@@ -163,7 +163,6 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-					Say(`\n`),
 					Say(`OK\n`),
 				))
 
@@ -179,7 +178,6 @@ var _ = Describe("bind-route-service command", func() {
 
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-						Say(`\n`),
 						Say(`FAILED\n`),
 					))
 
@@ -218,7 +216,6 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-					Say(`\n`),
 					Say(`OK\n`),
 				))
 
@@ -255,7 +252,7 @@ var _ = Describe("bind-route-service command", func() {
 			)
 
 			BeforeEach(func() {
-				broker = servicebrokerstub.New().WithRouteService().WithAsyncDelay(time.Second).EnableServiceAccess()
+				broker = servicebrokerstub.New().WithRouteService().EnableServiceAccess()
 				serviceInstanceName = helpers.NewServiceInstanceName()
 				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
 
@@ -263,6 +260,8 @@ var _ = Describe("bind-route-service command", func() {
 				hostname = helpers.NewHostName()
 				path = helpers.PrefixedRandomName("path")
 				Eventually(helpers.CF("create-route", domain, "--hostname", hostname, "--path", path)).Should(Exit(0))
+
+				broker.WithAsyncDelay(time.Second).Configure()
 			})
 
 			AfterEach(func() {
@@ -275,7 +274,6 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-					Say(`\n`),
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Binding in progress\.\n`),
@@ -293,7 +291,6 @@ var _ = Describe("bind-route-service command", func() {
 
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-						Say(`\n`),
 						Say(`Waiting for the operation to complete\.+\n`),
 						Say(`\n`),
 						Say(`OK\n`),
@@ -335,7 +332,6 @@ var _ = Describe("bind-route-service command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-					Say(`\n`),
 					Say(`Route %s.%s/%s is already bound to service instance %s\.\n`, hostname, domain, path, serviceInstanceName),
 					Say(`OK\n`),
 				))
