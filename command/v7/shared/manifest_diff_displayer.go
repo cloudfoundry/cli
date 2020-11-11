@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"fmt"
 	"path"
 	"reflect"
 	"strconv"
@@ -25,7 +26,7 @@ func NewManifestDiffDisplayer(ui command.UI) *ManifestDiffDisplayer {
 func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error {
 	// If there are no diffs, just print the manifest
 	if len(diff.Diffs) == 0 {
-		display.UI.DisplayDiffUnchanged(string(rawManifest), 0)
+		display.UI.DisplayDiffUnchanged(string(rawManifest), 0, false) //Todo this is unnecessary MdL
 		return nil
 	}
 
@@ -51,11 +52,11 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 	}
 
 	// Always display the yaml header line
-	display.UI.DisplayDiffUnchanged("---", 0)
+	display.UI.DisplayDiffUnchanged("---", 0, false)
 
 	// For each entry in the provided manifest, process any diffs at or below that entry
 	for _, entry := range yamlManifest {
-		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathAddReplaceMap, &pathRemoveMap)
+		display.processDiffsRecursively("/"+interfaceToString(entry.Key), entry.Value, 0, &pathAddReplaceMap, &pathRemoveMap, false)
 	}
 
 	return nil
@@ -66,32 +67,35 @@ func (display *ManifestDiffDisplayer) processDiffsRecursively(
 	value interface{},
 	depth int,
 	pathAddReplaceMap, pathRemoveMap *map[string]resources.Diff,
+	addHyphen bool,
 ) {
 	field := path.Base(currentManifestPath)
-
 	// If there is a diff at the current path, print it
 	if diff, ok := diffExistsAtTheCurrentPath(currentManifestPath, pathAddReplaceMap); ok {
-		display.formatDiff(field, diff, depth)
+		display.formatDiff(field, diff, depth, addHyphen)
 		return
 	}
-
 	// If the value is a slice type (i.e. a yaml.MapSlice or a slice), recurse into it
 	if isSliceType(value) {
+		addHyphen = isInt(field)
 		if isInt(field) {
-			// Do not print the numeric values in the diffs/paths used to indicate array position, i.e. /applications/0/env
-			display.UI.DisplayDiffUnchanged("-", depth)
 		} else {
-			display.UI.DisplayDiffUnchanged(field+":", depth)
+			display.UI.DisplayDiffUnchanged(field+":", depth, addHyphen)
+			fmt.Println("non int case:" + field)
+			depth += 1
 		}
 
 		if mapSlice, ok := value.(yaml.MapSlice); ok {
 			// If a map, recursively process each entry
-			for _, entry := range mapSlice {
+			for i, entry := range mapSlice {
+				if i > 0 {
+					addHyphen = false
+				}
 				display.processDiffsRecursively(
 					currentManifestPath+"/"+interfaceToString(entry.Key),
 					entry.Value,
-					depth+1,
-					pathAddReplaceMap, pathRemoveMap,
+					depth,
+					pathAddReplaceMap, pathRemoveMap, addHyphen,
 				)
 			}
 		} else if asSlice, ok := value.([]interface{}); ok {
@@ -100,35 +104,36 @@ func (display *ManifestDiffDisplayer) processDiffsRecursively(
 				display.processDiffsRecursively(
 					currentManifestPath+"/"+strconv.Itoa(index),
 					sliceValue,
-					depth+1,
-					pathAddReplaceMap, pathRemoveMap,
+					depth,
+					pathAddReplaceMap, pathRemoveMap, false,
 				)
 			}
 		}
 
 		// Print add/remove diffs after printing the rest of the map or slice
 		if diff, ok := diffExistsAtTheCurrentPath(currentManifestPath, pathRemoveMap); ok {
-			display.formatDiff(path.Base(diff.Path), diff, depth+1)
+			display.formatDiff(path.Base(diff.Path), diff, depth, addHyphen)
 		}
 
 		return
 	}
 
 	// Otherwise, print the unchanged field and value
-	display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth)
+	display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth, addHyphen)
 }
 
-func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int) {
+func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int, addHyphen bool) {
+	addHyphen = isInt(field) || addHyphen
 	switch diff.Op {
 	case resources.AddOperation:
-		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth)
+		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth, addHyphen)
 
 	case resources.ReplaceOperation:
-		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth)
-		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth)
+		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth, addHyphen)
+		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth, addHyphen)
 
 	case resources.RemoveOperation:
-		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth)
+		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth, addHyphen)
 	}
 }
 
@@ -139,11 +144,11 @@ func diffExistsAtTheCurrentPath(currentManifestPath string, pathDiffMap *map[str
 
 func formatKeyValue(key string, value interface{}) string {
 	if isInt(key) {
-		return "-\n" + indentOneLevelDeeper(interfaceToString(value))
+		return interfaceToString(value)
 	}
 
 	if isMapType(value) || isSliceType(value) {
-		return key + ":\n" + indentOneLevelDeeper(interfaceToString(value))
+		return key + ":\n" + interfaceToString(value)
 	}
 
 	return key + ": " + interfaceToString(value)
@@ -154,16 +159,16 @@ func interfaceToString(value interface{}) string {
 	return strings.TrimSpace(string(val))
 }
 
-func indentOneLevelDeeper(input string) string {
-	inputLines := strings.Split(input, "\n")
-	outputLines := make([]string, len(inputLines))
+// func indentOneLevelDeeper(input string, isInt bool) string {
+// 	inputLines := strings.Split(input, "\n")
+// 	outputLines := make([]string, len(inputLines))
 
-	for i, line := range inputLines {
-		outputLines[i] = "  " + line
-	}
+// 	for i, line := range inputLines {
+// 		outputLines[i] = "  " + line
+// 	}
 
-	return strings.Join(outputLines, "\n")
-}
+// 	return strings.Join(outputLines, "\n")
+// }
 
 func isSliceType(value interface{}) bool {
 	valueType := reflect.TypeOf(value)

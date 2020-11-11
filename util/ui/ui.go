@@ -274,18 +274,32 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
+func getIndent(depth int, addHyphen bool) string {
+	if depth == 0 {
+		return ""
+	}
+	indent := strings.Repeat("  ", depth-1)
+	if addHyphen {
+		return indent + "- "
+	} else {
+		return indent + "  "
+	}
+}
+
 // DisplayDiffAddition displays added lines in a diff, colored green and prefixed with '+'
-func (ui *UI) DisplayDiffAddition(lines string, depth int) {
+func (ui *UI) DisplayDiffAddition(lines string, depth int, addHyphen bool) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	indent := strings.Repeat("  ", depth)
+	indent := getIndent(depth, addHyphen)
 
-	for _, line := range strings.Split(lines, "\n") {
+	for i, line := range strings.Split(lines, "\n") {
 		if line == "" {
 			continue
 		}
-
+		if i > 0 {
+			indent = getIndent(depth, false)
+		}
 		template := "+ " + indent + line
 		formatted := ui.modifyColor(template, color.New(color.FgGreen))
 
@@ -294,17 +308,19 @@ func (ui *UI) DisplayDiffAddition(lines string, depth int) {
 }
 
 // DisplayDiffRemoval displays removed lines in a diff, colored red and prefixed with '-'
-func (ui *UI) DisplayDiffRemoval(lines string, depth int) {
+func (ui *UI) DisplayDiffRemoval(lines string, depth int, addHyphen bool) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	indent := strings.Repeat("  ", depth)
+	indent := getIndent(depth, addHyphen)
 
-	for _, line := range strings.Split(lines, "\n") {
+	for i, line := range strings.Split(lines, "\n") {
 		if line == "" {
 			continue
 		}
-
+		if i > 0 {
+			indent = getIndent(depth, false)
+		}
 		template := "- " + indent + line
 		formatted := ui.modifyColor(template, color.New(color.FgRed))
 
@@ -313,17 +329,19 @@ func (ui *UI) DisplayDiffRemoval(lines string, depth int) {
 }
 
 // DisplayDiffUnchanged displays unchanged lines in a diff, with no color or prefix
-func (ui *UI) DisplayDiffUnchanged(lines string, depth int) {
+func (ui *UI) DisplayDiffUnchanged(lines string, depth int, addHyphen bool) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	indent := strings.Repeat("  ", depth)
+	indent := getIndent(depth, addHyphen)
 
-	for _, line := range strings.Split(lines, "\n") {
+	for i, line := range strings.Split(lines, "\n") {
 		if line == "" {
 			continue
 		}
-
+		if i > 0 {
+			indent = getIndent(depth, false)
+		}
 		template := "  " + indent + line
 
 		fmt.Fprintf(ui.Out, "%s\n", template)

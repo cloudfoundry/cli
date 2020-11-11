@@ -332,22 +332,35 @@ var _ = Describe("UI", func() {
 
 	Describe("DisplayDiffAddition", func() {
 		It("displays a green indented line with a +", func() {
-			ui.DisplayDiffAddition("added", 3)
+			ui.DisplayDiffAddition("added", 3, false)
 			Expect(out).To(Say(`\x1b\[32m\+       added\x1b\[0m`))
 		})
+		It("displays a hyphen when the addHyphen is true", func() {
+			ui.DisplayDiffAddition("added", 3, true)
+			Expect(out).To(Say(`\x1b\[32m\+     - added\x1b\[0m`))
+		})
+
 	})
 
 	Describe("DisplayDiffRemoval", func() {
 		It("displays a red indented line with a -", func() {
-			ui.DisplayDiffRemoval("removed", 3)
+			ui.DisplayDiffRemoval("removed", 3, false)
 			Expect(out).To(Say(`\x1b\[31m\-       removed\x1b\[0m`))
+		})
+		It("displays a a hyphen when addHyphen is true", func() {
+			ui.DisplayDiffRemoval("removed", 3, true)
+			Expect(out).To(Say(`\x1b\[31m\-     - removed\x1b\[0m`))
 		})
 	})
 
 	Describe("DisplayDiffUnchanged", func() {
 		It("displays a plain indented line with no prefix", func() {
-			ui.DisplayDiffUnchanged("unchanged", 3)
+			ui.DisplayDiffUnchanged("unchanged", 3, false)
 			Expect(out).To(Say("        unchanged"))
+		})
+		It("displays a a hyphen when addHyphen is true", func() {
+			ui.DisplayDiffUnchanged("unchanged", 3, true)
+			Expect(out).To(Say("      - unchanged"))
 		})
 	})
 
