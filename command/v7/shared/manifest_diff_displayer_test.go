@@ -148,13 +148,12 @@ applications:
 				})
 
 				It("outputs a diff indicating addition for a single line", func() {
-					Expect(testUI.Out).To(Say(`---
+					Expect(testUI.Out).To(Say(`  ---
   applications:
-    -
-      name: dora
-      env:
-        a: b
-\+       r: m`))
+  - name: dora
+    env:
+      a: b
+\+     r: m`))
 				})
 			})
 
@@ -178,12 +177,11 @@ applications:
 				})
 
 				It("outputs a diff indicating addition of a map type", func() {
-					Expect(testUI.Out).To(Say(`---
+					Expect(testUI.Out).To(Say(`  ---
   applications:
-\+   -
-\+     env:
-\+       a: b
-\+     name: dora`))
+\+ - env:
+\+     a: b
+\+   name: dora`))
 				})
 			})
 
@@ -204,12 +202,11 @@ applications:
 				})
 
 				It("outputs a diff indicating addition of a map type", func() {
-					Expect(testUI.Out).To(Say(`---
+					Expect(testUI.Out).To(Say(`  ---
   applications:
-    -
-      name: dora
-\+     env:
-\+       a: b`))
+  - name: dora
+\+   env:
+\+     a: b`))
 				})
 			})
 
@@ -243,15 +240,14 @@ applications:
 
 				When("each element of the array is a map value", func() {
 					It("outputs a diff indicating addition for each map type", func() {
-						Expect(testUI.Out).To(Say(`---
+						Expect(testUI.Out).To(Say(`  ---
   applications:
-    -
-      name: dora
-      env:
-        r: m
-\+     routes:
-\+       - route: route1.cli.fun
-\+       - route: route2.cli.fun`))
+  - name: dora
+    env:
+      r: m
+\+   routes:
+\+   - route: route1.cli.fun
+\+   - route: route2.cli.fun`))
 					})
 				})
 			})
@@ -271,13 +267,12 @@ applications:
 				})
 
 				It("outputs correctly formatted diff with key removed", func() {
-					Expect(testUI.Out).To(Say(`---
+					Expect(testUI.Out).To(Say(`  ---
   applications:
-    -
-      name: dora
-      env:
-        r: m
--       a: b`))
+  - name: dora
+    env:
+      r: m
+-     a: b`))
 				})
 			})
 
@@ -299,12 +294,11 @@ applications:
 				It("outputs correctly formatted diff", func() {
 					Expect(testUI.Out).To(Say(`---
   applications:
-    -
-      name: dora
-      env:
--       a: b
-\+       a: c
-        r: m
+  - name: dora
+    env:
+-     a: b
+\+     a: c
+      r: m
 `))
 				})
 			})

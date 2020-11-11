@@ -202,7 +202,7 @@ units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
+		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
 	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
 
 units-full: build units-plugin units-non-plugin

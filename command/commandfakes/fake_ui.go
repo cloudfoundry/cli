@@ -47,23 +47,26 @@ type FakeUI struct {
 	displayDeprecationWarningMutex       sync.RWMutex
 	displayDeprecationWarningArgsForCall []struct {
 	}
-	DisplayDiffAdditionStub        func(string, int)
+	DisplayDiffAdditionStub        func(string, int, bool)
 	displayDiffAdditionMutex       sync.RWMutex
 	displayDiffAdditionArgsForCall []struct {
 		arg1 string
 		arg2 int
+		arg3 bool
 	}
-	DisplayDiffRemovalStub        func(string, int)
+	DisplayDiffRemovalStub        func(string, int, bool)
 	displayDiffRemovalMutex       sync.RWMutex
 	displayDiffRemovalArgsForCall []struct {
 		arg1 string
 		arg2 int
+		arg3 bool
 	}
-	DisplayDiffUnchangedStub        func(string, int)
+	DisplayDiffUnchangedStub        func(string, int, bool)
 	displayDiffUnchangedMutex       sync.RWMutex
 	displayDiffUnchangedArgsForCall []struct {
 		arg1 string
 		arg2 int
+		arg3 bool
 	}
 	DisplayErrorStub        func(error)
 	displayErrorMutex       sync.RWMutex
@@ -305,9 +308,10 @@ func (fake *FakeUI) DeferText(arg1 string, arg2 ...map[string]interface{}) {
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DeferTextStub
 	fake.recordInvocation("DeferText", []interface{}{arg1, arg2})
 	fake.deferTextMutex.Unlock()
-	if fake.DeferTextStub != nil {
+	if stub != nil {
 		fake.DeferTextStub(arg1, arg2...)
 	}
 }
@@ -339,15 +343,16 @@ func (fake *FakeUI) DisplayBoolPrompt(arg1 bool, arg2 string, arg3 ...map[string
 		arg2 string
 		arg3 []map[string]interface{}
 	}{arg1, arg2, arg3})
+	stub := fake.DisplayBoolPromptStub
+	fakeReturns := fake.displayBoolPromptReturns
 	fake.recordInvocation("DisplayBoolPrompt", []interface{}{arg1, arg2, arg3})
 	fake.displayBoolPromptMutex.Unlock()
-	if fake.DisplayBoolPromptStub != nil {
-		return fake.DisplayBoolPromptStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.displayBoolPromptReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -407,15 +412,16 @@ func (fake *FakeUI) DisplayChangesForPush(arg1 []ui.Change) error {
 	fake.displayChangesForPushArgsForCall = append(fake.displayChangesForPushArgsForCall, struct {
 		arg1 []ui.Change
 	}{arg1Copy})
+	stub := fake.DisplayChangesForPushStub
+	fakeReturns := fake.displayChangesForPushReturns
 	fake.recordInvocation("DisplayChangesForPush", []interface{}{arg1Copy})
 	fake.displayChangesForPushMutex.Unlock()
-	if fake.DisplayChangesForPushStub != nil {
-		return fake.DisplayChangesForPushStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.displayChangesForPushReturns
 	return fakeReturns.result1
 }
 
@@ -465,9 +471,10 @@ func (fake *FakeUI) DisplayDeprecationWarning() {
 	fake.displayDeprecationWarningMutex.Lock()
 	fake.displayDeprecationWarningArgsForCall = append(fake.displayDeprecationWarningArgsForCall, struct {
 	}{})
+	stub := fake.DisplayDeprecationWarningStub
 	fake.recordInvocation("DisplayDeprecationWarning", []interface{}{})
 	fake.displayDeprecationWarningMutex.Unlock()
-	if fake.DisplayDeprecationWarningStub != nil {
+	if stub != nil {
 		fake.DisplayDeprecationWarningStub()
 	}
 }
@@ -484,16 +491,18 @@ func (fake *FakeUI) DisplayDeprecationWarningCalls(stub func()) {
 	fake.DisplayDeprecationWarningStub = stub
 }
 
-func (fake *FakeUI) DisplayDiffAddition(arg1 string, arg2 int) {
+func (fake *FakeUI) DisplayDiffAddition(arg1 string, arg2 int, arg3 bool) {
 	fake.displayDiffAdditionMutex.Lock()
 	fake.displayDiffAdditionArgsForCall = append(fake.displayDiffAdditionArgsForCall, struct {
 		arg1 string
 		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("DisplayDiffAddition", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	stub := fake.DisplayDiffAdditionStub
+	fake.recordInvocation("DisplayDiffAddition", []interface{}{arg1, arg2, arg3})
 	fake.displayDiffAdditionMutex.Unlock()
-	if fake.DisplayDiffAdditionStub != nil {
-		fake.DisplayDiffAdditionStub(arg1, arg2)
+	if stub != nil {
+		fake.DisplayDiffAdditionStub(arg1, arg2, arg3)
 	}
 }
 
@@ -503,29 +512,31 @@ func (fake *FakeUI) DisplayDiffAdditionCallCount() int {
 	return len(fake.displayDiffAdditionArgsForCall)
 }
 
-func (fake *FakeUI) DisplayDiffAdditionCalls(stub func(string, int)) {
+func (fake *FakeUI) DisplayDiffAdditionCalls(stub func(string, int, bool)) {
 	fake.displayDiffAdditionMutex.Lock()
 	defer fake.displayDiffAdditionMutex.Unlock()
 	fake.DisplayDiffAdditionStub = stub
 }
 
-func (fake *FakeUI) DisplayDiffAdditionArgsForCall(i int) (string, int) {
+func (fake *FakeUI) DisplayDiffAdditionArgsForCall(i int) (string, int, bool) {
 	fake.displayDiffAdditionMutex.RLock()
 	defer fake.displayDiffAdditionMutex.RUnlock()
 	argsForCall := fake.displayDiffAdditionArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeUI) DisplayDiffRemoval(arg1 string, arg2 int) {
+func (fake *FakeUI) DisplayDiffRemoval(arg1 string, arg2 int, arg3 bool) {
 	fake.displayDiffRemovalMutex.Lock()
 	fake.displayDiffRemovalArgsForCall = append(fake.displayDiffRemovalArgsForCall, struct {
 		arg1 string
 		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("DisplayDiffRemoval", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	stub := fake.DisplayDiffRemovalStub
+	fake.recordInvocation("DisplayDiffRemoval", []interface{}{arg1, arg2, arg3})
 	fake.displayDiffRemovalMutex.Unlock()
-	if fake.DisplayDiffRemovalStub != nil {
-		fake.DisplayDiffRemovalStub(arg1, arg2)
+	if stub != nil {
+		fake.DisplayDiffRemovalStub(arg1, arg2, arg3)
 	}
 }
 
@@ -535,29 +546,31 @@ func (fake *FakeUI) DisplayDiffRemovalCallCount() int {
 	return len(fake.displayDiffRemovalArgsForCall)
 }
 
-func (fake *FakeUI) DisplayDiffRemovalCalls(stub func(string, int)) {
+func (fake *FakeUI) DisplayDiffRemovalCalls(stub func(string, int, bool)) {
 	fake.displayDiffRemovalMutex.Lock()
 	defer fake.displayDiffRemovalMutex.Unlock()
 	fake.DisplayDiffRemovalStub = stub
 }
 
-func (fake *FakeUI) DisplayDiffRemovalArgsForCall(i int) (string, int) {
+func (fake *FakeUI) DisplayDiffRemovalArgsForCall(i int) (string, int, bool) {
 	fake.displayDiffRemovalMutex.RLock()
 	defer fake.displayDiffRemovalMutex.RUnlock()
 	argsForCall := fake.displayDiffRemovalArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeUI) DisplayDiffUnchanged(arg1 string, arg2 int) {
+func (fake *FakeUI) DisplayDiffUnchanged(arg1 string, arg2 int, arg3 bool) {
 	fake.displayDiffUnchangedMutex.Lock()
 	fake.displayDiffUnchangedArgsForCall = append(fake.displayDiffUnchangedArgsForCall, struct {
 		arg1 string
 		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("DisplayDiffUnchanged", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	stub := fake.DisplayDiffUnchangedStub
+	fake.recordInvocation("DisplayDiffUnchanged", []interface{}{arg1, arg2, arg3})
 	fake.displayDiffUnchangedMutex.Unlock()
-	if fake.DisplayDiffUnchangedStub != nil {
-		fake.DisplayDiffUnchangedStub(arg1, arg2)
+	if stub != nil {
+		fake.DisplayDiffUnchangedStub(arg1, arg2, arg3)
 	}
 }
 
@@ -567,17 +580,17 @@ func (fake *FakeUI) DisplayDiffUnchangedCallCount() int {
 	return len(fake.displayDiffUnchangedArgsForCall)
 }
 
-func (fake *FakeUI) DisplayDiffUnchangedCalls(stub func(string, int)) {
+func (fake *FakeUI) DisplayDiffUnchangedCalls(stub func(string, int, bool)) {
 	fake.displayDiffUnchangedMutex.Lock()
 	defer fake.displayDiffUnchangedMutex.Unlock()
 	fake.DisplayDiffUnchangedStub = stub
 }
 
-func (fake *FakeUI) DisplayDiffUnchangedArgsForCall(i int) (string, int) {
+func (fake *FakeUI) DisplayDiffUnchangedArgsForCall(i int) (string, int, bool) {
 	fake.displayDiffUnchangedMutex.RLock()
 	defer fake.displayDiffUnchangedMutex.RUnlock()
 	argsForCall := fake.displayDiffUnchangedArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeUI) DisplayError(arg1 error) {
@@ -585,9 +598,10 @@ func (fake *FakeUI) DisplayError(arg1 error) {
 	fake.displayErrorArgsForCall = append(fake.displayErrorArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.DisplayErrorStub
 	fake.recordInvocation("DisplayError", []interface{}{arg1})
 	fake.displayErrorMutex.Unlock()
-	if fake.DisplayErrorStub != nil {
+	if stub != nil {
 		fake.DisplayErrorStub(arg1)
 	}
 }
@@ -615,9 +629,10 @@ func (fake *FakeUI) DisplayFileDeprecationWarning() {
 	fake.displayFileDeprecationWarningMutex.Lock()
 	fake.displayFileDeprecationWarningArgsForCall = append(fake.displayFileDeprecationWarningArgsForCall, struct {
 	}{})
+	stub := fake.DisplayFileDeprecationWarningStub
 	fake.recordInvocation("DisplayFileDeprecationWarning", []interface{}{})
 	fake.displayFileDeprecationWarningMutex.Unlock()
-	if fake.DisplayFileDeprecationWarningStub != nil {
+	if stub != nil {
 		fake.DisplayFileDeprecationWarningStub()
 	}
 }
@@ -639,9 +654,10 @@ func (fake *FakeUI) DisplayHeader(arg1 string) {
 	fake.displayHeaderArgsForCall = append(fake.displayHeaderArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DisplayHeaderStub
 	fake.recordInvocation("DisplayHeader", []interface{}{arg1})
 	fake.displayHeaderMutex.Unlock()
-	if fake.DisplayHeaderStub != nil {
+	if stub != nil {
 		fake.DisplayHeaderStub(arg1)
 	}
 }
@@ -675,9 +691,10 @@ func (fake *FakeUI) DisplayInstancesTableForApp(arg1 [][]string) {
 	fake.displayInstancesTableForAppArgsForCall = append(fake.displayInstancesTableForAppArgsForCall, struct {
 		arg1 [][]string
 	}{arg1Copy})
+	stub := fake.DisplayInstancesTableForAppStub
 	fake.recordInvocation("DisplayInstancesTableForApp", []interface{}{arg1Copy})
 	fake.displayInstancesTableForAppMutex.Unlock()
-	if fake.DisplayInstancesTableForAppStub != nil {
+	if stub != nil {
 		fake.DisplayInstancesTableForAppStub(arg1)
 	}
 }
@@ -713,9 +730,10 @@ func (fake *FakeUI) DisplayKeyValueTable(arg1 string, arg2 [][]string, arg3 int)
 		arg2 [][]string
 		arg3 int
 	}{arg1, arg2Copy, arg3})
+	stub := fake.DisplayKeyValueTableStub
 	fake.recordInvocation("DisplayKeyValueTable", []interface{}{arg1, arg2Copy, arg3})
 	fake.displayKeyValueTableMutex.Unlock()
-	if fake.DisplayKeyValueTableStub != nil {
+	if stub != nil {
 		fake.DisplayKeyValueTableStub(arg1, arg2, arg3)
 	}
 }
@@ -749,9 +767,10 @@ func (fake *FakeUI) DisplayKeyValueTableForApp(arg1 [][]string) {
 	fake.displayKeyValueTableForAppArgsForCall = append(fake.displayKeyValueTableForAppArgsForCall, struct {
 		arg1 [][]string
 	}{arg1Copy})
+	stub := fake.DisplayKeyValueTableForAppStub
 	fake.recordInvocation("DisplayKeyValueTableForApp", []interface{}{arg1Copy})
 	fake.displayKeyValueTableForAppMutex.Unlock()
-	if fake.DisplayKeyValueTableForAppStub != nil {
+	if stub != nil {
 		fake.DisplayKeyValueTableForAppStub(arg1)
 	}
 }
@@ -781,9 +800,10 @@ func (fake *FakeUI) DisplayLogMessage(arg1 ui.LogMessage, arg2 bool) {
 		arg1 ui.LogMessage
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.DisplayLogMessageStub
 	fake.recordInvocation("DisplayLogMessage", []interface{}{arg1, arg2})
 	fake.displayLogMessageMutex.Unlock()
-	if fake.DisplayLogMessageStub != nil {
+	if stub != nil {
 		fake.DisplayLogMessageStub(arg1, arg2)
 	}
 }
@@ -811,9 +831,10 @@ func (fake *FakeUI) DisplayNewline() {
 	fake.displayNewlineMutex.Lock()
 	fake.displayNewlineArgsForCall = append(fake.displayNewlineArgsForCall, struct {
 	}{})
+	stub := fake.DisplayNewlineStub
 	fake.recordInvocation("DisplayNewline", []interface{}{})
 	fake.displayNewlineMutex.Unlock()
-	if fake.DisplayNewlineStub != nil {
+	if stub != nil {
 		fake.DisplayNewlineStub()
 	}
 }
@@ -842,9 +863,10 @@ func (fake *FakeUI) DisplayNonWrappingTable(arg1 string, arg2 [][]string, arg3 i
 		arg2 [][]string
 		arg3 int
 	}{arg1, arg2Copy, arg3})
+	stub := fake.DisplayNonWrappingTableStub
 	fake.recordInvocation("DisplayNonWrappingTable", []interface{}{arg1, arg2Copy, arg3})
 	fake.displayNonWrappingTableMutex.Unlock()
-	if fake.DisplayNonWrappingTableStub != nil {
+	if stub != nil {
 		fake.DisplayNonWrappingTableStub(arg1, arg2, arg3)
 	}
 }
@@ -872,9 +894,10 @@ func (fake *FakeUI) DisplayOK() {
 	fake.displayOKMutex.Lock()
 	fake.displayOKArgsForCall = append(fake.displayOKArgsForCall, struct {
 	}{})
+	stub := fake.DisplayOKStub
 	fake.recordInvocation("DisplayOK", []interface{}{})
 	fake.displayOKMutex.Unlock()
-	if fake.DisplayOKStub != nil {
+	if stub != nil {
 		fake.DisplayOKStub()
 	}
 }
@@ -899,15 +922,16 @@ func (fake *FakeUI) DisplayOptionalTextPrompt(arg1 string, arg2 string, arg3 ...
 		arg2 string
 		arg3 []map[string]interface{}
 	}{arg1, arg2, arg3})
+	stub := fake.DisplayOptionalTextPromptStub
+	fakeReturns := fake.displayOptionalTextPromptReturns
 	fake.recordInvocation("DisplayOptionalTextPrompt", []interface{}{arg1, arg2, arg3})
 	fake.displayOptionalTextPromptMutex.Unlock()
-	if fake.DisplayOptionalTextPromptStub != nil {
-		return fake.DisplayOptionalTextPromptStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.displayOptionalTextPromptReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -963,15 +987,16 @@ func (fake *FakeUI) DisplayPasswordPrompt(arg1 string, arg2 ...map[string]interf
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayPasswordPromptStub
+	fakeReturns := fake.displayPasswordPromptReturns
 	fake.recordInvocation("DisplayPasswordPrompt", []interface{}{arg1, arg2})
 	fake.displayPasswordPromptMutex.Unlock()
-	if fake.DisplayPasswordPromptStub != nil {
-		return fake.DisplayPasswordPromptStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.displayPasswordPromptReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1032,9 +1057,10 @@ func (fake *FakeUI) DisplayTableWithHeader(arg1 string, arg2 [][]string, arg3 in
 		arg2 [][]string
 		arg3 int
 	}{arg1, arg2Copy, arg3})
+	stub := fake.DisplayTableWithHeaderStub
 	fake.recordInvocation("DisplayTableWithHeader", []interface{}{arg1, arg2Copy, arg3})
 	fake.displayTableWithHeaderMutex.Unlock()
-	if fake.DisplayTableWithHeaderStub != nil {
+	if stub != nil {
 		fake.DisplayTableWithHeaderStub(arg1, arg2, arg3)
 	}
 }
@@ -1064,9 +1090,10 @@ func (fake *FakeUI) DisplayText(arg1 string, arg2 ...map[string]interface{}) {
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayTextStub
 	fake.recordInvocation("DisplayText", []interface{}{arg1, arg2})
 	fake.displayTextMutex.Unlock()
-	if fake.DisplayTextStub != nil {
+	if stub != nil {
 		fake.DisplayTextStub(arg1, arg2...)
 	}
 }
@@ -1103,15 +1130,16 @@ func (fake *FakeUI) DisplayTextMenu(arg1 []string, arg2 string, arg3 ...map[stri
 		arg2 string
 		arg3 []map[string]interface{}
 	}{arg1Copy, arg2, arg3})
+	stub := fake.DisplayTextMenuStub
+	fakeReturns := fake.displayTextMenuReturns
 	fake.recordInvocation("DisplayTextMenu", []interface{}{arg1Copy, arg2, arg3})
 	fake.displayTextMenuMutex.Unlock()
-	if fake.DisplayTextMenuStub != nil {
-		return fake.DisplayTextMenuStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.displayTextMenuReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1167,15 +1195,16 @@ func (fake *FakeUI) DisplayTextPrompt(arg1 string, arg2 ...map[string]interface{
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayTextPromptStub
+	fakeReturns := fake.displayTextPromptReturns
 	fake.recordInvocation("DisplayTextPrompt", []interface{}{arg1, arg2})
 	fake.displayTextPromptMutex.Unlock()
-	if fake.DisplayTextPromptStub != nil {
-		return fake.DisplayTextPromptStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.displayTextPromptReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1230,9 +1259,10 @@ func (fake *FakeUI) DisplayTextWithBold(arg1 string, arg2 ...map[string]interfac
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayTextWithBoldStub
 	fake.recordInvocation("DisplayTextWithBold", []interface{}{arg1, arg2})
 	fake.displayTextWithBoldMutex.Unlock()
-	if fake.DisplayTextWithBoldStub != nil {
+	if stub != nil {
 		fake.DisplayTextWithBoldStub(arg1, arg2...)
 	}
 }
@@ -1262,9 +1292,10 @@ func (fake *FakeUI) DisplayTextWithFlavor(arg1 string, arg2 ...map[string]interf
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayTextWithFlavorStub
 	fake.recordInvocation("DisplayTextWithFlavor", []interface{}{arg1, arg2})
 	fake.displayTextWithFlavorMutex.Unlock()
-	if fake.DisplayTextWithFlavorStub != nil {
+	if stub != nil {
 		fake.DisplayTextWithFlavorStub(arg1, arg2...)
 	}
 }
@@ -1294,9 +1325,10 @@ func (fake *FakeUI) DisplayWarning(arg1 string, arg2 ...map[string]interface{}) 
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayWarningStub
 	fake.recordInvocation("DisplayWarning", []interface{}{arg1, arg2})
 	fake.displayWarningMutex.Unlock()
-	if fake.DisplayWarningStub != nil {
+	if stub != nil {
 		fake.DisplayWarningStub(arg1, arg2...)
 	}
 }
@@ -1330,9 +1362,10 @@ func (fake *FakeUI) DisplayWarnings(arg1 []string) {
 	fake.displayWarningsArgsForCall = append(fake.displayWarningsArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.DisplayWarningsStub
 	fake.recordInvocation("DisplayWarnings", []interface{}{arg1Copy})
 	fake.displayWarningsMutex.Unlock()
-	if fake.DisplayWarningsStub != nil {
+	if stub != nil {
 		fake.DisplayWarningsStub(arg1)
 	}
 }
@@ -1361,15 +1394,16 @@ func (fake *FakeUI) GetErr() io.Writer {
 	ret, specificReturn := fake.getErrReturnsOnCall[len(fake.getErrArgsForCall)]
 	fake.getErrArgsForCall = append(fake.getErrArgsForCall, struct {
 	}{})
+	stub := fake.GetErrStub
+	fakeReturns := fake.getErrReturns
 	fake.recordInvocation("GetErr", []interface{}{})
 	fake.getErrMutex.Unlock()
-	if fake.GetErrStub != nil {
-		return fake.GetErrStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getErrReturns
 	return fakeReturns.result1
 }
 
@@ -1413,15 +1447,16 @@ func (fake *FakeUI) GetIn() io.Reader {
 	ret, specificReturn := fake.getInReturnsOnCall[len(fake.getInArgsForCall)]
 	fake.getInArgsForCall = append(fake.getInArgsForCall, struct {
 	}{})
+	stub := fake.GetInStub
+	fakeReturns := fake.getInReturns
 	fake.recordInvocation("GetIn", []interface{}{})
 	fake.getInMutex.Unlock()
-	if fake.GetInStub != nil {
-		return fake.GetInStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getInReturns
 	return fakeReturns.result1
 }
 
@@ -1465,15 +1500,16 @@ func (fake *FakeUI) GetOut() io.Writer {
 	ret, specificReturn := fake.getOutReturnsOnCall[len(fake.getOutArgsForCall)]
 	fake.getOutArgsForCall = append(fake.getOutArgsForCall, struct {
 	}{})
+	stub := fake.GetOutStub
+	fakeReturns := fake.getOutReturns
 	fake.recordInvocation("GetOut", []interface{}{})
 	fake.getOutMutex.Unlock()
-	if fake.GetOutStub != nil {
-		return fake.GetOutStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getOutReturns
 	return fakeReturns.result1
 }
 
@@ -1523,15 +1559,16 @@ func (fake *FakeUI) RequestLoggerFileWriter(arg1 []string) *ui.RequestLoggerFile
 	fake.requestLoggerFileWriterArgsForCall = append(fake.requestLoggerFileWriterArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.RequestLoggerFileWriterStub
+	fakeReturns := fake.requestLoggerFileWriterReturns
 	fake.recordInvocation("RequestLoggerFileWriter", []interface{}{arg1Copy})
 	fake.requestLoggerFileWriterMutex.Unlock()
-	if fake.RequestLoggerFileWriterStub != nil {
-		return fake.RequestLoggerFileWriterStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.requestLoggerFileWriterReturns
 	return fakeReturns.result1
 }
 
@@ -1582,15 +1619,16 @@ func (fake *FakeUI) RequestLoggerTerminalDisplay() *ui.RequestLoggerTerminalDisp
 	ret, specificReturn := fake.requestLoggerTerminalDisplayReturnsOnCall[len(fake.requestLoggerTerminalDisplayArgsForCall)]
 	fake.requestLoggerTerminalDisplayArgsForCall = append(fake.requestLoggerTerminalDisplayArgsForCall, struct {
 	}{})
+	stub := fake.RequestLoggerTerminalDisplayStub
+	fakeReturns := fake.requestLoggerTerminalDisplayReturns
 	fake.recordInvocation("RequestLoggerTerminalDisplay", []interface{}{})
 	fake.requestLoggerTerminalDisplayMutex.Unlock()
-	if fake.RequestLoggerTerminalDisplayStub != nil {
-		return fake.RequestLoggerTerminalDisplayStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.requestLoggerTerminalDisplayReturns
 	return fakeReturns.result1
 }
 
@@ -1636,15 +1674,16 @@ func (fake *FakeUI) TranslateText(arg1 string, arg2 ...map[string]interface{}) s
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2})
+	stub := fake.TranslateTextStub
+	fakeReturns := fake.translateTextReturns
 	fake.recordInvocation("TranslateText", []interface{}{arg1, arg2})
 	fake.translateTextMutex.Unlock()
-	if fake.TranslateTextStub != nil {
-		return fake.TranslateTextStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.translateTextReturns
 	return fakeReturns.result1
 }
 
@@ -1696,15 +1735,16 @@ func (fake *FakeUI) UserFriendlyDate(arg1 time.Time) string {
 	fake.userFriendlyDateArgsForCall = append(fake.userFriendlyDateArgsForCall, struct {
 		arg1 time.Time
 	}{arg1})
+	stub := fake.UserFriendlyDateStub
+	fakeReturns := fake.userFriendlyDateReturns
 	fake.recordInvocation("UserFriendlyDate", []interface{}{arg1})
 	fake.userFriendlyDateMutex.Unlock()
-	if fake.UserFriendlyDateStub != nil {
-		return fake.UserFriendlyDateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.userFriendlyDateReturns
 	return fakeReturns.result1
 }
 
@@ -1755,15 +1795,16 @@ func (fake *FakeUI) Writer() io.Writer {
 	ret, specificReturn := fake.writerReturnsOnCall[len(fake.writerArgsForCall)]
 	fake.writerArgsForCall = append(fake.writerArgsForCall, struct {
 	}{})
+	stub := fake.WriterStub
+	fakeReturns := fake.writerReturns
 	fake.recordInvocation("Writer", []interface{}{})
 	fake.writerMutex.Unlock()
-	if fake.WriterStub != nil {
-		return fake.WriterStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.writerReturns
 	return fakeReturns.result1
 }
 
