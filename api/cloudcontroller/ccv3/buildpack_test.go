@@ -101,7 +101,7 @@ var _ = Describe("Buildpacks", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/buildpacks", "names=some-buildpack-name"),
+						VerifyRequest(http.MethodGet, "/v3/buildpacks", "names=some-buildpack-name&per_page=5000"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

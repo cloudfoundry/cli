@@ -361,7 +361,7 @@ var _ = Describe("Organizations", func() {
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/organizations", "names=some-org-name"),
+						VerifyRequest(http.MethodGet, "/v3/organizations", "names=some-org-name&per_page=5000"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
