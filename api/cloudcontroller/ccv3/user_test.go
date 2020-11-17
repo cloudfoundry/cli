@@ -227,7 +227,7 @@ var _ = Describe("User", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/users", "usernames=some-user-name&origins=uaa&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/users", "usernames=some-user-name&origins=uaa"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)

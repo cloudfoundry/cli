@@ -72,7 +72,7 @@ var _ = Describe("Service Instance", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_instances", "names=some-service-instance-name&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_instances", "names=some-service-instance-name"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(

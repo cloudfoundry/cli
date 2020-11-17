@@ -178,7 +178,7 @@ var _ = Describe("Spaces", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -277,7 +277,7 @@ var _ = Describe("Spaces", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name&include=organizations&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name&include=organizations"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 				)

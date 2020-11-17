@@ -106,7 +106,7 @@ var _ = Describe("Service Plan", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "names=myServicePlan&service_broker_names=myServiceBroker&service_offering_names=someOffering&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "names=myServicePlan&service_broker_names=myServiceBroker&service_offering_names=someOffering"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(
@@ -327,7 +327,7 @@ var _ = Describe("Service Plan", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization&service_offering_names=someOffering&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization&service_offering_names=someOffering"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(
@@ -392,7 +392,7 @@ var _ = Describe("Service Plan", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -585,7 +585,7 @@ var _ = Describe("Service Plan", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&fields[service_offering.service_broker]=name,guid&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&fields[service_offering.service_broker]=name,guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(
@@ -684,7 +684,7 @@ var _ = Describe("Service Plan", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&fields[service_offering.service_broker]=name,guid&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&fields[service_offering.service_broker]=name,guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

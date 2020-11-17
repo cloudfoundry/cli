@@ -434,7 +434,7 @@ var _ = Describe("Role", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)
@@ -517,7 +517,7 @@ var _ = Describe("Role", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)

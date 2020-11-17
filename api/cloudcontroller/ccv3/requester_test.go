@@ -513,7 +513,7 @@ var _ = Describe("shared request helpers", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)
@@ -620,7 +620,7 @@ var _ = Describe("shared request helpers", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)
@@ -771,62 +771,6 @@ var _ = Describe("shared request helpers", func() {
 						},
 					}))
 					Expect(warnings).To(ConsistOf("this is a warning"))
-				})
-			})
-
-			When("`per_page` is specified`", func() {
-				BeforeEach(func() {
-					requestParams.Query = append(requestParams.Query, Query{Key: PerPage, Values: []string{"42"}})
-
-					response1 := fmt.Sprintf(`{
-	"pagination": {
-		"next": {
-			"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1&include=users"
-		}
-	},
-  "resources": [
-    {
-      "guid": "role-guid-1",
-      "type": "organization_user"
-    }
-  ]
-}`, server.URL())
-					response2 := `{
-							"pagination": {
-								"next": null
-							},
-						 "resources": [
-						   {
-						     "guid": "role-guid-2",
-						     "type": "organization_manager"
-						   }
-						 ]
-						}`
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&include=users&per_page=42"),
-							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-						),
-					)
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1&include=users"),
-							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-						),
-					)
-				})
-
-				It("overrides the default `per_page` value", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resourceList).To(Equal([]resources.Role{{
-						GUID: "role-guid-1",
-						Type: constant.OrgUserRole,
-					}, {
-						GUID: "role-guid-2",
-						Type: constant.OrgManagerRole,
-					}}))
 				})
 			})
 		})

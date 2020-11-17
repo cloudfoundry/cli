@@ -415,13 +415,13 @@ var _ = Describe("Route", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/routes", "space_guids=guid1,guid2&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/routes", "space_guids=guid1,guid2"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v3/routes", "page=2", "space_guids=guid1,guid2&per_page=5000"),
+							VerifyRequest(http.MethodGet, "/v3/routes", "page=2", "space_guids=guid1,guid2"),
 							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 						),
 					)

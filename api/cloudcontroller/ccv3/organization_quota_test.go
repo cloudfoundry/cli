@@ -239,7 +239,7 @@ var _ = Describe("Organization Quotas", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/organization_quotas", "names=sancho-panza&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/organization_quotas", "names=sancho-panza"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"page1 warning"}}),
 					),
 				)

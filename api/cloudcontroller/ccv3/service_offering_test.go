@@ -111,7 +111,7 @@ var _ = Describe("Service Offering", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker&fields[service_broker]=name,guid&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker&fields[service_broker]=name,guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(

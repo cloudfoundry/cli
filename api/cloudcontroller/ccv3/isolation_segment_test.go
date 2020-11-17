@@ -160,7 +160,7 @@ var _ = Describe("Isolation Segments", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/isolation_segments", "organization_guids=some-org-guid&names=iso1,iso2,iso3&per_page=5000"),
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments", "organization_guids=some-org-guid&names=iso1,iso2,iso3"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

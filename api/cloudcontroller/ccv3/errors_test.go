@@ -168,7 +168,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 
 						It("returns a APINotFoundError", func() {
-							Expect(makeError).To(MatchError(ccerror.APINotFoundError{URL: server.URL() + "/v3/apps?per_page=5000"}))
+							Expect(makeError).To(MatchError(ccerror.APINotFoundError{URL: server.URL() + "/v3/apps"}))
 						})
 					})
 
