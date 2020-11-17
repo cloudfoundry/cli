@@ -26,7 +26,7 @@ var _ = Describe("logs command", func() {
 
 		helpers.AddHandler(server,
 			http.MethodGet,
-			"/v3/organizations?order_by=name&per_page=5000",
+			"/v3/organizations?order_by=name",
 			http.StatusOK,
 			[]byte(
 				`{
@@ -44,7 +44,7 @@ var _ = Describe("logs command", func() {
 		// See below for comparison with v7 version.
 		helpers.AddHandler(server,
 			http.MethodGet,
-			"/v3/spaces?organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a&per_page=5000",
+			"/v3/spaces?organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a",
 			http.StatusOK,
 			[]byte(
 				`{
@@ -64,7 +64,7 @@ var _ = Describe("logs command", func() {
 		// a handler for both routes (with and without 'order_by').
 		helpers.AddHandler(server,
 			http.MethodGet,
-			"/v3/spaces?order_by=name&organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a&per_page=5000",
+			"/v3/spaces?order_by=name&organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a",
 			http.StatusOK,
 			[]byte(
 				`{
@@ -100,7 +100,7 @@ var _ = Describe("logs command", func() {
 
 		helpers.AddHandler(server,
 			http.MethodGet,
-			"/v3/apps?names=some-fake-app&per_page=5000&space_guids=1704b4e7-14bb-4b7b-bc23-0b8d23a60238",
+			"/v3/apps?names=some-fake-app&space_guids=1704b4e7-14bb-4b7b-bc23-0b8d23a60238",
 			http.StatusOK,
 			[]byte(
 				`{
