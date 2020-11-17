@@ -354,7 +354,7 @@ var _ = Describe("Package", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid"),
+						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid&per_page=5000"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -405,7 +405,7 @@ var _ = Describe("Package", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid"),
+						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid&per_page=5000"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

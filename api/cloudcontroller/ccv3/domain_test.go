@@ -782,7 +782,7 @@ var _ = Describe("Domain", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/organizations/some-org-guid/domains", "organization_guids=some-org-guid"),
+						VerifyRequest(http.MethodGet, "/v3/organizations/some-org-guid/domains", "organization_guids=some-org-guid&per_page=5000"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

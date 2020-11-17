@@ -230,7 +230,7 @@ var _ = Describe("ServiceBroker", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_brokers", "names=special-unicorn-broker"),
+						VerifyRequest(http.MethodGet, "/v3/service_brokers", "names=special-unicorn-broker&per_page=5000"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)

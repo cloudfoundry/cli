@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
+
+const DefaultPerPage = 5000
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester
 
@@ -83,6 +86,7 @@ func (requester *RealRequester) InitializeRouter(resources map[string]string) {
 }
 
 func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
+	requestParams.Query = adjustPerPage(requestParams.Query)
 	request, err := requester.buildRequest(requestParams)
 	if err != nil {
 		return IncludedResources{}, nil, err
@@ -271,4 +275,14 @@ func (requester *RealRequester) uploadAsynchronously(request *cloudcontroller.Re
 	}
 
 	return response.ResourceLocationURL, response.Warnings, firstError
+}
+
+func adjustPerPage(query []Query) []Query {
+	for _, q := range query {
+		if q.Key == PerPage {
+			return query
+		}
+	}
+
+	return append(query, Query{Key: PerPage, Values: []string{strconv.Itoa(DefaultPerPage)}})
 }
