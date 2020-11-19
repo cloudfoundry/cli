@@ -65,10 +65,10 @@ var _ = Describe("marketplace", func() {
 
 			Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 			queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
-			Expect(queries).To(ConsistOf(ccv3.Query{
-				Key:    ccv3.AvailableFilter,
-				Values: []string{"true"},
-			}))
+			Expect(queries).To(ConsistOf(
+				ccv3.Query{Key: ccv3.AvailableFilter, Values: []string{"true"}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
+			))
 		})
 
 		It("returns a list of service offerings and plans", func() {
@@ -162,6 +162,7 @@ var _ = Describe("marketplace", func() {
 					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
 					ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{"my-service-offering"}},
 					ccv3.Query{Key: ccv3.AvailableFilter, Values: []string{"true"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 				))
 			})
 		})

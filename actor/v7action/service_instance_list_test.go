@@ -180,7 +180,8 @@ var _ = Describe("Service Instance List Action", func() {
 				ccv3.Query{Key: ccv3.FieldsServicePlan, Values: []string{"guid", "name", "relationships.service_offering"}},
 				ccv3.Query{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"guid", "name", "relationships.service_broker"}},
 				ccv3.Query{Key: ccv3.FieldsServicePlanServiceOfferingServiceBroker, Values: []string{"guid", "name"}},
-				ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+				ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 			))
 		})
 

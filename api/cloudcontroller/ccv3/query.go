@@ -122,6 +122,9 @@ const (
 
 	// Purge is a query parameter used on a Delete request to indicate that dependent resources should also be deleted
 	Purge = "purge"
+
+	// MaxPerPage is the largest value of "per_page" that should be used
+	MaxPerPage = "5000"
 )
 
 // Query is additional settings that can be passed to some requests that can

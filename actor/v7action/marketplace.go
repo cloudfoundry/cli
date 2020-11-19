@@ -12,7 +12,7 @@ type MarketplaceFilter struct {
 }
 
 func (actor Actor) Marketplace(filter MarketplaceFilter) ([]ServiceOfferingWithPlans, Warnings, error) {
-	var query []ccv3.Query
+	query := []ccv3.Query{{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}}}
 
 	if filter.SpaceGUID != "" {
 		query = append(query, ccv3.Query{
