@@ -11,8 +11,8 @@ import (
 func (actor Actor) GetFeatureFlagByName(featureFlagName string) (resources.FeatureFlag, Warnings, error) {
 	var (
 		featureFlags resources.FeatureFlag
-		warnings ccv3.Warnings
-		err      error
+		warnings     ccv3.Warnings
+		err          error
 	)
 	featureFlags, warnings, err = actor.CloudControllerClient.GetFeatureFlag(featureFlagName)
 
