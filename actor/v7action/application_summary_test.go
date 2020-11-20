@@ -438,7 +438,7 @@ var _ = Describe("Application Summary Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetProcessSidecarsReturns(
-						[]ccv3.Sidecar{
+						[]resources.Sidecar{
 							{
 								GUID:    "sidecar-guid",
 								Name:    "sidecar_name",
@@ -512,7 +512,7 @@ var _ = Describe("Application Summary Actions", func() {
 												Command:    *types.NewFilteredString("[Redacted Value]"),
 												MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 											},
-											Sidecars: []Sidecar{
+											Sidecars: []resources.Sidecar{
 												{
 													GUID:    "sidecar-guid",
 													Name:    "sidecar_name",
@@ -538,7 +538,7 @@ var _ = Describe("Application Summary Actions", func() {
 												Type:       "some-type",
 												Command:    *types.NewFilteredString("some-start-command"),
 											},
-											Sidecars: []Sidecar{
+											Sidecars: []resources.Sidecar{
 												{
 													GUID:    "sidecar-guid",
 													Name:    "sidecar_name",
@@ -656,7 +656,7 @@ var _ = Describe("Application Summary Actions", func() {
 											Command:    *types.NewFilteredString("[Redacted Value]"),
 											MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 										},
-										Sidecars: []Sidecar{
+										Sidecars: []resources.Sidecar{
 											{
 												GUID:    "sidecar-guid",
 												Name:    "sidecar_name",
@@ -682,7 +682,7 @@ var _ = Describe("Application Summary Actions", func() {
 											Type:       "some-type",
 											Command:    *types.NewFilteredString("some-start-command"),
 										},
-										Sidecars: []Sidecar{
+										Sidecars: []resources.Sidecar{
 											{
 												GUID:    "sidecar-guid",
 												Name:    "sidecar_name",

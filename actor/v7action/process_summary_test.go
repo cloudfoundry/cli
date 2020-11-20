@@ -61,7 +61,7 @@ var _ = Describe("Process Actions", func() {
 					Process: resources.Process{
 						Type: constant.ProcessTypeWeb,
 					},
-					Sidecars: []Sidecar{
+					Sidecars: []resources.Sidecar{
 						{Name: "authenticator"},
 						{Name: "clock"},
 					},

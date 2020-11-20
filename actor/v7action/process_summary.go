@@ -14,7 +14,7 @@ import (
 type ProcessSummary struct {
 	resources.Process
 
-	Sidecars []Sidecar
+	Sidecars []resources.Sidecar
 
 	InstanceDetails []ProcessInstance
 }
@@ -126,7 +126,7 @@ func (actor Actor) getProcessSummary(process resources.Process) (ProcessSummary,
 		Process: process,
 	}
 	for _, sidecar := range sidecars {
-		processSummary.Sidecars = append(processSummary.Sidecars, Sidecar(sidecar))
+		processSummary.Sidecars = append(processSummary.Sidecars, resources.Sidecar(sidecar))
 	}
 	for _, instance := range instances {
 		processSummary.InstanceDetails = append(processSummary.InstanceDetails, ProcessInstance(instance))

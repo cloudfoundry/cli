@@ -27,19 +27,24 @@ code.cloudfoundry.org/diego-ssh/test_helpers/fake_io
 code.cloudfoundry.org/diego-ssh/test_helpers/fake_net
 code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh
 # code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34
+## explicit
 code.cloudfoundry.org/go-log-cache
 code.cloudfoundry.org/go-log-cache/internal
 code.cloudfoundry.org/go-log-cache/rpc/logcache_v1
 # code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
+## explicit
 code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2
 # code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
+## explicit
 code.cloudfoundry.org/gofileutils/fileutils
 # code.cloudfoundry.org/jsonry v1.1.2
+## explicit
 code.cloudfoundry.org/jsonry
 code.cloudfoundry.org/jsonry/internal/context
 code.cloudfoundry.org/jsonry/internal/path
 code.cloudfoundry.org/jsonry/internal/tree
 # code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be
+## explicit
 code.cloudfoundry.org/lager
 code.cloudfoundry.org/lager/internal/truncate
 code.cloudfoundry.org/lager/lagerctx

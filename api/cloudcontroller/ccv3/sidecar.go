@@ -2,28 +2,21 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-type Sidecar struct {
-	GUID    string               `json:"guid"`
-	Name    string               `json:"name"`
-	Command types.FilteredString `json:"command"`
-}
-
-func (client *Client) GetProcessSidecars(processGuid string) ([]Sidecar, Warnings, error) {
-	var resources []Sidecar
+func (client *Client) GetProcessSidecars(processGuid string) ([]resources.Sidecar, Warnings, error) {
+	var sidecars []resources.Sidecar
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetProcessSidecarsRequest,
 		URIParams:    internal.Params{"process_guid": processGuid},
-		ResponseBody: Sidecar{},
+		ResponseBody: resources.Sidecar{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Sidecar))
+			sidecars = append(sidecars, item.(resources.Sidecar))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return sidecars, warnings, err
 }
