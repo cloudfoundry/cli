@@ -104,7 +104,7 @@ type CloudControllerClient interface {
 	GetProcess(processGUID string) (resources.Process, ccv3.Warnings, error)
 	GetProcesses(query ...ccv3.Query) ([]resources.Process, ccv3.Warnings, error)
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
-	GetProcessSidecars(processGUID string) ([]ccv3.Sidecar, ccv3.Warnings, error)
+	GetProcessSidecars(processGUID string) ([]resources.Sidecar, ccv3.Warnings, error)
 	GetRoles(query ...ccv3.Query) ([]resources.Role, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetRouteBindings(query ...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetRouteDestinations(routeGUID string) ([]resources.RouteDestination, ccv3.Warnings, error)

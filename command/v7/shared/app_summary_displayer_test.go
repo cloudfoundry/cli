@@ -58,7 +58,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -97,7 +97,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -168,7 +168,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -187,7 +187,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 							},
 						},
@@ -217,7 +217,7 @@ var _ = Describe("app summary displayer", func() {
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									},
-									Sidecars:        []v7action.Sidecar{},
+									Sidecars:        []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
 								}},
 						},
@@ -245,20 +245,20 @@ var _ = Describe("app summary displayer", func() {
 										Type:    constant.ProcessTypeWeb,
 										Command: *types.NewFilteredString("some-command-1"),
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 								{
 									Process: resources.Process{
 										Type:    "console",
 										Command: *types.NewFilteredString("some-command-2"),
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 								{
 									Process: resources.Process{
 										Type: "random",
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 							},
 						},
@@ -312,7 +312,7 @@ var _ = Describe("app summary displayer", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 							{
 								Process: resources.Process{
@@ -320,7 +320,7 @@ var _ = Describe("app summary displayer", func() {
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 						},
 					},
@@ -361,7 +361,7 @@ var _ = Describe("app summary displayer", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{
+								Sidecars: []resources.Sidecar{
 									{Name: "authenticator"},
 									{Name: "clock"},
 								},
@@ -397,13 +397,13 @@ var _ = Describe("app summary displayer", func() {
 								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 							{
 								Process: resources.Process{
 									Type: "console",
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 						},
 					},

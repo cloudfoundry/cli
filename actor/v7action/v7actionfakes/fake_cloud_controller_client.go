@@ -1391,18 +1391,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetProcessSidecarsStub        func(string) ([]ccv3.Sidecar, ccv3.Warnings, error)
+	GetProcessSidecarsStub        func(string) ([]resources.Sidecar, ccv3.Warnings, error)
 	getProcessSidecarsMutex       sync.RWMutex
 	getProcessSidecarsArgsForCall []struct {
 		arg1 string
 	}
 	getProcessSidecarsReturns struct {
-		result1 []ccv3.Sidecar
+		result1 []resources.Sidecar
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getProcessSidecarsReturnsOnCall map[int]struct {
-		result1 []ccv3.Sidecar
+		result1 []resources.Sidecar
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -8672,7 +8672,7 @@ func (fake *FakeCloudControllerClient) GetProcessInstancesReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetProcessSidecars(arg1 string) ([]ccv3.Sidecar, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetProcessSidecars(arg1 string) ([]resources.Sidecar, ccv3.Warnings, error) {
 	fake.getProcessSidecarsMutex.Lock()
 	ret, specificReturn := fake.getProcessSidecarsReturnsOnCall[len(fake.getProcessSidecarsArgsForCall)]
 	fake.getProcessSidecarsArgsForCall = append(fake.getProcessSidecarsArgsForCall, struct {
@@ -8696,7 +8696,7 @@ func (fake *FakeCloudControllerClient) GetProcessSidecarsCallCount() int {
 	return len(fake.getProcessSidecarsArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetProcessSidecarsCalls(stub func(string) ([]ccv3.Sidecar, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetProcessSidecarsCalls(stub func(string) ([]resources.Sidecar, ccv3.Warnings, error)) {
 	fake.getProcessSidecarsMutex.Lock()
 	defer fake.getProcessSidecarsMutex.Unlock()
 	fake.GetProcessSidecarsStub = stub
@@ -8709,30 +8709,30 @@ func (fake *FakeCloudControllerClient) GetProcessSidecarsArgsForCall(i int) stri
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetProcessSidecarsReturns(result1 []ccv3.Sidecar, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetProcessSidecarsReturns(result1 []resources.Sidecar, result2 ccv3.Warnings, result3 error) {
 	fake.getProcessSidecarsMutex.Lock()
 	defer fake.getProcessSidecarsMutex.Unlock()
 	fake.GetProcessSidecarsStub = nil
 	fake.getProcessSidecarsReturns = struct {
-		result1 []ccv3.Sidecar
+		result1 []resources.Sidecar
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetProcessSidecarsReturnsOnCall(i int, result1 []ccv3.Sidecar, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetProcessSidecarsReturnsOnCall(i int, result1 []resources.Sidecar, result2 ccv3.Warnings, result3 error) {
 	fake.getProcessSidecarsMutex.Lock()
 	defer fake.getProcessSidecarsMutex.Unlock()
 	fake.GetProcessSidecarsStub = nil
 	if fake.getProcessSidecarsReturnsOnCall == nil {
 		fake.getProcessSidecarsReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Sidecar
+			result1 []resources.Sidecar
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getProcessSidecarsReturnsOnCall[i] = struct {
-		result1 []ccv3.Sidecar
+		result1 []resources.Sidecar
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
