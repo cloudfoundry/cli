@@ -1,9 +1,9 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -42,7 +42,7 @@ func (cmd FeatureFlagCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd FeatureFlagCommand) displayTable(featureFlag v7action.FeatureFlag) {
+func (cmd FeatureFlagCommand) displayTable(featureFlag resources.FeatureFlag) {
 	var keyValueTable = [][]string{
 		{"Features", "State"},
 		{featureFlag.Name, shared.FlagBoolToString(featureFlag.Enabled)},

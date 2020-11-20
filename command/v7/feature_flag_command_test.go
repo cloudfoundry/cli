@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -51,7 +52,7 @@ var _ = Describe("Feature Flag Command", func() {
 		cmd.RequiredArgs.Feature = featureFlagName
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
 
-		fakeActor.GetFeatureFlagByNameReturns(v7action.FeatureFlag{
+		fakeActor.GetFeatureFlagByNameReturns(resources.FeatureFlag{
 			Name:    "flag1",
 			Enabled: true,
 		}, v7action.Warnings{"this is a warning"}, nil)
@@ -88,7 +89,7 @@ var _ = Describe("Feature Flag Command", func() {
 	When("getting featureFlag fails", func() {
 		When("the featureFlag does not exist", func() {
 			BeforeEach(func() {
-				featureFlag := v7action.FeatureFlag{}
+				featureFlag := resources.FeatureFlag{}
 				fakeActor.GetFeatureFlagByNameReturns(featureFlag, v7action.Warnings{"this is a warning"}, actionerror.FeatureFlagNotFoundError{FeatureFlagName: featureFlagName})
 			})
 
@@ -98,7 +99,7 @@ var _ = Describe("Feature Flag Command", func() {
 			})
 		})
 		BeforeEach(func() {
-			fakeActor.GetFeatureFlagByNameReturns(v7action.FeatureFlag{}, v7action.Warnings{"this is a warning"},
+			fakeActor.GetFeatureFlagByNameReturns(resources.FeatureFlag{}, v7action.Warnings{"this is a warning"},
 				errors.New("some-error"))
 		})
 

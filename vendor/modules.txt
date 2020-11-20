@@ -1,19 +1,25 @@
 # code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
+## explicit
 code.cloudfoundry.org/bytefmt
 # code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
+## explicit
 code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking
 code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1
 code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1/internal
 code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror
 code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper
 # code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
+## explicit
 code.cloudfoundry.org/cli-plugin-repo/web
 # code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
+## explicit
 code.cloudfoundry.org/cli/integration/assets/hydrabroker/config
 # code.cloudfoundry.org/clock v1.0.0
+## explicit
 code.cloudfoundry.org/clock
 code.cloudfoundry.org/clock/fakeclock
 # code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f
+## explicit
 code.cloudfoundry.org/diego-ssh/server
 code.cloudfoundry.org/diego-ssh/server/fakes
 code.cloudfoundry.org/diego-ssh/test_helpers
