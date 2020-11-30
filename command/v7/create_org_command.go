@@ -2,7 +2,6 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -61,18 +60,6 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 		}
 		cmd.UI.DisplayOK()
 	}
-
-	cmd.UI.DisplayTextWithFlavor("Assigning role OrgManager to user {{.User}} in org {{.Organization}} as {{.User}}...",
-		map[string]interface{}{
-			"User":         user.Name,
-			"Organization": orgName,
-		})
-	warnings, err = cmd.Actor.CreateOrgRole(constant.OrgManagerRole, org.GUID, user.Name, user.Origin, user.IsClient)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-	cmd.UI.DisplayOK()
 
 	cmd.UI.DisplayText(`TIP: Use 'cf target -o "{{.Organization}}"' to target new org`,
 		map[string]interface{}{
