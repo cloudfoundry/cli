@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -147,28 +146,11 @@ var _ = Describe("create-org Command", func() {
 		})
 	})
 
-	When("assigning the org manager role errors", func() {
-		BeforeEach(func() {
-			fakeActor.CreateOrganizationReturns(resources.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
-			fakeActor.CreateOrgRoleReturns(
-				v7action.Warnings{"role-create-warning-1"},
-				errors.New("err-create-role"))
-		})
-
-		It("returns an error and displays warnings", func() {
-			Expect(executeErr).To(MatchError("err-create-role"))
-			Expect(testUI.Err).To(Say("role-create-warning-1"))
-		})
-	})
-
 	When("creating the org is successful", func() {
 		var orgGUID = "some-org-guid"
 		BeforeEach(func() {
 			fakeActor.CreateOrganizationReturns(resources.Organization{Name: orgName, GUID: orgGUID}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			fakeActor.ApplyOrganizationQuotaByNameReturns(v7action.Warnings{"quota-warnings-1", "quota-warnings-2"}, nil)
-			fakeActor.CreateOrgRoleReturns(
-				v7action.Warnings{"role-create-warning-1"},
-				nil)
 		})
 
 		It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -184,10 +166,6 @@ var _ = Describe("create-org Command", func() {
 			Expect(testUI.Err).To(Say("quota-warnings-2"))
 			Expect(testUI.Out).To(Say("OK"))
 
-			Expect(testUI.Out).To(Say(`Assigning role OrgManager to user %s in org %s as %s\.\.\.`, currentUsername, orgName, currentUsername))
-			Expect(testUI.Err).To(Say("role-create-warning-1"))
-			Expect(testUI.Out).To(Say("OK"))
-
 			Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))
 		})
 
@@ -198,21 +176,9 @@ var _ = Describe("create-org Command", func() {
 		})
 
 		It("applies he quota to the org", func() {
-			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
 			passedQuotaName, passedGuid := fakeActor.ApplyOrganizationQuotaByNameArgsForCall(0)
 			Expect(passedQuotaName).To(Equal(quotaName))
 			Expect(passedGuid).To(Equal(orgGUID))
-		})
-
-		It("assigns org manager to the admin", func() {
-			Expect(testUI.Out).To(Say(`Assigning role OrgManager to user %s in org %s as %s\.\.\.`, currentUsername, orgName, currentUsername))
-			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
-			givenRoleType, givenOrgGuid, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateOrgRoleArgsForCall(0)
-			Expect(givenRoleType).To(Equal(constant.OrgManagerRole))
-			Expect(givenOrgGuid).To(Equal("some-org-guid"))
-			Expect(givenUserName).To(Equal(currentUsername))
-			Expect(givenOrigin).To(Equal(""))
-			Expect(givenIsClient).To(BeFalse())
 		})
 	})
 })
