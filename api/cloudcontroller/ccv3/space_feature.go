@@ -2,15 +2,11 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-type SpaceFeature struct {
-	Name    string
-	Enabled bool
-}
-
 func (client *Client) GetSpaceFeature(spaceGUID string, featureName string) (bool, Warnings, error) {
-	var responseBody SpaceFeature
+	var responseBody resources.SpaceFeature
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetSpaceFeatureRequest,

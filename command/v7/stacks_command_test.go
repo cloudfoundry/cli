@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -96,7 +97,7 @@ var _ = Describe("stacks Command", func() {
 
 		When("StacksActor does not return an error", func() {
 			BeforeEach(func() {
-				stacks := []v7action.Stack{
+				stacks := []resources.Stack{
 					{Name: "Stack2", Description: "desc2"},
 					{Name: "stack1", Description: "desc1"},
 				}

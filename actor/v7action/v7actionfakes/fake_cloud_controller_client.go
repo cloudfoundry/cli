@@ -1872,18 +1872,18 @@ type FakeCloudControllerClient struct {
 		result3 ccv3.Warnings
 		result4 error
 	}
-	GetStacksStub        func(...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)
+	GetStacksStub        func(...ccv3.Query) ([]resources.Stack, ccv3.Warnings, error)
 	getStacksMutex       sync.RWMutex
 	getStacksArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getStacksReturns struct {
-		result1 []ccv3.Stack
+		result1 []resources.Stack
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getStacksReturnsOnCall map[int]struct {
-		result1 []ccv3.Stack
+		result1 []resources.Stack
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -10744,7 +10744,7 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []r
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeCloudControllerClient) GetStacks(arg1 ...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetStacks(arg1 ...ccv3.Query) ([]resources.Stack, ccv3.Warnings, error) {
 	fake.getStacksMutex.Lock()
 	ret, specificReturn := fake.getStacksReturnsOnCall[len(fake.getStacksArgsForCall)]
 	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
@@ -10768,7 +10768,7 @@ func (fake *FakeCloudControllerClient) GetStacksCallCount() int {
 	return len(fake.getStacksArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetStacksCalls(stub func(...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetStacksCalls(stub func(...ccv3.Query) ([]resources.Stack, ccv3.Warnings, error)) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = stub
@@ -10781,30 +10781,30 @@ func (fake *FakeCloudControllerClient) GetStacksArgsForCall(i int) []ccv3.Query 
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetStacksReturns(result1 []ccv3.Stack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetStacksReturns(result1 []resources.Stack, result2 ccv3.Warnings, result3 error) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = nil
 	fake.getStacksReturns = struct {
-		result1 []ccv3.Stack
+		result1 []resources.Stack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetStacksReturnsOnCall(i int, result1 []ccv3.Stack, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetStacksReturnsOnCall(i int, result1 []resources.Stack, result2 ccv3.Warnings, result3 error) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = nil
 	if fake.getStacksReturnsOnCall == nil {
 		fake.getStacksReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Stack
+			result1 []resources.Stack
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getStacksReturnsOnCall[i] = struct {
-		result1 []ccv3.Stack
+		result1 []resources.Stack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

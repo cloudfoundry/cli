@@ -479,7 +479,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStacksReturns(
-					[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+					[]resources.Stack{resources.Stack{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
@@ -515,7 +515,7 @@ var _ = Describe("labels", func() {
 			When("fetching the stack fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+						[]resources.Stack{resources.Stack{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-stacks-error"),
 					)
@@ -531,7 +531,7 @@ var _ = Describe("labels", func() {
 			When("updating the stack fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+						[]resources.Stack{resources.Stack{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -1091,7 +1091,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStacksReturns(
-					[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+					[]resources.Stack{resources.Stack{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
@@ -1118,7 +1118,7 @@ var _ = Describe("labels", func() {
 				BeforeEach(func() {
 					expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{ccv3.Stack{
+						[]resources.Stack{resources.Stack{
 							GUID: "some-guid",
 							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
@@ -1138,7 +1138,7 @@ var _ = Describe("labels", func() {
 		When("there is a client error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStacksReturns(
-					[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+					[]resources.Stack{resources.Stack{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					errors.New("get-stacks-error"),
 				)

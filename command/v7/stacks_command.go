@@ -3,7 +3,7 @@ package v7
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -45,7 +45,7 @@ func (cmd StacksCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd StacksCommand) displayTable(stacks []v7action.Stack) {
+func (cmd StacksCommand) displayTable(stacks []resources.Stack) {
 	if len(stacks) > 0 {
 		var keyValueTable = [][]string{
 			{"name", "description"},
