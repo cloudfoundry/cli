@@ -189,7 +189,7 @@ rsrc.syso:
 	@# Software for windows icon
 	GOFLAGS="" GOMODULE111=off go get github.com/akavel/rsrc
 	@# Generates icon file
-	rsrc -ico cf.ico
+	rsrc -ico cf.ico -o rsrc.syso
 
 test: units ## (synonym for units)
 
