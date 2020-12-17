@@ -28,6 +28,10 @@ var _ = Describe("ManifestDiffDisplayer", func() {
 			err         error
 		)
 
+		BeforeEach(func() {
+			rawManifest = []byte("")
+		})
+
 		JustBeforeEach(func() {
 			err = displayer.DisplayDiff(rawManifest, diff)
 		})
