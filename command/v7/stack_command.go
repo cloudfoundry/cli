@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type StackCommand struct {
@@ -27,7 +27,7 @@ func (cmd *StackCommand) Execute(args []string) error {
 	return cmd.displayStackInfo()
 }
 
-func (cmd *StackCommand) getStack(stackName string) (v7action.Stack, error) {
+func (cmd *StackCommand) getStack(stackName string) (resources.Stack, error) {
 	stack, warnings, err := cmd.Actor.GetStackByName(cmd.RequiredArgs.StackName)
 	cmd.UI.DisplayWarnings(warnings)
 	return stack, err

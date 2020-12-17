@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +29,7 @@ var _ = Describe("Stack", func() {
 		var expectedErr error
 		var err error
 		var warnings Warnings
-		var stack Stack
+		var stack resources.Stack
 
 		JustBeforeEach(func() {
 			stack, warnings, err = actor.GetStackByName("some-stack-name")
@@ -39,7 +40,7 @@ var _ = Describe("Stack", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("CC Error")
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{},
+						[]resources.Stack{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						expectedErr,
 					)
@@ -54,7 +55,7 @@ var _ = Describe("Stack", func() {
 			When("the stack does not exist", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{},
+						[]resources.Stack{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						actionerror.StackNotFoundError{Name: "some-stack-name"},
 					)
@@ -70,7 +71,7 @@ var _ = Describe("Stack", func() {
 		Context("there are no errors", func() {
 
 			When("the stack exists", func() {
-				expectedStack := ccv3.Stack{
+				expectedStack := resources.Stack{
 					GUID:        "some-stack-guid",
 					Name:        "some-stack-name",
 					Description: "Some stack desc",
@@ -80,7 +81,7 @@ var _ = Describe("Stack", func() {
 
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
-						[]ccv3.Stack{expectedStack},
+						[]resources.Stack{expectedStack},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -103,8 +104,8 @@ var _ = Describe("Stack", func() {
 
 	Describe("GetStacks", func() {
 		var (
-			ccv3Stacks []ccv3.Stack
-			stacks     []Stack
+			apiReturnedStacks []resources.Stack
+			stacks            []resources.Stack
 
 			stack1Name        string
 			stack1Description string
@@ -117,7 +118,7 @@ var _ = Describe("Stack", func() {
 		)
 
 		BeforeEach(func() {
-			ccv3Stacks = []ccv3.Stack{
+			apiReturnedStacks = []resources.Stack{
 				{Name: stack1Name, Description: stack1Description},
 				{Name: stack2Name, Description: stack2Description},
 			}
@@ -133,7 +134,7 @@ var _ = Describe("Stack", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetStacksReturns(
-					[]ccv3.Stack{},
+					[]resources.Stack{},
 					ccv3.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
 
@@ -147,13 +148,13 @@ var _ = Describe("Stack", func() {
 			When("the cloud controller returns back stacks", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
-						ccv3Stacks,
+						apiReturnedStacks,
 						ccv3.Warnings{"some-stack-warning"}, nil)
 				})
 
 				It("returns back the stacks and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(stacks).To(ConsistOf(Stack{Name: stack1Name, Description: stack1Description}, Stack{Name: stack2Name, Description: stack2Description}))
+					Expect(stacks).To(ConsistOf(resources.Stack{Name: stack1Name, Description: stack1Description}, resources.Stack{Name: stack2Name, Description: stack2Description}))
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
 					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
 				})

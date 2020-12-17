@@ -52,52 +52,75 @@ code.cloudfoundry.org/lager/lagertest
 # code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a
 code.cloudfoundry.org/rfc5424
 # code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
+## explicit
 code.cloudfoundry.org/tlsconfig
 # code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
+## explicit
 code.cloudfoundry.org/ykk
 # github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78
+## explicit
 github.com/Azure/go-ansiterm
 github.com/Azure/go-ansiterm/winterm
 # github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
+## explicit
 github.com/SermoDigital/jose
 github.com/SermoDigital/jose/crypto
 github.com/SermoDigital/jose/jws
 github.com/SermoDigital/jose/jwt
+# github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77
+## explicit
 # github.com/blang/semver v3.5.1+incompatible
+## explicit
 github.com/blang/semver
 # github.com/bmatcuk/doublestar v1.3.1
+## explicit
 github.com/bmatcuk/doublestar
 # github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
 github.com/bmizerany/pat
 # github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1
+## explicit
 github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v5.5.1+incompatible
+## explicit
 github.com/cloudfoundry/bosh-cli/director/template
 # github.com/cloudfoundry/bosh-utils v0.0.0-20180315210917-c6a922e299b8
+## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
 github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/noaa v2.1.1-0.20190110210640-5ce49363dfa6+incompatible
+## explicit
 github.com/cloudfoundry/noaa
 github.com/cloudfoundry/noaa/consumer
 github.com/cloudfoundry/noaa/consumer/internal
 github.com/cloudfoundry/noaa/errors
 # github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
+## explicit
 github.com/cloudfoundry/sonde-go/events
 # github.com/cppforlife/go-patch v0.1.0
+## explicit
 github.com/cppforlife/go-patch/patch
 # github.com/cyphar/filepath-securejoin v0.2.1
+## explicit
 github.com/cyphar/filepath-securejoin
 # github.com/docker/distribution v2.6.0-rc.1.0.20171109224904-e5b5e44386f7+incompatible
+## explicit
 github.com/docker/distribution/digestset
 github.com/docker/distribution/reference
 # github.com/docker/docker v1.4.2-0.20171120205147-9de84a78d76e
+## explicit
 github.com/docker/docker/pkg/term/windows
+# github.com/elazarl/goproxy v0.0.0-20200809112317-0581fc3aee2d
+## explicit
+# github.com/elazarl/goproxy/ext v0.0.0-20200809112317-0581fc3aee2d
+## explicit
 # github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
+## explicit
 github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
+## explicit
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor

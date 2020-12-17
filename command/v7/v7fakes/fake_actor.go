@@ -1996,18 +1996,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetStackByNameStub        func(string) (v7action.Stack, v7action.Warnings, error)
+	GetStackByNameStub        func(string) (resources.Stack, v7action.Warnings, error)
 	getStackByNameMutex       sync.RWMutex
 	getStackByNameArgsForCall []struct {
 		arg1 string
 	}
 	getStackByNameReturns struct {
-		result1 v7action.Stack
+		result1 resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}
 	getStackByNameReturnsOnCall map[int]struct {
-		result1 v7action.Stack
+		result1 resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -2026,18 +2026,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetStacksStub        func(string) ([]v7action.Stack, v7action.Warnings, error)
+	GetStacksStub        func(string) ([]resources.Stack, v7action.Warnings, error)
 	getStacksMutex       sync.RWMutex
 	getStacksArgsForCall []struct {
 		arg1 string
 	}
 	getStacksReturns struct {
-		result1 []v7action.Stack
+		result1 []resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}
 	getStacksReturnsOnCall map[int]struct {
-		result1 []v7action.Stack
+		result1 []resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -11613,7 +11613,7 @@ func (fake *FakeActor) GetSpaceUsersByRoleTypeReturnsOnCall(i int, result1 map[c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetStackByName(arg1 string) (v7action.Stack, v7action.Warnings, error) {
+func (fake *FakeActor) GetStackByName(arg1 string) (resources.Stack, v7action.Warnings, error) {
 	fake.getStackByNameMutex.Lock()
 	ret, specificReturn := fake.getStackByNameReturnsOnCall[len(fake.getStackByNameArgsForCall)]
 	fake.getStackByNameArgsForCall = append(fake.getStackByNameArgsForCall, struct {
@@ -11637,7 +11637,7 @@ func (fake *FakeActor) GetStackByNameCallCount() int {
 	return len(fake.getStackByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetStackByNameCalls(stub func(string) (v7action.Stack, v7action.Warnings, error)) {
+func (fake *FakeActor) GetStackByNameCalls(stub func(string) (resources.Stack, v7action.Warnings, error)) {
 	fake.getStackByNameMutex.Lock()
 	defer fake.getStackByNameMutex.Unlock()
 	fake.GetStackByNameStub = stub
@@ -11650,30 +11650,30 @@ func (fake *FakeActor) GetStackByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetStackByNameReturns(result1 v7action.Stack, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetStackByNameReturns(result1 resources.Stack, result2 v7action.Warnings, result3 error) {
 	fake.getStackByNameMutex.Lock()
 	defer fake.getStackByNameMutex.Unlock()
 	fake.GetStackByNameStub = nil
 	fake.getStackByNameReturns = struct {
-		result1 v7action.Stack
+		result1 resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetStackByNameReturnsOnCall(i int, result1 v7action.Stack, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetStackByNameReturnsOnCall(i int, result1 resources.Stack, result2 v7action.Warnings, result3 error) {
 	fake.getStackByNameMutex.Lock()
 	defer fake.getStackByNameMutex.Unlock()
 	fake.GetStackByNameStub = nil
 	if fake.getStackByNameReturnsOnCall == nil {
 		fake.getStackByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Stack
+			result1 resources.Stack
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getStackByNameReturnsOnCall[i] = struct {
-		result1 v7action.Stack
+		result1 resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11745,7 +11745,7 @@ func (fake *FakeActor) GetStackLabelsReturnsOnCall(i int, result1 map[string]typ
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetStacks(arg1 string) ([]v7action.Stack, v7action.Warnings, error) {
+func (fake *FakeActor) GetStacks(arg1 string) ([]resources.Stack, v7action.Warnings, error) {
 	fake.getStacksMutex.Lock()
 	ret, specificReturn := fake.getStacksReturnsOnCall[len(fake.getStacksArgsForCall)]
 	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
@@ -11769,7 +11769,7 @@ func (fake *FakeActor) GetStacksCallCount() int {
 	return len(fake.getStacksArgsForCall)
 }
 
-func (fake *FakeActor) GetStacksCalls(stub func(string) ([]v7action.Stack, v7action.Warnings, error)) {
+func (fake *FakeActor) GetStacksCalls(stub func(string) ([]resources.Stack, v7action.Warnings, error)) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = stub
@@ -11782,30 +11782,30 @@ func (fake *FakeActor) GetStacksArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetStacksReturns(result1 []v7action.Stack, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetStacksReturns(result1 []resources.Stack, result2 v7action.Warnings, result3 error) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = nil
 	fake.getStacksReturns = struct {
-		result1 []v7action.Stack
+		result1 []resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetStacksReturnsOnCall(i int, result1 []v7action.Stack, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetStacksReturnsOnCall(i int, result1 []resources.Stack, result2 v7action.Warnings, result3 error) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = nil
 	if fake.getStacksReturnsOnCall == nil {
 		fake.getStacksReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Stack
+			result1 []resources.Stack
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getStacksReturnsOnCall[i] = struct {
-		result1 []v7action.Stack
+		result1 []resources.Stack
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

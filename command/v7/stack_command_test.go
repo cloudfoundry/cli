@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -94,7 +95,7 @@ var _ = Describe("Stack Command", func() {
 
 		Context("When the stack exists", func() {
 			BeforeEach(func() {
-				stack := v7action.Stack{
+				stack := resources.Stack{
 					Name:        "some-stack-name",
 					GUID:        "some-stack-guid",
 					Description: "some-stack-desc",
@@ -130,7 +131,7 @@ var _ = Describe("Stack Command", func() {
 			expectedError := actionerror.StackNotFoundError{Name: "some-stack-name"}
 			BeforeEach(func() {
 				fakeActor.GetStackByNameReturns(
-					v7action.Stack{},
+					resources.Stack{},
 					v7action.Warnings{"some-warning-1"},
 					expectedError,
 				)
@@ -147,7 +148,7 @@ var _ = Describe("Stack Command", func() {
 		When("There was an error in the actor", func() {
 			BeforeEach(func() {
 				fakeActor.GetStackByNameReturns(
-					v7action.Stack{},
+					resources.Stack{},
 					v7action.Warnings{"some-warning-1"},
 					errors.New("some-random-error"),
 				)

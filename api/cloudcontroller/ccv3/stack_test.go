@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -22,7 +23,7 @@ var _ = Describe("Stacks", func() {
 		var (
 			query Query
 
-			stacks     []Stack
+			stacks     []resources.Stack
 			warnings   Warnings
 			executeErr error
 		)
@@ -88,9 +89,9 @@ var _ = Describe("Stacks", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(stacks).To(ConsistOf(
-					Stack{Name: "stack-name-1", GUID: "stack-guid-1", Description: "stack desc 1"},
-					Stack{Name: "stack-name-2", GUID: "stack-guid-2", Description: "stack desc 2"},
-					Stack{Name: "stack-name-3", GUID: "stack-guid-3", Description: "stack desc 3"},
+					resources.Stack{Name: "stack-name-1", GUID: "stack-guid-1", Description: "stack desc 1"},
+					resources.Stack{Name: "stack-name-2", GUID: "stack-guid-2", Description: "stack desc 2"},
+					resources.Stack{Name: "stack-name-3", GUID: "stack-guid-3", Description: "stack desc 3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
