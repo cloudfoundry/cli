@@ -604,7 +604,7 @@ var _ = Describe("install actions", func() {
 				BeforeEach(func() {
 					fakeConfig.BinaryVersionReturns("8.0.0")
 					pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
-						Major: 2,
+						Major: 1,
 						Minor: 0,
 						Build: 0,
 					}
@@ -639,19 +639,19 @@ var _ = Describe("install actions", func() {
 					})
 				})
 
-				When("the plugin is for an older CLI", func() {
-					BeforeEach(func() {
-						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
-							Major: 1,
-							Minor: 0,
-							Build: 0,
-						}
-						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
-					})
-					It("reports the plugin is wrong", func() {
-						Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
-					})
-				})
+				// When("the plugin is for an older CLI", func() {
+				// 	BeforeEach(func() {
+				// 		pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+				// 			Major: 1,
+				// 			Minor: 0,
+				// 			Build: 0,
+				// 		}
+				// 		fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+				// 	})
+				// 	It("reports the plugin is wrong", func() {
+				// 		Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
+				// 	})
+				// })
 			})
 		})
 	})
