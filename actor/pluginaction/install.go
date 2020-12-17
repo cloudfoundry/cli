@@ -7,13 +7,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blang/semver"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	"code.cloudfoundry.org/gofileutils/fileutils"
+	"github.com/blang/semver"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginMetadata
@@ -102,14 +101,14 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	}
 
 	switch cliVersion.Major {
-	case 6, 7:
+	case 6, 7, 8:
 		if pluginLibraryMajorVersion > 1 {
 			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
 		}
-	case 8:
-		if pluginLibraryMajorVersion != 2 {
-			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
-		}
+	// case 8:
+	// 	if pluginLibraryMajorVersion != 2 {
+	// 		return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
+	// 	}
 	default:
 		panic("unrecognized major version")
 	}
