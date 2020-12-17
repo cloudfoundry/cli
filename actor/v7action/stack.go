@@ -24,9 +24,9 @@ func (actor *Actor) GetStackByName(stackName string) (resources.Stack, Warnings,
 
 func (actor Actor) GetStacks(labelSelector string) ([]resources.Stack, Warnings, error) {
 	var (
-		stacks []resources.Stack
-		warnings   ccv3.Warnings
-		err        error
+		stacks   []resources.Stack
+		warnings ccv3.Warnings
+		err      error
 	)
 	if len(labelSelector) > 0 {
 		queries := []ccv3.Query{
