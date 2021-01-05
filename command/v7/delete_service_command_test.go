@@ -279,9 +279,10 @@ var _ = Describe("delete-service command", func() {
 	})
 
 	It("prompts the user", func() {
-		Expect(testUI.Out).To(Say(
-			`Really delete the service instance %s, including app bindings, route bindings, and service keys\? \[yN\]:`,
-			serviceInstanceName,
+		Expect(testUI.Out).To(SatisfyAll(
+			Say(`This action impacts all resources scoped to this service instance, including service bindings, service keys and route bindings\.`),
+			Say(`This will remove the service instance from any spaces where it has been shared\.`),
+			Say(`Really delete the service instance %s\? \[yN\]:`, serviceInstanceName),
 		))
 	})
 
