@@ -13,8 +13,8 @@ type ScaleCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
-	Force               bool           `short:"f" description:"Force restart of app without prompt"`
-	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
+	Force               bool           `long:"force" short:"f" description:"Force restart of app without prompt"`
+	Instances           flag.Instances `long:"instances" short:"i" required:"false" description:"Number of instances"`
 	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
