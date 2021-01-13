@@ -96,7 +96,6 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 // last case, a JobTimeoutError is returned.
 func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 	return client.PollJobForState(jobURL, constant.JobComplete)
-
 }
 
 func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (Warnings, error) {
