@@ -178,6 +178,17 @@ var _ = Describe("Job", func() {
 			warnings, executeErr = client.PollJob(jobLocation)
 		})
 
+		When("the job URL is an empty", func() {
+			BeforeEach(func() {
+				jobLocation = ""
+			})
+
+			It("returns no warnings or errors", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(BeEmpty())
+			})
+		})
+
 		When("the job starts queued and then finishes successfully", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(

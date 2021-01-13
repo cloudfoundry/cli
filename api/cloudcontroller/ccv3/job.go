@@ -90,6 +90,10 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 // error is encountered, or config.OverallPollingTimeout is reached. In the
 // last case, a JobTimeoutError is returned.
 func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
+	if jobURL == "" {
+		return nil, nil
+	}
+
 	var (
 		err         error
 		warnings    Warnings
