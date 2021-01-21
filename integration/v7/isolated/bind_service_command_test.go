@@ -207,24 +207,19 @@ var _ = Describe("bind-service command", func() {
 				Expect(binding.LastOperation.State).To(BeEquivalentTo("succeeded"))
 			})
 
-			// --------------------------------------------------------------------------------------
-			// Will not work until this is fixed: https://www.pivotaltracker.com/story/show/175515392
-			// --------------------------------------------------------------------------------------
-			//
-			//When("parameters are specified", func() {
-			//	It("fails with an error returned by the CC", func() {
-			//		session := helpers.CF(command, appName, serviceInstanceName, "-c", `{"foo":"bar"}`)
-			//		Eventually(session).Should(Exit(1))
-			//
-			//		Expect(session.Out).To(SatisfyAll(
-			//			Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
-			//			Say(`\n`),
-			//			Say(`FAILED\n`),
-			//		))
-			//
-			//		Expect(session.Err).To(Say(`Binding parameters are not supported for user-provided service instances\n`))
-			//	})
-			//})
+			When("parameters are specified", func() {
+				It("fails with an error returned by the CC", func() {
+					session := helpers.CF(command, appName, serviceInstanceName, "-c", `{"foo":"bar"}`)
+					Eventually(session).Should(Exit(1))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+						Say(`FAILED\n`),
+					))
+
+					Expect(session.Err).To(Say(`Binding parameters are not supported for user-provided service instances\n`))
+				})
+			})
 		})
 
 		Context("managed service instance with synchronous broker response", func() {
