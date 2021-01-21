@@ -448,15 +448,15 @@ var _ = Describe("Service App Binding Action", func() {
 
 			When("fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
-						resources.Application{},
-						ccv3.Warnings{"get app warning"},
+					fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+						[]resources.ServiceCredentialBinding{},
+						ccv3.Warnings{"get binding warning"},
 						errors.New("boom"),
 					)
 				})
 
 				It("returns the error and warning", func() {
-					Expect(warnings).To(ContainElement("get app warning"))
+					Expect(warnings).To(ContainElement("get binding warning"))
 					Expect(executionError).To(MatchError("boom"))
 				})
 			})

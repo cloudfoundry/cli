@@ -773,6 +773,23 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	DeleteServiceKeyByServiceInstanceAndNameStub        func(string, string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	deleteServiceKeyByServiceInstanceAndNameMutex       sync.RWMutex
+	deleteServiceKeyByServiceInstanceAndNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	deleteServiceKeyByServiceInstanceAndNameReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	deleteServiceKeyByServiceInstanceAndNameReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	DeleteSpaceByNameAndOrganizationNameStub        func(string, string) (v7action.Warnings, error)
 	deleteSpaceByNameAndOrganizationNameMutex       sync.RWMutex
 	deleteSpaceByNameAndOrganizationNameArgsForCall []struct {
@@ -6775,6 +6792,74 @@ func (fake *FakeActor) DeleteServiceInstanceReturnsOnCall(i int, result1 chan v7
 		})
 	}
 	fake.deleteServiceInstanceReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndName(arg1 string, arg2 string, arg3 string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Lock()
+	ret, specificReturn := fake.deleteServiceKeyByServiceInstanceAndNameReturnsOnCall[len(fake.deleteServiceKeyByServiceInstanceAndNameArgsForCall)]
+	fake.deleteServiceKeyByServiceInstanceAndNameArgsForCall = append(fake.deleteServiceKeyByServiceInstanceAndNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("DeleteServiceKeyByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	if fake.DeleteServiceKeyByServiceInstanceAndNameStub != nil {
+		return fake.DeleteServiceKeyByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteServiceKeyByServiceInstanceAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameCallCount() int {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.RUnlock()
+	return len(fake.deleteServiceKeyByServiceInstanceAndNameArgsForCall)
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameCalls(stub func(string, string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.DeleteServiceKeyByServiceInstanceAndNameStub = stub
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameArgsForCall(i int) (string, string, string) {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.RUnlock()
+	argsForCall := fake.deleteServiceKeyByServiceInstanceAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.DeleteServiceKeyByServiceInstanceAndNameStub = nil
+	fake.deleteServiceKeyByServiceInstanceAndNameReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Lock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.Unlock()
+	fake.DeleteServiceKeyByServiceInstanceAndNameStub = nil
+	if fake.deleteServiceKeyByServiceInstanceAndNameReturnsOnCall == nil {
+		fake.deleteServiceKeyByServiceInstanceAndNameReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceKeyByServiceInstanceAndNameReturnsOnCall[i] = struct {
 		result1 chan v7action.PollJobEvent
 		result2 v7action.Warnings
 		result3 error
@@ -18546,6 +18631,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteServiceBrokerMutex.RUnlock()
 	fake.deleteServiceInstanceMutex.RLock()
 	defer fake.deleteServiceInstanceMutex.RUnlock()
+	fake.deleteServiceKeyByServiceInstanceAndNameMutex.RLock()
+	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.RUnlock()
 	fake.deleteSpaceByNameAndOrganizationNameMutex.RLock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.RUnlock()
 	fake.deleteSpaceQuotaByNameMutex.RLock()
