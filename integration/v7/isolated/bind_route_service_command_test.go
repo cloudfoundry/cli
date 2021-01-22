@@ -39,7 +39,7 @@ var _ = Describe("bind-route-service command", func() {
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n`),
 			Say(`\s+--hostname, -n\s+Hostname used in combination with DOMAIN to specify the route to bind\n`),
 			Say(`\s+--path\s+Path used in combination with HOSTNAME and DOMAIN to specify the route to bind\n`),
-			Say(`\s+--wait, -w\s+Wait for the bind operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+routes, services\n`),

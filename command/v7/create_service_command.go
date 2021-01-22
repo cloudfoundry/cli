@@ -17,7 +17,7 @@ type CreateServiceCommand struct {
 	ServiceBroker    string                        `short:"b" description:"Create a service instance from a particular broker. Required when service offering name is ambiguous"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Tags             flag.Tags                     `short:"t" description:"User provided tags"`
-	Wait             bool                          `short:"w" long:"wait" description:"Wait for the create operation to complete"`
+	Wait             bool                          `short:"w" long:"wait" description:"Wait for the operation to complete"`
 	relatedCommands  interface{}                   `related_commands:"bind-service, create-user-provided-service, marketplace, services"`
 }
 

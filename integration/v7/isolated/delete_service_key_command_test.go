@@ -30,7 +30,7 @@ var _ = Describe("delete-service-key command", func() {
 			Say(`\n`),
 			Say(`OPTIONS:\n`),
 			Say(`\s+-f\s+Force deletion without confirmation\n`),
-			Say(`\s+--wait, -w\s+Wait for the bind operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+service-keys\n`),

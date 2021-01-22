@@ -49,6 +49,7 @@ type Actor interface {
 	CreateSecurityGroup(name, filePath string) (v7action.Warnings, error)
 	CreateServiceAppBinding(params v7action.CreateServiceAppBindingParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateServiceBroker(model resources.ServiceBroker) (v7action.Warnings, error)
+	CreateServiceKey(params v7action.CreateServiceKeyParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateSharedDomain(domainName string, internal bool, routerGroupName string) (v7action.Warnings, error)
 	CreateSpace(spaceName, orgGUID string) (resources.Space, v7action.Warnings, error)
 	CreateSpaceQuota(spaceQuotaName string, orgGuid string, limits v7action.QuotaLimits) (v7action.Warnings, error)

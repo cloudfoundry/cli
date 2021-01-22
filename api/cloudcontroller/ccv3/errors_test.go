@@ -518,6 +518,27 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
+					When("the service key name already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The binding name is invalid. Key binding names must be unique. The service instance already has a key binding with name 'my-key'.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns an ServiceKeyTakenError", func() {
+							Expect(makeError).To(MatchError(ccerror.ServiceKeyTakenError{
+								Message: "The binding name is invalid. Key binding names must be unique. The service instance already has a key binding with name 'my-key'.",
+							}))
+						})
+					})
 				})
 			})
 

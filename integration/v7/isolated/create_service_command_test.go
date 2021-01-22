@@ -54,7 +54,7 @@ var _ = Describe("create-service command", func() {
 			Say(`\s+-b\s+Create a service instance from a particular broker\. Required when service offering name is ambiguous`),
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`),
 			Say(`\s+-t\s+User provided tags`),
-			Say(`\s+--wait, -w\s+Wait for the create operation to complete`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete`),
 			Say(`SEE ALSO:`),
 			Say(`\s+bind-service, create-user-provided-service, marketplace, services`),
 		)

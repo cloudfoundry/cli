@@ -14,7 +14,7 @@ type UnbindRouteServiceCommand struct {
 	Force           bool                  `short:"f" description:"Force unbinding without confirmation"`
 	Hostname        string                `long:"hostname" short:"n" description:"Hostname used in combination with DOMAIN to specify the route to unbind"`
 	Path            flag.V7RoutePath      `long:"path" description:"Path used in combination with HOSTNAME and DOMAIN to specify the route to unbind"`
-	Wait            bool                  `short:"w" long:"wait" description:"Wait for the unbind operation to complete"`
+	Wait            bool                  `short:"w" long:"wait" description:"Wait for the operation to complete"`
 	relatedCommands interface{}           `related_commands:"delete-service, routes, services"`
 }
 

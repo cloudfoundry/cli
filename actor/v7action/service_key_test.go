@@ -25,6 +25,175 @@ var _ = Describe("Service Key Action", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
+	Describe("CreateServiceKey", func() {
+		const (
+			serviceInstanceName = "fake-service-instance-name"
+			serviceInstanceGUID = "fake-service-instance-guid"
+			serviceKeyName      = "fake-key-name"
+			spaceGUID           = "fake-space-guid"
+			fakeJobURL          = ccv3.JobURL("fake-job-url")
+		)
+
+		var (
+			params         CreateServiceKeyParams
+			warnings       Warnings
+			executionError error
+			stream         chan PollJobEvent
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					Name: serviceInstanceName,
+					GUID: serviceInstanceGUID,
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"get instance warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.CreateServiceCredentialBindingReturns(
+				fakeJobURL,
+				ccv3.Warnings{"create key warning"},
+				nil,
+			)
+
+			fakeStream := make(chan ccv3.PollJobEvent)
+			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+			go func() {
+				fakeStream <- ccv3.PollJobEvent{
+					State:    constant.JobPolling,
+					Warnings: ccv3.Warnings{"poll warning"},
+				}
+			}()
+
+			params = CreateServiceKeyParams{
+				SpaceGUID:           spaceGUID,
+				ServiceInstanceName: serviceInstanceName,
+				ServiceKeyName:      serviceKeyName,
+				Parameters: types.NewOptionalObject(map[string]interface{}{
+					"foo": "bar",
+				}),
+			}
+		})
+
+		JustBeforeEach(func() {
+			stream, warnings, executionError = actor.CreateServiceKey(params)
+		})
+
+		It("returns an event stream, warnings, and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+
+			Expect(warnings).To(ConsistOf(Warnings{
+				"get instance warning",
+				"create key warning",
+			}))
+
+			Eventually(stream).Should(Receive(Equal(PollJobEvent{
+				State:    JobPolling,
+				Warnings: Warnings{"poll warning"},
+				Err:      nil,
+			})))
+		})
+
+		Describe("service instance lookup", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualServiceInstanceName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualServiceInstanceName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(BeEmpty())
+			})
+
+			When("not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"get instance warning"},
+						ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get instance warning"))
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"get instance warning"},
+						errors.New("boof"),
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get instance warning"))
+					Expect(executionError).To(MatchError("boof"))
+				})
+			})
+		})
+
+		Describe("initiating the create", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.CreateServiceCredentialBindingCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateServiceCredentialBindingArgsForCall(0)).To(Equal(resources.ServiceCredentialBinding{
+					Type:                resources.KeyBinding,
+					Name:                serviceKeyName,
+					ServiceInstanceGUID: serviceInstanceGUID,
+					Parameters: types.NewOptionalObject(map[string]interface{}{
+						"foo": "bar",
+					}),
+				}))
+			})
+
+			When("key already exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateServiceCredentialBindingReturns(
+						"",
+						ccv3.Warnings{"create binding warning"},
+						ccerror.ServiceKeyTakenError{
+							Message: "The binding name is invalid. Key binding names must be unique. The service instance already has a key binding with name 'fake-key-name'.",
+						},
+					)
+				})
+
+				It("returns an actionerror and warnings", func() {
+					Expect(warnings).To(ContainElement("create binding warning"))
+					Expect(executionError).To(MatchError(actionerror.ResourceAlreadyExistsError{
+						Message: "Service key fake-key-name already exists",
+					}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateServiceCredentialBindingReturns(
+						"",
+						ccv3.Warnings{"create binding warning"},
+						errors.New("boop"),
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ContainElement("create binding warning"))
+					Expect(executionError).To(MatchError("boop"))
+				})
+			})
+		})
+
+		Describe("polling the job", func() {
+			It("polls the job", func() {
+				Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)).To(Equal(fakeJobURL))
+			})
+		})
+	})
+
 	Describe("GetServiceKeysByServiceInstance", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
