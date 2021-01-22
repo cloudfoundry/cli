@@ -11,7 +11,7 @@ type UnbindServiceCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.BindServiceArgs `positional-args:"yes"`
-	Wait            bool                 `short:"w" long:"wait" description:"Wait for the bind operation to complete"`
+	Wait            bool                 `short:"w" long:"wait" description:"Wait for the operation to complete"`
 	relatedCommands interface{}          `related_commands:"apps, delete-service, services"`
 }
 

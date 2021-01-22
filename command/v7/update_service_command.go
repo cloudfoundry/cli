@@ -18,7 +18,7 @@ type UpdateServiceCommand struct {
 	Parameters   flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	Plan         string                        `short:"p" description:"Change service plan for a service instance"`
 	Tags         flag.Tags                     `short:"t" description:"User provided tags"`
-	Wait         bool                          `short:"w" long:"wait" description:"Wait for the update operation to complete"`
+	Wait         bool                          `short:"w" long:"wait" description:"Wait for the operation to complete"`
 	Upgrade      bool                          `long:"upgrade" hidden:"true"`
 
 	relatedCommands interface{} `related_commands:"rename-service, services, update-user-provided-service"`

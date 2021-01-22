@@ -27,7 +27,7 @@ var _ = Describe("unbind-service command", func() {
 			Say(`\s+us\n`),
 			Say(`\n`),
 			Say(`OPTIONS:\n`),
-			Say(`\s+--wait, -w\s+Wait for the bind operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+apps, delete-service, services\n`),

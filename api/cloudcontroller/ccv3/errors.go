@@ -179,6 +179,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"The app is already bound to the service instance"):
 		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
+	case strings.Contains(errorString,
+		"Key binding names must be unique"):
+		return ccerror.ServiceKeyTakenError{Message: err.Message}
 	default:
 		return err
 	}

@@ -59,7 +59,7 @@ var _ = Describe("bind-service command", func() {
 			Say(`OPTIONS:\n`),
 			Say(`\s+--binding-name\s+Name to expose service instance to app process with \(Default: service instance name\)\n`),
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n`),
-			Say(`\s+--wait, -w\s+Wait for the bind operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+services\n`),

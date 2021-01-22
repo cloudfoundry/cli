@@ -30,7 +30,7 @@ var _ = Describe("unbind-route-service command", func() {
 			Say(`-f\s+Force unbinding without confirmation`),
 			Say(`--hostname, -n\s+Hostname used in combination with DOMAIN to specify the route to unbind`),
 			Say(`--path\s+Path used in combination with HOSTNAME and DOMAIN to specify the route to unbind`),
-			Say(`\s+--wait, -w\s+Wait for the unbind operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say("SEE ALSO:"),
 			Say("delete-service, routes, services"),
 		)

@@ -46,7 +46,7 @@ var _ = Describe("update-service command", func() {
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.\n`),
 			Say(`\s+-p\s+Change service plan for a service instance\n`),
 			Say(`\s+-t\s+User provided tags\n`),
-			Say(`\s+--wait, -w\s+Wait for the update operation to complete\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+rename-service, services, update-user-provided-service\n`),
 		)

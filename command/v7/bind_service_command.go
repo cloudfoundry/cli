@@ -14,7 +14,7 @@ type BindServiceCommand struct {
 	RequiredArgs     flag.BindServiceArgs          `positional-args:"yes"`
 	BindingName      flag.BindingName              `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	Wait             bool                          `short:"w" long:"wait" description:"Wait for the bind operation to complete"`
+	Wait             bool                          `short:"w" long:"wait" description:"Wait for the operation to complete"`
 	relatedCommands  interface{}                   `related_commands:"services"`
 }
 

@@ -450,6 +450,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	CreateServiceKeyStub        func(v7action.CreateServiceKeyParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
+	createServiceKeyMutex       sync.RWMutex
+	createServiceKeyArgsForCall []struct {
+		arg1 v7action.CreateServiceKeyParams
+	}
+	createServiceKeyReturns struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
+	createServiceKeyReturnsOnCall map[int]struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}
 	CreateSharedDomainStub        func(string, bool, string) (v7action.Warnings, error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
@@ -5368,6 +5383,72 @@ func (fake *FakeActor) CreateServiceBrokerReturnsOnCall(i int, result1 v7action.
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) CreateServiceKey(arg1 v7action.CreateServiceKeyParams) (chan v7action.PollJobEvent, v7action.Warnings, error) {
+	fake.createServiceKeyMutex.Lock()
+	ret, specificReturn := fake.createServiceKeyReturnsOnCall[len(fake.createServiceKeyArgsForCall)]
+	fake.createServiceKeyArgsForCall = append(fake.createServiceKeyArgsForCall, struct {
+		arg1 v7action.CreateServiceKeyParams
+	}{arg1})
+	fake.recordInvocation("CreateServiceKey", []interface{}{arg1})
+	fake.createServiceKeyMutex.Unlock()
+	if fake.CreateServiceKeyStub != nil {
+		return fake.CreateServiceKeyStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createServiceKeyReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) CreateServiceKeyCallCount() int {
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
+	return len(fake.createServiceKeyArgsForCall)
+}
+
+func (fake *FakeActor) CreateServiceKeyCalls(stub func(v7action.CreateServiceKeyParams) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
+	fake.CreateServiceKeyStub = stub
+}
+
+func (fake *FakeActor) CreateServiceKeyArgsForCall(i int) v7action.CreateServiceKeyParams {
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
+	argsForCall := fake.createServiceKeyArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) CreateServiceKeyReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
+	fake.CreateServiceKeyStub = nil
+	fake.createServiceKeyReturns = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateServiceKeyReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
+	fake.CreateServiceKeyStub = nil
+	if fake.createServiceKeyReturnsOnCall == nil {
+		fake.createServiceKeyReturnsOnCall = make(map[int]struct {
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createServiceKeyReturnsOnCall[i] = struct {
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string) (v7action.Warnings, error) {
@@ -18587,6 +18668,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createServiceAppBindingMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
