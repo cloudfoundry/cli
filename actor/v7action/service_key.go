@@ -56,6 +56,31 @@ func (actor Actor) GetServiceKeyDetailsByServiceInstanceAndName(serviceInstanceN
 	return details, Warnings(warnings), err
 }
 
+func (actor Actor) DeleteServiceKeyByServiceInstanceAndName(serviceInstanceName, serviceKeyName, spaceGUID string) (chan PollJobEvent, Warnings, error) {
+	var (
+		key    resources.ServiceCredentialBinding
+		jobURL ccv3.JobURL
+		stream chan PollJobEvent
+	)
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			key, warnings, err = actor.getServiceKeyByServiceInstanceAndName(serviceInstanceName, serviceKeyName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceCredentialBinding(key.GUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			stream = actor.PollJobToEventStream(jobURL)
+			return
+		},
+	)
+
+	return stream, Warnings(warnings), err
+}
+
 func (actor Actor) getServiceKeyByServiceInstanceAndName(serviceInstanceName, serviceKeyName, spaceGUID string) (resources.ServiceCredentialBinding, ccv3.Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance
