@@ -24,7 +24,7 @@ var _ = Describe("create-service command", func() {
 			Say(`\s+create-service - Create a service instance\n`),
 			Say(`\n`),
 			Say(`USAGE:\n`),
-			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE \[-b SERVICE_BROKER\] \[-c JSON_PARAMS\] \[-t TAGS\]\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE \[-b SERVICE_BROKER\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\]\n`),
 			Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n`),
 			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n`),
 			Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.\n`),

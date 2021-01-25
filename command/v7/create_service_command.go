@@ -23,7 +23,7 @@ type CreateServiceCommand struct {
 
 func (cmd CreateServiceCommand) Usage() string {
 	return `
-CF_NAME create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE [-b SERVICE_BROKER] [-c JSON_PARAMS] [-t TAGS]
+CF_NAME create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE [-b SERVICE_BROKER] [-c PARAMETERS_AS_JSON] [-t TAGS]
 
 Optionally provide service-specific configuration parameters in a valid JSON object in-line:
 
