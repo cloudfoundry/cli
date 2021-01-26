@@ -183,7 +183,7 @@ var _ = Describe("delete-service-key command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Deleting key %s for service instance %s as %s\.\.\.\n`, nonExistentKey, serviceInstanceName, username),
 					Say(`\n`),
-					Say(`Service key %s does not exist\.\n`, nonExistentKey),
+					Say(`Service key %s does not exist for service instance %s\.\n`, nonExistentKey, serviceInstanceName),
 					Say(`OK\n`),
 				))
 				Expect(string(session.Err.Contents())).To(BeEmpty())

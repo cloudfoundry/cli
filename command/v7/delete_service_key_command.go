@@ -108,7 +108,7 @@ func (cmd DeleteServiceKeyCommand) displayIntro() error {
 
 func (cmd DeleteServiceKeyCommand) displayNotFound() {
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Service key {{.ServiceKey}} does not exist.", cmd.names())
+	cmd.UI.DisplayText("Service key {{.ServiceKey}} does not exist for service instance {{.ServiceInstance}}.", cmd.names())
 }
 
 func (cmd DeleteServiceKeyCommand) names() map[string]interface{} {

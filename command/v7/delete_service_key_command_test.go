@@ -152,7 +152,7 @@ var _ = Describe("delete-service-key Command", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(SatisfyAll(
 				Say(`\n`),
-				Say(`Service key %s does not exist\.\n`, fakeServiceKeyName),
+				Say(`Service key %s does not exist for service instance %s\.\n`, fakeServiceKeyName, fakeServiceInstanceName),
 				Say(`OK\n`),
 			))
 		})
