@@ -137,7 +137,7 @@ var _ = Describe("rename-service command", func() {
 						Say(`Renaming service %s to %s in org %s / space %s as %s...\n`, currentName, newName, orgName, spaceName, username),
 						Say(`FAILED\n`),
 					))
-					Expect(session.Err).To(Say(`The service instance name is taken: %s\n`, newName))
+					Expect(session.Err).To(Say(`The service instance name is taken: %s\.\n`, newName))
 				})
 			})
 		}
