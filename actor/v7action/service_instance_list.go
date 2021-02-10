@@ -13,14 +13,14 @@ import (
 )
 
 type ServiceInstance struct {
-	Type                resources.ServiceInstanceType `json:"type,omitempty"`
-	Name                string                        `json:"name"`
-	ServicePlanName     string                        `json:"plan,omitempty"`
-	ServiceOfferingName string                        `json:"offering,omitempty"`
-	ServiceBrokerName   string                        `json:"broker,omitempty"`
-	BoundApps           []string                      `json:"bound_apps,omitempty"`
-	LastOperation       string                        `json:"last_operation,omitempty"`
-	UpgradeAvailable    types.OptionalBoolean         `json:"upgrade_available"`
+	Type                resources.ServiceInstanceType
+	Name                string
+	ServicePlanName     string
+	ServiceOfferingName string
+	ServiceBrokerName   string
+	BoundApps           []string
+	LastOperation       string
+	UpgradeAvailable    types.OptionalBoolean
 }
 
 type planDetails struct {

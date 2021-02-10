@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"encoding/json"
 	"strings"
 
 	"code.cloudfoundry.org/cli/resources"
@@ -14,7 +13,6 @@ import (
 type ServicesCommand struct {
 	BaseCommand
 
-	Format          string      `long:"format" hidden:"yes"`
 	OmitApps        bool        `long:"no-apps" description:"Do not retrieve bound apps information."`
 	relatedCommands interface{} `related_commands:"create-service, marketplace"`
 }
@@ -34,15 +32,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		return err
 	}
 
-	switch cmd.Format {
-	case "json":
-		cmd.displayJSON(instances)
-	case "split":
-		cmd.displaySplitTable(instances)
-	default:
-		cmd.displayHeritageTable(instances)
-	}
-
+	cmd.displayTable(instances)
 	return nil
 }
 
@@ -66,7 +56,7 @@ func (cmd ServicesCommand) displayMessage() error {
 	return nil
 }
 
-func (cmd ServicesCommand) displayHeritageTable(instances []v7action.ServiceInstance) {
+func (cmd ServicesCommand) displayTable(instances []v7action.ServiceInstance) {
 	if len(instances) == 0 {
 		cmd.UI.DisplayText("No service instances found.")
 		return
@@ -78,54 +68,6 @@ func (cmd ServicesCommand) displayHeritageTable(instances []v7action.ServiceInst
 		table.AppendRow(si)
 	}
 	cmd.UI.DisplayTableWithHeader("", table.table, ui.DefaultTableSpacePadding)
-}
-
-func (cmd ServicesCommand) displaySplitTable(instances []v7action.ServiceInstance) {
-	if len(instances) == 0 {
-		cmd.UI.DisplayText("No service instances found.")
-		return
-	}
-
-	var managed, user []v7action.ServiceInstance
-	for _, i := range instances {
-		if i.Type == resources.UserProvidedServiceInstance {
-			user = append(user, i)
-		} else {
-			managed = append(managed, i)
-		}
-	}
-
-	if len(managed) > 0 {
-		table := NewServicesTable(false, cmd.OmitApps)
-		for _, si := range managed {
-			table.AppendRow(si)
-		}
-		cmd.UI.DisplayText("Managed service instances:")
-		cmd.UI.DisplayTableWithHeader("    ", table.table, ui.DefaultTableSpacePadding)
-
-		if len(user) > 0 {
-			cmd.UI.DisplayNewline()
-		}
-	}
-
-	if len(user) > 0 {
-		table := NewServicesTable(true, cmd.OmitApps)
-		for _, si := range user {
-			table.AppendRow(si)
-			//table = append(table, []string{i.Name, strings.Join(i.BoundApps, ", ")})
-		}
-		cmd.UI.DisplayText("User-provided service instances:")
-		cmd.UI.DisplayTableWithHeader("    ", table.table, ui.DefaultTableSpacePadding)
-	}
-}
-
-func (cmd ServicesCommand) displayJSON(instances []v7action.ServiceInstance) {
-	data, err := json.MarshalIndent(instances, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-
-	cmd.UI.DisplayText(string(data))
 }
 
 func upgradeAvailableString(u types.OptionalBoolean) string {
