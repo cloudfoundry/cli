@@ -228,6 +228,8 @@ var _ = Describe("services command V3", func() {
 			Say(`cf services\n`),
 			Say(`ALIAS:\n`),
 			Say(`s\n`),
+			Say(`OPTIONS:\n`),
+			Say(`--no-apps\s+Do not retrieve bound apps information\.\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`create-service, marketplace\n`),
 		)
