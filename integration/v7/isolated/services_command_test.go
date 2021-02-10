@@ -339,8 +339,8 @@ var _ = Describe("services command V3", func() {
 					Say(`name\s+offering\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available\n`),
 					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, "create succeeded", broker.Name, "yes"),
 					Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName1, appName2, "create succeeded", broker.Name, "no"),
-					Say(`%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", appName1),
-					Say(`%s\s+%s\s+%s, %s\s*\n`, userProvidedService2, "user-provided", appName1, appName2),
+					Say(`%s\s+%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", appName1, "create succeeded"),
+					Say(`%s\s+%s\s+%s, %s\s+%s\s*\n`, userProvidedService2, "user-provided", appName1, appName2, "create succeeded"),
 				))
 			})
 
@@ -353,8 +353,8 @@ var _ = Describe("services command V3", func() {
 					Say(`name\s+offering\s+plan\s+last operation\s+broker\s+upgrade available\n`),
 					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService1, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "create succeeded", broker.Name, "yes"),
 					Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\n`, managedService2, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), "create succeeded", broker.Name, "no"),
-					Say(`%s\s+%s\s*\n`, userProvidedService1, "user-provided"),
-					Say(`%s\s+%s\s*\n`, userProvidedService2, "user-provided"),
+					Say(`%s\s+%s\s+%s\s*\n`, userProvidedService1, "user-provided", "create succeeded"),
+					Say(`%s\s+%s\s+%s\s*\n`, userProvidedService2, "user-provided", "create succeeded"),
 				))
 			})
 		})
