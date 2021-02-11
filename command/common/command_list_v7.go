@@ -143,8 +143,7 @@ type commandList struct {
 	ServiceBrokers                     v7.ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
 	ServiceKey                         v7.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
 	ServiceKeys                        v7.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
-	Services                           v6.ServicesCommand                           `command:"services" alias:"s" description:"List all service instances in the target space"`
-	ServicesV3                         v7.ServicesCommand                           `command:"v3-services" alias:"s" description:"List all service instances in the target space"`
+	Services                           v7.ServicesCommand                           `command:"services" alias:"s" description:"List all service instances in the target space"`
 	SetDroplet                         v7.SetDropletCommand                         `command:"set-droplet" description:"Set the droplet used to run an app"`
 	SetEnv                             v7.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v7.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app's process"`
