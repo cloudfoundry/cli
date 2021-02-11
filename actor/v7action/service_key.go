@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/extract"
 	"code.cloudfoundry.org/cli/util/railway"
 )
 
@@ -48,7 +47,7 @@ func (actor Actor) CreateServiceKey(params CreateServiceKeyParams) (chan PollJob
 	return stream, Warnings(warnings), nil
 }
 
-func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUID string) ([]string, Warnings, error) {
+func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUID string) ([]resources.ServiceCredentialBinding, Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance
 		keys            []resources.ServiceCredentialBinding
@@ -68,7 +67,7 @@ func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUI
 		},
 	)
 
-	return extract.List("Name", keys), Warnings(warnings), err
+	return keys, Warnings(warnings), err
 }
 
 func (actor Actor) GetServiceKeyByServiceInstanceAndName(serviceInstanceName, serviceKeyName, spaceGUID string) (resources.ServiceCredentialBinding, Warnings, error) {

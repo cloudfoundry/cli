@@ -1,9 +1,12 @@
 package v7
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -23,20 +26,26 @@ func (cmd ServiceKeysCommand) Execute(args []string) error {
 		return err
 	}
 
-	names, warnings, err := cmd.Actor.GetServiceKeysByServiceInstance(
+	keys, warnings, err := cmd.Actor.GetServiceKeysByServiceInstance(
 		string(cmd.RequiredArgs.ServiceInstance),
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	switch err.(type) {
 	case nil:
-		cmd.displayResult(names)
-		return nil
 	case actionerror.ServiceInstanceTypeError:
 		return translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}
 	default:
 		return err
 	}
+
+	switch len(keys) {
+	case 0:
+		cmd.displayEmptyResult()
+	default:
+		cmd.displayKeysTable(keys)
+	}
+	return nil
 }
 
 func (cmd ServiceKeysCommand) Usage() string {
@@ -62,18 +71,24 @@ func (cmd ServiceKeysCommand) displayIntro() error {
 	return nil
 }
 
-func (cmd ServiceKeysCommand) displayResult(names []string) {
-	switch len(names) {
-	case 0:
-		cmd.UI.DisplayText("No service keys for service instance {{.ServiceInstanceName}}", map[string]interface{}{
-			"ServiceInstanceName": string(cmd.RequiredArgs.ServiceInstance),
-		})
-	default:
-		table := [][]string{{"name"}}
-		for _, n := range names {
-			table = append(table, []string{n})
-		}
+func (cmd ServiceKeysCommand) displayEmptyResult() {
+	cmd.UI.DisplayText("No service keys for service instance {{.ServiceInstanceName}}", map[string]interface{}{
+		"ServiceInstanceName": string(cmd.RequiredArgs.ServiceInstance),
+	})
+}
 
-		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+func (cmd ServiceKeysCommand) displayKeysTable(keys []resources.ServiceCredentialBinding) {
+	table := [][]string{{"name", "last operation", "message"}}
+	for _, k := range keys {
+		table = append(table, []string{k.Name, lastOperation(k.LastOperation), k.LastOperation.Description})
 	}
+
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+}
+
+func lastOperation(lo resources.LastOperation) string {
+	if lo.Type != "" && lo.State != "" {
+		return fmt.Sprintf("%s %s", lo.Type, lo.State)
+	}
+	return ""
 }
