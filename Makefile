@@ -1,3 +1,4 @@
+SHELL := env PATH=$(PATH) /bin/bash
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 PACKAGES ?= api actor command types util version integration/helpers
@@ -26,7 +27,7 @@ ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
 GINKGO_UNITS_FLAGS=$(GINKGO_FLAGS) -randomizeSuites -p
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
-export GOFLAGS := -mod=vendor
+GOFLAGS := -mod=vendor
 
 all: lint test build
 
