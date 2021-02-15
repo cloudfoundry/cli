@@ -136,40 +136,52 @@ github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
 # github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+## explicit
 github.com/google/go-querystring/query
 # github.com/gorilla/websocket v1.2.1-0.20171201014301-b89020ee79b8
+## explicit
 github.com/gorilla/websocket
 # github.com/grpc-ecosystem/grpc-gateway v1.14.0
 github.com/grpc-ecosystem/grpc-gateway/internal
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
+## explicit
 github.com/jessevdk/go-flags
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/kr/pty v1.1.1
+## explicit
 github.com/kr/pty
 # github.com/lunixbochs/vtclean v1.0.0
+## explicit
 github.com/lunixbochs/vtclean
 # github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e
+## explicit
 github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
 # github.com/mattn/go-colorable v0.1.0
+## explicit
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.3
+## explicit
 github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
+## explicit
 github.com/mattn/go-runewidth
 # github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
+## explicit
 github.com/maxbrunsfeld/counterfeiter/v6
 github.com/maxbrunsfeld/counterfeiter/v6/arguments
 github.com/maxbrunsfeld/counterfeiter/v6/command
 github.com/maxbrunsfeld/counterfeiter/v6/generator
 # github.com/moby/moby v1.4.2-0.20171120205147-9de84a78d76e
+## explicit
 github.com/moby/moby/pkg/term
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
+## explicit
 github.com/nu7hatch/gouuid
 # github.com/nxadm/tail v1.4.4
 github.com/nxadm/tail
@@ -178,6 +190,7 @@ github.com/nxadm/tail/util
 github.com/nxadm/tail/watch
 github.com/nxadm/tail/winfile
 # github.com/onsi/ginkgo v1.14.1
+## explicit
 github.com/onsi/ginkgo
 github.com/onsi/ginkgo/config
 github.com/onsi/ginkgo/extensions/table
@@ -198,7 +211,8 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/gomega v1.10.2
+# github.com/onsi/gomega v1.10.5
+## explicit
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/gbytes
@@ -217,21 +231,33 @@ github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # github.com/opencontainers/go-digest v1.0.0-rc1
+## explicit
 github.com/opencontainers/go-digest
 # github.com/pkg/errors v0.9.1
+## explicit
 github.com/pkg/errors
+# github.com/poy/eachers v0.0.0-20181020210610-23942921fe77
+## explicit
 # github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
+## explicit
 github.com/sabhiram/go-gitignore
 # github.com/sajari/fuzzy v1.0.0
+## explicit
 github.com/sajari/fuzzy
 # github.com/sirupsen/logrus v1.2.0
+## explicit
 github.com/sirupsen/logrus
+# github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00
+## explicit
 # github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
+## explicit
 github.com/tedsuo/rata
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
+## explicit
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
 # golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/curve25519
@@ -242,7 +268,8 @@ golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20201021035429-f5854403a974
+# golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+## explicit
 golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -262,6 +289,7 @@ golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.3
+## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
@@ -296,9 +324,6 @@ golang.org/x/tools/internal/imports
 golang.org/x/tools/internal/module
 golang.org/x/tools/internal/semver
 golang.org/x/tools/internal/span
-# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
-golang.org/x/xerrors
-golang.org/x/xerrors/internal
 # google.golang.org/genproto v0.0.0-20200304201815-d429ff31ee6c
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
@@ -342,8 +367,13 @@ google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
 # gopkg.in/cheggaaa/pb.v1 v1.0.27
+## explicit
 gopkg.in/cheggaaa/pb.v1
 # gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
 gopkg.in/tomb.v1
 # gopkg.in/yaml.v2 v2.3.0
+## explicit
 gopkg.in/yaml.v2
+# gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7
+# github.com/golang/protobuf => github.com/golang/protobuf v1.3.4
+# golang.org/x/sys => golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6
