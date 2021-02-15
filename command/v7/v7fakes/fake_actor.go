@@ -1164,6 +1164,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetBindingsByServiceInstanceStub        func(v7action.BindingListParameters) (v7action.BindingList, v7action.Warnings, error)
+	getBindingsByServiceInstanceMutex       sync.RWMutex
+	getBindingsByServiceInstanceArgsForCall []struct {
+		arg1 v7action.BindingListParameters
+	}
+	getBindingsByServiceInstanceReturns struct {
+		result1 v7action.BindingList
+		result2 v7action.Warnings
+		result3 error
+	}
+	getBindingsByServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.BindingList
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetBuildpackLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getBuildpackLabelsMutex       sync.RWMutex
 	getBuildpackLabelsArgsForCall []struct {
@@ -8478,6 +8493,72 @@ func (fake *FakeActor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, result
 	}
 	fake.getApplicationsByNamesAndSpaceReturnsOnCall[i] = struct {
 		result1 []resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstance(arg1 v7action.BindingListParameters) (v7action.BindingList, v7action.Warnings, error) {
+	fake.getBindingsByServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.getBindingsByServiceInstanceReturnsOnCall[len(fake.getBindingsByServiceInstanceArgsForCall)]
+	fake.getBindingsByServiceInstanceArgsForCall = append(fake.getBindingsByServiceInstanceArgsForCall, struct {
+		arg1 v7action.BindingListParameters
+	}{arg1})
+	fake.recordInvocation("GetBindingsByServiceInstance", []interface{}{arg1})
+	fake.getBindingsByServiceInstanceMutex.Unlock()
+	if fake.GetBindingsByServiceInstanceStub != nil {
+		return fake.GetBindingsByServiceInstanceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getBindingsByServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstanceCallCount() int {
+	fake.getBindingsByServiceInstanceMutex.RLock()
+	defer fake.getBindingsByServiceInstanceMutex.RUnlock()
+	return len(fake.getBindingsByServiceInstanceArgsForCall)
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstanceCalls(stub func(v7action.BindingListParameters) (v7action.BindingList, v7action.Warnings, error)) {
+	fake.getBindingsByServiceInstanceMutex.Lock()
+	defer fake.getBindingsByServiceInstanceMutex.Unlock()
+	fake.GetBindingsByServiceInstanceStub = stub
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstanceArgsForCall(i int) v7action.BindingListParameters {
+	fake.getBindingsByServiceInstanceMutex.RLock()
+	defer fake.getBindingsByServiceInstanceMutex.RUnlock()
+	argsForCall := fake.getBindingsByServiceInstanceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstanceReturns(result1 v7action.BindingList, result2 v7action.Warnings, result3 error) {
+	fake.getBindingsByServiceInstanceMutex.Lock()
+	defer fake.getBindingsByServiceInstanceMutex.Unlock()
+	fake.GetBindingsByServiceInstanceStub = nil
+	fake.getBindingsByServiceInstanceReturns = struct {
+		result1 v7action.BindingList
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetBindingsByServiceInstanceReturnsOnCall(i int, result1 v7action.BindingList, result2 v7action.Warnings, result3 error) {
+	fake.getBindingsByServiceInstanceMutex.Lock()
+	defer fake.getBindingsByServiceInstanceMutex.Unlock()
+	fake.GetBindingsByServiceInstanceStub = nil
+	if fake.getBindingsByServiceInstanceReturnsOnCall == nil {
+		fake.getBindingsByServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v7action.BindingList
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getBindingsByServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.BindingList
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -18762,6 +18843,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationTasksMutex.RUnlock()
 	fake.getApplicationsByNamesAndSpaceMutex.RLock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
+	fake.getBindingsByServiceInstanceMutex.RLock()
+	defer fake.getBindingsByServiceInstanceMutex.RUnlock()
 	fake.getBuildpackLabelsMutex.RLock()
 	defer fake.getBuildpackLabelsMutex.RUnlock()
 	fake.getBuildpacksMutex.RLock()

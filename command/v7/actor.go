@@ -96,6 +96,7 @@ type Actor interface {
 	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)
 	GetApplicationTasks(appName string, sortOrder v7action.SortOrder) ([]resources.Task, v7action.Warnings, error)
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, v7action.Warnings, error)
+	GetBindingsByServiceInstance(params v7action.BindingListParameters) (v7action.BindingList, v7action.Warnings, error)
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 	GetBuildpacks(labelSelector string) ([]resources.Buildpack, v7action.Warnings, error)
 	GetDefaultDomain(orgGUID string) (resources.Domain, v7action.Warnings, error)

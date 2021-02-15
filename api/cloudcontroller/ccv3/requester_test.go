@@ -697,6 +697,12 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "plan-guid-1",
 									"name": "plan-name-1"
 								}
+							],
+							"routes": [
+								{
+									"guid": "route-guid-1",
+									"path": "/foo"
+								}
 							]
 						}
 					}`, server.URL())
@@ -759,6 +765,12 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "plan-guid-2",
 									"name": "plan-name-2"
 								}
+							],
+							"routes": [
+								{
+									"guid": "route-guid-2",
+									"path": "/bar"
+								}
 							]
 						  }
 						}`
@@ -795,17 +807,13 @@ var _ = Describe("shared request helpers", func() {
 						Apps: []resources.Application{
 							{Name: "app-name-1", GUID: "app-guid-1"},
 						},
-						Users: []resources.User{
-							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
-							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
-						},
-						Spaces: []Space{
-							{GUID: "space-guid-1", Name: "space-name-1"},
-							{GUID: "space-guid-2", Name: "space-name-2"},
-						},
 						Organizations: []Organization{
 							{GUID: "org-guid-1", Name: "org-name-1"},
 							{GUID: "org-guid-2", Name: "org-name-2"},
+						},
+						Routes: []resources.Route{
+							{GUID: "route-guid-1", Path: "/foo"},
+							{GUID: "route-guid-2", Path: "/bar"},
 						},
 						ServiceBrokers: []ServiceBroker{
 							{Name: "broker-name-1", GUID: "broker-guid-1"},
@@ -822,6 +830,14 @@ var _ = Describe("shared request helpers", func() {
 						ServicePlans: []ServicePlan{
 							{Name: "plan-name-1", GUID: "plan-guid-1"},
 							{Name: "plan-name-2", GUID: "plan-guid-2"},
+						},
+						Spaces: []Space{
+							{GUID: "space-guid-1", Name: "space-name-1"},
+							{GUID: "space-guid-2", Name: "space-name-2"},
+						},
+						Users: []resources.User{
+							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
+							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
 						},
 					}))
 				})
