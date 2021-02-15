@@ -215,10 +215,10 @@ var _ = Describe("Service Key Action", func() {
 
 			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 				[]resources.ServiceCredentialBinding{
-					{Name: "flopsy"},
-					{Name: "mopsy"},
-					{Name: "cottontail"},
-					{Name: "peter"},
+					{GUID: "1", Name: "flopsy", LastOperation: resources.LastOperation{Type: "create", State: "succeeded"}},
+					{GUID: "2", Name: "mopsy", LastOperation: resources.LastOperation{Type: "create", State: "failed"}},
+					{GUID: "3", Name: "cottontail", LastOperation: resources.LastOperation{Type: "update", State: "succeeded"}},
+					{GUID: "4", Name: "peter", LastOperation: resources.LastOperation{Type: "create", State: "in progress"}},
 				},
 				ccv3.Warnings{"get keys warning"},
 				nil,
@@ -226,13 +226,13 @@ var _ = Describe("Service Key Action", func() {
 		})
 
 		var (
-			names          []string
+			keys           []resources.ServiceCredentialBinding
 			warnings       Warnings
 			executionError error
 		)
 
 		JustBeforeEach(func() {
-			names, warnings, executionError = actor.GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUID)
+			keys, warnings, executionError = actor.GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUID)
 		})
 
 		It("makes the correct call to get the service instance", func() {
@@ -254,7 +254,12 @@ var _ = Describe("Service Key Action", func() {
 		It("returns a list of keys, with warnings and no error", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 			Expect(warnings).To(ContainElements("get instance warning", "get keys warning"))
-			Expect(names).To(Equal([]string{"flopsy", "mopsy", "cottontail", "peter"}))
+			Expect(keys).To(Equal([]resources.ServiceCredentialBinding{
+				{GUID: "1", Name: "flopsy", LastOperation: resources.LastOperation{Type: "create", State: "succeeded"}},
+				{GUID: "2", Name: "mopsy", LastOperation: resources.LastOperation{Type: "create", State: "failed"}},
+				{GUID: "3", Name: "cottontail", LastOperation: resources.LastOperation{Type: "update", State: "succeeded"}},
+				{GUID: "4", Name: "peter", LastOperation: resources.LastOperation{Type: "create", State: "in progress"}},
+			}))
 		})
 
 		When("service instance is user-provided", func() {

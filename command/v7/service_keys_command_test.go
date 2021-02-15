@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -52,7 +53,12 @@ var _ = Describe("service-keys Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 		fakeActor.GetServiceKeysByServiceInstanceReturns(
-			[]string{"flopsy", "mopsy", "cottontail", "peter"},
+			[]resources.ServiceCredentialBinding{
+				{GUID: "1", Name: "flopsy", LastOperation: resources.LastOperation{Type: "create", State: "succeeded", Description: "desc-1"}},
+				{GUID: "2", Name: "mopsy", LastOperation: resources.LastOperation{Type: "update", State: "failed", Description: "desc-2"}},
+				{GUID: "3", Name: "cottontail"},
+				{GUID: "4", Name: "peter", LastOperation: resources.LastOperation{Type: "create", State: "in progress"}},
+			},
 			v7action.Warnings{"fake warning"},
 			nil,
 		)
@@ -80,17 +86,17 @@ var _ = Describe("service-keys Command", func() {
 		Expect(actualSpaceGUID).To(Equal(fakeSpaceGUID))
 	})
 
-	It("prints an intro, key names, and warnings", func() {
+	It("prints an intro, key details, and warnings", func() {
 		Expect(executeErr).NotTo(HaveOccurred())
 		Expect(testUI.Err).To(Say("fake warning"))
 		Expect(testUI.Out).To(SatisfyAll(
 			Say(`Getting keys for service instance %s as %s\.\.\.\n`, fakeServiceInstanceName, fakeUserName),
 			Say(`\n`),
-			Say(`name\n`),
-			Say(`flopsy\n`),
-			Say(`mopsy\n`),
-			Say(`cottontail\n`),
-			Say(`peter\n`),
+			Say(`name\s+last operation\s+message\n`),
+			Say(`flopsy\s+create succeeded\s+desc-1\n`),
+			Say(`mopsy\s+update failed\s+desc-2\n`),
+			Say(`cottontail\s*\n`),
+			Say(`peter\s+create in progress\s*\n`),
 		))
 	})
 

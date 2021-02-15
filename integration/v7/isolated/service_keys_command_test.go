@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
@@ -91,6 +93,8 @@ var _ = Describe("service-keys command", func() {
 
 			serviceInstanceName = helpers.NewServiceInstanceName()
 			helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+			broker.WithAsyncDelay(time.Millisecond).Configure()
 		})
 
 		AfterEach(func() {
@@ -118,8 +122,8 @@ var _ = Describe("service-keys command", func() {
 			BeforeEach(func() {
 				keyName1 = helpers.RandomName()
 				keyName2 = helpers.RandomName()
-				Eventually(helpers.CF("create-service-key", serviceInstanceName, keyName1)).Should(Exit(0))
-				Eventually(helpers.CF("create-service-key", serviceInstanceName, keyName2)).Should(Exit(0))
+				Eventually(helpers.CF("create-service-key", serviceInstanceName, keyName1, "--wait")).Should(Exit(0))
+				Eventually(helpers.CF("create-service-key", serviceInstanceName, keyName2, "--wait")).Should(Exit(0))
 			})
 
 			It("prints the names of the keys in all spaces", func() {
@@ -129,9 +133,9 @@ var _ = Describe("service-keys command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Getting keys for service instance %s as %s\.\.\.\n`, serviceInstanceName, userName),
 					Say(`\n`),
-					Say(`name\n`),
-					Say(`%s\n`, keyName1),
-					Say(`%s\n`, keyName2),
+					Say(`name\s+last operation\s+message\n`),
+					Say(`%s\s+%s\s+%s\n`, keyName1, "create succeeded", "very happy service"),
+					Say(`%s\s+%s\s+%s\n`, keyName2, "create succeeded", "very happy service"),
 				))
 			})
 		})

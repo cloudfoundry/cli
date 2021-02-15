@@ -2096,19 +2096,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetServiceKeysByServiceInstanceStub        func(string, string) ([]string, v7action.Warnings, error)
+	GetServiceKeysByServiceInstanceStub        func(string, string) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
 	getServiceKeysByServiceInstanceMutex       sync.RWMutex
 	getServiceKeysByServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getServiceKeysByServiceInstanceReturns struct {
-		result1 []string
+		result1 []resources.ServiceCredentialBinding
 		result2 v7action.Warnings
 		result3 error
 	}
 	getServiceKeysByServiceInstanceReturnsOnCall map[int]struct {
-		result1 []string
+		result1 []resources.ServiceCredentialBinding
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -12450,7 +12450,7 @@ func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndNameReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceKeysByServiceInstance(arg1 string, arg2 string) ([]string, v7action.Warnings, error) {
+func (fake *FakeActor) GetServiceKeysByServiceInstance(arg1 string, arg2 string) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {
 	fake.getServiceKeysByServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.getServiceKeysByServiceInstanceReturnsOnCall[len(fake.getServiceKeysByServiceInstanceArgsForCall)]
 	fake.getServiceKeysByServiceInstanceArgsForCall = append(fake.getServiceKeysByServiceInstanceArgsForCall, struct {
@@ -12475,7 +12475,7 @@ func (fake *FakeActor) GetServiceKeysByServiceInstanceCallCount() int {
 	return len(fake.getServiceKeysByServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) GetServiceKeysByServiceInstanceCalls(stub func(string, string) ([]string, v7action.Warnings, error)) {
+func (fake *FakeActor) GetServiceKeysByServiceInstanceCalls(stub func(string, string) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)) {
 	fake.getServiceKeysByServiceInstanceMutex.Lock()
 	defer fake.getServiceKeysByServiceInstanceMutex.Unlock()
 	fake.GetServiceKeysByServiceInstanceStub = stub
@@ -12488,30 +12488,30 @@ func (fake *FakeActor) GetServiceKeysByServiceInstanceArgsForCall(i int) (string
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetServiceKeysByServiceInstanceReturns(result1 []string, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceKeysByServiceInstanceReturns(result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
 	fake.getServiceKeysByServiceInstanceMutex.Lock()
 	defer fake.getServiceKeysByServiceInstanceMutex.Unlock()
 	fake.GetServiceKeysByServiceInstanceStub = nil
 	fake.getServiceKeysByServiceInstanceReturns = struct {
-		result1 []string
+		result1 []resources.ServiceCredentialBinding
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetServiceKeysByServiceInstanceReturnsOnCall(i int, result1 []string, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetServiceKeysByServiceInstanceReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
 	fake.getServiceKeysByServiceInstanceMutex.Lock()
 	defer fake.getServiceKeysByServiceInstanceMutex.Unlock()
 	fake.GetServiceKeysByServiceInstanceStub = nil
 	if fake.getServiceKeysByServiceInstanceReturnsOnCall == nil {
 		fake.getServiceKeysByServiceInstanceReturnsOnCall = make(map[int]struct {
-			result1 []string
+			result1 []resources.ServiceCredentialBinding
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceKeysByServiceInstanceReturnsOnCall[i] = struct {
-		result1 []string
+		result1 []resources.ServiceCredentialBinding
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
