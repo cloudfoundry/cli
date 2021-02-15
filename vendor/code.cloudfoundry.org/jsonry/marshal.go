@@ -46,15 +46,16 @@ func marshalStruct(ctx context.Context, in reflect.Value) (map[string]interface{
 		f := t.Field(i)
 
 		if public(f) {
-			p := path.ComputePath(f)
+			path := path.ComputePath(f)
+			val := in.Field(i)
 
-			if shouldMarshal(p, in.Field(i)) {
-				r, err := marshal(ctx.WithField(f.Name, f.Type), in.Field(i))
+			if shouldMarshal(path, val) {
+				r, err := marshal(ctx.WithField(f.Name, f.Type), val)
 				if err != nil {
 					return nil, err
 				}
 
-				out.Attach(p, r)
+				out.Attach(path, r)
 			}
 		}
 	}
@@ -132,16 +133,17 @@ func marshalMap(ctx context.Context, in reflect.Value) (out map[string]interface
 }
 
 func marshalJSONMarshaler(ctx context.Context, in reflect.Value) (interface{}, error) {
-	t := in.MethodByName("MarshalJSON").Call(nil)
+	const method = "MarshalJSON"
+	t := in.MethodByName(method).Call(nil)
 
 	if err := checkForError(t[1]); err != nil {
-		return nil, fmt.Errorf("error from MarshaJSON() call at %s: %w", ctx, err)
+		return nil, fmt.Errorf("error from %s() call at %s: %w", method, ctx, err)
 	}
 
 	var r interface{}
 	err := json.Unmarshal(t[0].Bytes(), &r)
 	if err != nil {
-		return nil, fmt.Errorf(`error parsing MarshaJSON() output "%s" at %s: %w`, t[0].Bytes(), ctx, err)
+		return nil, fmt.Errorf(`error parsing %s() output "%s" at %s: %w`, method, t[0].Bytes(), ctx, err)
 	}
 
 	return r, nil

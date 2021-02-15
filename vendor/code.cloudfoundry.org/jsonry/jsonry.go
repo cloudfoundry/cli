@@ -18,7 +18,7 @@
 // There is no need to create intermediate structures as would be required with the standard Go JSON parser.
 //
 // JSONry uses the standard Go parser under the covers.
-// JSONry is a trade-off that delivers usability at a slight cost to performance.
+// JSONry is a trade-off that delivers usability in exchange for performance.
 //
 // JSONry uses struct tags to specify locations in the JSON document.
 //
