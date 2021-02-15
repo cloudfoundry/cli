@@ -12,7 +12,7 @@ require (
 	code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
-	code.cloudfoundry.org/jsonry v1.1.2
+	code.cloudfoundry.org/jsonry v1.1.3
 	code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be
 	code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d

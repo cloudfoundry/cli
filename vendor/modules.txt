@@ -37,7 +37,7 @@ code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2
 # code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 ## explicit
 code.cloudfoundry.org/gofileutils/fileutils
-# code.cloudfoundry.org/jsonry v1.1.2
+# code.cloudfoundry.org/jsonry v1.1.3
 ## explicit
 code.cloudfoundry.org/jsonry
 code.cloudfoundry.org/jsonry/internal/context

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	omitEmptyToken  string = "omitempty"
+	omitEmptyToken  string = ",omitempty"
 	omitAlwaysToken string = "-"
 )
 
@@ -76,28 +76,39 @@ func parseTag(tag, defaultName string) (name string, omitempty, omitalways bool)
 		return defaultName, false, true
 	}
 
-	parts := strings.Split(tag, ",")
-
-	if len(parts) >= 1 && len(parts[0]) > 0 {
-		name = parts[0]
-	} else {
+	commaIndex := strings.IndexByte(tag, ',')
+	switch commaIndex {
+	case -1:
+		name = tag
+	case 0:
 		name = defaultName
-	}
-
-	if len(parts) >= 2 && parts[1] == omitEmptyToken {
-		omitempty = true
+		omitempty = tag == omitEmptyToken
+	default:
+		name = tag[0:commaIndex]
+		omitempty = tag[commaIndex:] == omitEmptyToken
 	}
 
 	return
 }
 
 func parseSegments(name string) (s []Segment) {
-	for _, elem := range strings.Split(name, ".") {
-		s = append(s, Segment{
-			Name: strings.TrimRight(elem, "[]"),
-			List: strings.HasSuffix(elem, "[]"),
-		})
+	add := func(elem string) {
+		if strings.HasSuffix(elem, "[]") {
+			s = append(s, Segment{Name: elem[:len(elem)-2], List: true})
+		} else {
+			s = append(s, Segment{Name: elem})
+		}
 	}
+
+	start := 0
+	delim := strings.IndexByte(name, '.')
+	for delim >= 0 {
+		add(name[start : start+delim])
+		start = start + delim + 1
+		delim = strings.IndexByte(name[start:], '.')
+	}
+
+	add(name[start:])
 
 	return
 }

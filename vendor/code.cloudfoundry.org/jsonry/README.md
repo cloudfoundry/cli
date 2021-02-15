@@ -1,4 +1,4 @@
-[![CI](https://github.com/cloudfoundry/jsonry/workflows/Go/badge.svg?branch=main)](https://github.com/cloudfoundry/jsonry/actions?query=workflow%3AGo)
+[![test](https://github.com/cloudfoundry/jsonry/workflows/test/badge.svg?branch=main)](https://github.com/cloudfoundry/jsonry/actions?query=workflow%3Atest+branch%3Amain)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/code.cloudfoundry.org/jsonry?tab=doc)
 
 # JSONry
@@ -38,3 +38,4 @@ that it can be used in other projects too.
 More information:
 - [License](./LICENSE)
 - [Releasing](./RELEASING.md)
+- [Performance](./PERFORMANCE.md)
