@@ -2046,6 +2046,22 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceInstanceParametersStub        func(string, string) (v7action.ServiceInstanceDetails, v7action.Warnings, error)
+	getServiceInstanceParametersMutex       sync.RWMutex
+	getServiceInstanceParametersArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getServiceInstanceParametersReturns struct {
+		result1 v7action.ServiceInstanceDetails
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceInstanceParametersReturnsOnCall map[int]struct {
+		result1 v7action.ServiceInstanceDetails
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceInstancesForSpaceStub        func(string, bool) ([]v7action.ServiceInstance, v7action.Warnings, error)
 	getServiceInstancesForSpaceMutex       sync.RWMutex
 	getServiceInstancesForSpaceArgsForCall []struct {
@@ -12247,6 +12263,73 @@ func (fake *FakeActor) GetServiceInstanceLabelsReturnsOnCall(i int, result1 map[
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServiceInstanceParameters(arg1 string, arg2 string) (v7action.ServiceInstanceDetails, v7action.Warnings, error) {
+	fake.getServiceInstanceParametersMutex.Lock()
+	ret, specificReturn := fake.getServiceInstanceParametersReturnsOnCall[len(fake.getServiceInstanceParametersArgsForCall)]
+	fake.getServiceInstanceParametersArgsForCall = append(fake.getServiceInstanceParametersArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetServiceInstanceParameters", []interface{}{arg1, arg2})
+	fake.getServiceInstanceParametersMutex.Unlock()
+	if fake.GetServiceInstanceParametersStub != nil {
+		return fake.GetServiceInstanceParametersStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServiceInstanceParametersReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceInstanceParametersCallCount() int {
+	fake.getServiceInstanceParametersMutex.RLock()
+	defer fake.getServiceInstanceParametersMutex.RUnlock()
+	return len(fake.getServiceInstanceParametersArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceInstanceParametersCalls(stub func(string, string) (v7action.ServiceInstanceDetails, v7action.Warnings, error)) {
+	fake.getServiceInstanceParametersMutex.Lock()
+	defer fake.getServiceInstanceParametersMutex.Unlock()
+	fake.GetServiceInstanceParametersStub = stub
+}
+
+func (fake *FakeActor) GetServiceInstanceParametersArgsForCall(i int) (string, string) {
+	fake.getServiceInstanceParametersMutex.RLock()
+	defer fake.getServiceInstanceParametersMutex.RUnlock()
+	argsForCall := fake.getServiceInstanceParametersArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetServiceInstanceParametersReturns(result1 v7action.ServiceInstanceDetails, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceParametersMutex.Lock()
+	defer fake.getServiceInstanceParametersMutex.Unlock()
+	fake.GetServiceInstanceParametersStub = nil
+	fake.getServiceInstanceParametersReturns = struct {
+		result1 v7action.ServiceInstanceDetails
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceInstanceParametersReturnsOnCall(i int, result1 v7action.ServiceInstanceDetails, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceParametersMutex.Lock()
+	defer fake.getServiceInstanceParametersMutex.Unlock()
+	fake.GetServiceInstanceParametersStub = nil
+	if fake.getServiceInstanceParametersReturnsOnCall == nil {
+		fake.getServiceInstanceParametersReturnsOnCall = make(map[int]struct {
+			result1 v7action.ServiceInstanceDetails
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstanceParametersReturnsOnCall[i] = struct {
+		result1 v7action.ServiceInstanceDetails
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServiceInstancesForSpace(arg1 string, arg2 bool) ([]v7action.ServiceInstance, v7action.Warnings, error) {
 	fake.getServiceInstancesForSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesForSpaceReturnsOnCall[len(fake.getServiceInstancesForSpaceArgsForCall)]
@@ -18878,6 +18961,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getServiceInstanceDetailsMutex.RUnlock()
 	fake.getServiceInstanceLabelsMutex.RLock()
 	defer fake.getServiceInstanceLabelsMutex.RUnlock()
+	fake.getServiceInstanceParametersMutex.RLock()
+	defer fake.getServiceInstanceParametersMutex.RUnlock()
 	fake.getServiceInstancesForSpaceMutex.RLock()
 	defer fake.getServiceInstancesForSpaceMutex.RUnlock()
 	fake.getServiceKeyByServiceInstanceAndNameMutex.RLock()

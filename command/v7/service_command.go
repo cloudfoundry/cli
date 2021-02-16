@@ -16,6 +16,7 @@ type ServiceCommand struct {
 
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
 	ShowGUID        bool                 `long:"guid" description:"Retrieve and display the given service instances's guid. All other output is suppressed."`
+	Params          bool                 `long:"params" description:"Retrieve and display the given service instances's parameters. All other output is suppressed."`
 	usage           interface{}          `usage:"CF_NAME service SERVICE_INSTANCE"`
 	relatedCommands interface{}          `related_commands:"bind-service, rename-service, update-service"`
 
@@ -32,7 +33,12 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID, false)
+	switch {
+	case cmd.Params:
+		cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceParameters(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
+	default:
+		cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID, false)
+	}
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -41,6 +47,8 @@ func (cmd ServiceCommand) Execute(args []string) error {
 	switch {
 	case cmd.ShowGUID:
 		return cmd.displayGUID()
+	case cmd.Params:
+		return cmd.displayParameters()
 	case cmd.serviceInstance.Type == resources.UserProvidedServiceInstance:
 		return cmd.chain(
 			cmd.displayIntro,
@@ -53,7 +61,6 @@ func (cmd ServiceCommand) Execute(args []string) error {
 			cmd.displayPropertiesManaged,
 			cmd.displayLastOperation,
 			cmd.displayBoundApps,
-			cmd.displayParameters,
 			cmd.displaySharingInfo,
 			cmd.displayUpgrades,
 		)
@@ -177,15 +184,7 @@ func (cmd ServiceCommand) displayParametersEmpty() {
 }
 
 func (cmd ServiceCommand) displayParametersData() {
-	cmd.UI.DisplayTextWithFlavor(
-		"Showing parameters for service instance {{.ServiceInstanceName}}...",
-		map[string]interface{}{
-			"ServiceInstanceName": cmd.serviceInstance.Name,
-		},
-	)
-	cmd.UI.DisplayNewline()
-
-	data, err := json.Marshal(cmd.serviceInstance.Parameters.Value)
+	data, err := json.MarshalIndent(cmd.serviceInstance.Parameters.Value, "", "  ")
 	if err != nil {
 		panic(err)
 	}

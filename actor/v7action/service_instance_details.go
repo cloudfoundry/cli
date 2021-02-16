@@ -72,10 +72,6 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.Parameters, warnings = actor.getServiceInstanceParameters(serviceInstanceDetails.GUID)
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
 			serviceInstanceDetails.SharedStatus, warnings, err = actor.getServiceInstanceSharedStatus(serviceInstanceDetails, spaceGUID)
 			return
 		},
@@ -87,6 +83,26 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 			if !omitApps {
 				serviceInstanceDetails.BoundApps, warnings, err = actor.getServiceInstanceBoundApps(serviceInstanceDetails.GUID)
 			}
+			return
+		},
+	)
+	if err != nil {
+		return ServiceInstanceDetails{}, Warnings(warnings), err
+	}
+
+	return serviceInstanceDetails, Warnings(warnings), nil
+}
+
+func (actor Actor) GetServiceInstanceParameters(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, Warnings, error) {
+	var serviceInstanceDetails ServiceInstanceDetails
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstanceDetails.ServiceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstanceDetails.Parameters, warnings = actor.getServiceInstanceParameters(serviceInstanceDetails.ServiceInstance.GUID)
 			return
 		},
 	)
