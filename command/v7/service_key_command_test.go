@@ -5,10 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/types"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
@@ -113,24 +111,6 @@ var _ = Describe("service-key Command", func() {
 			})
 		})
 
-		When("not a managed service instance", func() {
-			BeforeEach(func() {
-				fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
-					resources.ServiceCredentialBindingDetails{},
-					v7action.Warnings{"a warning"},
-					actionerror.ServiceInstanceTypeError{
-						Name:         fakeServiceInstanceName,
-						RequiredType: resources.ManagedServiceInstance,
-					},
-				)
-			})
-
-			It("prints warnings and returns an error", func() {
-				Expect(testUI.Err).To(Say("a warning"))
-				Expect(executeErr).To(MatchError(translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}))
-			})
-		})
-
 		When("actor returns another error", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
@@ -173,25 +153,7 @@ var _ = Describe("service-key Command", func() {
 			Expect(testUI.Err).NotTo(Say("a warning"))
 		})
 
-		When("not a managed service instance", func() {
-			BeforeEach(func() {
-				fakeActor.GetServiceKeyByServiceInstanceAndNameReturns(
-					resources.ServiceCredentialBinding{},
-					v7action.Warnings{"a warning"},
-					actionerror.ServiceInstanceTypeError{
-						Name:         fakeServiceInstanceName,
-						RequiredType: resources.ManagedServiceInstance,
-					},
-				)
-			})
-
-			It("prints warnings and returns an error", func() {
-				Expect(testUI.Err).To(Say("a warning"))
-				Expect(executeErr).To(MatchError(translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}))
-			})
-		})
-
-		When("actor returns another error", func() {
+		When("actor returns an error", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceKeyByServiceInstanceAndNameReturns(
 					resources.ServiceCredentialBinding{},

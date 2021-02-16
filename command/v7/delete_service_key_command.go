@@ -49,8 +49,6 @@ func (cmd DeleteServiceKeyCommand) Execute(args []string) error {
 		cmd.displayNotFound()
 	case actionerror.ServiceInstanceNotFoundError:
 		return translatableerror.ServiceInstanceNotFoundError{Name: cmd.RequiredArgs.ServiceInstance}
-	case actionerror.ServiceInstanceTypeError:
-		return translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}
 	default:
 		return err
 	}

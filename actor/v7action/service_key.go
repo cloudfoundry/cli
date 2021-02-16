@@ -55,7 +55,7 @@ func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUI
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, _, warnings, err = actor.getManagedServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			serviceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -147,7 +147,7 @@ func (actor Actor) getServiceKeyByServiceInstanceAndName(serviceInstanceName, se
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, _, warnings, err = actor.getManagedServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			serviceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
