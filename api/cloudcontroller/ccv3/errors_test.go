@@ -275,6 +275,33 @@ var _ = Describe("Error Wrapper", func() {
 					})
 				})
 
+				Context("(409) Conflict", func() {
+					BeforeEach(func() {
+						serverResponseCode = http.StatusConflict
+					})
+
+					When("a service instance operation is in progress", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 60016,
+      "detail": "An operation for service instance foo is in progress.",
+      "title": "CF-AsyncServiceInstanceOperationInProgress"
+    }
+  ]
+}`
+						})
+
+						It("returns a ServiceInstanceOperationInProgressError", func() {
+							Expect(makeError).To(MatchError(ccerror.ServiceInstanceOperationInProgressError{
+								Message: "An operation for service instance foo is in progress.",
+							}))
+						})
+					})
+				})
+
 				Context("(422) Unprocessable Entity", func() {
 					BeforeEach(func() {
 						serverResponseCode = http.StatusUnprocessableEntity

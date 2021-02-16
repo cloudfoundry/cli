@@ -10,7 +10,10 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
-const taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
+const (
+	taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
+	operationInProgress    = "CF-AsyncServiceInstanceOperationInProgress"
+)
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
@@ -71,12 +74,16 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError, request *cloudcontr
 			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
 		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
-	default:
-		return ccerror.V3UnexpectedResponseError{
-			ResponseCode:    rawHTTPStatusErr.StatusCode,
-			RequestIDs:      rawHTTPStatusErr.RequestIDs,
-			V3ErrorResponse: errorResponse,
+	case http.StatusConflict:
+		if firstErr.Title == operationInProgress {
+			return ccerror.ServiceInstanceOperationInProgressError{Message: firstErr.Detail}
 		}
+	}
+
+	return ccerror.V3UnexpectedResponseError{
+		ResponseCode:    rawHTTPStatusErr.StatusCode,
+		RequestIDs:      rawHTTPStatusErr.RequestIDs,
+		V3ErrorResponse: errorResponse,
 	}
 }
 
