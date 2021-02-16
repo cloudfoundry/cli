@@ -3,9 +3,7 @@ package v7
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 type ServiceKeyCommand struct {
@@ -46,9 +44,6 @@ func (cmd ServiceKeyCommand) guid() error {
 	case nil:
 		cmd.UI.DisplayText(key.GUID)
 		return nil
-	case actionerror.ServiceInstanceTypeError:
-		cmd.UI.DisplayWarnings(warnings)
-		return translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}
 	default:
 		cmd.UI.DisplayWarnings(warnings)
 		return err
@@ -73,11 +68,7 @@ func (cmd ServiceKeyCommand) details() error {
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)
-	switch err.(type) {
-	case nil:
-	case actionerror.ServiceInstanceTypeError:
-		return translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}
-	default:
+	if err != nil {
 		return err
 	}
 

@@ -3,9 +3,7 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -31,11 +29,7 @@ func (cmd ServiceKeysCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)
-	switch err.(type) {
-	case nil:
-	case actionerror.ServiceInstanceTypeError:
-		return translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}
-	default:
+	if err != nil {
 		return err
 	}
 

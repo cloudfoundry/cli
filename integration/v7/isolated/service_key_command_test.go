@@ -103,28 +103,7 @@ var _ = Describe("service-key command", func() {
 			})
 		})
 
-		When("service instance is user-provided", func() {
-			var serviceInstance string
-
-			BeforeEach(func() {
-				serviceInstance = helpers.NewServiceInstanceName()
-				Eventually(helpers.CF("cups", serviceInstance)).Should(Exit(0))
-			})
-
-			It("reports a helpful error", func() {
-				session := helpers.CF(command, serviceInstance, "no-such-key")
-				Eventually(session).Should(Exit(1))
-
-				Expect(session.Out).To(SatisfyAll(
-					Say(`Getting key no-such-key for service instance %s as %s\.\.\.\n`, serviceInstance, username),
-					Say(`FAILED\n`),
-				))
-
-				Expect(session.Err).To(Say(`Service keys are not supported for user-provided service instances`))
-			})
-		})
-
-		When("service instance is managed", func() {
+		When("service instance exists", func() {
 			var (
 				broker          *servicebrokerstub.ServiceBrokerStub
 				serviceInstance string

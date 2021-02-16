@@ -287,21 +287,6 @@ func (actor Actor) getServiceInstanceByNameAndSpace(serviceInstanceName string, 
 	}
 }
 
-func (actor Actor) getManagedServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string, query ...ccv3.Query) (serviceInstance resources.ServiceInstance, included ccv3.IncludedResources, warnings ccv3.Warnings, err error) {
-	warnings, err = railway.Sequentially(
-		func() (warnings ccv3.Warnings, err error) {
-			serviceInstance, included, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
-			err = assertServiceInstanceType(resources.ManagedServiceInstance, serviceInstance)
-			return
-		},
-	)
-
-	return serviceInstance, included, warnings, err
-}
-
 func (actor Actor) getServiceInstanceForUpdate(serviceInstanceName string, spaceGUID string, includePlan bool) (resources.ServiceInstance, resources.ServiceOffering, resources.ServiceBroker, ccv3.Warnings, error) {
 	var query []ccv3.Query
 	if includePlan {

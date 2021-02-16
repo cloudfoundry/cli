@@ -3,10 +3,8 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
@@ -117,21 +115,6 @@ var _ = Describe("service-keys Command", func() {
 				Say(`\n`),
 				Say(`No service keys for service instance %s\n`, fakeServiceInstanceName),
 			))
-		})
-	})
-
-	When("the service instance is user-provided", func() {
-		BeforeEach(func() {
-			fakeActor.GetServiceKeysByServiceInstanceReturns(
-				nil,
-				v7action.Warnings{"fake warning"},
-				actionerror.ServiceInstanceTypeError{},
-			)
-		})
-
-		It("returns a helpful error and prints warnings", func() {
-			Expect(testUI.Err).To(Say("fake warning"))
-			Expect(executeErr).To(MatchError(translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}))
 		})
 	})
 

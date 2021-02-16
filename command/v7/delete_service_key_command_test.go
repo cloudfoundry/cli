@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -175,25 +174,7 @@ var _ = Describe("delete-service-key Command", func() {
 		})
 	})
 
-	When("service instance is user-provided", func() {
-		BeforeEach(func() {
-			fakeActor.DeleteServiceKeyByServiceInstanceAndNameReturns(
-				nil,
-				v7action.Warnings{"upsi warning"},
-				actionerror.ServiceInstanceTypeError{
-					Name:         fakeServiceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				},
-			)
-		})
-
-		It("returns an appropriate error", func() {
-			Expect(testUI.Err).To(Say("upsi warning"))
-			Expect(executeErr).To(MatchError(translatableerror.ServiceKeysNotSupportedWithUserProvidedServiceInstances{}))
-		})
-	})
-
-	When("there is another error", func() {
+	When("there is an error", func() {
 		BeforeEach(func() {
 			fakeActor.DeleteServiceKeyByServiceInstanceAndNameReturns(
 				nil,

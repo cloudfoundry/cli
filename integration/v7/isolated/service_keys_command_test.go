@@ -73,7 +73,7 @@ var _ = Describe("service-keys command", func() {
 		})
 	})
 
-	When("there is a managed service instance", func() {
+	When("there is a service instance", func() {
 		var (
 			userName            string
 			orgName             string
@@ -138,43 +138,6 @@ var _ = Describe("service-keys command", func() {
 					Say(`%s\s+%s\s+%s\n`, keyName2, "create succeeded", "very happy service"),
 				))
 			})
-		})
-	})
-
-	When("there is a user-provided service instance", func() {
-		var (
-			userName            string
-			orgName             string
-			spaceName           string
-			serviceInstanceName string
-		)
-
-		BeforeEach(func() {
-			userName, _ = helpers.GetCredentials()
-
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			helpers.SetupCF(orgName, spaceName)
-
-			serviceInstanceName = helpers.NewServiceInstanceName()
-			Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
-		})
-
-		It("fails with a message", func() {
-			session := helpers.CF(command, serviceInstanceName)
-			Eventually(session).Should(Exit(1))
-
-			Expect(session.Err).To(Say("Service keys are not supported for user-provided service instances"))
-
-			Expect(session.Out).To(SatisfyAll(
-				Say(`Getting keys for service instance %s as %s\.\.\.\n`, serviceInstanceName, userName),
-				Say(`\n`),
-				Say(`FAILED\n`),
-			))
 		})
 	})
 })

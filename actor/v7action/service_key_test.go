@@ -262,29 +262,6 @@ var _ = Describe("Service Key Action", func() {
 			}))
 		})
 
-		When("service instance is user-provided", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Name: serviceInstanceName,
-						GUID: serviceInstanceGUID,
-						Type: resources.UserProvidedServiceInstance,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"get instance warning"},
-					nil,
-				)
-			})
-
-			It("returns an error and warning", func() {
-				Expect(warnings).To(ContainElement("get instance warning"))
-				Expect(executionError).To(MatchError(actionerror.ServiceInstanceTypeError{
-					Name:         serviceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				}))
-			})
-		})
-
 		When("service instance not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
@@ -398,29 +375,6 @@ var _ = Describe("Service Key Action", func() {
 			Expect(warnings).To(ContainElements("get instance warning", "get keys warning"))
 			Expect(key.Name).To(Equal(serviceKeyName))
 			Expect(key.GUID).To(Equal(serviceKeyGUID))
-		})
-
-		When("service instance is user-provided", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Name: serviceInstanceName,
-						GUID: serviceInstanceGUID,
-						Type: resources.UserProvidedServiceInstance,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"get instance warning"},
-					nil,
-				)
-			})
-
-			It("returns an error and warning", func() {
-				Expect(warnings).To(ContainElement("get instance warning"))
-				Expect(executionError).To(MatchError(actionerror.ServiceInstanceTypeError{
-					Name:         serviceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				}))
-			})
 		})
 
 		When("service instance not found", func() {
@@ -566,29 +520,6 @@ var _ = Describe("Service Key Action", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 			Expect(warnings).To(ContainElements("get instance warning", "get keys warning", "get details warning"))
 			Expect(details.Credentials).To(Equal(types.JSONObject{"foo": "bar"}))
-		})
-
-		When("service instance is user-provided", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
-					resources.ServiceInstance{
-						Name: serviceInstanceName,
-						GUID: serviceInstanceGUID,
-						Type: resources.UserProvidedServiceInstance,
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"get instance warning"},
-					nil,
-				)
-			})
-
-			It("returns an error and warning", func() {
-				Expect(warnings).To(ContainElement("get instance warning"))
-				Expect(executionError).To(MatchError(actionerror.ServiceInstanceTypeError{
-					Name:         serviceInstanceName,
-					RequiredType: resources.ManagedServiceInstance,
-				}))
-			})
 		})
 
 		When("service instance not found", func() {
