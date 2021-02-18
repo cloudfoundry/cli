@@ -360,7 +360,6 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 	if len(routes) < 1 {
 		return resources.Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{
 			DomainName: domain.Name,
-			DomainGUID: domain.GUID,
 			Host:       hostname,
 			Path:       path,
 			Port:       port,

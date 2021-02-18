@@ -330,7 +330,7 @@ func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 	if len(ccv2Routes) == 0 {
 		return Route{}, Warnings(warnings), actionerror.RouteNotFoundError{
 			Host:       route.Host,
-			DomainGUID: route.Domain.GUID,
+			DomainName: route.Domain.Name,
 			Path:       route.Path,
 			Port:       route.Port.Value,
 		}
