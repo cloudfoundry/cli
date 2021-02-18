@@ -160,15 +160,19 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 
 func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings) {
 	params, warnings, err := actor.CloudControllerClient.GetServiceInstanceParameters(serviceInstanceGUID)
-	if err != nil {
-		if e, ok := err.(ccerror.V3UnexpectedResponseError); ok && len(e.Errors) > 0 {
-			return ServiceInstanceParameters{MissingReason: e.Errors[0].Detail}, warnings
-		} else {
-			return ServiceInstanceParameters{MissingReason: err.Error()}, warnings
-		}
-	}
 
-	return ServiceInstanceParameters{Value: params}, warnings
+	switch err := err.(type) {
+	case nil:
+		return ServiceInstanceParameters{Value: params}, warnings
+	case ccerror.ResourceNotFoundError: // Old API versions did not produce a helpful error
+		return ServiceInstanceParameters{MissingReason: "This service does not support fetching service instance parameters."}, warnings
+	case ccerror.ServiceInstanceParametersFetchNotSupportedError:
+		return ServiceInstanceParameters{MissingReason: err.Message}, warnings
+	case ccerror.V3UnexpectedResponseError:
+		return ServiceInstanceParameters{MissingReason: err.Errors[0].Detail}, warnings
+	default:
+		return ServiceInstanceParameters{MissingReason: err.Error()}, warnings
+	}
 }
 
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {

@@ -811,7 +811,7 @@ var _ = Describe("Service Instance Details Action", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
 			})
 
-			When("getting the parameters fails with an expected error", func() {
+			When("getting the parameters fails with a V3UnexpectedResponseError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
 						types.JSONObject{},
@@ -832,6 +832,42 @@ var _ = Describe("Service Instance Details Action", func() {
 					Expect(executionError).NotTo(HaveOccurred())
 					Expect(warnings).To(ContainElement("some-parameters-warning"))
 					Expect(serviceInstance.Parameters.MissingReason).To(Equal("cannot get parameters reason"))
+				})
+			})
+
+			When("getting the parameters fails with a ServiceInstanceParametersFetchNotSupportedError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+						types.JSONObject{},
+						ccv3.Warnings{"some-parameters-warning"},
+						ccerror.ServiceInstanceParametersFetchNotSupportedError{
+							Message: "This service does not support fetching service instance parameters.",
+						},
+					)
+				})
+
+				It("does not return an error, but returns warnings and the reason", func() {
+					Expect(executionError).NotTo(HaveOccurred())
+					Expect(warnings).To(ContainElement("some-parameters-warning"))
+					Expect(serviceInstance.Parameters.MissingReason).To(Equal("This service does not support fetching service instance parameters."))
+				})
+			})
+
+			When("getting the parameters fails with a ResourceNotFoundError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+						types.JSONObject{},
+						ccv3.Warnings{"some-parameters-warning"},
+						ccerror.ResourceNotFoundError{
+							Message: "Service instance not found",
+						},
+					)
+				})
+
+				It("converts the error to fetching not supported", func() {
+					Expect(executionError).NotTo(HaveOccurred())
+					Expect(warnings).To(ContainElement("some-parameters-warning"))
+					Expect(serviceInstance.Parameters.MissingReason).To(Equal("This service does not support fetching service instance parameters."))
 				})
 			})
 

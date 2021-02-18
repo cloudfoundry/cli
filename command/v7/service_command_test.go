@@ -746,7 +746,6 @@ var _ = Describe("service command", func() {
 				Expect(testUI.Out).To(Say(`No parameters are set for service instance %s.\n`, serviceInstanceName))
 			})
 		})
-
 	})
 
 	When("there is a problem looking up the service instance", func() {

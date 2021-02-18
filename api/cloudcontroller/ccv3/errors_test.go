@@ -107,6 +107,26 @@ var _ = Describe("Error Wrapper", func() {
 						})
 
 					})
+
+					When("service instance fetch params not supported", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+   "errors": [
+      {
+         "detail": "This service does not support fetching service instance parameters.",
+         "title": "CF-ServiceFetchInstanceParametersNotSupported",
+         "code": 120004
+      }
+   ]
+}`
+						})
+
+						It("returns a BadRequestError", func() {
+							Expect(makeError).To(MatchError(ccerror.ServiceInstanceParametersFetchNotSupportedError{
+								Message: "This service does not support fetching service instance parameters."}))
+						})
+					})
 				})
 
 				Context("(401) Unauthorized", func() {
