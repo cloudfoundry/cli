@@ -708,18 +708,19 @@ var _ = Describe("service command", func() {
 							Name: serviceInstanceName,
 							Type: resources.ManagedServiceInstance,
 						},
-						Parameters: v7action.ServiceInstanceParameters{
-							MissingReason: "because of a good reason",
-						},
+						Parameters: v7action.ServiceInstanceParameters{},
 					},
 					v7action.Warnings{"warning one", "warning two"},
-					nil,
+					errors.New("something happened"),
 				)
 			})
 
 			It("displays the reason", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say(`Unable to show parameters: because of a good reason\n`))
+				Expect(executeErr).To(MatchError("something happened"))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
 			})
 		})
 

@@ -33,8 +33,7 @@ type SharedStatus struct {
 }
 
 type ServiceInstanceParameters struct {
-	Value         types.JSONObject
-	MissingReason string
+	Value types.JSONObject
 }
 
 type ServiceInstanceUpgradeState int
@@ -102,7 +101,7 @@ func (actor Actor) GetServiceInstanceParameters(serviceInstanceName string, spac
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.Parameters, warnings = actor.getServiceInstanceParameters(serviceInstanceDetails.ServiceInstance.GUID)
+			serviceInstanceDetails.Parameters, warnings, err = actor.getServiceInstanceParameters(serviceInstanceDetails.ServiceInstance.GUID)
 			return
 		},
 	)
@@ -158,21 +157,19 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 	return result, warnings, nil
 }
 
-func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings) {
+func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings, error) {
 	params, warnings, err := actor.CloudControllerClient.GetServiceInstanceParameters(serviceInstanceGUID)
 
 	switch err := err.(type) {
 	case nil:
-		return ServiceInstanceParameters{Value: params}, warnings
-	case ccerror.ResourceNotFoundError: // Old API versions did not produce a helpful error
-		return ServiceInstanceParameters{MissingReason: "This service does not support fetching service instance parameters."}, warnings
-	case ccerror.ServiceInstanceParametersFetchNotSupportedError:
-		return ServiceInstanceParameters{MissingReason: err.Message}, warnings
-	case ccerror.V3UnexpectedResponseError:
-		return ServiceInstanceParameters{MissingReason: err.Errors[0].Detail}, warnings
+	case ccerror.ResourceNotFoundError,
+		ccerror.ServiceInstanceParametersFetchNotSupportedError:
+		return ServiceInstanceParameters{}, warnings, actionerror.ServiceInstanceParamsFetchingNotSupportedError{}
 	default:
-		return ServiceInstanceParameters{MissingReason: err.Error()}, warnings
+		return ServiceInstanceParameters{}, warnings, err
 	}
+
+	return ServiceInstanceParameters{Value: params}, warnings, nil
 }
 
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {

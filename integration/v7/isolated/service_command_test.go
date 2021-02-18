@@ -176,6 +176,18 @@ var _ = Describe("service command", func() {
 					))
 				})
 			})
+
+			When("--params is requested", func() {
+				When("service instance parameters have been set", func() {
+					It("reports the service instance parameters JSON", func() {
+						session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
+						Eventually(session).Should(Exit(1))
+
+						Eventually(session.Err).Should(Say("This service does not support fetching service instance parameters."))
+					})
+				})
+			})
+
 		})
 
 		When("the service instance is managed by a broker", func() {
@@ -514,35 +526,25 @@ var _ = Describe("service command", func() {
 					))
 				})
 			})
-		})
 
-		When("--params is requested", func() {
-			var broker *servicebrokerstub.ServiceBrokerStub
-
-			AfterEach(func() {
-				broker.Forget()
-			})
-
-			When("service instance parameters have been set", func() {
+			When("--params is requested", func() {
 				var key string
 				var value string
 
 				BeforeEach(func() {
-					broker = servicebrokerstub.EnableServiceAccess()
 					key = "foo"
 					value = helpers.RandomName()
-					command := []string{
-						"create-service",
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					helpers.CreateManagedServiceInstance(
 						broker.FirstServiceOfferingName(),
 						broker.FirstServicePlanName(),
 						serviceInstanceName,
 						"-c", fmt.Sprintf(`{"%s":"%s"}`, key, value),
-					}
-					Eventually(helpers.CF(command...)).Should(Exit(0))
-					Eventually(helpers.CF(serviceCommand, serviceInstanceName)).Should(Say(`status:\s+create succeeded`))
+					)
 				})
 
-				FIt("reports the service instance parameters JSON", func() {
+				It("reports the service instance parameters JSON", func() {
 					session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
 					Eventually(session).Should(Exit(0))
 

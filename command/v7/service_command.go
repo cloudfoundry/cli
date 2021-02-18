@@ -163,8 +163,6 @@ func (cmd ServiceCommand) displayLastOperation() error {
 
 func (cmd ServiceCommand) displayParameters() error {
 	switch {
-	case cmd.serviceInstance.Parameters.MissingReason != "":
-		cmd.displayParametersMissingReason()
 	case len(cmd.serviceInstance.Parameters.Value) > 0:
 		cmd.displayParametersData()
 	default:
@@ -190,15 +188,6 @@ func (cmd ServiceCommand) displayParametersData() {
 	}
 
 	cmd.UI.DisplayText(string(data))
-}
-
-func (cmd ServiceCommand) displayParametersMissingReason() {
-	cmd.UI.DisplayText(
-		"Unable to show parameters: {{.Reason}}",
-		map[string]interface{}{
-			"Reason": cmd.serviceInstance.Parameters.MissingReason,
-		},
-	)
 }
 
 func (cmd ServiceCommand) displayIntro() error {

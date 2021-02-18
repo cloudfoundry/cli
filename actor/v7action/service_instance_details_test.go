@@ -811,28 +811,21 @@ var _ = Describe("Service Instance Details Action", func() {
 				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
 			})
 
-			When("getting the parameters fails with a V3UnexpectedResponseError", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
-						ccv3.Warnings{"some-parameters-warning"},
-						ccerror.V3UnexpectedResponseError{
-							V3ErrorResponse: ccerror.V3ErrorResponse{
-								Errors: []ccerror.V3Error{{
-									Code:   1234,
-									Detail: "cannot get parameters reason",
-									Title:  "CF-SomeRandomError",
-								}},
-							},
+			It("returns parameters", func() {
+				Expect(serviceInstance).To(Equal(
+					ServiceInstanceDetails{
+						ServiceInstance: resources.ServiceInstance{
+							Type:      resources.ManagedServiceInstance,
+							Name:      serviceInstanceName,
+							GUID:      serviceInstanceGUID,
+							SpaceGUID: spaceGUID,
 						},
-					)
-				})
-
-				It("does not return an error, but returns warnings and the reason", func() {
-					Expect(executionError).NotTo(HaveOccurred())
-					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("cannot get parameters reason"))
-				})
+						SharedStatus: SharedStatus{},
+						Parameters: ServiceInstanceParameters{
+							Value: types.JSONObject{"foo": "bar"},
+						},
+					},
+				))
 			})
 
 			When("getting the parameters fails with a ServiceInstanceParametersFetchNotSupportedError", func() {
@@ -847,9 +840,8 @@ var _ = Describe("Service Instance Details Action", func() {
 				})
 
 				It("does not return an error, but returns warnings and the reason", func() {
-					Expect(executionError).NotTo(HaveOccurred())
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceParamsFetchingNotSupportedError{}))
 					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("This service does not support fetching service instance parameters."))
 				})
 			})
 
@@ -865,9 +857,8 @@ var _ = Describe("Service Instance Details Action", func() {
 				})
 
 				It("converts the error to fetching not supported", func() {
-					Expect(executionError).NotTo(HaveOccurred())
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceParamsFetchingNotSupportedError{}))
 					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("This service does not support fetching service instance parameters."))
 				})
 			})
 
@@ -881,9 +872,8 @@ var _ = Describe("Service Instance Details Action", func() {
 				})
 
 				It("does not return an error, but returns warnings and the reason", func() {
-					Expect(executionError).NotTo(HaveOccurred())
+					Expect(executionError).To(MatchError("not expected"))
 					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("not expected"))
 				})
 			})
 		})
