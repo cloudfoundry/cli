@@ -611,9 +611,6 @@ var _ = Describe("service command", func() {
 						},
 						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
-						Parameters: v7action.ServiceInstanceParameters{
-							Value: types.JSONObject{"foo": "bar"},
-						},
 						SharedStatus: v7action.SharedStatus{
 							IsSharedToOtherSpaces: true,
 						},
@@ -654,10 +651,6 @@ var _ = Describe("service command", func() {
 	})
 
 	When("the --params flag is specified", func() {
-		const (
-			parameters = `{"foo":"bar"}`
-		)
-
 		BeforeEach(func() {
 			setFlag(&cmd, "--params")
 		})
@@ -665,15 +658,7 @@ var _ = Describe("service command", func() {
 		When("parameters are set", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceParametersReturns(
-					v7action.ServiceInstanceDetails{
-						ServiceInstance: resources.ServiceInstance{
-							GUID: serviceInstanceGUID,
-							Name: serviceInstanceName,
-						},
-						Parameters: v7action.ServiceInstanceParameters{
-							Value: types.JSONObject{"foo": "bar"},
-						},
-					},
+					v7action.ServiceInstanceParameters(types.JSONObject{"foo": "bar"}),
 					v7action.Warnings{"warning one", "warning two"},
 					nil,
 				)
@@ -702,14 +687,7 @@ var _ = Describe("service command", func() {
 		When("there was a problem retrieving the parameters", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceParametersReturns(
-					v7action.ServiceInstanceDetails{
-						ServiceInstance: resources.ServiceInstance{
-							GUID: serviceInstanceGUID,
-							Name: serviceInstanceName,
-							Type: resources.ManagedServiceInstance,
-						},
-						Parameters: v7action.ServiceInstanceParameters{},
-					},
+					v7action.ServiceInstanceParameters{},
 					v7action.Warnings{"warning one", "warning two"},
 					errors.New("something happened"),
 				)
@@ -727,16 +705,7 @@ var _ = Describe("service command", func() {
 		When("the parameters are empty", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceParametersReturns(
-					v7action.ServiceInstanceDetails{
-						ServiceInstance: resources.ServiceInstance{
-							GUID: serviceInstanceGUID,
-							Name: serviceInstanceName,
-							Type: resources.ManagedServiceInstance,
-						},
-						Parameters: v7action.ServiceInstanceParameters{
-							Value: types.JSONObject{},
-						},
-					},
+					v7action.ServiceInstanceParameters{},
 					v7action.Warnings{"warning one", "warning two"},
 					nil,
 				)
@@ -744,7 +713,7 @@ var _ = Describe("service command", func() {
 
 			It("says there were no parameters", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say(`No parameters are set for service instance %s.\n`, serviceInstanceName))
+				Expect(testUI.Out).To(Say(`No parameters are set for this service instance.\n`))
 			})
 		})
 	})

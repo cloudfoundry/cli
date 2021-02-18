@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -20,35 +21,53 @@ type ServiceCommand struct {
 	usage           interface{}          `usage:"CF_NAME service SERVICE_INSTANCE"`
 	relatedCommands interface{}          `related_commands:"bind-service, rename-service, update-service"`
 
-	serviceInstance v7action.ServiceInstanceDetails
+	serviceInstance       v7action.ServiceInstanceDetails
+	serviceInstanceParams v7action.ServiceInstanceParameters
 }
 
 func (cmd ServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
 	}
-
-	var (
-		warnings v7action.Warnings
-		err      error
-	)
-
 	switch {
+	case cmd.ShowGUID:
+		return cmd.fetchAndDisplayGUID()
 	case cmd.Params:
-		cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceParameters(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
+		return cmd.fetchAndDisplayParams()
 	default:
-		cmd.serviceInstance, warnings, err = cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID, false)
+		return cmd.fetchAndDisplayDetails()
 	}
-	cmd.UI.DisplayWarnings(warnings)
+}
+
+func (cmd ServiceCommand) fetchAndDisplayGUID() error {
+	var err error
+	cmd.serviceInstance, err = cmd.fetchServiceInstanceDetails()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayText(cmd.serviceInstance.GUID)
+	return nil
+}
+
+func (cmd ServiceCommand) fetchAndDisplayParams() error {
+	var err error
+	cmd.serviceInstanceParams, err = cmd.fetchServiceInstanceParameters()
+	if err != nil {
+		return err
+	}
+
+	return cmd.displayParameters()
+}
+
+func (cmd ServiceCommand) fetchAndDisplayDetails() error {
+	var err error
+	cmd.serviceInstance, err = cmd.fetchServiceInstanceDetails()
 	if err != nil {
 		return err
 	}
 
 	switch {
-	case cmd.ShowGUID:
-		return cmd.displayGUID()
-	case cmd.Params:
-		return cmd.displayParameters()
 	case cmd.serviceInstance.Type == resources.UserProvidedServiceInstance:
 		return cmd.chain(
 			cmd.displayIntro,
@@ -67,9 +86,18 @@ func (cmd ServiceCommand) Execute(args []string) error {
 	}
 }
 
-func (cmd ServiceCommand) displayGUID() error {
-	cmd.UI.DisplayText(cmd.serviceInstance.GUID)
-	return nil
+func (cmd ServiceCommand) fetchServiceInstanceDetails() (v7action.ServiceInstanceDetails, error) {
+	serviceInstance, warnings, err := cmd.Actor.GetServiceInstanceDetails(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID, false)
+	cmd.UI.DisplayWarnings(warnings)
+
+	return serviceInstance, err
+}
+
+func (cmd ServiceCommand) fetchServiceInstanceParameters() (v7action.ServiceInstanceParameters, error) {
+	serviceInstanceParameters, warnings, err := cmd.Actor.GetServiceInstanceParameters(string(cmd.RequiredArgs.ServiceInstance), cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+
+	return serviceInstanceParameters, err
 }
 
 func (cmd ServiceCommand) displayPropertiesUserProvided() error {
@@ -163,7 +191,7 @@ func (cmd ServiceCommand) displayLastOperation() error {
 
 func (cmd ServiceCommand) displayParameters() error {
 	switch {
-	case len(cmd.serviceInstance.Parameters.Value) > 0:
+	case len(cmd.serviceInstanceParams) > 0:
 		cmd.displayParametersData()
 	default:
 		cmd.displayParametersEmpty()
@@ -173,19 +201,13 @@ func (cmd ServiceCommand) displayParameters() error {
 }
 
 func (cmd ServiceCommand) displayParametersEmpty() {
-	cmd.UI.DisplayTextWithFlavor(
-		"No parameters are set for service instance {{.ServiceInstanceName}}.",
-		map[string]interface{}{
-			"ServiceInstanceName": cmd.serviceInstance.Name,
-		},
+	cmd.UI.DisplayText(
+		"No parameters are set for this service instance.",
 	)
 }
 
 func (cmd ServiceCommand) displayParametersData() {
-	data, err := json.MarshalIndent(cmd.serviceInstance.Parameters.Value, "", "  ")
-	if err != nil {
-		panic(err)
-	}
+	data, _ := json.MarshalIndent(cmd.serviceInstanceParams, "", "  ")
 
 	cmd.UI.DisplayText(string(data))
 }

@@ -148,7 +148,6 @@ var _ = Describe("Service Instance Details Action", func() {
 					ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 					ServiceBrokerName: serviceBrokerName,
 					SharedStatus:      SharedStatus{},
-					Parameters:        ServiceInstanceParameters{},
 					BoundApps: []resources.ServiceCredentialBinding{
 						{
 							Type:    resources.AppBinding,
@@ -717,9 +716,9 @@ var _ = Describe("Service Instance Details Action", func() {
 		)
 
 		var (
-			serviceInstance ServiceInstanceDetails
-			warnings        Warnings
-			executionError  error
+			serviceInstanceParams ServiceInstanceParameters
+			warnings              Warnings
+			executionError        error
 		)
 
 		BeforeEach(func() {
@@ -744,7 +743,7 @@ var _ = Describe("Service Instance Details Action", func() {
 		})
 
 		JustBeforeEach(func() {
-			serviceInstance, warnings, executionError = actor.GetServiceInstanceParameters(serviceInstanceName, spaceGUID)
+			serviceInstanceParams, warnings, executionError = actor.GetServiceInstanceParameters(serviceInstanceName, spaceGUID)
 		})
 
 		Describe("getting the service instance", func() {
@@ -812,20 +811,8 @@ var _ = Describe("Service Instance Details Action", func() {
 			})
 
 			It("returns parameters", func() {
-				Expect(serviceInstance).To(Equal(
-					ServiceInstanceDetails{
-						ServiceInstance: resources.ServiceInstance{
-							Type:      resources.ManagedServiceInstance,
-							Name:      serviceInstanceName,
-							GUID:      serviceInstanceGUID,
-							SpaceGUID: spaceGUID,
-						},
-						SharedStatus: SharedStatus{},
-						Parameters: ServiceInstanceParameters{
-							Value: types.JSONObject{"foo": "bar"},
-						},
-					},
-				))
+				Expect(serviceInstanceParams).To(Equal(
+					ServiceInstanceParameters(types.JSONObject{"foo": "bar"})))
 			})
 
 			When("getting the parameters fails with a ServiceInstanceParametersFetchNotSupportedError", func() {

@@ -122,7 +122,7 @@ var _ = Describe("Error Wrapper", func() {
 }`
 						})
 
-						It("returns a BadRequestError", func() {
+						It("returns a ServiceInstanceParametersFetchNotSupportedError", func() {
 							Expect(makeError).To(MatchError(ccerror.ServiceInstanceParametersFetchNotSupportedError{
 								Message: "This service does not support fetching service instance parameters."}))
 						})

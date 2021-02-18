@@ -80,7 +80,7 @@ var _ = Describe("service command", func() {
 		})
 	})
 
-	When("user is logged in and targeting a space", func() {
+	FWhen("user is logged in and targeting a space", func() {
 		var (
 			serviceInstanceName string
 			orgName             string

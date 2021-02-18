@@ -32,9 +32,7 @@ type SharedStatus struct {
 	UsageSummary              []UsageSummaryWithSpaceAndOrg
 }
 
-type ServiceInstanceParameters struct {
-	Value types.JSONObject
-}
+type ServiceInstanceParameters types.JSONObject
 
 type ServiceInstanceUpgradeState int
 
@@ -56,7 +54,6 @@ type ServiceInstanceDetails struct {
 	ServiceOffering   resources.ServiceOffering
 	ServicePlan       resources.ServicePlan
 	ServiceBrokerName string
-	Parameters        ServiceInstanceParameters
 	SharedStatus      SharedStatus
 	UpgradeStatus     ServiceInstanceUpgradeStatus
 	BoundApps         []resources.ServiceCredentialBinding
@@ -92,24 +89,25 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	return serviceInstanceDetails, Warnings(warnings), nil
 }
 
-func (actor Actor) GetServiceInstanceParameters(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, Warnings, error) {
-	var serviceInstanceDetails ServiceInstanceDetails
+func (actor Actor) GetServiceInstanceParameters(serviceInstanceName string, spaceGUID string) (ServiceInstanceParameters, Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var parameters ServiceInstanceParameters
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.ServiceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			serviceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.Parameters, warnings, err = actor.getServiceInstanceParameters(serviceInstanceDetails.ServiceInstance.GUID)
+			parameters, warnings, err = actor.getServiceInstanceParameters(serviceInstance.GUID)
 			return
 		},
 	)
 	if err != nil {
-		return ServiceInstanceDetails{}, Warnings(warnings), err
+		return ServiceInstanceParameters{}, Warnings(warnings), err
 	}
 
-	return serviceInstanceDetails, Warnings(warnings), nil
+	return parameters, Warnings(warnings), nil
 }
 
 func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, ccv3.Warnings, error) {
@@ -162,14 +160,13 @@ func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (Ser
 
 	switch err := err.(type) {
 	case nil:
+		return ServiceInstanceParameters(params), warnings, nil
 	case ccerror.ResourceNotFoundError,
 		ccerror.ServiceInstanceParametersFetchNotSupportedError:
 		return ServiceInstanceParameters{}, warnings, actionerror.ServiceInstanceParamsFetchingNotSupportedError{}
 	default:
 		return ServiceInstanceParameters{}, warnings, err
 	}
-
-	return ServiceInstanceParameters{Value: params}, warnings, nil
 }
 
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {

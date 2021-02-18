@@ -155,7 +155,7 @@ type Actor interface {
 	GetServiceKeyDetailsByServiceInstanceAndName(serviceInstanceName, serviceKeyName, spaceGUID string) (resources.ServiceCredentialBindingDetails, v7action.Warnings, error)
 	GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID string) (resources.ServiceInstance, v7action.Warnings, error)
 	GetServiceInstanceDetails(serviceInstanceName, spaceGUID string, omitApps bool) (v7action.ServiceInstanceDetails, v7action.Warnings, error)
-	GetServiceInstanceParameters(serviceInstanceName, spaceGUID string) (v7action.ServiceInstanceDetails, v7action.Warnings, error)
+	GetServiceInstanceParameters(serviceInstanceName, spaceGUID string) (v7action.ServiceInstanceParameters, v7action.Warnings, error)
 	GetServiceInstanceLabels(serviceInstanceName, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetServiceInstancesForSpace(spaceGUID string, omitApps bool) ([]v7action.ServiceInstance, v7action.Warnings, error)
 	GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUID string) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
