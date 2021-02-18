@@ -709,7 +709,7 @@ var _ = Describe("Service Instance Details Action", func() {
 		})
 	})
 
-	FDescribe("GetServiceInstanceParameters", func() {
+	Describe("GetServiceInstanceParameters", func() {
 		const (
 			serviceInstanceName = "some-service-instance-name"
 			serviceInstanceGUID = "some-service-instance-guid"
