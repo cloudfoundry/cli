@@ -196,9 +196,6 @@ var _ = Describe("update-service command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`plan:\s+%s`, newPlanName),
 					Say(`tags:\s+%s`, newTags),
-					Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
-					Say(`\n`),
-					Say(`%s\n`, `{"foo":"bar"}`),
 				))
 			})
 
@@ -229,12 +226,12 @@ var _ = Describe("update-service command", func() {
 				)
 
 				checkParams := func() {
-					session := helpers.CF(serviceCommand, serviceInstanceName)
+					session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(SatisfyAll(
-						Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
-						Say(`%s\n`, validParams),
+						Say(`\{\n`),
+						Say(`  "funky": "chicken"\n`),
+						Say(`\}\n`),
 					))
 				}
 

@@ -16,7 +16,7 @@ import (
 
 const serviceCommand = "v3-service"
 
-var _ = Describe("create-service command", func() {
+var _ = FDescribe("create-service command", func() {
 	Describe("help", func() {
 
 		matchHelpMessage := SatisfyAll(
@@ -173,9 +173,13 @@ var _ = Describe("create-service command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF(serviceCommand, serviceInstanceName)
+					session = helpers.CF(serviceCommand, serviceInstanceName, "--params")
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("%s", parametersJSON))
+					Eventually(session).Should(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  "valid": "json"\n`),
+						Say(`\}\n`),
+					))
 				})
 			})
 
@@ -198,9 +202,13 @@ var _ = Describe("create-service command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF(serviceCommand, serviceInstanceName)
+					session = helpers.CF(serviceCommand, serviceInstanceName, "--params")
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("%s", parametersJSON))
+					Eventually(session).Should(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  "valid": "json"\n`),
+						Say(`\}\n`),
+					))
 				})
 			})
 
