@@ -16,7 +16,7 @@ import (
 
 const serviceCommand = "v3-service"
 
-var _ = FDescribe("create-service command", func() {
+var _ = Describe("create-service command", func() {
 	Describe("help", func() {
 
 		matchHelpMessage := SatisfyAll(
