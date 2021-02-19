@@ -137,6 +137,13 @@ var _ = Describe("service command", func() {
 					Say(`route service url:\s+%s\n`, routeServiceURL),
 					Say(`syslog drain url:\s+%s\n`, syslogURL),
 					Say(`\n`),
+					Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+					Say(`\n`),
+					Say(`status:\s+create succeeded\n`),
+					Say(`message:\s+Operation succeeded\n`),
+					Say(`started:\s+%s\n`, helpers.TimestampRegex),
+					Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+					Say(`\n`),
 					Say(`Bound apps:\n`),
 					Say(`There are no bound apps for this service instance\.\n`),
 				))
