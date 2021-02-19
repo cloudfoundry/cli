@@ -28,6 +28,7 @@ var _ = Describe("service command", func() {
 			Say(`\n`),
 			Say(`OPTIONS:\n`),
 			Say(`\s+--guid\s+Retrieve and display the given service instances's guid. All other output is suppressed.\n`),
+			Say(`\s+--params\s+Retrieve and display the given service instances's parameters. All other output is suppressed.\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
 			Say(`\s+bind-service, rename-service, update-service\n`),
@@ -175,6 +176,18 @@ var _ = Describe("service command", func() {
 					))
 				})
 			})
+
+			When("--params is requested", func() {
+				When("service instance parameters have been set", func() {
+					It("reports the service instance parameters JSON", func() {
+						session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
+						Eventually(session).Should(Exit(1))
+
+						Eventually(session.Err).Should(Say("This service does not support fetching service instance parameters."))
+					})
+				})
+			})
+
 		})
 
 		When("the service instance is managed by a broker", func() {
@@ -232,8 +245,6 @@ var _ = Describe("service command", func() {
 						Say(`\n`),
 						Say(`Bound apps:\n`),
 						Say(`There are no bound apps for this service instance\.\n`),
-						Say(`\n`),
-						Say(`No parameters are set for service instance %s.\n`, serviceInstanceName),
 						Say(`\n`),
 						Say(`Sharing:\n`),
 						Say(`This service instance is not currently being shared.`),
@@ -297,43 +308,11 @@ var _ = Describe("service command", func() {
 						Say(`Bound apps:\n`),
 						Say(`There are no bound apps for this service instance\.\n`),
 						Say(`\n`),
-						Say(`Unable to show parameters: An operation for service instance %s is in progress.`, serviceInstanceName),
-						Say(`\n`),
 						Say(`Sharing:\n`),
 						Say(`This service instance is not currently being shared.`),
 						Say(`\n`),
 						Say(`Upgrading:\n`),
 						Say(`Upgrades are not supported by this broker.\n`),
-					))
-				})
-			})
-
-			When("service instance parameters have been set", func() {
-				var parameters string
-
-				BeforeEach(func() {
-					broker = servicebrokerstub.EnableServiceAccess()
-					parameters = fmt.Sprintf(`{"foo":"%s"}`, helpers.RandomName())
-					command := []string{
-						"create-service",
-						broker.FirstServiceOfferingName(),
-						broker.FirstServicePlanName(),
-						serviceInstanceName,
-						"-c", parameters,
-					}
-					Eventually(helpers.CF(command...)).Should(Exit(0))
-					Eventually(helpers.CF(serviceCommand, serviceInstanceName)).Should(Say(`status:\s+create succeeded`))
-				})
-
-				It("reports the service instance parameters", func() {
-					session := helpers.CF(serviceCommand, serviceInstanceName)
-					Eventually(session).Should(Exit(0))
-
-					Expect(session).To(SatisfyAll(
-						Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
-						Say(`%s\n`, parameters),
-						Say(`\n`),
 					))
 				})
 			})
@@ -544,6 +523,35 @@ var _ = Describe("service command", func() {
 						Say(`name\s+binding name\s+status\s+message\n`),
 						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName1, bindingName1),
 						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName2, bindingName2),
+					))
+				})
+			})
+
+			When("--params is requested", func() {
+				var key string
+				var value string
+
+				BeforeEach(func() {
+					key = "foo"
+					value = helpers.RandomName()
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-c", fmt.Sprintf(`{"%s":"%s"}`, key, value),
+					)
+				})
+
+				It("reports the service instance parameters JSON", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  %q: %q\n`, key, value),
+						Say(`\}\n`),
 					))
 				})
 			})

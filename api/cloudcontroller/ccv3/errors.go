@@ -115,9 +115,10 @@ func handleBadRequest(errorResponse ccerror.V3Error, _ *cloudcontroller.Request)
 	switch errorResponse.Detail {
 	case "Bad request: Cannot stage package whose state is not ready.":
 		return ccerror.InvalidStateError{}
+	case "This service does not support fetching service instance parameters.":
+		return ccerror.ServiceInstanceParametersFetchNotSupportedError{Message: errorResponse.Detail}
 	default:
 		return ccerror.BadRequestError{Message: errorResponse.Detail}
-
 	}
 }
 

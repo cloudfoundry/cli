@@ -91,23 +91,45 @@ var _ = Describe("service command", func() {
 
 	When("the --guid flag is specified", func() {
 		BeforeEach(func() {
+			fakeActor.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					GUID: serviceInstanceGUID,
+					Name: serviceInstanceName,
+				},
+				v7action.Warnings{"warning one", "warning two"},
+				nil,
+			)
+
 			setFlag(&cmd, "--guid")
 		})
 
-		It("looks up the service instance and prints the GUID and warnings", func() {
+		It("looks up the service instance and prints the GUID and no warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeActor.GetServiceInstanceDetailsCallCount()).To(Equal(1))
-			actualName, actualSpaceGUID, actualOmitApps := fakeActor.GetServiceInstanceDetailsArgsForCall(0)
+			Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+			actualName, actualSpaceGUID := fakeActor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
 			Expect(actualName).To(Equal(serviceInstanceName))
 			Expect(actualSpaceGUID).To(Equal(spaceGUID))
-			Expect(actualOmitApps).To(BeFalse())
 
 			Expect(testUI.Out).To(Say(`^%s\n$`, serviceInstanceGUID))
-			Expect(testUI.Err).To(SatisfyAll(
-				Say("warning one"),
-				Say("warning two"),
-			))
+			Expect(testUI.Err).NotTo(Say("warning"))
+		})
+
+		When("getting the service instance fails", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceByNameAndSpaceReturns(
+					resources.ServiceInstance{
+						GUID: serviceInstanceGUID,
+						Name: serviceInstanceName,
+					},
+					v7action.Warnings{"warning one", "warning two"},
+					errors.New("yuck"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("yuck"))
+			})
 		})
 	})
 
@@ -256,9 +278,6 @@ var _ = Describe("service command", func() {
 					},
 					ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 					ServiceBrokerName: serviceBrokerName,
-					Parameters: v7action.ServiceInstanceParameters{
-						Value: types.JSONObject{"foo": "bar"},
-					},
 					SharedStatus: v7action.SharedStatus{
 						IsSharedToOtherSpaces: true,
 						UsageSummary:          []v7action.UsageSummaryWithSpaceAndOrg{{"shared-to-space", "some-org", 3}},
@@ -301,10 +320,6 @@ var _ = Describe("service command", func() {
 				Say(`\n`),
 				Say(`Bound apps:\n`),
 				Say(`There are no bound apps for this service instance\.\n`),
-				Say(`\n`),
-				Say(`Showing parameters for service instance %s...\n`, serviceInstanceName),
-				Say(`\n`),
-				Say(`%s\n`, parameters),
 				Say(`\n`),
 				Say(`Sharing:`),
 				Say(`Shared with spaces:\n`),
@@ -590,84 +605,6 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		Context("parameters", func() {
-			When("there was a problem retrieving the parameters", func() {
-				BeforeEach(func() {
-					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceDetails{
-							ServiceInstance: resources.ServiceInstance{
-								GUID: serviceInstanceGUID,
-								Name: serviceInstanceName,
-								Type: resources.ManagedServiceInstance,
-								LastOperation: resources.LastOperation{
-									Type:        lastOperationType,
-									State:       lastOperationState,
-									Description: lastOperationDescription,
-									CreatedAt:   lastOperationStartTime,
-									UpdatedAt:   lastOperationUpdatedTime,
-								},
-							},
-							ServiceOffering: resources.ServiceOffering{
-								Name:             serviceOfferingName,
-								Description:      serviceOfferingDescription,
-								DocumentationURL: serviceOfferingDocs,
-							},
-							ServicePlan:       resources.ServicePlan{Name: servicePlanName},
-							ServiceBrokerName: serviceBrokerName,
-							Parameters: v7action.ServiceInstanceParameters{
-								MissingReason: "because of a good reason",
-							},
-						},
-						v7action.Warnings{"warning one", "warning two"},
-						nil,
-					)
-				})
-
-				It("displays the reason", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say(`Unable to show parameters: because of a good reason\n`))
-				})
-			})
-
-			When("the parameters are empty", func() {
-				BeforeEach(func() {
-					fakeActor.GetServiceInstanceDetailsReturns(
-						v7action.ServiceInstanceDetails{
-							ServiceInstance: resources.ServiceInstance{
-								GUID: serviceInstanceGUID,
-								Name: serviceInstanceName,
-								Type: resources.ManagedServiceInstance,
-								LastOperation: resources.LastOperation{
-									Type:        lastOperationType,
-									State:       lastOperationState,
-									Description: lastOperationDescription,
-									CreatedAt:   lastOperationStartTime,
-									UpdatedAt:   lastOperationUpdatedTime,
-								},
-							},
-							ServiceOffering: resources.ServiceOffering{
-								Name:             serviceOfferingName,
-								Description:      serviceOfferingDescription,
-								DocumentationURL: serviceOfferingDocs,
-							},
-							ServicePlan:       resources.ServicePlan{Name: servicePlanName},
-							ServiceBrokerName: serviceBrokerName,
-							Parameters: v7action.ServiceInstanceParameters{
-								Value: types.JSONObject{},
-							},
-						},
-						v7action.Warnings{"warning one", "warning two"},
-						nil,
-					)
-				})
-
-				It("says there were no parameters", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say(`No parameters are set for service instance %s.\n`, serviceInstanceName))
-				})
-			})
-		})
-
 		Context("bound apps", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceDetailsReturns(
@@ -696,9 +633,6 @@ var _ = Describe("service command", func() {
 						},
 						ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 						ServiceBrokerName: serviceBrokerName,
-						Parameters: v7action.ServiceInstanceParameters{
-							Value: types.JSONObject{"foo": "bar"},
-						},
 						SharedStatus: v7action.SharedStatus{
 							IsSharedToOtherSpaces: true,
 						},
@@ -738,6 +672,74 @@ var _ = Describe("service command", func() {
 		})
 	})
 
+	When("the --params flag is specified", func() {
+		BeforeEach(func() {
+			setFlag(&cmd, "--params")
+		})
+
+		When("parameters are set", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceParametersReturns(
+					v7action.ServiceInstanceParameters(types.JSONObject{"foo": "bar"}),
+					v7action.Warnings{"warning one", "warning two"},
+					nil,
+				)
+			})
+
+			It("returns parameters JSON", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeActor.GetServiceInstanceParametersCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID := fakeActor.GetServiceInstanceParametersArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`\{\n`),
+					Say(`  "foo": "bar"\n`),
+					Say(`\}\n`),
+				))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
+			})
+		})
+
+		When("there was a problem retrieving the parameters", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceParametersReturns(
+					v7action.ServiceInstanceParameters{},
+					v7action.Warnings{"warning one", "warning two"},
+					errors.New("something happened"),
+				)
+			})
+
+			It("displays the reason", func() {
+				Expect(executeErr).To(MatchError("something happened"))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
+			})
+		})
+
+		When("the parameters are empty", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceParametersReturns(
+					v7action.ServiceInstanceParameters{},
+					v7action.Warnings{"warning one", "warning two"},
+					nil,
+				)
+			})
+
+			It("displays empty parameters", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`{}\n`))
+			})
+		})
+	})
+
 	When("there is a problem looking up the service instance", func() {
 		BeforeEach(func() {
 			fakeActor.GetServiceInstanceDetailsReturns(
@@ -750,7 +752,6 @@ var _ = Describe("service command", func() {
 		It("prints warnings and returns an error", func() {
 			Expect(executeErr).To(MatchError("boom"))
 
-			Expect(testUI.Out).NotTo(Say(`.`), "output not empty!")
 			Expect(testUI.Err).To(SatisfyAll(
 				Say("warning one"),
 				Say("warning two"),

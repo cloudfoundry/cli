@@ -32,10 +32,7 @@ type SharedStatus struct {
 	UsageSummary              []UsageSummaryWithSpaceAndOrg
 }
 
-type ServiceInstanceParameters struct {
-	Value         types.JSONObject
-	MissingReason string
-}
+type ServiceInstanceParameters types.JSONObject
 
 type ServiceInstanceUpgradeState int
 
@@ -57,7 +54,6 @@ type ServiceInstanceDetails struct {
 	ServiceOffering   resources.ServiceOffering
 	ServicePlan       resources.ServicePlan
 	ServiceBrokerName string
-	Parameters        ServiceInstanceParameters
 	SharedStatus      SharedStatus
 	UpgradeStatus     ServiceInstanceUpgradeStatus
 	BoundApps         []resources.ServiceCredentialBinding
@@ -69,10 +65,6 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
 			serviceInstanceDetails, warnings, err = actor.getServiceInstanceDetails(serviceInstanceName, spaceGUID)
-			return
-		},
-		func() (warnings ccv3.Warnings, err error) {
-			serviceInstanceDetails.Parameters, warnings = actor.getServiceInstanceParameters(serviceInstanceDetails.GUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -95,6 +87,27 @@ func (actor Actor) GetServiceInstanceDetails(serviceInstanceName string, spaceGU
 	}
 
 	return serviceInstanceDetails, Warnings(warnings), nil
+}
+
+func (actor Actor) GetServiceInstanceParameters(serviceInstanceName string, spaceGUID string) (ServiceInstanceParameters, Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var parameters ServiceInstanceParameters
+
+	warnings, err := railway.Sequentially(
+		func() (warnings ccv3.Warnings, err error) {
+			serviceInstance, _, warnings, err = actor.getServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+			return
+		},
+		func() (warnings ccv3.Warnings, err error) {
+			parameters, warnings, err = actor.getServiceInstanceParameters(serviceInstance.GUID)
+			return
+		},
+	)
+	if err != nil {
+		return ServiceInstanceParameters{}, Warnings(warnings), err
+	}
+
+	return parameters, Warnings(warnings), nil
 }
 
 func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGUID string) (ServiceInstanceDetails, ccv3.Warnings, error) {
@@ -142,17 +155,18 @@ func (actor Actor) getServiceInstanceDetails(serviceInstanceName string, spaceGU
 	return result, warnings, nil
 }
 
-func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings) {
+func (actor Actor) getServiceInstanceParameters(serviceInstanceGUID string) (ServiceInstanceParameters, ccv3.Warnings, error) {
 	params, warnings, err := actor.CloudControllerClient.GetServiceInstanceParameters(serviceInstanceGUID)
-	if err != nil {
-		if e, ok := err.(ccerror.V3UnexpectedResponseError); ok && len(e.Errors) > 0 {
-			return ServiceInstanceParameters{MissingReason: e.Errors[0].Detail}, warnings
-		} else {
-			return ServiceInstanceParameters{MissingReason: err.Error()}, warnings
-		}
-	}
 
-	return ServiceInstanceParameters{Value: params}, warnings
+	switch err := err.(type) {
+	case nil:
+		return ServiceInstanceParameters(params), warnings, nil
+	case ccerror.ResourceNotFoundError,
+		ccerror.ServiceInstanceParametersFetchNotSupportedError:
+		return ServiceInstanceParameters{}, warnings, actionerror.ServiceInstanceParamsFetchingNotSupportedError{}
+	default:
+		return ServiceInstanceParameters{}, warnings, err
+	}
 }
 
 func (actor Actor) getServiceInstanceSharedStatus(serviceInstanceDetails ServiceInstanceDetails, targetedSpace string) (SharedStatus, ccv3.Warnings, error) {

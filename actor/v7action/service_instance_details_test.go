@@ -73,12 +73,6 @@ var _ = Describe("Service Instance Details Action", func() {
 				nil,
 			)
 
-			fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-				types.JSONObject{"foo": "bar"},
-				ccv3.Warnings{"some-parameters-warning"},
-				nil,
-			)
-
 			fakeCloudControllerClient.GetFeatureFlagReturns(
 				resources.FeatureFlag{Name: "service_instance_sharing", Enabled: true},
 				ccv3.Warnings{},
@@ -129,7 +123,6 @@ var _ = Describe("Service Instance Details Action", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf(
 				"some-service-instance-warning",
-				"some-parameters-warning",
 				"some-bindings-warning",
 			))
 		})
@@ -155,9 +148,6 @@ var _ = Describe("Service Instance Details Action", func() {
 					ServicePlan:       resources.ServicePlan{Name: servicePlanName},
 					ServiceBrokerName: serviceBrokerName,
 					SharedStatus:      SharedStatus{},
-					Parameters: ServiceInstanceParameters{
-						Value: types.JSONObject{"foo": "bar"},
-					},
 					BoundApps: []resources.ServiceCredentialBinding{
 						{
 							Type:    resources.AppBinding,
@@ -259,53 +249,6 @@ var _ = Describe("Service Instance Details Action", func() {
 					Expect(fakeCloudControllerClient.GetServiceInstanceSharedSpacesCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(0))
-				})
-			})
-		})
-
-		Describe("getting the parameters", func() {
-			It("makes the correct call to get the parameters", func() {
-				Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
-			})
-
-			When("getting the parameters fails with an expected error", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
-						ccv3.Warnings{"some-parameters-warning"},
-						ccerror.V3UnexpectedResponseError{
-							V3ErrorResponse: ccerror.V3ErrorResponse{
-								Errors: []ccerror.V3Error{{
-									Code:   1234,
-									Detail: "cannot get parameters reason",
-									Title:  "CF-SomeRandomError",
-								}},
-							},
-						},
-					)
-				})
-
-				It("does not return an error, but returns warnings and the reason", func() {
-					Expect(executionError).NotTo(HaveOccurred())
-					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("cannot get parameters reason"))
-				})
-			})
-
-			When("getting the parameters fails with an another error", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
-						ccv3.Warnings{"some-parameters-warning"},
-						errors.New("not expected"),
-					)
-				})
-
-				It("does not return an error, but returns warnings and the reason", func() {
-					Expect(executionError).NotTo(HaveOccurred())
-					Expect(warnings).To(ContainElement("some-parameters-warning"))
-					Expect(serviceInstance.Parameters.MissingReason).To(Equal("not expected"))
 				})
 			})
 		})
@@ -467,7 +410,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns an empty service instance, warnings, and the error", func() {
 						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
 						Expect(executionError).To(MatchError("error getting feature flag"))
-						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
 					})
 				})
 
@@ -485,7 +428,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns an empty service instance, warnings, and the error", func() {
 						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
 						Expect(executionError).To(MatchError("error getting offering"))
-						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
 					})
 				})
 
@@ -518,7 +461,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns an empty service instance, warnings, and the error", func() {
 						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
 						Expect(executionError).To(MatchError("no service instance"))
-						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
 					})
 				})
 
@@ -542,7 +485,7 @@ var _ = Describe("Service Instance Details Action", func() {
 					It("returns an empty service instance, warnings, and the error", func() {
 						Expect(serviceInstance).To(Equal(ServiceInstanceDetails{}))
 						Expect(executionError).To(MatchError("no service instance"))
-						Expect(warnings).To(ConsistOf("some-service-instance-warning", "some-parameters-warning", warningMessage))
+						Expect(warnings).To(ConsistOf("some-service-instance-warning", warningMessage))
 					})
 				})
 
@@ -760,6 +703,164 @@ var _ = Describe("Service Instance Details Action", func() {
 				It("returns the error and warnings", func() {
 					Expect(executionError).To(MatchError("a bindings error"))
 					Expect(warnings).To(ContainElement("some-bindings-warning"))
+				})
+			})
+		})
+	})
+
+	Describe("GetServiceInstanceParameters", func() {
+		const (
+			serviceInstanceName = "some-service-instance-name"
+			serviceInstanceGUID = "some-service-instance-guid"
+			spaceGUID           = "some-source-space-guid"
+		)
+
+		var (
+			serviceInstanceParams ServiceInstanceParameters
+			warnings              Warnings
+			executionError        error
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					Type:      resources.ManagedServiceInstance,
+					Name:      serviceInstanceName,
+					GUID:      serviceInstanceGUID,
+					SpaceGUID: spaceGUID,
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"some-service-instance-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+				types.JSONObject{"foo": "bar"},
+				ccv3.Warnings{"some-parameters-warning"},
+				nil,
+			)
+
+		})
+
+		JustBeforeEach(func() {
+			serviceInstanceParams, warnings, executionError = actor.GetServiceInstanceParameters(serviceInstanceName, spaceGUID)
+		})
+
+		Describe("getting the service instance", func() {
+			It("makes the correct call to get the service instance", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualQuery := fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualQuery).To(BeNil())
+			})
+
+			When("the service instance cannot be found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{},
+						ccerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
+					)
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}))
+				})
+
+				It("does not attempt any other requests", func() {
+					Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetFeatureFlagCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceOfferingByGUIDCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceInstanceSharedSpacesCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(0))
+				})
+			})
+
+			When("getting the service instance returns an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+						resources.ServiceInstance{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"some-service-instance-warning"},
+						errors.New("no service instance"))
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(executionError).To(MatchError("no service instance"))
+					Expect(warnings).To(ConsistOf("some-service-instance-warning"))
+				})
+
+				It("does not attempt any other requests", func() {
+					Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetFeatureFlagCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceOfferingByGUIDCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceInstanceSharedSpacesCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServicePlanByGUIDCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Describe("getting the parameters", func() {
+			It("makes the correct call to get the parameters", func() {
+				Expect(fakeCloudControllerClient.GetServiceInstanceParametersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceInstanceParametersArgsForCall(0)).To(Equal(serviceInstanceGUID))
+			})
+
+			It("returns parameters", func() {
+				Expect(serviceInstanceParams).To(Equal(
+					ServiceInstanceParameters(types.JSONObject{"foo": "bar"})))
+			})
+
+			When("getting the parameters fails with a ServiceInstanceParametersFetchNotSupportedError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+						types.JSONObject{},
+						ccv3.Warnings{"some-parameters-warning"},
+						ccerror.ServiceInstanceParametersFetchNotSupportedError{
+							Message: "This service does not support fetching service instance parameters.",
+						},
+					)
+				})
+
+				It("does not return an error, but returns warnings and the reason", func() {
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceParamsFetchingNotSupportedError{}))
+					Expect(warnings).To(ContainElement("some-parameters-warning"))
+				})
+			})
+
+			When("getting the parameters fails with a ResourceNotFoundError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+						types.JSONObject{},
+						ccv3.Warnings{"some-parameters-warning"},
+						ccerror.ResourceNotFoundError{
+							Message: "Service instance not found",
+						},
+					)
+				})
+
+				It("converts the error to fetching not supported", func() {
+					Expect(executionError).To(MatchError(actionerror.ServiceInstanceParamsFetchingNotSupportedError{}))
+					Expect(warnings).To(ContainElement("some-parameters-warning"))
+				})
+			})
+
+			When("getting the parameters fails with an another error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
+						types.JSONObject{},
+						ccv3.Warnings{"some-parameters-warning"},
+						errors.New("not expected"),
+					)
+				})
+
+				It("does not return an error, but returns warnings and the reason", func() {
+					Expect(executionError).To(MatchError("not expected"))
+					Expect(warnings).To(ContainElement("some-parameters-warning"))
 				})
 			})
 		})
