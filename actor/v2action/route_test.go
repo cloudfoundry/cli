@@ -1645,7 +1645,7 @@ var _ = Describe("Route Actions", func() {
 					Host:       inputRoute.Host,
 					Path:       inputRoute.Path,
 					Port:       inputRoute.Port.Value,
-					DomainName: domain.Name,
+					DomainGUID: domain.GUID,
 				}))
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
 			})
@@ -1794,7 +1794,7 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = actionerror.RouteNotFoundError{Host: route.Host, DomainName: route.Domain.Name, Path: route.Path}
+				expectedErr = actionerror.RouteNotFoundError{Host: route.Host, DomainGUID: route.Domain.GUID, Path: route.Path}
 				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
 				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"check route warning"}, nil)
 			})

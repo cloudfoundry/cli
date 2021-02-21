@@ -1281,6 +1281,7 @@ var _ = Describe("Route Actions", func() {
 					warnings, err := actor.DeleteRoute("domain.com", "hostname", "/path", 0)
 					Expect(err).To(Equal(actionerror.RouteNotFoundError{
 						DomainName: "domain.com",
+						DomainGUID: "domain-guid",
 						Host:       "hostname",
 						Path:       "/path",
 						Port:       0,
@@ -1377,6 +1378,7 @@ var _ = Describe("Route Actions", func() {
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
 						DomainName: domainName,
+						DomainGUID: domainGUID,
 						Host:       hostname,
 						Path:       path,
 					}))
@@ -1444,6 +1446,7 @@ var _ = Describe("Route Actions", func() {
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
 						DomainName: domainName,
+						DomainGUID: domainGUID,
 						Port:       port,
 					}))
 				})
