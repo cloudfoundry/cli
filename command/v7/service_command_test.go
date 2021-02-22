@@ -135,9 +135,14 @@ var _ = Describe("service command", func() {
 
 	When("it is a user-provided service instance", func() {
 		const (
-			routeServiceURL = "https://route.com"
-			syslogURL       = "https://syslog.com"
-			tags            = "foo, bar"
+			routeServiceURL          = "https://route.com"
+			syslogURL                = "https://syslog.com"
+			tags                     = "foo, bar"
+			lastOperationType        = "update"
+			lastOperationState       = "succeeded"
+			lastOperationDescription = "doing amazing work"
+			lastOperationStartTime   = "a second ago"
+			lastOperationUpdatedTime = "just now"
 		)
 
 		BeforeEach(func() {
@@ -150,6 +155,13 @@ var _ = Describe("service command", func() {
 						SyslogDrainURL:  types.NewOptionalString(syslogURL),
 						RouteServiceURL: types.NewOptionalString(routeServiceURL),
 						Tags:            types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+						LastOperation: resources.LastOperation{
+							Type:        lastOperationType,
+							State:       lastOperationState,
+							Description: lastOperationDescription,
+							CreatedAt:   lastOperationStartTime,
+							UpdatedAt:   lastOperationUpdatedTime,
+						},
 					},
 				},
 				v7action.Warnings{"warning one", "warning two"},
@@ -176,6 +188,13 @@ var _ = Describe("service command", func() {
 				Say(`route service url:\s+%s\n`, routeServiceURL),
 				Say(`syslog drain url:\s+%s\n`, syslogURL),
 				Say(`\n`),
+				Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+				Say(`\n`),
+				Say(`status:\s+%s %s\n`, lastOperationType, lastOperationState),
+				Say(`message:\s+%s\n`, lastOperationDescription),
+				Say(`started:\s+%s\n`, lastOperationStartTime),
+				Say(`updated:\s+%s\n`, lastOperationUpdatedTime),
+				Say(`\n`),
 				Say(`Bound apps:\n`),
 				Say(`There are no bound apps for this service instance\.\n`),
 			))
@@ -184,6 +203,57 @@ var _ = Describe("service command", func() {
 				Say("warning one"),
 				Say("warning two"),
 			))
+		})
+
+		When("last operation is not set", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceInstanceDetailsReturns(
+					v7action.ServiceInstanceDetails{
+						ServiceInstance: resources.ServiceInstance{
+							GUID:            serviceInstanceGUID,
+							Name:            serviceInstanceName,
+							Type:            resources.UserProvidedServiceInstance,
+							SyslogDrainURL:  types.NewOptionalString(syslogURL),
+							RouteServiceURL: types.NewOptionalString(routeServiceURL),
+							Tags:            types.NewOptionalStringSlice(strings.Split(tags, ", ")...),
+						},
+					},
+					v7action.Warnings{"warning one", "warning two"},
+					nil,
+				)
+			})
+
+			It("when last operation does not exist", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeActor.GetServiceInstanceDetailsCallCount()).To(Equal(1))
+				actualName, actualSpaceGUID, actualOmitApps := fakeActor.GetServiceInstanceDetailsArgsForCall(0)
+				Expect(actualName).To(Equal(serviceInstanceName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualOmitApps).To(BeFalse())
+
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`name:\s+%s\n`, serviceInstanceName),
+					Say(`guid:\s+\S+\n`),
+					Say(`type:\s+user-provided`),
+					Say(`tags:\s+%s\n`, tags),
+					Say(`route service url:\s+%s\n`, routeServiceURL),
+					Say(`syslog drain url:\s+%s\n`, syslogURL),
+					Say(`\n`),
+					Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+					Say(`There is no last operation available for this service instance\.\n`),
+					Say(`\n`),
+					Say(`Bound apps:\n`),
+					Say(`There are no bound apps for this service instance\.\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
+			})
 		})
 
 		When("there are bound apps", func() {
@@ -248,7 +318,6 @@ var _ = Describe("service command", func() {
 			lastOperationDescription   = "doing amazing work"
 			lastOperationStartTime     = "a second ago"
 			lastOperationUpdatedTime   = "just now"
-			parameters                 = `{"foo":"bar"}`
 		)
 
 		BeforeEach(func() {

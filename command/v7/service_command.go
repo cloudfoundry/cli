@@ -81,6 +81,7 @@ func (cmd ServiceCommand) fetchAndDisplayDetails() error {
 	switch {
 	case serviceInstanceWithDetails.Type == resources.UserProvidedServiceInstance:
 		cmd.displayPropertiesUserProvided(serviceInstanceWithDetails)
+		cmd.displayLastOperation(serviceInstanceWithDetails)
 		cmd.displayBoundApps(serviceInstanceWithDetails)
 	default:
 		cmd.displayPropertiesManaged(serviceInstanceWithDetails)
@@ -184,16 +185,22 @@ func (cmd ServiceCommand) displayLastOperation(serviceInstanceWithDetails v7acti
 			"ServiceInstanceName": serviceInstanceWithDetails.Name,
 		},
 	)
-	cmd.UI.DisplayNewline()
 
-	status := fmt.Sprintf("%s %s", serviceInstanceWithDetails.LastOperation.Type, serviceInstanceWithDetails.LastOperation.State)
-	table := [][]string{
-		{cmd.UI.TranslateText("status:"), status},
-		{cmd.UI.TranslateText("message:"), serviceInstanceWithDetails.LastOperation.Description},
-		{cmd.UI.TranslateText("started:"), serviceInstanceWithDetails.LastOperation.CreatedAt},
-		{cmd.UI.TranslateText("updated:"), serviceInstanceWithDetails.LastOperation.UpdatedAt},
+	if serviceInstanceWithDetails.LastOperation == (resources.LastOperation{}) {
+		cmd.UI.DisplayText("There is no last operation available for this service instance.")
+	} else {
+		cmd.UI.DisplayNewline()
+
+		status := fmt.Sprintf("%s %s", serviceInstanceWithDetails.LastOperation.Type, serviceInstanceWithDetails.LastOperation.State)
+		table := [][]string{
+			{cmd.UI.TranslateText("status:"), status},
+			{cmd.UI.TranslateText("message:"), serviceInstanceWithDetails.LastOperation.Description},
+			{cmd.UI.TranslateText("started:"), serviceInstanceWithDetails.LastOperation.CreatedAt},
+			{cmd.UI.TranslateText("updated:"), serviceInstanceWithDetails.LastOperation.UpdatedAt},
+		}
+		cmd.UI.DisplayKeyValueTable("", table, 3)
 	}
-	cmd.UI.DisplayKeyValueTable("", table, 3)
+
 	cmd.UI.DisplayNewline()
 }
 
