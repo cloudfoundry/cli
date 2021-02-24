@@ -333,8 +333,8 @@ var _ = Describe("set-label command", func() {
 				It("displays an error", func() {
 					invalidRoute := "non-existent-host." + domainName
 					session := helpers.CF("set-label", "route", invalidRoute, "some-key=some-value")
-					Eventually(session.Err).Should(Say(fmt.Sprintf("Route with host 'non-existent-host' and domain '%s' not found", domainName)))
-					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Route with host 'non-existent-host', domain '%s', and path '/' not found\.`, domainName))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})

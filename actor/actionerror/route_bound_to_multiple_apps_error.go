@@ -2,7 +2,7 @@ package actionerror
 
 import "fmt"
 
-// RouteNotFoundError is returned when a route cannot be found
+// RouteBoundToMultipleAppsError is returned when a route is mapped to more than one app
 type RouteBoundToMultipleAppsError struct {
 	AppName  string
 	RouteURL string
