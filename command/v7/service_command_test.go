@@ -188,14 +188,13 @@ var _ = Describe("service command", func() {
 				Say(`route service url:\s+%s\n`, routeServiceURL),
 				Say(`syslog drain url:\s+%s\n`, syslogURL),
 				Say(`\n`),
-				Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+				Say(`Showing status of last operation:\n`),
+				Say(`\s+status:\s+%s %s\n`, lastOperationType, lastOperationState),
+				Say(`\s+message:\s+%s\n`, lastOperationDescription),
+				Say(`\s+started:\s+%s\n`, lastOperationStartTime),
+				Say(`\s+updated:\s+%s\n`, lastOperationUpdatedTime),
 				Say(`\n`),
-				Say(`status:\s+%s %s\n`, lastOperationType, lastOperationState),
-				Say(`message:\s+%s\n`, lastOperationDescription),
-				Say(`started:\s+%s\n`, lastOperationStartTime),
-				Say(`updated:\s+%s\n`, lastOperationUpdatedTime),
-				Say(`\n`),
-				Say(`Bound apps:\n`),
+				Say(`Showing bound apps:\n`),
 				Say(`There are no bound apps for this service instance\.\n`),
 			))
 
@@ -242,10 +241,10 @@ var _ = Describe("service command", func() {
 					Say(`route service url:\s+%s\n`, routeServiceURL),
 					Say(`syslog drain url:\s+%s\n`, syslogURL),
 					Say(`\n`),
-					Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
+					Say(`Showing status of last operation:\n`),
 					Say(`There is no last operation available for this service instance\.\n`),
 					Say(`\n`),
-					Say(`Bound apps:\n`),
+					Say(`Showing bound apps:\n`),
 					Say(`There are no bound apps for this service instance\.\n`),
 				))
 
@@ -295,7 +294,7 @@ var _ = Describe("service command", func() {
 
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Bound apps:\n`),
+					Say(`Showing bound apps:\n`),
 					Say(`   name\s+binding name\s+status\s+message\n`),
 					Say(`   app-1\s+named-binding\s+create succeeded\s+great\n`),
 					Say(`   app-2\s+update failed\s+sorry\n`),
@@ -380,19 +379,18 @@ var _ = Describe("service command", func() {
 				Say(`documentation:\s+%s\n`, serviceOfferingDocs),
 				Say(`dashboard url:\s+%s\n`, dashboardURL),
 				Say(`\n`),
-				Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-				Say(`\n`),
+				Say(`Showing status of last operation:`),
 				Say(`status:\s+%s %s\n`, lastOperationType, lastOperationState),
 				Say(`message:\s+%s\n`, lastOperationDescription),
 				Say(`started:\s+%s\n`, lastOperationStartTime),
 				Say(`updated:\s+%s\n`, lastOperationUpdatedTime),
 				Say(`\n`),
-				Say(`Bound apps:\n`),
+				Say(`Showing bound apps:`),
 				Say(`There are no bound apps for this service instance\.\n`),
 				Say(`\n`),
-				Say(`Sharing:`),
+				Say(`Showing sharing info:`),
 				Say(`Shared with spaces:\n`),
-				Say(`Upgrading:\n`),
+				Say(`Showing upgrade status:`),
 				Say(`Upgrades are not supported by this broker.\n`),
 			))
 
@@ -407,7 +405,7 @@ var _ = Describe("service command", func() {
 				When("service instance is shared", func() {
 					It("shows shared information", func() {
 						Expect(testUI.Out).To(SatisfyAll(
-							Say(`Sharing:`),
+							Say(`Showing sharing info:`),
 							Say(`Shared with spaces:`),
 							Say(`org\s+space\s+bindings\s*\n`),
 							Say(`some-org\s+shared-to-space\s+3\s*\n`),
@@ -433,7 +431,7 @@ var _ = Describe("service command", func() {
 
 					It("displays that the service is not shared", func() {
 						Expect(testUI.Out).To(SatisfyAll(
-							Say(`Sharing:`),
+							Say(`Showing sharing info:`),
 							Say(`This service instance is not currently being shared.`),
 						))
 					})
@@ -457,7 +455,7 @@ var _ = Describe("service command", func() {
 
 					It("displays that the sharing feature is disabled", func() {
 						Expect(testUI.Out).To(SatisfyAll(
-							Say(`Sharing:\n`),
+							Say(`Showing sharing info:\n`),
 							Say(`\n`),
 							Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.\n`),
 							Say(`\n`),
@@ -504,7 +502,7 @@ var _ = Describe("service command", func() {
 
 					It("displays that the sharing feature is disabled", func() {
 						Expect(testUI.Out).To(SatisfyAll(
-							Say(`Sharing:\n`),
+							Say(`Showing sharing info:\n`),
 							Say(`\n`),
 							Say(`Service instance sharing is disabled for this service offering.\n`),
 							Say(`\n`),
@@ -564,9 +562,8 @@ var _ = Describe("service command", func() {
 
 				It("shows original space information", func() {
 					Expect(testUI.Out).To(SatisfyAll(
-						Say(`Sharing:\n`),
+						Say(`Showing sharing info:\n`),
 						Say(`This service instance is shared from space %s of org %s.\n`, spaceName, orgName),
-						Say(`Upgrading:`),
 					))
 				})
 
@@ -619,12 +616,10 @@ var _ = Describe("service command", func() {
 				It("says an upgrade is available and shows the description", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(SatisfyAll(
-						Say(`Upgrading:\n`),
-						Say(`Showing available upgrade details for this service...\n`),
-						Say(`\n`),
+						Say(`Showing upgrade status:\n`),
+						Say(`There is an upgrade available for this service.\n`),
 						Say(`Upgrade description: really cool upgrade\n`),
 						Say(`with juicy bits\n`),
-						Say(`\n`),
 						Say(`TIP: You can upgrade using 'cf upgrade-service %s'\n`, serviceInstanceName),
 					))
 				})
@@ -667,7 +662,7 @@ var _ = Describe("service command", func() {
 				It("says an upgrade is available and shows the description", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(SatisfyAll(
-						Say(`Upgrading:\n`),
+						Say(`Showing upgrade status:\n`),
 						Say(`There is no upgrade available for this service.\n`),
 					))
 				})
@@ -732,7 +727,7 @@ var _ = Describe("service command", func() {
 
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Bound apps:\n`),
+					Say(`Showing bound apps:\n`),
 					Say(`name\s+binding name\s+status\s+message\n`),
 					Say(`app-1\s+named-binding\s+create succeeded\s+great\n`),
 					Say(`app-2\s+update failed\s+sorry\n`),
