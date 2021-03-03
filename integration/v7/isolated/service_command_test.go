@@ -14,7 +14,7 @@ import (
 )
 
 var _ = Describe("service command", func() {
-	const serviceCommand = "v3-service"
+	const serviceCommand = "service"
 
 	Describe("help", func() {
 		const serviceInstanceName = "fake-service-instance-name"
