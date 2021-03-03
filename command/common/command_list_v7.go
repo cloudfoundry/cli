@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	"code.cloudfoundry.org/cli/command/plugin"
-	v6 "code.cloudfoundry.org/cli/command/v6"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
@@ -137,8 +136,7 @@ type commandList struct {
 	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	SecurityGroup                      v7.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	SecurityGroups                     v7.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
-	Service                            v6.ServiceCommand                            `command:"service" description:"Show service instance info"`
-	ServiceV3                          v7.ServiceCommand                            `command:"v3-service" description:"Show service instance info"`
+	Service                            v7.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	ServiceAccess                      v7.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
 	ServiceBrokers                     v7.ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
 	ServiceKey                         v7.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
