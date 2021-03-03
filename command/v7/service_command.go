@@ -11,6 +11,8 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
+const indent = "   "
+
 type ServiceCommand struct {
 	BaseCommand
 
@@ -124,7 +126,7 @@ func (cmd ServiceCommand) displayPropertiesUserProvided(serviceInstanceWithDetai
 		{cmd.UI.TranslateText("syslog drain url:"), serviceInstanceWithDetails.SyslogDrainURL.String()},
 	}
 
-	cmd.UI.DisplayKeyValueTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, ui.DefaultTableSpacePadding)
 	cmd.UI.DisplayNewline()
 }
 
@@ -142,16 +144,15 @@ func (cmd ServiceCommand) displayPropertiesManaged(serviceInstanceWithDetails v7
 		{cmd.UI.TranslateText("documentation:"), serviceInstanceWithDetails.ServiceOffering.DocumentationURL},
 		{cmd.UI.TranslateText("dashboard url:"), serviceInstanceWithDetails.DashboardURL.String()},
 	}
-	cmd.UI.DisplayKeyValueTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, ui.DefaultTableSpacePadding)
 	cmd.UI.DisplayNewline()
 }
 
 func (cmd ServiceCommand) displaySharingInfo(serviceInstanceWithDetails v7action.ServiceInstanceDetails) {
-	cmd.UI.DisplayText("Sharing:")
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Showing sharing info:")
 
 	if serviceInstanceWithDetails.SharedStatus.IsSharedFromOriginalSpace {
-		cmd.UI.DisplayText("This service instance is shared from space {{.Space}} of org {{.Org}}.", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor(indent+"This service instance is shared from space {{.Space}} of org {{.Org}}.", map[string]interface{}{
 			"Space": serviceInstanceWithDetails.SpaceName,
 			"Org":   serviceInstanceWithDetails.OrganizationName,
 		})
@@ -160,37 +161,32 @@ func (cmd ServiceCommand) displaySharingInfo(serviceInstanceWithDetails v7action
 	}
 
 	if serviceInstanceWithDetails.SharedStatus.IsSharedToOtherSpaces {
-		cmd.UI.DisplayText("Shared with spaces:")
+		cmd.UI.DisplayText(indent + "Shared with spaces:")
 		cmd.displaySharedTo(serviceInstanceWithDetails)
+		cmd.UI.DisplayNewline()
 	} else {
-		cmd.UI.DisplayText("This service instance is not currently being shared.")
+		cmd.UI.DisplayText(indent + "This service instance is not currently being shared.")
 		cmd.UI.DisplayNewline()
 	}
 
-	if serviceInstanceWithDetails.SharedStatus.FeatureFlagIsDisabled {
-		cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
-		cmd.UI.DisplayNewline()
-	}
+	if serviceInstanceWithDetails.SharedStatus.FeatureFlagIsDisabled || serviceInstanceWithDetails.SharedStatus.OfferingDisablesSharing {
+		if serviceInstanceWithDetails.SharedStatus.FeatureFlagIsDisabled {
+			cmd.UI.DisplayText(indent + `The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+		}
 
-	if serviceInstanceWithDetails.SharedStatus.OfferingDisablesSharing {
-		cmd.UI.DisplayText("Service instance sharing is disabled for this service offering.")
+		if serviceInstanceWithDetails.SharedStatus.OfferingDisablesSharing {
+			cmd.UI.DisplayText(indent + "Service instance sharing is disabled for this service offering.")
+		}
 		cmd.UI.DisplayNewline()
 	}
 }
 
 func (cmd ServiceCommand) displayLastOperation(serviceInstanceWithDetails v7action.ServiceInstanceDetails) {
-	cmd.UI.DisplayTextWithFlavor(
-		"Showing status of last operation from service instance {{.ServiceInstanceName}}...",
-		map[string]interface{}{
-			"ServiceInstanceName": serviceInstanceWithDetails.Name,
-		},
-	)
+	cmd.UI.DisplayText("Showing status of last operation:")
 
 	if serviceInstanceWithDetails.LastOperation == (resources.LastOperation{}) {
 		cmd.UI.DisplayText("There is no last operation available for this service instance.")
 	} else {
-		cmd.UI.DisplayNewline()
-
 		status := fmt.Sprintf("%s %s", serviceInstanceWithDetails.LastOperation.Type, serviceInstanceWithDetails.LastOperation.State)
 		table := [][]string{
 			{cmd.UI.TranslateText("status:"), status},
@@ -198,30 +194,29 @@ func (cmd ServiceCommand) displayLastOperation(serviceInstanceWithDetails v7acti
 			{cmd.UI.TranslateText("started:"), serviceInstanceWithDetails.LastOperation.CreatedAt},
 			{cmd.UI.TranslateText("updated:"), serviceInstanceWithDetails.LastOperation.UpdatedAt},
 		}
-		cmd.UI.DisplayKeyValueTable("", table, 3)
+		cmd.UI.DisplayKeyValueTable(indent, table, ui.DefaultTableSpacePadding)
 	}
 
 	cmd.UI.DisplayNewline()
 }
 
 func (cmd ServiceCommand) displayUpgrades(serviceInstanceWithDetails v7action.ServiceInstanceDetails) {
-	cmd.UI.DisplayText("Upgrading:")
+	cmd.UI.DisplayText("Showing upgrade status:")
 
 	switch serviceInstanceWithDetails.UpgradeStatus.State {
 	case v7action.ServiceInstanceUpgradeAvailable:
-		cmd.UI.DisplayText("Showing available upgrade details for this service...")
+		cmd.UI.DisplayText(indent + "There is an upgrade available for this service.")
 		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Upgrade description: {{.Description}}", map[string]interface{}{
+		cmd.UI.DisplayText(indent+"Upgrade description: {{.Description}}", map[string]interface{}{
 			"Description": serviceInstanceWithDetails.UpgradeStatus.Description,
 		})
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("TIP: You can upgrade using 'cf upgrade-service {{.InstanceName}}'", map[string]interface{}{
+		cmd.UI.DisplayText(indent+"TIP: You can upgrade using 'cf upgrade-service {{.InstanceName}}'", map[string]interface{}{
 			"InstanceName": serviceInstanceWithDetails.Name,
 		})
 	case v7action.ServiceInstanceUpgradeNotAvailable:
-		cmd.UI.DisplayText("There is no upgrade available for this service.")
+		cmd.UI.DisplayText(indent + "There is no upgrade available for this service.")
 	default:
-		cmd.UI.DisplayText("Upgrades are not supported by this broker.")
+		cmd.UI.DisplayText(indent + "Upgrades are not supported by this broker.")
 	}
 
 	cmd.UI.DisplayNewline()
@@ -232,15 +227,14 @@ func (cmd ServiceCommand) displaySharedTo(serviceInstanceWithDetails v7action.Se
 	for _, usageSummaryLine := range serviceInstanceWithDetails.SharedStatus.UsageSummary {
 		table = append(table, []string{usageSummaryLine.OrganizationName, usageSummaryLine.SpaceName, strconv.Itoa(usageSummaryLine.BoundAppCount)})
 	}
-	cmd.UI.DisplayTableWithHeader("   ", table, ui.DefaultTableSpacePadding)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayTableWithHeader(indent, table, ui.DefaultTableSpacePadding)
 }
 
 func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.ServiceInstanceDetails) {
-	cmd.UI.DisplayText("Bound apps:")
+	cmd.UI.DisplayText("Showing bound apps:")
 
 	if len(serviceInstanceWithDetails.BoundApps) == 0 {
-		cmd.UI.DisplayText("There are no bound apps for this service instance.")
+		cmd.UI.DisplayText(indent + "There are no bound apps for this service instance.")
 		cmd.UI.DisplayNewline()
 		return
 	}
@@ -255,6 +249,6 @@ func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.S
 		})
 	}
 
-	cmd.UI.DisplayTableWithHeader("   ", table, ui.DefaultTableSpacePadding)
+	cmd.UI.DisplayTableWithHeader(indent, table, ui.DefaultTableSpacePadding)
 	cmd.UI.DisplayNewline()
 }

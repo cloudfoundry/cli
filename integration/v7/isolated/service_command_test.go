@@ -137,14 +137,13 @@ var _ = Describe("service command", func() {
 					Say(`route service url:\s+%s\n`, routeServiceURL),
 					Say(`syslog drain url:\s+%s\n`, syslogURL),
 					Say(`\n`),
-					Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-					Say(`\n`),
+					Say(`Showing status of last operation:\n`),
 					Say(`status:\s+create succeeded\n`),
 					Say(`message:\s+Operation succeeded\n`),
 					Say(`started:\s+%s\n`, helpers.TimestampRegex),
 					Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 					Say(`\n`),
-					Say(`Bound apps:\n`),
+					Say(`Showing bound apps:\n`),
 					Say(`There are no bound apps for this service instance\.\n`),
 				))
 			})
@@ -176,7 +175,7 @@ var _ = Describe("service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
-						Say(`Bound apps:\n`),
+						Say(`Showing bound apps:\n`),
 						Say(`name\s+binding name\s+status\s+message\n`),
 						Say(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
 						Say(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
@@ -243,17 +242,16 @@ var _ = Describe("service command", func() {
 						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
-						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
+						Say(`Showing status of last operation:\n`),
 						Say(`status:\s+create succeeded\n`),
 						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 						Say(`\n`),
-						Say(`Bound apps:\n`),
+						Say(`Showing bound apps:\n`),
 						Say(`There are no bound apps for this service instance\.\n`),
 						Say(`\n`),
-						Say(`Sharing:\n`),
+						Say(`Showing sharing info:\n`),
 						Say(`This service instance is not currently being shared.`),
 						Say(`\n`),
 						Say(`Upgrades are not supported by this broker.\n`),
@@ -305,20 +303,19 @@ var _ = Describe("service command", func() {
 						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
 						Say(`dashboard url:\s+http://example.com\n`),
 						Say(`\n`),
-						Say(`Showing status of last operation from service instance %s...\n`, serviceInstanceName),
-						Say(`\n`),
+						Say(`Showing status of last operation:\n`),
 						Say(`status:\s+create in progress\n`),
 						Say(`message:\s+very happy service\n`),
 						Say(`started:\s+%s\n`, helpers.TimestampRegex),
 						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
 						Say(`\n`),
-						Say(`Bound apps:\n`),
+						Say(`Showing bound apps:\n`),
 						Say(`There are no bound apps for this service instance\.\n`),
 						Say(`\n`),
-						Say(`Sharing:\n`),
+						Say(`Showing sharing info:\n`),
 						Say(`This service instance is not currently being shared.`),
 						Say(`\n`),
-						Say(`Upgrading:\n`),
+						Say(`Showing upgrade status:\n`),
 						Say(`Upgrades are not supported by this broker.\n`),
 					))
 				})
@@ -374,7 +371,7 @@ var _ = Describe("service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
-						Say(`Sharing:\n`),
+						Say(`Showing sharing info:\n`),
 						Say(`Shared with spaces:\n`),
 						Say(`org\s+space\s+bindings\n`),
 						Say(`%s\s+%s\s+0\s*\n`, orgName, sharedToSpaceName),
@@ -436,7 +433,7 @@ var _ = Describe("service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
-						Say(`Sharing:\n`),
+						Say(`Showing sharing info:\n`),
 						Say(`This service instance is shared from space %s of org %s.\n`, spaceName, orgName),
 					))
 				})
@@ -457,7 +454,7 @@ var _ = Describe("service command", func() {
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(SatisfyAll(
-							Say(`Upgrading:\n`),
+							Say(`Showing upgrade status:\n`),
 							Say(`There is no upgrade available for this service.\n`),
 						))
 					})
@@ -479,11 +476,9 @@ var _ = Describe("service command", func() {
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(SatisfyAll(
-							Say(`Upgrading:\n`),
-							Say(`Showing available upgrade details for this service...\n`),
-							Say(`\n`),
+							Say(`Showing upgrade status:\n`),
+							Say(`There is an upgrade available for this service.\n`),
 							Say(`Upgrade description: really cool improvement\n`),
-							Say(`\n`),
 							Say(`TIP: You can upgrade using 'cf upgrade-service %s'\n`, serviceInstanceName),
 						))
 					})
@@ -526,7 +521,7 @@ var _ = Describe("service command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(SatisfyAll(
-						Say(`Bound apps:\n`),
+						Say(`Showing bound apps:\n`),
 						Say(`name\s+binding name\s+status\s+message\n`),
 						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName1, bindingName1),
 						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName2, bindingName2),
