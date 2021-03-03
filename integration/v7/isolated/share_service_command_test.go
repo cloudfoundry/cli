@@ -230,7 +230,7 @@ var _ = Describe("share-service command", func() {
 						session = helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Exit(0))
 						Expect(session.Out).To(SatisfyAll(
-							Say(`shared with spaces`),
+							Say(`Shared with spaces`),
 							Say(`org\s+space\s+bindings`),
 							Say(`%s\s+%s\s+0`, orgName, shareToSpaceName),
 						))
@@ -264,7 +264,7 @@ var _ = Describe("share-service command", func() {
 						session = helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Exit(0))
 						Expect(session.Out).To(SatisfyAll(
-							Say(`shared with spaces`),
+							Say(`Shared with spaces`),
 							Say(`org\s+space\s+bindings`),
 							Say(`%s\s+%s\s+0`, shareToOrgName, shareToSpaceName),
 						))
