@@ -115,7 +115,7 @@ var _ = Describe("update-service command", func() {
 	})
 
 	When("logged in and targeting a space", func() {
-		const serviceCommand = "v3-service"
+		const serviceCommand = "service"
 
 		var (
 			orgName             string

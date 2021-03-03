@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-const serviceCommand = "v3-service"
+const serviceCommand = "service"
 
 var _ = Describe("create-service command", func() {
 	Describe("help", func() {

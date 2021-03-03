@@ -246,7 +246,7 @@ var _ = Describe("unshare-service command", func() {
 					By("validating the service is unshared", func() {
 						session = helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Exit(0))
-						Expect(session.Out).To(Say(`This service is not currently shared.`))
+						Expect(session.Out).To(Say(`This service instance is not currently being shared.`))
 					})
 				})
 			})
@@ -279,7 +279,7 @@ var _ = Describe("unshare-service command", func() {
 					By("validating the service is unshared", func() {
 						session = helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Exit(0))
-						Expect(session.Out).To(Say(`This service is not currently shared.`))
+						Expect(session.Out).To(Say(`This service instance is not currently being shared.`))
 					})
 				})
 			})
