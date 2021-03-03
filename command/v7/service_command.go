@@ -171,7 +171,7 @@ func (cmd ServiceCommand) displaySharingInfo(serviceInstanceWithDetails v7action
 
 	if serviceInstanceWithDetails.SharedStatus.FeatureFlagIsDisabled || serviceInstanceWithDetails.SharedStatus.OfferingDisablesSharing {
 		if serviceInstanceWithDetails.SharedStatus.FeatureFlagIsDisabled {
-			cmd.UI.DisplayText(`   The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+			cmd.UI.DisplayText(indent + `The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
 		}
 
 		if serviceInstanceWithDetails.SharedStatus.OfferingDisablesSharing {
@@ -194,7 +194,7 @@ func (cmd ServiceCommand) displayLastOperation(serviceInstanceWithDetails v7acti
 			{cmd.UI.TranslateText("started:"), serviceInstanceWithDetails.LastOperation.CreatedAt},
 			{cmd.UI.TranslateText("updated:"), serviceInstanceWithDetails.LastOperation.UpdatedAt},
 		}
-		cmd.UI.DisplayKeyValueTable(indent+"", table, ui.DefaultTableSpacePadding)
+		cmd.UI.DisplayKeyValueTable(indent, table, ui.DefaultTableSpacePadding)
 	}
 
 	cmd.UI.DisplayNewline()
@@ -234,7 +234,7 @@ func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.S
 	cmd.UI.DisplayText("Showing bound apps:")
 
 	if len(serviceInstanceWithDetails.BoundApps) == 0 {
-		cmd.UI.DisplayText("There are no bound apps for this service instance.")
+		cmd.UI.DisplayText(indent + "There are no bound apps for this service instance.")
 		cmd.UI.DisplayNewline()
 		return
 	}
