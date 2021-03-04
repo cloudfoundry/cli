@@ -185,7 +185,7 @@ func (cmd ServiceCommand) displayLastOperation(serviceInstanceWithDetails v7acti
 	cmd.UI.DisplayText("Showing status of last operation:")
 
 	if serviceInstanceWithDetails.LastOperation == (resources.LastOperation{}) {
-		cmd.UI.DisplayText("There is no last operation available for this service instance.")
+		cmd.UI.DisplayText(indent + "There is no last operation available for this service instance.")
 	} else {
 		status := fmt.Sprintf("%s %s", serviceInstanceWithDetails.LastOperation.Type, serviceInstanceWithDetails.LastOperation.State)
 		table := [][]string{
