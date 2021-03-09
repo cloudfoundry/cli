@@ -180,7 +180,7 @@ out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
 
 out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
 	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
+	rm -f rsrc.syso
 
 rsrc.syso:
 	@# 'Temporarily' using GOMODULE111 hack: see
