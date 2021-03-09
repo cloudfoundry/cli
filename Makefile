@@ -151,12 +151,12 @@ lint: custom-lint ## Runs all linters and formatters
 # Build dynamic binary for Darwin
 ifeq ($(UNAME_S),Darwin)
 out/cf: $(GOSRC)
-	go build -ldflags "$(LD_FLAGS)" -o out/cf .
+	go build -ldflags "$(LD_FLAGS)" -o /usr/local/bin/cf .
 else
 out/cf: $(GOSRC)
 	CGO_ENABLED=0 go build \
 		$(REQUIRED_FOR_STATIC_BINARY) \
-		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
+		-ldflags "$(LD_FLAGS_LINUX)" -o /usr/local/bin/cf .
 endif
 
 out/cf-cli_linux_i686: $(GOSRC)

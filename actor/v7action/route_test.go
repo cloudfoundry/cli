@@ -623,9 +623,6 @@ var _ = Describe("Route Actions", func() {
 				{
 					GUID:         "route-guid-3",
 					Destinations: []resources.RouteDestination{},
-					DomainGUID:   "domain-guid-1",
-					Port:         1028,
-					URL:          "domain-1.com:1028",
 				},
 			}
 
@@ -653,40 +650,16 @@ var _ = Describe("Route Actions", func() {
 			It("returns the routes and warnings", func() {
 				Expect(routeSummaries).To(Equal([]RouteSummary{
 					{
-						Route: resources.Route{
-							GUID: "route-guid-1",
-							Destinations: []resources.RouteDestination{
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-1"},
-								},
-							},
-						},
+						Route:    resources.Route{GUID: "route-guid-1", Destinations: []resources.RouteDestination{{App: resources.RouteDestinationApp{GUID: "app-guid-1"}}}},
 						AppNames: []string{"app-name-1"},
 					},
 					{
-						Route: resources.Route{
-							GUID: "route-guid-2",
-							Destinations: []resources.RouteDestination{
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-1"},
-								},
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-2"},
-								},
-							},
-						},
+						Route:    resources.Route{GUID: "route-guid-2", Destinations: []resources.RouteDestination{{App: resources.RouteDestinationApp{GUID: "app-guid-1"}}, {App: resources.RouteDestinationApp{GUID: "app-guid-2"}}}},
 						AppNames: []string{"app-name-1", "app-name-2"},
 					},
 					{
-						Route: resources.Route{
-							GUID:         "route-guid-3",
-							Destinations: []resources.RouteDestination{},
-							DomainGUID:   "domain-guid-1",
-							Port:         1028,
-							URL:          "domain-1.com:1028",
-						},
-						AppNames:   nil,
-						DomainName: "domain-1.com",
+						Route:    resources.Route{GUID: "route-guid-3", Destinations: []resources.RouteDestination{}},
+						AppNames: nil,
 					},
 				}))
 				Expect(warnings).To(ConsistOf("get-apps-warning"))

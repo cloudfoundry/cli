@@ -136,43 +136,6 @@ var _ = Describe("routes command", func() {
 			})
 		})
 
-		When("when shared tcp routes exist", func() {
-			var (
-				domainName  string
-				domain      helpers.Domain
-				routerGroup helpers.RouterGroup
-			)
-
-			BeforeEach(func() {
-				domainName = helpers.NewDomainName()
-
-				domain = helpers.NewDomain(orgName, domainName)
-
-				routerGroup = helpers.NewRouterGroup(
-					helpers.NewRouterGroupName(),
-					"1024-2048",
-				)
-				routerGroup.Create()
-				domain.CreateWithRouterGroup(routerGroup.Name)
-
-				Eventually(helpers.CF("create-route", domainName, "--port", "1028")).Should(Exit(0))
-			})
-
-			AfterEach(func() {
-				domain.DeleteShared()
-				routerGroup.Delete()
-			})
-
-			It("lists all the routes", func() {
-				session := helpers.CF("routes")
-				Eventually(session).Should(Exit(0))
-
-				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`))
-				Expect(session).To(Say(`%s\s+%s[^:]\s+%d\s+tcp`, spaceName, domainName, 1028))
-			})
-		})
-
 		When("no routes exist", func() {
 			It("outputs a message about no routes existing", func() {
 				session := helpers.CF("routes")
