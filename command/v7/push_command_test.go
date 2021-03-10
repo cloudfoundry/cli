@@ -313,11 +313,30 @@ var _ = Describe("push Command", func() {
 						})
 
 						When("marsahlling the manifest succeeds", func() {
+							var expectedDiff resources.ManifestDiff
 							BeforeEach(func() {
+								expectedDiff = resources.ManifestDiff{
+									Diffs: []resources.Diff{
+										{Op: resources.AddOperation, Path: "/path/to/field", Value: "hello"},
+									},
+								}
 								fakeManifestParser.MarshalManifestReturns([]byte("our-manifest"), nil)
+								fakeActor.DiffSpaceManifestReturns(expectedDiff, nil, nil)
 							})
 
 							It("delegates to the version actor", func() {
+								//expect diff here and rename It block?
+
+								Expect(fakeActor.DiffSpaceManifestCallCount()).To(Equal(1))
+								spaceGUID, manifestBytes := fakeActor.DiffSpaceManifestArgsForCall(0)
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+								Expect(manifestBytes).To(Equal([]byte("manifesto")))
+
+								Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(1))
+								manifestBytes, diff := fakeDiffDisplayer.DisplayDiffArgsForCall(0)
+								Expect(manifestBytes).To(Equal([]byte("manifesto")))
+								Expect(diff).To(Equal(expectedDiff))
+
 								Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
 								actualSpaceGUID, actualManifestBytes := fakeVersionActor.SetSpaceManifestArgsForCall(0)
 								Expect(actualSpaceGUID).To(Equal("some-space-guid"))

@@ -111,7 +111,7 @@ type PushCommand struct {
 	CWD             string
 	ManifestLocator ManifestLocator
 	ManifestParser  ManifestParser
-
+	DiffDisplayer		DiffDisplayer
 	stopStreamingFunc func()
 }
 
@@ -132,6 +132,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
+	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
 
 	return err
 }
@@ -173,7 +174,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	transformedRawManifest, err := cmd.ManifestParser.MarshalManifest(transformedManifest)
+	transformedRawManifest, err := true, err //cmd.ManifestParser.MarshalManifest(transformedManifest)
 	if err != nil {
 		return err
 	}
@@ -183,6 +184,26 @@ func (cmd PushCommand) Execute(args []string) error {
 	hasManifest := transformedManifest.PathToManifest != ""
 
 	if hasManifest {
+		// check for diff here
+
+	  spaceGUID := cmd.Config.TargetedSpace().GUID
+		diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, manifestBytes)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
+				cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
+			} else {
+				return err
+			}
+		} else {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayText("Updating with these attributes...")
+
+			err = cmd.DiffDisplayer.DisplayDiff(manifestBytes, diff)
+			if err != nil {
+				return err
+			}
+		}
 		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
 			"Path": transformedManifest.PathToManifest,
 		})
