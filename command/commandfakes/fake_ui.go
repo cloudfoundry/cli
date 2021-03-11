@@ -66,6 +66,18 @@ type FakeUI struct {
 	displayInstancesTableForAppArgsForCall []struct {
 		arg1 [][]string
 	}
+	DisplayJSONStub        func(string, interface{}) error
+	displayJSONMutex       sync.RWMutex
+	displayJSONArgsForCall []struct {
+		arg1 string
+		arg2 interface{}
+	}
+	displayJSONReturns struct {
+		result1 error
+	}
+	displayJSONReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DisplayKeyValueTableStub        func(string, [][]string, int)
 	displayKeyValueTableMutex       sync.RWMutex
 	displayKeyValueTableArgsForCall []struct {
@@ -585,6 +597,67 @@ func (fake *FakeUI) DisplayInstancesTableForAppArgsForCall(i int) [][]string {
 	defer fake.displayInstancesTableForAppMutex.RUnlock()
 	argsForCall := fake.displayInstancesTableForAppArgsForCall[i]
 	return argsForCall.arg1
+}
+
+func (fake *FakeUI) DisplayJSON(arg1 string, arg2 interface{}) error {
+	fake.displayJSONMutex.Lock()
+	ret, specificReturn := fake.displayJSONReturnsOnCall[len(fake.displayJSONArgsForCall)]
+	fake.displayJSONArgsForCall = append(fake.displayJSONArgsForCall, struct {
+		arg1 string
+		arg2 interface{}
+	}{arg1, arg2})
+	fake.recordInvocation("DisplayJSON", []interface{}{arg1, arg2})
+	fake.displayJSONMutex.Unlock()
+	if fake.DisplayJSONStub != nil {
+		return fake.DisplayJSONStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.displayJSONReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeUI) DisplayJSONCallCount() int {
+	fake.displayJSONMutex.RLock()
+	defer fake.displayJSONMutex.RUnlock()
+	return len(fake.displayJSONArgsForCall)
+}
+
+func (fake *FakeUI) DisplayJSONCalls(stub func(string, interface{}) error) {
+	fake.displayJSONMutex.Lock()
+	defer fake.displayJSONMutex.Unlock()
+	fake.DisplayJSONStub = stub
+}
+
+func (fake *FakeUI) DisplayJSONArgsForCall(i int) (string, interface{}) {
+	fake.displayJSONMutex.RLock()
+	defer fake.displayJSONMutex.RUnlock()
+	argsForCall := fake.displayJSONArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeUI) DisplayJSONReturns(result1 error) {
+	fake.displayJSONMutex.Lock()
+	defer fake.displayJSONMutex.Unlock()
+	fake.DisplayJSONStub = nil
+	fake.displayJSONReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUI) DisplayJSONReturnsOnCall(i int, result1 error) {
+	fake.displayJSONMutex.Lock()
+	defer fake.displayJSONMutex.Unlock()
+	fake.DisplayJSONStub = nil
+	if fake.displayJSONReturnsOnCall == nil {
+		fake.displayJSONReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayJSONReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeUI) DisplayKeyValueTable(arg1 string, arg2 [][]string, arg3 int) {
@@ -1707,6 +1780,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayHeaderMutex.RUnlock()
 	fake.displayInstancesTableForAppMutex.RLock()
 	defer fake.displayInstancesTableForAppMutex.RUnlock()
+	fake.displayJSONMutex.RLock()
+	defer fake.displayJSONMutex.RUnlock()
 	fake.displayKeyValueTableMutex.RLock()
 	defer fake.displayKeyValueTableMutex.RUnlock()
 	fake.displayKeyValueTableForAppMutex.RLock()

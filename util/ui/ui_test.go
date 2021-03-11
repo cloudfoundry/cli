@@ -186,6 +186,38 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("Display JSON", func() {
+		It("displays the indented JSON object", func() {
+			obj := map[string]interface{}{
+				"str":  "hello",
+				"bool": true,
+				"int":  42,
+				"pass": "abc>&gd!f",
+				"map":  map[string]interface{}{"float": 123.03},
+				"arr":  []string{"a", "b"},
+			}
+
+			ui.DisplayJSON("named_json", obj)
+
+			Expect(out).To(SatisfyAll(
+				Say("named_json: {\n"),
+				Say(" \"arr\": \\[\n"),
+				Say("  \"a\","),
+				Say("  \"b\"\n"),
+				Say(" \\],\n"),
+				Say(" \"bool\": true,\n"),
+				Say(" \"int\": 42,\n"),
+				Say(" \"map\": {\n"),
+				Say("  \"float\": 123.03\n"),
+				Say(" },\n"),
+				Say(" \"pass\": \"abc>&gd!f\",\n"),
+				Say(" \"str\": \"hello\"\n"),
+				Say("}\n"),
+				Say("\n"),
+			))
+		})
+	})
+
 	Describe("DeferText", func() {
 		It("defers the template with map values substituted in to ui.Out with a newline", func() {
 			ui.DeferText(
