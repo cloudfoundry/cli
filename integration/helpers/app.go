@@ -332,3 +332,17 @@ func Zipit(source, target, prefix string) error {
 func ConfirmStagingLogs(session *Session) {
 	Eventually(session).Should(gbytes.Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
 }
+
+func WaitForAppMemoryToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool) {
+	if shouldRestartFirst {
+		session := CF("restart", appName)
+		Eventually(session).Should(Exit(0))
+	}
+
+	Eventually(func() string {
+		session := CF("app", appName)
+		Eventually(session).Should(Exit(0))
+		appTable := ParseV3AppProcessTable(session.Out.Contents())
+		return appTable.Processes[processIndex].Instances[instanceIndex].Memory
+	}).Should(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+}

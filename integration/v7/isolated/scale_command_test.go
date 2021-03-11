@@ -155,6 +155,11 @@ var _ = Describe("scale command", func() {
 						Consistently(session).ShouldNot(Say("Starting"))
 						Eventually(session).Should(Exit(0))
 
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(updatedAppTable.Processes).To(HaveLen(2))
 
@@ -179,6 +184,11 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
 
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(updatedAppTable.Processes).To(HaveLen(2))
 
@@ -194,6 +204,11 @@ var _ = Describe("scale command", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-m", "64M", "-f")
 							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Exit(0))
+
+							helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+							session = helpers.CF("app", appName)
 							Eventually(session).Should(Exit(0))
 
 							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
@@ -222,6 +237,11 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Say(`Instances starting\.\.\.`))
 						Eventually(session).Should(Exit(0))
 
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(updatedAppTable.Processes).To(HaveLen(2))
 
@@ -237,6 +257,11 @@ var _ = Describe("scale command", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-k", "512M", "-f")
 							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Exit(0))
+
+							helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+							session = helpers.CF("app", appName)
 							Eventually(session).Should(Exit(0))
 
 							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
@@ -296,6 +321,11 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
 
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(HaveLen(2))
 
@@ -320,6 +350,14 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(1))
+
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false)
+
+						session = helpers.CF("restart", appName)
+						Eventually(session).Should(Exit(1))
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
 
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(HaveLen(2))
@@ -379,6 +417,11 @@ var _ = Describe("scale command", func() {
 				It("scales the requested process", func() {
 					session := helpers.CF("scale", appName, "-i", "2", "--process", "console")
 					Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					helpers.WaitForAppMemoryToTakeEffect(appName, 1, 0, true)
+
+					session = helpers.CF("app", appName)
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
