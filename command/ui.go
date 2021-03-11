@@ -18,6 +18,7 @@ type UI interface {
 	DisplayFileDeprecationWarning()
 	DisplayHeader(text string)
 	DisplayInstancesTableForApp(table [][]string)
+	DisplayJSON(name string, jsonData interface{}) error
 	DisplayKeyValueTable(prefix string, table [][]string, padding int)
 	DisplayKeyValueTableForApp(table [][]string)
 	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
