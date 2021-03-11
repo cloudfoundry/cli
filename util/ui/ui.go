@@ -279,6 +279,9 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 // DisplayJSON encodes and indents the input
 // and outputs the result to ui.Out.
 func (ui *UI) DisplayJSON(name string, jsonData interface{}) error {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	buff := new(bytes.Buffer)
 	encoder := json.NewEncoder(buff)
 	encoder.SetEscapeHTML(false)
@@ -290,10 +293,11 @@ func (ui *UI) DisplayJSON(name string, jsonData interface{}) error {
 	}
 
 	if name != "" {
-		ui.DisplayText(fmt.Sprintf("%s: %s", name, buff))
+		fmt.Fprintf(ui.Out, "%s\n", fmt.Sprintf("%s: %s", name, buff))
 	} else {
-		ui.DisplayText(fmt.Sprint(buff))
+		fmt.Fprintf(ui.Out, "%s\n", buff)
 	}
+
 	return nil
 }
 
