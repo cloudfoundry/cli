@@ -285,7 +285,7 @@ func (ui *UI) DisplayJSON(name string, jsonData interface{}) error {
 	buff := new(bytes.Buffer)
 	encoder := json.NewEncoder(buff)
 	encoder.SetEscapeHTML(false)
-	encoder.SetIndent("", " ")
+	encoder.SetIndent("", "  ")
 
 	err := encoder.Encode(jsonData)
 	if err != nil {
