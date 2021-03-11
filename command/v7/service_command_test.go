@@ -744,7 +744,7 @@ var _ = Describe("service command", func() {
 		When("parameters are set", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceInstanceParametersReturns(
-					v7action.ServiceInstanceParameters(types.JSONObject{"foo": "bar"}),
+					map[string]interface{}{"foo": "bar"},
 					v7action.Warnings{"warning one", "warning two"},
 					nil,
 				)

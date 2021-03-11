@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/extract"
 	"code.cloudfoundry.org/cli/util/railway"
 )
@@ -32,7 +31,7 @@ type SharedStatus struct {
 	UsageSummary              []UsageSummaryWithSpaceAndOrg
 }
 
-type ServiceInstanceParameters types.JSONObject
+type ServiceInstanceParameters map[string]interface{}
 
 type ServiceInstanceUpgradeState int
 

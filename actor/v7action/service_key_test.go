@@ -477,7 +477,7 @@ var _ = Describe("Service Key Action", func() {
 
 			fakeCloudControllerClient.GetServiceCredentialBindingDetailsReturns(
 				resources.ServiceCredentialBindingDetails{
-					Credentials: types.JSONObject{"foo": "bar"},
+					Credentials: map[string]interface{}{"foo": "bar"},
 				},
 				ccv3.Warnings{"get details warning"},
 				nil,

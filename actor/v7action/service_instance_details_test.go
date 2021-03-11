@@ -735,7 +735,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			)
 
 			fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-				types.JSONObject{"foo": "bar"},
+				map[string]interface{}{"foo": "bar"},
 				ccv3.Warnings{"some-parameters-warning"},
 				nil,
 			)
@@ -812,13 +812,13 @@ var _ = Describe("Service Instance Details Action", func() {
 
 			It("returns parameters", func() {
 				Expect(serviceInstanceParams).To(Equal(
-					ServiceInstanceParameters(types.JSONObject{"foo": "bar"})))
+					ServiceInstanceParameters(map[string]interface{}{"foo": "bar"})))
 			})
 
 			When("getting the parameters fails with a ServiceInstanceParametersFetchNotSupportedError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
+						map[string]interface{}{},
 						ccv3.Warnings{"some-parameters-warning"},
 						ccerror.ServiceInstanceParametersFetchNotSupportedError{
 							Message: "This service does not support fetching service instance parameters.",
@@ -835,7 +835,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			When("getting the parameters fails with a ResourceNotFoundError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
+						map[string]interface{}{},
 						ccv3.Warnings{"some-parameters-warning"},
 						ccerror.ResourceNotFoundError{
 							Message: "Service instance not found",
@@ -852,7 +852,7 @@ var _ = Describe("Service Instance Details Action", func() {
 			When("getting the parameters fails with an another error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceParametersReturns(
-						types.JSONObject{},
+						map[string]interface{}{},
 						ccv3.Warnings{"some-parameters-warning"},
 						errors.New("not expected"),
 					)

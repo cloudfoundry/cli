@@ -1,9 +1,5 @@
 package resources
 
-import (
-	"code.cloudfoundry.org/cli/types"
-)
-
 type ServiceCredentialBindingDetails struct {
-	Credentials types.JSONObject `json:"credentials"`
+	Credentials map[string]interface{} `json:"credentials"`
 }
