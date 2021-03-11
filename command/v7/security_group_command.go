@@ -1,8 +1,6 @@
 package v7
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -43,12 +41,10 @@ func (cmd SecurityGroupCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("rules:"), ""},
 	}, 3)
 
-	jsonRules, err := json.MarshalIndent(securityGroupSummary.Rules, "\t", "\t")
+	err = cmd.UI.DisplayJSON("", securityGroupSummary.Rules)
 	if err != nil {
 		return err
 	}
-
-	cmd.UI.DisplayText("\t" + string(jsonRules))
 
 	cmd.UI.DisplayNewline()
 

@@ -10,8 +10,8 @@ func HandleStackOverride(manifest manifestparser.Manifest, overrides FlagOverrid
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
 		}
+		manifest.Applications[0].Stack = overrides.Stack
 	}
-	manifest.Applications[0].Stack = overrides.Stack
 
 	return manifest, nil
 }

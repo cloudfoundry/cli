@@ -6,6 +6,8 @@
 package ui
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -346,6 +348,31 @@ func (ui *UI) DisplayDiffUnchanged(lines string, depth int, addHyphen bool) {
 
 		fmt.Fprintf(ui.Out, "%s\n", template)
 	}
+}
+
+// DisplayJSON encodes and indents the input
+// and outputs the result to ui.Out.
+func (ui *UI) DisplayJSON(name string, jsonData interface{}) error {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	buff := new(bytes.Buffer)
+	encoder := json.NewEncoder(buff)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", " ")
+
+	err := encoder.Encode(jsonData)
+	if err != nil {
+		return err
+	}
+
+	if name != "" {
+		fmt.Fprintf(ui.Out, "%s\n", fmt.Sprintf("%s: %s", name, buff))
+	} else {
+		fmt.Fprintf(ui.Out, "%s\n", buff)
+	}
+
+	return nil
 }
 
 // FlushDeferred displays text previously deferred (using DeferText) to the UI's
