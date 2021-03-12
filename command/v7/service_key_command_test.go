@@ -3,8 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -74,7 +72,7 @@ var _ = Describe("service-key Command", func() {
 
 			fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
 				resources.ServiceCredentialBindingDetails{
-					Credentials: types.JSONObject{"foo": "bar"},
+					Credentials: map[string]interface{}{"foo": "bar", "pass": "<3test"},
 				},
 				v7action.Warnings{"a warning"},
 				nil,
@@ -96,7 +94,8 @@ var _ = Describe("service-key Command", func() {
 				Say(`Getting key %s for service instance %s as %s\.\.\.\n`, fakeServiceKeyName, fakeServiceInstanceName, fakeUserName),
 				Say(`\n`),
 				Say(`\{\n`),
-				Say(`  "foo": "bar"\n`),
+				Say(`  "foo": "bar",\n`),
+				Say(`  "pass": "<3test"\n`),
 				Say(`\}\n`),
 			))
 		})

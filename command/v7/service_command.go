@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -60,8 +59,10 @@ func (cmd ServiceCommand) fetchAndDisplayParams() error {
 		return err
 	}
 
-	data, _ := json.MarshalIndent(params, "", "  ")
-	cmd.UI.DisplayText(string(data))
+	err = cmd.UI.DisplayJSON("", params)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

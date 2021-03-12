@@ -1,8 +1,6 @@
 package v7
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -72,13 +70,12 @@ func (cmd ServiceKeyCommand) details() error {
 		return err
 	}
 
-	serialized, err := json.MarshalIndent(details.Credentials, "", "  ")
+	cmd.UI.DisplayNewline()
+
+	err = cmd.UI.DisplayJSON("", details)
 	if err != nil {
 		return err
 	}
-
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText(string(serialized))
 
 	return nil
 }
