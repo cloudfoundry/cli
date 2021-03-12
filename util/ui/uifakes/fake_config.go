@@ -58,16 +58,15 @@ func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct {
 	}{})
-	stub := fake.ColorEnabledStub
-	fakeReturns := fake.colorEnabledReturns
 	fake.recordInvocation("ColorEnabled", []interface{}{})
 	fake.colorEnabledMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ColorEnabledStub != nil {
+		return fake.ColorEnabledStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.colorEnabledReturns
 	return fakeReturns.result1
 }
 
@@ -111,16 +110,15 @@ func (fake *FakeConfig) IsTTY() bool {
 	ret, specificReturn := fake.isTTYReturnsOnCall[len(fake.isTTYArgsForCall)]
 	fake.isTTYArgsForCall = append(fake.isTTYArgsForCall, struct {
 	}{})
-	stub := fake.IsTTYStub
-	fakeReturns := fake.isTTYReturns
 	fake.recordInvocation("IsTTY", []interface{}{})
 	fake.isTTYMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.IsTTYStub != nil {
+		return fake.IsTTYStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isTTYReturns
 	return fakeReturns.result1
 }
 
@@ -164,16 +162,15 @@ func (fake *FakeConfig) Locale() string {
 	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct {
 	}{})
-	stub := fake.LocaleStub
-	fakeReturns := fake.localeReturns
 	fake.recordInvocation("Locale", []interface{}{})
 	fake.localeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.LocaleStub != nil {
+		return fake.LocaleStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.localeReturns
 	return fakeReturns.result1
 }
 
@@ -217,16 +214,15 @@ func (fake *FakeConfig) TerminalWidth() int {
 	ret, specificReturn := fake.terminalWidthReturnsOnCall[len(fake.terminalWidthArgsForCall)]
 	fake.terminalWidthArgsForCall = append(fake.terminalWidthArgsForCall, struct {
 	}{})
-	stub := fake.TerminalWidthStub
-	fakeReturns := fake.terminalWidthReturns
 	fake.recordInvocation("TerminalWidth", []interface{}{})
 	fake.terminalWidthMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TerminalWidthStub != nil {
+		return fake.TerminalWidthStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.terminalWidthReturns
 	return fakeReturns.result1
 }
 

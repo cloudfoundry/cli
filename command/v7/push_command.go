@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
@@ -182,10 +183,30 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	hasManifest := transformedManifest.PathToManifest != ""
 
+	spaceGUID := cmd.Config.TargetedSpace().GUID
 	if hasManifest {
 		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
 			"Path": transformedManifest.PathToManifest,
 		})
+
+		_, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, transformedRawManifest)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
+				cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
+			} else {
+				return err
+			}
+		} else {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayText("Updating with these attributes...")
+
+			// err = cmd.DiffDisplayer.DisplayDiff(transformedRawManifest, diff)
+			if err != nil {
+				return err
+			}
+
+		}
 	}
 
 	v7ActionWarnings, err := cmd.VersionActor.SetSpaceManifest(

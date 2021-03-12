@@ -32,16 +32,15 @@ func (fake *FakeInteractor) NewInteraction(arg1 string, arg2 ...interact.Choice)
 		arg1 string
 		arg2 []interact.Choice
 	}{arg1, arg2})
-	stub := fake.NewInteractionStub
-	fakeReturns := fake.newInteractionReturns
 	fake.recordInvocation("NewInteraction", []interface{}{arg1, arg2})
 	fake.newInteractionMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2...)
+	if fake.NewInteractionStub != nil {
+		return fake.NewInteractionStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.newInteractionReturns
 	return fakeReturns.result1
 }
 

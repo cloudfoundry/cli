@@ -40,16 +40,15 @@ func (fake *FakeResolver) Resolve(arg1 interface{}) error {
 	fake.resolveArgsForCall = append(fake.resolveArgsForCall, struct {
 		arg1 interface{}
 	}{arg1})
-	stub := fake.ResolveStub
-	fakeReturns := fake.resolveReturns
 	fake.recordInvocation("Resolve", []interface{}{arg1})
 	fake.resolveMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ResolveStub != nil {
+		return fake.ResolveStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.resolveReturns
 	return fakeReturns.result1
 }
 
@@ -100,10 +99,9 @@ func (fake *FakeResolver) SetIn(arg1 io.Reader) {
 	fake.setInArgsForCall = append(fake.setInArgsForCall, struct {
 		arg1 io.Reader
 	}{arg1})
-	stub := fake.SetInStub
 	fake.recordInvocation("SetIn", []interface{}{arg1})
 	fake.setInMutex.Unlock()
-	if stub != nil {
+	if fake.SetInStub != nil {
 		fake.SetInStub(arg1)
 	}
 }
@@ -132,10 +130,9 @@ func (fake *FakeResolver) SetOut(arg1 io.Writer) {
 	fake.setOutArgsForCall = append(fake.setOutArgsForCall, struct {
 		arg1 io.Writer
 	}{arg1})
-	stub := fake.SetOutStub
 	fake.recordInvocation("SetOut", []interface{}{arg1})
 	fake.setOutMutex.Unlock()
-	if stub != nil {
+	if fake.SetOutStub != nil {
 		fake.SetOutStub(arg1)
 	}
 }

@@ -68,16 +68,15 @@ func (fake *FakeLogMessage) Message() string {
 	ret, specificReturn := fake.messageReturnsOnCall[len(fake.messageArgsForCall)]
 	fake.messageArgsForCall = append(fake.messageArgsForCall, struct {
 	}{})
-	stub := fake.MessageStub
-	fakeReturns := fake.messageReturns
 	fake.recordInvocation("Message", []interface{}{})
 	fake.messageMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.MessageStub != nil {
+		return fake.MessageStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.messageReturns
 	return fakeReturns.result1
 }
 
@@ -121,16 +120,15 @@ func (fake *FakeLogMessage) SourceInstance() string {
 	ret, specificReturn := fake.sourceInstanceReturnsOnCall[len(fake.sourceInstanceArgsForCall)]
 	fake.sourceInstanceArgsForCall = append(fake.sourceInstanceArgsForCall, struct {
 	}{})
-	stub := fake.SourceInstanceStub
-	fakeReturns := fake.sourceInstanceReturns
 	fake.recordInvocation("SourceInstance", []interface{}{})
 	fake.sourceInstanceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.SourceInstanceStub != nil {
+		return fake.SourceInstanceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.sourceInstanceReturns
 	return fakeReturns.result1
 }
 
@@ -174,16 +172,15 @@ func (fake *FakeLogMessage) SourceType() string {
 	ret, specificReturn := fake.sourceTypeReturnsOnCall[len(fake.sourceTypeArgsForCall)]
 	fake.sourceTypeArgsForCall = append(fake.sourceTypeArgsForCall, struct {
 	}{})
-	stub := fake.SourceTypeStub
-	fakeReturns := fake.sourceTypeReturns
 	fake.recordInvocation("SourceType", []interface{}{})
 	fake.sourceTypeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.SourceTypeStub != nil {
+		return fake.SourceTypeStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.sourceTypeReturns
 	return fakeReturns.result1
 }
 
@@ -227,16 +224,15 @@ func (fake *FakeLogMessage) Timestamp() time.Time {
 	ret, specificReturn := fake.timestampReturnsOnCall[len(fake.timestampArgsForCall)]
 	fake.timestampArgsForCall = append(fake.timestampArgsForCall, struct {
 	}{})
-	stub := fake.TimestampStub
-	fakeReturns := fake.timestampReturns
 	fake.recordInvocation("Timestamp", []interface{}{})
 	fake.timestampMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TimestampStub != nil {
+		return fake.TimestampStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.timestampReturns
 	return fakeReturns.result1
 }
 
@@ -280,16 +276,15 @@ func (fake *FakeLogMessage) Type() string {
 	ret, specificReturn := fake.typeReturnsOnCall[len(fake.typeArgsForCall)]
 	fake.typeArgsForCall = append(fake.typeArgsForCall, struct {
 	}{})
-	stub := fake.TypeStub
-	fakeReturns := fake.typeReturns
 	fake.recordInvocation("Type", []interface{}{})
 	fake.typeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TypeStub != nil {
+		return fake.TypeStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.typeReturns
 	return fakeReturns.result1
 }
 
