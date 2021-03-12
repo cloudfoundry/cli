@@ -519,7 +519,7 @@ var _ = Describe("Service Key Action", func() {
 		It("returns the details, with warnings and no error", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 			Expect(warnings).To(ContainElements("get instance warning", "get keys warning", "get details warning"))
-			Expect(details.Credentials).To(Equal(types.JSONObject{"foo": "bar"}))
+			Expect(details.Credentials).To(Equal(map[string]interface{}{"foo": "bar"}))
 		})
 
 		When("service instance not found", func() {
