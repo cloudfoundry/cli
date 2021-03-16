@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -84,6 +85,8 @@ var _ = Describe("push Command", func() {
 		fakeConfig          *commandfakes.FakeConfig
 		fakeSharedActor     *commandfakes.FakeSharedActor
 		fakeActor           *v7fakes.FakePushActor
+		fakeDiffActor       *v7fakes.FakeActor
+		fakeDiffDisplayer   *v7fakes.FakeDiffDisplayer
 		fakeVersionActor    *v7fakes.FakeV7ActorForPush
 		fakeProgressBar     *v7fakes.FakeProgressBar
 		fakeLogCacheClient  *sharedactionfakes.FakeLogCacheClient
@@ -106,6 +109,8 @@ var _ = Describe("push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakePushActor)
+		fakeDiffActor = new(v7fakes.FakeActor)
+		fakeDiffDisplayer = new(v7fakes.FakeDiffDisplayer)
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v7fakes.FakeProgressBar)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
@@ -127,6 +132,7 @@ var _ = Describe("push Command", func() {
 				SharedActor: fakeSharedActor,
 				UI:          testUI,
 				Config:      fakeConfig,
+				Actor:       fakeDiffActor,
 			},
 			PushActor:       fakeActor,
 			VersionActor:    fakeVersionActor,
@@ -135,6 +141,7 @@ var _ = Describe("push Command", func() {
 			CWD:             pwd,
 			ManifestLocator: fakeManifestLocator,
 			ManifestParser:  fakeManifestParser,
+			DiffDisplayer:   fakeDiffDisplayer,
 		}
 	})
 
@@ -322,6 +329,81 @@ var _ = Describe("push Command", func() {
 								actualSpaceGUID, actualManifestBytes := fakeVersionActor.SetSpaceManifestArgsForCall(0)
 								Expect(actualSpaceGUID).To(Equal("some-space-guid"))
 								Expect(actualManifestBytes).To(Equal([]byte("our-manifest")))
+							})
+
+							When("the manifest is successfully parsed", func() {
+								var expectedDiff resources.ManifestDiff
+
+								BeforeEach(func() {
+									fakeActor.HandleFlagOverridesReturns(
+										manifestparser.Manifest{
+											PathToManifest: "path/to/manifest",
+										},
+										nil,
+									)
+									expectedDiff = resources.ManifestDiff{
+										Diffs: []resources.Diff{
+											{Op: resources.AddOperation, Path: "/path/to/field", Value: "hello"},
+										},
+									}
+
+									fakeVersionActor.SetSpaceManifestReturns(
+										v7action.Warnings{"some-manifest-warning"},
+										nil,
+									)
+
+									fakeDiffActor.DiffSpaceManifestReturns(
+										expectedDiff,
+										nil,
+										nil,
+									)
+								})
+
+								It("shows the manifest diff and sets the manifest", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("Applying manifest file %s...", ("path/to/manifest")))
+									Expect(testUI.Err).To(Say("some-manifest-warning"))
+
+									Expect(fakeDiffActor.DiffSpaceManifestCallCount()).To(Equal(1))
+									spaceGUID, manifestBytes := fakeDiffActor.DiffSpaceManifestArgsForCall(0)
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+									Expect(manifestBytes).To(Equal([]byte("our-manifest")))
+
+									Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(1))
+									manifestBytes, diff := fakeDiffDisplayer.DisplayDiffArgsForCall(0)
+									Expect(manifestBytes).To(Equal([]byte("our-manifest")))
+									Expect(diff).To(Equal(expectedDiff))
+
+									Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
+									spaceGUIDArg, actualBytes := fakeVersionActor.SetSpaceManifestArgsForCall(0)
+									Expect(actualBytes).To(Equal([]byte("our-manifest")))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+								})
+
+								When("the manifest diff fails", func() {
+									BeforeEach(func() {
+										fakeDiffActor.DiffSpaceManifestReturns(resources.ManifestDiff{}, v7action.Warnings{}, ccerror.V3UnexpectedResponseError{})
+									})
+
+									It("reports the 500, does not display the diff, but still applies the manifest", func() {
+										Expect(executeErr).ToNot(HaveOccurred())
+
+										Expect(testUI.Err).To(Say("Unable to generate diff. Continuing to apply manifest..."))
+										Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(0))
+										Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
+									})
+								})
+
+								When("displaying the manifest diff fails", func() {
+									BeforeEach(func() {
+										fakeDiffDisplayer.DisplayDiffReturns(errors.New("diff failed"))
+									})
+
+									It("returns the diff error", func() {
+										Expect(executeErr).To(MatchError("diff failed"))
+										Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(0))
+									})
+								})
 							})
 
 							When("applying the manifest fails", func() {
