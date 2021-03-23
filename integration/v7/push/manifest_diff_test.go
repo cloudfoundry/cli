@@ -26,8 +26,8 @@ var _ = Describe("displaying manifest differences between pushes", func() {
 				helpers.WriteManifest(pathToManifest, map[string]interface{}{
 					"applications": []map[string]interface{}{
 						{
-							"name":       appName,
-							"disk_quota": "1GB",
+							"name":      appName,
+							"instances": 1,
 						},
 					},
 				})
@@ -39,8 +39,8 @@ var _ = Describe("displaying manifest differences between pushes", func() {
 				helpers.WriteManifest(pathToManifest, map[string]interface{}{
 					"applications": []map[string]interface{}{
 						{
-							"name":       appName,
-							"disk_quota": "2GB",
+							"name":      appName,
+							"instances": 2,
 						},
 					},
 				})
@@ -48,8 +48,8 @@ var _ = Describe("displaying manifest differences between pushes", func() {
 				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say("name:\\s+%s", appName))
-				Expect(session).To(Say(`\-   disk-quota: 1024M`))
-				Expect(session).To(Say(`\+   disk-quota: 2028M`))
+				Expect(session).To(Say(`\-   instances: 1`))
+				Expect(session).To(Say(`\+   instances: 2`))
 			})
 		})
 	})
