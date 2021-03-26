@@ -125,8 +125,8 @@ var _ = Describe("scale command", func() {
 					Expect(processSummary.InstanceCount).To(Equal("1/1"))
 
 					instanceSummary := processSummary.Instances[0]
-					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+?[KMG]?`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+?[KMG]?`))
 
 					Expect(appTable.Processes[1].Type).To(Equal("console"))
 					Expect(appTable.Processes[1].InstanceCount).To(Equal("0/0"))
