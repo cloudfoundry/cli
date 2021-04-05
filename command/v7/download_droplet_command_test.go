@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -17,7 +16,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -91,7 +89,7 @@ var _ = Describe("download-droplet Command", func() {
 		)
 
 		BeforeEach(func() {
-			dropletGUID = fmt.Sprintf("fake-droplet-guid-%d", rand.Uint64())
+			dropletGUID = RandomString("fake-droplet-guid")
 			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet-bytes"), dropletGUID, v7action.Warnings{"some-warning"}, nil)
 
 			currentDir, _ := os.Getwd()
@@ -131,7 +129,7 @@ var _ = Describe("download-droplet Command", func() {
 		)
 
 		BeforeEach(func() {
-			dropletGUID = fmt.Sprintf("fake-droplet-guid-%d", rand.Uint64())
+			dropletGUID = RandomString("fake-droplet-guid")
 			pathToDropletFile = fmt.Sprintf("droplet_%s.tgz", dropletGUID)
 
 			setFlag(&cmd, "--droplet", dropletGUID)
@@ -169,7 +167,7 @@ var _ = Describe("download-droplet Command", func() {
 	When("a path to a file is passed in", func() {
 		var filePath string
 		BeforeEach(func() {
-			filePath = fmt.Sprintf("fake-file-%d", rand.Uint64())
+			filePath = RandomString("fake-file")
 
 			setFlag(&cmd, "--path", filePath)
 			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
