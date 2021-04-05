@@ -117,14 +117,12 @@ github.com/docker/docker/pkg/term/windows
 # github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 ## explicit
 github.com/fatih/color
-# github.com/fsnotify/fsnotify v1.4.9
-github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
 ## explicit
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
-# github.com/golang/protobuf v1.4.2 => github.com/golang/protobuf v1.3.4
+# github.com/golang/protobuf v1.4.3 => github.com/golang/protobuf v1.3.4
 github.com/golang/protobuf/descriptor
 github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/proto
@@ -183,35 +181,21 @@ github.com/moby/moby/pkg/term
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/nxadm/tail v1.4.4
-github.com/nxadm/tail
-github.com/nxadm/tail/ratelimiter
-github.com/nxadm/tail/util
-github.com/nxadm/tail/watch
-github.com/nxadm/tail/winfile
-# github.com/onsi/ginkgo v1.15.0
+# github.com/nxadm/tail v1.4.8
+## explicit
+# github.com/onsi/ginkgo v1.16.1-0.20210404183248-5e5aefc16e37
 ## explicit
 github.com/onsi/ginkgo
 github.com/onsi/ginkgo/config
 github.com/onsi/ginkgo/extensions/table
-github.com/onsi/ginkgo/internal/codelocation
-github.com/onsi/ginkgo/internal/containernode
-github.com/onsi/ginkgo/internal/failer
+github.com/onsi/ginkgo/formatter
+github.com/onsi/ginkgo/internal
 github.com/onsi/ginkgo/internal/global
-github.com/onsi/ginkgo/internal/leafnodes
-github.com/onsi/ginkgo/internal/remote
-github.com/onsi/ginkgo/internal/spec
-github.com/onsi/ginkgo/internal/spec_iterator
-github.com/onsi/ginkgo/internal/specrunner
-github.com/onsi/ginkgo/internal/suite
+github.com/onsi/ginkgo/internal/parallel_support
 github.com/onsi/ginkgo/internal/testingtproxy
-github.com/onsi/ginkgo/internal/writer
 github.com/onsi/ginkgo/reporters
-github.com/onsi/ginkgo/reporters/stenographer
-github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
-github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/gomega v1.10.5
+# github.com/onsi/gomega v1.11.1-0.20210307213111-c3c09204ab54
 ## explicit
 github.com/onsi/gomega
 github.com/onsi/gomega/format
@@ -379,9 +363,7 @@ google.golang.org/grpc/tap
 # gopkg.in/cheggaaa/pb.v1 v1.0.27
 ## explicit
 gopkg.in/cheggaaa/pb.v1
-# gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
-gopkg.in/tomb.v1
-# gopkg.in/yaml.v2 v2.3.0
+# gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
 # gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7

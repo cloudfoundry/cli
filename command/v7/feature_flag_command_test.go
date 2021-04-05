@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -89,18 +90,20 @@ var _ = Describe("Feature Flag Command", func() {
 	When("getting featureFlag fails", func() {
 		When("the featureFlag does not exist", func() {
 			BeforeEach(func() {
+			        fmt.Println("two")
 				featureFlag := resources.FeatureFlag{}
 				fakeActor.GetFeatureFlagByNameReturns(featureFlag, v7action.Warnings{"this is a warning"}, actionerror.FeatureFlagNotFoundError{FeatureFlagName: featureFlagName})
 			})
 
-			It("Fails and returns a FeatureFlagNotFoundError", func() {
+			FIt("Fails and returns a FeatureFlagNotFoundError", func() {
 				Expect(executeErr).To(Equal(actionerror.FeatureFlagNotFoundError{FeatureFlagName: featureFlagName}))
 				Expect(testUI.Err).To(Say("this is a warning"))
 			})
 		})
 		BeforeEach(func() {
+			fmt.Println("one")
 			fakeActor.GetFeatureFlagByNameReturns(resources.FeatureFlag{}, v7action.Warnings{"this is a warning"},
-				errors.New("some-error"))
+				errors.New("some-error2"))
 		})
 
 		It("prints warnings and returns error", func() {
