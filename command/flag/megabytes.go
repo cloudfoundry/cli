@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	AllowedUnits = "mg"
+	AllowedUnits = "mgt"
 )
 
 type Megabytes struct {
