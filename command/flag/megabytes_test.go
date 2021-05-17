@@ -47,6 +47,22 @@ var _ = Describe("Megabytes", func() {
 			})
 		})
 
+		When("the suffix is T", func() {
+			It("interprets the number as terabytes", func() {
+				err := megabytes.UnmarshalFlag("2T")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(megabytes.Value).To(BeEquivalentTo(2097152))
+			})
+		})
+
+		When("the suffix is TB", func() {
+			It("interprets the number as terabytes", func() {
+				err := megabytes.UnmarshalFlag("3TB")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(megabytes.Value).To(BeEquivalentTo(3145728))
+			})
+		})
+
 		When("the suffix is lowercase", func() {
 			It("is case insensitive", func() {
 				err := megabytes.UnmarshalFlag("7m")
