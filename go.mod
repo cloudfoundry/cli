@@ -9,7 +9,7 @@ require (
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.0.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f
-	code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34
+	code.cloudfoundry.org/go-log-cache v1.0.1-0.20200722221510-3f87d731aaa9
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.3
@@ -66,6 +66,6 @@ require (
 
 replace gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7
 
-replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.4
+replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
 
 replace golang.org/x/sys => golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6
