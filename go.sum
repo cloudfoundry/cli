@@ -15,9 +15,11 @@ code.cloudfoundry.org/go-diodes v0.0.0-20180905200951-72629b5276e3/go.mod h1:Jzi
 code.cloudfoundry.org/go-envstruct v1.5.0/go.mod h1:E2S/gzRZpZ51PZnIv7Bo7QvcgH18yio19upkrRk0xLU=
 code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34 h1:cSOAscWrWx7uix5SjqePlqDad/n8f2A/bugsSttxVx4=
 code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34/go.mod h1:0+5CSLZehiHLkrWCmwPt7mA/RlAa71idWz4SG4wfhOE=
+code.cloudfoundry.org/go-log-cache v1.0.1-0.20200722221510-3f87d731aaa9 h1:Yc+MUpc8qh86Pgu8Ix3lSv1dz/2OBbNpqp8WTXra1aI=
 code.cloudfoundry.org/go-log-cache v1.0.1-0.20200722221510-3f87d731aaa9/go.mod h1:mV/ReZXIR1kBGRUUHQNLyybmTb4KbGQc+U7Z7SlByuk=
 code.cloudfoundry.org/go-loggregator v7.4.0+incompatible h1:KqZYloMQWM5Zg/BQKunOIA4OODh7djZbk48qqbowNFI=
 code.cloudfoundry.org/go-loggregator v7.4.0+incompatible/go.mod h1:KPBTRqj+y738Nhf1+g4JHFaBU8j7dedirR5ETNHvMXU=
+code.cloudfoundry.org/go-loggregator/v8 v8.0.2-0.20200722201844-b5130958b65d h1:SXIrgeKWYaU6gJV/ohJcUkaULsjlIC9GHLp+lMEjBk4=
 code.cloudfoundry.org/go-loggregator/v8 v8.0.2-0.20200722201844-b5130958b65d/go.mod h1:Or3cWTXwK6d3caPRBTUJv/suT+47jOltB7hYC/3ECCo=
 code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f h1:UrKzEwTgeiff9vxdrfdqxibzpWjxLnuXDI5m6z3GJAk=
 code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f/go.mod h1:sk5LnIjB/nIEU7yP5sDQExVm62wu0pBh3yrElngUisI=
@@ -99,6 +101,7 @@ github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfU
 github.com/golang/mock v1.1.1/go.mod h1:oTYuIxOrZwtPieC+H1uAHpcLFnEyAGVDL/k47Jfbm0A=
 github.com/golang/protobuf v1.3.4 h1:87PNWwrRvUSnqS4dlcBU/ftvOIBep4sYuBLlh6rX2wk=
 github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
+github.com/golang/protobuf v1.3.5 h1:F768QJ1E9tib+q5Sc8MkdJi1RxLTbRcTf8LJV56aRls=
 github.com/golang/protobuf v1.3.5/go.mod h1:6O5/vntMXwX2lRkT1hjjk0nAC1IDOTvTlVgjlRvqsdk=
 github.com/google/go-cmp v0.2.0 h1:+dTQ8DZQJz0Mb/HjFlkptS1FeQ4cWSnN941F8aEG4SQ=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=

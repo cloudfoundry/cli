@@ -10,7 +10,7 @@ import (
 
 	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-log-cache/rpc/logcache_v1"
-	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -141,21 +141,23 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 		const offset = 1 * time.Second
 		walkStartTime := ts.Add(-offset)
 
+		v := func(envelopes []*loggregator_v2.Envelope) bool {
+			logMessages := convertEnvelopesToLogMessages(envelopes)
+			for _, logMessage := range logMessages {
+				select {
+				case <-ctx.Done():
+					return false
+				default:
+					outgoingLogStream <- *logMessage
+				}
+			}
+			return true
+		}
+
 		logcache.Walk(
 			ctx,
 			appGUID,
-			logcache.Visitor(func(envelopes []*loggregator_v2.Envelope) bool {
-				logMessages := convertEnvelopesToLogMessages(envelopes)
-				for _, logMessage := range logMessages {
-					select {
-					case <-ctx.Done():
-						return false
-					default:
-						outgoingLogStream <- *logMessage
-					}
-				}
-				return true
-			}),
+			v,
 			client.Read,
 			logcache.WithWalkDelay(2*time.Second),
 			logcache.WithWalkStartTime(walkStartTime),
