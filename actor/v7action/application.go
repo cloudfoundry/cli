@@ -312,6 +312,11 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 	for {
 		select {
 		case <-timeout:
+			warnings, err := actor.CancelDeployment(deploymentGUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return allWarnings, err
+			}
 			return allWarnings, actionerror.StartupTimeoutError{Name: app.Name}
 		case <-timer.C():
 			if !isDeployed(deployment) {
