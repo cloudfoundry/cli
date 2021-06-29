@@ -178,26 +178,21 @@ var _ = Describe("scale command", func() {
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "64M")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
-						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
+
+						Expect(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
 
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Exit(0))
-
-						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(HaveLen(2))
-
-						processSummary := updatedAppTable.Processes[0]
-						instanceSummary := processSummary.Instances[0]
-						Expect(processSummary.Type).To(Equal("web"))
-						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
-						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
-						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+						Eventually(func() string {
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Exit(0))
+							appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
+							return appTable.Processes[0].Instances[0].Memory
+						}).Should(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					})
 
 					When("-f flag provided", func() {
