@@ -79,10 +79,10 @@ var _ = Describe("scale command", func() {
 		When("the app name is not provided", func() {
 			It("tells the user that the app name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("scale")
-
-				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
+
+				Expect(session.Err).To(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+				Expect(session).To(Say("NAME:"))
 			})
 		})
 
@@ -90,9 +90,10 @@ var _ = Describe("scale command", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("scale", invalidAppName)
-				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
-				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
+
+				Expect(session.Err).To(Say("App '%s' not found", invalidAppName))
+				Expect(session).To(Say("FAILED"))
 			})
 		})
 
@@ -101,21 +102,24 @@ var _ = Describe("scale command", func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
+				helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "32M")
 			})
 
 			When("scale option flags are not provided", func() {
 				It("displays the current scale properties for all processes", func() {
 					session := helpers.CF("scale", appName)
 
-					Eventually(session).Should(Say(`Showing current scale of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(Say(`Showing current scale of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Expect(session).To(Say(`name:\s+%s`, appName))
+					Expect(session).To(Say(`requested state:\s+started`))
+
 					Consistently(session).ShouldNot(Say("Scaling"))
 					Consistently(session).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session).ShouldNot(Say("Stopping"))
 					Consistently(session).ShouldNot(Say("Starting"))
 					Consistently(session).ShouldNot(Say("Waiting"))
-					Eventually(session).Should(Say(`name:\s+%s`, appName))
-					Eventually(session).Should(Say(`requested state:\s+started`))
-					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(len(appTable.Processes)).To(Equal(2))
@@ -149,13 +153,13 @@ var _ = Describe("scale command", func() {
 
 						By("then scaling to 3 instances")
 						session = helpers.CF("scale", appName, "-i", "3")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Consistently(session).ShouldNot(Say("This will cause the app to restart"))
 						Consistently(session).ShouldNot(Say("Stopping"))
 						Consistently(session).ShouldNot(Say("Starting"))
-						Eventually(session).Should(Exit(0))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true, "32M")
 
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Exit(0))
@@ -179,42 +183,21 @@ var _ = Describe("scale command", func() {
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "64M")
 						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).To(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-						Expect(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Expect(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
-						Expect(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Expect(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
-
-						Eventually(func() string {
-							session := helpers.CF("app", appName)
-							Eventually(session).Should(Exit(0))
-							appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-							return appTable.Processes[0].Instances[0].Memory
-						}).Should(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "64M")
 					})
 
 					When("-f flag provided", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-m", "64M", "-f")
-							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 							Eventually(session).Should(Exit(0))
+							Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
-
-							session = helpers.CF("app", appName)
-							Eventually(session).Should(Exit(0))
-
-							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-							Expect(updatedAppTable.Processes).To(HaveLen(2))
-
-							processSummary := updatedAppTable.Processes[0]
-							instanceSummary := processSummary.Instances[0]
-							Expect(processSummary.Type).To(Equal("web"))
-							Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
-							Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
-							Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+							helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "64M")
 						})
 					})
 				})
@@ -225,49 +208,23 @@ var _ = Describe("scale command", func() {
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-k", "512M")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
-						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Instances starting\.\.\.`))
 						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).To(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Instances starting\.\.\.`))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
-
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Exit(0))
-
-						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(HaveLen(2))
-
-						processSummary := updatedAppTable.Processes[0]
-						instanceSummary := processSummary.Instances[0]
-						Expect(processSummary.Type).To(Equal("web"))
-						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
-						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 512M`))
+						helpers.WaitForAppDiskToTakeEffect(appName, 0, 0, false, "512M")
 					})
 
 					When("-f flag provided", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-k", "512M", "-f")
-							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 							Eventually(session).Should(Exit(0))
+							Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
-
-							session = helpers.CF("app", appName)
-							Eventually(session).Should(Exit(0))
-
-							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-							Expect(updatedAppTable.Processes).To(HaveLen(2))
-
-							processSummary := updatedAppTable.Processes[0]
-							instanceSummary := processSummary.Instances[0]
-							Expect(processSummary.Type).To(Equal("web"))
-							Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/1`))
-							Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-							Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 512M`))
+							helpers.WaitForAppDiskToTakeEffect(appName, 0, 0, false, "512M")
 						})
 					})
 				})
@@ -275,9 +232,9 @@ var _ = Describe("scale command", func() {
 				When("Scaling to 0 instances", func() {
 					It("scales to 0 instances", func() {
 						session := helpers.CF("scale", appName, "-i", "0")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Consistently(session).ShouldNot(Say(`This will cause the app to restart|Stopping|Starting`))
 						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Consistently(session).ShouldNot(Say(`This will cause the app to restart|Stopping|Starting`))
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(updatedAppTable.Processes[0].InstanceCount).To(Equal("0/0"))
 						Expect(updatedAppTable.Processes[0].Instances).To(BeEmpty())
@@ -288,14 +245,15 @@ var _ = Describe("scale command", func() {
 					It("cancels the scale", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("n\n"))
-						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "90M")
-						Eventually(session).Should(Say("This will cause the app to restart"))
+						Eventually(session).Should(Exit(0))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(session).To(Say("This will cause the app to restart"))
+						Expect(session).To(Say("Scaling cancelled"))
+
 						Consistently(session).ShouldNot(Say("Stopping"))
 						Consistently(session).ShouldNot(Say("Starting"))
-						Eventually(session).Should(Say("Scaling cancelled"))
 						Consistently(session).ShouldNot(Say(`Waiting for app to start\.\.\.`))
-						Eventually(session).Should(Exit(0))
 
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(BeEmpty())
@@ -310,13 +268,13 @@ var _ = Describe("scale command", func() {
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "512M", "-m", "60M")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
-						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).To(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true)
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "60M")
 
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Exit(0))
@@ -340,13 +298,13 @@ var _ = Describe("scale command", func() {
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "10M", "-m", "6M")
-						Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
-						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(1))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).To(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false)
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "6M")
 
 						session = helpers.CF("restart", appName)
 						Eventually(session).Should(Exit(1))
@@ -411,10 +369,8 @@ var _ = Describe("scale command", func() {
 			When("the process flag is provided", func() {
 				It("scales the requested process", func() {
 					session := helpers.CF("scale", appName, "-i", "2", "--process", "console")
-					Eventually(session).Should(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
-
-					helpers.WaitForAppMemoryToTakeEffect(appName, 1, 0, true)
+					Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 					session = helpers.CF("app", appName)
 					Eventually(session).Should(Exit(0))
@@ -423,12 +379,9 @@ var _ = Describe("scale command", func() {
 					Expect(appTable.Processes).To(HaveLen(2))
 
 					processSummary := appTable.Processes[1]
-					instanceSummary := processSummary.Instances[0]
 					Expect(processSummary.Instances).To(HaveLen(2))
 					Expect(processSummary.Type).To(Equal("console"))
 					Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
-					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 				})
 			})
 		})
@@ -438,52 +391,50 @@ var _ = Describe("scale command", func() {
 		When("a negative value is passed to a flag argument", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("scale", "some-app", "-i=-5")
-				Eventually(session.Err).Should(Say(`Incorrect Usage: invalid argument for flag '-i' \(expected int > 0\)`))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
-
+				Expect(session.Err).To(Say(`Incorrect Usage: invalid argument for flag '-i' \(expected int > 0\)`))
+				Expect(session).To(Say("cf scale APP_NAME"))
 				session = helpers.CF("scale", "some-app", "-k=-5")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
-
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 				session = helpers.CF("scale", "some-app", "-m=-5")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 			})
 		})
 
 		When("a non-integer value is passed to a flag argument", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("scale", "some-app", "-i", "not-an-integer")
-				Eventually(session.Err).Should(Say(`Incorrect Usage: invalid argument for flag '-i' \(expected int > 0\)`))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say(`Incorrect Usage: invalid argument for flag '-i' \(expected int > 0\)`))
+				Expect(session).To(Say("cf scale APP_NAME"))
 
 				session = helpers.CF("scale", "some-app", "-k", "not-an-integer")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 
 				session = helpers.CF("scale", "some-app", "-m", "not-an-integer")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 			})
 		})
 
 		When("the unit of measurement is not provided", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("scale", "some-app", "-k", "9")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 
 				session = helpers.CF("scale", "some-app", "-m", "7")
-				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-				Eventually(session).Should(Say("cf scale APP_NAME")) // help
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+				Expect(session).To(Say("cf scale APP_NAME"))
 			})
 		})
 	})
