@@ -1160,9 +1160,13 @@ var _ = Describe("Application Actions", func() {
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
 					)
+					fakeCloudControllerClient.CancelDeploymentReturns(
+						ccv3.Warnings{"cancel-deployment-warning"},
+						nil,
+					)
 				})
 
-				It("returns a timeout error and any warnings", func() {
+				It("returns a timeout error and any warnings and cancels the deployment", func() {
 					// initial tick
 					fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
 
@@ -1171,12 +1175,43 @@ var _ = Describe("Application Actions", func() {
 					// timeout tick
 					fakeClock.Increment(1 * time.Millisecond)
 
+					Eventually(fakeCloudControllerClient.CancelDeploymentCallCount).Should(Equal(1))
+
 					// wait for func to finish
 					Eventually(done).Should(Receive(BeTrue()))
 
 					Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-					Expect(warnings).To(ConsistOf("get-deployment-warning"))
+					Expect(warnings).To(ConsistOf("get-deployment-warning", "cancel-deployment-warning"))
 				})
+
+				When("the cancel deployment fails", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.CancelDeploymentReturns(
+							ccv3.Warnings{"cancel-deployment-warning"},
+							errors.New("cancel-deployment-error"),
+						)
+					})
+
+					It("returns a timeout error and any warnings and cancels the deployment", func() {
+						// initial tick
+						fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
+
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
+
+						// timeout tick
+						fakeClock.Increment(1 * time.Millisecond)
+
+						Eventually(fakeCloudControllerClient.CancelDeploymentCallCount).Should(Equal(1))
+
+						// wait for func to finish
+						Eventually(done).Should(Receive(BeTrue()))
+
+						Expect(executeErr).To(MatchError("cancel-deployment-error"))
+						Expect(warnings).To(ConsistOf("get-deployment-warning", "cancel-deployment-warning"))
+					})
+
+				})
+
 			})
 
 			When("the processes dont become healthy", func() {
