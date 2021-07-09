@@ -6,7 +6,7 @@ import (
 	"github.com/blang/semver"
 )
 
-const minimumCCAPIVersionForV7 = "3.85.0"
+const minimumCCAPIVersionForV8 = "3.99.0"
 
 func CheckCCAPIVersion(currentAPIVersion string) (string, error) {
 	currentSemver, err := semver.Make(currentAPIVersion)
@@ -14,13 +14,13 @@ func CheckCCAPIVersion(currentAPIVersion string) (string, error) {
 		return "", err
 	}
 
-	minimumSemver, err := semver.Make(minimumCCAPIVersionForV7)
+	minimumSemver, err := semver.Make(minimumCCAPIVersionForV8)
 	if err != nil {
 		return "", err
 	}
 
 	if currentSemver.LT(minimumSemver) {
-		return fmt.Sprintf("\nWarning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, minimumCCAPIVersionForV7), nil
+		return fmt.Sprintf("\nWarning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, minimumCCAPIVersionForV8), nil
 	}
 
 	return "", nil

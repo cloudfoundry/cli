@@ -56,7 +56,7 @@ var _ = Describe("login Command", func() {
 		cmd.APIEndpoint = ""
 
 		fakeActorReloader.ReloadReturns(fakeActor, nil)
-		fakeConfig.APIVersionReturns("3.85.0")
+		fakeConfig.APIVersionReturns("3.99.0")
 	})
 
 	JustBeforeEach(func() {
@@ -192,7 +192,7 @@ var _ = Describe("login Command", func() {
 						fakeConfig.APIVersionReturns("3.83.0")
 					})
 					It("warns that the user is targeting an unsupported API version and that things may not work correctly", func() {
-						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.85.0\\). Some commands may not function correctly."))
+						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.99.0\\). Some commands may not function correctly."))
 					})
 				})
 
