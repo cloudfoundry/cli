@@ -258,4 +258,24 @@ var _ = Describe("set-space-role Command", func() {
 			Expect(executeErr).To(MatchError("create-role-error"))
 		})
 	})
+
+	When("creating a space supporter space role", func() {
+		BeforeEach(func() {
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceSupporter"}
+			cmd.Args.Organization = "some-org-name"
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Username = "target-user-name"
+
+		})
+		It("creates the space role", func() {
+			Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(1))
+			givenRoleType, givenOrgGUID, givenSpaceGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateSpaceRoleArgsForCall(0)
+			Expect(givenRoleType).To(Equal(constant.SpaceSupporterRole))
+			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
+			Expect(givenUserName).To(Equal("target-user-name"))
+			Expect(givenOrigin).To(Equal(""))
+			Expect(givenIsClient).To(BeFalse())
+		})
+	})
 })

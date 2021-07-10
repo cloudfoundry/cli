@@ -23,6 +23,7 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say("SpaceManager - Invite and manage users, and enable features for a given space"))
 				Eventually(session).Should(Say("SpaceDeveloper - Create and manage apps and services, and see logs and reports"))
 				Eventually(session).Should(Say("SpaceAuditor - View logs, reports, and settings on this space"))
+				Eventually(session).Should(Say("SpaceSupporter - "))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`--client\s+Assign a space role to a client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say(`--origin\s+Indicates the identity provider to be used for authentication`))
@@ -35,7 +36,7 @@ var _ = Describe("set-space-role command", func() {
 		When("the role type is invalid", func() {
 			It("prints a useful error, prints help text, and exits 1", func() {
 				session := helpers.CF("set-space-role", "some-user", "some-org", "some-space", "NotARealRole")
-				Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`))
+				Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "SpaceManager", "SpaceDeveloper", "SpaceAuditor" or "SpaceSupporter"`))
 				Eventually(session).Should(Say(`NAME:`))
 				Eventually(session).Should(Exit(1))
 			})

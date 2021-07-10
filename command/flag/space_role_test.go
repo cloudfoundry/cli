@@ -59,11 +59,17 @@ var _ = Describe("SpaceRole", func() {
 			Expect(spaceRole).To(Equal(SpaceRole{Role: "SpaceAuditor"}))
 		})
 
+		It("accepts SpaceSupporter", func() {
+			err := spaceRole.UnmarshalFlag("spaceSupporter")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(spaceRole).To(Equal(SpaceRole{Role: "SpaceSupporter"}))
+		})
+
 		It("errors on anything else", func() {
 			err := spaceRole.UnmarshalFlag("I AM A BANANANANANANANANA")
 			Expect(err).To(MatchError(&flags.Error{
 				Type:    flags.ErrRequired,
-				Message: `ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`,
+				Message: `ROLE must be "SpaceManager", "SpaceDeveloper", "SpaceAuditor" or "SpaceSupporter"`,
 			}))
 			Expect(spaceRole.Role).To(BeEmpty())
 		})
