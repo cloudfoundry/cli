@@ -134,6 +134,24 @@ var _ = Describe("unset-space-role Command", func() {
 			cmd.IsClient = true
 		})
 
+		When("the role is space supporter", func() {
+			BeforeEach(func() {
+				cmd.Args.Role = flag.SpaceRole{Role: "SpaceSupporter"}
+			})
+
+			It("deletes the space role correctly", func() {
+				givenRoleType, givenSpaceGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.DeleteSpaceRoleArgsForCall(0)
+				Expect(givenRoleType).To(Equal(constant.SpaceSupporterRole))
+				Expect(givenSpaceGUID).To(Equal("some-space-guid"))
+				Expect(givenUserName).To(Equal("target-user-name"))
+				Expect(givenOrigin).To(Equal(""))
+				Expect(givenIsClient).To(BeTrue())
+
+				Expect(testUI.Out).To(Say("Removing role SpaceSupporter from user target-user-name in org some-org-name / space some-space-name as current-user..."))
+				Expect(testUI.Out).To(Say("OK"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
 		It("does not try to get the user", func() {
 			Expect(fakeActor.GetUserCallCount()).To(Equal(0))
 		})

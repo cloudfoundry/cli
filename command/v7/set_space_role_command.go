@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -14,7 +16,7 @@ type SetSpaceRoleCommand struct {
 	Args            flag.SpaceRoleArgs `positional-args:"yes"`
 	IsClient        bool               `long:"client" description:"Assign a space role to a client-id of a (non-user) service account"`
 	Origin          string             `long:"origin" description:"Indicates the identity provider to be used for authentication"`
-	usage           interface{}        `usage:"CF_NAME set-space-role USERNAME ORG SPACE ROLE\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
+	usage           interface{}        `usage:"CF_NAME set-space-role USERNAME ORG SPACE ROLE\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space\n   SpaceSupporter - (Beta role, behavior will change) TEMPLATE MESSAGE"`
 	relatedCommands interface{}        `related_commands:"space-users, unset-space-role"`
 }
 
@@ -89,13 +91,15 @@ func (cmd SetSpaceRoleCommand) validateFlags() error {
 }
 
 func convertSpaceRoleType(givenRole flag.SpaceRole) (constant.RoleType, error) {
-	switch givenRole.Role {
-	case "SpaceAuditor":
+	switch strings.ToLower(givenRole.Role) {
+	case "spaceauditor":
 		return constant.SpaceAuditorRole, nil
-	case "SpaceManager":
+	case "spacemanager":
 		return constant.SpaceManagerRole, nil
-	case "SpaceDeveloper":
+	case "spacedeveloper":
 		return constant.SpaceDeveloperRole, nil
+	case "spacesupporter":
+		return constant.SpaceSupporterRole, nil
 	default:
 		return "", errors.New("Invalid role type.")
 	}
