@@ -439,10 +439,10 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 				return nil, err
 			}
 			s := append(DefaultIgnoreLines, strings.Split(string(raw), "\n")...)
-			return ignore.CompileIgnoreLines(s...)
+			return ignore.CompileIgnoreLines(s...), nil
 		}
 	}
-	return ignore.CompileIgnoreLines(DefaultIgnoreLines...)
+	return ignore.CompileIgnoreLines(DefaultIgnoreLines...), nil
 }
 
 func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
@@ -467,7 +467,7 @@ func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.G
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
 		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
 	}
-	return ignore.CompileIgnoreLines(additionalIgnoreLines...)
+	return ignore.CompileIgnoreLines(additionalIgnoreLines...), nil
 }
 
 func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
