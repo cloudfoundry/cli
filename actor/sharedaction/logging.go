@@ -160,7 +160,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 			logcache.WithWalkDelay(2*time.Second),
 			logcache.WithWalkStartTime(walkStartTime),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
-			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
+			logcache.WithWalkBackoff(logcache.NewAlwaysRetryBackoff(250*time.Millisecond)),
 			logcache.WithWalkLogger(log.New(channelWriter{
 				errChannel: outgoingErrStream,
 			}, "", 0)),
