@@ -113,6 +113,7 @@ func (b *cliRetryBackoff) OnErr(error) bool {
 }
 
 func (b *cliRetryBackoff) OnEmpty() bool {
+	time.Sleep(b.interval)
 	return true
 }
 
