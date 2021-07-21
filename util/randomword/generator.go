@@ -193,6 +193,33 @@ wolverine
 wombat
 zebra`
 
+const letters = `a
+b
+c
+d
+e
+f
+g
+h
+i
+j
+k
+l
+m
+n
+o
+p
+q
+r
+s
+t
+u
+v
+w
+x
+y
+z`
+
 type Generator struct{}
 
 func NewGenerator() Generator {
@@ -213,9 +240,8 @@ func (Generator) RandomNoun() string {
 }
 
 func (Generator) RandomTwoLetters() string {
-	var asciiLetterA = 97
-	letterOne := string(rand.Intn(26) + asciiLetterA)
-	letterTwo := string(rand.Intn(26) + asciiLetterA)
+	letterOne := randomElement(letters)
+	letterTwo := randomElement(letters)
 	return letterOne + letterTwo
 }
 
