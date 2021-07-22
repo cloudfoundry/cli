@@ -90,13 +90,8 @@ github.com/cloudfoundry/bosh-utils/logger
 github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/noaa v2.1.1-0.20190110210640-5ce49363dfa6+incompatible
 ## explicit
-github.com/cloudfoundry/noaa
-github.com/cloudfoundry/noaa/consumer
-github.com/cloudfoundry/noaa/consumer/internal
-github.com/cloudfoundry/noaa/errors
 # github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
 ## explicit
-github.com/cloudfoundry/sonde-go/events
 # github.com/cppforlife/go-patch v0.1.0
 ## explicit
 github.com/cppforlife/go-patch/patch
@@ -121,9 +116,6 @@ github.com/fatih/color
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
 ## explicit
-github.com/gogo/protobuf/gogoproto
-github.com/gogo/protobuf/proto
-github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/protobuf v1.4.2 => github.com/golang/protobuf v1.3.4
 github.com/golang/protobuf/descriptor
 github.com/golang/protobuf/jsonpb
@@ -140,7 +132,6 @@ github.com/golang/protobuf/ptypes/wrappers
 github.com/google/go-querystring/query
 # github.com/gorilla/websocket v1.2.1-0.20171201014301-b89020ee79b8
 ## explicit
-github.com/gorilla/websocket
 # github.com/grpc-ecosystem/grpc-gateway v1.14.0
 github.com/grpc-ecosystem/grpc-gateway/internal
 github.com/grpc-ecosystem/grpc-gateway/runtime
@@ -158,10 +149,6 @@ github.com/kr/pty
 github.com/lunixbochs/vtclean
 # github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e
 ## explicit
-github.com/mailru/easyjson
-github.com/mailru/easyjson/buffer
-github.com/mailru/easyjson/jlexer
-github.com/mailru/easyjson/jwriter
 # github.com/mattn/go-colorable v0.1.0
 ## explicit
 github.com/mattn/go-colorable
