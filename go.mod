@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli
 
-go 1.14
+go 1.16
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
@@ -46,7 +46,7 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/moby/moby v1.4.2-0.20171120205147-9de84a78d76e
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/onsi/ginkgo v1.15.0
+	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.10.5
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1
@@ -57,9 +57,9 @@ require (
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
-	golang.org/x/text v0.3.3
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/net v0.0.0-20210716203947-853a461950ff
+	golang.org/x/text v0.3.6
 	gopkg.in/cheggaaa/pb.v1 v1.0.27
 	gopkg.in/yaml.v2 v2.3.0
 )

@@ -170,17 +170,18 @@ github.com/moby/moby/pkg/term
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/nxadm/tail v1.4.4
+# github.com/nxadm/tail v1.4.8
 github.com/nxadm/tail
 github.com/nxadm/tail/ratelimiter
 github.com/nxadm/tail/util
 github.com/nxadm/tail/watch
 github.com/nxadm/tail/winfile
-# github.com/onsi/ginkgo v1.15.0
+# github.com/onsi/ginkgo v1.16.4
 ## explicit
 github.com/onsi/ginkgo
 github.com/onsi/ginkgo/config
 github.com/onsi/ginkgo/extensions/table
+github.com/onsi/ginkgo/formatter
 github.com/onsi/ginkgo/internal/codelocation
 github.com/onsi/ginkgo/internal/containernode
 github.com/onsi/ginkgo/internal/failer
@@ -243,11 +244,12 @@ github.com/tedsuo/rata
 ## explicit
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
-# golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+# golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 ## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/curve25519
+golang.org/x/crypto/curve25519/internal/field
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
 golang.org/x/crypto/internal/subtle
@@ -258,7 +260,7 @@ golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.3.0
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+# golang.org/x/net v0.0.0-20210716203947-853a461950ff
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -273,12 +275,15 @@ golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
 golang.org/x/net/trace
 golang.org/x/net/websocket
-# golang.org/x/sys v0.0.0-20210112080510-489259a85091 => golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6
+# golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 => golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.3.3
+# golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
+golang.org/x/term
+# golang.org/x/text v0.3.6
 ## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
