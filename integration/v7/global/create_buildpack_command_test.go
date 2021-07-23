@@ -362,10 +362,10 @@ var _ = Describe("create buildpack command", func() {
 
 				It("returns the appropriate error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackURL, "1")
-					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
-					Eventually(session.Err).Should(Say("Get %s: dial tcp", buildpackURL))
-					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
+					Expect(session).To(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
+					Expect(session.Err).To(Say(`Get "%s": dial tcp`, buildpackURL))
+					Expect(session).To(Say("FAILED"))
 				})
 			})
 		})
