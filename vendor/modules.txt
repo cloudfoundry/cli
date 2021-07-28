@@ -67,6 +67,8 @@ github.com/SermoDigital/jose
 github.com/SermoDigital/jose/crypto
 github.com/SermoDigital/jose/jws
 github.com/SermoDigital/jose/jwt
+# github.com/akavel/rsrc v0.10.2
+## explicit
 # github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77
 ## explicit
 # github.com/blang/semver v3.5.1+incompatible
