@@ -49,6 +49,8 @@ func (d deprecations) Measure() Deprecation {
 		Message: "Measure is deprecated and will be removed in Ginkgo V2.  Please migrate to gomega/gmeasure.",
 		DocLink: "removed-measure",
 		Version: "1.16.3",
+		Message: "Measure is deprecated in Ginkgo V2",
+		DocLink: "removed-measure",
 	}
 }
 
@@ -103,7 +105,7 @@ func (d *DeprecationTracker) DeprecationsReport() string {
 	out += formatter.F("{{light-yellow}}============================================={{/}}\n")
 	out += formatter.F("Ginkgo 2.0 is under active development and will introduce (a small number of) breaking changes.\n")
 	out += formatter.F("To learn more, view the migration guide at {{cyan}}{{underline}}https://github.com/onsi/ginkgo/blob/v2/docs/MIGRATING_TO_V2.md{{/}}\n")
-	out += formatter.F("To comment, chime in at {{cyan}}{{underline}}https://github.com/onsi/ginkgo/issues/711{{/}}\n\n")
+	out += formatter.F("To comment, chime in at {{cyan}}{{underline}}https://github.com/onsi/ginkgo/issues/711{{/}}\n")
 
 	for deprecation, locations := range d.deprecations {
 		out += formatter.Fi(1, "{{yellow}}"+deprecation.Message+"{{/}}\n")
