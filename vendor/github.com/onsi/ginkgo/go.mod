@@ -9,3 +9,8 @@ require (
 	golang.org/x/sys v0.0.0-20210112080510-489259a85091
 	golang.org/x/tools v0.0.0-20201224043029-2b0845dc783e
 )
+<<<<<<< HEAD
+
+retract v1.16.3 // git tag accidentally associated with incorrect git commit
+=======
+>>>>>>> d289b547ff5c6553226884a2b19779941b6add80

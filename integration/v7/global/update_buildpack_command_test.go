@@ -410,9 +410,9 @@ var _ = Describe("update-buildpack command", func() {
 							})
 
 							It("returns the appropriate error", func() {
-								Eventually(session.Err).Should(Say("Get %s: dial tcp: lookup", buildpackPath))
-								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
+								Expect(session.Err).To(Say(`Get "%s": dial tcp: lookup`, buildpackPath))
+								Expect(session).To(Say("FAILED"))
 							})
 						})
 					})
