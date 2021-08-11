@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 1.16.4
 
 ### Fixes
@@ -18,7 +17,6 @@
 
 ### Fixes
 - Supress --stream deprecation warning on windows (#793)
-
 
 ## 1.16.0
 
