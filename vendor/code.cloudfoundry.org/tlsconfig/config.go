@@ -86,7 +86,7 @@ func (c Config) Client(opts ...ClientOption) (*tls.Config, error) {
 func WithExternalServiceDefaults() TLSOption {
 	return func(c *tls.Config) error {
 		c.MinVersion = tls.VersionTLS12
-		c.MaxVersion = tls.VersionTLS12
+		c.MaxVersion = tls.VersionTLS13
 		c.PreferServerCipherSuites = false
 		c.CipherSuites = []uint16{
 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
@@ -115,7 +115,7 @@ func WithExternalServiceDefaults() TLSOption {
 func WithInternalServiceDefaults() TLSOption {
 	return func(c *tls.Config) error {
 		c.MinVersion = tls.VersionTLS12
-		c.MaxVersion = tls.VersionTLS12
+		c.MaxVersion = tls.VersionTLS13
 		c.PreferServerCipherSuites = true
 		c.CipherSuites = []uint16{
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,

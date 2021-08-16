@@ -51,7 +51,7 @@ code.cloudfoundry.org/lager/lagerctx
 code.cloudfoundry.org/lager/lagertest
 # code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a
 code.cloudfoundry.org/rfc5424
-# code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
+# code.cloudfoundry.org/tlsconfig v0.0.0-20210615191307-5d92ef3894a7
 ## explicit
 code.cloudfoundry.org/tlsconfig
 # code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
