@@ -58,7 +58,7 @@ require (
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
-	golang.org/x/sys v0.0.0-20210816174021-fcbd12d029cd // indirect
+	golang.org/x/sys v0.0.0-20210816183151-1e6c022a8912 // indirect
 	golang.org/x/text v0.3.3
 	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.27
