@@ -26,7 +26,7 @@ After [PR #2180](https://github.com/cloudfoundry/cli/pull/2180) we should be in 
 
 ## Decision
 
-PR Submitted
+PR Accepted, pending implementation
 
 ## Consequences
 
