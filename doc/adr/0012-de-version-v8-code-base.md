@@ -3,7 +3,7 @@
 
 ## Status
 
-PR Submitted
+Accepted
 
 ## Context
 
@@ -33,5 +33,3 @@ PR Accepted, pending implementation
 If I am a relatively new contributor to the CLI and I want to make a change to a command I can much easier figure out the code relevant code path. I don't need to know what v6 or v7 are to make changes to v8.
 
 V7 and V8 diverge, meaning that future bugfixes that occur on both the v7 and v8 branch could be more challenging to cherry-pick between branches, as the file paths will be different.
-
-Will update with other consequences the CLI team suggests.
