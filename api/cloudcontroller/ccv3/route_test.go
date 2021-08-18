@@ -537,19 +537,52 @@ var _ = Describe("Route", func() {
 
 	Describe("MapRoute", func() {
 		var (
-			routeGUID  = "route-guid"
-			appGUID    = "app-guid"
-			warnings   Warnings
-			executeErr error
+			routeGUID           = "route-guid"
+			appGUID             = "app-guid"
+			destinationProtocol = "http2"
+			expectedBody        string
+			warnings            Warnings
+			executeErr          error
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.MapRoute(routeGUID, appGUID)
+			response := `{}`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPost, "/v3/routes/route-guid/destinations"),
+					VerifyJSON(expectedBody),
+					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+				),
+			)
+			warnings, executeErr = client.MapRoute(routeGUID, appGUID, destinationProtocol)
 		})
 
 		When("the request is successful", func() {
 			BeforeEach(func() {
-				expectedBody := fmt.Sprintf(`
+				expectedBody = fmt.Sprintf(`
+					{
+						"destinations": [
+						 {
+							"app": {
+								"guid": "%s"
+							},
+							"protocol": "%s"
+						 }
+						]
+					}
+				`, appGUID, destinationProtocol)
+			})
+
+			It("returns the warnings and no error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when destination protocol is not provided", func() {
+			BeforeEach(func() {
+				destinationProtocol = ""
+				expectedBody = fmt.Sprintf(`
 					{
 						"destinations": [
 						 {
@@ -560,21 +593,10 @@ var _ = Describe("Route", func() {
 						]
 					}
 				`, appGUID)
-
-				response := `{}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/routes/route-guid/destinations"),
-						VerifyJSON(expectedBody),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
 			})
 
-			It("returns the warnings and no error", func() {
+			It("does not include it in the request", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 

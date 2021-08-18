@@ -82,7 +82,7 @@ func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, err
 	return routes, warnings, err
 }
 
-func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error) {
+func (client Client) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
 	type destinationProcess struct {
 		ProcessType string `json:"process_type"`
 	}
@@ -92,7 +92,8 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 		Process *destinationProcess `json:"process,omitempty"`
 	}
 	type destination struct {
-		App destinationApp `json:"app"`
+		App      destinationApp `json:"app"`
+		Protocol string         `json:"protocol,omitempty"`
 	}
 
 	type body struct {
@@ -101,8 +102,13 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 
 	requestBody := body{
 		Destinations: []destination{
-			{App: destinationApp{GUID: appGUID}},
+			{
+				App: destinationApp{GUID: appGUID},
+			},
 		},
+	}
+	if destinationProtocol != "" {
+		requestBody.Destinations[0].Protocol = destinationProtocol
 	}
 
 	_, warnings, err := client.MakeRequest(RequestParams{

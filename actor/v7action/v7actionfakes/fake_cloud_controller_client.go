@@ -1951,11 +1951,12 @@ type FakeCloudControllerClient struct {
 		result2 *http.Response
 		result3 error
 	}
-	MapRouteStub        func(string, string) (ccv3.Warnings, error)
+	MapRouteStub        func(string, string, string) (ccv3.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	mapRouteReturns struct {
 		result1 ccv3.Warnings
@@ -11083,17 +11084,18 @@ func (fake *FakeCloudControllerClient) MakeRequestSendReceiveRawReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) MapRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) MapRoute(arg1 string, arg2 string, arg3 string) (ccv3.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
 	fake.mapRouteArgsForCall = append(fake.mapRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
 	fake.mapRouteMutex.Unlock()
 	if fake.MapRouteStub != nil {
-		return fake.MapRouteStub(arg1, arg2)
+		return fake.MapRouteStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -11108,17 +11110,17 @@ func (fake *FakeCloudControllerClient) MapRouteCallCount() int {
 	return len(fake.mapRouteArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) MapRouteCalls(stub func(string, string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) MapRouteCalls(stub func(string, string, string) (ccv3.Warnings, error)) {
 	fake.mapRouteMutex.Lock()
 	defer fake.mapRouteMutex.Unlock()
 	fake.MapRouteStub = stub
 }
 
-func (fake *FakeCloudControllerClient) MapRouteArgsForCall(i int) (string, string) {
+func (fake *FakeCloudControllerClient) MapRouteArgsForCall(i int) (string, string, string) {
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	argsForCall := fake.mapRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCloudControllerClient) MapRouteReturns(result1 ccv3.Warnings, result2 error) {

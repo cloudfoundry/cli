@@ -369,8 +369,8 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 	return routes[0], Warnings(ccWarnings), nil
 }
 
-func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID)
+func (actor Actor) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID, destinationProtocol)
 	return Warnings(warnings), err
 }
 
