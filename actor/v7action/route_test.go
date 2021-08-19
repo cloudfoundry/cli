@@ -1453,20 +1453,22 @@ var _ = Describe("Route Actions", func() {
 
 	Describe("MapRoute", func() {
 		var (
-			routeGUID string
-			appGUID   string
+			routeGUID           string
+			appGUID             string
+			destinationProtocol string
 
 			executeErr error
 			warnings   Warnings
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.MapRoute(routeGUID, appGUID)
+			warnings, executeErr = actor.MapRoute(routeGUID, appGUID, destinationProtocol)
 		})
 
 		BeforeEach(func() {
 			routeGUID = "route-guid"
 			appGUID = "app-guid"
+			destinationProtocol = "http2"
 		})
 
 		When("the cloud controller client errors", func() {
@@ -1483,6 +1485,13 @@ var _ = Describe("Route Actions", func() {
 		When("the cloud controller client succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.MapRouteReturns(ccv3.Warnings{"map-route-warning"}, nil)
+			})
+
+			It("calls the cloud controller client with the right arguments", func() {
+				actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeCloudControllerClient.MapRouteArgsForCall(0)
+				Expect(actualRouteGUID).To(Equal("route-guid"))
+				Expect(actualAppGUID).To(Equal("app-guid"))
+				Expect(actualDestinationProtocol).To(Equal("http2"))
 			})
 
 			It("returns the error and warnings", func() {

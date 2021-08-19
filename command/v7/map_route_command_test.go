@@ -53,9 +53,10 @@ var _ = Describe("map-route Command", func() {
 		spaceGUID = "some-space-guid"
 
 		cmd = MapRouteCommand{
-			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
-			Hostname:     hostname,
-			Path:         flag.V7RoutePath{Path: path},
+			RequiredArgs:        flag.AppDomain{App: appName, Domain: domain},
+			Hostname:            hostname,
+			Path:                flag.V7RoutePath{Path: path},
+			DestinationProtocol: "http2",
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -371,9 +372,10 @@ var _ = Describe("map-route Command", func() {
 								Expect(actualPort).To(Equal(cmd.Port))
 
 								Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
-								actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
+								actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeActor.MapRouteArgsForCall(0)
 								Expect(actualRouteGUID).To(Equal("route-guid"))
 								Expect(actualAppGUID).To(Equal("app-guid"))
+								Expect(actualDestinationProtocol).To(Equal("http2"))
 							})
 						})
 
@@ -391,7 +393,7 @@ var _ = Describe("map-route Command", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
 								})
 
-								By("passing the expected arguments to the actor ", func() {
+								By("passing the expected arguments to the actor", func() {
 									Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
 									Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
 
@@ -409,9 +411,10 @@ var _ = Describe("map-route Command", func() {
 									Expect(actualPort).To(Equal(cmd.Port))
 
 									Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
-									actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
+									actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeActor.MapRouteArgsForCall(0)
 									Expect(actualRouteGUID).To(Equal("route-guid"))
 									Expect(actualAppGUID).To(Equal("app-guid"))
+									Expect(actualDestinationProtocol).To(Equal("http2"))
 								})
 							})
 						})
@@ -531,9 +534,10 @@ var _ = Describe("map-route Command", func() {
 								Expect(actualPort).To(Equal(cmd.Port))
 
 								Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
-								actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
+								actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeActor.MapRouteArgsForCall(0)
 								Expect(actualRouteGUID).To(Equal("route-guid"))
 								Expect(actualAppGUID).To(Equal("app-guid"))
+								Expect(actualDestinationProtocol).To(Equal("http2"))
 							})
 						})
 
@@ -569,9 +573,10 @@ var _ = Describe("map-route Command", func() {
 									Expect(actualPort).To(Equal(cmd.Port))
 
 									Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
-									actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
+									actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeActor.MapRouteArgsForCall(0)
 									Expect(actualRouteGUID).To(Equal("route-guid"))
 									Expect(actualAppGUID).To(Equal("app-guid"))
+									Expect(actualDestinationProtocol).To(Equal("http2"))
 								})
 							})
 						})
