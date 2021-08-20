@@ -10,4 +10,6 @@ const (
 
 	MinVersionCreateServiceBrokerV3            = "3.72.0"
 	MinVersionCreateSpaceScopedServiceBrokerV3 = "3.75.0"
+
+	MinVersionHTTP2RoutingV3 = "3.104.0"
 )
