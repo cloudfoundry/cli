@@ -114,7 +114,8 @@ github.com/docker/docker/pkg/term/windows
 # github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 ## explicit
 github.com/fatih/color
-# github.com/fsnotify/fsnotify v1.4.9
+# github.com/fsnotify/fsnotify v1.5.0
+## explicit
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
 ## explicit
