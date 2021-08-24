@@ -228,7 +228,7 @@ var _ = Describe("map-route command", func() {
 
 					It("maps the route to an app", func() {
 						session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--destination-protocol", "http2")
-						Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Creating route %s.%s for org %s / space %s as %s\.\.\.`, hostName, domainName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Say(`Mapping route %s.%s to app %s with protocol http2 in org %s / space %s as %s\.\.\.`, hostName, domainName, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`OK`))
