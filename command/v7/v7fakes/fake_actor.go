@@ -1070,6 +1070,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationMapForRouteStub        func(resources.Route) (map[string]resources.Application, v7action.Warnings, error)
+	getApplicationMapForRouteMutex       sync.RWMutex
+	getApplicationMapForRouteArgsForCall []struct {
+		arg1 resources.Route
+	}
+	getApplicationMapForRouteReturns struct {
+		result1 map[string]resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationMapForRouteReturnsOnCall map[int]struct {
+		result1 map[string]resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationPackagesStub        func(string, string) ([]resources.Package, v7action.Warnings, error)
 	getApplicationPackagesMutex       sync.RWMutex
 	getApplicationPackagesArgsForCall []struct {
@@ -8090,6 +8105,72 @@ func (fake *FakeActor) GetApplicationLabelsReturnsOnCall(i int, result1 map[stri
 	}
 	fake.getApplicationLabelsReturnsOnCall[i] = struct {
 		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationMapForRoute(arg1 resources.Route) (map[string]resources.Application, v7action.Warnings, error) {
+	fake.getApplicationMapForRouteMutex.Lock()
+	ret, specificReturn := fake.getApplicationMapForRouteReturnsOnCall[len(fake.getApplicationMapForRouteArgsForCall)]
+	fake.getApplicationMapForRouteArgsForCall = append(fake.getApplicationMapForRouteArgsForCall, struct {
+		arg1 resources.Route
+	}{arg1})
+	fake.recordInvocation("GetApplicationMapForRoute", []interface{}{arg1})
+	fake.getApplicationMapForRouteMutex.Unlock()
+	if fake.GetApplicationMapForRouteStub != nil {
+		return fake.GetApplicationMapForRouteStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationMapForRouteReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetApplicationMapForRouteCallCount() int {
+	fake.getApplicationMapForRouteMutex.RLock()
+	defer fake.getApplicationMapForRouteMutex.RUnlock()
+	return len(fake.getApplicationMapForRouteArgsForCall)
+}
+
+func (fake *FakeActor) GetApplicationMapForRouteCalls(stub func(resources.Route) (map[string]resources.Application, v7action.Warnings, error)) {
+	fake.getApplicationMapForRouteMutex.Lock()
+	defer fake.getApplicationMapForRouteMutex.Unlock()
+	fake.GetApplicationMapForRouteStub = stub
+}
+
+func (fake *FakeActor) GetApplicationMapForRouteArgsForCall(i int) resources.Route {
+	fake.getApplicationMapForRouteMutex.RLock()
+	defer fake.getApplicationMapForRouteMutex.RUnlock()
+	argsForCall := fake.getApplicationMapForRouteArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetApplicationMapForRouteReturns(result1 map[string]resources.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationMapForRouteMutex.Lock()
+	defer fake.getApplicationMapForRouteMutex.Unlock()
+	fake.GetApplicationMapForRouteStub = nil
+	fake.getApplicationMapForRouteReturns = struct {
+		result1 map[string]resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationMapForRouteReturnsOnCall(i int, result1 map[string]resources.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationMapForRouteMutex.Lock()
+	defer fake.getApplicationMapForRouteMutex.Unlock()
+	fake.GetApplicationMapForRouteStub = nil
+	if fake.getApplicationMapForRouteReturnsOnCall == nil {
+		fake.getApplicationMapForRouteReturnsOnCall = make(map[int]struct {
+			result1 map[string]resources.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationMapForRouteReturnsOnCall[i] = struct {
+		result1 map[string]resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -18835,6 +18916,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationDropletsMutex.RUnlock()
 	fake.getApplicationLabelsMutex.RLock()
 	defer fake.getApplicationLabelsMutex.RUnlock()
+	fake.getApplicationMapForRouteMutex.RLock()
+	defer fake.getApplicationMapForRouteMutex.RUnlock()
 	fake.getApplicationPackagesMutex.RLock()
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()

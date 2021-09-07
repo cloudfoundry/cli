@@ -126,6 +126,7 @@ type commandList struct {
 	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	RouterGroups                       v7.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
+	Route                              v7.RouteCommand                              `command:"route" alias:"ro" description:"Display route details and mapped destinations"`
 	Routes                             v7.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
 	RunTask                            v7.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
 	RunningEnvironmentVariableGroup    v7.RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`

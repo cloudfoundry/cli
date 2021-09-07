@@ -204,6 +204,17 @@ func (actor Actor) GetRoutesByOrg(orgGUID string, labelSelector string) ([]resou
 	return routes, allWarnings, nil
 }
 
+func (actor Actor) GetApplicationMapForRoute(route resources.Route) (map[string]resources.Application, Warnings, error) {
+	var v7Warning Warnings
+	apps, v7Warning, err := actor.GetApplicationsByGUIDs(extract.UniqueList("Destinations.App.GUID", route))
+
+	appMap := make(map[string]resources.Application)
+	for _, a := range apps {
+		appMap[a.GUID] = a
+	}
+	return appMap, v7Warning, err
+}
+
 func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, Warnings, error) {
 	var (
 		spaces           []resources.Space
