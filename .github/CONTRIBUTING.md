@@ -8,8 +8,8 @@ mailing list.
 
 ## CLI Versions
 The cf CLI follows a branching model:
-- V8 of the cf CLI is built from the [master branch](https://github.com/cloudfoundry/cli/tree/master). **This branch is for breaking changes** meant to ship in the next major revision. Please note that although this branch can be thought of as "V8", this version is still in the planning stage and has not yet been released in any form.
-- V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is under active development**.
+- V8 of the cf CLI is built from the [master branch](https://github.com/cloudfoundry/cli/tree/master). **This branch is under active development**.
+- V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is maintenance only** and will only be updated to patch CVEs and very severe blocking defects.
 - V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is maintenance only** and will only be updated to patch CVEs and very severe blocking defects.
 
 ## Prerequisites
@@ -36,7 +36,7 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
    * Follow the other sections on this page to [set up your development environment](#development-environment-setup), [build `cf`](#building-the-cf-binary) and [run the tests](#testing).
    * Tests are required for any changes.
 1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
-1. The cf CLI team will merge your changes from V7 of the cf CLI to master for you after the PR is merged.
+1. The cf CLI team will merge your changes from the versioned branch (e.g. v7) to master for you after the PR is merged.
 
 Note: All contributions must be sent using GitHub Pull Requests.
 We prefer a small, focused pull request with a clear message
