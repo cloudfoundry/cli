@@ -66,6 +66,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 ### Installation instructions
 - [Install V6](https://github.com/cloudfoundry/cli/wiki/V6-CLI-Installation-Guide)
 - [Install V7](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide)
+- [Install V8](https://github.com/cloudfoundry/cli/wiki/V8-CLI-Installation-Guide)
 - [Switching Between Multiple Versions](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide)
 
 ## Known Issues
