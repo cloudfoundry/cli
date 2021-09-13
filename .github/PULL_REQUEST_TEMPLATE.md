@@ -9,7 +9,7 @@ If your contribution falls under a company CLA but your membership is not public
 * Contributions must conform to our [style guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide). Please reach out to us if you have questions.
 
 
-## Does this PR modify CLI v6 or v7?
+## Does this PR modify CLI v6, CLI v7, or CLI v8?
 
 Please see the contribution doc above or review [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide).
 
