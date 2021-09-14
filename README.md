@@ -70,6 +70,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 - [Switching Between Multiple Versions](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide)
 
 ## Known Issues
+**Note:** For most up-to-date information in issues and workarounds please review [the open and closed github issues](https://github.com/cloudfoundry/cli/issues)
 
 * On Windows in Cygwin and Git Bash, interactive password prompts (in `cf login`) do not hide the password properly from stdout ([issue #1835](https://github.com/cloudfoundry/cli/issues/1835)). Please use an alternative command (non-interactive authentication `cf auth` instead of `cf login`) to work around this. Or, use the Windows `cmd` command line.
 * On Windows, `cf ssh` may not display correctly if the `TERM` is not set. We've found that setting `TERM` to `msys` fixes some of these issues.
@@ -78,6 +79,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 * API tracing to terminal (using `CF_TRACE=true`, `-v` option or `cf config --trace`) doesn't work well with some CLI plugin commands. Trace to file works fine. On Linux, `CF_TRACE=/dev/stdout` works too. See [this Diego-Enabler plugin issue](https://github.com/cloudfoundry-attic/Diego-Enabler/issues/6) for more information.
 * .cfignore used in `cf push` must be in UTF-8 encoding for CLI to interpret correctly. ([issue #281](https://github.com/cloudfoundry/cli/issues/281#issuecomment-65315518))
 * On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the [correct binary or installer for your architecture](https://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists).
+* X-Cf-Warnings are printed through the `stdout`, if that's an inconvenience you could set `CF_RAISE_ERROR_ON_WARNINGS` and in that case warnings will be printed through the `stderr`. See [X-Cf-Warnings printed through stdout issue](https://github.com/cloudfoundry/cli/issues/2164)
 
 ## Filing Issues & Feature Requests
 
