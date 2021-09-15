@@ -175,6 +175,81 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("GetApplicationMapForRoute", func() {
+		var (
+			appsByAppGuid map[string]resources.Application
+			app1          resources.Application
+			app2          resources.Application
+			route         resources.Route
+			warnings      Warnings
+			err           error
+		)
+
+		BeforeEach(func() {
+			app1 = resources.Application{
+				GUID: "app-guid-1",
+				Name: "app-name-1",
+			}
+			app2 = resources.Application{
+				GUID: "app-guid-2",
+				Name: "app-name-2",
+			}
+			route = resources.Route{
+				Destinations: []resources.RouteDestination{
+					{
+						App: resources.RouteDestinationApp{
+							GUID: "app-guid-1",
+						},
+					},
+					{
+						App: resources.RouteDestinationApp{
+							GUID: "app-guid-2",
+						},
+					},
+				},
+				SpaceGUID: "fake-space-1-guid",
+				URL:       "fake-url-1/fake-path-1:1",
+				Host:      "fake-host-1",
+				Path:      "fake-path-1",
+				Port:      1,
+			}
+		})
+
+		JustBeforeEach(func() {
+			appsByAppGuid, warnings, err = actor.GetApplicationMapForRoute(route)
+		})
+
+		When("CC successfully returns the response", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{app1, app2},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
+			})
+			It("returns a mapping from apps guids to apps", func() {
+				Expect(appsByAppGuid).To(Equal(map[string]resources.Application{"app-guid-1": app1, "app-guid-2": app2}))
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
+		When("CC errors", func() {
+			var cc_err = errors.New("failed to get route")
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{},
+					ccv3.Warnings{"get-apps-warning"},
+					cc_err,
+				)
+			})
+			It("returns an error", func() {
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+				Expect(err).To(Equal(cc_err))
+			})
+		})
+	})
+
 	Describe("GetRoutesBySpace", func() {
 		var (
 			routes     []resources.Route
