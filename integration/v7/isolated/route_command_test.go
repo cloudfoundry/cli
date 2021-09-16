@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -119,6 +120,12 @@ var _ = Describe("route command", func() {
 						Eventually(session).Should(Say(`\n`))
 						Eventually(session).Should(Say(`Destinations:`))
 						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+protocol`))
+						Eventually(session).Should(Exit(0))
+					})
+
+					It("displays the protocol in the route summary and exits without failing", func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionHTTP2RoutingV3)
+						session := helpers.CF("route", domainName, "--hostname", hostname, "--path", path)
 						Eventually(session).Should(Say(`\s+killer\s+web\s+8080\s+http1`))
 						Eventually(session).Should(Exit(0))
 					})
@@ -161,6 +168,12 @@ var _ = Describe("route command", func() {
 						Eventually(session).Should(Say(`\n`))
 						Eventually(session).Should(Say(`Destinations:`))
 						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+protocol`))
+						Eventually(session).Should(Exit(0))
+					})
+
+					It("displays the protocol in the route summary and exits without failing", func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionHTTP2RoutingV3)
+						session := helpers.CF("route", tcpDomain.Name, "--port", fmt.Sprintf("%d", port))
 						Eventually(session).Should(Say(`\s+killer\s+web\s+8080\s+tcp`))
 						Eventually(session).Should(Exit(0))
 					})
