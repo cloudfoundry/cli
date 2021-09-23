@@ -81,7 +81,6 @@ var _ = Describe("api command", func() {
 
 		Context("--unset is passed", func() {
 			BeforeEach(func() {
-
 				userConfig := configv3.Config{
 					ConfigFile: configv3.JSONConfig{
 						ConfigVersion: configv3.CurrentConfigVersion,
@@ -338,6 +337,7 @@ var _ = Describe("api command", func() {
 		Expect(configFile.TargetedSpace.GUID).To(BeEmpty())
 		Expect(configFile.TargetedSpace.Name).To(BeEmpty())
 		Expect(configFile.TargetedSpace.AllowSSH).To(BeFalse())
+		Expect(configFile.CFOnK8s).To(Equal(configv3.CFOnK8s{}))
 	})
 
 	It("handles API endpoints with trailing slash", func() {
@@ -355,5 +355,36 @@ var _ = Describe("api command", func() {
 
 		session = helpers.CF("orgs")
 		Eventually(session).Should(Exit(0))
+	})
+
+	When("targeting CF-on-K8s", func() {
+		var server *ghttp.Server
+
+		BeforeEach(func() {
+			server = ghttp.NewServer()
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/"),
+					ghttp.RespondWith(http.StatusOK, `{ "cf-on-k8s": true }`),
+				),
+			)
+		})
+
+		AfterEach(func() {
+			server.Close()
+		})
+
+		It("sets the \"CFOnK8s.Enabled\" config property to true", func() {
+			Eventually(helpers.CF("api", server.URL())).Should(Exit(0))
+
+			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			Expect(err).NotTo(HaveOccurred())
+
+			var configFile configv3.JSONConfig
+			err = json.Unmarshal(rawConfig, &configFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(configFile.CFOnK8s).To(Equal(configv3.CFOnK8s{Enabled: true}))
+		})
 	})
 })

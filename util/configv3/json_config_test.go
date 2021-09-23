@@ -307,6 +307,7 @@ var _ = Describe("JSONConfig", func() {
 				LogCache:          "https://log-cache.foo.com",
 				Routing:           "https://api.foo.com/routing",
 				SkipSSLValidation: true,
+				CFOnK8s:           true,
 			})
 
 			Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
@@ -323,6 +324,8 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
 			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+
+			Expect(config.ConfigFile.CFOnK8s.Enabled).To(BeTrue())
 		})
 	})
 

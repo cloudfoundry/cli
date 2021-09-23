@@ -31,6 +31,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		Routing:           rootInfo.Routing(),
 		SkipSSLValidation: settings.SkipSSLValidation,
 		UAA:               rootInfo.UAA(),
+		CFOnK8s:           rootInfo.CFOnK8s,
 	})
 
 	actor.Config.SetTokenInformation("", "", "")
