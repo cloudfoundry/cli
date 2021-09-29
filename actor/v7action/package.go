@@ -204,27 +204,7 @@ func (actor Actor) UploadBitsPackage(pkg resources.Package, matchedResources []s
 	}
 
 	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(resources.Package(pkg), apiResources, newResources, newResourcesLength)
-	allWarnings := warnings
-	for appPkg.State != constant.PackageReady &&
-		appPkg.State != constant.PackageFailed &&
-		appPkg.State != constant.PackageExpired {
-		time.Sleep(actor.Config.PollingInterval())
-		appPkg, warnings, err = actor.CloudControllerClient.GetPackage(pkg.GUID)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return resources.Package{}, Warnings(allWarnings), err
-		}
-	}
-
-	if appPkg.State == constant.PackageFailed {
-		return resources.Package{}, Warnings(allWarnings), actionerror.PackageProcessingFailedError{}
-	} else if appPkg.State == constant.PackageExpired {
-		return resources.Package{}, Warnings(allWarnings), actionerror.PackageProcessingExpiredError{}
-	}
-
-	updatedPackage, updatedWarnings, err := actor.PollPackage(resources.Package(pkg))
-
-	return resources.Package(updatedPackage), append(updatedWarnings, allWarnings...), err
+	return resources.Package(appPkg), Warnings(warnings), err
 }
 
 // PollPackage returns a package of an app.
