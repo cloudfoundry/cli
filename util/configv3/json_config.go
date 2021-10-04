@@ -12,6 +12,7 @@ type JSONConfig struct {
 	APIVersion               string             `json:"APIVersion"`
 	AsyncTimeout             int                `json:"AsyncTimeout"`
 	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
+	CFOnK8s                  CFOnK8s            `json:"CFOnK8s"`
 	ColorEnabled             string             `json:"ColorEnabled"`
 	ConfigVersion            int                `json:"ConfigVersion"`
 	DopplerEndpoint          string             `json:"DopplerEndPoint"`
@@ -46,6 +47,10 @@ type Space struct {
 	GUID     string `json:"GUID"`
 	Name     string `json:"Name"`
 	AllowSSH bool   `json:"AllowSSH"`
+}
+
+type CFOnK8s struct {
+	Enabled bool `json:"Enabled"`
 }
 
 // User represents the user information provided by the JWT access token.
@@ -192,6 +197,7 @@ type TargetInformationArgs struct {
 	Routing           string
 	SkipSSLValidation bool
 	UAA               string
+	CFOnK8s           bool
 }
 
 // SetTargetInformation sets the currently targeted CC API and related other
@@ -212,6 +218,8 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	// NOTE: This gets written to the config file, but I do not believe it is currently
 	// ever read from there.
 	config.ConfigFile.AuthorizationEndpoint = args.Auth
+
+	config.ConfigFile.CFOnK8s.Enabled = args.CFOnK8s
 
 	config.UnsetOrganizationAndSpaceInformation()
 }
@@ -319,7 +327,6 @@ func (config *Config) UnsetUserInformation() {
 	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
 
 	config.UnsetOrganizationAndSpaceInformation()
-
 }
 
 // V7SetSpaceInformation sets the currently targeted space.

@@ -130,11 +130,15 @@ ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
 
-integration-tests: build integration-cleanup integration-isolated integration-push integration-global ## Run all isolated, push, and global integration tests
+integration-selfcontained:
+	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
+
+integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
+
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
-integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
+integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global integration-selfcontained ## Run all isolated, push, experimental, plugin, selfcontained, and global integration tests
 
 integration-tests-full-ci: integration-cleanup
 	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
