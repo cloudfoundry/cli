@@ -60,7 +60,7 @@ type LoginCommand struct {
 }
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
+	ccClient := shared.NewWrappedCloudControllerClient(config, ui, nil)
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	cmd.ActorReloader = ActualActorReloader{}
 
@@ -260,7 +260,7 @@ func (cmd *LoginCommand) targetAPI(settings v7action.TargetSettings) error {
 
 func (cmd *LoginCommand) authenticate() error {
 	var err error
-	var credentials = make(map[string]string)
+	credentials := make(map[string]string)
 
 	prompts, err := cmd.Actor.GetLoginPrompts()
 	if err != nil {
@@ -468,7 +468,6 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []resources.Organization) (resourc
 	}
 
 	chosenOrgName, err := cmd.promptMenu(orgNames, "Select an org:", "Org")
-
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
 			if cmd.Space != "" {

@@ -26,7 +26,7 @@ func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
+	ccClient := shared.NewWrappedCloudControllerClient(config, ui, nil)
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	return nil
 }

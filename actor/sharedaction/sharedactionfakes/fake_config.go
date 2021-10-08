@@ -60,6 +60,16 @@ type FakeConfig struct {
 	hasTargetedSpaceReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	IsCFOnK8sStub        func() bool
+	isCFOnK8sMutex       sync.RWMutex
+	isCFOnK8sArgsForCall []struct {
+	}
+	isCFOnK8sReturns struct {
+		result1 bool
+	}
+	isCFOnK8sReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	RefreshTokenStub        func() string
 	refreshTokenMutex       sync.RWMutex
 	refreshTokenArgsForCall []struct {
@@ -359,6 +369,58 @@ func (fake *FakeConfig) HasTargetedSpaceReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) IsCFOnK8s() bool {
+	fake.isCFOnK8sMutex.Lock()
+	ret, specificReturn := fake.isCFOnK8sReturnsOnCall[len(fake.isCFOnK8sArgsForCall)]
+	fake.isCFOnK8sArgsForCall = append(fake.isCFOnK8sArgsForCall, struct {
+	}{})
+	fake.recordInvocation("IsCFOnK8s", []interface{}{})
+	fake.isCFOnK8sMutex.Unlock()
+	if fake.IsCFOnK8sStub != nil {
+		return fake.IsCFOnK8sStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isCFOnK8sReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) IsCFOnK8sCallCount() int {
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
+	return len(fake.isCFOnK8sArgsForCall)
+}
+
+func (fake *FakeConfig) IsCFOnK8sCalls(stub func() bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = stub
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturns(result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	fake.isCFOnK8sReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturnsOnCall(i int, result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	if fake.isCFOnK8sReturnsOnCall == nil {
+		fake.isCFOnK8sReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isCFOnK8sReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) RefreshToken() string {
 	fake.refreshTokenMutex.Lock()
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
@@ -531,6 +593,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.hasTargetedOrganizationMutex.RUnlock()
 	fake.hasTargetedSpaceMutex.RLock()
 	defer fake.hasTargetedSpaceMutex.RUnlock()
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
 	fake.targetedOrganizationNameMutex.RLock()

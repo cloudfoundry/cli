@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/router"
@@ -14,24 +15,27 @@ import (
 func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersionV3 string) (*ccv3.Client, *uaa.Client, *router.Client, error) {
 	var err error
 
-	ccClient, authWrapper := NewWrappedCloudControllerClient(config, ui)
+	uaaClient, err := newWrappedUAAClient(config, ui)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	routingClient, err := newWrappedRoutingClient(config, ui, uaaClient)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	ccClient := NewWrappedCloudControllerClient(config, ui, uaaClient)
 
 	ccClient, err = connectToCF(config, ui, ccClient, minVersionV3)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	routingClient, err := newWrappedRoutingClient(config, ui, uaaClient)
-
 	return ccClient, uaaClient, routingClient, err
 }
 
-func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv3.Client, *ccWrapper.UAAAuthentication) {
+func NewWrappedCloudControllerClient(config command.Config, ui command.UI, uaaClient *uaa.Client) *ccv3.Client {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -42,22 +46,25 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv
 		ccWrappers = append(ccWrappers, ccWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	authWrapper := ccWrapper.NewUAAAuthentication(nil, config)
+	var authWrapper ccv3.ConnectionWrapper
+	authWrapper = ccWrapper.NewUAAAuthentication(uaaClient, config)
+	if config.IsCFOnK8s() {
+		authWrapper = ccWrapper.NewKubernetesAuthentication(config, v7action.NewDefaultKubernetesConfigGetter(), uaaClient != nil)
+	}
 
 	ccWrappers = append(ccWrappers, authWrapper)
 	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	ccClient := ccv3.NewClient(ccv3.Config{
+	return ccv3.NewClient(ccv3.Config{
 		AppName:            config.BinaryName(),
 		AppVersion:         config.BinaryVersion(),
 		JobPollingTimeout:  config.OverallPollingTimeout(),
 		JobPollingInterval: config.PollingInterval(),
 		Wrappers:           ccWrappers,
 	})
-	return ccClient, authWrapper
 }
 
-func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error) {
+func newWrappedUAAClient(config command.Config, ui command.UI) (*uaa.Client, error) {
 	var err error
 	verbose, location := config.Verbose()
 
@@ -77,9 +84,6 @@ func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Cl
 	if err != nil {
 		return nil, err
 	}
-
-	uaaAuthWrapper.SetClient(uaaClient)
-	authWrapper.SetClient(uaaClient)
 
 	return uaaClient, nil
 }

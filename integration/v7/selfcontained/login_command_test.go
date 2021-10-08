@@ -27,7 +27,6 @@ var _ = Describe("LoginCommand", func() {
 			stdin          *gbytes.Buffer
 			kubeConfigPath string
 			kubeConfig     apiv1.Config
-			env            helpers.CFEnv
 			session        *gexec.Session
 			loginArgs      []string
 			apiConfig      fake.CFAPIConfig
@@ -54,31 +53,31 @@ var _ = Describe("LoginCommand", func() {
 			apiServer.SetConfiguration(apiConfig)
 
 			kubeConfig = apiv1.Config{
-				Kind:        "Config",
-				APIVersion:  "v1",
-				Preferences: apiv1.Preferences{},
-				Clusters: []apiv1.NamedCluster{
-					{
-						Name:    "cluster1",
-						Cluster: apiv1.Cluster{},
-					},
-				},
+				Kind:       "Config",
+				APIVersion: "v1",
 				AuthInfos: []apiv1.NamedAuthInfo{
-					{Name: "one", AuthInfo: apiv1.AuthInfo{Token: "asdf"}},
-					{Name: "two", AuthInfo: apiv1.AuthInfo{Token: "fdsa"}},
-				},
-				Contexts: []apiv1.NamedContext{
 					{
-						Name: "ctx1",
-						Context: apiv1.Context{
-							Cluster:   "cluster1",
-							AuthInfo:  "one",
-							Namespace: "default",
+						Name: "one",
+						AuthInfo: apiv1.AuthInfo{
+							Token: "foo",
+						},
+					},
+					{
+						Name: "two",
+						AuthInfo: apiv1.AuthInfo{
+							AuthProvider: &apiv1.AuthProviderConfig{
+								Name: "oidc",
+								Config: map[string]string{
+									"id-token":       string(token),
+									"idp-issuer-url": "-",
+									"client-id":      "-",
+								},
+							},
 						},
 					},
 				},
-				CurrentContext: "ctx1",
 			}
+
 			kubeConfigPath := filepath.Join(homeDir, ".kube", "config")
 			storeKubeConfig(kubeConfig, kubeConfigPath)
 

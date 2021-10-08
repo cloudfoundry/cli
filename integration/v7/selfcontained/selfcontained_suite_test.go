@@ -1,14 +1,19 @@
 package selfcontained_test
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/v7/selfcontained/fake"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"github.com/SermoDigital/jose/crypto"
+	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -16,6 +21,8 @@ import (
 var (
 	homeDir   string
 	apiServer *fake.CFAPI
+	env       helpers.CFEnv
+	token     []byte
 )
 
 func TestSelfcontained(t *testing.T) {
@@ -29,6 +36,15 @@ var _ = BeforeEach(func() {
 	helpers.SetConfig(func(config *configv3.Config) {
 		config.ConfigFile.Target = apiServer.URL()
 	})
+
+	keyPair, err := rsa.GenerateKey(rand.Reader, 2048)
+	Expect(err).NotTo(HaveOccurred())
+
+	jwt := jws.NewJWT(jws.Claims{
+		"exp": time.Now().Add(time.Hour).Unix(),
+	}, crypto.SigningMethodRS256)
+	token, err = jwt.Serialize(keyPair)
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterEach(func() {

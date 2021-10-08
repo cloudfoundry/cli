@@ -2,6 +2,8 @@ package fake
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"strings"
 
 	. "github.com/onsi/gomega"
@@ -46,6 +48,17 @@ func (a *CFAPI) Close() {
 
 func (a *CFAPI) URL() string {
 	return a.server.URL()
+}
+
+func (a *CFAPI) ReceivedRequests() map[string][]*http.Request {
+	result := map[string][]*http.Request{}
+
+	for _, req := range a.server.ReceivedRequests() {
+		key := fmt.Sprintf("%s %s", req.Method, req.URL.Path)
+		result[key] = append(result[key], req)
+	}
+
+	return result
 }
 
 func parseRequest(request string) (string, string) {
