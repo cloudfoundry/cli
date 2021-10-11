@@ -50,10 +50,12 @@ require (
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
-	golang.org/x/text v0.3.6
-	gopkg.in/cheggaaa/pb.v1 v1.0.27
+	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
+	golang.org/x/text v0.3.7
+	golang.org/x/tools v0.1.6-0.20210908190839-cf92b39a962c // indirect
+	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
+	k8s.io/client-go v0.22.2
 )
 
 replace (

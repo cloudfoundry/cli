@@ -11,36 +11,48 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 )
 
-func (actor Actor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
-	if grantType == constant.GrantTypePassword && actor.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
+type defaultAuthActor struct {
+	config    Config
+	uaaClient UAAClient
+}
+
+func NewDefaultAuthActor(config Config, uaaClient UAAClient) AuthActor {
+	return &defaultAuthActor{
+		config:    config,
+		uaaClient: uaaClient,
+	}
+}
+
+func (actor defaultAuthActor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
+	if grantType == constant.GrantTypePassword && actor.config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 		return actionerror.PasswordGrantTypeLogoutRequiredError{}
 	}
 
-	actor.Config.UnsetOrganizationAndSpaceInformation()
-	accessToken, refreshToken, err := actor.UAAClient.Authenticate(credentials, origin, grantType)
+	actor.config.UnsetOrganizationAndSpaceInformation()
+	accessToken, refreshToken, err := actor.uaaClient.Authenticate(credentials, origin, grantType)
 	if err != nil {
-		actor.Config.SetTokenInformation("", "", "")
+		actor.config.SetTokenInformation("", "", "")
 		return err
 	}
 
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
-	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
+	actor.config.SetTokenInformation(accessToken, refreshToken, "")
 
 	if grantType == constant.GrantTypePassword {
-		actor.Config.SetUAAGrantType("")
+		actor.config.SetUAAGrantType("")
 	} else {
-		actor.Config.SetUAAGrantType(string(grantType))
+		actor.config.SetUAAGrantType(string(grantType))
 	}
 
 	if grantType == constant.GrantTypeClientCredentials {
-		actor.Config.SetUAAClientCredentials(credentials["client_id"], "")
+		actor.config.SetUAAClientCredentials(credentials["client_id"], "")
 	}
 
 	return nil
 }
 
-func (actor Actor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
-	rawPrompts, err := actor.UAAClient.GetLoginPrompts()
+func (actor defaultAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
+	rawPrompts, err := actor.uaaClient.GetLoginPrompts()
 	if err != nil {
 		return nil, err
 	}

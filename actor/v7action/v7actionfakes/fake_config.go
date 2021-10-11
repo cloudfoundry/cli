@@ -40,6 +40,16 @@ type FakeConfig struct {
 	dialTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
+	IsCFOnK8sStub        func() bool
+	isCFOnK8sMutex       sync.RWMutex
+	isCFOnK8sArgsForCall []struct {
+	}
+	isCFOnK8sReturns struct {
+		result1 bool
+	}
+	isCFOnK8sReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	PollingIntervalStub        func() time.Duration
 	pollingIntervalMutex       sync.RWMutex
 	pollingIntervalArgsForCall []struct {
@@ -73,6 +83,11 @@ type FakeConfig struct {
 	SetAccessTokenStub        func(string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	SetKubernetesAuthInfoStub        func(string)
+	setKubernetesAuthInfoMutex       sync.RWMutex
+	setKubernetesAuthInfoArgsForCall []struct {
 		arg1 string
 	}
 	SetRefreshTokenStub        func(string)
@@ -317,6 +332,58 @@ func (fake *FakeConfig) DialTimeoutReturnsOnCall(i int, result1 time.Duration) {
 	}{result1}
 }
 
+func (fake *FakeConfig) IsCFOnK8s() bool {
+	fake.isCFOnK8sMutex.Lock()
+	ret, specificReturn := fake.isCFOnK8sReturnsOnCall[len(fake.isCFOnK8sArgsForCall)]
+	fake.isCFOnK8sArgsForCall = append(fake.isCFOnK8sArgsForCall, struct {
+	}{})
+	fake.recordInvocation("IsCFOnK8s", []interface{}{})
+	fake.isCFOnK8sMutex.Unlock()
+	if fake.IsCFOnK8sStub != nil {
+		return fake.IsCFOnK8sStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isCFOnK8sReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) IsCFOnK8sCallCount() int {
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
+	return len(fake.isCFOnK8sArgsForCall)
+}
+
+func (fake *FakeConfig) IsCFOnK8sCalls(stub func() bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = stub
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturns(result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	fake.isCFOnK8sReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturnsOnCall(i int, result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	if fake.isCFOnK8sReturnsOnCall == nil {
+		fake.isCFOnK8sReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isCFOnK8sReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) PollingInterval() time.Duration {
 	fake.pollingIntervalMutex.Lock()
 	ret, specificReturn := fake.pollingIntervalReturnsOnCall[len(fake.pollingIntervalArgsForCall)]
@@ -501,6 +568,37 @@ func (fake *FakeConfig) SetAccessTokenArgsForCall(i int) string {
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	argsForCall := fake.setAccessTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfo(arg1 string) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	fake.setKubernetesAuthInfoArgsForCall = append(fake.setKubernetesAuthInfoArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetKubernetesAuthInfo", []interface{}{arg1})
+	fake.setKubernetesAuthInfoMutex.Unlock()
+	if fake.SetKubernetesAuthInfoStub != nil {
+		fake.SetKubernetesAuthInfoStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCallCount() int {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	return len(fake.setKubernetesAuthInfoArgsForCall)
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCalls(stub func(string)) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	defer fake.setKubernetesAuthInfoMutex.Unlock()
+	fake.SetKubernetesAuthInfoStub = stub
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoArgsForCall(i int) string {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	argsForCall := fake.setKubernetesAuthInfoArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -954,6 +1052,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.accessTokenMutex.RUnlock()
 	fake.dialTimeoutMutex.RLock()
 	defer fake.dialTimeoutMutex.RUnlock()
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()
 	defer fake.pollingIntervalMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
@@ -962,6 +1062,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()

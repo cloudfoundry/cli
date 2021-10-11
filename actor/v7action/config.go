@@ -27,4 +27,6 @@ type Config interface {
 	Target() string
 	UAAGrantType() string
 	UnsetOrganizationAndSpaceInformation()
+	SetKubernetesAuthInfo(authInfo string)
+	IsCFOnK8s() bool
 }

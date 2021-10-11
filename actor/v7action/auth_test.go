@@ -11,20 +11,20 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Auth Actions", func() {
+var _ = Describe("Default Auth Actions", func() {
 	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
-		fakeUAAClient             *v7actionfakes.FakeUAAClient
-		fakeConfig                *v7actionfakes.FakeConfig
-		creds                     map[string]string
+		actor         *Actor
+		fakeConfig    *v7actionfakes.FakeConfig
+		fakeUAAClient *v7actionfakes.FakeUAAClient
+		creds         map[string]string
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil, nil)
+		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
+
+		fakeConfig.IsCFOnK8sReturns(false)
+		actor = NewActor(nil, fakeConfig, nil, fakeUAAClient, nil, nil)
 		creds = map[string]string{
 			"client_id":     "some-username",
 			"client_secret": "some-password",

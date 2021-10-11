@@ -130,7 +130,7 @@ ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
 
-integration-selfcontained:
+integration-selfcontained: build
 	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests

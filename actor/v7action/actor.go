@@ -2,6 +2,8 @@
 package v7action
 
 import (
+	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/clock"
 )
 
@@ -16,6 +18,11 @@ const (
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string
 
+type AuthActor interface {
+	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
+	GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error)
+}
+
 // Actor represents a V7 actor.
 type Actor struct {
 	CloudControllerClient CloudControllerClient
@@ -24,6 +31,8 @@ type Actor struct {
 	UAAClient             UAAClient
 	RoutingClient         RoutingClient
 	Clock                 clock.Clock
+
+	AuthActor
 }
 
 // NewActor returns a new V7 actor.
@@ -35,6 +44,11 @@ func NewActor(
 	routingClient RoutingClient,
 	clk clock.Clock,
 ) *Actor {
+	authActor := NewDefaultAuthActor(config, uaaClient)
+	if config != nil && config.IsCFOnK8s() {
+		authActor = NewKubernetesAuthActor(config, NewDefaultKubernetesConfigGetter())
+	}
+
 	return &Actor{
 		CloudControllerClient: client,
 		Config:                config,
@@ -42,5 +56,6 @@ func NewActor(
 		UAAClient:             uaaClient,
 		RoutingClient:         routingClient,
 		Clock:                 clk,
+		AuthActor:             authActor,
 	}
 }

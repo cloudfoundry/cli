@@ -123,6 +123,63 @@ var _ = Describe("login Command", func() {
 				Expect(executeErr).To(MatchError(translatableerror.PasswordGrantTypeLogoutRequiredError{}))
 			})
 		})
+
+		When("running against cf-on-k8s API", func() {
+			BeforeEach(func() {
+				fakeConfig.IsCFOnK8sReturns(true)
+				fakeConfig.TargetReturns("https://foo.bar")
+			})
+
+			When("password flag is provider", func() {
+				BeforeEach(func() {
+					cmd.Password = "pass"
+				})
+
+				It("returns unsupported flag error", func() {
+					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-p"}))
+				})
+			})
+
+			When("sso flag is provider", func() {
+				BeforeEach(func() {
+					cmd.SSO = true
+				})
+
+				It("returns unsupported flag error", func() {
+					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso"}))
+				})
+			})
+
+			When("sso passcode flag is provider", func() {
+				BeforeEach(func() {
+					cmd.SSOPasscode = "sso-pass"
+				})
+
+				It("returns unsupported flag error", func() {
+					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso-passcode"}))
+				})
+			})
+
+			When("username flag is provider", func() {
+				BeforeEach(func() {
+					cmd.Username = "my-user"
+				})
+
+				It("returns unsupported flag error", func() {
+					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-u"}))
+				})
+			})
+
+			When("origin flag is provider", func() {
+				BeforeEach(func() {
+					cmd.Origin = "my-origin"
+				})
+
+				It("returns unsupported flag error", func() {
+					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--origin"}))
+				})
+			})
+		})
 	})
 
 	Describe("API Endpoint", func() {

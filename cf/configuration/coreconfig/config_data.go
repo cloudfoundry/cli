@@ -12,11 +12,13 @@ type AuthPromptType string
 const (
 	AuthPromptTypeText     AuthPromptType = "TEXT"
 	AuthPromptTypePassword AuthPromptType = "PASSWORD"
+	AuthPromptTypeMenu     AuthPromptType = "MENU"
 )
 
 type AuthPrompt struct {
 	Type        AuthPromptType
 	DisplayName string
+	Entries     []string
 }
 
 type Data struct {

@@ -1,43 +1,30 @@
 package selfcontained_test
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/integration/v7/selfcontained/fake"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("cf api", func() {
-	var (
-		server       *ghttp.Server
-		responseBody string
-	)
+	var apiConfig fake.CFAPIConfig
 
 	BeforeEach(func() {
-		responseBody = "{}"
+		apiConfig = fake.CFAPIConfig{
+			Routes: map[string]fake.Response{
+				"GET /": {Code: http.StatusOK, Body: ccv3.Info{}},
+			},
+		}
+		apiServer.SetConfiguration(apiConfig)
 	})
 
 	JustBeforeEach(func() {
-		server = ghttp.NewServer()
-		server.AppendHandlers(
-			ghttp.CombineHandlers(
-				ghttp.VerifyRequest("GET", "/"),
-				ghttp.RespondWith(http.StatusOK, responseBody),
-			),
-		)
-
-		Eventually(helpers.CF("api", server.URL())).Should(gexec.Exit(0))
-	})
-
-	AfterEach(func() {
-		server.Close()
+		Eventually(helpers.CF("api", apiServer.URL())).Should(gexec.Exit(0))
 	})
 
 	It("disables cf-on-k8s in config", func() {
@@ -46,7 +33,10 @@ var _ = Describe("cf api", func() {
 
 	When("pointed to cf-on-k8s", func() {
 		BeforeEach(func() {
-			responseBody = `{ "cf_on_k8s": true }`
+			apiConfig.Routes["GET /"] = fake.Response{
+				Code: http.StatusOK, Body: ccv3.Info{CFOnK8s: true},
+			}
+			apiServer.SetConfiguration(apiConfig)
 		})
 
 		It("enables cf-on-k8s in config", func() {
@@ -54,13 +44,3 @@ var _ = Describe("cf api", func() {
 		})
 	})
 })
-
-func loadConfig() configv3.JSONConfig {
-	rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
-	Expect(err).NotTo(HaveOccurred())
-
-	var configFile configv3.JSONConfig
-	Expect(json.Unmarshal(rawConfig, &configFile)).To(Succeed())
-
-	return configFile
-}

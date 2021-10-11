@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -14,8 +15,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
-
-	"testing"
 )
 
 func TestV3Action(t *testing.T) {

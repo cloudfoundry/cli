@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -16,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -95,6 +95,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			invalidSSLErr.SuggestedCommand = "login"
 			return invalidSSLErr
 		}
+		return err
+	}
+
+	err = cmd.validateTargetSpecificFlags()
+	if err != nil {
 		return err
 	}
 
@@ -208,7 +213,7 @@ func (cmd *LoginCommand) determineAPIEndpoint() (v7action.TargetSettings, error)
 	endpoint := cmd.APIEndpoint
 	skipSSLValidation := cmd.SkipSSLValidation
 
-	var configTarget = cmd.Config.Target()
+	configTarget := cmd.Config.Target()
 
 	if endpoint == "" && configTarget != "" {
 		endpoint = configTarget
@@ -272,7 +277,11 @@ func (cmd *LoginCommand) authenticate() error {
 	}
 
 	for key, prompt := range nonPasswordPrompts {
-		credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+		if prompt.Type == coreconfig.AuthPromptTypeMenu {
+			credentials[key], err = cmd.UI.DisplayTextMenu(prompt.Entries, prompt.DisplayName)
+		} else {
+			credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+		}
 		if err != nil {
 			return err
 		}
@@ -569,6 +578,29 @@ func (cmd *LoginCommand) validateFlags() error {
 		}
 	}
 
+	return nil
+}
+
+func (cmd *LoginCommand) validateTargetSpecificFlags() error {
+	if !cmd.Config.IsCFOnK8s() {
+		return nil
+	}
+
+	if cmd.Password != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-p"}
+	}
+	if cmd.SSO {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso"}
+	}
+	if cmd.SSOPasscode != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso-passcode"}
+	}
+	if cmd.Username != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-u"}
+	}
+	if cmd.Origin != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--origin"}
+	}
 	return nil
 }
 

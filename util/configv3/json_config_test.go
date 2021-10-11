@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo"
@@ -47,92 +48,6 @@ var _ = Describe("JSONConfig", func() {
 			}
 
 			Expect(config.APIVersion()).To(Equal("2.59.0"))
-		})
-	})
-
-	Describe("CurrentUser", func() {
-		When("using client credentials and the user token is set", func() {
-			It("returns the user", func() {
-				config = &Config{
-					ConfigFile: JSONConfig{
-						AccessToken: AccessTokenForClientUsers,
-					},
-				}
-				user, err := config.CurrentUser()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(user).To(Equal(User{
-					Name:     "potato-face",
-					GUID:     "potato-face",
-					IsClient: true,
-				}))
-			})
-		})
-
-		When("using user/password and the user token is set", func() {
-			It("returns the user", func() {
-				config = &Config{
-					ConfigFile: JSONConfig{
-						AccessToken: AccessTokenForHumanUsers,
-					},
-				}
-
-				user, err := config.CurrentUser()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(user).To(Equal(User{
-					Name:     "admin",
-					GUID:     "9519be3e-44d9-40d0-ab9a-f4ace11df159",
-					Origin:   "uaa",
-					IsClient: false,
-				}))
-			})
-		})
-
-		When("the user token is blank", func() {
-			It("returns the user", func() {
-				config = new(Config)
-				user, err := config.CurrentUser()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(user).To(Equal(User{}))
-			})
-		})
-	})
-
-	Describe("CurrentUserName", func() {
-		When("using client credentials and the user token is set", func() {
-			It("returns the username", func() {
-				config = &Config{
-					ConfigFile: JSONConfig{
-						AccessToken: AccessTokenForClientUsers,
-					},
-				}
-
-				username, err := config.CurrentUserName()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(username).To(Equal("potato-face"))
-			})
-		})
-
-		When("using user/password and the user token is set", func() {
-			It("returns the username", func() {
-				config = &Config{
-					ConfigFile: JSONConfig{
-						AccessToken: AccessTokenForHumanUsers,
-					},
-				}
-
-				username, err := config.CurrentUserName()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(username).To(Equal("admin"))
-			})
-		})
-
-		When("the user token is blank", func() {
-			It("returns an empty string", func() {
-				config = new(Config)
-				username, err := config.CurrentUserName()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(username).To(BeEmpty())
-			})
 		})
 	})
 
@@ -579,6 +494,47 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal(DefaultUAAOAuthClient))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(DefaultUAAOAuthClientSecret))
+		})
+	})
+
+	When("using CF-on-K8s", func() {
+		var err error
+
+		BeforeEach(func() {
+			rawConfig := fmt.Sprintf(`{ "CFOnK8s": {"Enabled": true, "AuthInfo": "auth-info-name"}, "ConfigVersion": %d }`, CurrentConfigVersion)
+
+			setConfig(homeDir, rawConfig)
+
+			config, err = LoadConfig()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config).ToNot(BeNil())
+		})
+
+		Describe("CurrentUser", func() {
+			var user configv3.User
+
+			JustBeforeEach(func() {
+				user, err = config.CurrentUser()
+			})
+
+			It("returns a user with the auth-info name", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(user.Name).To(Equal("auth-info-name"))
+				Expect(user.GUID).To(BeEmpty())
+			})
+		})
+
+		Describe("CurrentUserName", func() {
+			var userName string
+
+			JustBeforeEach(func() {
+				userName, err = config.CurrentUserName()
+			})
+
+			It("returns the auth-info name", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(userName).To(Equal("auth-info-name"))
+			})
 		})
 	})
 })
