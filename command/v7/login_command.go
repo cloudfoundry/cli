@@ -60,7 +60,7 @@ type LoginCommand struct {
 }
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient := shared.NewWrappedCloudControllerClient(config, ui, nil)
+	ccClient := shared.NewWrappedCloudControllerClient(config, ui)
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	cmd.ActorReloader = ActualActorReloader{}
 

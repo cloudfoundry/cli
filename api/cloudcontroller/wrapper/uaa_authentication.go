@@ -50,10 +50,6 @@ func NewUAAAuthentication(client UAAClient, cache TokenCache) *UAAAuthentication
 // wrapped connection's Make. If the client is not set on the wrapper, it will
 // not add any header or handle any authentication errors.
 func (t *UAAAuthentication) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	if t.client == nil {
-		return t.connection.Make(request, passedResponse)
-	}
-
 	if request.Header.Get("Authorization") == "" && (t.cache.AccessToken() != "" || t.cache.RefreshToken() != "") {
 		// assert a valid access token for authenticated requests
 		err := t.refreshTokenIfNecessary(t.cache.AccessToken())

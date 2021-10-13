@@ -28,7 +28,6 @@ var _ = Describe("KubernetesAuthentication", func() {
 		wrappedConnection *ccv3fakes.FakeConnectionWrapper
 		req               *cloudcontroller.Request
 		resp              *cloudcontroller.Response
-		needsAuth         bool
 		err               error
 	)
 
@@ -49,13 +48,10 @@ var _ = Describe("KubernetesAuthentication", func() {
 				StatusCode: http.StatusTeapot,
 			},
 		}
-
-		needsAuth = true
-
 	})
 
 	JustBeforeEach(func() {
-		k8sAuthWrapper = wrapper.NewKubernetesAuthentication(config, k8sConfigGetter, needsAuth)
+		k8sAuthWrapper = wrapper.NewKubernetesAuthentication(config, k8sConfigGetter)
 		k8sAuthWrapper.Wrap(wrappedConnection)
 
 		err = k8sAuthWrapper.Make(req, resp)
@@ -151,27 +147,6 @@ var _ = Describe("KubernetesAuthentication", func() {
 			It("errors", func() {
 				Expect(err).To(MatchError(ContainSubstring(`auth info "not-present" not present in kubeconfig`)))
 			})
-
-		})
-
-		When("authentication is not required", func() {
-			BeforeEach(func() {
-				needsAuth = false
-			})
-
-			It("succeeds", func() {
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("does not send an Authorization header", func() {
-				Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
-
-				actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-				Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
-
-				Expect(actualReq.Header.Get("Authorization")).To(BeEmpty())
-			})
-
 		})
 	})
 })

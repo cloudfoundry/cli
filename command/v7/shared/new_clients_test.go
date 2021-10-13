@@ -58,8 +58,8 @@ var _ = Describe("New Clients", func() {
 	})
 
 	When("not targetting", func() {
-		It("does not target and returns no UAA client", func() {
-			ccClient := NewWrappedCloudControllerClient(fakeConfig, testUI, nil)
+		It("does not target", func() {
+			ccClient := NewWrappedCloudControllerClient(fakeConfig, testUI)
 			Expect(ccClient).ToNot(BeNil())
 			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(0))
 		})

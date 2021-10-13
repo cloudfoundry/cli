@@ -25,7 +25,7 @@ func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersio
 		return nil, nil, nil, err
 	}
 
-	ccClient := NewWrappedCloudControllerClient(config, ui, uaaClient)
+	ccClient := NewAuthWrappedCloudControllerClient(config, ui, uaaClient)
 
 	ccClient, err = connectToCF(config, ui, ccClient, minVersionV3)
 	if err != nil {
@@ -35,7 +35,7 @@ func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersio
 	return ccClient, uaaClient, routingClient, err
 }
 
-func NewWrappedCloudControllerClient(config command.Config, ui command.UI, uaaClient *uaa.Client) *ccv3.Client {
+func NewWrappedCloudControllerClient(config command.Config, ui command.UI, extraWrappers ...ccv3.ConnectionWrapper) *ccv3.Client {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -46,13 +46,7 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI, uaaCl
 		ccWrappers = append(ccWrappers, ccWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	var authWrapper ccv3.ConnectionWrapper
-	authWrapper = ccWrapper.NewUAAAuthentication(uaaClient, config)
-	if config.IsCFOnK8s() {
-		authWrapper = ccWrapper.NewKubernetesAuthentication(config, v7action.NewDefaultKubernetesConfigGetter(), uaaClient != nil)
-	}
-
-	ccWrappers = append(ccWrappers, authWrapper)
+	ccWrappers = append(ccWrappers, extraWrappers...)
 	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	return ccv3.NewClient(ccv3.Config{
@@ -62,6 +56,16 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI, uaaCl
 		JobPollingInterval: config.PollingInterval(),
 		Wrappers:           ccWrappers,
 	})
+}
+
+func NewAuthWrappedCloudControllerClient(config command.Config, ui command.UI, uaaClient *uaa.Client) *ccv3.Client {
+	var authWrapper ccv3.ConnectionWrapper
+	authWrapper = ccWrapper.NewUAAAuthentication(uaaClient, config)
+	if config.IsCFOnK8s() {
+		authWrapper = ccWrapper.NewKubernetesAuthentication(config, v7action.NewDefaultKubernetesConfigGetter())
+	}
+
+	return NewWrappedCloudControllerClient(config, ui, authWrapper)
 }
 
 func newWrappedUAAClient(config command.Config, ui command.UI) (*uaa.Client, error) {

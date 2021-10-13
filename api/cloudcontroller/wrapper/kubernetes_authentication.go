@@ -20,22 +20,16 @@ type KubernetesAuthentication struct {
 	connection      cloudcontroller.Connection
 	config          command.Config
 	k8sConfigGetter v7action.KubernetesConfigGetter
-	requiresAuth    bool
 }
 
-func NewKubernetesAuthentication(config command.Config, k8sConfigGetter v7action.KubernetesConfigGetter, requiresAuth bool) *KubernetesAuthentication {
+func NewKubernetesAuthentication(config command.Config, k8sConfigGetter v7action.KubernetesConfigGetter) *KubernetesAuthentication {
 	return &KubernetesAuthentication{
 		config:          config,
 		k8sConfigGetter: k8sConfigGetter,
-		requiresAuth:    requiresAuth,
 	}
 }
 
 func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	if !a.requiresAuth {
-		return a.connection.Make(request, passedResponse)
-	}
-
 	k8sConfig, err := a.k8sConfigGetter.Get()
 	if err != nil {
 		return err
