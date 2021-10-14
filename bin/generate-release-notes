@@ -20,6 +20,13 @@ Binaries
 - Mac OS X [64 bit](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=$VERSION&source=github-rel) (tgz)
 - Windows [64 bit](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=$VERSION&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=windows32-exe&version=$VERSION&source=github-rel) (zip)
 
+
+Docker
+--------
+\`\`\`shell
+docker pull cloudfoundry/cli:$VERSION
+\`\`\`
+
 Change Log
 ----------
 NOTES

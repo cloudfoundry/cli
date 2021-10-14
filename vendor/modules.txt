@@ -117,7 +117,8 @@ github.com/docker/docker/pkg/term/windows
 # github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 ## explicit
 github.com/fatih/color
-# github.com/fsnotify/fsnotify v1.4.9
+# github.com/fsnotify/fsnotify v1.5.1
+## explicit
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
 ## explicit
@@ -189,7 +190,7 @@ github.com/nxadm/tail/ratelimiter
 github.com/nxadm/tail/util
 github.com/nxadm/tail/watch
 github.com/nxadm/tail/winfile
-# github.com/onsi/ginkgo v1.16.4
+# github.com/onsi/ginkgo v1.16.5
 ## explicit
 github.com/onsi/ginkgo
 github.com/onsi/ginkgo/config
@@ -270,7 +271,7 @@ golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.4.2
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+# golang.org/x/net v0.0.0-20211013171255-e13a2654a71e
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -285,14 +286,14 @@ golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
 golang.org/x/net/trace
 golang.org/x/net/websocket
-# golang.org/x/sys v0.0.0-20210816183151-1e6c022a8912
+# golang.org/x/sys v0.0.0-20211013075003-97ac67df715c
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.3.3
+# golang.org/x/text v0.3.6
 ## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
@@ -314,7 +315,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.1.5
+# golang.org/x/tools v0.1.7
 ## explicit
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/gcexportdata
