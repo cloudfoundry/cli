@@ -1,6 +1,7 @@
 package wrapper_test
 
 import (
+	"encoding/base64"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -33,6 +34,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 
 	BeforeEach(func() {
 		k8sConfigGetter = new(v7actionfakes.FakeKubernetesConfigGetter)
+		k8sConfigGetter.GetReturns(&api.Config{}, nil)
 
 		config = new(commandfakes.FakeConfig)
 		config.CurrentUserNameReturns("auth-test", nil)
@@ -57,7 +59,47 @@ var _ = Describe("KubernetesAuthentication", func() {
 		err = k8sAuthWrapper.Make(req, resp)
 	})
 
-	Context("Auth-Provider", func() {
+	When("getting the k8s config fails", func() {
+		BeforeEach(func() {
+			k8sConfigGetter.GetReturns(nil, errors.New("boom!"))
+		})
+
+		It("returns the error", func() {
+			Expect(err).To(MatchError("boom!"))
+		})
+	})
+
+	When("no user is set in the config", func() {
+		BeforeEach(func() {
+			config.CurrentUserNameReturns("", nil)
+		})
+
+		It("errors", func() {
+			Expect(err).To(MatchError(ContainSubstring("current user not set")))
+		})
+	})
+
+	When("there is an error getting the current user from the config", func() {
+		BeforeEach(func() {
+			config.CurrentUserNameReturns("", errors.New("boom"))
+		})
+
+		It("errors", func() {
+			Expect(err).To(MatchError(ContainSubstring("boom")))
+		})
+	})
+
+	When("the chosen kubeernetes auth info is not present in kubeconfig", func() {
+		BeforeEach(func() {
+			config.CurrentUserNameReturns("not-present", nil)
+		})
+
+		It("errors", func() {
+			Expect(err).To(MatchError(ContainSubstring(`auth info "not-present" not present in kubeconfig`)))
+		})
+	})
+
+	Describe("auth-provider", func() {
 		var token []byte
 
 		BeforeEach(func() {
@@ -87,11 +129,8 @@ var _ = Describe("KubernetesAuthentication", func() {
 			}, nil)
 		})
 
-		It("succeeds", func() {
-			Expect(err).NotTo(HaveOccurred())
-		})
-
 		It("uses the auth-provider to generate the Bearer token", func() {
+			Expect(err).NotTo(HaveOccurred())
 			Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
 
 			actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
@@ -108,45 +147,56 @@ var _ = Describe("KubernetesAuthentication", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(body)).To(Equal("hello"))
 		})
+	})
 
-		When("getting the k8s config fails", func() {
-			BeforeEach(func() {
-				k8sConfigGetter.GetReturns(nil, errors.New("boom!"))
-			})
+	Describe("client-cert/key-data", func() {
+		const (
+			clientCertData = "client-cert-data"
+			clientKeyData  = "client-key-data"
+		)
 
-			It("returns the error", func() {
-				Expect(err).To(MatchError("boom!"))
-			})
+		BeforeEach(func() {
+			k8sConfigGetter.GetReturns(&api.Config{
+				Kind:       "Config",
+				APIVersion: "v1",
+				AuthInfos: map[string]*api.AuthInfo{
+					"auth-test": {
+						ClientCertificateData: []byte(clientCertData),
+						ClientKeyData:         []byte(clientKeyData),
+					},
+				},
+			}, nil)
 		})
 
-		When("no user is set in the cofig", func() {
-			BeforeEach(func() {
-				config.CurrentUserNameReturns("", nil)
-			})
+		It("puts concatenated client ceritificate and key data into the Authorization header", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
 
-			It("errors", func() {
-				Expect(err).To(MatchError(ContainSubstring("current user not set")))
-			})
+			actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
+			Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+
+			Expect(actualReq.Header).To(HaveKeyWithValue("Authorization", ConsistOf(HavePrefix("ClientCert "))))
+
+			certAndKey := actualReq.Header.Get("Authorization")[11:]
+			certAndKeyDecoded, err := base64.StdEncoding.DecodeString(string(certAndKey))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(certAndKeyDecoded)).To(Equal(clientCertData + clientKeyData))
+		})
+	})
+
+	Describe("unsupported authentication method", func() {
+		BeforeEach(func() {
+			k8sConfigGetter.GetReturns(&api.Config{
+				Kind:       "Config",
+				APIVersion: "v1",
+				AuthInfos: map[string]*api.AuthInfo{
+					"auth-test": {},
+				},
+			}, nil)
 		})
 
-		When("there is an error getting the current user from the config", func() {
-			BeforeEach(func() {
-				config.CurrentUserNameReturns("", errors.New("boom"))
-			})
-
-			It("errors", func() {
-				Expect(err).To(MatchError(ContainSubstring("boom")))
-			})
-		})
-
-		When("the chosen kubeernetes auth info is not present in kubeconfig", func() {
-			BeforeEach(func() {
-				config.CurrentUserNameReturns("not-present", nil)
-			})
-
-			It("errors", func() {
-				Expect(err).To(MatchError(ContainSubstring(`auth info "not-present" not present in kubeconfig`)))
-			})
+		It("returns an error", func() {
+			Expect(err).To(MatchError(ContainSubstring("authentication method not supported")))
 		})
 	})
 })

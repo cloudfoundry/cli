@@ -1,6 +1,7 @@
 package wrapper
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -22,7 +23,11 @@ type KubernetesAuthentication struct {
 	k8sConfigGetter v7action.KubernetesConfigGetter
 }
 
-func NewKubernetesAuthentication(config command.Config, k8sConfigGetter v7action.KubernetesConfigGetter) *KubernetesAuthentication {
+func NewKubernetesAuthentication(
+	config command.Config,
+	k8sConfigGetter v7action.KubernetesConfigGetter,
+) *KubernetesAuthentication {
+
 	return &KubernetesAuthentication{
 		config:          config,
 		k8sConfigGetter: k8sConfigGetter,
@@ -48,21 +53,35 @@ func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passed
 		return fmt.Errorf("auth info %q not present in kubeconfig", username)
 	}
 
-	pathOpts := clientcmd.NewDefaultPathOptions()
-	persister := clientcmd.PersisterForUser(pathOpts, username)
-	authProvider, err := rest.GetAuthProvider(a.config.Target(), authInfo.AuthProvider, persister)
-	if err != nil {
+	if authInfo.AuthProvider != nil {
+		pathOpts := clientcmd.NewDefaultPathOptions()
+		persister := clientcmd.PersisterForUser(pathOpts, username)
+		authProvider, err := rest.GetAuthProvider(a.config.Target(), authInfo.AuthProvider, persister)
+		if err != nil {
+			return err
+		}
+
+		wrappedRoundTripper := authProvider.WrapTransport(
+			connectionRoundTripper{
+				connection: a.connection,
+				ccRequest:  request,
+				ccResponse: passedResponse,
+			})
+		_, err = wrappedRoundTripper.RoundTrip(request.Request)
 		return err
 	}
 
-	wrappedRoundTripper := authProvider.WrapTransport(
-		connectionRoundTripper{
-			connection: a.connection,
-			ccRequest:  request,
-			ccResponse: passedResponse,
-		})
-	_, err = wrappedRoundTripper.RoundTrip(request.Request)
-	return err
+	if len(authInfo.ClientCertificateData) > 0 && len(authInfo.ClientKeyData) > 0 {
+		certBytes := append([]byte{}, authInfo.ClientCertificateData...)
+		certBytes = append(certBytes, authInfo.ClientKeyData...)
+
+		auth := "ClientCert " + base64.StdEncoding.EncodeToString(certBytes)
+		request.Header.Set("Authorization", auth)
+
+		return a.connection.Make(request, passedResponse)
+	}
+
+	return errors.New("authentication method not supported")
 }
 
 func (a *KubernetesAuthentication) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {

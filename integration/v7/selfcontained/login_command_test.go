@@ -1,8 +1,6 @@
 package selfcontained_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,7 +15,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
-	"gopkg.in/yaml.v2"
 	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
@@ -147,24 +144,3 @@ var _ = Describe("LoginCommand", func() {
 		})
 	})
 })
-
-func storeKubeConfig(kubeconfig apiv1.Config, kubeConfigPath string) {
-	Expect(os.MkdirAll(filepath.Dir(kubeConfigPath), 0755)).To(Succeed())
-	kubeConfigFile, err := os.OpenFile(kubeConfigPath, os.O_CREATE|os.O_WRONLY, 0755)
-	Expect(kubeConfigFile.Truncate(0)).To(Succeed())
-	Expect(err).NotTo(HaveOccurred())
-
-	// we need to serialise the config to JSON as the Config type only has json annotations (and no yaml ones)
-	var buf bytes.Buffer
-	err = json.NewEncoder(&buf).Encode(kubeconfig)
-	Expect(err).NotTo(HaveOccurred())
-
-	var configmap map[string]interface{}
-	err = json.Unmarshal(buf.Bytes(), &configmap)
-	Expect(err).NotTo(HaveOccurred())
-
-	// now we can save the config as yaml
-	err = yaml.NewEncoder(kubeConfigFile).Encode(configmap)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(kubeConfigFile.Close()).To(Succeed())
-}

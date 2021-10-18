@@ -62,7 +62,10 @@ func NewAuthWrappedCloudControllerClient(config command.Config, ui command.UI, u
 	var authWrapper ccv3.ConnectionWrapper
 	authWrapper = ccWrapper.NewUAAAuthentication(uaaClient, config)
 	if config.IsCFOnK8s() {
-		authWrapper = ccWrapper.NewKubernetesAuthentication(config, v7action.NewDefaultKubernetesConfigGetter())
+		authWrapper = ccWrapper.NewKubernetesAuthentication(
+			config,
+			v7action.NewDefaultKubernetesConfigGetter(),
+		)
 	}
 
 	return NewWrappedCloudControllerClient(config, ui, authWrapper)
