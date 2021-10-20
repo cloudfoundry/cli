@@ -1,7 +1,10 @@
 package wrapper
 
 import (
+	"bytes"
+	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -35,11 +39,6 @@ func NewKubernetesAuthentication(
 }
 
 func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	k8sConfig, err := a.k8sConfigGetter.Get()
-	if err != nil {
-		return err
-	}
-
 	username, err := a.config.CurrentUserName()
 	if err != nil {
 		return err
@@ -48,40 +47,68 @@ func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passed
 		return errors.New("current user not set")
 	}
 
-	authInfo, ok := k8sConfig.AuthInfos[username]
-	if !ok {
-		return fmt.Errorf("auth info %q not present in kubeconfig", username)
-	}
-
-	if authInfo.AuthProvider != nil {
-		pathOpts := clientcmd.NewDefaultPathOptions()
-		persister := clientcmd.PersisterForUser(pathOpts, username)
-		authProvider, err := rest.GetAuthProvider(a.config.Target(), authInfo.AuthProvider, persister)
-		if err != nil {
-			return err
-		}
-
-		wrappedRoundTripper := authProvider.WrapTransport(
-			connectionRoundTripper{
-				connection: a.connection,
-				ccRequest:  request,
-				ccResponse: passedResponse,
-			})
-		_, err = wrappedRoundTripper.RoundTrip(request.Request)
+	k8sConfig, err := a.k8sConfigGetter.Get()
+	if err != nil {
 		return err
 	}
 
-	if len(authInfo.ClientCertificateData) > 0 && len(authInfo.ClientKeyData) > 0 {
-		certBytes := append([]byte{}, authInfo.ClientCertificateData...)
-		certBytes = append(certBytes, authInfo.ClientKeyData...)
+	restConfig, err := clientcmd.NewDefaultClientConfig(
+		*k8sConfig,
+		&clientcmd.ConfigOverrides{
+			Context: api.Context{AuthInfo: username},
+		}).ClientConfig()
+	if err != nil {
+		return err
+	}
 
-		auth := "ClientCert " + base64.StdEncoding.EncodeToString(certBytes)
+	tlsConfig, err := rest.TLSConfigFor(restConfig)
+	if err != nil {
+		return fmt.Errorf("failed to get tls config: %w", err)
+	}
+
+	if tlsConfig != nil && tlsConfig.GetClientCertificate != nil {
+		cert, err := tlsConfig.GetClientCertificate(nil)
+		if err != nil {
+			return fmt.Errorf("failed to get client certificate: %w", err)
+		}
+
+		var buf bytes.Buffer
+
+		if err := pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate[0]}); err != nil {
+			return fmt.Errorf("could not convert certificate to PEM format: %w", err)
+		}
+
+		key, err := x509.MarshalPKCS8PrivateKey(cert.PrivateKey)
+		if err != nil {
+			return fmt.Errorf("could not marshal private key: %w", err)
+		}
+
+		if err := pem.Encode(&buf, &pem.Block{Type: "PRIVATE KEY", Bytes: key}); err != nil {
+			return fmt.Errorf("could not convert key to PEM format: %w", err)
+		}
+
+		auth := "ClientCert " + base64.StdEncoding.EncodeToString(buf.Bytes())
 		request.Header.Set("Authorization", auth)
 
 		return a.connection.Make(request, passedResponse)
 	}
 
-	return errors.New("authentication method not supported")
+	transportConfig, err := restConfig.TransportConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get transport config: %w", err)
+	}
+
+	if transportConfig.WrapTransport == nil {
+		return fmt.Errorf("authentication method not supported")
+	}
+
+	_, err = transportConfig.WrapTransport(connectionRoundTripper{
+		connection: a.connection,
+		ccRequest:  request,
+		ccResponse: passedResponse,
+	}).RoundTrip(request.Request)
+
+	return err
 }
 
 func (a *KubernetesAuthentication) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {

@@ -73,6 +73,25 @@ var _ = Describe("LoginCommand", func() {
 						},
 					},
 				},
+				Clusters: []apiv1.NamedCluster{
+					{
+						Name: "my-cluster",
+						Cluster: apiv1.Cluster{
+							Server: "https://example.org",
+						},
+					},
+				},
+				Contexts: []apiv1.NamedContext{
+					{
+						Name: "my-context",
+						Context: apiv1.Context{
+							Cluster:   "my-cluster",
+							AuthInfo:  "my-auth-info",
+							Namespace: "my-namespace",
+						},
+					},
+				},
+				CurrentContext: "my-context",
 			}
 
 			kubeConfigPath := filepath.Join(homeDir, ".kube", "config")
