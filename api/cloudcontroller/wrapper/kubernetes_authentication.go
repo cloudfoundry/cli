@@ -72,25 +72,27 @@ func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passed
 			return fmt.Errorf("failed to get client certificate: %w", err)
 		}
 
-		var buf bytes.Buffer
+		if len(cert.Certificate) > 0 && cert.PrivateKey != nil {
+			var buf bytes.Buffer
 
-		if err := pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate[0]}); err != nil {
-			return fmt.Errorf("could not convert certificate to PEM format: %w", err)
+			if err := pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate[0]}); err != nil {
+				return fmt.Errorf("could not convert certificate to PEM format: %w", err)
+			}
+
+			key, err := x509.MarshalPKCS8PrivateKey(cert.PrivateKey)
+			if err != nil {
+				return fmt.Errorf("could not marshal private key: %w", err)
+			}
+
+			if err := pem.Encode(&buf, &pem.Block{Type: "PRIVATE KEY", Bytes: key}); err != nil {
+				return fmt.Errorf("could not convert key to PEM format: %w", err)
+			}
+
+			auth := "ClientCert " + base64.StdEncoding.EncodeToString(buf.Bytes())
+			request.Header.Set("Authorization", auth)
+
+			return a.connection.Make(request, passedResponse)
 		}
-
-		key, err := x509.MarshalPKCS8PrivateKey(cert.PrivateKey)
-		if err != nil {
-			return fmt.Errorf("could not marshal private key: %w", err)
-		}
-
-		if err := pem.Encode(&buf, &pem.Block{Type: "PRIVATE KEY", Bytes: key}); err != nil {
-			return fmt.Errorf("could not convert key to PEM format: %w", err)
-		}
-
-		auth := "ClientCert " + base64.StdEncoding.EncodeToString(buf.Bytes())
-		request.Header.Set("Authorization", auth)
-
-		return a.connection.Make(request, passedResponse)
 	}
 
 	transportConfig, err := restConfig.TransportConfig()

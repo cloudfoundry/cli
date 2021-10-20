@@ -2,6 +2,7 @@ package wrapper_test
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"io/ioutil"
@@ -20,7 +21,14 @@ import (
 	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientauthenticationv1beta1 "k8s.io/client-go/pkg/apis/clientauthentication/v1beta1"
 	"k8s.io/client-go/tools/clientcmd/api"
+)
+
+const (
+	clientCertData = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lJVk9iMUFIckxNUjh3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TVRFd01EVXhOVEExTURsYUZ3MHlNakV3TURVeE5UQTFNVEZhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXJrdWxLbS9qTTJhZWZsdjkKK00zQk9Jc2QvVXZrRTBONGhWb3hSeWRBbE0xQXhWd3REYUdzL3dmUzRzb0xuNHJENTF3UE1SRlNJaitwSzdGYQprRGdaR0x4UFhrai96UkZOTzcvU3J2RHYwVGxjYjJENzNCS21qaXArQ2hBWkpQdWhMQlY2VnlTN0pXSWhOM1lOCktyamR5TnB5MHN3SjI1TW9CbW1saUpFc3V2dCtDaEhseERqWE9KenF1U2owa1hPQVVsWUFTN1dKK09JMU9HbzQKUjcvdHdHZlFTNW9oYXpRVVlDR2lZSllYcjVRNkVKTmJOVVI0RjdpRSthY1I5Rm9GNnNKSmkrQStET1VDUFFSKwptbjQ5Zm1pcFVHSGtMc3BicTNFZ0FEME40VW5jcmIyeUJEMFNVTmdLQmJjclY1S2hybFA2SzkwNkY5NEpubzNHCm1Id1JwUUlEQVFBQm8xWXdWREFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JUV2VNZ1ZBRkRhbWcraDRqS3hoRUh2Q1l5egp5akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBUUxMWWFXQTRva1M2b3ZEWjQ1Z28ybkVZdUR4MklmRXZwYnh3CkNmYkFTNDY4M3lLT3FiYVBHOEpTVGhSbkh3TWlMcVBrbGFsdkJvV2R3aFB5Vkk0d2tVNHI4Y2c0UEpxNEZwWnQKVkNUQzFPZWVwRGpTMFpVQjRwSDVIZVlNQUxqSDBqcFV3RU96djFpaEtid05IMHFoZ2pGeUNTdld5TG9oZHdzbApJWXIvV1NEZm50NlBETC84TjFpcEJJbEN5Z1JHVGdoSFhPemhHUklPWG4rYWVOR29yWm9YWm0xbHErc1hyUnc5CktNdVZhRmdhaWVjSm0vbytyemFFSG9VZjRYOERKeVNubmVTa3ViaEx6ZERNc2o5eEs1cEJpdFgvaDlQMUQrMkcKeW5rcWdJVTJSWTM0SjBRcnU4Z0syNlJVT2pOcHIvRWJHQ0dUQUxiMXJnSDM0K2NFdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+	clientKeyData  = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ3VTNlVxYitNelpwNSsKVy8zNHpjRTRpeDM5UytRVFEzaUZXakZISjBDVXpVREZYQzBOb2F6L0I5TGl5Z3VmaXNQblhBOHhFVklpUDZrcgpzVnFRT0JrWXZFOWVTUC9ORVUwN3Y5S3U4Ty9ST1Z4dllQdmNFcWFPS240S0VCa2srNkVzRlhwWEpMc2xZaUUzCmRnMHF1TjNJMm5MU3pBbmJreWdHYWFXSWtTeTYrMzRLRWVYRU9OYzRuT3E1S1BTUmM0QlNWZ0JMdFluNDRqVTQKYWpoSHYrM0FaOUJMbWlGck5CUmdJYUpnbGhldmxEb1FrMXMxUkhnWHVJVDVweEgwV2dYcXdrbUw0RDRNNVFJOQpCSDZhZmoxK2FLbFFZZVF1eWx1cmNTQUFQUTNoU2R5dHZiSUVQUkpRMkFvRnR5dFhrcUd1VS9vcjNUb1gzZ21lCmpjYVlmQkdsQWdNQkFBRUNnZ0VBZG80WndLM3VteTM0TFBjaDM3VUU4eE1keVFkd0VmSlk3a3dWTE5MMFNNTDgKaGNKWEd1aVlKYmtLcHh6TG55L2laV0xuS25jZnFSQW9ZQUg1R2hRdWJmYlkvY2NseURVMmxhZTdCU2Y1MkJUdQpYUXhaQks3aS85ekRjdERVYWFXSFVkY2lLbGhmdStQdHVDM2ljdWJnWlJqQjljUzRCOVVtNm9XK0JSREtuandICkduQ0lEZlNNQWt4VXdTaUwwa2NXelNpZ1BYMVN3UHcxOEZvZWgzTmJEd1VXTHhxUWZLVThydVlSTUsxYUg5M3cKcjFtbjlDWUwvd0hiVWRqcmtZMlIxTjVUR21ab2Vldm5qUXgyQVc2NkYzdEg1cGg4RTF6TEFQVTl4TFdRTW9KcwpXM0gzSTdUaEYvRnJuNERQa3hQbThUUVVhQUdvQ09SSWFUQkN5VlgxQVFLQmdRREkxbkRmNWYySHdHaldrTStpCk9YbGE1R1VnRUtXaGZpeGhidE5OclNpMDU5VnZQUEJwNXdtbGQzMHJKUDhWem8vbnFnUW5ISmpmaEQ2Y3NSMTQKL2VlMHZ1Um0zYzZwZzMrODdwOHhWY3lLNHhDd0JmdFFuMGRZWWFLMkRMOEtYb0liYThpN09EQmFoNW5OZWQwcgpKa1RPcE5NRGRkL0p0bEpPZ25jRXBlUk9oUUtCZ1FEZUt1L0R1MXU1QVR3Y3p5STRXOWV1L1YwTXRwMHdqM3RpClF2MmpObW83QU1zS3BwK0ZKVDFqWFhUKzZCTm02OWpxUVJwdlAyd2RhVUdqV1dLa1lHVEVpbUZCc2ZuKzJDOFAKOEc3Uk50YWpRdEV2QlR1ZDZPN0tZUkFoTU56dm9RcDkrZmJKY1ZsRG13Nlk0bUYzUTJXS3NmZU51TGtpY3VqNQpYVFV1ekVMd29RS0JnUUREU0IvQTFYVEx4cjhwd3V6aHBGam5sQ1R3Skwrb1kzTHIya01EeUZkSWNCUU1jWWlpCnNNK2tZS2NJaUpTdnM0WWhrQ014bEpEZzVVbXNPbHVhQmVpQ3l3cHpLMEdEZWlWK285ZU90UXFLRVhkc2NLU0oKSkJiUFRVQlZHOWUyVVdiWkd0aTNrazhSOThBSkYzR0NQMWV3Um53WFpVb1FiSU5qYTJBbTJOZEJzUUtCZ0Q4eApOVXVXTWl1NE56SDJsTVExRTI4NXI4cmE4bkVLanN6UFF6ZTJWWmI4emNQMHl2RGpPOGZVb0YrVkFWZklBOFgxCnlLQVdDUm1BZytRRG03UW5tdUh3Zm1OaVRUcDRvVUpHWUM3d0N6TWE0VWNmbE9xQWc5TmFzbXpPYWpsYXRCSkwKRkRBT0pwYTlOdlN6aDRlVnl2OGRTYzJzMmpQN1BWc1ljUFVqc25LaEFvR0JBSy9kQjlnVEFpME5nczVmaVNtWQovWkp3Yk52MjcyTHdKbWV4Vit2eWtjN3J5LzRraTRQb2xRd1BHNzQ5eFZ0T2NNc2FhRlVNMVVkclN2NlIwbjlkCmpTbXhCeTl2YWdzc1FmVDNSc3BvUUJKM0w5YWxiNHM2V2ZtUEpzNkFrQkhIZHNpVXFaaElYT2J2WE1lQ0k2aVMKOTQ2R0toekFxMlVGbjhFUGxXaFVNeEFiCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
 )
 
 var _ = Describe("KubernetesAuthentication", func() {
@@ -165,40 +173,35 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 	})
 
-	Describe("client certs", func() {
-		const (
-			clientCertData = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lJVk9iMUFIckxNUjh3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TVRFd01EVXhOVEExTURsYUZ3MHlNakV3TURVeE5UQTFNVEZhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXJrdWxLbS9qTTJhZWZsdjkKK00zQk9Jc2QvVXZrRTBONGhWb3hSeWRBbE0xQXhWd3REYUdzL3dmUzRzb0xuNHJENTF3UE1SRlNJaitwSzdGYQprRGdaR0x4UFhrai96UkZOTzcvU3J2RHYwVGxjYjJENzNCS21qaXArQ2hBWkpQdWhMQlY2VnlTN0pXSWhOM1lOCktyamR5TnB5MHN3SjI1TW9CbW1saUpFc3V2dCtDaEhseERqWE9KenF1U2owa1hPQVVsWUFTN1dKK09JMU9HbzQKUjcvdHdHZlFTNW9oYXpRVVlDR2lZSllYcjVRNkVKTmJOVVI0RjdpRSthY1I5Rm9GNnNKSmkrQStET1VDUFFSKwptbjQ5Zm1pcFVHSGtMc3BicTNFZ0FEME40VW5jcmIyeUJEMFNVTmdLQmJjclY1S2hybFA2SzkwNkY5NEpubzNHCm1Id1JwUUlEQVFBQm8xWXdWREFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JUV2VNZ1ZBRkRhbWcraDRqS3hoRUh2Q1l5egp5akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBUUxMWWFXQTRva1M2b3ZEWjQ1Z28ybkVZdUR4MklmRXZwYnh3CkNmYkFTNDY4M3lLT3FiYVBHOEpTVGhSbkh3TWlMcVBrbGFsdkJvV2R3aFB5Vkk0d2tVNHI4Y2c0UEpxNEZwWnQKVkNUQzFPZWVwRGpTMFpVQjRwSDVIZVlNQUxqSDBqcFV3RU96djFpaEtid05IMHFoZ2pGeUNTdld5TG9oZHdzbApJWXIvV1NEZm50NlBETC84TjFpcEJJbEN5Z1JHVGdoSFhPemhHUklPWG4rYWVOR29yWm9YWm0xbHErc1hyUnc5CktNdVZhRmdhaWVjSm0vbytyemFFSG9VZjRYOERKeVNubmVTa3ViaEx6ZERNc2o5eEs1cEJpdFgvaDlQMUQrMkcKeW5rcWdJVTJSWTM0SjBRcnU4Z0syNlJVT2pOcHIvRWJHQ0dUQUxiMXJnSDM0K2NFdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
-			clientKeyData  = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ3VTNlVxYitNelpwNSsKVy8zNHpjRTRpeDM5UytRVFEzaUZXakZISjBDVXpVREZYQzBOb2F6L0I5TGl5Z3VmaXNQblhBOHhFVklpUDZrcgpzVnFRT0JrWXZFOWVTUC9ORVUwN3Y5S3U4Ty9ST1Z4dllQdmNFcWFPS240S0VCa2srNkVzRlhwWEpMc2xZaUUzCmRnMHF1TjNJMm5MU3pBbmJreWdHYWFXSWtTeTYrMzRLRWVYRU9OYzRuT3E1S1BTUmM0QlNWZ0JMdFluNDRqVTQKYWpoSHYrM0FaOUJMbWlGck5CUmdJYUpnbGhldmxEb1FrMXMxUkhnWHVJVDVweEgwV2dYcXdrbUw0RDRNNVFJOQpCSDZhZmoxK2FLbFFZZVF1eWx1cmNTQUFQUTNoU2R5dHZiSUVQUkpRMkFvRnR5dFhrcUd1VS9vcjNUb1gzZ21lCmpjYVlmQkdsQWdNQkFBRUNnZ0VBZG80WndLM3VteTM0TFBjaDM3VUU4eE1keVFkd0VmSlk3a3dWTE5MMFNNTDgKaGNKWEd1aVlKYmtLcHh6TG55L2laV0xuS25jZnFSQW9ZQUg1R2hRdWJmYlkvY2NseURVMmxhZTdCU2Y1MkJUdQpYUXhaQks3aS85ekRjdERVYWFXSFVkY2lLbGhmdStQdHVDM2ljdWJnWlJqQjljUzRCOVVtNm9XK0JSREtuandICkduQ0lEZlNNQWt4VXdTaUwwa2NXelNpZ1BYMVN3UHcxOEZvZWgzTmJEd1VXTHhxUWZLVThydVlSTUsxYUg5M3cKcjFtbjlDWUwvd0hiVWRqcmtZMlIxTjVUR21ab2Vldm5qUXgyQVc2NkYzdEg1cGg4RTF6TEFQVTl4TFdRTW9KcwpXM0gzSTdUaEYvRnJuNERQa3hQbThUUVVhQUdvQ09SSWFUQkN5VlgxQVFLQmdRREkxbkRmNWYySHdHaldrTStpCk9YbGE1R1VnRUtXaGZpeGhidE5OclNpMDU5VnZQUEJwNXdtbGQzMHJKUDhWem8vbnFnUW5ISmpmaEQ2Y3NSMTQKL2VlMHZ1Um0zYzZwZzMrODdwOHhWY3lLNHhDd0JmdFFuMGRZWWFLMkRMOEtYb0liYThpN09EQmFoNW5OZWQwcgpKa1RPcE5NRGRkL0p0bEpPZ25jRXBlUk9oUUtCZ1FEZUt1L0R1MXU1QVR3Y3p5STRXOWV1L1YwTXRwMHdqM3RpClF2MmpObW83QU1zS3BwK0ZKVDFqWFhUKzZCTm02OWpxUVJwdlAyd2RhVUdqV1dLa1lHVEVpbUZCc2ZuKzJDOFAKOEc3Uk50YWpRdEV2QlR1ZDZPN0tZUkFoTU56dm9RcDkrZmJKY1ZsRG13Nlk0bUYzUTJXS3NmZU51TGtpY3VqNQpYVFV1ekVMd29RS0JnUUREU0IvQTFYVEx4cjhwd3V6aHBGam5sQ1R3Skwrb1kzTHIya01EeUZkSWNCUU1jWWlpCnNNK2tZS2NJaUpTdnM0WWhrQ014bEpEZzVVbXNPbHVhQmVpQ3l3cHpLMEdEZWlWK285ZU90UXFLRVhkc2NLU0oKSkJiUFRVQlZHOWUyVVdiWkd0aTNrazhSOThBSkYzR0NQMWV3Um53WFpVb1FiSU5qYTJBbTJOZEJzUUtCZ0Q4eApOVXVXTWl1NE56SDJsTVExRTI4NXI4cmE4bkVLanN6UFF6ZTJWWmI4emNQMHl2RGpPOGZVb0YrVkFWZklBOFgxCnlLQVdDUm1BZytRRG03UW5tdUh3Zm1OaVRUcDRvVUpHWUM3d0N6TWE0VWNmbE9xQWc5TmFzbXpPYWpsYXRCSkwKRkRBT0pwYTlOdlN6aDRlVnl2OGRTYzJzMmpQN1BWc1ljUFVqc25LaEFvR0JBSy9kQjlnVEFpME5nczVmaVNtWQovWkp3Yk52MjcyTHdKbWV4Vit2eWtjN3J5LzRraTRQb2xRd1BHNzQ5eFZ0T2NNc2FhRlVNMVVkclN2NlIwbjlkCmpTbXhCeTl2YWdzc1FmVDNSc3BvUUJKM0w5YWxiNHM2V2ZtUEpzNkFrQkhIZHNpVXFaaElYT2J2WE1lQ0k2aVMKOTQ2R0toekFxMlVGbjhFUGxXaFVNeEFiCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
-		)
+	checkClientCertInAuthHeader := func() {
+		Expect(makeErr).NotTo(HaveOccurred())
+		Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
 
+		actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
+		Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+
+		Expect(actualReq.Header).To(HaveKeyWithValue("Authorization", ConsistOf(HavePrefix("ClientCert "))))
+
+		certAndKeyPEMBase64 := actualReq.Header.Get("Authorization")[11:]
+		certAndKeyPEM, err := base64.StdEncoding.DecodeString(certAndKeyPEMBase64)
+		Expect(err).NotTo(HaveOccurred())
+
+		cert, rest := pem.Decode(certAndKeyPEM)
+		Expect(cert.Type).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Type))
+		Expect(cert.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Bytes))
+
+		var key *pem.Block
+		key, rest = pem.Decode(rest)
+		Expect(key.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientKeyData).Bytes))
+
+		Expect(rest).To(BeEmpty())
+	}
+
+	Describe("client certs", func() {
 		var (
 			certFilePath string
 			keyFilePath  string
 		)
-
-		checkClientCertInAuthHeader := func() {
-			Expect(makeErr).NotTo(HaveOccurred())
-			Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
-
-			actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-			Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
-
-			Expect(actualReq.Header).To(HaveKeyWithValue("Authorization", ConsistOf(HavePrefix("ClientCert "))))
-
-			certAndKeyPEMBase64 := actualReq.Header.Get("Authorization")[11:]
-			certAndKeyPEM, err := base64.StdEncoding.DecodeString(certAndKeyPEMBase64)
-			Expect(err).NotTo(HaveOccurred())
-
-			cert, rest := pem.Decode(certAndKeyPEM)
-			Expect(cert.Type).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Type))
-			Expect(cert.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Bytes))
-
-			var key *pem.Block
-			key, rest = pem.Decode(rest)
-			Expect(key.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientKeyData).Bytes))
-
-			Expect(rest).To(BeEmpty())
-		}
 
 		BeforeEach(func() {
 			certFilePath = writeToFile(clientCertData)
@@ -273,8 +276,8 @@ var _ = Describe("KubernetesAuthentication", func() {
 		When("file and inline key is provided", func() {
 			BeforeEach(func() {
 				kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
-					ClientCertificateData: []byte(clientCertData),
-					ClientKeyData:         []byte(clientKeyData),
+					ClientCertificateData: []byte(base64Decode(clientCertData)),
+					ClientKeyData:         []byte(base64Decode(clientKeyData)),
 					ClientKey:             keyFilePath,
 				}
 			})
@@ -311,6 +314,48 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 	})
 
+	Describe("exec", func() {
+		BeforeEach(func() {
+			kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
+				Exec: &api.ExecConfig{
+					APIVersion:      "client.authentication.k8s.io/v1beta1",
+					InteractiveMode: "Never",
+					Command:         "echo",
+				},
+			}
+		})
+
+		When("the command returns a token", func() {
+			BeforeEach(func() {
+				kubeConfig.AuthInfos["auth-test"].Exec.Args = []string{execCredential(&clientauthenticationv1beta1.ExecCredentialStatus{
+					Token: "a-token",
+				})}
+			})
+
+			It("uses the exec command to generate the Bearer token", func() {
+				Expect(makeErr).NotTo(HaveOccurred())
+				Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
+
+				actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
+				Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+				Expect(actualReq.Header.Get("Authorization")).To(Equal("Bearer a-token"))
+			})
+		})
+
+		When("the command returns a client cert and key", func() {
+			BeforeEach(func() {
+				kubeConfig.AuthInfos["auth-test"].Exec.Args = []string{execCredential(&clientauthenticationv1beta1.ExecCredentialStatus{
+					ClientCertificateData: base64Decode(clientCertData),
+					ClientKeyData:         base64Decode(clientKeyData),
+				})}
+			})
+
+			It("uses the exec command to generate client certs", func() {
+				checkClientCertInAuthHeader()
+			})
+		})
+	})
+
 	Describe("unsupported authentication method", func() {
 		BeforeEach(func() {
 			kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{}
@@ -342,4 +387,15 @@ func writeToFile(base64Data string) string {
 	file.WriteString(base64Decode(base64Data))
 	Expect(file.Close()).To(Succeed())
 	return file.Name()
+}
+
+func execCredential(status *clientauthenticationv1beta1.ExecCredentialStatus) string {
+	execCred, err := json.Marshal(clientauthenticationv1beta1.ExecCredential{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "client.authentication.k8s.io/v1beta1",
+		},
+		Status: status,
+	})
+	Expect(err).NotTo(HaveOccurred())
+	return string(execCred)
 }
