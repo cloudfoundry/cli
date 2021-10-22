@@ -129,6 +129,51 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 	})
 
+	checkCalls := func() *cloudcontroller.Request {
+		Expect(makeErr).NotTo(HaveOccurred())
+		Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
+
+		actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
+		Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+
+		body, err := ioutil.ReadAll(actualReq.Body)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(body)).To(Equal("hello"))
+
+		return actualReq
+	}
+
+	checkBearerTokenInAuthHeader := func() {
+		actualReq := checkCalls()
+
+		token, err := jws.ParseJWTFromRequest(actualReq.Request)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(token.Validate(keyPair.Public(), crypto.SigningMethodRS256)).To(Succeed())
+
+		claims := token.Claims()
+		Expect(claims).To(HaveKeyWithValue("another", "thing"))
+	}
+
+	checkClientCertInAuthHeader := func() {
+		actualReq := checkCalls()
+
+		Expect(actualReq.Header).To(HaveKeyWithValue("Authorization", ConsistOf(HavePrefix("ClientCert "))))
+
+		certAndKeyPEMBase64 := actualReq.Header.Get("Authorization")[11:]
+		certAndKeyPEM, err := base64.StdEncoding.DecodeString(certAndKeyPEMBase64)
+		Expect(err).NotTo(HaveOccurred())
+
+		cert, rest := pem.Decode(certAndKeyPEM)
+		Expect(cert.Type).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Type))
+		Expect(cert.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Bytes))
+
+		var key *pem.Block
+		key, rest = pem.Decode(rest)
+		Expect(key.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientKeyData).Bytes))
+
+		Expect(rest).To(BeEmpty())
+	}
+
 	Describe("auth-provider", func() {
 		var token []byte
 
@@ -154,48 +199,9 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 
 		It("uses the auth-provider to generate the Bearer token", func() {
-			Expect(makeErr).NotTo(HaveOccurred())
-			Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
-
-			actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-			Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
-
-			token, err := jws.ParseJWTFromRequest(actualReq.Request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(token.Validate(keyPair.Public(), crypto.SigningMethodRS256)).To(Succeed())
-
-			claims := token.Claims()
-			Expect(claims).To(HaveKeyWithValue("another", "thing"))
-
-			body, err := ioutil.ReadAll(actualReq.Body)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(body)).To(Equal("hello"))
+			checkBearerTokenInAuthHeader()
 		})
 	})
-
-	checkClientCertInAuthHeader := func() {
-		Expect(makeErr).NotTo(HaveOccurred())
-		Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
-
-		actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-		Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
-
-		Expect(actualReq.Header).To(HaveKeyWithValue("Authorization", ConsistOf(HavePrefix("ClientCert "))))
-
-		certAndKeyPEMBase64 := actualReq.Header.Get("Authorization")[11:]
-		certAndKeyPEM, err := base64.StdEncoding.DecodeString(certAndKeyPEMBase64)
-		Expect(err).NotTo(HaveOccurred())
-
-		cert, rest := pem.Decode(certAndKeyPEM)
-		Expect(cert.Type).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Type))
-		Expect(cert.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientCertData).Bytes))
-
-		var key *pem.Block
-		key, rest = pem.Decode(rest)
-		Expect(key.Bytes).To(Equal(pemDecodeKubeConfigCertData(clientKeyData).Bytes))
-
-		Expect(rest).To(BeEmpty())
-	}
 
 	Describe("client certs", func() {
 		var (
@@ -356,13 +362,66 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 	})
 
-	Describe("unsupported authentication method", func() {
+	Describe("tokens provided in config", func() {
+		var token []byte
+
 		BeforeEach(func() {
-			kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{}
+			jwt := jws.NewJWT(jws.Claims{
+				"exp":     time.Now().Add(time.Hour).Unix(),
+				"another": "thing",
+			}, crypto.SigningMethodRS256)
+			var err error
+			token, err = jwt.Serialize(keyPair)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("returns an error", func() {
-			Expect(makeErr).To(MatchError(ContainSubstring("authentication method not supported")))
+		Context("inline tokens", func() {
+			BeforeEach(func() {
+				kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
+					Token: string(token),
+				}
+			})
+
+			It("inserts the token in the authorization header", func() {
+				checkBearerTokenInAuthHeader()
+			})
+		})
+
+		Context("token file paths", func() {
+			var tokenFilePath string
+
+			BeforeEach(func() {
+				tokenFile, err := ioutil.TempFile("", "")
+				Expect(err).NotTo(HaveOccurred())
+				defer tokenFile.Close()
+				_, err = tokenFile.Write(token)
+				Expect(err).NotTo(HaveOccurred())
+				tokenFilePath = tokenFile.Name()
+				kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
+					TokenFile: tokenFilePath,
+				}
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tokenFilePath)).To(Succeed())
+			})
+
+			It("inserts the token in the authorization header", func() {
+				checkBearerTokenInAuthHeader()
+			})
+		})
+
+		When("both file and inline token are provided", func() {
+			BeforeEach(func() {
+				kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
+					Token:     string(token),
+					TokenFile: "some-path",
+				}
+			})
+
+			It("the inline token takes precedence", func() {
+				checkBearerTokenInAuthHeader()
+			})
 		})
 	})
 })

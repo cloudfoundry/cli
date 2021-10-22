@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/transport"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -100,15 +101,26 @@ func (a *KubernetesAuthentication) Make(request *cloudcontroller.Request, passed
 		return fmt.Errorf("failed to get transport config: %w", err)
 	}
 
+	var roundtripper http.RoundTripper
 	if transportConfig.WrapTransport == nil {
-		return fmt.Errorf("authentication method not supported")
+		// i.e. not auth-provider or exec plugin
+		roundtripper, err = transport.HTTPWrappersForConfig(transportConfig, connectionRoundTripper{
+			connection: a.connection,
+			ccRequest:  request,
+			ccResponse: passedResponse,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create new transport: %w", err)
+		}
+	} else {
+		roundtripper = transportConfig.WrapTransport(connectionRoundTripper{
+			connection: a.connection,
+			ccRequest:  request,
+			ccResponse: passedResponse,
+		})
 	}
 
-	_, err = transportConfig.WrapTransport(connectionRoundTripper{
-		connection: a.connection,
-		ccRequest:  request,
-		ccResponse: passedResponse,
-	}).RoundTrip(request.Request)
+	_, err = roundtripper.RoundTrip(request.Request)
 
 	return err
 }
