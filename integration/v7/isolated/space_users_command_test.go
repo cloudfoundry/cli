@@ -45,12 +45,14 @@ var _ = Describe("space-users command", func() {
 			var (
 				spaceManagerUser   string
 				spaceDeveloperUser string
+				spaceSupporterUser string
 				spaceAuditorUser1  string
 			)
 
 			BeforeEach(func() {
 				spaceManagerUser, _ = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceManager")
 				spaceDeveloperUser, _ = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceDeveloper")
+				spaceSupporterUser, _ = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceSupporter")
 				spaceAuditorUser1, _ = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceAuditor")
 			})
 
@@ -61,6 +63,8 @@ var _ = Describe("space-users command", func() {
 				Eventually(session).Should(Say(`\s+%s \(uaa\)`, spaceManagerUser))
 				Eventually(session).Should(Say("SPACE DEVELOPER"))
 				Eventually(session).Should(Say(`\s+%s \(uaa\)`, spaceDeveloperUser))
+				Eventually(session).Should(Say("SPACE SUPPORTER"))
+				Eventually(session).Should(Say(`\s+%s \(uaa\)`, spaceSupporterUser))
 				Eventually(session).Should(Say("SPACE AUDITOR"))
 				Eventually(session).Should(Say(`\s+%s \(uaa\)`, spaceAuditorUser1))
 				Eventually(session).Should(Exit(0))
