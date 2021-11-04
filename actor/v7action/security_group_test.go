@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -598,7 +599,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		When("the request errors", func() {
+		FWhen("the request errors", func() {
 			var expectedError error
 			JustBeforeEach(func() {
 				securityGroupSummaries, warnings, executeErr = actor.GetSecurityGroups()
@@ -639,7 +640,72 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(executeErr).To(MatchError(expectedError))
 				})
 			})
+
 		})
+		When("there are many spaces associated", func() {
+			const batches = 10
+			JustBeforeEach(func() {
+				securityGroupSummaries, _, _ = actor.GetSecurityGroups()
+			})
+			BeforeEach(func() {
+				var (
+					securityGroups  []resources.SecurityGroup
+					manySpaces      []resources.Space
+					manySpacesGUIDs []string
+				)
+
+				for i := 0; i < batcher.BatchSize*batches; i++ {
+					guid := fmt.Sprintf("some-space-guid-%d", i)
+					manySpaces = append(manySpaces, resources.Space{
+						Name: fmt.Sprintf("some-space-%d", i),
+						GUID: guid,
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
+						},
+					})
+					manySpacesGUIDs = append(manySpacesGUIDs, guid)
+				}
+
+				securityGroups = append(securityGroups, resources.SecurityGroup{
+					GUID: "some-security-group-guid-1",
+					Name: "some-security-group-1",
+					Rules: []resources.Rule{{
+						Destination: "127.0.0.1",
+						Description: &description,
+						Ports:       &port,
+						Protocol:    "tcp",
+					}},
+					RunningGloballyEnabled: &trueVal,
+					StagingGloballyEnabled: &falseVal,
+					RunningSpaceGUIDs:      manySpacesGUIDs,
+				})
+
+				for b := 0; b < batches; b++ {
+					fakeCloudControllerClient.GetSpacesReturns(
+						manySpaces[:batcher.BatchSize],
+						ccv3.IncludedResources{
+							Organizations: []resources.Organization{{GUID: "some-org-guid"}},
+						},
+						ccv3.Warnings{"get-spaces-warnings"},
+						nil,
+					)
+					manySpaces = manySpaces[batcher.BatchSize:]
+				}
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					securityGroups,
+					ccv3.Warnings{"get-spaces-warnings"},
+					nil,
+				)
+			})
+
+			It("makes mutiple calls to get spaces", func() {
+				Expect(len(securityGroupSummaries)).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetSpacesArgsForCall(1)))
+			})
+		})
+
 	})
 
 	Describe("GetSecurityGroup", func() {
