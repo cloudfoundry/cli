@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 )
 
 type SecurityGroupSummary struct {
@@ -322,16 +323,23 @@ func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpac
 	associatedSpaceGuids = append(associatedSpaceGuids, stagingSpaceGUIDs...)
 
 	var securityGroupSpaces []SecurityGroupSpace
-	if len(associatedSpaceGuids) > 0 {
-		spaces, includes, newWarnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-			Key:    ccv3.GUIDFilter,
-			Values: associatedSpaceGuids,
-		}, ccv3.Query{
-			Key:    ccv3.Include,
-			Values: []string{"organization"},
-		})
+	var spaces []resources.Space
+	var includes ccv3.IncludedResources
 
-		warnings = newWarnings
+	if len(associatedSpaceGuids) > 0 {
+		ccv3Warnings, err := batcher.RequestByGUID(associatedSpaceGuids, func(guids []string) (ccv3.Warnings, error) {
+			batchSpaces, batchIncludes, newWarnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+				Key:    ccv3.GUIDFilter,
+				Values: guids,
+			}, ccv3.Query{
+				Key:    ccv3.Include,
+				Values: []string{"organization"},
+			})
+			spaces = append(spaces, batchSpaces...)
+			includes.Organizations = append(includes.Organizations, batchIncludes.Organizations...)
+			return newWarnings, err
+		})
+		warnings = ccv3Warnings
 		if err != nil {
 			return securityGroupSpaces, warnings, err
 		}
