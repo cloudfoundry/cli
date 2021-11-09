@@ -479,6 +479,7 @@ var _ = Describe("JSONConfig", func() {
 			config.SetUAAClientCredentials("some-client", "some-client-secret")
 			config.SetOrganizationInformation("some-org-guid", "some-org")
 			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+			config.SetKubernetesAuthInfo("some-auth-info")
 		})
 
 		It("resets all user information", func() {
@@ -494,6 +495,7 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal(DefaultUAAOAuthClient))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(DefaultUAAOAuthClientSecret))
+			Expect(config.ConfigFile.CFOnK8s.AuthInfo).To(BeEmpty())
 		})
 	})
 

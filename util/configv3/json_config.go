@@ -304,6 +304,7 @@ func (config *Config) UnsetUserInformation() {
 	config.SetRefreshToken("")
 	config.SetUAAGrantType("")
 	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
+	config.SetKubernetesAuthInfo("")
 
 	config.UnsetOrganizationAndSpaceInformation()
 }
