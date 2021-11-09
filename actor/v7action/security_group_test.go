@@ -599,7 +599,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		FWhen("the request errors", func() {
+		When("the request errors", func() {
 			var expectedError error
 			JustBeforeEach(func() {
 				securityGroupSummaries, warnings, executeErr = actor.GetSecurityGroups()
