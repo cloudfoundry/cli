@@ -44,4 +44,5 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 func (actor Actor) ClearTarget() {
 	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{})
 	actor.Config.SetTokenInformation("", "", "")
+	actor.Config.SetKubernetesAuthInfo("")
 }

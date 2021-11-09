@@ -77,3 +77,23 @@ var _ = Describe("cf api", func() {
 		})
 	})
 })
+
+var _ = Describe("cf api --unset", func() {
+	BeforeEach(func() {
+		helpers.SetConfig(func(config *configv3.Config) {
+			config.ConfigFile.CFOnK8s.Enabled = true
+			config.ConfigFile.CFOnK8s.AuthInfo = "something"
+		})
+	})
+
+	JustBeforeEach(func() {
+		Eventually(helpers.CF("api", "--unset")).Should(gexec.Exit(0))
+	})
+
+	It("disables cf-on-k8s in config and clears the auth-info", func() {
+		Expect(loadConfig().CFOnK8s).To(Equal(configv3.CFOnK8s{
+			Enabled:  false,
+			AuthInfo: "",
+		}))
+	})
+})

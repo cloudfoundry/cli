@@ -183,5 +183,14 @@ var _ = Describe("Targeting", func() {
 			Expect(refreshToken).To(BeEmpty())
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
+
+		It("clears the Kubernetes auth-info", func() {
+			actor.ClearTarget()
+
+			Expect(fakeConfig.SetKubernetesAuthInfoCallCount()).To(Equal(1))
+			authInfo := fakeConfig.SetKubernetesAuthInfoArgsForCall(0)
+
+			Expect(authInfo).To(BeEmpty())
+		})
 	})
 })
