@@ -131,6 +131,13 @@ var _ = Describe("Targeting", func() {
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
 
+		It("clears the Kubernetes auth-info", func() {
+			Expect(fakeConfig.SetKubernetesAuthInfoCallCount()).To(Equal(1))
+			authInfo := fakeConfig.SetKubernetesAuthInfoArgsForCall(0)
+
+			Expect(authInfo).To(BeEmpty())
+		})
+
 		It("succeeds and returns all warnings", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))

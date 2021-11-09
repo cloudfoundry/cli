@@ -35,6 +35,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	})
 
 	actor.Config.SetTokenInformation("", "", "")
+	actor.Config.SetKubernetesAuthInfo("")
 
 	return allWarnings, nil
 }
