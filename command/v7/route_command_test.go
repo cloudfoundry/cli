@@ -220,7 +220,7 @@ var _ = Describe("route Command", func() {
 			Expect(testUI.Out).To(Say(`protocol:\s+http`))
 			Expect(testUI.Out).To(Say(`\n`))
 			Expect(testUI.Out).To(Say(`Destinations:`))
-			Expect(testUI.Out).To(Say(`\s+app\s+process\s+port\s+protocol`))
+			Expect(testUI.Out).To(Say(`\s+app\s+process\s+port\s+app-protocol`))
 			Expect(testUI.Out).To(Say(`\s+app-name\s+web\s+8080\s+http1`))
 			Expect(testUI.Out).To(Say(`\s+other-app-name\s+web\s+1337\s+http2`))
 
