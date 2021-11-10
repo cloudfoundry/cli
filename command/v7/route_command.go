@@ -116,7 +116,7 @@ func (cmd RouteCommand) displayDestinations(route resources.Route, appMap map[st
 				cmd.UI.TranslateText("app"),
 				cmd.UI.TranslateText("process"),
 				cmd.UI.TranslateText("port"),
-				cmd.UI.TranslateText("protocol"),
+				cmd.UI.TranslateText("app-protocol"),
 			},
 		}
 
