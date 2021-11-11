@@ -2,10 +2,14 @@ package v7action
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
@@ -14,6 +18,12 @@ import (
 
 type KubernetesConfigGetter interface {
 	Get() (*clientcmdapi.Config, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WhoAmIer
+
+type WhoAmIer interface {
+	WhoAmI() (resources.K8sUser, ccv3.Warnings, error)
 }
 
 type DefaultKubernetesConfigGetter struct{}
@@ -30,12 +40,14 @@ func (c DefaultKubernetesConfigGetter) Get() (*clientcmdapi.Config, error) {
 type kubernetesAuthActor struct {
 	config          Config
 	k8sConfigGetter KubernetesConfigGetter
+	whoAmIer        WhoAmIer
 }
 
-func NewKubernetesAuthActor(config Config, k8sConfigGetter KubernetesConfigGetter) AuthActor {
+func NewKubernetesAuthActor(config Config, k8sConfigGetter KubernetesConfigGetter, whoAmIer WhoAmIer) AuthActor {
 	return &kubernetesAuthActor{
 		config:          config,
 		k8sConfigGetter: k8sConfigGetter,
+		whoAmIer:        whoAmIer,
 	}
 }
 
@@ -65,4 +77,13 @@ func (actor kubernetesAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPr
 		Entries:     prompts,
 		DisplayName: "Choose your Kubernetes authentication info",
 	}}, nil
+}
+
+func (actor kubernetesAuthActor) GetCurrentUser() (configv3.User, error) {
+	user, _, err := actor.whoAmIer.WhoAmI()
+	if err != nil {
+		return configv3.User{}, fmt.Errorf("calling /whoami endpoint failed: %w", err)
+	}
+
+	return configv3.User{Name: user.Name}, nil
 }

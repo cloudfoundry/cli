@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type defaultAuthActor struct {
@@ -68,6 +69,10 @@ func (actor defaultAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPromp
 	return prompts, nil
 }
 
+func (actor defaultAuthActor) GetCurrentUser() (configv3.User, error) {
+	return actor.config.CurrentUser()
+}
+
 // TODO: error check this in future stories
 func (actor Actor) RevokeAccessAndRefreshTokens() error {
 	accessToken := actor.Config.AccessToken()
@@ -87,7 +92,6 @@ func (actor Actor) isTokenRevocable(token string) bool {
 	}
 
 	jsonPayload, err := base64.RawURLEncoding.DecodeString(segments[1])
-
 	if err != nil {
 		return false
 	}

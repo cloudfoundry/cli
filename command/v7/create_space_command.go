@@ -31,9 +31,7 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		return err
 	}
 
-	var (
-		orgName, orgGUID string
-	)
+	var orgName, orgGUID string
 
 	if cmd.Organization == "" {
 		_, err = cmd.SharedActor.RequireTargetedOrg()
@@ -52,7 +50,7 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		orgGUID = org.GUID
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

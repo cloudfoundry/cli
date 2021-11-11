@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -172,7 +173,6 @@ var _ = Describe("Default Auth Actions", func() {
 		})
 
 		When("the token is revokable", func() {
-
 			It("calls the UAA to revoke refresh and access tokens", func() {
 				Expect(fakeUAAClient.RevokeCallCount()).To(Equal(2))
 
@@ -193,4 +193,23 @@ var _ = Describe("Default Auth Actions", func() {
 		})
 	})
 
+	Describe("Get Current User", func() {
+		var (
+			user configv3.User
+			err  error
+		)
+
+		JustBeforeEach(func() {
+			user, err = actor.GetCurrentUser()
+		})
+
+		BeforeEach(func() {
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "jim"}, nil)
+		})
+
+		It("delegates to the injected config", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(user.Name).To(Equal("jim"))
+		})
+	})
 })

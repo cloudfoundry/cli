@@ -30,6 +30,18 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	CurrentUserStub        func() (configv3.User, error)
+	currentUserMutex       sync.RWMutex
+	currentUserArgsForCall []struct {
+	}
+	currentUserReturns struct {
+		result1 configv3.User
+		result2 error
+	}
+	currentUserReturnsOnCall map[int]struct {
+		result1 configv3.User
+		result2 error
+	}
 	DialTimeoutStub        func() time.Duration
 	dialTimeoutMutex       sync.RWMutex
 	dialTimeoutArgsForCall []struct {
@@ -278,6 +290,61 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 	fake.accessTokenReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeConfig) CurrentUser() (configv3.User, error) {
+	fake.currentUserMutex.Lock()
+	ret, specificReturn := fake.currentUserReturnsOnCall[len(fake.currentUserArgsForCall)]
+	fake.currentUserArgsForCall = append(fake.currentUserArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CurrentUser", []interface{}{})
+	fake.currentUserMutex.Unlock()
+	if fake.CurrentUserStub != nil {
+		return fake.CurrentUserStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.currentUserReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeConfig) CurrentUserCallCount() int {
+	fake.currentUserMutex.RLock()
+	defer fake.currentUserMutex.RUnlock()
+	return len(fake.currentUserArgsForCall)
+}
+
+func (fake *FakeConfig) CurrentUserCalls(stub func() (configv3.User, error)) {
+	fake.currentUserMutex.Lock()
+	defer fake.currentUserMutex.Unlock()
+	fake.CurrentUserStub = stub
+}
+
+func (fake *FakeConfig) CurrentUserReturns(result1 configv3.User, result2 error) {
+	fake.currentUserMutex.Lock()
+	defer fake.currentUserMutex.Unlock()
+	fake.CurrentUserStub = nil
+	fake.currentUserReturns = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeConfig) CurrentUserReturnsOnCall(i int, result1 configv3.User, result2 error) {
+	fake.currentUserMutex.Lock()
+	defer fake.currentUserMutex.Unlock()
+	fake.CurrentUserStub = nil
+	if fake.currentUserReturnsOnCall == nil {
+		fake.currentUserReturnsOnCall = make(map[int]struct {
+			result1 configv3.User
+			result2 error
+		})
+	}
+	fake.currentUserReturnsOnCall[i] = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeConfig) DialTimeout() time.Duration {
@@ -1050,6 +1117,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.currentUserMutex.RLock()
+	defer fake.currentUserMutex.RUnlock()
 	fake.dialTimeoutMutex.RLock()
 	defer fake.dialTimeoutMutex.RUnlock()
 	fake.isCFOnK8sMutex.RLock()

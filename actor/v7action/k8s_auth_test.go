@@ -7,6 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -16,6 +18,7 @@ var _ = Describe("KubernetesAuthActor", func() {
 	var (
 		k8sAuthActor    v7action.AuthActor
 		k8sConfigGetter *v7actionfakes.FakeKubernetesConfigGetter
+		whoAmIer        *v7actionfakes.FakeWhoAmIer
 		config          *v7actionfakes.FakeConfig
 		err             error
 	)
@@ -26,7 +29,8 @@ var _ = Describe("KubernetesAuthActor", func() {
 		k8sConfigGetter.GetReturns(&clientcmdapi.Config{
 			AuthInfos: map[string]*clientcmdapi.AuthInfo{"foo": {}, "bar": {}},
 		}, nil)
-		k8sAuthActor = v7action.NewKubernetesAuthActor(config, k8sConfigGetter)
+		whoAmIer = new(v7actionfakes.FakeWhoAmIer)
+		k8sAuthActor = v7action.NewKubernetesAuthActor(config, k8sConfigGetter, whoAmIer)
 	})
 
 	Describe("Authenticate", func() {
@@ -81,6 +85,36 @@ var _ = Describe("KubernetesAuthActor", func() {
 
 			It("returns an error", func() {
 				Expect(err).To(MatchError("no kubernetes authentication infos configured"))
+			})
+		})
+	})
+
+	Describe("Get Current User", func() {
+		var (
+			user configv3.User
+			err  error
+		)
+
+		BeforeEach(func() {
+			whoAmIer.WhoAmIReturns(resources.K8sUser{Name: "bob", Kind: "User"}, nil, nil)
+		})
+
+		JustBeforeEach(func() {
+			user, err = k8sAuthActor.GetCurrentUser()
+		})
+
+		It("uses the WhoAmI function to get the real current user name", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(user.Name).To(Equal("bob"))
+		})
+
+		When("calling the whoami endpoint fails", func() {
+			BeforeEach(func() {
+				whoAmIer.WhoAmIReturns(resources.K8sUser{}, nil, errors.New("boom!"))
+			})
+
+			It("returns an error", func() {
+				Expect(err).To(MatchError(ContainSubstring("boom!")))
 			})
 		})
 	})

@@ -4,6 +4,7 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/clock"
 )
 
@@ -21,6 +22,7 @@ type Warnings []string
 type AuthActor interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
 	GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error)
+	GetCurrentUser() (configv3.User, error)
 }
 
 // Actor represents a V7 actor.
@@ -46,7 +48,7 @@ func NewActor(
 ) *Actor {
 	authActor := NewDefaultAuthActor(config, uaaClient)
 	if config != nil && config.IsCFOnK8s() {
-		authActor = NewKubernetesAuthActor(config, NewDefaultKubernetesConfigGetter())
+		authActor = NewKubernetesAuthActor(config, NewDefaultKubernetesConfigGetter(), client)
 	}
 
 	return &Actor{
