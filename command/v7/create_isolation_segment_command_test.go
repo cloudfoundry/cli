@@ -69,7 +69,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})

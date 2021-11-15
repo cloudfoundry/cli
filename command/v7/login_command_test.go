@@ -620,7 +620,7 @@ var _ = Describe("login Command", func() {
 
 				When("authenticating succeeds", func() {
 					BeforeEach(func() {
-						fakeConfig.CurrentUserNameReturns("potatoface", nil)
+						fakeActor.GetCurrentUserReturns(configv3.User{Name: "potatoface"}, nil)
 						_, err := input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
 						Expect(err).ToNot(HaveOccurred())
 					})
@@ -700,7 +700,7 @@ var _ = Describe("login Command", func() {
 				},
 			}, nil)
 
-			fakeConfig.CurrentUserNameReturns("potatoface", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "potatoface"}, nil)
 		})
 
 		When("--sso flag is set", func() {
@@ -780,7 +780,7 @@ var _ = Describe("login Command", func() {
 					fakeActor.AuthenticateReturns(uaa.UnauthorizedError{
 						Message: "Bad credentials",
 					})
-					fakeConfig.CurrentUserNameReturns("", nil)
+					fakeActor.GetCurrentUserReturns(configv3.User{}, nil)
 					_, err := input.Write([]byte("some-passcode\n"))
 					Expect(err).ToNot(HaveOccurred())
 				})
@@ -825,7 +825,7 @@ var _ = Describe("login Command", func() {
 				cmd.Username = "some-user"
 				cmd.Password = "some-password"
 				fakeConfig.APIVersionReturns("3.4.5")
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			})
 
 			It("writes to the config", func() {
@@ -860,7 +860,7 @@ var _ = Describe("login Command", func() {
 			cmd.Username = "some-user"
 			cmd.Password = "some-password"
 			fakeConfig.APIVersionReturns("3.4.5")
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 		})
 
 		When("-o was passed", func() {
@@ -930,7 +930,7 @@ var _ = Describe("login Command", func() {
 				cmd.Username = "some-user"
 				cmd.Password = "some-password"
 				cmd.Space = "some-space"
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				fakeConfig.TargetReturns("https://example.com")
 				fakeActor.GetOrganizationsReturns(
 					[]resources.Organization{},
@@ -948,7 +948,7 @@ var _ = Describe("login Command", func() {
 			When("no org valid org exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]resources.Organization{resources.Organization{
+						[]resources.Organization{{
 							GUID: "some-org-guid",
 							Name: "some-org-name",
 						}},
@@ -976,10 +976,10 @@ var _ = Describe("login Command", func() {
 			When("only one valid org exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]resources.Organization{resources.Organization{
+						[]resources.Organization{{
 							GUID: "some-org-guid1",
 							Name: "some-org-name1",
-						}, resources.Organization{
+						}, {
 							GUID: "some-org-guid2",
 							Name: "some-org-name2",
 						}},
@@ -1001,15 +1001,15 @@ var _ = Describe("login Command", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
 						[]resources.Organization{
-							resources.Organization{
+							{
 								GUID: "some-org-guid3",
 								Name: "1234",
 							},
-							resources.Organization{
+							{
 								GUID: "some-org-guid1",
 								Name: "some-org-name1",
 							},
-							resources.Organization{
+							{
 								GUID: "some-org-guid2",
 								Name: "some-org-name2",
 							},
@@ -1032,7 +1032,7 @@ var _ = Describe("login Command", func() {
 			When("filtering the orgs errors", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]resources.Organization{resources.Organization{
+						[]resources.Organization{{
 							GUID: "some-org-guid",
 							Name: "some-org-name",
 						}},
@@ -1072,7 +1072,7 @@ var _ = Describe("login Command", func() {
 
 			When("fetching the organizations succeeds", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("some-user", nil)
+					fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 					fakeConfig.TargetReturns("https://example.com")
 				})
 
@@ -1096,7 +1096,7 @@ var _ = Describe("login Command", func() {
 				When("only one org exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationsReturns(
-							[]resources.Organization{resources.Organization{
+							[]resources.Organization{{
 								GUID: "some-org-guid",
 								Name: "some-org-name",
 							}},
@@ -1118,15 +1118,15 @@ var _ = Describe("login Command", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationsReturns(
 							[]resources.Organization{
-								resources.Organization{
+								{
 									GUID: "some-org-guid3",
 									Name: "1234",
 								},
-								resources.Organization{
+								{
 									GUID: "some-org-guid1",
 									Name: "some-org-name1",
 								},
-								resources.Organization{
+								{
 									GUID: "some-org-guid2",
 									Name: "some-org-name2",
 								},
@@ -1140,7 +1140,8 @@ var _ = Describe("login Command", func() {
 						When("the position is valid", func() {
 							BeforeEach(func() {
 								fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-									GUID: "targeted-org-guid1"})
+									GUID: "targeted-org-guid1",
+								})
 								fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
 								_, err := input.Write([]byte("2\n"))
 								Expect(err).ToNot(HaveOccurred())
@@ -1248,7 +1249,6 @@ var _ = Describe("login Command", func() {
 							})
 						})
 					})
-
 				})
 
 				When("more than 50 orgs exist", func() {
@@ -1302,7 +1302,6 @@ var _ = Describe("login Command", func() {
 							})
 						})
 					})
-
 				})
 			})
 
@@ -1333,14 +1332,15 @@ var _ = Describe("login Command", func() {
 			cmd.Username = "some-user"
 			cmd.Password = "some-password"
 			fakeConfig.APIVersionReturns("3.4.5")
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 		})
 
 		When("an org has been successfully targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 					GUID: "targeted-org-guid",
-					Name: "targeted-org-name"},
+					Name: "targeted-org-name",
+				},
 				)
 				fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
 			})
@@ -1611,9 +1611,7 @@ var _ = Describe("login Command", func() {
 										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 									})
 								})
-
 							})
-
 						})
 
 						When("the user enters text which is both a space name and a digit", func() {
@@ -1710,7 +1708,6 @@ var _ = Describe("login Command", func() {
 								It("does not target the space", func() {
 									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 								})
-
 							})
 
 							When("the space is not in the list", func() {
@@ -1728,7 +1725,6 @@ var _ = Describe("login Command", func() {
 								})
 							})
 						})
-
 					})
 				})
 

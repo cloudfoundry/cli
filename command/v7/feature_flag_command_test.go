@@ -50,7 +50,7 @@ var _ = Describe("Feature Flag Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd.RequiredArgs.Feature = featureFlagName
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 
 		fakeActor.GetFeatureFlagByNameReturns(resources.FeatureFlag{
 			Name:    "flag1",

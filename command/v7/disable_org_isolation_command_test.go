@@ -49,7 +49,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		org = "org1"
 		isolationSegment = "segment1"
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "admin"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "admin"}, nil)
 		cmd.RequiredArgs.OrganizationName = org
 		cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 
@@ -79,7 +79,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 
 	When("user is not logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("user-not-logged-in"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("user-not-logged-in"))
 			cmd.RequiredArgs.OrganizationName = org
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})

@@ -41,7 +41,7 @@ func (cmd ServicesCommand) Usage() string {
 }
 
 func (cmd ServicesCommand) displayMessage() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

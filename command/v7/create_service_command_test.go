@@ -90,7 +90,7 @@ var _ = Describe("create-service Command", func() {
 				Name: fakeOrgName,
 			})
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 		})
 
 		It("calls the actor with the right arguments", func() {
@@ -292,7 +292,7 @@ var _ = Describe("create-service Command", func() {
 
 		When("getting the user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, errors.New("boom"))
 			})
 
 			It("returns the error", func() {

@@ -65,7 +65,7 @@ var _ = Describe("Org Quota Command", func() {
 
 	When("getting the org quota fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},
@@ -90,7 +90,7 @@ var _ = Describe("Org Quota Command", func() {
 
 	When("getting the org quota succeeds", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},

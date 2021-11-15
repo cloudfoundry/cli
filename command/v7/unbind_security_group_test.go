@@ -52,7 +52,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.ExperimentalReturns(true)
 
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 		fakeActor.UnbindSecurityGroupReturns(
@@ -84,7 +84,7 @@ var _ = Describe("unbind-security-group Command", func() {
 	When("getting the current user fails", func() {
 		BeforeEach(func() {
 			expectedErr = errors.New("getting user failed")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("returns an error", func() {

@@ -39,7 +39,11 @@ func (cmd CreatePackageCommand) Execute(args []string) error {
 	}
 
 	isDockerImage := (cmd.DockerImage.Path != "")
-	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
+	user, err := cmd.Actor.GetCurrentUser()
+	if err != nil {
+		return err
+	}
+	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, user.Name, isDockerImage)
 	if err != nil {
 		return err
 	}

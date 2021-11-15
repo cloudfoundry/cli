@@ -98,7 +98,7 @@ func (cmd ServiceCommand) fetchAndDisplayDetails() error {
 }
 
 func (cmd ServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

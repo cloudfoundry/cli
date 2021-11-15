@@ -25,7 +25,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 
 	space := cmd.Config.TargetedSpace()
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

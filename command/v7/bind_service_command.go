@@ -101,7 +101,7 @@ CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --bindin
 }
 
 func (cmd BindServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

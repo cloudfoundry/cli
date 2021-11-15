@@ -75,7 +75,7 @@ var _ = Describe("map-route Command", func() {
 			GUID: spaceGUID,
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -102,7 +102,7 @@ var _ = Describe("map-route Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

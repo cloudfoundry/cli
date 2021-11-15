@@ -47,7 +47,7 @@ var _ = Describe("delete-space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("delete-space Command", func() {
 
 				BeforeEach(func() {
 					returnedErr = errors.New("some error")
-					fakeConfig.CurrentUserReturns(configv3.User{}, returnedErr)
+					fakeActor.GetCurrentUserReturns(configv3.User{}, returnedErr)
 				})
 
 				It("returns the error", func() {

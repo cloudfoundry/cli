@@ -58,7 +58,7 @@ var _ = Describe("disable-service-access Command", func() {
 		"message text",
 		func(plan, org, broker, expected string) {
 			setPositionalFlags(&cmd, "fake-service")
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
 			setFlag(&cmd, "-o", org)
 			setFlag(&cmd, "-p", plan)

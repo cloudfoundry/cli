@@ -49,7 +49,7 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 		}
 
 		currentUserName = "bob"
-		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 	})
 
 	JustBeforeEach(func() {

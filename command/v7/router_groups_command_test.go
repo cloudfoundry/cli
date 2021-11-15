@@ -71,7 +71,7 @@ var _ = Describe("router-groups Command", func() {
 
 	Context("when the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		When("getting router groups succeeds", func() {

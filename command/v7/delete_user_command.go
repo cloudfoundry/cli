@@ -37,14 +37,14 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 		}
 	}
 
-	currentUser, err := cmd.Config.CurrentUserName()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Deleting user {{.TargetUser}} as {{.CurrentUser}}...", map[string]interface{}{
 		"TargetUser":  cmd.RequiredArgs.Username,
-		"CurrentUser": currentUser,
+		"CurrentUser": currentUser.Name,
 	})
 
 	user, err := cmd.Actor.GetUser(cmd.RequiredArgs.Username, cmd.Origin)
@@ -59,7 +59,6 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 	}
 
 	warnings, err := cmd.Actor.DeleteUser(user.GUID)
-
 	if err != nil {
 		return err
 	}

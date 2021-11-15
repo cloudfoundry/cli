@@ -97,7 +97,7 @@ var _ = Describe("update-user-provided-service Command", func() {
 				Name: fakeOrgName,
 			})
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 			setPositionalFlags(&cmd, fakeServiceInstanceName)
 

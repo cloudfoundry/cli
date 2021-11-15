@@ -134,7 +134,7 @@ var _ = Describe("org Command", func() {
 	When("the --guid flag is not provided", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{
 						Name: "some-user",
 					},
@@ -195,7 +195,7 @@ var _ = Describe("org Command", func() {
 						Expect(testUI.Out).To(Say(`spaces:\s+space1, space2`))
 						Expect(testUI.Out).To(Say(`isolation segments:\s+isolation-segment-1 \(default\), isolation-segment-2`))
 
-						Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+						Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 
 						Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
 						orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
@@ -231,7 +231,7 @@ var _ = Describe("org Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("getting current user error")
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{},
 					expectedErr)
 			})

@@ -407,13 +407,13 @@ func (cmd *LoginCommand) showStatus() {
 		},
 	}
 
-	user, err := cmd.Config.CurrentUserName()
-	if user == "" || err != nil {
+	user, err := cmd.Actor.GetCurrentUser()
+	if user.Name == "" || err != nil {
 		cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 		return
 	}
-	tableContent = append(tableContent, []string{cmd.UI.TranslateText("user:"), user})
+	tableContent = append(tableContent, []string{cmd.UI.TranslateText("user:"), user.Name})
 
 	orgName := cmd.Config.TargetedOrganizationName()
 	if orgName == "" {

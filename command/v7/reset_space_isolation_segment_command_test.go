@@ -71,7 +71,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: org,
 				GUID: "some-org-guid",

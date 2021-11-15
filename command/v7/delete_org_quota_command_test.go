@@ -37,7 +37,7 @@ var _ = Describe("delete-org-quota Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 		cmd = DeleteOrgQuotaCommand{
 			BaseCommand: BaseCommand{

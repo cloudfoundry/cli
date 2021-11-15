@@ -55,7 +55,7 @@ var _ = Describe("restart Command", func() {
 			Name: "some-space",
 			GUID: "some-space-guid",
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		fakeActor.GetApplicationByNameAndSpaceReturns(app, v7action.Warnings{"get-app-warning"}, nil)
 
 		cmd = v7.RestartCommand{
@@ -97,7 +97,7 @@ var _ = Describe("restart Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

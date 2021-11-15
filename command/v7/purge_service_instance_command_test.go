@@ -110,7 +110,7 @@ var _ = Describe("purge-service-instance command", func() {
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: spaceGUID})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 
 		cmd = PurgeServiceInstanceCommand{
 			BaseCommand: BaseCommand{
@@ -201,7 +201,7 @@ var _ = Describe("purge-service-instance command", func() {
 
 		When("getting the username fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("boom"))
 				confirmYes()
 			})
 

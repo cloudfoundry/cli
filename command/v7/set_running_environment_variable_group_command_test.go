@@ -72,7 +72,7 @@ var _ = Describe("set-running-environment-variable-group Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 		})
 
 		It("should print text indicating its running", func() {

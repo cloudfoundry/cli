@@ -35,7 +35,7 @@ func (cmd DeleteIsolationSegmentCommand) Execute(args []string) error {
 		}
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

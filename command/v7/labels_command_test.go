@@ -49,7 +49,7 @@ var _ = Describe("labels command", func() {
 	Context("shared validations", func() {
 		When("fetching the current user's name fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, errors.New("boom"))
 				executeErr = cmd.Execute(nil)
 			})
 
@@ -182,18 +182,16 @@ var _ = Describe("labels command", func() {
 				}
 			})
 		})
-
 	})
 
 	Describe("listing labels", func() {
-
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
 		})
 
 		Describe("for apps", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
 				cmd.RequiredArgs = flag.LabelsArgs{
@@ -273,7 +271,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("for domains", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "domain",
 					ResourceName: "example.com",
@@ -346,12 +344,11 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
 		})
 
 		Describe("for orgs", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "org",
 					ResourceName: "fake-org",
@@ -422,12 +419,11 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
 		})
 
 		Describe("for routes", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
 				cmd.RequiredArgs = flag.LabelsArgs{
@@ -503,12 +499,11 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
 		})
 
 		Describe("for spaces", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "space",
@@ -580,12 +575,11 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
 		})
 
 		Describe("for stacks", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "stack",
 					ResourceName: "fake-stack",
@@ -656,12 +650,11 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
 		})
 
 		Describe("for buildpacks", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "buildpack",
 					ResourceName: "my-buildpack",
@@ -773,7 +766,7 @@ var _ = Describe("labels command", func() {
 		Describe("for service-brokers", func() {
 			When("There is an error fetching the labels", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("some-user", nil)
+					fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 					cmd.RequiredArgs = flag.LabelsArgs{
 						ResourceType: "service-broker",
@@ -804,7 +797,7 @@ var _ = Describe("labels command", func() {
 						"some-label":       types.NewNullString("some-value"),
 					}
 
-					fakeConfig.CurrentUserNameReturns("some-user", nil)
+					fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 					cmd.RequiredArgs = flag.LabelsArgs{
 						ResourceType: "service-broker",
@@ -831,14 +824,13 @@ var _ = Describe("labels command", func() {
 				It("prints all the warnings", func() {
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
-
 				})
 			})
 		})
 
 		Describe("for service-instances", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
 
@@ -905,7 +897,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("for service-offerings", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "service-offering",
@@ -990,7 +982,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("for service-plans", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "service-plan",

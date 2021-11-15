@@ -44,7 +44,7 @@ func (cmd *StackCommand) displayStackGUID() error {
 }
 
 func (cmd *StackCommand) displayStackInfo() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

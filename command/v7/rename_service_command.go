@@ -49,7 +49,7 @@ func (cmd RenameServiceCommand) Usage() string {
 }
 
 func (cmd RenameServiceCommand) displayMessage() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

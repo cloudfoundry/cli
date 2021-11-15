@@ -28,7 +28,7 @@ func (cmd *LogoutCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd LogoutCommand) Execute(args []string) error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

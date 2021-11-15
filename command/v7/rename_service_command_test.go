@@ -60,7 +60,7 @@ var _ = Describe("rename-service command test", func() {
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: spaceGUID, Name: spaceName})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 
 		fakeActor.RenameServiceInstanceReturns(v7action.Warnings{"rename instance warning"}, nil)
 	})
@@ -107,7 +107,7 @@ var _ = Describe("rename-service command test", func() {
 
 	When("getting the user returns an error", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bang"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bang"))
 		})
 
 		It("returns the error", func() {

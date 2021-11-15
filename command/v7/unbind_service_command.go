@@ -61,7 +61,7 @@ func (cmd UnbindServiceCommand) Usage() string {
 }
 
 func (cmd UnbindServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

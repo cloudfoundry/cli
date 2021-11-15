@@ -58,7 +58,7 @@ var _ = Describe("download-droplet Command", func() {
 		fakeConfig.TargetedSpaceReturns(configv3.Space{
 			GUID: "some-space-guid",
 			Name: "some-space"})
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 	})

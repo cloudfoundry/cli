@@ -14,13 +14,12 @@ type AllowSpaceSSHCommand struct {
 }
 
 func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
-
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
 	}
 
-	currentUserName, err := cmd.Config.CurrentUserName()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -30,7 +29,7 @@ func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayTextWithFlavor("Enabling ssh support for space {{.Space}} as {{.CurrentUserName}}...", map[string]interface{}{
 		"Space":           inputSpace,
-		"CurrentUserName": currentUserName,
+		"CurrentUserName": currentUser.Name,
 	})
 
 	warnings, err := cmd.Actor.UpdateSpaceFeature(inputSpace, targetedOrgGUID, true, "ssh")
@@ -50,5 +49,4 @@ func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return err
-
 }

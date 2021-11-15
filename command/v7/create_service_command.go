@@ -110,7 +110,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 }
 
 func (cmd CreateServiceCommand) displayCreatingMessage() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

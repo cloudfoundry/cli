@@ -88,7 +88,7 @@ var _ = Describe("add-network-policy Command", func() {
 
 	When("the user is logged in, an org is targeted, and a space is targeted", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})

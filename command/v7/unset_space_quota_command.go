@@ -18,7 +18,7 @@ func (cmd *UnsetSpaceQuotaCommand) Execute(args []string) error {
 		return err
 	}
 
-	currentUser, err := cmd.Config.CurrentUserName()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (cmd *UnsetSpaceQuotaCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Unassigning space quota {{.QuotaName}} from space {{.SpaceName}} as {{.UserName}}...", map[string]interface{}{
 		"QuotaName": cmd.RequiredArgs.SpaceQuota,
 		"SpaceName": cmd.RequiredArgs.Space,
-		"UserName":  currentUser,
+		"UserName":  currentUser.Name,
 	})
 
 	warnings, err := cmd.Actor.UnsetSpaceQuota(cmd.RequiredArgs.SpaceQuota, cmd.RequiredArgs.Space, targetedOrgGUID)

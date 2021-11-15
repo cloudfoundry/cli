@@ -7,9 +7,22 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeSetLabelActor struct {
+	GetCurrentUserStub        func() (configv3.User, error)
+	getCurrentUserMutex       sync.RWMutex
+	getCurrentUserArgsForCall []struct {
+	}
+	getCurrentUserReturns struct {
+		result1 configv3.User
+		result2 error
+	}
+	getCurrentUserReturnsOnCall map[int]struct {
+		result1 configv3.User
+		result2 error
+	}
 	UpdateApplicationLabelsByApplicationNameStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateApplicationLabelsByApplicationNameMutex       sync.RWMutex
 	updateApplicationLabelsByApplicationNameArgsForCall []struct {
@@ -174,6 +187,61 @@ type FakeSetLabelActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeSetLabelActor) GetCurrentUser() (configv3.User, error) {
+	fake.getCurrentUserMutex.Lock()
+	ret, specificReturn := fake.getCurrentUserReturnsOnCall[len(fake.getCurrentUserArgsForCall)]
+	fake.getCurrentUserArgsForCall = append(fake.getCurrentUserArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetCurrentUser", []interface{}{})
+	fake.getCurrentUserMutex.Unlock()
+	if fake.GetCurrentUserStub != nil {
+		return fake.GetCurrentUserStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getCurrentUserReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) GetCurrentUserCallCount() int {
+	fake.getCurrentUserMutex.RLock()
+	defer fake.getCurrentUserMutex.RUnlock()
+	return len(fake.getCurrentUserArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) GetCurrentUserCalls(stub func() (configv3.User, error)) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = stub
+}
+
+func (fake *FakeSetLabelActor) GetCurrentUserReturns(result1 configv3.User, result2 error) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = nil
+	fake.getCurrentUserReturns = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) GetCurrentUserReturnsOnCall(i int, result1 configv3.User, result2 error) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = nil
+	if fake.getCurrentUserReturnsOnCall == nil {
+		fake.getCurrentUserReturnsOnCall = make(map[int]struct {
+			result1 configv3.User
+			result2 error
+		})
+	}
+	fake.getCurrentUserReturnsOnCall[i] = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
@@ -891,6 +959,8 @@ func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameReturnsOnCall(i int, 
 func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.getCurrentUserMutex.RLock()
+	defer fake.getCurrentUserMutex.RUnlock()
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()

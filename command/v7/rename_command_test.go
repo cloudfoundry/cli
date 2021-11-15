@@ -45,7 +45,7 @@ var _ = Describe("rename Command", func() {
 		cmd.RequiredArgs.OldAppName = "old-app-name"
 		cmd.RequiredArgs.NewAppName = "new-app-name"
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "username"}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "targeted-org"})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "targeted-space"})
 		fakeActor.RenameApplicationByNameAndSpaceGUIDReturns(resources.Application{Name: "new-app-name"}, v7action.Warnings{"rename-app-warning"}, nil)
@@ -86,7 +86,7 @@ var _ = Describe("rename Command", func() {
 		)
 		BeforeEach(func() {
 			returnedError = errors.New("current user not found")
-			fakeConfig.CurrentUserReturns(configv3.User{}, returnedError)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, returnedError)
 		})
 		It("returns the CurrentUser error", func() {
 			Expect(executeErr).To(MatchError(returnedError))

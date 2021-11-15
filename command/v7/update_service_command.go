@@ -115,7 +115,7 @@ CF_NAME update-service mydb -t "list, of, tags"
 }
 
 func (cmd UpdateServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

@@ -188,7 +188,7 @@ var _ = Describe("push Command", func() {
 
 		When("the user is logged in, and org and space are targeted", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+				fakeDiffActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 					Name: orgName,
@@ -415,7 +415,6 @@ var _ = Describe("push Command", func() {
 									Expect(executeErr).To(MatchError("apply-manifest-error"))
 									Expect(testUI.Err).To(Say("apply-manifest-warnings"))
 								})
-
 							})
 
 							When("applying the manifest succeeds", func() {
@@ -451,15 +450,14 @@ var _ = Describe("push Command", func() {
 										Expect(executeErr).To(MatchError("create-push-plans-error"))
 										Expect(testUI.Err).To(Say("create-push-plans-warnings"))
 									})
-
 								})
 
 								When("creating the push plans succeeds", func() {
 									BeforeEach(func() {
 										fakeActor.CreatePushPlansReturns(
 											[]v7pushaction.PushPlan{
-												v7pushaction.PushPlan{Application: resources.Application{Name: "first-app", GUID: "potato"}},
-												v7pushaction.PushPlan{Application: resources.Application{Name: "second-app", GUID: "potato"}},
+												{Application: resources.Application{Name: "first-app", GUID: "potato"}},
+												{Application: resources.Application{Name: "second-app", GUID: "potato"}},
 											},
 											v7action.Warnings{"create-push-plans-warnings"},
 											nil,
@@ -593,7 +591,6 @@ var _ = Describe("push Command", func() {
 														passedAppName, spaceGUID, _ = fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(1)
 														Expect(passedAppName).To(Equal(appName2))
 														Expect(spaceGUID).To(Equal("some-space-guid"))
-
 													})
 												})
 
@@ -665,7 +662,6 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Err).To(Say("get-application-summary-warnings"))
 												})
 											})
-
 										})
 
 										When("actualize returns an error", func() {

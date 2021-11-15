@@ -48,7 +48,7 @@ var _ = Describe("rename-org Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -61,7 +61,7 @@ var _ = Describe("rename-org Command", func() {
 
 			BeforeEach(func() {
 				returnedErr = errors.New("some error")
-				fakeConfig.CurrentUserReturns(configv3.User{}, returnedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, returnedErr)
 			})
 
 			It("returns the error", func() {
@@ -70,7 +70,7 @@ var _ = Describe("rename-org Command", func() {
 		})
 		When("when the command succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "username"}, nil)
 				fakeActor.RenameOrganizationReturns(
 					resources.Organization{GUID: "old-org-guid", Name: "new-org-name"},
 					v7action.Warnings{"warning-1", "warning-2"},

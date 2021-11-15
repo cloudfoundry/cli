@@ -46,7 +46,7 @@ var _ = Describe("unbind-running-security-group Command", func() {
 
 		cmd.RequiredArgs.SecurityGroup = "some-security-group"
 
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 	})

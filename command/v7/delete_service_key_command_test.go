@@ -50,7 +50,7 @@ var _ = Describe("delete-service-key Command", func() {
 		}
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: fakeSpaceGUID})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 		fakeActor.DeleteServiceKeyByServiceInstanceAndNameReturns(
 			nil,
@@ -351,7 +351,7 @@ var _ = Describe("delete-service-key Command", func() {
 
 	When("getting the username returns an error", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bad thing"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bad thing"))
 		})
 
 		It("returns the error", func() {

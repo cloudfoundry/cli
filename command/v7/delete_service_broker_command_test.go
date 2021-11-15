@@ -52,7 +52,7 @@ var _ = Describe("delete-service-broker Command", func() {
 
 		setPositionalFlags(&cmd, serviceBrokerName)
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {

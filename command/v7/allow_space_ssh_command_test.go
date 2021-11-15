@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -47,7 +48,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		currentUserName = "some-user"
-		fakeConfig.CurrentUserNameReturns(currentUserName, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -71,7 +72,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 
 	When("checking the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserNameReturns("", errors.New("uh oh"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("uh oh"))
 		})
 
 		It("returns the error", func() {

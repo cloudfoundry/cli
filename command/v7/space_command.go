@@ -33,7 +33,7 @@ func (cmd SpaceCommand) Execute(args []string) error {
 		return cmd.displaySpaceGUID(spaceName, targetedOrg.GUID)
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

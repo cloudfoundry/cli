@@ -60,7 +60,7 @@ var _ = Describe("space-quotas command", func() {
 
 	When("running the command successfully", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			spaceQuotas := []resources.SpaceQuota{
 				{
 					Quota: resources.Quota{
@@ -167,7 +167,7 @@ var _ = Describe("space-quotas command", func() {
 
 	When("the quota list is empty", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			fakeActor.GetSpaceQuotasByOrgGUIDReturns([]resources.SpaceQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 		})
 

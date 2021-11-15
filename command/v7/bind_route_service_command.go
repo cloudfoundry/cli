@@ -76,7 +76,7 @@ In Windows Command Line use single-quoted, escaped JSON: '{\"valid\":\"json\"}'
 }
 
 func (cmd BindRouteServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

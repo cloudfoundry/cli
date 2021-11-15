@@ -72,7 +72,7 @@ var _ = Describe("Feature Flags Command", func() {
 
 	Context("When the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		When("FeatureFlagsActor returns an error", func() {
