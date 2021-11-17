@@ -20,6 +20,7 @@ import (
 type RouteSummary struct {
 	resources.Route
 	AppNames            []string
+	AppProtocols        []string
 	DomainName          string
 	SpaceName           string
 	ServiceInstanceName string
@@ -275,13 +276,24 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 	for _, route := range routes {
 		var appNames []string
 
+		protocolSet := map[string]bool{}
 		for _, destination := range route.Destinations {
 			appNames = append(appNames, appNamesByGUID[destination.App.GUID])
+			protocolSet[destination.Protocol] = true
+		}
+
+		var appProtocols []string
+		if len(protocolSet) > 0 {
+			appProtocols = make([]string, 0, len(protocolSet))
+			for key := range protocolSet {
+				appProtocols = append(appProtocols, key)
+			}
 		}
 
 		routeSummaries = append(routeSummaries, RouteSummary{
 			Route:               route,
 			AppNames:            appNames,
+			AppProtocols:        appProtocols,
 			SpaceName:           spaceNamesByGUID[route.SpaceGUID],
 			DomainName:          getDomainName(route.URL, route.Host, route.Path, route.Port),
 			ServiceInstanceName: serviceInstanceNameByRouteGUID[route.GUID],

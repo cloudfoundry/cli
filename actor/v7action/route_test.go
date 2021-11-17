@@ -677,6 +677,7 @@ var _ = Describe("Route Actions", func() {
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-1",
 							},
+							Protocol: "http1",
 						},
 					},
 					SpaceGUID: "fake-space-1-guid",
@@ -692,11 +693,13 @@ var _ = Describe("Route Actions", func() {
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-1",
 							},
+							Protocol: "http2",
 						},
 						{
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-2",
 							},
+							Protocol: "http1",
 						},
 					},
 					SpaceGUID: "fake-space-1-guid",
@@ -797,7 +800,8 @@ var _ = Describe("Route Actions", func() {
 						GUID: "route-guid-1",
 						Destinations: []resources.RouteDestination{
 							{
-								App: resources.RouteDestinationApp{GUID: "app-guid-1"},
+								App:      resources.RouteDestinationApp{GUID: "app-guid-1"},
+								Protocol: "http1",
 							},
 						},
 						SpaceGUID: "fake-space-1-guid",
@@ -807,6 +811,7 @@ var _ = Describe("Route Actions", func() {
 						Port:      1,
 					},
 					AppNames:            []string{"app-name-1"},
+					AppProtocols:        []string{"http1"},
 					DomainName:          "fake-url-1/fake-path-1",
 					SpaceName:           "fake-space-1",
 					ServiceInstanceName: "foo",
@@ -816,10 +821,12 @@ var _ = Describe("Route Actions", func() {
 						GUID: "route-guid-2",
 						Destinations: []resources.RouteDestination{
 							{
-								App: resources.RouteDestinationApp{GUID: "app-guid-1"},
+								App:      resources.RouteDestinationApp{GUID: "app-guid-1"},
+								Protocol: "http2",
 							},
 							{
-								App: resources.RouteDestinationApp{GUID: "app-guid-2"},
+								App:      resources.RouteDestinationApp{GUID: "app-guid-2"},
+								Protocol: "http1",
 							},
 						},
 						SpaceGUID: "fake-space-1-guid",
@@ -829,6 +836,7 @@ var _ = Describe("Route Actions", func() {
 						Port:      2,
 					},
 					AppNames:            []string{"app-name-1", "app-name-2"},
+					AppProtocols:        []string{"http2", "http1"},
 					DomainName:          "fake-url-2/fake-path-2",
 					SpaceName:           "fake-space-1",
 					ServiceInstanceName: "bar",
@@ -928,6 +936,10 @@ var _ = Describe("Route Actions", func() {
 
 				for i := 0; i < batcher.BatchSize*batches; i++ {
 					port := i + 1000
+					appProtocol := "http1"
+					if i%2 == 0 {
+						appProtocol = "http2"
+					}
 					route := resources.Route{
 						GUID: fmt.Sprintf("route-guid-%d", i),
 						Destinations: []resources.RouteDestination{
@@ -935,6 +947,7 @@ var _ = Describe("Route Actions", func() {
 								App: resources.RouteDestinationApp{
 									GUID: fmt.Sprintf("fake-app-guid-%d", i),
 								},
+								Protocol: appProtocol,
 							},
 						},
 						SpaceGUID: fmt.Sprintf("fake-space-guid-%d", i),
@@ -968,6 +981,7 @@ var _ = Describe("Route Actions", func() {
 
 					manyResults = append(manyResults, RouteSummary{
 						Route:               route,
+						AppProtocols:        []string{appProtocol},
 						AppNames:            []string{fmt.Sprintf("fake-app-name-%d", i)},
 						DomainName:          fmt.Sprintf("fake-url-%d/fake-path-%d", i, i),
 						SpaceName:           fmt.Sprintf("fake-space-name-%d", i),
