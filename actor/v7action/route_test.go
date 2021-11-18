@@ -836,7 +836,7 @@ var _ = Describe("Route Actions", func() {
 						Port:      2,
 					},
 					AppNames:            []string{"app-name-1", "app-name-2"},
-					AppProtocols:        []string{"http2", "http1"},
+					AppProtocols:        []string{"http1", "http2"},
 					DomainName:          "fake-url-2/fake-path-2",
 					SpaceName:           "fake-space-1",
 					ServiceInstanceName: "bar",

@@ -288,6 +288,7 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 			for key := range protocolSet {
 				appProtocols = append(appProtocols, key)
 			}
+			sort.Strings(appProtocols)
 		}
 
 		routeSummaries = append(routeSummaries, RouteSummary{

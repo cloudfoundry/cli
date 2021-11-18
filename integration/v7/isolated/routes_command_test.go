@@ -1,6 +1,9 @@
 package isolated
 
 import (
+	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -11,6 +14,13 @@ import (
 )
 
 var _ = Describe("routes command", func() {
+
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance`
+	appProtocolValue := "http1"
+	if !helpers.IsVersionMet(ccversion.MinVersionHTTP2RoutingV3) {
+		appProtocolValue = ""
+	}
+
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -110,35 +120,74 @@ var _ = Describe("routes command", func() {
 			It("lists all the routes", func() {
 				session := helpers.CF("routes")
 				Eventually(session).Should(Exit(0))
-
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
-				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
-				Expect(session).To(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
-				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
-				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName2))
+				Expect(session).To(Say(tableHeaders))
+				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
+				Expect(session).To(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName2))
 			})
 
 			It("lists all the routes by label", func() {
 				session := helpers.CF("routes", "--labels", "env in (prod)")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
-				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
-				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
-				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName1))
-				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+\n`, spaceName, domainName, appName2))
+				Expect(session).To(Say(tableHeaders))
+				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
+				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName2))
 			})
 
 			When("fetching routes by org", func() {
 				It("lists all the routes in the org", func() {
 					session := helpers.CF("routes", "--org-level")
-					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
-					Eventually(session).Should(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps\s+service instance\n`))
-					Eventually(session).Should(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\n`, spaceName, domainName, appName1, serviceInstanceName))
-					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+http\s+%s\s+\n`, otherSpaceName, domainName, appName2))
 					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
+					Expect(session).To(Say(tableHeaders))
+					Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
+					Expect(session).To(Say(`%s\s+route2\s+%s\s+\/dodo\s+http\s+%s\s+%s\s+\n`, otherSpaceName, domainName, appProtocolValue, appName2))
 				})
+			})
+		})
+
+		When("http1 and http2 routes exist", func() {
+			var (
+				domainName string
+				domain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionHTTP2RoutingV3)
+				domainName = helpers.NewDomainName()
+
+				domain = helpers.NewDomain(orgName, domainName)
+
+				appName1 = helpers.NewAppName()
+				Eventually(helpers.CF("create-app", appName1)).Should(Exit(0))
+				appName2 = helpers.NewAppName()
+				Eventually(helpers.CF("create-app", appName2)).Should(Exit(0))
+
+				domain.CreatePrivate()
+
+				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1")).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName2, domainName, "--hostname", "route2")).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName2, domainName, "--hostname", "route1", "--app-protocol", "http2")).Should(Exit(0))
+
+				helpers.SetupCF(orgName, spaceName)
+			})
+
+			AfterEach(func() {
+				domain.Delete()
+			})
+
+			It("lists all the routes", func() {
+				session := helpers.CF("routes")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Expect(session).To(Say(tableHeaders))
+				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+http1, http2\s+%s\s+\n`, spaceName, domainName, fmt.Sprintf("%s, %s", appName1, appName2)))
+				Expect(session).To(Say(`%s\s+route2\s+%s\s+http\s+http1\s+%s\s+\n`, spaceName, domainName, appName2))
 			})
 		})
 
@@ -174,7 +223,7 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`))
+				Expect(session).To(Say(tableHeaders))
 				Expect(session).To(Say(`%s\s+%s[^:]\s+%d\s+tcp`, spaceName, domainName, 1028))
 			})
 		})
@@ -182,9 +231,9 @@ var _ = Describe("routes command", func() {
 		When("no routes exist", func() {
 			It("outputs a message about no routes existing", func() {
 				session := helpers.CF("routes")
-				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Eventually(session).Should(Say("No routes found"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Expect(session).To(Say("No routes found"))
 			})
 		})
 	})
