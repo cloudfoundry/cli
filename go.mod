@@ -27,9 +27,10 @@ require (
 	github.com/cyphar/filepath-securejoin v0.2.1
 	github.com/docker/distribution v2.6.0-rc.1.0.20171109224904-e5b5e44386f7+incompatible
 	github.com/docker/docker v1.4.2-0.20171120205147-9de84a78d76e // indirect
-	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
+	github.com/fatih/color v1.7.0
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+	github.com/goreleaser/chglog v0.1.2 // indirect
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
 	github.com/kr/pty v1.1.1
 	github.com/lunixbochs/vtclean v1.0.0
@@ -45,7 +46,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
-	github.com/sirupsen/logrus v1.2.0
+	github.com/sirupsen/logrus v1.4.1
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
