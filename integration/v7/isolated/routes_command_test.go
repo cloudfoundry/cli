@@ -15,12 +15,8 @@ import (
 
 var _ = Describe("routes command", func() {
 
-	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance`
 	appProtocolValue := "http1"
-	if !helpers.IsVersionMet(ccversion.MinVersionHTTP2RoutingV3) {
-		appProtocolValue = ""
-	}
-
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance`
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -70,6 +66,10 @@ var _ = Describe("routes command", func() {
 
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
+			if !helpers.IsVersionMet(ccversion.MinVersionHTTP2RoutingV3) {
+				appProtocolValue = ""
+			}
+
 		})
 
 		AfterEach(func() {
