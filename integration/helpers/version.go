@@ -87,11 +87,11 @@ func SkipIfUAAVersionAtLeast(version string) {
 }
 
 func matchMajorAPIVersion(minVersion string) string {
-	version := GetAPIVersionV2()
 	if strings.HasPrefix(minVersion, "3") {
-		version = getAPIVersionV3()
+		return getAPIVersionV3()
+	} else {
+		return GetAPIVersionV2()
 	}
-	return version
 }
 
 // GetAPIVersionV2 returns the V2 api version of the targeted API
