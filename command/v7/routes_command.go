@@ -82,7 +82,6 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			cmd.UI.TranslateText("port"),
 			cmd.UI.TranslateText("path"),
 			cmd.UI.TranslateText("protocol"),
-			cmd.UI.TranslateText("app-protocol"),
 			cmd.UI.TranslateText("apps"),
 			cmd.UI.TranslateText("service instance"),
 		},
@@ -100,7 +99,6 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			port,
 			routeSummary.Path,
 			routeSummary.Protocol,
-			strings.Join(routeSummary.AppProtocols, ", "),
 			strings.Join(routeSummary.AppNames, ", "),
 			routeSummary.ServiceInstanceName,
 		})

@@ -8,11 +8,11 @@ import (
 type MapRouteCommand struct {
 	BaseCommand
 
-	RequiredArgs flag.AppDomain   `positional-args:"yes"`
-	Hostname     string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
-	Path         flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
-	Port         int              `long:"port" description:"Port for the TCP route (default: random port)"`
-	AppProtocol  string           `long:"app-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
+	RequiredArgs        flag.AppDomain   `positional-args:"yes"`
+	Hostname            string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
+	Path                flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	Port                int              `long:"port" description:"Port for the TCP route (default: random port)"`
+	DestinationProtocol string           `long:"destination-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
 
 	relatedCommands interface{} `related_commands:"create-route, routes, unmap-route"`
 }
@@ -20,7 +20,7 @@ type MapRouteCommand struct {
 func (cmd MapRouteCommand) Usage() string {
 	return `
 Map an HTTP route:
-   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--app-protocol PROTOCOL]
+   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--destination-protocol PROTOCOL]
 
 Map a TCP route:
    CF_NAME map-route APP_NAME DOMAIN [--port PORT]`
@@ -31,7 +31,7 @@ func (cmd MapRouteCommand) Examples() string {
 CF_NAME map-route my-app example.com                                                # example.com
 CF_NAME map-route my-app example.com --hostname myhost                              # myhost.example.com
 CF_NAME map-route my-app example.com --hostname myhost --path foo                   # myhost.example.com/foo
-CF_NAME map-route my-app example.com --hostname myhost --app-protocol http2 # myhost.example.com
+CF_NAME map-route my-app example.com --hostname myhost --destination-protocol http2 # myhost.example.com
 CF_NAME map-route my-app example.com --port 5000                                    # example.com:5000`
 }
 
@@ -88,14 +88,14 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 	}
 
-	if cmd.AppProtocol != "" {
+	if cmd.DestinationProtocol != "" {
 		cmd.UI.DisplayTextWithFlavor("Mapping route {{.URL}} to app {{.AppName}} with protocol {{.Protocol}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
 			"URL":       route.URL,
 			"AppName":   cmd.RequiredArgs.App,
 			"User":      user.Name,
 			"SpaceName": cmd.Config.TargetedSpace().Name,
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"Protocol":  cmd.AppProtocol,
+			"Protocol":  cmd.DestinationProtocol,
 		})
 
 	} else {
@@ -121,7 +121,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
-	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.AppProtocol)
+	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.DestinationProtocol)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

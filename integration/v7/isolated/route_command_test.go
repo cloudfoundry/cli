@@ -119,7 +119,7 @@ var _ = Describe("route command", func() {
 						Eventually(session).Should(Say(`protocol:\s+http`))
 						Eventually(session).Should(Say(`\n`))
 						Eventually(session).Should(Say(`Destinations:`))
-						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+app-protocol`))
+						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+protocol`))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -167,7 +167,7 @@ var _ = Describe("route command", func() {
 						Eventually(session).Should(Say(`protocol:\s+tcp`))
 						Eventually(session).Should(Say(`\n`))
 						Eventually(session).Should(Say(`Destinations:`))
-						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+app-protocol`))
+						Eventually(session).Should(Say(`\s+app\s+process\s+port\s+protocol`))
 						Eventually(session).Should(Exit(0))
 					})
 
