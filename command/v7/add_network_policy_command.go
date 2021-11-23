@@ -98,7 +98,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 		destSpaceGUID = destSpace.GUID
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

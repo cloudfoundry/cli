@@ -624,7 +624,7 @@ var _ = Describe("login command", func() {
 				Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 				Eventually(session).Should(Exit(1))
 
-				//And I am still logged in
+				// And I am still logged in
 				targetSession := helpers.CF("target")
 				Eventually(targetSession).Should(Exit(0))
 			})

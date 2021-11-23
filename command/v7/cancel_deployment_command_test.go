@@ -63,7 +63,7 @@ var _ = Describe("Cancel deployment command", func() {
 			GUID: spaceGUID,
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "timmyD"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "timmyD"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("Cancel deployment command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserNameReturns("", expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

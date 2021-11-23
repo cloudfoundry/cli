@@ -88,7 +88,7 @@ var _ = Describe("target Command", func() {
 
 				BeforeEach(func() {
 					someErr = errors.New("some-current-user-error")
-					fakeConfig.CurrentUserReturns(configv3.User{}, someErr)
+					fakeActor.GetCurrentUserReturns(configv3.User{}, someErr)
 				})
 
 				It("returns the same error", func() {
@@ -101,7 +101,7 @@ var _ = Describe("target Command", func() {
 
 			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(
+					fakeActor.GetCurrentUserReturns(
 						configv3.User{Name: "some-user"},
 						nil)
 				})

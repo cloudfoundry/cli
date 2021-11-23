@@ -11,6 +11,7 @@ import (
 type Config interface {
 	AccessToken() string
 	APIVersion() string
+	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
 	PollingInterval() time.Duration
 	RefreshToken() string
@@ -27,4 +28,6 @@ type Config interface {
 	Target() string
 	UAAGrantType() string
 	UnsetOrganizationAndSpaceInformation()
+	SetKubernetesAuthInfo(authInfo string)
+	IsCFOnK8s() bool
 }

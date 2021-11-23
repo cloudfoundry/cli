@@ -39,7 +39,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, err = cmd.Config.CurrentUser()
+	_, err = cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

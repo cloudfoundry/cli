@@ -60,7 +60,7 @@ var _ = Describe("update-service command", func() {
 			Name: spaceName,
 			GUID: spaceGUID,
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 
 		fakeStream := make(chan v7action.PollJobEvent)
 		close(fakeStream)
@@ -266,7 +266,7 @@ var _ = Describe("update-service command", func() {
 
 		When("getting the user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bang"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bang"))
 			})
 
 			It("returns the error", func() {

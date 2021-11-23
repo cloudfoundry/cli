@@ -9,6 +9,7 @@ type Config interface {
 	CurrentUserName() (string, error)
 	HasTargetedOrganization() bool
 	HasTargetedSpace() bool
+	IsCFOnK8s() bool
 	RefreshToken() string
 	TargetedOrganizationName() string
 	Verbose() (bool, []string)

@@ -50,7 +50,7 @@ var _ = Describe("marketplace command", func() {
 			Name: "fake-org-name",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-username"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "fake-username"}, nil)
 	})
 
 	Describe("pre-flight checks", func() {
@@ -70,7 +70,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("gets the user", func() {
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 			})
 
 			It("checks the target", func() {
@@ -82,7 +82,7 @@ var _ = Describe("marketplace command", func() {
 
 			When("getting the user fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
+					fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
 				})
 
 				It("returns an error", func() {
@@ -107,7 +107,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("does not try to get the username or check the target", func() {
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(0))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(0))
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
 			})
 		})

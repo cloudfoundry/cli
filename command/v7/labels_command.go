@@ -47,10 +47,12 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.username, err = cmd.Config.CurrentUserName()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
+
+	cmd.username = user.Name
 
 	if err := cmd.validateFlags(); err != nil {
 		return err

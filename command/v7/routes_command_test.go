@@ -88,7 +88,7 @@ var _ = Describe("routes Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
 				Name: "some-org",

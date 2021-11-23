@@ -172,6 +172,7 @@ const (
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
 	UnmapRouteRequest                                           = "UnmapRoute"
+	WhoAmI                                                      = "WhoAmI"
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
@@ -339,4 +340,5 @@ var APIRoutes = map[string]Route{
 	GetUserRequest:                                              {Path: "/v3/users/:user_guid", Method: http.MethodGet},
 	PostUserRequest:                                             {Path: "/v3/users", Method: http.MethodPost},
 	DeleteUserRequest:                                           {Path: "/v3/users/:user_guid", Method: http.MethodDelete},
+	WhoAmI:                                                      {Path: "/whoami", Method: http.MethodGet},
 }

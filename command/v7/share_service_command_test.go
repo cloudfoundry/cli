@@ -85,7 +85,7 @@ var _ = Describe("share-service command", func() {
 			fakeSharedActor.CheckTargetReturns(nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: expectedTargetedOrgGuid, Name: expectedTargetedOrgName})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: expectedUser}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: expectedUser}, nil)
 		})
 
 		When("the share completes successfully", func() {
@@ -167,7 +167,7 @@ var _ = Describe("share-service command", func() {
 
 		When("getting the username fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("boom"))
 			})
 
 			It("returns the error", func() {

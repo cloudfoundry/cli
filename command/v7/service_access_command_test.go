@@ -44,7 +44,7 @@ var _ = Describe("service-access Command", func() {
 
 	When("logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetReturns("some-url")
 		})
 
@@ -178,14 +178,14 @@ var _ = Describe("service-access Command", func() {
 
 	When("getting user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
 		})
 
 		It("returns an error", func() {
 			executeErr := cmd.Execute(nil)
 			Expect(executeErr).To(MatchError("fake get user error"))
 
-			Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+			Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 		})
 	})
 })

@@ -80,7 +80,7 @@ var _ = Describe("set-droplet Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -97,7 +97,7 @@ var _ = Describe("set-droplet Command", func() {
 				Name: "some-space",
 				GUID: "some-space-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("set-droplet Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})

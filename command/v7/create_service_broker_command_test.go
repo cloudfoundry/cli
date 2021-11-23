@@ -65,7 +65,7 @@ var _ = Describe("create-service-broker Command", func() {
 
 	When("fetching the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("an error occurred"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("an error occurred"))
 		})
 
 		It("return an error", func() {
@@ -75,7 +75,7 @@ var _ = Describe("create-service-broker Command", func() {
 
 	When("fetching the current user succeeds", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
 		It("checks that there is a valid target", func() {

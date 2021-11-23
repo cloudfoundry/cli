@@ -88,7 +88,7 @@ var _ = Describe("apply-manifest Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -109,7 +109,7 @@ var _ = Describe("apply-manifest Command", func() {
 				Name: "some-space",
 				GUID: "some-space-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
 		When("the manifest location is specified with `-f`", func() {

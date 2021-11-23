@@ -14,7 +14,7 @@ func (cmd DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, err = cmd.Config.CurrentUser()
+	_, err = cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func (cmd DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		}
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

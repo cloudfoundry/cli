@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -49,7 +50,7 @@ var _ = Describe("ssh-enabled Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		currentUserName = "some-user"
-		fakeConfig.CurrentUserNameReturns(currentUserName, nil)
+		fakeSSHEnabledActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 	})
 
 	JustBeforeEach(func() {

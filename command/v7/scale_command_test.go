@@ -87,7 +87,7 @@ var _ = Describe("scale Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				GUID: "some-space-guid",
 				Name: "some-space"})
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{Name: "some-user"},
 				nil)
 		})
@@ -97,7 +97,7 @@ var _ = Describe("scale Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("getting current user error")
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{},
 					expectedErr)
 			})

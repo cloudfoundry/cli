@@ -55,7 +55,7 @@ var _ = Describe("enable-service-access command", func() {
 	DescribeTable(
 		"message text",
 		func(plan, org, broker, expected string) {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
 			setPositionalFlags(&cmd, "fake-service")
 			setFlag(&cmd, "-p", plan)

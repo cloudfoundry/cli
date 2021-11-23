@@ -81,7 +81,7 @@ CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json
 }
 
 func (cmd CreateServiceKeyCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

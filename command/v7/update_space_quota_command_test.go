@@ -50,7 +50,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		}
 
 		currentUserName = "bob"
-		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid"})
 		fakeConfig.TargetedOrganizationNameReturns(orgName)
 	})

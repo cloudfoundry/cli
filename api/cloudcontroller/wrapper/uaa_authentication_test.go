@@ -50,22 +50,6 @@ var _ = Describe("UAA Authentication", func() {
 	})
 
 	Describe("Make", func() {
-		When("the client is nil", func() {
-			BeforeEach(func() {
-				inner.SetClient(nil)
-
-				fakeConnection.MakeReturns(ccerror.InvalidAuthTokenError{})
-			})
-
-			It("calls the connection without any side effects", func() {
-				err := wrapper.Make(request, nil)
-				Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{}))
-
-				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
-				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
-			})
-		})
-
 		When("no tokens are set", func() {
 			BeforeEach(func() {
 				inMemoryCache.SetAccessToken("")

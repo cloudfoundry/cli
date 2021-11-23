@@ -18,7 +18,7 @@ func (cmd *SetSpaceQuotaCommand) Execute(args []string) error {
 		return err
 	}
 
-	currentUser, err := cmd.Config.CurrentUserName()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (cmd *SetSpaceQuotaCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Setting space quota {{.QuotaName}} to space {{.SpaceName}} as {{.UserName}}...", map[string]interface{}{
 		"QuotaName": cmd.RequiredArgs.SpaceQuota,
 		"SpaceName": cmd.RequiredArgs.Space,
-		"UserName":  currentUser,
+		"UserName":  currentUser.Name,
 	})
 
 	org := cmd.Config.TargetedOrganization()

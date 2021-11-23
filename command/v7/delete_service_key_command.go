@@ -89,7 +89,7 @@ func (cmd DeleteServiceKeyCommand) displayPrompt() (bool, error) {
 }
 
 func (cmd DeleteServiceKeyCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

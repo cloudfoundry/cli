@@ -18,7 +18,7 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 		return err
 	}
 
-	userName, err := cmd.Config.CurrentUserName()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 			"AppName":   cmd.RequiredArgs.AppName,
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
 			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"UserName":  userName,
+			"UserName":  user.Name,
 		},
 	)
 

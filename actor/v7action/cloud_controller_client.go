@@ -186,6 +186,7 @@ type CloudControllerClient interface {
 	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadPackage(pkg resources.Package, zipFilepath string) (resources.Package, ccv3.Warnings, error)
+	WhoAmI() (resources.K8sUser, ccv3.Warnings, error)
 
 	servicePlanVisibilityClient
 }

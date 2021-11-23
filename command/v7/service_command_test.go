@@ -54,7 +54,7 @@ var _ = Describe("service command", func() {
 			},
 		}
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{
 			GUID: spaceGUID,

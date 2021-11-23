@@ -62,7 +62,7 @@ var _ = Describe("unbind-route-service Command", func() {
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: fakeOrgName})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 		fakeActor.DeleteRouteBindingReturns(
 			nil,
@@ -452,7 +452,7 @@ var _ = Describe("unbind-route-service Command", func() {
 
 		When("getting the username returns an error", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bad thing"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bad thing"))
 			})
 
 			It("returns the error", func() {

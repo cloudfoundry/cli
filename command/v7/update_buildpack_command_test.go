@@ -147,7 +147,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		When("getting the current user fails", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error that happened")
-				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 			})
 
 			It("returns the error", func() {
@@ -160,7 +160,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 			BeforeEach(func() {
 				userName = "some-user"
-				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 			})
 
 			When("preparing buildpack bits causes an error", func() {

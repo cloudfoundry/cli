@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/SermoDigital/jose/jwt"
 )
 
@@ -99,6 +100,7 @@ type Actor interface {
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, v7action.Warnings, error)
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 	GetBuildpacks(labelSelector string) ([]resources.Buildpack, v7action.Warnings, error)
+	GetCurrentUser() (configv3.User, error)
 	GetDefaultDomain(orgGUID string) (resources.Domain, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	GetDomain(domainGUID string) (resources.Domain, v7action.Warnings, error)

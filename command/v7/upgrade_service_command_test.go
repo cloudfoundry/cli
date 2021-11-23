@@ -58,7 +58,7 @@ var _ = Describe("upgrade-service command", func() {
 			Name: spaceName,
 			GUID: spaceGUID,
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 	})
 
 	JustBeforeEach(func() {

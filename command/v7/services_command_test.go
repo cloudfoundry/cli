@@ -56,7 +56,7 @@ var _ = Describe("services command", func() {
 			Name: org,
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: username}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: username}, nil)
 
 		fakeActor.GetServiceInstancesForSpaceReturns(
 			[]v7action.ServiceInstance{
@@ -191,7 +191,7 @@ var _ = Describe("services command", func() {
 
 	When("getting the user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bang"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bang"))
 		})
 
 		It("fails", func() {

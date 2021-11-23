@@ -88,7 +88,7 @@ var _ = Describe("tasks Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("get current user error")
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{},
 					expectedErr)
 			})
@@ -100,7 +100,7 @@ var _ = Describe("tasks Command", func() {
 
 		When("getting the current user does not return an error", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})

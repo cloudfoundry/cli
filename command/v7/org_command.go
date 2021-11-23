@@ -43,7 +43,7 @@ func (cmd OrgCommand) displayOrgGUID() error {
 }
 
 func (cmd OrgCommand) displayOrgSummary() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

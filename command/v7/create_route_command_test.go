@@ -92,7 +92,7 @@ var _ = Describe("create-route Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: spaceName,
 				GUID: spaceGUID,

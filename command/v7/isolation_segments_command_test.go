@@ -66,7 +66,7 @@ var _ = Describe("isolation-segments Command", func() {
 
 	When("checking target does not fail", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		When("an error is not encountered getting the isolation segment summaries", func() {

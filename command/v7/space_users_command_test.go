@@ -75,7 +75,7 @@ var _ = Describe("space-users Command", func() {
 
 		When("getting the current user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-current-user-error"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("get-current-user-error"))
 			})
 
 			It("returns the error", func() {
@@ -85,7 +85,7 @@ var _ = Describe("space-users Command", func() {
 
 		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})

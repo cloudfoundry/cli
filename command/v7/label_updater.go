@@ -9,11 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SetLabelActor
 
 type SetLabelActor interface {
+	GetCurrentUser() (configv3.User, error)
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
@@ -60,11 +62,12 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 	cmd.labels = labels
 	cmd.targetResource.ResourceType = strings.ToLower(cmd.targetResource.ResourceType)
 
-	var err error
-	cmd.Username, err = cmd.Config.CurrentUserName()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
+
+	cmd.Username = user.Name
 
 	if err := cmd.validateFlags(); err != nil {
 		return err

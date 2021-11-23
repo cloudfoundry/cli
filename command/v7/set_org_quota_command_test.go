@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -53,7 +54,7 @@ var _ = Describe("set-org-quota Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		currentUser = "current-user"
-		fakeConfig.CurrentUserNameReturns(currentUser, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUser}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
 			resources.Organization{GUID: "some-org-guid"},
@@ -122,7 +123,7 @@ var _ = Describe("set-org-quota Command", func() {
 
 	When("getting the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserNameReturns("", errors.New("current-user-error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("current-user-error"))
 		})
 
 		It("returns the error", func() {

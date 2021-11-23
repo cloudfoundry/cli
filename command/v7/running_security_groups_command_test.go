@@ -63,7 +63,7 @@ var _ = Describe("Running Security Groups Command", func() {
 
 	When("there are no globally enabled running security groups found", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},
@@ -88,7 +88,7 @@ var _ = Describe("Running Security Groups Command", func() {
 
 	When("there are globally enabled running security groups", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 		})
 
 		When("the security group does not have associated rules or spaces", func() {

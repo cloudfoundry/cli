@@ -8,6 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,6 +16,8 @@ import (
 )
 
 var _ = Describe("delete-user Command", func() {
+	const currentUser = "bob"
+
 	var (
 		cmd             DeleteUserCommand
 		testUI          *ui.UI
@@ -24,8 +27,6 @@ var _ = Describe("delete-user Command", func() {
 		binaryName      string
 		executeErr      error
 		input           *Buffer
-		currentUser     string
-		err             error
 	)
 
 	BeforeEach(func() {
@@ -34,8 +35,7 @@ var _ = Describe("delete-user Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
-		currentUser, err = fakeConfig.CurrentUserName()
-		Expect(err).NotTo(HaveOccurred())
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUser}, nil)
 
 		cmd = DeleteUserCommand{
 			BaseCommand: BaseCommand{

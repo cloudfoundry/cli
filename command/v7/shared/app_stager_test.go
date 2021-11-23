@@ -121,7 +121,7 @@ var _ = Describe("app stager", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
 
-			user, err := fakeConfig.CurrentUser()
+			user, err := fakeActor.GetCurrentUser()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, app.Name, organization.Name, space.Name, user.Name))
 			Expect(testUI.Out).To(Say("Waiting for app to start..."))
@@ -330,7 +330,7 @@ var _ = Describe("app stager", func() {
 			organization = configv3.Organization{Name: "some-org"}
 			resourceGUID = "droplet-guid"
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"application-summary-warning-1", "application-summary-warning-2"}, nil)
 		})
 
@@ -456,7 +456,7 @@ var _ = Describe("app stager", func() {
 				It("displays output for each step of starting", func() {
 					Expect(executeErr).To(BeNil())
 
-					user, err := fakeConfig.CurrentUser()
+					user, err := fakeActor.GetCurrentUser()
 					Expect(err).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, app.Name, organization.Name, space.Name, user.Name))
 
@@ -490,7 +490,7 @@ var _ = Describe("app stager", func() {
 				It("displays output for each step of restarting", func() {
 					Expect(executeErr).To(BeNil())
 
-					user, err := fakeConfig.CurrentUser()
+					user, err := fakeActor.GetCurrentUser()
 					Expect(err).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, app.Name, organization.Name, space.Name, user.Name))
 

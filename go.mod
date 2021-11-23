@@ -9,8 +9,8 @@ require (
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.0.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f
-	code.cloudfoundry.org/go-log-cache v1.0.1-0.20200316170138-f466e0302c34
-	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
+	code.cloudfoundry.org/go-log-cache v1.0.1-0.20211011162012-ede82a99d3cc
+	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.3
 	code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be
@@ -40,7 +40,7 @@ require (
 	github.com/moby/moby v1.4.2-0.20171120205147-9de84a78d76e
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.10.5
+	github.com/onsi/gomega v1.13.0
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
@@ -50,14 +50,15 @@ require (
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/net v0.0.0-20210716203947-853a461950ff
-	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
-	golang.org/x/text v0.3.6
-	golang.org/x/tools v0.1.5 // indirect
-	gopkg.in/cheggaaa/pb.v1 v1.0.27
-	gopkg.in/yaml.v2 v2.3.0
+	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e
+	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	golang.org/x/text v0.3.7
+	golang.org/x/tools v0.1.6-0.20210908190839-cf92b39a962c // indirect
+	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4 // indirect
+	google.golang.org/grpc v1.41.0 // indirect
+	gopkg.in/cheggaaa/pb.v1 v1.0.28
+	gopkg.in/yaml.v2 v2.4.0
+	k8s.io/client-go v0.22.2
 )
 
 replace gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7
-
-replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.4

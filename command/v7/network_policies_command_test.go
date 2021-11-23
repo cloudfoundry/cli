@@ -17,21 +17,23 @@ import (
 
 var _ = Describe("network-policies Command", func() {
 	var (
-		cmd             NetworkPoliciesCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeNetworkPoliciesActor
-		binaryName      string
-		executeErr      error
-		srcApp          string
+		cmd                      NetworkPoliciesCommand
+		testUI                   *ui.UI
+		fakeConfig               *commandfakes.FakeConfig
+		fakeSharedActor          *commandfakes.FakeSharedActor
+		fakeActor                *v7fakes.FakeActor
+		fakeNetworkPoliciesActor *v7fakes.FakeNetworkPoliciesActor
+		binaryName               string
+		executeErr               error
+		srcApp                   string
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeNetworkPoliciesActor)
+		fakeActor = new(v7fakes.FakeActor)
+		fakeNetworkPoliciesActor = new(v7fakes.FakeNetworkPoliciesActor)
 
 		srcApp = ""
 
@@ -40,8 +42,9 @@ var _ = Describe("network-policies Command", func() {
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				UI:          testUI,
+				Actor:       fakeActor,
 			},
-			NetworkingActor: fakeActor,
+			NetworkingActor: fakeNetworkPoliciesActor,
 			SourceApp:       srcApp,
 		}
 
@@ -70,7 +73,7 @@ var _ = Describe("network-policies Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
@@ -81,7 +84,7 @@ var _ = Describe("network-policies Command", func() {
 
 		When("fetching the user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("some-error"))
 			})
 
 			It("returns an error", func() {
@@ -91,7 +94,7 @@ var _ = Describe("network-policies Command", func() {
 
 		When("listing policies is successful", func() {
 			BeforeEach(func() {
-				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
+				fakeNetworkPoliciesActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
 					{
 						SourceName:           "app1",
 						DestinationName:      "app2",
@@ -114,8 +117,8 @@ var _ = Describe("network-policies Command", func() {
 
 			It("lists the policies when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.NetworkPoliciesBySpaceCallCount()).To(Equal(1))
-				passedSpaceGuid := fakeActor.NetworkPoliciesBySpaceArgsForCall(0)
+				Expect(fakeNetworkPoliciesActor.NetworkPoliciesBySpaceCallCount()).To(Equal(1))
+				passedSpaceGuid := fakeNetworkPoliciesActor.NetworkPoliciesBySpaceArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 
 				Expect(testUI.Out).To(Say(`Listing network policies in org some-org / space some-space as some-user\.\.\.`))
@@ -131,7 +134,7 @@ var _ = Describe("network-policies Command", func() {
 			When("a source app name is passed", func() {
 				BeforeEach(func() {
 					cmd.SourceApp = "some-app"
-					fakeActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
+					fakeNetworkPoliciesActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
 						{
 							SourceName:           "app1",
 							DestinationName:      "app2",
@@ -154,8 +157,8 @@ var _ = Describe("network-policies Command", func() {
 
 				It("lists the policies when no error occurs", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeActor.NetworkPoliciesBySpaceAndAppNameCallCount()).To(Equal(1))
-					passedSpaceGuid, passedSrcAppName := fakeActor.NetworkPoliciesBySpaceAndAppNameArgsForCall(0)
+					Expect(fakeNetworkPoliciesActor.NetworkPoliciesBySpaceAndAppNameCallCount()).To(Equal(1))
+					passedSpaceGuid, passedSrcAppName := fakeNetworkPoliciesActor.NetworkPoliciesBySpaceAndAppNameArgsForCall(0)
 					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedSrcAppName).To(Equal("some-app"))
 
@@ -173,7 +176,7 @@ var _ = Describe("network-policies Command", func() {
 
 		When("listing the policies is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
+				fakeNetworkPoliciesActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("displays warnings and returns the error", func() {

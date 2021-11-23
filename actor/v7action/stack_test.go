@@ -25,7 +25,6 @@ var _ = Describe("Stack", func() {
 	})
 
 	Describe("Get stack by name", func() {
-
 		var expectedErr error
 		var err error
 		var warnings Warnings

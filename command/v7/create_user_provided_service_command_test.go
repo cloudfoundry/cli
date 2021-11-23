@@ -86,7 +86,7 @@ var _ = Describe("create-user-provided-service Command", func() {
 				Name: fakeOrgName,
 			})
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 			setPositionalFlags(&cmd, fakeServiceInstanceName)
 
@@ -188,7 +188,7 @@ var _ = Describe("create-user-provided-service Command", func() {
 
 		When("getting the user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, errors.New("boom"))
 			})
 
 			It("returns the error", func() {

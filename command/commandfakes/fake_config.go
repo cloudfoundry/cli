@@ -201,6 +201,16 @@ type FakeConfig struct {
 	hasTargetedSpaceReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	IsCFOnK8sStub        func() bool
+	isCFOnK8sMutex       sync.RWMutex
+	isCFOnK8sArgsForCall []struct {
+	}
+	isCFOnK8sReturns struct {
+		result1 bool
+	}
+	isCFOnK8sReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	IsTTYStub        func() bool
 	isTTYMutex       sync.RWMutex
 	isTTYArgsForCall []struct {
@@ -369,6 +379,11 @@ type FakeConfig struct {
 	SetColorEnabledStub        func(string)
 	setColorEnabledMutex       sync.RWMutex
 	setColorEnabledArgsForCall []struct {
+		arg1 string
+	}
+	SetKubernetesAuthInfoStub        func(string)
+	setKubernetesAuthInfoMutex       sync.RWMutex
+	setKubernetesAuthInfoArgsForCall []struct {
 		arg1 string
 	}
 	SetLocaleStub        func(string)
@@ -621,16 +636,15 @@ func (fake *FakeConfig) APIVersion() string {
 	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
 	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
 	}{})
-	stub := fake.APIVersionStub
-	fakeReturns := fake.aPIVersionReturns
 	fake.recordInvocation("APIVersion", []interface{}{})
 	fake.aPIVersionMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.aPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -674,16 +688,15 @@ func (fake *FakeConfig) AccessToken() string {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
-	stub := fake.AccessTokenStub
-	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -727,10 +740,9 @@ func (fake *FakeConfig) AddPlugin(arg1 configv3.Plugin) {
 	fake.addPluginArgsForCall = append(fake.addPluginArgsForCall, struct {
 		arg1 configv3.Plugin
 	}{arg1})
-	stub := fake.AddPluginStub
 	fake.recordInvocation("AddPlugin", []interface{}{arg1})
 	fake.addPluginMutex.Unlock()
-	if stub != nil {
+	if fake.AddPluginStub != nil {
 		fake.AddPluginStub(arg1)
 	}
 }
@@ -760,10 +772,9 @@ func (fake *FakeConfig) AddPluginRepository(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.AddPluginRepositoryStub
 	fake.recordInvocation("AddPluginRepository", []interface{}{arg1, arg2})
 	fake.addPluginRepositoryMutex.Unlock()
-	if stub != nil {
+	if fake.AddPluginRepositoryStub != nil {
 		fake.AddPluginRepositoryStub(arg1, arg2)
 	}
 }
@@ -792,16 +803,15 @@ func (fake *FakeConfig) AuthorizationEndpoint() string {
 	ret, specificReturn := fake.authorizationEndpointReturnsOnCall[len(fake.authorizationEndpointArgsForCall)]
 	fake.authorizationEndpointArgsForCall = append(fake.authorizationEndpointArgsForCall, struct {
 	}{})
-	stub := fake.AuthorizationEndpointStub
-	fakeReturns := fake.authorizationEndpointReturns
 	fake.recordInvocation("AuthorizationEndpoint", []interface{}{})
 	fake.authorizationEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.AuthorizationEndpointStub != nil {
+		return fake.AuthorizationEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.authorizationEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -845,16 +855,15 @@ func (fake *FakeConfig) BinaryName() string {
 	ret, specificReturn := fake.binaryNameReturnsOnCall[len(fake.binaryNameArgsForCall)]
 	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct {
 	}{})
-	stub := fake.BinaryNameStub
-	fakeReturns := fake.binaryNameReturns
 	fake.recordInvocation("BinaryName", []interface{}{})
 	fake.binaryNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.BinaryNameStub != nil {
+		return fake.BinaryNameStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.binaryNameReturns
 	return fakeReturns.result1
 }
 
@@ -898,16 +907,15 @@ func (fake *FakeConfig) BinaryVersion() string {
 	ret, specificReturn := fake.binaryVersionReturnsOnCall[len(fake.binaryVersionArgsForCall)]
 	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct {
 	}{})
-	stub := fake.BinaryVersionStub
-	fakeReturns := fake.binaryVersionReturns
 	fake.recordInvocation("BinaryVersion", []interface{}{})
 	fake.binaryVersionMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.BinaryVersionStub != nil {
+		return fake.BinaryVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.binaryVersionReturns
 	return fakeReturns.result1
 }
 
@@ -951,16 +959,15 @@ func (fake *FakeConfig) CFPassword() string {
 	ret, specificReturn := fake.cFPasswordReturnsOnCall[len(fake.cFPasswordArgsForCall)]
 	fake.cFPasswordArgsForCall = append(fake.cFPasswordArgsForCall, struct {
 	}{})
-	stub := fake.CFPasswordStub
-	fakeReturns := fake.cFPasswordReturns
 	fake.recordInvocation("CFPassword", []interface{}{})
 	fake.cFPasswordMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CFPasswordStub != nil {
+		return fake.CFPasswordStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.cFPasswordReturns
 	return fakeReturns.result1
 }
 
@@ -1004,16 +1011,15 @@ func (fake *FakeConfig) CFUsername() string {
 	ret, specificReturn := fake.cFUsernameReturnsOnCall[len(fake.cFUsernameArgsForCall)]
 	fake.cFUsernameArgsForCall = append(fake.cFUsernameArgsForCall, struct {
 	}{})
-	stub := fake.CFUsernameStub
-	fakeReturns := fake.cFUsernameReturns
 	fake.recordInvocation("CFUsername", []interface{}{})
 	fake.cFUsernameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CFUsernameStub != nil {
+		return fake.CFUsernameStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.cFUsernameReturns
 	return fakeReturns.result1
 }
 
@@ -1057,16 +1063,15 @@ func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct {
 	}{})
-	stub := fake.ColorEnabledStub
-	fakeReturns := fake.colorEnabledReturns
 	fake.recordInvocation("ColorEnabled", []interface{}{})
 	fake.colorEnabledMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ColorEnabledStub != nil {
+		return fake.ColorEnabledStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.colorEnabledReturns
 	return fakeReturns.result1
 }
 
@@ -1110,16 +1115,15 @@ func (fake *FakeConfig) CurrentUser() (configv3.User, error) {
 	ret, specificReturn := fake.currentUserReturnsOnCall[len(fake.currentUserArgsForCall)]
 	fake.currentUserArgsForCall = append(fake.currentUserArgsForCall, struct {
 	}{})
-	stub := fake.CurrentUserStub
-	fakeReturns := fake.currentUserReturns
 	fake.recordInvocation("CurrentUser", []interface{}{})
 	fake.currentUserMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CurrentUserStub != nil {
+		return fake.CurrentUserStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.currentUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1166,16 +1170,15 @@ func (fake *FakeConfig) CurrentUserName() (string, error) {
 	ret, specificReturn := fake.currentUserNameReturnsOnCall[len(fake.currentUserNameArgsForCall)]
 	fake.currentUserNameArgsForCall = append(fake.currentUserNameArgsForCall, struct {
 	}{})
-	stub := fake.CurrentUserNameStub
-	fakeReturns := fake.currentUserNameReturns
 	fake.recordInvocation("CurrentUserName", []interface{}{})
 	fake.currentUserNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CurrentUserNameStub != nil {
+		return fake.CurrentUserNameStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.currentUserNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1222,16 +1225,15 @@ func (fake *FakeConfig) DialTimeout() time.Duration {
 	ret, specificReturn := fake.dialTimeoutReturnsOnCall[len(fake.dialTimeoutArgsForCall)]
 	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct {
 	}{})
-	stub := fake.DialTimeoutStub
-	fakeReturns := fake.dialTimeoutReturns
 	fake.recordInvocation("DialTimeout", []interface{}{})
 	fake.dialTimeoutMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.DialTimeoutStub != nil {
+		return fake.DialTimeoutStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.dialTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -1275,16 +1277,15 @@ func (fake *FakeConfig) DockerPassword() string {
 	ret, specificReturn := fake.dockerPasswordReturnsOnCall[len(fake.dockerPasswordArgsForCall)]
 	fake.dockerPasswordArgsForCall = append(fake.dockerPasswordArgsForCall, struct {
 	}{})
-	stub := fake.DockerPasswordStub
-	fakeReturns := fake.dockerPasswordReturns
 	fake.recordInvocation("DockerPassword", []interface{}{})
 	fake.dockerPasswordMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.DockerPasswordStub != nil {
+		return fake.DockerPasswordStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.dockerPasswordReturns
 	return fakeReturns.result1
 }
 
@@ -1328,16 +1329,15 @@ func (fake *FakeConfig) Experimental() bool {
 	ret, specificReturn := fake.experimentalReturnsOnCall[len(fake.experimentalArgsForCall)]
 	fake.experimentalArgsForCall = append(fake.experimentalArgsForCall, struct {
 	}{})
-	stub := fake.ExperimentalStub
-	fakeReturns := fake.experimentalReturns
 	fake.recordInvocation("Experimental", []interface{}{})
 	fake.experimentalMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ExperimentalStub != nil {
+		return fake.ExperimentalStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.experimentalReturns
 	return fakeReturns.result1
 }
 
@@ -1382,16 +1382,15 @@ func (fake *FakeConfig) GetPlugin(arg1 string) (configv3.Plugin, bool) {
 	fake.getPluginArgsForCall = append(fake.getPluginArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetPluginStub
-	fakeReturns := fake.getPluginReturns
 	fake.recordInvocation("GetPlugin", []interface{}{arg1})
 	fake.getPluginMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetPluginStub != nil {
+		return fake.GetPluginStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getPluginReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1446,16 +1445,15 @@ func (fake *FakeConfig) GetPluginCaseInsensitive(arg1 string) (configv3.Plugin, 
 	fake.getPluginCaseInsensitiveArgsForCall = append(fake.getPluginCaseInsensitiveArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetPluginCaseInsensitiveStub
-	fakeReturns := fake.getPluginCaseInsensitiveReturns
 	fake.recordInvocation("GetPluginCaseInsensitive", []interface{}{arg1})
 	fake.getPluginCaseInsensitiveMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetPluginCaseInsensitiveStub != nil {
+		return fake.GetPluginCaseInsensitiveStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getPluginCaseInsensitiveReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1509,16 +1507,15 @@ func (fake *FakeConfig) HasTargetedOrganization() bool {
 	ret, specificReturn := fake.hasTargetedOrganizationReturnsOnCall[len(fake.hasTargetedOrganizationArgsForCall)]
 	fake.hasTargetedOrganizationArgsForCall = append(fake.hasTargetedOrganizationArgsForCall, struct {
 	}{})
-	stub := fake.HasTargetedOrganizationStub
-	fakeReturns := fake.hasTargetedOrganizationReturns
 	fake.recordInvocation("HasTargetedOrganization", []interface{}{})
 	fake.hasTargetedOrganizationMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasTargetedOrganizationStub != nil {
+		return fake.HasTargetedOrganizationStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasTargetedOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -1562,16 +1559,15 @@ func (fake *FakeConfig) HasTargetedSpace() bool {
 	ret, specificReturn := fake.hasTargetedSpaceReturnsOnCall[len(fake.hasTargetedSpaceArgsForCall)]
 	fake.hasTargetedSpaceArgsForCall = append(fake.hasTargetedSpaceArgsForCall, struct {
 	}{})
-	stub := fake.HasTargetedSpaceStub
-	fakeReturns := fake.hasTargetedSpaceReturns
 	fake.recordInvocation("HasTargetedSpace", []interface{}{})
 	fake.hasTargetedSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasTargetedSpaceStub != nil {
+		return fake.HasTargetedSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasTargetedSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -1610,21 +1606,72 @@ func (fake *FakeConfig) HasTargetedSpaceReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) IsCFOnK8s() bool {
+	fake.isCFOnK8sMutex.Lock()
+	ret, specificReturn := fake.isCFOnK8sReturnsOnCall[len(fake.isCFOnK8sArgsForCall)]
+	fake.isCFOnK8sArgsForCall = append(fake.isCFOnK8sArgsForCall, struct {
+	}{})
+	fake.recordInvocation("IsCFOnK8s", []interface{}{})
+	fake.isCFOnK8sMutex.Unlock()
+	if fake.IsCFOnK8sStub != nil {
+		return fake.IsCFOnK8sStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isCFOnK8sReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) IsCFOnK8sCallCount() int {
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
+	return len(fake.isCFOnK8sArgsForCall)
+}
+
+func (fake *FakeConfig) IsCFOnK8sCalls(stub func() bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = stub
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturns(result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	fake.isCFOnK8sReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturnsOnCall(i int, result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	if fake.isCFOnK8sReturnsOnCall == nil {
+		fake.isCFOnK8sReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isCFOnK8sReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) IsTTY() bool {
 	fake.isTTYMutex.Lock()
 	ret, specificReturn := fake.isTTYReturnsOnCall[len(fake.isTTYArgsForCall)]
 	fake.isTTYArgsForCall = append(fake.isTTYArgsForCall, struct {
 	}{})
-	stub := fake.IsTTYStub
-	fakeReturns := fake.isTTYReturns
 	fake.recordInvocation("IsTTY", []interface{}{})
 	fake.isTTYMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.IsTTYStub != nil {
+		return fake.IsTTYStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isTTYReturns
 	return fakeReturns.result1
 }
 
@@ -1668,16 +1715,15 @@ func (fake *FakeConfig) Locale() string {
 	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct {
 	}{})
-	stub := fake.LocaleStub
-	fakeReturns := fake.localeReturns
 	fake.recordInvocation("Locale", []interface{}{})
 	fake.localeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.LocaleStub != nil {
+		return fake.LocaleStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.localeReturns
 	return fakeReturns.result1
 }
 
@@ -1721,16 +1767,15 @@ func (fake *FakeConfig) LogCacheEndpoint() string {
 	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
 	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
 	}{})
-	stub := fake.LogCacheEndpointStub
-	fakeReturns := fake.logCacheEndpointReturns
 	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
 	fake.logCacheEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.LogCacheEndpointStub != nil {
+		return fake.LogCacheEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.logCacheEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -1774,16 +1819,15 @@ func (fake *FakeConfig) MinCLIVersion() string {
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
 	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct {
 	}{})
-	stub := fake.MinCLIVersionStub
-	fakeReturns := fake.minCLIVersionReturns
 	fake.recordInvocation("MinCLIVersion", []interface{}{})
 	fake.minCLIVersionMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.MinCLIVersionStub != nil {
+		return fake.MinCLIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.minCLIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1827,16 +1871,15 @@ func (fake *FakeConfig) NOAARequestRetryCount() int {
 	ret, specificReturn := fake.nOAARequestRetryCountReturnsOnCall[len(fake.nOAARequestRetryCountArgsForCall)]
 	fake.nOAARequestRetryCountArgsForCall = append(fake.nOAARequestRetryCountArgsForCall, struct {
 	}{})
-	stub := fake.NOAARequestRetryCountStub
-	fakeReturns := fake.nOAARequestRetryCountReturns
 	fake.recordInvocation("NOAARequestRetryCount", []interface{}{})
 	fake.nOAARequestRetryCountMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.NOAARequestRetryCountStub != nil {
+		return fake.NOAARequestRetryCountStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.nOAARequestRetryCountReturns
 	return fakeReturns.result1
 }
 
@@ -1880,16 +1923,15 @@ func (fake *FakeConfig) NetworkPolicyV1Endpoint() string {
 	ret, specificReturn := fake.networkPolicyV1EndpointReturnsOnCall[len(fake.networkPolicyV1EndpointArgsForCall)]
 	fake.networkPolicyV1EndpointArgsForCall = append(fake.networkPolicyV1EndpointArgsForCall, struct {
 	}{})
-	stub := fake.NetworkPolicyV1EndpointStub
-	fakeReturns := fake.networkPolicyV1EndpointReturns
 	fake.recordInvocation("NetworkPolicyV1Endpoint", []interface{}{})
 	fake.networkPolicyV1EndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.NetworkPolicyV1EndpointStub != nil {
+		return fake.NetworkPolicyV1EndpointStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.networkPolicyV1EndpointReturns
 	return fakeReturns.result1
 }
 
@@ -1933,16 +1975,15 @@ func (fake *FakeConfig) OverallPollingTimeout() time.Duration {
 	ret, specificReturn := fake.overallPollingTimeoutReturnsOnCall[len(fake.overallPollingTimeoutArgsForCall)]
 	fake.overallPollingTimeoutArgsForCall = append(fake.overallPollingTimeoutArgsForCall, struct {
 	}{})
-	stub := fake.OverallPollingTimeoutStub
-	fakeReturns := fake.overallPollingTimeoutReturns
 	fake.recordInvocation("OverallPollingTimeout", []interface{}{})
 	fake.overallPollingTimeoutMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.OverallPollingTimeoutStub != nil {
+		return fake.OverallPollingTimeoutStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.overallPollingTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -1986,16 +2027,15 @@ func (fake *FakeConfig) PluginHome() string {
 	ret, specificReturn := fake.pluginHomeReturnsOnCall[len(fake.pluginHomeArgsForCall)]
 	fake.pluginHomeArgsForCall = append(fake.pluginHomeArgsForCall, struct {
 	}{})
-	stub := fake.PluginHomeStub
-	fakeReturns := fake.pluginHomeReturns
 	fake.recordInvocation("PluginHome", []interface{}{})
 	fake.pluginHomeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.PluginHomeStub != nil {
+		return fake.PluginHomeStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.pluginHomeReturns
 	return fakeReturns.result1
 }
 
@@ -2039,16 +2079,15 @@ func (fake *FakeConfig) PluginRepositories() []configv3.PluginRepository {
 	ret, specificReturn := fake.pluginRepositoriesReturnsOnCall[len(fake.pluginRepositoriesArgsForCall)]
 	fake.pluginRepositoriesArgsForCall = append(fake.pluginRepositoriesArgsForCall, struct {
 	}{})
-	stub := fake.PluginRepositoriesStub
-	fakeReturns := fake.pluginRepositoriesReturns
 	fake.recordInvocation("PluginRepositories", []interface{}{})
 	fake.pluginRepositoriesMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.PluginRepositoriesStub != nil {
+		return fake.PluginRepositoriesStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.pluginRepositoriesReturns
 	return fakeReturns.result1
 }
 
@@ -2092,16 +2131,15 @@ func (fake *FakeConfig) Plugins() []configv3.Plugin {
 	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
 	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct {
 	}{})
-	stub := fake.PluginsStub
-	fakeReturns := fake.pluginsReturns
 	fake.recordInvocation("Plugins", []interface{}{})
 	fake.pluginsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.PluginsStub != nil {
+		return fake.PluginsStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.pluginsReturns
 	return fakeReturns.result1
 }
 
@@ -2145,16 +2183,15 @@ func (fake *FakeConfig) PollingInterval() time.Duration {
 	ret, specificReturn := fake.pollingIntervalReturnsOnCall[len(fake.pollingIntervalArgsForCall)]
 	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct {
 	}{})
-	stub := fake.PollingIntervalStub
-	fakeReturns := fake.pollingIntervalReturns
 	fake.recordInvocation("PollingInterval", []interface{}{})
 	fake.pollingIntervalMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.PollingIntervalStub != nil {
+		return fake.PollingIntervalStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.pollingIntervalReturns
 	return fakeReturns.result1
 }
 
@@ -2198,16 +2235,15 @@ func (fake *FakeConfig) RefreshToken() string {
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 	}{})
-	stub := fake.RefreshTokenStub
-	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1
 }
 
@@ -2251,10 +2287,9 @@ func (fake *FakeConfig) RemovePlugin(arg1 string) {
 	fake.removePluginArgsForCall = append(fake.removePluginArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.RemovePluginStub
 	fake.recordInvocation("RemovePlugin", []interface{}{arg1})
 	fake.removePluginMutex.Unlock()
-	if stub != nil {
+	if fake.RemovePluginStub != nil {
 		fake.RemovePluginStub(arg1)
 	}
 }
@@ -2283,16 +2318,15 @@ func (fake *FakeConfig) RequestRetryCount() int {
 	ret, specificReturn := fake.requestRetryCountReturnsOnCall[len(fake.requestRetryCountArgsForCall)]
 	fake.requestRetryCountArgsForCall = append(fake.requestRetryCountArgsForCall, struct {
 	}{})
-	stub := fake.RequestRetryCountStub
-	fakeReturns := fake.requestRetryCountReturns
 	fake.recordInvocation("RequestRetryCount", []interface{}{})
 	fake.requestRetryCountMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RequestRetryCountStub != nil {
+		return fake.RequestRetryCountStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.requestRetryCountReturns
 	return fakeReturns.result1
 }
 
@@ -2336,16 +2370,15 @@ func (fake *FakeConfig) RoutingEndpoint() string {
 	ret, specificReturn := fake.routingEndpointReturnsOnCall[len(fake.routingEndpointArgsForCall)]
 	fake.routingEndpointArgsForCall = append(fake.routingEndpointArgsForCall, struct {
 	}{})
-	stub := fake.RoutingEndpointStub
-	fakeReturns := fake.routingEndpointReturns
 	fake.recordInvocation("RoutingEndpoint", []interface{}{})
 	fake.routingEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RoutingEndpointStub != nil {
+		return fake.RoutingEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.routingEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -2389,16 +2422,15 @@ func (fake *FakeConfig) SSHOAuthClient() string {
 	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
 	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct {
 	}{})
-	stub := fake.SSHOAuthClientStub
-	fakeReturns := fake.sSHOAuthClientReturns
 	fake.recordInvocation("SSHOAuthClient", []interface{}{})
 	fake.sSHOAuthClientMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.sSHOAuthClientReturns
 	return fakeReturns.result1
 }
 
@@ -2442,10 +2474,9 @@ func (fake *FakeConfig) SetAccessToken(arg1 string) {
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetAccessTokenStub
 	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
 	fake.setAccessTokenMutex.Unlock()
-	if stub != nil {
+	if fake.SetAccessTokenStub != nil {
 		fake.SetAccessTokenStub(arg1)
 	}
 }
@@ -2474,10 +2505,9 @@ func (fake *FakeConfig) SetAsyncTimeout(arg1 int) {
 	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
 		arg1 int
 	}{arg1})
-	stub := fake.SetAsyncTimeoutStub
 	fake.recordInvocation("SetAsyncTimeout", []interface{}{arg1})
 	fake.setAsyncTimeoutMutex.Unlock()
-	if stub != nil {
+	if fake.SetAsyncTimeoutStub != nil {
 		fake.SetAsyncTimeoutStub(arg1)
 	}
 }
@@ -2506,10 +2536,9 @@ func (fake *FakeConfig) SetColorEnabled(arg1 string) {
 	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetColorEnabledStub
 	fake.recordInvocation("SetColorEnabled", []interface{}{arg1})
 	fake.setColorEnabledMutex.Unlock()
-	if stub != nil {
+	if fake.SetColorEnabledStub != nil {
 		fake.SetColorEnabledStub(arg1)
 	}
 }
@@ -2533,15 +2562,45 @@ func (fake *FakeConfig) SetColorEnabledArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConfig) SetKubernetesAuthInfo(arg1 string) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	fake.setKubernetesAuthInfoArgsForCall = append(fake.setKubernetesAuthInfoArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetKubernetesAuthInfo", []interface{}{arg1})
+	fake.setKubernetesAuthInfoMutex.Unlock()
+	if fake.SetKubernetesAuthInfoStub != nil {
+		fake.SetKubernetesAuthInfoStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCallCount() int {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	return len(fake.setKubernetesAuthInfoArgsForCall)
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCalls(stub func(string)) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	defer fake.setKubernetesAuthInfoMutex.Unlock()
+	fake.SetKubernetesAuthInfoStub = stub
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoArgsForCall(i int) string {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	argsForCall := fake.setKubernetesAuthInfoArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConfig) SetLocale(arg1 string) {
 	fake.setLocaleMutex.Lock()
 	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetLocaleStub
 	fake.recordInvocation("SetLocale", []interface{}{arg1})
 	fake.setLocaleMutex.Unlock()
-	if stub != nil {
+	if fake.SetLocaleStub != nil {
 		fake.SetLocaleStub(arg1)
 	}
 }
@@ -2570,10 +2629,9 @@ func (fake *FakeConfig) SetMinCLIVersion(arg1 string) {
 	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetMinCLIVersionStub
 	fake.recordInvocation("SetMinCLIVersion", []interface{}{arg1})
 	fake.setMinCLIVersionMutex.Unlock()
-	if stub != nil {
+	if fake.SetMinCLIVersionStub != nil {
 		fake.SetMinCLIVersionStub(arg1)
 	}
 }
@@ -2603,10 +2661,9 @@ func (fake *FakeConfig) SetOrganizationInformation(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.SetOrganizationInformationStub
 	fake.recordInvocation("SetOrganizationInformation", []interface{}{arg1, arg2})
 	fake.setOrganizationInformationMutex.Unlock()
-	if stub != nil {
+	if fake.SetOrganizationInformationStub != nil {
 		fake.SetOrganizationInformationStub(arg1, arg2)
 	}
 }
@@ -2635,10 +2692,9 @@ func (fake *FakeConfig) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetRefreshTokenStub
 	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
 	fake.setRefreshTokenMutex.Unlock()
-	if stub != nil {
+	if fake.SetRefreshTokenStub != nil {
 		fake.SetRefreshTokenStub(arg1)
 	}
 }
@@ -2669,10 +2725,9 @@ func (fake *FakeConfig) SetSpaceInformation(arg1 string, arg2 string, arg3 bool)
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
-	stub := fake.SetSpaceInformationStub
 	fake.recordInvocation("SetSpaceInformation", []interface{}{arg1, arg2, arg3})
 	fake.setSpaceInformationMutex.Unlock()
-	if stub != nil {
+	if fake.SetSpaceInformationStub != nil {
 		fake.SetSpaceInformationStub(arg1, arg2, arg3)
 	}
 }
@@ -2701,10 +2756,9 @@ func (fake *FakeConfig) SetTargetInformation(arg1 configv3.TargetInformationArgs
 	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
 		arg1 configv3.TargetInformationArgs
 	}{arg1})
-	stub := fake.SetTargetInformationStub
 	fake.recordInvocation("SetTargetInformation", []interface{}{arg1})
 	fake.setTargetInformationMutex.Unlock()
-	if stub != nil {
+	if fake.SetTargetInformationStub != nil {
 		fake.SetTargetInformationStub(arg1)
 	}
 }
@@ -2735,10 +2789,9 @@ func (fake *FakeConfig) SetTokenInformation(arg1 string, arg2 string, arg3 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.SetTokenInformationStub
 	fake.recordInvocation("SetTokenInformation", []interface{}{arg1, arg2, arg3})
 	fake.setTokenInformationMutex.Unlock()
-	if stub != nil {
+	if fake.SetTokenInformationStub != nil {
 		fake.SetTokenInformationStub(arg1, arg2, arg3)
 	}
 }
@@ -2767,10 +2820,9 @@ func (fake *FakeConfig) SetTrace(arg1 string) {
 	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetTraceStub
 	fake.recordInvocation("SetTrace", []interface{}{arg1})
 	fake.setTraceMutex.Unlock()
-	if stub != nil {
+	if fake.SetTraceStub != nil {
 		fake.SetTraceStub(arg1)
 	}
 }
@@ -2800,10 +2852,9 @@ func (fake *FakeConfig) SetUAAClientCredentials(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.SetUAAClientCredentialsStub
 	fake.recordInvocation("SetUAAClientCredentials", []interface{}{arg1, arg2})
 	fake.setUAAClientCredentialsMutex.Unlock()
-	if stub != nil {
+	if fake.SetUAAClientCredentialsStub != nil {
 		fake.SetUAAClientCredentialsStub(arg1, arg2)
 	}
 }
@@ -2832,10 +2883,9 @@ func (fake *FakeConfig) SetUAAEndpoint(arg1 string) {
 	fake.setUAAEndpointArgsForCall = append(fake.setUAAEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetUAAEndpointStub
 	fake.recordInvocation("SetUAAEndpoint", []interface{}{arg1})
 	fake.setUAAEndpointMutex.Unlock()
-	if stub != nil {
+	if fake.SetUAAEndpointStub != nil {
 		fake.SetUAAEndpointStub(arg1)
 	}
 }
@@ -2864,10 +2914,9 @@ func (fake *FakeConfig) SetUAAGrantType(arg1 string) {
 	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetUAAGrantTypeStub
 	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
 	fake.setUAAGrantTypeMutex.Unlock()
-	if stub != nil {
+	if fake.SetUAAGrantTypeStub != nil {
 		fake.SetUAAGrantTypeStub(arg1)
 	}
 }
@@ -2896,16 +2945,15 @@ func (fake *FakeConfig) SkipSSLValidation() bool {
 	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
 	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct {
 	}{})
-	stub := fake.SkipSSLValidationStub
-	fakeReturns := fake.skipSSLValidationReturns
 	fake.recordInvocation("SkipSSLValidation", []interface{}{})
 	fake.skipSSLValidationMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.SkipSSLValidationStub != nil {
+		return fake.SkipSSLValidationStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.skipSSLValidationReturns
 	return fakeReturns.result1
 }
 
@@ -2949,16 +2997,15 @@ func (fake *FakeConfig) StagingTimeout() time.Duration {
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
 	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct {
 	}{})
-	stub := fake.StagingTimeoutStub
-	fakeReturns := fake.stagingTimeoutReturns
 	fake.recordInvocation("StagingTimeout", []interface{}{})
 	fake.stagingTimeoutMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StagingTimeoutStub != nil {
+		return fake.StagingTimeoutStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.stagingTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -3002,16 +3049,15 @@ func (fake *FakeConfig) StartupTimeout() time.Duration {
 	ret, specificReturn := fake.startupTimeoutReturnsOnCall[len(fake.startupTimeoutArgsForCall)]
 	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct {
 	}{})
-	stub := fake.StartupTimeoutStub
-	fakeReturns := fake.startupTimeoutReturns
 	fake.recordInvocation("StartupTimeout", []interface{}{})
 	fake.startupTimeoutMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StartupTimeoutStub != nil {
+		return fake.StartupTimeoutStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.startupTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -3055,16 +3101,15 @@ func (fake *FakeConfig) Target() string {
 	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
 	fake.targetArgsForCall = append(fake.targetArgsForCall, struct {
 	}{})
-	stub := fake.TargetStub
-	fakeReturns := fake.targetReturns
 	fake.recordInvocation("Target", []interface{}{})
 	fake.targetMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TargetStub != nil {
+		return fake.TargetStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.targetReturns
 	return fakeReturns.result1
 }
 
@@ -3108,16 +3153,15 @@ func (fake *FakeConfig) TargetedOrganization() configv3.Organization {
 	ret, specificReturn := fake.targetedOrganizationReturnsOnCall[len(fake.targetedOrganizationArgsForCall)]
 	fake.targetedOrganizationArgsForCall = append(fake.targetedOrganizationArgsForCall, struct {
 	}{})
-	stub := fake.TargetedOrganizationStub
-	fakeReturns := fake.targetedOrganizationReturns
 	fake.recordInvocation("TargetedOrganization", []interface{}{})
 	fake.targetedOrganizationMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TargetedOrganizationStub != nil {
+		return fake.TargetedOrganizationStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.targetedOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -3161,16 +3205,15 @@ func (fake *FakeConfig) TargetedOrganizationName() string {
 	ret, specificReturn := fake.targetedOrganizationNameReturnsOnCall[len(fake.targetedOrganizationNameArgsForCall)]
 	fake.targetedOrganizationNameArgsForCall = append(fake.targetedOrganizationNameArgsForCall, struct {
 	}{})
-	stub := fake.TargetedOrganizationNameStub
-	fakeReturns := fake.targetedOrganizationNameReturns
 	fake.recordInvocation("TargetedOrganizationName", []interface{}{})
 	fake.targetedOrganizationNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TargetedOrganizationNameStub != nil {
+		return fake.TargetedOrganizationNameStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.targetedOrganizationNameReturns
 	return fakeReturns.result1
 }
 
@@ -3214,16 +3257,15 @@ func (fake *FakeConfig) TargetedSpace() configv3.Space {
 	ret, specificReturn := fake.targetedSpaceReturnsOnCall[len(fake.targetedSpaceArgsForCall)]
 	fake.targetedSpaceArgsForCall = append(fake.targetedSpaceArgsForCall, struct {
 	}{})
-	stub := fake.TargetedSpaceStub
-	fakeReturns := fake.targetedSpaceReturns
 	fake.recordInvocation("TargetedSpace", []interface{}{})
 	fake.targetedSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TargetedSpaceStub != nil {
+		return fake.TargetedSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.targetedSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -3267,16 +3309,15 @@ func (fake *FakeConfig) TerminalWidth() int {
 	ret, specificReturn := fake.terminalWidthReturnsOnCall[len(fake.terminalWidthArgsForCall)]
 	fake.terminalWidthArgsForCall = append(fake.terminalWidthArgsForCall, struct {
 	}{})
-	stub := fake.TerminalWidthStub
-	fakeReturns := fake.terminalWidthReturns
 	fake.recordInvocation("TerminalWidth", []interface{}{})
 	fake.terminalWidthMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TerminalWidthStub != nil {
+		return fake.TerminalWidthStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.terminalWidthReturns
 	return fakeReturns.result1
 }
 
@@ -3320,16 +3361,15 @@ func (fake *FakeConfig) UAADisableKeepAlives() bool {
 	ret, specificReturn := fake.uAADisableKeepAlivesReturnsOnCall[len(fake.uAADisableKeepAlivesArgsForCall)]
 	fake.uAADisableKeepAlivesArgsForCall = append(fake.uAADisableKeepAlivesArgsForCall, struct {
 	}{})
-	stub := fake.UAADisableKeepAlivesStub
-	fakeReturns := fake.uAADisableKeepAlivesReturns
 	fake.recordInvocation("UAADisableKeepAlives", []interface{}{})
 	fake.uAADisableKeepAlivesMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UAADisableKeepAlivesStub != nil {
+		return fake.UAADisableKeepAlivesStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uAADisableKeepAlivesReturns
 	return fakeReturns.result1
 }
 
@@ -3373,16 +3413,15 @@ func (fake *FakeConfig) UAAEndpoint() string {
 	ret, specificReturn := fake.uAAEndpointReturnsOnCall[len(fake.uAAEndpointArgsForCall)]
 	fake.uAAEndpointArgsForCall = append(fake.uAAEndpointArgsForCall, struct {
 	}{})
-	stub := fake.UAAEndpointStub
-	fakeReturns := fake.uAAEndpointReturns
 	fake.recordInvocation("UAAEndpoint", []interface{}{})
 	fake.uAAEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UAAEndpointStub != nil {
+		return fake.UAAEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uAAEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -3426,16 +3465,15 @@ func (fake *FakeConfig) UAAGrantType() string {
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
 	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
 	}{})
-	stub := fake.UAAGrantTypeStub
-	fakeReturns := fake.uAAGrantTypeReturns
 	fake.recordInvocation("UAAGrantType", []interface{}{})
 	fake.uAAGrantTypeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uAAGrantTypeReturns
 	return fakeReturns.result1
 }
 
@@ -3479,16 +3517,15 @@ func (fake *FakeConfig) UAAOAuthClient() string {
 	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
 	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct {
 	}{})
-	stub := fake.UAAOAuthClientStub
-	fakeReturns := fake.uAAOAuthClientReturns
 	fake.recordInvocation("UAAOAuthClient", []interface{}{})
 	fake.uAAOAuthClientMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uAAOAuthClientReturns
 	return fakeReturns.result1
 }
 
@@ -3532,16 +3569,15 @@ func (fake *FakeConfig) UAAOAuthClientSecret() string {
 	ret, specificReturn := fake.uAAOAuthClientSecretReturnsOnCall[len(fake.uAAOAuthClientSecretArgsForCall)]
 	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct {
 	}{})
-	stub := fake.UAAOAuthClientSecretStub
-	fakeReturns := fake.uAAOAuthClientSecretReturns
 	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
 	fake.uAAOAuthClientSecretMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UAAOAuthClientSecretStub != nil {
+		return fake.UAAOAuthClientSecretStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uAAOAuthClientSecretReturns
 	return fakeReturns.result1
 }
 
@@ -3584,10 +3620,9 @@ func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
 	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
 	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct {
 	}{})
-	stub := fake.UnsetOrganizationAndSpaceInformationStub
 	fake.recordInvocation("UnsetOrganizationAndSpaceInformation", []interface{}{})
 	fake.unsetOrganizationAndSpaceInformationMutex.Unlock()
-	if stub != nil {
+	if fake.UnsetOrganizationAndSpaceInformationStub != nil {
 		fake.UnsetOrganizationAndSpaceInformationStub()
 	}
 }
@@ -3608,10 +3643,9 @@ func (fake *FakeConfig) UnsetSpaceInformation() {
 	fake.unsetSpaceInformationMutex.Lock()
 	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct {
 	}{})
-	stub := fake.UnsetSpaceInformationStub
 	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
 	fake.unsetSpaceInformationMutex.Unlock()
-	if stub != nil {
+	if fake.UnsetSpaceInformationStub != nil {
 		fake.UnsetSpaceInformationStub()
 	}
 }
@@ -3632,10 +3666,9 @@ func (fake *FakeConfig) UnsetUserInformation() {
 	fake.unsetUserInformationMutex.Lock()
 	fake.unsetUserInformationArgsForCall = append(fake.unsetUserInformationArgsForCall, struct {
 	}{})
-	stub := fake.UnsetUserInformationStub
 	fake.recordInvocation("UnsetUserInformation", []interface{}{})
 	fake.unsetUserInformationMutex.Unlock()
-	if stub != nil {
+	if fake.UnsetUserInformationStub != nil {
 		fake.UnsetUserInformationStub()
 	}
 }
@@ -3658,10 +3691,9 @@ func (fake *FakeConfig) V7SetSpaceInformation(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.V7SetSpaceInformationStub
 	fake.recordInvocation("V7SetSpaceInformation", []interface{}{arg1, arg2})
 	fake.v7SetSpaceInformationMutex.Unlock()
-	if stub != nil {
+	if fake.V7SetSpaceInformationStub != nil {
 		fake.V7SetSpaceInformationStub(arg1, arg2)
 	}
 }
@@ -3690,16 +3722,15 @@ func (fake *FakeConfig) Verbose() (bool, []string) {
 	ret, specificReturn := fake.verboseReturnsOnCall[len(fake.verboseArgsForCall)]
 	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct {
 	}{})
-	stub := fake.VerboseStub
-	fakeReturns := fake.verboseReturns
 	fake.recordInvocation("Verbose", []interface{}{})
 	fake.verboseMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.VerboseStub != nil {
+		return fake.VerboseStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.verboseReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -3746,16 +3777,15 @@ func (fake *FakeConfig) WriteConfig() error {
 	ret, specificReturn := fake.writeConfigReturnsOnCall[len(fake.writeConfigArgsForCall)]
 	fake.writeConfigArgsForCall = append(fake.writeConfigArgsForCall, struct {
 	}{})
-	stub := fake.WriteConfigStub
-	fakeReturns := fake.writeConfigReturns
 	fake.recordInvocation("WriteConfig", []interface{}{})
 	fake.writeConfigMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.WriteConfigStub != nil {
+		return fake.WriteConfigStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.writeConfigReturns
 	return fakeReturns.result1
 }
 
@@ -3799,16 +3829,15 @@ func (fake *FakeConfig) WritePluginConfig() error {
 	ret, specificReturn := fake.writePluginConfigReturnsOnCall[len(fake.writePluginConfigArgsForCall)]
 	fake.writePluginConfigArgsForCall = append(fake.writePluginConfigArgsForCall, struct {
 	}{})
-	stub := fake.WritePluginConfigStub
-	fakeReturns := fake.writePluginConfigReturns
 	fake.recordInvocation("WritePluginConfig", []interface{}{})
 	fake.writePluginConfigMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.WritePluginConfigStub != nil {
+		return fake.WritePluginConfigStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.writePluginConfigReturns
 	return fakeReturns.result1
 }
 
@@ -3888,6 +3917,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.hasTargetedOrganizationMutex.RUnlock()
 	fake.hasTargetedSpaceMutex.RLock()
 	defer fake.hasTargetedSpaceMutex.RUnlock()
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
 	fake.isTTYMutex.RLock()
 	defer fake.isTTYMutex.RUnlock()
 	fake.localeMutex.RLock()
@@ -3926,6 +3957,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setAsyncTimeoutMutex.RUnlock()
 	fake.setColorEnabledMutex.RLock()
 	defer fake.setColorEnabledMutex.RUnlock()
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
 	fake.setMinCLIVersionMutex.RLock()

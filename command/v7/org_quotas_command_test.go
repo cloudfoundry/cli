@@ -57,7 +57,7 @@ var _ = Describe("org-quotas command", func() {
 
 	When("running the command successfully", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			orgQuotas := []resources.OrganizationQuota{
 				{
 					Quota: resources.Quota{
@@ -160,7 +160,7 @@ var _ = Describe("org-quotas command", func() {
 
 	When("the quota list is empty", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			fakeActor.GetOrganizationQuotasReturns([]resources.OrganizationQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 		})
 

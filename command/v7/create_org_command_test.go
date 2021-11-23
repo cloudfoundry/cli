@@ -45,7 +45,7 @@ var _ = Describe("create-org Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		orgName = "some-org"
 		currentUsername = "bob"
-		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUsername}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUsername}, nil)
 		quotaName = "quota-name"
 
 		cmd = v7.CreateOrgCommand{
