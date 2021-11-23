@@ -68,7 +68,7 @@ var _ = Describe("service-key Command", func() {
 		const fakeUserName = "fake-user-name"
 
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: fakeUserName}, nil)
 
 			fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
 				resources.ServiceCredentialBindingDetails{
@@ -102,7 +102,7 @@ var _ = Describe("service-key Command", func() {
 
 		When("getting the username returns an error", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("bad thing"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("bad thing"))
 			})
 
 			It("returns the error", func() {

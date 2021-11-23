@@ -77,7 +77,7 @@ func (cmd MarketplaceCommand) processLoginContext() (string, error) {
 		return "", err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return "", err
 	}

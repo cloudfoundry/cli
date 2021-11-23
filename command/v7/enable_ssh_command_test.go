@@ -10,6 +10,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -49,7 +50,7 @@ var _ = Describe("enable-ssh Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		currentUserName = "some-user"
-		fakeConfig.CurrentUserNameReturns(currentUserName, nil)
+		fakeEnableSSHActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -185,7 +186,6 @@ var _ = Describe("enable-ssh Command", func() {
 			When("GetAppFeature action errors", func() {
 				returnedErr := errors.New("some-error")
 				BeforeEach(func() {
-
 					fakeEnableSSHActor.GetAppFeatureReturns(
 						resources.ApplicationFeature{},
 						nil,

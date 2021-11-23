@@ -77,7 +77,7 @@ var _ = Describe("Stack Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some current user error")
-				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 			})
 
 			It("return an error", func() {
@@ -90,7 +90,7 @@ var _ = Describe("Stack Command", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		Context("When the stack exists", func() {

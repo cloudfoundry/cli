@@ -600,7 +600,7 @@ var _ = Describe("Droplet Actions", func() {
 		})
 
 		When("the upload returns an error", func() {
-			var uploadErr = errors.New("upload failed")
+			uploadErr := errors.New("upload failed")
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadDropletBitsReturns(
@@ -617,7 +617,7 @@ var _ = Describe("Droplet Actions", func() {
 		})
 
 		When("the upload job fails eventually", func() {
-			var jobErr = errors.New("job failed")
+			jobErr := errors.New("job failed")
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadDropletBitsReturns(

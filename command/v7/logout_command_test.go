@@ -33,7 +33,7 @@ var _ = Describe("logout command", func() {
 			},
 		}
 
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{
 				Name: "some-user",
 			},
@@ -59,12 +59,12 @@ var _ = Describe("logout command", func() {
 	When("unable to revoke token", func() {
 		When("because the user is not logged in", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, nil)
 			})
 
 			It("does not impact the logout", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 				Expect(fakeConfig.UnsetUserInformationCallCount()).To(Equal(1))
 				Expect(testUI.Out).To(Say("Logging out ..."))
 				Expect(testUI.Out).To(Say("OK"))

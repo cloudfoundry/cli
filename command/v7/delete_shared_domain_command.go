@@ -22,7 +22,7 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 	}
 	domainName := cmd.RequiredArgs.Domain
 
-	currentUser, err := cmd.Config.CurrentUser()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

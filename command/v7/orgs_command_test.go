@@ -68,7 +68,7 @@ var _ = Describe("orgs Command", func() {
 	When("the user is logged in and an org is targeted", func() {
 		When("getting the current user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-user-error"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("get-user-error"))
 			})
 
 			It("returns the error", func() {
@@ -78,7 +78,7 @@ var _ = Describe("orgs Command", func() {
 
 		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})

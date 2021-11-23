@@ -80,4 +80,6 @@ type Config interface {
 	Verbose() (bool, []string)
 	WritePluginConfig() error
 	WriteConfig() error
+	IsCFOnK8s() bool
+	SetKubernetesAuthInfo(authInfo string)
 }

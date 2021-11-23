@@ -82,19 +82,19 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some current user error")
-				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 			})
 
 			It("return an error", func() {
 				Expect(executeErr).To(Equal(expectedErr))
 
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 			})
 		})
 
 		When("the user is logged in", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			})
 
 			When("the org lookup is unsuccessful", func() {

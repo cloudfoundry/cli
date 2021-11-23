@@ -18,7 +18,7 @@ var _ = Describe("Info", func() {
 		client          *Client
 		rootRespondWith http.HandlerFunc
 
-		apis       Info
+		info       Info
 		warnings   Warnings
 		executeErr error
 	)
@@ -37,7 +37,7 @@ var _ = Describe("Info", func() {
 			),
 		)
 
-		apis, warnings, executeErr = client.GetInfo()
+		info, warnings, executeErr = client.GetInfo()
 	})
 
 	Describe("when all requests are successful", func() {
@@ -86,17 +86,28 @@ var _ = Describe("Info", func() {
 
 		It("returns the CC Information", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
-			Expect(apis.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
-			Expect(apis.NetworkPolicyV1()).To(Equal(fmt.Sprintf("%s/networking/v1/external", server.URL())))
-			Expect(apis.AppSSHHostKeyFingerprint()).To(Equal("some-fingerprint"))
-			Expect(apis.AppSSHEndpoint()).To(Equal("ssh.bosh-lite.com:2222"))
-			Expect(apis.OAuthClient()).To(Equal("some-client"))
+			Expect(info.UAA()).To(Equal("https://uaa.bosh-lite.com"))
+			Expect(info.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
+			Expect(info.NetworkPolicyV1()).To(Equal(fmt.Sprintf("%s/networking/v1/external", server.URL())))
+			Expect(info.AppSSHHostKeyFingerprint()).To(Equal("some-fingerprint"))
+			Expect(info.AppSSHEndpoint()).To(Equal("ssh.bosh-lite.com:2222"))
+			Expect(info.OAuthClient()).To(Equal("some-client"))
+			Expect(info.CFOnK8s).To(BeFalse())
 		})
 
 		It("returns all warnings", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("warning 1"))
+		})
+
+		When("CF-on-K8s", func() {
+			BeforeEach(func() {
+				rootRespondWith = RespondWith(http.StatusOK, `{ "cf_on_k8s": true }`)
+			})
+
+			It("sets the CFOnK8s", func() {
+				Expect(info.CFOnK8s).To(BeTrue())
+			})
 		})
 	})
 

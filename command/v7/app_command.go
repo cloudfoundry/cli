@@ -24,7 +24,7 @@ func (cmd AppCommand) Execute(args []string) error {
 		return cmd.displayAppGUID()
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

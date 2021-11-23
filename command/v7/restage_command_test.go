@@ -61,7 +61,7 @@ var _ = Describe("restage Command", func() {
 			Name: "some-space",
 			GUID: "some-space-guid",
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		fakeSharedActor.CheckTargetReturns(nil)
 		fakeActor.GetApplicationByNameAndSpaceReturns(
 			app,
@@ -97,7 +97,7 @@ var _ = Describe("restage Command", func() {
 	When("the user is not logged in", func() {
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

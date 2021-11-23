@@ -53,7 +53,7 @@ var _ = Describe("bind-security-group Command", func() {
 		cmd.RequiredArgs.SecurityGroupName = "some-security-group"
 		cmd.RequiredArgs.OrganizationName = "some-org"
 
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 		fakeActor.GetSecurityGroupReturns(
@@ -95,7 +95,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("getting current user error")
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{},
 					expectedErr)
 			})

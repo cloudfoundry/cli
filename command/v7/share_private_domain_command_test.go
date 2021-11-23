@@ -75,7 +75,7 @@ var _ = Describe("share-private-domain command", func() {
 
 	When("getting the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("current-user-error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("current-user-error"))
 		})
 
 		It("returns an error", func() {
@@ -90,7 +90,7 @@ var _ = Describe("share-private-domain command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 		})
 
 		It("should print text indicating it is sharing a domain", func() {

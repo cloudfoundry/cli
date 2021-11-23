@@ -80,7 +80,7 @@ var _ = Describe("stop Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -97,7 +97,7 @@ var _ = Describe("stop Command", func() {
 				Name: "some-space",
 				GUID: "some-space-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
 		})
@@ -129,7 +129,7 @@ var _ = Describe("stop Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
@@ -153,7 +153,7 @@ var _ = Describe("stop Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
@@ -178,7 +178,7 @@ var _ = Describe("stop Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 		})
 
@@ -205,7 +205,7 @@ var _ = Describe("stop Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = errors.New("some-error")
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
@@ -231,7 +231,7 @@ var _ = Describe("stop Command", func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = errors.New("some-error")
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)

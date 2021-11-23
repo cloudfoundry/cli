@@ -17,6 +17,7 @@ import (
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/SermoDigital/jose/jwt"
 )
 
@@ -1209,6 +1210,18 @@ type FakeActor struct {
 		result1 []resources.Buildpack
 		result2 v7action.Warnings
 		result3 error
+	}
+	GetCurrentUserStub        func() (configv3.User, error)
+	getCurrentUserMutex       sync.RWMutex
+	getCurrentUserArgsForCall []struct {
+	}
+	getCurrentUserReturns struct {
+		result1 configv3.User
+		result2 error
+	}
+	getCurrentUserReturnsOnCall map[int]struct {
+		result1 configv3.User
+		result2 error
 	}
 	GetDefaultDomainStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDefaultDomainMutex       sync.RWMutex
@@ -8712,6 +8725,61 @@ func (fake *FakeActor) GetBuildpacksReturnsOnCall(i int, result1 []resources.Bui
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetCurrentUser() (configv3.User, error) {
+	fake.getCurrentUserMutex.Lock()
+	ret, specificReturn := fake.getCurrentUserReturnsOnCall[len(fake.getCurrentUserArgsForCall)]
+	fake.getCurrentUserArgsForCall = append(fake.getCurrentUserArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetCurrentUser", []interface{}{})
+	fake.getCurrentUserMutex.Unlock()
+	if fake.GetCurrentUserStub != nil {
+		return fake.GetCurrentUserStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getCurrentUserReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) GetCurrentUserCallCount() int {
+	fake.getCurrentUserMutex.RLock()
+	defer fake.getCurrentUserMutex.RUnlock()
+	return len(fake.getCurrentUserArgsForCall)
+}
+
+func (fake *FakeActor) GetCurrentUserCalls(stub func() (configv3.User, error)) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = stub
+}
+
+func (fake *FakeActor) GetCurrentUserReturns(result1 configv3.User, result2 error) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = nil
+	fake.getCurrentUserReturns = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) GetCurrentUserReturnsOnCall(i int, result1 configv3.User, result2 error) {
+	fake.getCurrentUserMutex.Lock()
+	defer fake.getCurrentUserMutex.Unlock()
+	fake.GetCurrentUserStub = nil
+	if fake.getCurrentUserReturnsOnCall == nil {
+		fake.getCurrentUserReturnsOnCall = make(map[int]struct {
+			result1 configv3.User
+			result2 error
+		})
+	}
+	fake.getCurrentUserReturnsOnCall[i] = struct {
+		result1 configv3.User
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) GetDefaultDomain(arg1 string) (resources.Domain, v7action.Warnings, error) {
@@ -18934,6 +19002,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getBuildpackLabelsMutex.RUnlock()
 	fake.getBuildpacksMutex.RLock()
 	defer fake.getBuildpacksMutex.RUnlock()
+	fake.getCurrentUserMutex.RLock()
+	defer fake.getCurrentUserMutex.RUnlock()
 	fake.getDefaultDomainMutex.RLock()
 	defer fake.getDefaultDomainMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()

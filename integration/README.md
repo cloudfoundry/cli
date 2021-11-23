@@ -24,7 +24,8 @@ Running `make integration-tests` can be time-consuming, because it includes the 
 - `isolated` suite is for tests that are stand alone and do not affect each other. They are meant to run in their own organization and space, and will not affect system state. This is the most common type of integration tests.
 - `push` suite is for tests related to the `cf push` command only.
 - `experimental` suite is for tests that require the cf experimental flag to be set and/or an experimental feature for the CF CLI.
-- `plugin` suite is for tests that surround the CF CLI plugin framework. *These tests do not run in parallel.*
+- `plugin` suite is for tests that surround the CF CLI plugin framework. _These tests do not run in parallel._
+- `selfcontained` suite is for tests that talk to a fake CF API, hence they do not require a cf deployment
 
 ## How to run
 These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed.

@@ -78,7 +78,7 @@ var _ = Describe("create-private-domain Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 		})
 
 		It("should print text indicating it is creating a domain", func() {

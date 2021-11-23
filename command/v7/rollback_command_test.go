@@ -55,7 +55,7 @@ var _ = Describe("rollback Command", func() {
 		)
 
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 			Name: "some-org",
 			GUID: "some-org-guid",
@@ -107,7 +107,7 @@ var _ = Describe("rollback Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("returns an error", func() {

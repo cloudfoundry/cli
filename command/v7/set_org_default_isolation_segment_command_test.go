@@ -50,7 +50,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		org = "some-org"
 		isolationSegment = "segment1"
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 		cmd.RequiredArgs.OrganizationName = org
 		cmd.RequiredArgs.IsolationSegmentName = isolationSegment
@@ -84,7 +84,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("fetching the user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("some-error"))
 		})
 
 		It("returns an error", func() {

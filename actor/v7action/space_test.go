@@ -265,10 +265,12 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns a space with a quota relationship", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]resources.Space{{GUID: "some-space-guid", Name: spaceName,
+						[]resources.Space{{
+							GUID: "some-space-guid", Name: spaceName,
 							Relationships: resources.Relationships{
 								constant.RelationshipTypeQuota: resources.Relationship{GUID: "some-space-quota-guid"},
-							}}},
+							},
+						}},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"some-space-warning"}, nil)
 				})

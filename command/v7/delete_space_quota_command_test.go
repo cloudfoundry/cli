@@ -37,7 +37,7 @@ var _ = Describe("delete-space-quota Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "targeted-org-guid"})
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 

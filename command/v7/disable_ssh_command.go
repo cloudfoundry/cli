@@ -18,14 +18,14 @@ func (cmd *DisableSSHCommand) Execute(args []string) error {
 		return err
 	}
 
-	username, err := cmd.Config.CurrentUserName()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Disabling ssh support for app {{.AppName}} as {{.CurrentUserName}}...", map[string]interface{}{
 		"AppName":         cmd.RequiredArgs.AppName,
-		"CurrentUserName": username,
+		"CurrentUserName": user.Name,
 	})
 
 	app, getAppWarnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)

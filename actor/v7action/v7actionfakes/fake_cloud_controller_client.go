@@ -2665,6 +2665,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	WhoAmIStub        func() (resources.K8sUser, ccv3.Warnings, error)
+	whoAmIMutex       sync.RWMutex
+	whoAmIArgsForCall []struct {
+	}
+	whoAmIReturns struct {
+		result1 resources.K8sUser
+		result2 ccv3.Warnings
+		result3 error
+	}
+	whoAmIReturnsOnCall map[int]struct {
+		result1 resources.K8sUser
+		result2 ccv3.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -14232,6 +14246,64 @@ func (fake *FakeCloudControllerClient) UploadPackageReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) WhoAmI() (resources.K8sUser, ccv3.Warnings, error) {
+	fake.whoAmIMutex.Lock()
+	ret, specificReturn := fake.whoAmIReturnsOnCall[len(fake.whoAmIArgsForCall)]
+	fake.whoAmIArgsForCall = append(fake.whoAmIArgsForCall, struct {
+	}{})
+	fake.recordInvocation("WhoAmI", []interface{}{})
+	fake.whoAmIMutex.Unlock()
+	if fake.WhoAmIStub != nil {
+		return fake.WhoAmIStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.whoAmIReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) WhoAmICallCount() int {
+	fake.whoAmIMutex.RLock()
+	defer fake.whoAmIMutex.RUnlock()
+	return len(fake.whoAmIArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) WhoAmICalls(stub func() (resources.K8sUser, ccv3.Warnings, error)) {
+	fake.whoAmIMutex.Lock()
+	defer fake.whoAmIMutex.Unlock()
+	fake.WhoAmIStub = stub
+}
+
+func (fake *FakeCloudControllerClient) WhoAmIReturns(result1 resources.K8sUser, result2 ccv3.Warnings, result3 error) {
+	fake.whoAmIMutex.Lock()
+	defer fake.whoAmIMutex.Unlock()
+	fake.WhoAmIStub = nil
+	fake.whoAmIReturns = struct {
+		result1 resources.K8sUser
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) WhoAmIReturnsOnCall(i int, result1 resources.K8sUser, result2 ccv3.Warnings, result3 error) {
+	fake.whoAmIMutex.Lock()
+	defer fake.whoAmIMutex.Unlock()
+	fake.WhoAmIStub = nil
+	if fake.whoAmIReturnsOnCall == nil {
+		fake.whoAmIReturnsOnCall = make(map[int]struct {
+			result1 resources.K8sUser
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.whoAmIReturnsOnCall[i] = struct {
+		result1 resources.K8sUser
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -14585,6 +14657,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.uploadDropletBitsMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
 	defer fake.uploadPackageMutex.RUnlock()
+	fake.whoAmIMutex.RLock()
+	defer fake.whoAmIMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

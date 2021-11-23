@@ -72,7 +72,7 @@ var _ = Describe("copy-source Command", func() {
 
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeSharedActor.CheckTargetReturns(nil)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -112,12 +112,12 @@ var _ = Describe("copy-source Command", func() {
 	})
 
 	It("retrieves the current user", func() {
-		Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+		Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 	})
 
 	When("retrieving the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("not-logged-in"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("not-logged-in"))
 		})
 
 		It("returns an error", func() {

@@ -7,24 +7,25 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Auth Actions", func() {
+var _ = Describe("Default Auth Actions", func() {
 	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
-		fakeUAAClient             *v7actionfakes.FakeUAAClient
-		fakeConfig                *v7actionfakes.FakeConfig
-		creds                     map[string]string
+		actor         *Actor
+		fakeConfig    *v7actionfakes.FakeConfig
+		fakeUAAClient *v7actionfakes.FakeUAAClient
+		creds         map[string]string
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil, nil)
+		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
+
+		fakeConfig.IsCFOnK8sReturns(false)
+		actor = NewActor(nil, fakeConfig, nil, fakeUAAClient, nil, nil)
 		creds = map[string]string{
 			"client_id":     "some-username",
 			"client_secret": "some-password",
@@ -172,7 +173,6 @@ var _ = Describe("Auth Actions", func() {
 		})
 
 		When("the token is revokable", func() {
-
 			It("calls the UAA to revoke refresh and access tokens", func() {
 				Expect(fakeUAAClient.RevokeCallCount()).To(Equal(2))
 
@@ -193,4 +193,23 @@ var _ = Describe("Auth Actions", func() {
 		})
 	})
 
+	Describe("Get Current User", func() {
+		var (
+			user configv3.User
+			err  error
+		)
+
+		JustBeforeEach(func() {
+			user, err = actor.GetCurrentUser()
+		})
+
+		BeforeEach(func() {
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "jim"}, nil)
+		})
+
+		It("delegates to the injected config", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(user.Name).To(Equal("jim"))
+		})
+	})
 })

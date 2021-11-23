@@ -114,7 +114,7 @@ var _ = Describe("unshare-service command", func() {
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: expectedTargetedOrgName})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: expectedSpaceName, GUID: expectedTargetedSpaceGuid})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: expectedUser}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: expectedUser}, nil)
 
 		cmd = UnshareServiceCommand{
 			BaseCommand: BaseCommand{
@@ -156,7 +156,7 @@ var _ = Describe("unshare-service command", func() {
 			fakeSharedActor.CheckTargetReturns(nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: expectedTargetedSpaceGuid})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: expectedTargetedOrgGuid, Name: expectedTargetedOrgName})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: expectedUser}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: expectedUser}, nil)
 		})
 
 		It("prompts the user", func() {
@@ -220,7 +220,7 @@ var _ = Describe("unshare-service command", func() {
 		When("getting the username fails", func() {
 			BeforeEach(func() {
 				input.Write([]byte("y\n"))
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("boom"))
 			})
 
 			It("returns the error", func() {

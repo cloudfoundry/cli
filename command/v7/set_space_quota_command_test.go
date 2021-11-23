@@ -73,7 +73,7 @@ var _ = Describe("set-space-quota Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		currentUser = "current-user"
-		fakeConfig.CurrentUserNameReturns(currentUser, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUser}, nil)
 
 		fakeConfig.TargetedOrganizationReturns(org)
 

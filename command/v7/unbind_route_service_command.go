@@ -95,7 +95,7 @@ func (cmd UnbindRouteServiceCommand) displayPrompt() (bool, error) {
 }
 
 func (cmd UnbindRouteServiceCommand) displayIntro() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

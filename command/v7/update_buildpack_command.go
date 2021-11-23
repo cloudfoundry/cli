@@ -91,7 +91,7 @@ func (cmd UpdateBuildpackCommand) validateSetup() (configv3.User, error) {
 		return user, err
 	}
 
-	return cmd.Config.CurrentUser()
+	return cmd.Actor.GetCurrentUser()
 }
 
 func (cmd UpdateBuildpackCommand) prepareBuildpackBits() (string, string, error) {

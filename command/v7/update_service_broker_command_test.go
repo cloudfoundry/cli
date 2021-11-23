@@ -59,7 +59,7 @@ var _ = Describe("update-service-broker command", func() {
 				nil,
 			)
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "user"}, nil)
+			fakeUpdateServiceBrokerActor.GetCurrentUserReturns(configv3.User{Name: "user"}, nil)
 		})
 
 		It("succeeds", func() {
@@ -113,7 +113,7 @@ var _ = Describe("update-service-broker command", func() {
 
 		When("it fails to get the current user", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("no user found"))
+				fakeUpdateServiceBrokerActor.GetCurrentUserReturns(configv3.User{}, errors.New("no user found"))
 			})
 
 			It("returns the error and displays all warnings", func() {

@@ -81,7 +81,6 @@ var _ = Describe("api command", func() {
 
 		Context("--unset is passed", func() {
 			BeforeEach(func() {
-
 				userConfig := configv3.Config{
 					ConfigFile: configv3.JSONConfig{
 						ConfigVersion: configv3.CurrentConfigVersion,
@@ -338,6 +337,7 @@ var _ = Describe("api command", func() {
 		Expect(configFile.TargetedSpace.GUID).To(BeEmpty())
 		Expect(configFile.TargetedSpace.Name).To(BeEmpty())
 		Expect(configFile.TargetedSpace.AllowSSH).To(BeFalse())
+		Expect(configFile.CFOnK8s).To(Equal(configv3.CFOnK8s{}))
 	})
 
 	It("handles API endpoints with trailing slash", func() {

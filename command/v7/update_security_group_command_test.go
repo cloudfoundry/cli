@@ -53,7 +53,7 @@ var _ = Describe("update-security-group Command", func() {
 		}
 		fakeConfig.HasTargetedOrganizationReturns(false)
 		fakeConfig.HasTargetedSpaceReturns(false)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {

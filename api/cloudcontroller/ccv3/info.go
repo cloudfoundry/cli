@@ -39,7 +39,8 @@ type InfoLinks struct {
 // controller API.
 type Info struct {
 	// Links is a list of top level Cloud Controller APIs.
-	Links InfoLinks `json:"links"`
+	Links   InfoLinks `json:"links"`
+	CFOnK8s bool      `json:"cf_on_k8s"`
 }
 
 // AppSSHEndpoint returns the HREF for SSHing into an app container.

@@ -70,7 +70,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 			cmd.RequiredArgs.OrganizationName = org
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment

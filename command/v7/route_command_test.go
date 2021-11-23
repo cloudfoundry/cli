@@ -51,7 +51,7 @@ var _ = Describe("route Command", func() {
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 		fakeActor.GetDomainByNameReturns(
 			resources.Domain{Name: domainName, GUID: "domain-guid"},
@@ -94,12 +94,12 @@ var _ = Describe("route Command", func() {
 	})
 
 	It("checks if the user is logged in", func() {
-		Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+		Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 	})
 
 	When("the user is not logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("no current user"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("no current user"))
 		})
 
 		It("returns an error", func() {

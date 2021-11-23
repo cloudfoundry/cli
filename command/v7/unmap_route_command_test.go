@@ -83,7 +83,7 @@ var _ = Describe("unmap-route Command", func() {
 			GUID: spaceGUID,
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 
 		fakeActor.GetDomainByNameReturns(
 			resources.Domain{Name: "some-domain.com", GUID: "domain-guid"},
@@ -138,7 +138,7 @@ var _ = Describe("unmap-route Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

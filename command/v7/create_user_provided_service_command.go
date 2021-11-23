@@ -52,7 +52,7 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 }
 
 func (cmd CreateUserProvidedServiceCommand) displayMessage() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

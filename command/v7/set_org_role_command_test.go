@@ -56,7 +56,7 @@ var _ = Describe("set-org-role Command", func() {
 	})
 
 	BeforeEach(func() {
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
 			resources.Organization{GUID: "some-org-guid", Name: "some-org-name"},

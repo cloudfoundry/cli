@@ -73,7 +73,7 @@ func (cmd DeleteServiceCommand) Usage() string {
 }
 
 func (cmd DeleteServiceCommand) displayEvent() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

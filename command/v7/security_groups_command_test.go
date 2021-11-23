@@ -64,7 +64,7 @@ var _ = Describe("Security Groups Command", func() {
 
 	When("getting the security groups fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},
@@ -88,7 +88,7 @@ var _ = Describe("Security Groups Command", func() {
 
 	When("getting the security groups succeeds", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
 		})
 

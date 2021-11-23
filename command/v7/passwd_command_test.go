@@ -42,7 +42,7 @@ var _ = Describe("passwd Command", func() {
 			},
 		}
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve", GUID: "steve-guid"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve", GUID: "steve-guid"}, nil)
 
 		fakeUI.DisplayPasswordPromptReturnsOnCall(0, "old1", nil)
 		fakeUI.DisplayPasswordPromptReturnsOnCall(1, "new1", nil)
@@ -98,7 +98,7 @@ var _ = Describe("passwd Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {

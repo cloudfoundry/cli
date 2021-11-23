@@ -959,7 +959,8 @@ var _ = Describe("labels", func() {
 							GUID: "some-guid",
 							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
-							}}},
+							},
+						}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -1122,7 +1123,8 @@ var _ = Describe("labels", func() {
 							GUID: "some-guid",
 							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
-							}}},
+							},
+						}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -1204,7 +1206,8 @@ var _ = Describe("labels", func() {
 						Name: resourceName,
 						Metadata: &resources.Metadata{
 							Labels: expectedLabels,
-						}}},
+						},
+					}},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)
@@ -1422,7 +1425,8 @@ var _ = Describe("labels", func() {
 						Name: resourceName,
 						Metadata: &resources.Metadata{
 							Labels: expectedLabels,
-						}}},
+						},
+					}},
 					[]string{"warning-1", "warning-2"},
 					nil,
 				)

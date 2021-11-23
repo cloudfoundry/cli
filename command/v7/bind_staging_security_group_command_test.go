@@ -47,7 +47,7 @@ var _ = Describe("bind-staging-security-group Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		fakeConfig.CurrentUserReturns(
+		fakeActor.GetCurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 	})
@@ -63,7 +63,7 @@ var _ = Describe("bind-staging-security-group Command", func() {
 
 	When("the current user is invalid", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{},
 				errors.New("some-error"))
 		})
