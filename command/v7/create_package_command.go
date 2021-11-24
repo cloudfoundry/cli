@@ -14,7 +14,7 @@ type CreatePackageCommand struct {
 
 	RequiredArgs    flag.AppName                `positional-args:"yes"`
 	DockerImage     flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
-	AppPath         flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	AppPath         flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory. By default, this is the current directory."`
 	usage           interface{}                 `usage:"CF_NAME create-package APP_NAME [-p APP_PATH | --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
 	relatedCommands interface{}                 `related_commands:"app, droplets, packages, push"`
 

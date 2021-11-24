@@ -8,7 +8,7 @@
       "translation": "SYNTAXE :"
    },
    {
-      "id": "Path to app directory or to a zip file of the contents of the app directory",
+      "id": "Path to app directory or to a zip file of the contents of the app directory. By default, this is the current directory.",
       "translation": "Chemin d'accès au répertoire de l'application ou à un fichier zip du contenu du répertoire de l'application"
    },
    {

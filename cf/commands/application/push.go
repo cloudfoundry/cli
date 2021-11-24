@@ -62,7 +62,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["k"] = &flags.StringFlag{ShortName: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname (e.g. my-subdomain)")}
-	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
+	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory. By default, this is the current directory.")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["vars-file"] = &flags.StringFlag{Usage: T("Path to a variable substitution file for manifest; can specify multiple times")}
 	fs["var"] = &flags.StringFlag{Usage: T("Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times")}
