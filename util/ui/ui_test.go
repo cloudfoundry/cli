@@ -197,7 +197,7 @@ var _ = Describe("UI", func() {
 				"arr":  []string{"a", "b"},
 			}
 
-			ui.DisplayJSON("named_json", obj)
+			_ = ui.DisplayJSON("named_json", obj)
 
 			Expect(out).To(SatisfyAll(
 				Say("named_json: {\n"),
