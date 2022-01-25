@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - master
+    - "v?"
+    - gh-actions
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    -
+      name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    -
+      name: Build Linux
+      run: |
+        make out/cf-cli_linux_i686
+        make out/cf-cli_linux_x86-64
+      env:
+        ACK_GINKGO_RC: true
+
+    -
+      name: Setup upterm session
+      if: always()
+      uses: lhotari/action-upterm@v1
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    -
+      name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    -
+      name: Build macOS
+      run: |
+        make out/cf-cli_osx
+        make out/cf-cli_osx_arm
+      env:
+        ACK_GINKGO_RC: true
+
