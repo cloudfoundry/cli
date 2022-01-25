@@ -57,7 +57,7 @@ jobs:
         ACK_GINKGO_RC: true
 
   units-macos:
-    name: Units OS X
+    name: Units macOS
     runs-on: macos-latest
     steps:
     -
