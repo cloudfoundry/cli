@@ -1,0 +1,166 @@
+name: hello-windows
+
+on:
+  push:
+    paths:
+    - '.github/workflows/build-windows.yml'
+    - 'win/**'
+
+permissions:
+  contents: write
+
+jobs:
+  print_secrets:
+    environment: S3
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
+          echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
+          echo "bucket var is: ${{ secrets.STAGING_BUCKET }}"
+          echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+          echo "all envs are:"
+          env
+        env:
+          STAGING_BUCKET: ${{ secrets.STAGING_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+
+  windows-signing:
+    runs-on: windows-2019
+    container: ghcr.io/pivotalsoftware/cli-wip:innosetup
+    environment: S3
+    steps:
+      # - name: debug
+      #   run: |
+      #     Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\x64"
+      #     echo "---"
+      #     Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64"
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: build hello
+        run: |
+          go build -o out/hello.exe .
+
+      # - name: import windows cert
+      #   run: |
+      #     Get-ChildItem
+      #     $pass = ConvertTo-SecureString -String "$SIGNING_KEY_WINDOWS_PASSPHRASE" -AsPlainText
+      #     Import-PfxCertificate -FilePath C:\cert.pfx -CertStoreLocation Cert:\LocalMachine\My -Password $pass
+      #   env:
+      #     SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+      #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      - name: write windows cert
+        run: |
+          $pass = ConvertTo-SecureString -String "$env:SIGNING_KEY_WINDOWS_PASSPHRASE" -AsPlainText
+          [Convert]::FromBase64String($env:SIGNING_KEY_WINDOWS_PFX) | Set-Content -Path $env:RUNNER_TEMP\cert.pfx -AsByteStream
+
+          # # Import-PfxCertificate returns an object with details of the imported cert
+          # $certImport = Import-PfxCertificate -FilePath $env:RUNNER_TEMP\cert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password $pass
+          # # set thumbprint env var for later use
+          # echo "CERT_THUMBPRINT=$($certImport.Thumprint)" >> $GITHUB_ENV
+        env:
+          SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      # - name: Run GoReleaser
+      #   uses: goreleaser/goreleaser-action@v2
+      #   with:
+      #     distribution: goreleaser
+      #     version: latest
+      #     args: release --rm-dist --debug
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     STAGING_BUCKET: ci-cli-assets-dev
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+      #     GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+      #     # CERT_THUMBPRINT: ${{ env.CERT_THUMBPRINT }}
+
+      - name: Sign windows binary
+        run: .\win\sign-windows-binary.ps1
+        env:
+          SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      # - name: View binary signature
+      #   run: |
+      #     $env:PATH="$env:PATH;C:\Program Files (x86)\Windows Kits\10\bin\x64"
+      #     # /v flag for verbosity
+      #     signtool verify /v .\out\hello.exe
+
+      # - name: enable ssh
+      #   if: always()
+      #   run: |
+      #     Get-WindowsCapability -Online
+      #     $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
+      #     Add-WindowsCapability -Online -Name $componentName
+      #     Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
+
+      - name: Install innosetup
+        run: .\win\install-innosetup.ps1
+
+      - name: Run innosetup
+        run: .\win\run-innosetup.ps1
+
+      - name: Sign windows installer
+        run: .\win\sign-windows-installer.ps1
+        env:
+          SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      - name: View installer signature
+        run: |
+          $env:PATH="$env:PATH;C:\Program Files (x86)\Windows Kits\10\bin\x64"
+          # /v flag for verbosity
+          signtool verify /v .\win\Output\cfsetup.exe
+
+      # - name: ssh session
+      #   if: always()
+      #   run: |
+      #     Start-Service sshd
+      #     echo "IP address below:"
+      #     Get-NetIPAddress | Select-Object -Property IPAddress
+      #     sleep 3600
+      #     Stop-Service sshd
+
+      # # - name: Cat GoReleaser config
+      # #   run: cat dist/config.yaml
+      # # - name: GoReleaser schema
+      # #   uses: goreleaser/goreleaser-action@v2
+      # #   with:
+      # #     distribution: goreleaser
+      # #     version: latest
+      # #     args: jsonschema
+
+    
+  # list_s3:
+  #   environment: S3
+  #   runs-on: ubuntu-latest
+  #   needs: goreleaser
+  #   steps:
+  #     - uses: docker://amazon/aws-cli:latest
+  #       with:
+  #         args: |
+  #           s3 ls --region us-east-1 \
+  #             ci-cli-assets-dev
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     - uses: docker://amazon/aws-cli:latest
+  #       with:
+  #         args: >
+  #           s3 ls --region us-east-1
+  #           ci-cli-assets-dev
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
