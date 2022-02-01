@@ -27,7 +27,6 @@ jobs:
 
   windows-signing:
     runs-on: windows-2019
-    container: ghcr.io/pivotalsoftware/cli-wip:innosetup
     environment: S3
     steps:
       # - name: debug
