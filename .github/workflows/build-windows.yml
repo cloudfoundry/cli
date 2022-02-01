@@ -90,7 +90,7 @@ jobs:
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
       - name: View binary signature
-        run: Get-AuthenticodeSignature .\out\hello.exe
+        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\hello.exe
 
       # - name: enable ssh
       #   if: always()
@@ -119,7 +119,7 @@ jobs:
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
       - name: View installer signature
-        run: Get-AuthenticodeSignature .\win\Output\cfsetup.exe
+        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\win\Output\cfsetup.exe
 
       - name: Save installer as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
