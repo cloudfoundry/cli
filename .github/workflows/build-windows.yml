@@ -102,6 +102,12 @@ jobs:
       #     Add-WindowsCapability -Online -Name $componentName
       #     Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
 
+      - name: Save signed binary as a GitHub Action Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: hello.exe
+          path: .\out\hello.exe
+
       - name: Install innosetup
         run: .\win\install-innosetup.ps1
 
@@ -116,6 +122,12 @@ jobs:
 
       - name: View installer signature
         run: Get-AuthenticodeSignature .\win\Output\cfsetup.exe
+
+      - name: Save installer as a GitHub Action Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-installer
+          path: .\win\Output\cfsetup.exe
 
       # - name: ssh session
       #   if: always()
