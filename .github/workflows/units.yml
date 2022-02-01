@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - "*"
+    paths-ignore:
+    - '.github/workflows/build-windows.yml'
+    - 'win/**'
 
 permissions:
   contents: write

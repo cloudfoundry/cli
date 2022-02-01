@@ -3,6 +3,9 @@ name: "Code Quality"
 on:
   push:
     branches: [ master, '*' ]
+    paths-ignore:
+    - '.github/workflows/build-windows.yml'
+    - 'win/**'
   pull_request:
     branches: [ master ]
   schedule:
