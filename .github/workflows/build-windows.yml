@@ -17,12 +17,12 @@ jobs:
       - run: |
           echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
           echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
-          echo "bucket var is: ${{ secrets.STAGING_BUCKET }}"
+          echo "bucket var is: ${{ secrets.AWS_BUCKET_STAGING }}"
           echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
           echo "all envs are:"
           env
         env:
-          STAGING_BUCKET: ${{ secrets.STAGING_BUCKET }}
+          AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 
   windows-signing:
@@ -77,11 +77,11 @@ jobs:
       #     args: release --rm-dist --debug
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     STAGING_BUCKET: ci-cli-assets-dev
+      #     AWS_BUCKET_STAGING: ci-cli-assets-dev
       #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-      #     GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      #     SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+      #     SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
       #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
       #     # CERT_THUMBPRINT: ${{ env.CERT_THUMBPRINT }}
 
