@@ -91,11 +91,8 @@ jobs:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
-      # - name: View binary signature
-      #   run: |
-      #     $env:PATH="$env:PATH;C:\Program Files (x86)\Windows Kits\10\bin\x64"
-      #     # /v flag for verbosity
-      #     signtool verify /v .\out\hello.exe
+      - name: View binary signature
+        run: Get-AuthenticodeSignature .\out\hello.exe
 
       # - name: enable ssh
       #   if: always()
@@ -118,10 +115,7 @@ jobs:
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
       - name: View installer signature
-        run: |
-          $env:PATH="$env:PATH;C:\Program Files (x86)\Windows Kits\10\bin\x64"
-          # /v flag for verbosity
-          signtool verify /v .\win\Output\cfsetup.exe
+        run: Get-AuthenticodeSignature .\win\Output\cfsetup.exe
 
       # - name: ssh session
       #   if: always()
