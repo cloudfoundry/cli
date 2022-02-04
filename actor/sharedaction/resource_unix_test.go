@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package sharedaction_test

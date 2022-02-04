@@ -78,7 +78,7 @@ var _ = Describe("update-security-group command", func() {
 		session := helpers.CF("update-security-group", securityGroupName, updatedRulesPath)
 		Eventually(session).Should(Say(`Updating security group %s as %s`, securityGroupName, username))
 		Eventually(session).Should(Say("OK"))
-		Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications.`))
+		Eventually(session).Should(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("security-group", securityGroupName)
@@ -160,7 +160,7 @@ func displaysUpdateSecurityGroupHelpText(session *Session) {
 	Eventually(session).Should(Say(`"description": "Allow http and https traffic from ZoneA"`))
 	Eventually(session).Should(Say("}"))
 	Eventually(session).Should(Say("]"))
-	Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications.`))
+	Eventually(session).Should(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 	Eventually(session).Should(Say("SEE ALSO:"))
 	Eventually(session).Should(Say("restage, security-groups"))
 }

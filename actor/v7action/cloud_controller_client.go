@@ -162,6 +162,7 @@ type CloudControllerClient interface {
 	UpdateApplicationRestart(appGUID string) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationStart(appGUID string) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationStop(appGUID string) (resources.Application, ccv3.Warnings, error)
+	UpdateDestination(routeGUID string, destinationGUID string, protocol string) (ccv3.Warnings, error)
 	UpdateBuildpack(buildpack resources.Buildpack) (resources.Buildpack, ccv3.Warnings, error)
 	UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars resources.EnvironmentVariables) (resources.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateFeatureFlag(flag resources.FeatureFlag) (resources.FeatureFlag, ccv3.Warnings, error)
