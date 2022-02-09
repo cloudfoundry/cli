@@ -1,4 +1,4 @@
-name: hello-windows
+name: build-windows
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     - 'win/**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   print_secrets:
