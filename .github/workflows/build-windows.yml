@@ -47,6 +47,7 @@ jobs:
 
       - name: Build CF CLI for Windows
         run: |
+          Get-Command make
           make out/cf-cli_win32.exe
           make out/cf-cli_winx64.exe
 
