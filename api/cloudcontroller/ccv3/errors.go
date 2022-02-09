@@ -171,6 +171,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Assign a droplet before starting this app."):
 		return ccerror.InvalidStartError{}
+	case strings.Contains(errorString,
+		"The service instance name is taken"):
+		return ccerror.ServiceInstanceNameTakenError{Message: err.Message}
 	case orgNameTakenRegexp.MatchString(errorString):
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	case roleExistsRegexp.MatchString(errorString):
