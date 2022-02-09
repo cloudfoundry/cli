@@ -41,9 +41,14 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: build hello
+      - name: Get build-time dependencies
         run: |
-          go build -o out/hello.exe .
+          go install github.com/akavel/rsrc@v0.10.2
+
+      - name: Build CF CLI for Windows
+        run: |
+          make out/cf-cli_win32.exe
+          make out/cf-cli_winx64.exe
 
       # - name: import windows cert
       #   run: |
@@ -103,8 +108,10 @@ jobs:
       - name: Save signed binary as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hello.exe
-          path: .\out\hello.exe
+          name: cf-windows-binaries
+          path: |
+            out/cf-cli_win32.exe
+            out/cf-cli_winx64.exe
 
       - name: Install innosetup
         run: .\win\install-innosetup.ps1
