@@ -72,24 +72,10 @@ jobs:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
-      # - name: Run GoReleaser
-      #   uses: goreleaser/goreleaser-action@v2
-      #   with:
-      #     distribution: goreleaser
-      #     version: latest
-      #     args: release --rm-dist --debug
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     AWS_BUCKET_STAGING: ci-cli-assets-dev
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
-      #     SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
-      #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
-      #     # CERT_THUMBPRINT: ${{ env.CERT_THUMBPRINT }}
-
-      - name: Sign windows binary
-        run: .\win\sign-windows-binary.ps1
+      - name: Sign windows binaries
+        run: |
+          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
+          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
