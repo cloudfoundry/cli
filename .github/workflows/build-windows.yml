@@ -26,6 +26,7 @@ jobs:
 
   windows-signing:
     runs-on: windows-2019
+    environment: DEV
     steps:
       # - name: debug
       #   run: |
@@ -50,10 +51,8 @@ jobs:
         run: |
           Get-Command make
           Get-Item Makefile
-          make --help
-          $LASTEXITCODE
-          # make out/cf-cli_win32.exe
-          # make out/cf-cli_winx64.exe
+          make out/cf-cli_win32.exe
+          make out/cf-cli_winx64.exe
 
       # - name: import windows cert
       #   run: |
