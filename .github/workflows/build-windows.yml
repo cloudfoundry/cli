@@ -2,9 +2,8 @@ name: build-windows
 
 on:
   push:
-    paths:
-    - '.github/workflows/build-windows.yml'
-    - 'win/**'
+    branches:
+    - gha-windows
 
 permissions:
   contents: read
