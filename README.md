@@ -80,6 +80,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 * .cfignore used in `cf push` must be in UTF-8 encoding for CLI to interpret correctly. ([issue #281](https://github.com/cloudfoundry/cli/issues/281#issuecomment-65315518))
 * On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the [correct binary or installer for your architecture](https://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists).
 * X-Cf-Warnings are printed through the `stdout`, if that's an inconvenience you could set `CF_RAISE_ERROR_ON_WARNINGS` and in that case warnings will be printed through the `stderr`. See [X-Cf-Warnings printed through stdout issue](https://github.com/cloudfoundry/cli/issues/2164)
+* False negative message for user org creation. CLI v7.0 and CLI v7.1 non-admin users with the user-org-creation feature flag enabled will experience a failure when running cf create-org. The command will explicitly fail attempting to grant the user an org-manager role. However, it actually succeeds because the user would have an org-manager role granted to them via CAPI and therefore be able to access their org. This issue is resolved as of CLI v7.2. See [Inconsistent v2/v3 behavior around creating new orgs + assigning roles](https://github.com/cloudfoundry/cloud_controller_ng/issues/1879). 
 
 ## Filing Issues & Feature Requests
 
