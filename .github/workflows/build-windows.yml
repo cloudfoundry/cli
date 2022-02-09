@@ -43,6 +43,7 @@ jobs:
 
       - name: Get build-time dependencies
         run: |
+          choco install --no-progress --limit-output -y make
           go install github.com/akavel/rsrc@v0.10.2
 
       - name: Build CF CLI for Windows
