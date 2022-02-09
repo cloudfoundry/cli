@@ -1,4 +1,3 @@
-SHELL := env PATH=$(PATH) /bin/bash
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 PACKAGES ?= api actor command types util version integration/helpers
