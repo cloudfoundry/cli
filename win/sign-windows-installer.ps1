@@ -10,4 +10,4 @@ Get-ChildItem win\Output
 
 Get-Command signtool
 # signtool sign /v /fd SHA256 /f $env:RUNNER_TEMP.pfx /p "$SIGNING_KEY_WINDOWS_PASSPHRASE" .\dist\hello-windows_windows_amd64\hello.exe
-signtool sign /v /p "$env:SIGNING_KEY_WINDOWS_PASSPHRASE" /fd SHA256 /f $env:RUNNER_TEMP\cert.pfx win\Output\cfsetup.exe
+signtool sign /v /p "$env:SIGNING_KEY_WINDOWS_PASSPHRASE" /fd SHA256 /f $env:RUNNER_TEMP\cert.pfx $env:RUNNER_TEMP\x64\cf8_installer.exe
