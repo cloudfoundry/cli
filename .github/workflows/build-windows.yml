@@ -130,9 +130,9 @@ jobs:
           name: cf8-cli-installer_winx64
           if-no-files-found: error
           path: |
-            win\LICENSE
-            win\NOTICE
-            "$env:RUNNER_TEMP/x64/cf8_installer.exe"
+            win/LICENSE
+            win/NOTICE
+            {{ $env:RUNNER_TEMP }}/x64/cf8_installer.exe
 
       # - name: ssh session
       #   if: always()
