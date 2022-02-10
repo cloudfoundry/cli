@@ -83,8 +83,10 @@ jobs:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
-      - name: View binary signature
-        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\hello.exe
+      - name: View binary signatures
+        run: |
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_win32.exe
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_winx64.exe
 
       # - name: enable ssh
       #   if: always()
