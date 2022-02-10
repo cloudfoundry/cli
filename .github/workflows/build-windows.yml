@@ -100,6 +100,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cf-windows-binaries
+          if-no-files-found: error
           path: |
             out/cf-cli_win32.exe
             out/cf-cli_winx64.exe
@@ -108,7 +109,9 @@ jobs:
         run: .\win\install-innosetup.ps1
 
       - name: Run innosetup
-        run: .\win\run-innosetup.ps1
+        run: |
+          mkdir "$env:RUNNER_TEMP\x64"
+          .\win\run-innosetup.ps1 -InstallerOutputFilePath "$env:RUNNER_TEMP\x64\cf8_installer.exe"
 
       - name: Sign windows installer
         run: .\win\sign-windows-installer.ps1
@@ -117,13 +120,17 @@ jobs:
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
       - name: View installer signature
-        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\win\Output\cfsetup.exe
+        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\x64\cf8_installer.exe"
 
-      - name: Save installer as a GitHub Action Artifact
+      - name: Save 64-bit installer and dist files as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: windows-installer
-          path: .\win\Output\cfsetup.exe
+          name: cf8-cli-installer_winx64
+          if-no-files-found: error
+          path: |
+            win\LICENSE
+            win\NOTICE
+            "$env:RUNNER_TEMP/x64/cf8_installer.exe"
 
       # - name: ssh session
       #   if: always()
