@@ -114,7 +114,7 @@ jobs:
           .\win\run-innosetup.ps1 -InstallerOutputFilePath "$env:RUNNER_TEMP\x64\cf8_installer.exe"
 
       - name: Sign windows installer
-        run: .\win\sign-windows-installer.ps1
+        run: .\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\x64\cf8_installer.exe"
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
