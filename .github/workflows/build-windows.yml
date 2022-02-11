@@ -132,7 +132,7 @@ jobs:
           path: |
             win/LICENSE
             win/NOTICE
-            {{ $env:RUNNER_TEMP }}/x64/cf8_installer.exe
+            ${{ env.RUNNER_TEMP }}/x64/cf8_installer.exe
 
       # - name: ssh session
       #   if: always()
