@@ -124,15 +124,16 @@ jobs:
       - name: View installer signature
         run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\x64\cf8_installer.exe"
 
+      - name: Arrange files for upload
+        # note the -Path flag takes comma-delimited args
+        run: Copy-Item -Destination "$env:RUNNER_TEMP\x64" -Path win\LICENSE,win\NOTICE
+
       - name: Save 64-bit installer and dist files as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
           name: cf8-cli-installer_winx64
           if-no-files-found: error
-          path: |
-            win/LICENSE
-            win/NOTICE
-            ${{ runner.temp }}/x64/cf8_installer.exe
+          path: ${{ runner.temp }}/x64/*
 
       # - name: ssh session
       #   if: always()
