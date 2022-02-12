@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - gha-windows
+    - gha-s3
     tags:
     - 'v0.0.*-test'
 
@@ -14,17 +15,50 @@ jobs:
   print_secrets:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
-          echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
-          echo "bucket var is: ${{ secrets.AWS_BUCKET_STAGING }}"
-          echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-          echo "all envs are:"
-          env
-        env:
-          AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    - run: |
+        echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
+        echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
+        echo "bucket var is: ${{ secrets.AWS_BUCKET_STAGING }}"
+        echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+        echo "all envs are:"
+        env
+      env:
+        AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 
+  s3-upload:
+    runs-on: ubuntu-latest
+    steps:
+    - name: WIP - Download previous run's artifacts
+      run: |
+        set -x
+        binaryUrl="https://api.github.com/repos/pivotal-cf/cli/actions/artifacts/163073301/zip"
+        installerUrl="https://api.github.com/repos/pivotal-cf/cli/actions/artifacts/163073300/zip"
+
+        mkdir -p signed/cf-windows-binaries
+        # curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$binaryUrl" 2>/dev/null
+        downloadUrl="$(curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$binaryUrl" 2>/dev/null | grep location | cut -d ' ' -f 2 | tr -d '\n\r')"
+        curl -u ":$GITHUB_TOKEN" --output signed/cf-windows-binaries/art.zip "$downloadUrl"
+
+        mkdir -p signed/cf8-cli-installer_winx64
+        downloadUrl="$(curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$installerUrl" 2>/dev/null | grep location | cut -d ' ' -f 2 | tr -d '\n\r')"
+        curl -u ":$GITHUB_TOKEN" --output signed/cf8-cli-installer_winx64/art.zip "$downloadUrl"
+
+        pushd signed/cf-windows-binaries && unzip art.zip && rm art.zip && popd
+        pushd signed/cf8-cli-installer_winx64 && unzip art.zip && rm art.zip && popd
+
+        ls -l signed/cf-windows-binaries
+        ls -l signed/cf8-cli-installer_winx64
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload to S3
+      uses: pivotalsoftware/s3-cp-action@v2
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        source: './signed/cf8-cli-installer_winx64/cf8_installer.exe'
+        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/v0.0.18/cf8_installer.exe"
 
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
