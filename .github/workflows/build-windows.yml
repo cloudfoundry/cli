@@ -27,6 +27,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 
   s3-upload:
+    environment: DEV
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -45,16 +46,14 @@ jobs:
         ls -l signed/cf8-cli-installer_winx64
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Upload to S3
       uses: pivotalsoftware/s3-cp-action@v2
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         source: './signed/cf8-cli-installer_winx64/cf8_installer.exe'
-        dest: "s3://$AWS_S3_BUCKET/cli/v0.0.18/cf8_installer.exe"
-      env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/v0.0.18/cf8_installer.exe"
 
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
