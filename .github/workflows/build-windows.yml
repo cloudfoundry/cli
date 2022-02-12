@@ -28,26 +28,20 @@ jobs:
 
   s3-upload:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
     - name: WIP - Download previous run's artifacts
       run: |
-        set -x
-        binaryUrl="https://api.github.com/repos/pivotal-cf/cli/actions/artifacts/163073301/zip"
+        set -o pipefail
         installerUrl="https://api.github.com/repos/pivotal-cf/cli/actions/artifacts/163073300/zip"
-
-        mkdir -p signed/cf-windows-binaries
-        # curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$binaryUrl" 2>/dev/null
-        downloadUrl="$(curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$binaryUrl" 2>/dev/null | grep location | cut -d ' ' -f 2 | tr -d '\n\r')"
-        curl -u ":$GITHUB_TOKEN" --output signed/cf-windows-binaries/art.zip "$downloadUrl"
 
         mkdir -p signed/cf8-cli-installer_winx64
         downloadUrl="$(curl --include -u ":$GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$installerUrl" 2>/dev/null | grep location | cut -d ' ' -f 2 | tr -d '\n\r')"
         curl -u ":$GITHUB_TOKEN" --output signed/cf8-cli-installer_winx64/art.zip "$downloadUrl"
 
-        pushd signed/cf-windows-binaries && unzip art.zip && rm art.zip && popd
         pushd signed/cf8-cli-installer_winx64 && unzip art.zip && rm art.zip && popd
 
-        ls -l signed/cf-windows-binaries
         ls -l signed/cf8-cli-installer_winx64
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
