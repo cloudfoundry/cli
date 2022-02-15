@@ -10,7 +10,7 @@ type DeleteSecurityGroupCommand struct {
 
 	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
 	Force           bool               `long:"force" short:"f" description:"Force deletion without confirmation"`
-	usage           interface{}        `usage:"CF_NAME delete-security-group SECURITY_GROUP [-f]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	usage           interface{}        `usage:"CF_NAME delete-security-group SECURITY_GROUP [-f]\n\nTIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}        `related_commands:"security-groups"`
 }
 
@@ -64,7 +64,7 @@ func (cmd *DeleteSecurityGroupCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
+	cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
 
 	return nil
 }
