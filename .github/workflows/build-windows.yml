@@ -47,13 +47,20 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload to S3
+    - name: zip windows artifacts
+      run: |
+        ZIP_FILENAME=cf8-cli-installer_0.0.18_winx64.zip
+        pushd signed/cf8-cli-installer_winx64
+          zip "$ZIP_FILENAME" *
+        popd
+
+    - name: Upload installer to S3
       uses: pivotalsoftware/s3-cp-action@v2
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: './signed/cf8-cli-installer_winx64/cf8_installer.exe'
-        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/v0.0.18/cf8_installer.exe"
+        source: "./signed/cf8-cli-installer_winx64/cf8-cli-installer_0.0.18_winx64.zip"
+        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/v0.0.18/cf8-cli-installer_0.0.18_winx64.zip"
 
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
