@@ -47,11 +47,26 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: zip windows artifacts
+    - name: name windows edge artifact
+      if: ${{ github.ref_type != 'tag' }}
+      # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
-        ZIP_FILENAME=cf8-cli-installer_0.0.18_winx64.zip
+        echo "INSTALLER_RELEASE_VERSION=edge" >> $GITHUB_ENV
+        echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_edge_winx64.zip" >> $GITHUB_ENV
+
+    - name: name windows release artifact
+      if: ${{ github.ref_type == 'tag' }}
+      # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      run: |
+        echo "INSTALLER_RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+        echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${{ github.ref_name }}_winx64.zip" >> $GITHUB_ENV
+        # echo "BINARY_ZIP_FILENAME: " >> ENV
+
+    - name: zip windows artifact
+      run: |
         pushd signed/cf8-cli-installer_winx64
-          zip "$ZIP_FILENAME" *
+          zip "$INSTALLER_ZIP_FILENAME" *
+          ls
         popd
 
     - name: Upload installer to S3
@@ -59,8 +74,8 @@ jobs:
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: "./signed/cf8-cli-installer_winx64/cf8-cli-installer_0.0.18_winx64.zip"
-        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/v0.0.18/cf8-cli-installer_0.0.18_winx64.zip"
+        source: "./signed/cf8-cli-installer_winx64/${{ env.INSTALLER_ZIP_FILENAME }}"
+        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/cli/${{ env.INSTALLER_RELEASE_VERSION }}/${{ env.INSTALLER_ZIP_FILENAME }}"
 
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
