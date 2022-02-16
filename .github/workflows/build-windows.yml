@@ -62,9 +62,10 @@ jobs:
       # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
         # strip leading v to go from tag -> semver
-        echo "INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)" >> $GITHUB_ENV
+        INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
+        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
         echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${INSTALLER_RELEASE_VERSION}_winx64.zip" >> $GITHUB_ENV
-        # echo "BINARY_ZIP_FILENAME: " >> ENV
+        cat $GITHUB_ENV
 
     - name: zip windows artifact
       run: |
