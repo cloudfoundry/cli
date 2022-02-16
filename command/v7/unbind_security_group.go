@@ -12,7 +12,7 @@ type UnbindSecurityGroupCommand struct {
 
 	RequiredArgs    flag.UnbindSecurityGroupV7Args `positional-args:"yes"`
 	Lifecycle       flag.SecurityGroupLifecycle    `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
-	usage           interface{}                    `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	usage           interface{}                    `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\n\nTIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}                    `related_commands:"apps, restart, security-groups"`
 }
 
@@ -52,7 +52,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			cmd.UI.DisplayWarning(err.Error())
 
 			cmd.UI.DisplayOK()
-			cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
+			cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
 			return nil
 		}
 
@@ -60,7 +60,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
+	cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
 
 	return nil
 }
