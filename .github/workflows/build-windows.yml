@@ -74,6 +74,7 @@ jobs:
         popd
 
     - name: Upload installer to CLAW S3 bucket
+      if: ${{ github.ref_type == 'tag' }}
       # forked for security considerations
       uses: pivotalsoftware/s3-cp-action@v2
       with:
