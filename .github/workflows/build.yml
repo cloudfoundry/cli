@@ -1,10 +1,9 @@
-name: build-windows
+name: Build-Sign-Release - DEV
 
 on:
   push:
     branches:
-    - gha-windows
-    - gha-s3
+    - gha-allplatforms
     tags:
     - 'v0.0.*-test'
     - 'v8.100.*-test'
