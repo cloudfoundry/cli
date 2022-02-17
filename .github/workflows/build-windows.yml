@@ -86,6 +86,8 @@ jobs:
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
     # - name: Download signed artifacts
     #   uses: actions/download-artifact@v2
