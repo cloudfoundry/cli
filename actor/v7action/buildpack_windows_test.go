@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package v7action_test
