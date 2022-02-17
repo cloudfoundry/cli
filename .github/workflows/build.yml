@@ -22,11 +22,11 @@ defaults:
 jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
-  reuseartifacts:
+  reuse-artifacts:
     environment: DEV
     runs-on: ubuntu-latest
     outputs:
-      joboutput: ${{ steps.set-output.outputs.reuse-artifacts }}
+      reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
       output1: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
       output2: "a string"
     steps:
@@ -34,9 +34,7 @@ jobs:
     - id: test-output
       run: echo "::set-output name=test-output::foo"
     - id: set-reuse-artifacts
-      run: echo "::set-output name=reuse-artifacts::bool${REUSE_ARTIFACTS}"
-      env:
-        REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
+      run: echo "::set-output name=reuse-artifacts::true"
     - name: debug
       run: echo ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
 
@@ -779,12 +777,12 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       # - windows-signing
-      - reuseartifacts
+      - reuse-artifacts
     permissions:
       actions: read
     steps:
     - name: foo
-      run: echo ${{ needs.reuseartifacts.outputs.output1 }}
+      run: echo ${{ needs.reuse-artifacts.outputs.reuse-artifacts }}
       # run: echo ${{ needs.reuseartifacts.outputs.joboutput }}
     - name: WIP - Download previous run's artifacts
       if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'true' }}
