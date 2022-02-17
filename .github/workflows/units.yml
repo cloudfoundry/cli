@@ -4,9 +4,6 @@ on:
   push:
     branches:
     - "*"
-    paths-ignore:
-    - '.github/workflows/build-windows.yml'
-    - 'win/**'
 
 permissions:
   contents: write
@@ -20,66 +17,66 @@ jobs:
     name: Lint code
     runs-on: ubuntu-latest
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-    -
-      name: Run go fmt
+
+    - name: Run go fmt
       run: go fmt && git diff --exit-code
 
   units-linux:
     name: Units Linux
     runs-on: ubuntu-latest
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-    -
-      name: Set up Test
+
+    - name: Set up Test
       run: |
         go get -u github.com/onsi/ginkgo/ginkgo
         go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run Linux Units
+
+    - name: Run Linux Units
       run: make units
       env:
         ACK_GINKGO_RC: true
 
   units-macos:
-    name: Units OS X
+    name: Units macOS
     runs-on: macos-latest
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-    -
-      name: Set up Test
+
+    - name: Set up Test
       run: |
         go get -u github.com/onsi/ginkgo/ginkgo
         go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run MacOS Units
+
+    - name: Run MacOS Units
       run: make units
       env:
         ACK_GINKGO_RC: true
@@ -88,23 +85,23 @@ jobs:
     name: Units Windows
     runs-on: windows-latest
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-    -
-      name: Set up Test
+
+    - name: Set up Test
       run: |
         go get -u github.com/onsi/ginkgo/ginkgo
         go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run Windows Units
+
+    - name: Run Windows Units
       shell: pwsh
       run: >
         ginkgo -r -p
@@ -114,3 +111,5 @@ jobs:
         -flakeAttempts=2
       env:
         ACK_GINKGO_RC: true
+
+# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
