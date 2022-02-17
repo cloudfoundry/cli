@@ -27,16 +27,21 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
-      output1: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
-      output2: "a string"
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
-    - id: test-output
-      run: echo "::set-output name=test-output::foo"
     - id: set-reuse-artifacts
-      run: echo "::set-output name=reuse-artifacts::true"
+      run: |
+        if [ "$REUSE_ARTIFACTS" == "true" ] || [ "$REUSE_ARTIFACTS" == "True" ]; then
+          reuse="TRUE"
+        else
+          reuse="FALSE"
+        fi
+        echo "::set-output name=reuse-artifacts::$reuse"
+      env:
+        REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
     - name: debug
-      run: echo ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
+      run: |
+        echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
   print_secrets:
     runs-on: ubuntu-latest
@@ -785,14 +790,14 @@ jobs:
       run: echo ${{ needs.reuse-artifacts.outputs.reuse-artifacts }}
       # run: echo ${{ needs.reuseartifacts.outputs.joboutput }}
     - name: WIP - Download previous run's artifacts
-      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'true' }}
+      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
       uses: pivotalsoftware/action-download-artifact@v2
       with:
         workflow: build-windows.yml
         run_number: 51
         path: signed
     - name: Download signed artifacts
-      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'true' }}
+      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
       uses: actions/download-artifact@v2
       with:
         # path: will download all artifacts to the given directory. use name: instead for individual artifacts
