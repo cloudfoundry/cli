@@ -1,3 +1,4 @@
+//go:build (!linux || !arm64) && (!linux || !riscv64) && !windows && !solaris
 // +build !linux !arm64
 // +build !linux !riscv64
 // +build !windows
