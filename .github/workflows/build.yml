@@ -172,7 +172,7 @@ jobs:
         ref: master
 
     - name: Install Linux Packages
-      run: sudo apt update && sudo apt install -y --no-install-recommends expect fakeroot
+      run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
@@ -265,16 +265,6 @@ jobs:
         set -ex
         set -o pipefail
 
-        cat<< EOF >sign-rpm
-        #!/usr/bin/expect -f
-        spawn rpmsign --addsign {*}\$argv
-        expect -exact "Enter pass phrase: "
-        send -- "$SIGNING_KEY_GPG_PASSPHRASE\r"
-        expect eof
-        EOF
-
-        chmod 700 sign-rpm
-
         VERSION=$(cat BUILD_VERSION)
         echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -286,33 +276,22 @@ jobs:
         %_gpg_name $SIGNING_KEY_GPG_ID
         EOF
 
-        mkdir gpg-dir
-        export GNUPGHOME=$PWD/gpg-dir
-        chmod 700 $GNUPGHOME
+        # mkdir gpg-dir
+        # export GNUPGHOME=$PWD/gpg-dir
+        # chmod 700 $GNUPGHOME
         # TODO: restore
         # trap "rm -rf $GNUPGHOME" 0
 
         cp packaged/cf*.rpm   signed-redhat-installer/
 
-        # ./sign-rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_i686.rpm
-        # ./sign-rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_x86-64.rpm
-
-        # echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
-
         # gpg-connect-agent RELOADAGENT /bye
 
+        # echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
         # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset B94FA54D4D79041DD7966A6E7AE4622DAA833376 #pvt
         # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset 5E2EA1C9C49415D8F15E7509A151D2E521CC07EA # pub
 
         # TODO: consider to add --key-id
-        # rpmsign --addsign signed-redhat-installer/*.rpm
-
-        for r in signed-redhat-installer/*.rpm; do
-          echo $r
-          # rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $r
-          # rpmsign --addsign $r
-          # rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $r
-        done
+        rpmsign --addsign signed-redhat-installer/*.rpm
 
     - name: Print RPM Signature
       run: |
