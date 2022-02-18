@@ -1,16 +1,14 @@
-name: Build-Sign-Release - DEV
+name: Build-Sign-Release
 
 on:
   push:
     branches:
-    - gha-allplatforms
     - gh-actions
     - master
     - main
     - "v?"
     tags:
-    - 'v0.0.*-test'
-    - 'v8.100.*-test'
+    - 'v8.0.1*-test'
 
 permissions:
   contents: read
