@@ -65,20 +65,6 @@ jobs:
         version=$(cat BUILD_VERSION)
         echo "::set-build-version=build-version::$version"
 
-  print_secrets:
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
-        echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
-        echo "bucket var is: ${{ secrets.AWS_BUCKET_STAGING }}"
-        echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-        echo "all envs are:"
-        env
-      env:
-        AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-
   test-rpm-package:
     name: Test RPM Packages
     needs: build-linux
