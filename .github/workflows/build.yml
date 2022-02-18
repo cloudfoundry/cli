@@ -16,10 +16,55 @@ permissions:
   contents: read
 
 defaults:
+  # top-level defaults subkeys apply to jobs
+  # run subkeys apply to all steps within all jobs
   run:
     shell: bash
 
+env:
+  REUSE_ARTIFACT_WORKFLOW: build-windows.yml
+  REUSE_ARTIFACT_BUILD: 51
+
 jobs:
+  # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
+  # see https://github.community/t/if-expression-with-context-variable/16558/4
+  reuse-artifacts:
+    environment: DEV
+    runs-on: ubuntu-latest
+    outputs:
+      reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
+    steps:
+    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+    - id: set-reuse-artifacts
+      run: |
+        if [ "$REUSE_ARTIFACTS" == "true" ] || [ "$REUSE_ARTIFACTS" == "True" ]; then
+          reuse="TRUE"
+        else
+          reuse="FALSE"
+        fi
+        echo "::set-output name=reuse-artifacts::$reuse"
+      env:
+        REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
+    - name: debug
+      run: |
+        echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
+
+  shared-values:
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      build-version: ${{ steps.set-build-version.outputs.build-version }}
+    steps:
+    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+    - id: set-secrets-environment
+      run: echo "::set-output name=secrets-environment::DEV"
+    - name: Checkout
+      uses: actions/checkout@v2
+    - id: set-build-version
+      run: |
+        version=$(cat BUILD_VERSION)
+        echo "::set-build-version=build-version::$version"
+
   print_secrets:
     runs-on: ubuntu-latest
     steps:
@@ -101,8 +146,12 @@ jobs:
 
   build-linux:
     name: Build Linux
+    needs:
+    - reuse-artifacts
+    - shared-values
+    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
-    environment: PROD
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
     - name: Checkout cli
@@ -403,8 +452,12 @@ jobs:
 
   build-macos:
     name: Build macOS
+    needs:
+    - reuse-artifacts
+    - shared-values
+    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: macos-latest
-    environment: PROD
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
     - name: Checkout
@@ -596,8 +649,15 @@ jobs:
 
 
   windows-signing:
+    needs:
+    - reuse-artifacts
+    - shared-values
+    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: windows-2019
-    environment: DEV
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    defaults:
+      run:
+        shell: pwsh
     steps:
       # - name: debug
       #   run: |
@@ -753,19 +813,31 @@ jobs:
 
 
   s3-upload:
-    environment: DEV
     runs-on: ubuntu-latest
-    needs: windows-signing
+    needs:
+      - shared-values
+      # - windows-signing
+      - reuse-artifacts
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     permissions:
       actions: read
     steps:
-    # - name: WIP - Download previous run's artifacts
-    #   uses: pivotalsoftware/action-download-artifact@v2
-    #   with:
-    #     workflow: build-windows.yml
-    #     run_number: 51
-    #     path: signed
+    - name: WIP - Download previous windows artifacts
+      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
+      uses: pivotalsoftware/action-download-artifact@v2
+      with:
+        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
+        path: signed
+    - name: WIP - Download previous mac and linux artifacts
+      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
+      uses: pivotalsoftware/action-download-artifact@v2
+      with:
+        workflow: build
+        run_id: 1857830935 # build #20
+        path: signed
     - name: Download signed artifacts
+      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
       uses: actions/download-artifact@v2
       with:
         # path: will download all artifacts to the given directory. use name: instead for individual artifacts
@@ -830,8 +902,8 @@ jobs:
     # - name: WIP - Download previous run's artifacts
     #   uses: pivotalsoftware/action-download-artifact@v2
     #   with:
-    #     workflow: build-windows.yml
-    #     run_number: 51
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
     #     path: signed
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
