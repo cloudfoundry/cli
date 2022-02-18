@@ -19,6 +19,10 @@ defaults:
   run:
     shell: bash
 
+env:
+  REUSE_ARTIFACT_WORKFLOW: build-windows.yml
+  REUSE_ARTIFACT_BUILD: 51
+
 jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
@@ -793,8 +797,8 @@ jobs:
       if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
       uses: pivotalsoftware/action-download-artifact@v2
       with:
-        workflow: build-windows.yml
-        run_number: 51
+        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
         path: signed
     - name: Download signed artifacts
       if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
@@ -862,8 +866,8 @@ jobs:
     # - name: WIP - Download previous run's artifacts
     #   uses: pivotalsoftware/action-download-artifact@v2
     #   with:
-    #     workflow: build-windows.yml
-    #     run_number: 51
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
     #     path: signed
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
