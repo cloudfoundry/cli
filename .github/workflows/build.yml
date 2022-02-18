@@ -24,14 +24,12 @@ defaults:
 env:
   REUSE_ARTIFACT_WORKFLOW: build-windows.yml
   REUSE_ARTIFACT_BUILD: 51
-  # using yaml anchors here
-  SECRETS_ENVIRONMENT: &secrets_environment DEV
 
 jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
   reuse-artifacts:
-    environment: *secrets_environment
+    environment: DEV
     runs-on: ubuntu-latest
     outputs:
       reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
@@ -50,6 +48,22 @@ jobs:
     - name: debug
       run: |
         echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
+
+  shared-values:
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      build-version: ${{ steps.set-build-version.outputs.build-version }}
+    steps:
+    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+    - id: set-secrets-environment
+      run: echo "::set-output name=secrets-environment::DEV"
+    - name: Checkout
+      uses: actions/checkout@v2
+    - id: set-build-version
+      run: |
+        version=$(cat BUILD_VERSION)
+        echo "::set-build-version=build-version::$version"
 
   print_secrets:
     runs-on: ubuntu-latest
@@ -133,7 +147,8 @@ jobs:
   build-linux:
     name: Build Linux
     runs-on: ubuntu-latest
-    environment: *secrets_environment
+    needs: shared-values
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
     - name: Checkout cli
@@ -435,7 +450,8 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-latest
-    environment: *secrets_environment
+    needs: shared-values
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
     - name: Checkout
@@ -630,7 +646,8 @@ jobs:
     # needs: reuse-artifacts
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'true' }}
     runs-on: windows-2019
-    environment: *secrets_environment
+    needs: shared-values
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
       # - name: debug
       #   run: |
@@ -786,11 +803,12 @@ jobs:
 
 
   s3-upload:
-    environment: *secrets_environment
     runs-on: ubuntu-latest
     needs:
+      - shared-values
       # - windows-signing
       - reuse-artifacts
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
     permissions:
       actions: read
     steps:
