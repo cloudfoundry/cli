@@ -646,6 +646,9 @@ jobs:
     # needs: reuse-artifacts
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'true' }}
     runs-on: windows-2019
+    defaults:
+      run:
+        shell: pwsh
     needs: shared-values
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
