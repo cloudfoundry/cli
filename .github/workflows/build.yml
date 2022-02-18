@@ -16,6 +16,9 @@ permissions:
   contents: read
 
 defaults:
+  # top-level defaults subkeys apply to jobs
+  environment: DEV
+  # run subkeys apply to all steps within all jobs
   run:
     shell: bash
 
@@ -27,7 +30,6 @@ jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
   reuse-artifacts:
-    environment: DEV
     runs-on: ubuntu-latest
     outputs:
       reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
@@ -129,7 +131,6 @@ jobs:
   build-linux:
     name: Build Linux
     runs-on: ubuntu-latest
-    environment: PROD
     steps:
 
     - name: Checkout cli
@@ -431,7 +432,6 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-latest
-    environment: PROD
     steps:
 
     - name: Checkout
@@ -626,7 +626,6 @@ jobs:
     # needs: reuse-artifacts
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'true' }}
     runs-on: windows-2019
-    environment: DEV
     steps:
       # - name: debug
       #   run: |
@@ -782,7 +781,6 @@ jobs:
 
 
   s3-upload:
-    environment: DEV
     runs-on: ubuntu-latest
     needs:
       # - windows-signing
