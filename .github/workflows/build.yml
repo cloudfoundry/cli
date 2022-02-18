@@ -57,7 +57,7 @@ jobs:
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
     - id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::DEV"
+      run: echo "::set-output name=secrets-environment::PROD"
     - name: Checkout
       uses: actions/checkout@v2
     - id: set-build-version
