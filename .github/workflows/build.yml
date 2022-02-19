@@ -527,7 +527,7 @@ jobs:
             mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
 
             cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
-            gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
+            ln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
             cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
             cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
             chmod -R go-w cf-cli
