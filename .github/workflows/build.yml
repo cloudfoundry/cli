@@ -153,7 +153,7 @@ jobs:
 
     - name: Setup
       run: |
-        echo "BUILD_VERSION=${{ steps.get_build_version.outputs.build_version }}" >> $GITHUB_ENV
+        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build_version }}" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
@@ -161,9 +161,6 @@ jobs:
 
     - name: Checkout cli
       uses: actions/checkout@v2
-
-    - name: Print Build Version
-      run: echo "${{ steps.get_build_version.outputs.build_version }}"
 
     - name: Checkout cli-ci
       uses: actions/checkout@v2
@@ -541,11 +538,6 @@ jobs:
             mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
           popd
         )
-
-    - name: Print go environment
-      id: get-version
-      run: |
-        echo "::set-output name=version::$(cat BUILD_VERSION)"
 
     - name: Load macos key
       env:
