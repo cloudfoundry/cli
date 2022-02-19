@@ -3,7 +3,7 @@ name: Build-Sign-Release
 on:
   push:
     branches:
-    - gh-actions
+    - gh-actions*
     - master
     - main
     - "v?"
