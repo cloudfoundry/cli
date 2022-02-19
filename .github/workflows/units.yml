@@ -47,7 +47,11 @@ jobs:
     needs: setup
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os:
+          - ubuntu-latest
+          - ubuntu-18.04
+          - macos-latest
+          - macos-10.15
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -71,7 +75,13 @@ jobs:
 
   units-windows:
     name: Units Windows
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os:
+          - windows-2022
+          - windows-2019
+          - windows-2016
+    runs-on: ${{ matrix.os }}
     needs: setup
     defaults:
       run:
