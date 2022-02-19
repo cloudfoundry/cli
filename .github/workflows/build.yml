@@ -79,12 +79,14 @@ jobs:
     - name: Checkout cli
       uses: actions/checkout@v2
 
-    - id: set-build-version
+    - name: Set build version
+      id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
         echo "::set-build-version=build-version::$version"
 
-    - id: set-go-version
+    - name: Set go version
+      id: set-go-version
       run: echo "::set-output name=go-version::1.17"
 
   test-rpm-package:
@@ -153,7 +155,7 @@ jobs:
 
     - name: Setup
       run: |
-        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build_version }}" >> $GITHUB_ENV
+        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build-version }}" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
@@ -211,8 +213,7 @@ jobs:
         $SIGNING_KEY_GPG_ID
         EOF
 
-        VERSION=$(cat BUILD_VERSION)
-        RPM_VERSION=${VERSION//-/_}
+        RPM_VERSION=${BUILD_VERSION//-/_}
 
         mkdir -pv $root/packaged
 
@@ -262,9 +263,6 @@ jobs:
       run: |
         set -ex
         set -o pipefail
-
-        VERSION=$(cat BUILD_VERSION)
-        echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
         SUFFIX=8
 
@@ -339,8 +337,6 @@ jobs:
 
         root=$PWD
 
-        VERSION=$(cat BUILD_VERSION)
-
         mkdir -pv $root/packaged
 
         echo "Build 32-bit Debian package"
@@ -362,7 +358,7 @@ jobs:
 
         	  cp control_v8.template cf/DEBIAN/control
         	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${VERSION}" >> cf/DEBIAN/control
+        	  echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
         	  echo "Architecture: i386" >> cf/DEBIAN/control
 
         	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
@@ -395,7 +391,7 @@ jobs:
 
         	  cp control_v8.template cf/DEBIAN/control
         	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${VERSION}" >> cf/DEBIAN/control
+        	  echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
         	  echo "Architecture: amd64" >> cf/DEBIAN/control
 
         	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
@@ -434,6 +430,14 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
+    - name: Setup
+      run: |
+        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build-version }}" >> $GITHUB_ENV
+
+    - name: Get Build Version
+      id: get_build_version
+      run: echo "BUILD_VERSION $BUILD_VERSION"
+
     - name: Checkout
       uses: actions/checkout@v2
       # with:
@@ -462,24 +466,24 @@ jobs:
       with:
         go-version: ${{ needs.shared-values.outputs.go-version }}
 
-    - name: Update Homebrew
-      run: |
-        brew tap mitchellh/gon
-        brew update --preinstall
-        cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
-
-    - name: Configure Homebrew cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/Library/Caches/Homebrew/gon--*
-          ~/Library/Caches/Homebrew/downloads/*--gon-*
-        key: brew-${{ hashFiles('.github/brew-formulae') }}
-        restore-keys: brew-
-
-    - name: Install Homebrew dependencies
-      run: |
-        env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
+    # - name: Update Homebrew
+    #   run: |
+    #     brew tap mitchellh/gon
+    #     brew update --preinstall
+    #     cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
+    #
+    # - name: Configure Homebrew cache
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: |
+    #       ~/Library/Caches/Homebrew/gon--*
+    #       ~/Library/Caches/Homebrew/downloads/*--gon-*
+    #     key: brew-${{ hashFiles('.github/brew-formulae') }}
+    #     restore-keys: brew-
+    #
+    # - name: Install Homebrew dependencies
+    #   run: |
+    #     env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
 
     - name: Print go environment
       id: go-cache-paths
@@ -512,13 +516,12 @@ jobs:
 
         mkdir -pv $root/packaged
 
-        VERSION=$(cat BUILD_VERSION)
         echo "Building OS X installer"
         (
           SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
 
           pushd cli-ci/ci/installers/osx_v8
-            sed -i -e "s/VERSION/${VERSION}/g" Distribution
+            sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
             sed -i -e "s/SIZE/${SIZE}/g" Distribution
             mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
 
@@ -595,7 +598,6 @@ jobs:
     - name: Sign macOS
       env:
         SUFFIX: 8
-        VERSION: ${{ steps.get-version.outputs.version }}
         SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
       run: |
@@ -607,7 +609,7 @@ jobs:
         productsign --timestamp \
           --sign "$SIGNING_KEY_MAC_ID" \
           "$root/packaged/cf${SUFFIX}-cli-installer_osx.pkg" \
-          "signed-osx-installer/cf${SUFFIX}-cli-installer_${VERSION}_osx.pkg"
+          "signed-osx-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
 
     - name: Store macOS Signed Packages
       uses: actions/upload-artifact@v2
@@ -765,20 +767,17 @@ jobs:
         # set -ex
 
         # if [ "$TARGET_MAJOR_VERSION" == "7" ]; then
-        #  VERSION=$(cat cli/BUILD_VERSION)
         #  BUCKET_PREFIX=v7-
         # elif [ "$TARGET_MAJOR_VERSION" == "8" ]; then
-        #  VERSION=$(cat cli/BUILD_VERSION)
         #  BUCKET_PREFIX=v8-
         # else
-        #  VERSION=$(cat cli/BUILD_VERSION)
         #  BUCKET_PREFIX=
         # fi
 
-        # aws s3 cp repackaged-binaries-and-installers/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-osx-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
+        # aws s3 cp repackaged-binaries-and-installers/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+        # aws s3 cp signed-osx-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+        # aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+        # aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
 
 
   s3-upload:
