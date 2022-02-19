@@ -111,10 +111,9 @@ jobs:
         RELEASE_VERSION=8.100.0
 
         rpm_location="*.rpm"
-
-        rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $rpm_location
-        rpm -i $rpm_location
-        cf -v
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p $rpm_location
+        # rpm -i $rpm_location
+        # cf -v
 
   test-deb-package:
     name: Test Debian Packages
@@ -302,11 +301,7 @@ jobs:
         rpmsign --addsign signed-redhat-installer/*.rpm
 
     - name: Print RPM Signature
-      run: |
-        for f in *.rpm; do
-          echo $f
-          rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $f
-        done
+      run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
       working-directory: signed-redhat-installer
 
     - name: Store Signed Linux Packages
