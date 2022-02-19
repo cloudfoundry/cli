@@ -15,6 +15,7 @@ on:
     tags:
     - 'v0.0.*-test'
     - 'v8.100.*-test'
+    - 'v8.0.1??-test'
 
 jobs:
   s3-upload:
@@ -113,18 +114,17 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 2
-    # # for faster iteration
-    # - name: WIP - Download previous run's artifacts
-    #   uses: pivotalsoftware/action-download-artifact@v2
-    #   with:
-    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-    #     run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
-    #     path: signed
-    - name: Download signed artifacts
-      uses: actions/download-artifact@v2
+    - name: WIP - Download previous run's artifacts
+      uses: pivotalsoftware/action-download-artifact@v2
       with:
-        # path: will download all artifacts to the given directory. use name: instead for individual artifacts
+        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
         path: signed
+    # - name: Download signed artifacts
+    #   uses: actions/download-artifact@v2
+    #   with:
+    #     # path: will download all artifacts to the given directory. use name: instead for individual artifacts
+    #     path: signed
     - name: debug
       run: ls -R signed
 
@@ -134,6 +134,7 @@ jobs:
         draft: true
         fail_on_unmatched_files: true
         files: |
+          signed/macos-signed-packages/cf8-cli-installer*pkg
           signed/cf-windows-binaries/cf-cli_win32.exe
           signed/cf-windows-binaries/cf-cli_winx64.exe
           signed/cf8-cli-installer_winx64/cf8_installer.exe
