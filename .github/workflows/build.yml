@@ -475,24 +475,24 @@ jobs:
       with:
         go-version: ${{ needs.shared-values.outputs.go-version }}
 
-    # - name: Update Homebrew
-    #   run: |
-    #     brew tap mitchellh/gon
-    #     brew update --preinstall
-    #     cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
-    #
-    # - name: Configure Homebrew cache
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: |
-    #       ~/Library/Caches/Homebrew/gon--*
-    #       ~/Library/Caches/Homebrew/downloads/*--gon-*
-    #     key: brew-${{ hashFiles('.github/brew-formulae') }}
-    #     restore-keys: brew-
-    #
-    # - name: Install Homebrew dependencies
-    #   run: |
-    #     env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
+    - name: Update Homebrew
+      run: |
+        brew tap mitchellh/gon
+        brew update --preinstall
+        cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
+
+    - name: Configure Homebrew cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/Library/Caches/Homebrew/gon--*
+          ~/Library/Caches/Homebrew/downloads/*--gon-*
+        key: brew-${{ hashFiles('.github/brew-formulae') }}
+        restore-keys: brew-
+
+    - name: Install Homebrew dependencies
+      run: |
+        env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
 
     - name: Print go environment
       id: go-cache-paths
@@ -534,28 +534,28 @@ jobs:
 
         echo "Building OS X installer"
         (
-          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
+        SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
 
-          pushd cli-ci/ci/installers/osx_v8
-            sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
-            sed -i -e "s/SIZE/${SIZE}/g" Distribution
-            mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
+        pushd cli-ci/ci/installers/osx_v8
+          sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
+          sed -i -e "s/SIZE/${SIZE}/g" Distribution
+          mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
 
-            cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
-            ln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
-            cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
-            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
-            chmod -R go-w cf-cli
-            pushd cf-cli
-              find usr | cpio -o --format=odc | gzip -c > ../Payload
-            popd
-
-            $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
-            mkbom -i bom_list Bom
-            mv Bom Payload com.cloudfoundry.cf8-cli.pkg
-            xar -c --compression none -f cf8-cli-installer_osx.pkg com.cloudfoundry.cf8-cli.pkg Distribution
-            mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
+          cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
+          gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
+          cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
+          chmod -R go-w cf-cli
+          pushd cf-cli
+            find usr | cpio -o --format=odc | gzip -c > ../Payload
           popd
+
+          $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+          mkbom -i bom_list Bom
+          mv Bom Payload com.cloudfoundry.cf8-cli.pkg
+          xar -c --compression none -f cf8-cli-installer_osx.pkg com.cloudfoundry.cf8-cli.pkg Distribution
+          mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
+        popd
         )
 
     - name: Load macos key
