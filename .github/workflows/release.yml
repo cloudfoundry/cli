@@ -110,10 +110,6 @@ jobs:
       actions: read
     # needs: windows-signing
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
     - name: WIP - Download previous run's artifacts
       uses: pivotalsoftware/action-download-artifact@v2
       with:
