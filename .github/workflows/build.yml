@@ -200,14 +200,13 @@ jobs:
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
-        make out/cf-cli_osx_arm
 
     - name: Store Linux Binaries
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
         name: cf-cli-linux-binaries
-        path: out/*.deb
+        path: out/cf-cli_linux*
 
     - name: Build RedHat Packages
       env:
@@ -302,7 +301,7 @@ jobs:
       run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
       working-directory: signed-redhat-installer
 
-    - name: Store Signed Linux Packages
+    - name: Store Signed Linux RPM Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
@@ -521,7 +520,7 @@ jobs:
       with:
         if-no-files-found: error
         name: cf-cli-macos-binaries
-        path: out/*.deb
+        path: out/cf-cli*
 
     - name: Build macOS Installer
       run: |
