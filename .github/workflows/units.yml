@@ -13,7 +13,7 @@ defaults:
     shell: bash
 
 jobs:
-  setup:
+  shared-values:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
@@ -28,7 +28,7 @@ jobs:
   lint:
     name: Lint code
     runs-on: ubuntu-latest
-    needs: setup
+    needs: shared-values
     steps:
 
     - name: Checkout
@@ -37,14 +37,14 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.setup.outputs.go-version }}
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Run go fmt
       run: go fmt && git diff --exit-code
 
   units:
     name: Units
-    needs: setup
+    needs: shared-values
     strategy:
       matrix:
         os:
@@ -61,7 +61,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.setup.outputs.go-version }}
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Set up Test
       run: |
@@ -82,7 +82,7 @@ jobs:
           - windows-2019
           - windows-2016
     runs-on: ${{ matrix.os }}
-    needs: setup
+    needs: shared-values
     defaults:
       run:
         shell: pwsh
@@ -94,7 +94,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.setup.outputs.go-version }}
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Set up Test
       run: |
