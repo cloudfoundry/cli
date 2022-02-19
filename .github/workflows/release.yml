@@ -88,12 +88,13 @@ jobs:
     - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
       # forked for security considerations
-      uses: pivotalsoftware/s3-cp-action@v2
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: "./upload/*"
-        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+      uses: pivotalsoftware/s3-sync-action@v0.5.1
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        SOURCE_DIR: upload
+        DEST_DIR: "/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
 
     - name: Instruct human to update CLAW
       run: |
