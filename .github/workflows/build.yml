@@ -184,7 +184,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.share-values.outputs.go-version }}
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Print go environment
       id: go-cache-paths
@@ -473,7 +473,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.share-values.outputs.go-version }}
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Update Homebrew
       run: |
@@ -658,7 +658,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: ${{ needs.share-values.outputs.go-version }}
+          go-version: ${{ needs.shared-values.outputs.go-version }}
 
       - name: Get build-time dependencies
         run: |
