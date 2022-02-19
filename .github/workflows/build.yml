@@ -1,4 +1,4 @@
-name: Build-Sign-Release
+name: Buid-Sign-Release
 
 on:
   push:
@@ -101,7 +101,7 @@ jobs:
     - name: Download Signed Linux Packages
       uses: actions/download-artifact@v2
       with:
-        name: signed-linux-rpm-packages
+        name: cf-cli-linux-rpm-packages
 
     - name: Display structure of downloaded files
       run: ls -R
@@ -121,12 +121,12 @@ jobs:
     - name: Download Signed Linux Packages
       uses: actions/download-artifact@v2
       with:
-        name: store-linux-deb-packages
+        name: cf-cli-linux-deb-packages
 
     - name: Display structure of downloaded files
       run: |
         ls -R
-        dpkg --info *.deb
+        ls *.deb | xargs -n1 dpkg --info
 
   test-macos:
     name: Test macOS Packages
@@ -137,7 +137,7 @@ jobs:
     - name: Download Signed macOS Packages
       uses: actions/download-artifact@v2
       with:
-        name: macos-signed-packages
+        name: cf-cli-macos-packages
 
     - name: Inspect macOS packages
       run: |
