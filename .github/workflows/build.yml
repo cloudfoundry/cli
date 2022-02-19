@@ -148,11 +148,11 @@ jobs:
     if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
-    steps:
 
-    - name: Setup
-      run: |
-        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build-version }}" >> $GITHUB_ENV
+    env:
+      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+
+    steps:
 
     - name: Get Build Version
       id: get_build_version
@@ -442,7 +442,7 @@ jobs:
       id: get_build_version
       run: echo "BUILD_VERSION $BUILD_VERSION"
 
-    - name: Checkout
+    - name: Checkout cli
       uses: actions/checkout@v2
       # with:
       #   fetch-depth: 0

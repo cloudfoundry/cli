@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   shared-values:
-    name: Setup
+    name: Shared Values
     runs-on: ubuntu-latest
     outputs:
       go-version: ${{ steps.set-go-version.outputs.go-version }}
