@@ -15,7 +15,7 @@ on:
     tags:
     - 'v0.0.*-test'
     - 'v8.100.*-test'
-    - 'v8.0.1??-test'
+    - 'v8.0.1*-test'
 
 jobs:
   s3-upload:
