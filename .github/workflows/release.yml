@@ -137,6 +137,8 @@ jobs:
         draft: true
         fail_on_unmatched_files: true
         files: |
+          signed/signed-linux-rpm-packages/cf*rpm
+          signed/store-linux-deb-packages/cf*deb
           signed/macos-signed-packages/cf8-cli-installer*pkg
           signed/cf-windows-binaries/cf-cli_win32.exe
           signed/cf-windows-binaries/cf-cli_winx64.exe
