@@ -50,12 +50,16 @@ jobs:
   preflight-check:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
+
     - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
       run: |
         echo "Git Ref: ${{ github.ref }}"
         echo "BUILD_VERSION: $(cat BUILD_VERSION)"
 
-        [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
+        # [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
         # temporary short circut for the development
         exit 0
 
@@ -72,7 +76,7 @@ jobs:
     - id: set-secrets-environment
       run: echo "::set-output name=secrets-environment::PROD"
 
-    - name: Checkout
+    - name: Checkout cli
       uses: actions/checkout@v2
 
     - id: set-build-version
