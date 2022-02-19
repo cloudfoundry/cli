@@ -20,7 +20,6 @@ defaults:
     shell: bash
 
 env:
-  go-version: 1.17
   REUSE_ARTIFACT_WORKFLOW: build-windows.yml
   REUSE_ARTIFACT_BUILD: 51
 
@@ -61,16 +60,23 @@ jobs:
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
       build-version: ${{ steps.set-build-version.outputs.build-version }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+
     - id: set-secrets-environment
       run: echo "::set-output name=secrets-environment::PROD"
+
     - name: Checkout
       uses: actions/checkout@v2
+
     - id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
         echo "::set-build-version=build-version::$version"
+
+    - id: set-go-version
+      run: echo "::set-output name=go-version::1.17"
 
   test-rpm-package:
     name: Test RPM Packages
@@ -169,7 +175,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ env.go-version }}
+        go-version: ${{ needs.share-values.outputs.go-version }}
 
     - name: Print go environment
       id: go-cache-paths
@@ -458,7 +464,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ env.go-version }}
+        go-version: ${{ needs.share-values.outputs.go-version }}
 
     - name: Update Homebrew
       run: |
@@ -643,7 +649,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: ${{ env.go-version }}
+          go-version: ${{ needs.share-values.outputs.go-version }}
 
       - name: Get build-time dependencies
         run: |
