@@ -342,67 +342,67 @@ jobs:
 
         echo "Build 32-bit Debian package"
         (
-        	SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
 
-        	pushd cli-ci/ci/installers/deb
-        	  mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
-        	  cp copyright_preamble cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-        	  cat copyright_comment_header >> cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-        	  cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
 
-        	  cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
-        	  cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
 
-        	  cp control_v8.template cf/DEBIAN/control
-        	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
-        	  echo "Architecture: i386" >> cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: i386" >> cf/DEBIAN/control
 
-        	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
-        	  cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
-        	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+            cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-        	  fakeroot dpkg --build cf cf8-cli-installer_i686.deb
-        	  mv cf8-cli-installer_i686.deb $root/packaged-deb
-        	  rm -rf cf
-        	popd
+            fakeroot dpkg --build cf cf8-cli-installer_i686.deb
+            mv cf8-cli-installer_i686.deb $root/packaged-deb
+            rm -rf cf
+          popd
         )
 
         echo "Build 64-bit Debian package"
         (
-        	SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
 
-        	pushd cli-ci/ci/installers/deb
-        	  mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
-        	  cp copyright_preamble cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-        	  cat copyright_comment_header >> cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-        	  cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
 
-        	  cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
-        	  cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
 
-        	  cp control_v8.template cf/DEBIAN/control
-        	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
-        	  echo "Architecture: amd64" >> cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: amd64" >> cf/DEBIAN/control
 
-        	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
-        	  cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
-        	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+            cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-        	  fakeroot dpkg --build cf cf8-cli-installer_x86-64.deb
-        	  mv cf8-cli-installer_x86-64.deb $root/packaged-deb
-        	popd
+            fakeroot dpkg --build cf cf8-cli-installer_x86-64.deb
+            mv cf8-cli-installer_x86-64.deb $root/packaged-deb
+          popd
         )
 
     - name: Print DEB Packages Info
