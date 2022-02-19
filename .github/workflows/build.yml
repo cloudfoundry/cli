@@ -128,6 +128,35 @@ jobs:
         ls -R
         dpkg --info store-linux-deb-packages/*.deb
 
+    - name: Setup upterm session
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_BUCKET_INTEGRATION: ${{ secrets.AWS_BUCKET_INTEGRATION }}
+        AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #
+        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+        #
+        SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+        #
+        SIGNING_CER_MAC: ${{ secrets.SIGNING_CER_MAC }}
+        SIGNING_KEYCHAIN_PASSPHRASE: ${{ secrets.SIGNING_KEYCHAIN_PASSPHRASE }}
+        #
+        SIGNING_KEY_MAC: ${{ secrets.SIGNING_KEY_MAC }}
+        SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+        SIGNING_KEY_MAC_PFX: ${{ secrets.SIGNING_KEY_MAC_PFX }}
+        #
+        SIGNING_KEY_WINDOWS_ID: ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
+        SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+        SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+      if: always()
+      uses: lhotari/action-upterm@v1
+      timeout-minutes: 60
+
   test-macos:
     name: Test macOS Packages
     needs: build-macos
@@ -782,6 +811,7 @@ jobs:
 
 
   s3-upload:
+    if: false
     runs-on: ubuntu-latest
     needs:
       - shared-values
