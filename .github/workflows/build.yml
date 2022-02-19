@@ -200,6 +200,14 @@ jobs:
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
+        make out/cf-cli_osx_arm
+
+    - name: Store Linux Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-binaries
+        path: out/*.deb
 
     - name: Build RedHat Packages
       env:
@@ -298,7 +306,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: signed-linux-rpm-packages
+        name: cf-cli-linux-rpm-packages
         path: signed-redhat-installer/*.rpm
 
     # - name: Setup upterm session
@@ -418,7 +426,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: store-linux-deb-packages
+        name: cf-cli-linux-deb-packages
         path: packaged-deb/*.deb
 
   build-macos:
@@ -507,6 +515,13 @@ jobs:
       run: |
         make out/cf-cli_osx
         make out/cf-cli_osx_arm
+
+    - name: Store macOS Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-macos-binaries
+        path: out/*.deb
 
     - name: Build macOS Installer
       run: |
@@ -616,7 +631,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: macos-signed-packages
+        name: cf-cli-macos-packages
         path: signed-osx-installer/*.pkg
 
 
