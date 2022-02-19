@@ -104,16 +104,8 @@ jobs:
       run: ls -R
 
     - name: Test RPMs
-      env:
-        RELEASE_VERSION: ${{ inputs.version }}
       run: |
-        echo "RELEASE_VERSION: $RELEASE_VERSION"
-        RELEASE_VERSION=8.100.0
-
-        rpm_location="*.rpm"
-        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p $rpm_location
-        # rpm -i $rpm_location
-        # cf -v
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
 
   test-deb-package:
     name: Test Debian Packages
@@ -131,9 +123,7 @@ jobs:
     - name: Display structure of downloaded files
       run: |
         ls -R
-        for f in store-linux-deb-packages/*.deb; do
-          dpkg --info "$f"
-        done
+        dpkg --info store-linux-deb-packages/*.deb
 
   test-macos:
     name: Test macOS Packages
@@ -161,12 +151,16 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
-    - name: Checkout cli
-      uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        echo "BUILD_VERSION=${{ steps.get_build_version.outputs.build_version }}" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
-      run: echo "::set-output name=build_version::$(cat BUILD_VERSION)"
+      run: echo "BUILD_VERSION $BUILD_VERSION"
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
 
     - name: Print Build Version
       run: echo "${{ steps.get_build_version.outputs.build_version }}"
@@ -201,10 +195,6 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-
-    - name: View GPG keys
-      run: |
-        gpg --list-keys
 
     - name: Build Linux
       run: |
@@ -263,6 +253,10 @@ jobs:
         SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
       run: |
         echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+    - name: View GPG keys
+      run: |
+        gpg --list-keys
 
     - name: Sign RedHat Packages
       env:
@@ -419,6 +413,7 @@ jobs:
 
     - name: Print DEB Packages Info
       run: |
+        ls -R
         for f in *.deb; do
           echo $f
           dpkg --info $f
