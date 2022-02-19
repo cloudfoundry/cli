@@ -76,24 +76,23 @@ jobs:
 
     ##############################################
 
-    - name: Upload mac installer to CLAW S3 bucket
-      if: ${{ github.ref_type == 'tag' }}
-      # forked for security considerations
-      uses: pivotalsoftware/s3-cp-action@v2
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: "./signed/macos-signed-packages/cf8-cli-installer*pkg"
-        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+    - name: rearrange artifacts before upload
+      run: |
+        mkdir upload
+        cp -t upload  \
+          signed/signed-linux-rpm-packages/cf*rpm \
+          signed/store-linux-deb-packages/cf*deb \
+          signed/macos-signed-packages/cf*pkg \
+          signed/cf8-cli-installer_winx64/cf*zip
 
-    - name: Upload windows installer to CLAW S3 bucket
+    - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
       # forked for security considerations
       uses: pivotalsoftware/s3-cp-action@v2
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: "./signed/cf8-cli-installer_winx64/${{ env.INSTALLER_ZIP_FILENAME }}"
+        source: "./upload/*"
         dest: "s3://${{ secrets.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
 
     - name: Instruct human to update CLAW
