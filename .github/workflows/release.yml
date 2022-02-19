@@ -108,6 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      contents: write
     # needs: windows-signing
     steps:
     - name: WIP - Download previous windows artifacts
