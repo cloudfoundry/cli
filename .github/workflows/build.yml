@@ -338,7 +338,7 @@ jobs:
 
         root=$PWD
 
-        mkdir -pv $root/packaged
+        mkdir -pv $root/packaged-deb
 
         echo "Build 32-bit Debian package"
         (
@@ -368,7 +368,7 @@ jobs:
         	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
         	  fakeroot dpkg --build cf cf8-cli-installer_i686.deb
-        	  mv cf8-cli-installer_i686.deb $root/packaged
+        	  mv cf8-cli-installer_i686.deb $root/packaged-deb
         	  rm -rf cf
         	popd
         )
@@ -401,7 +401,7 @@ jobs:
         	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
         	  fakeroot dpkg --build cf cf8-cli-installer_x86-64.deb
-        	  mv cf8-cli-installer_x86-64.deb $root/packaged
+        	  mv cf8-cli-installer_x86-64.deb $root/packaged-deb
         	popd
         )
 
@@ -412,14 +412,14 @@ jobs:
           echo $f
           dpkg --info $f
         done
-      working-directory: packaged
+      working-directory: packaged-deb
 
     - name: Store Debian Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
         name: store-linux-deb-packages
-        path: packaged/*.deb
+        path: packaged-deb/*.deb
 
   build-macos:
     name: Build macOS
