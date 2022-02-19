@@ -27,7 +27,7 @@ jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
   reuse-artifacts:
-    environment: DEV
+    environment: PROD
     runs-on: ubuntu-latest
     outputs:
       reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
