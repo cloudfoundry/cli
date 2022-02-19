@@ -110,11 +110,17 @@ jobs:
       actions: read
     # needs: windows-signing
     steps:
-    - name: WIP - Download previous run's artifacts
+    - name: WIP - Download previous windows artifacts
       uses: pivotalsoftware/action-download-artifact@v2
       with:
         workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
         run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
+        path: signed
+    - name: WIP - Download previous mac and linux artifacts
+      uses: pivotalsoftware/action-download-artifact@v2
+      with:
+        workflow: build
+        run_id: 1857830935 # build #20
         path: signed
     # - name: Download signed artifacts
     #   uses: actions/download-artifact@v2
