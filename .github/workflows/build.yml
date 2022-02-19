@@ -83,7 +83,7 @@ jobs:
       id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
-        echo "::set-build-version=build-version::$version"
+        echo "::set-output name=build-version::$version"
 
     - name: Set go version
       id: set-go-version
