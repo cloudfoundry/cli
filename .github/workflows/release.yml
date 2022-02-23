@@ -1,8 +1,8 @@
 name: Release - DEV
 
 env:
-  REUSE_ARTIFACT_WORKFLOW: build-windows.yml
-  REUSE_ARTIFACT_BUILD: 51
+  REUSE_ARTIFACT_WORKFLOW: build.yml
+  REUSE_ARTIFACT_RUN_ID: 1879559877 #155
 
 on:
   push:
@@ -26,23 +26,12 @@ jobs:
     permissions:
       actions: read
     steps:
-    - name: WIP - Download previous windows artifacts
+    - name: Download previous artifacts
       uses: pivotalsoftware/action-download-artifact@v2
       with:
         workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
+        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
         path: signed
-    - name: WIP - Download previous mac and linux artifacts
-      uses: pivotalsoftware/action-download-artifact@v2
-      with:
-        workflow: build
-        run_id: 1857830935 # build #20
-        path: signed
-    # - name: Download signed artifacts
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     # path: will download all artifacts to the given directory. use name: instead for individual artifacts
-    #     path: signed
     - name: debug
       run: ls -R signed
 
@@ -80,9 +69,9 @@ jobs:
       run: |
         mkdir upload
         cp -t upload  \
-          signed/signed-linux-rpm-packages/cf*rpm \
-          signed/store-linux-deb-packages/cf*deb \
-          signed/macos-signed-packages/cf*pkg \
+          signed/cf-cli-linux-rpm-packages/cf*rpm \
+          signed/cf-cli-linux-deb-packages/cf*deb \
+          signed/cf-cli-macos-packages/cf*pkg \
           signed/cf8-cli-installer_winx64/cf*zip
 
     - name: Upload installers to CLAW S3 bucket
@@ -111,23 +100,12 @@ jobs:
       contents: write
     # needs: windows-signing
     steps:
-    - name: WIP - Download previous windows artifacts
+    - name: Download previous artifacts
       uses: pivotalsoftware/action-download-artifact@v2
       with:
         workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
+        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
         path: signed
-    - name: WIP - Download previous mac and linux artifacts
-      uses: pivotalsoftware/action-download-artifact@v2
-      with:
-        workflow: build
-        run_id: 1857830935 # build #20
-        path: signed
-    # - name: Download signed artifacts
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     # path: will download all artifacts to the given directory. use name: instead for individual artifacts
-    #     path: signed
     - name: debug
       run: ls -R signed
 
@@ -137,11 +115,10 @@ jobs:
         draft: true
         fail_on_unmatched_files: true
         files: |
-          signed/signed-linux-rpm-packages/cf*rpm
-          signed/store-linux-deb-packages/cf*deb
-          signed/macos-signed-packages/cf8-cli-installer*pkg
-          signed/cf-windows-binaries/cf-cli_win32.exe
-          signed/cf-windows-binaries/cf-cli_winx64.exe
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-windows-binaries/*.exe
           signed/cf8-cli-installer_winx64/cf8_installer.exe
 
   # list_s3:
