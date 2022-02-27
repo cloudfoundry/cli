@@ -1,4 +1,8 @@
-name: Buid-Sign-Release
+name: Build-Sign-Release
+
+env:
+  REUSE_ARTIFACT_WORKFLOW: build.yml
+  REUSE_ARTIFACT_RUN_ID: 1879559877 #155
 
 on:
   push:
@@ -18,10 +22,6 @@ defaults:
   # run subkeys apply to all steps within all jobs
   run:
     shell: bash
-
-env:
-  REUSE_ARTIFACT_WORKFLOW: build-windows.yml
-  REUSE_ARTIFACT_BUILD: 51
 
 jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
@@ -794,40 +794,31 @@ jobs:
         # aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
         # aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
 
+#################################
+######## Release Section ########
+#################################
 
   s3-upload:
-    if: false
     runs-on: ubuntu-latest
-    needs:
-      - shared-values
+    # needs:
       # - windows-signing
-      - reuse-artifacts
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: DEV
     permissions:
       actions: read
     steps:
-    - name: WIP - Download previous windows artifacts
-      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
+    - name: Download previous artifacts
       uses: pivotalsoftware/action-download-artifact@v2
       with:
         workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-        run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
-        path: signed
-    - name: WIP - Download previous mac and linux artifacts
-      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts == 'TRUE' }}
-      uses: pivotalsoftware/action-download-artifact@v2
-      with:
-        workflow: build
-        run_id: 1857830935 # build #20
-        path: signed
-    - name: Download signed artifacts
-      if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
-      uses: actions/download-artifact@v2
-      with:
-        # path: will download all artifacts to the given directory. use name: instead for individual artifacts
+        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
         path: signed
     - name: debug
       run: ls -R signed
+
+    ##############################################
+    # Consider moving
+    # might be a windows workflow responsibility #
+    ##############################################
 
     - name: name windows edge artifact
       if: ${{ github.ref_type != 'tag' }}
@@ -836,7 +827,6 @@ jobs:
         echo "INSTALLER_RELEASE_VERSION=edge" >> $GITHUB_ENV
         echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_edge_winx64.zip" >> $GITHUB_ENV
         # echo "BINARY_ZIP_FILENAME: " >> ENV
-
     - name: name windows release artifact
       if: ${{ github.ref_type == 'tag' }}
       # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
@@ -846,7 +836,6 @@ jobs:
         echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
         echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${INSTALLER_RELEASE_VERSION}_winx64.zip" >> $GITHUB_ENV
         cat $GITHUB_ENV
-
     - name: zip windows artifact
       run: |
         pushd signed/cf8-cli-installer_winx64
@@ -854,15 +843,27 @@ jobs:
           ls
         popd
 
-    - name: Upload installer to CLAW S3 bucket
+    ##############################################
+
+    - name: rearrange artifacts before upload
+      run: |
+        mkdir upload
+        cp -t upload  \
+          signed/cf-cli-linux-rpm-packages/cf*rpm \
+          signed/cf-cli-linux-deb-packages/cf*deb \
+          signed/cf-cli-macos-packages/cf*pkg \
+          signed/cf8-cli-installer_winx64/cf*zip
+
+    - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
       # forked for security considerations
-      uses: pivotalsoftware/s3-cp-action@v2
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: "./signed/cf8-cli-installer_winx64/${{ env.INSTALLER_ZIP_FILENAME }}"
-        dest: "s3://${{ secrets.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/${{ env.INSTALLER_ZIP_FILENAME }}"
+      uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        SOURCE_DIR: upload
+        DEST_DIR: "v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
 
     - name: Instruct human to update CLAW
       run: |
@@ -870,29 +871,30 @@ jobs:
         echo
         echo "- ${INSTALLER_RELEASE_VERSION}"
 
+    - name: list S3
+      uses: docker://amazon/aws-cli:latest
+      with:
+        args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/"
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
 
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
-    needs: windows-signing
+      contents: write
+    # needs: windows-signing
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - name: Download previous artifacts
+      uses: pivotalsoftware/action-download-artifact@v2
       with:
-        fetch-depth: 2
-    # # for faster iteration
-    # - name: WIP - Download previous run's artifacts
-    #   uses: pivotalsoftware/action-download-artifact@v2
-    #   with:
-    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-    #     run_number: ${{ env.REUSE_ARTIFACT_BUILD }}
-    #     path: signed
-    - name: Download signed artifacts
-      uses: actions/download-artifact@v2
-      with:
-        # path: will download all artifacts to the given directory. use name: instead for individual artifacts
+        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
         path: signed
     - name: debug
       run: ls -R signed
@@ -903,31 +905,29 @@ jobs:
         draft: true
         fail_on_unmatched_files: true
         files: |
-          signed/cf-windows-binaries/cf-cli_win32.exe
-          signed/cf-windows-binaries/cf-cli_winx64.exe
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-windows-binaries/*.exe
           signed/cf8-cli-installer_winx64/cf8_installer.exe
 
   # list_s3:
-  #   environment: S3
+  #   environment: DEV
   #   runs-on: ubuntu-latest
-  #   needs: goreleaser
+  #   needs: s3-upload
   #   steps:
   #     - uses: docker://amazon/aws-cli:latest
   #       with:
-  #         args: |
-  #           s3 ls --region us-east-1 \
-  #             ci-cli-assets-dev
+  #         args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
   #       env:
+  #         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     - uses: docker://amazon/aws-cli:latest
-  #       with:
-  #         args: >
-  #           s3 ls --region us-east-1
-  #           ci-cli-assets-dev
-  #       env:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+#######################################################################
+# ------------------------------------------------------------------- #
+#######################################################################
 
 
 # Update:
