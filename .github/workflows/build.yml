@@ -1,9 +1,5 @@
 name: Build-Sign-Release
 
-env:
-  REUSE_ARTIFACT_WORKFLOW: build.yml
-  REUSE_ARTIFACT_RUN_ID: 1879559877 #155
-
 on:
   push:
     branches:
@@ -800,18 +796,24 @@ jobs:
 
   s3-upload:
     runs-on: ubuntu-latest
-    # needs:
-      # - windows-signing
+    needs:
+      - build-linux
+      - build-macos
+      - windows-signing
     environment: DEV
     permissions:
       actions: read
     steps:
-    - name: Download previous artifacts
-      uses: pivotalsoftware/action-download-artifact@v2
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
       with:
-        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
-        path: signed
+        path: signed # download all artifacts to 'signed/'
+    # - name: Download previous artifacts
+    #   uses: pivotalsoftware/action-download-artifact@v2
+    #   with:
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
+    #     path: signed
     - name: debug
       run: ls -R signed
 
@@ -888,14 +890,21 @@ jobs:
     permissions:
       actions: read
       contents: write
-    # needs: windows-signing
+    needs:
+      - build-linux
+      - build-macos
+      - windows-signing
     steps:
-    - name: Download previous artifacts
-      uses: pivotalsoftware/action-download-artifact@v2
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
       with:
-        workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-        run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
-        path: signed
+        path: signed # download all artifacts to 'signed/'
+    # - name: Download previous artifacts
+    #   uses: pivotalsoftware/action-download-artifact@v2
+    #   with:
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
+    #     path: signed
     - name: debug
       run: ls -R signed
 
