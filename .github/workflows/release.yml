@@ -77,7 +77,7 @@ jobs:
     - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
       # forked for security considerations
-      uses: pivotalsoftware/s3-sync-action@v0.5.1
+      uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
