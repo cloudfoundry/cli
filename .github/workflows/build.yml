@@ -850,6 +850,7 @@ jobs:
     environment: DEV
     permissions:
       actions: read
+      contents: read
     steps:
       # only needed for BUILD_VERSION
     - name: Checkout cli
