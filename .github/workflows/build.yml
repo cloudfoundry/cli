@@ -851,6 +851,9 @@ jobs:
     permissions:
       actions: read
     steps:
+      # only needed for BUILD_VERSION
+    - name: Checkout cli
+      uses: actions/checkout@v2
     - name: get semver version
       # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
