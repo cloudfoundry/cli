@@ -713,7 +713,7 @@ jobs:
       - name: Save signed binaries as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cf-windows-binaries
+          name: cf-cli-windows-binaries
           if-no-files-found: error
           path: |
             out/cf-cli_win32.exe
@@ -740,12 +740,45 @@ jobs:
         # note the -Path flag takes comma-delimited args
         run: Copy-Item -Destination "$env:RUNNER_TEMP\x64" -Path win\LICENSE,win\NOTICE
 
+      # - name: name windows edge artifact
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      #   run: |
+      #     echo "INSTALLER_RELEASE_VERSION=edge" >> $GITHUB_ENV
+      #     echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_edge_winx64.zip" >> $GITHUB_ENV
+      #     # echo "BINARY_ZIP_FILENAME: " >> ENV
+      # - name: name windows release artifact
+      #   if: ${{ github.ref_type == 'tag' }}
+      #   # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      #   run: |
+      #     # strip leading v to go from tag -> semver
+      #     INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
+      #     echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
+      #     echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${INSTALLER_RELEASE_VERSION}_winx64.zip" >> $GITHUB_ENV
+      #     cat $GITHUB_ENV
+      # - name: zip windows artifact
+      #   run: |
+      #     pushd signed/cf8-cli-installer_winx64
+      #       zip "$INSTALLER_ZIP_FILENAME" *
+      #       ls
+      #     popd
+
+      - name: zip windows artifact
+        run: |
+          pushd "$env:RUNNER_TEMP\x64"
+            # strip leading v to go from tag -> semver
+            $installer_release_version="${{ github.ref_name }}".Replace("v", "")
+            $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_winx64.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          Get-ChildItem "$env:RUNNER_TEMP"
+
       - name: Save 64-bit installer and dist files as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cf8-cli-installer_winx64
+          name: cf-cli-windows-packages
           if-no-files-found: error
-          path: ${{ runner.temp }}/x64/*
+          path: ${{ runner.temp }}/cf8-cli-installer*winx64.zip
 
       # - name: ssh session
       #   if: always()
@@ -817,36 +850,6 @@ jobs:
     - name: debug
       run: ls -R signed
 
-    ##############################################
-    # Consider moving
-    # might be a windows workflow responsibility #
-    ##############################################
-
-    - name: name windows edge artifact
-      if: ${{ github.ref_type != 'tag' }}
-      # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-      run: |
-        echo "INSTALLER_RELEASE_VERSION=edge" >> $GITHUB_ENV
-        echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_edge_winx64.zip" >> $GITHUB_ENV
-        # echo "BINARY_ZIP_FILENAME: " >> ENV
-    - name: name windows release artifact
-      if: ${{ github.ref_type == 'tag' }}
-      # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-      run: |
-        # strip leading v to go from tag -> semver
-        INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
-        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
-        echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${INSTALLER_RELEASE_VERSION}_winx64.zip" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-    - name: zip windows artifact
-      run: |
-        pushd signed/cf8-cli-installer_winx64
-          zip "$INSTALLER_ZIP_FILENAME" *
-          ls
-        popd
-
-    ##############################################
-
     - name: rearrange artifacts before upload
       run: |
         mkdir upload
@@ -854,7 +857,7 @@ jobs:
           signed/cf-cli-linux-rpm-packages/cf*rpm \
           signed/cf-cli-linux-deb-packages/cf*deb \
           signed/cf-cli-macos-packages/cf*pkg \
-          signed/cf8-cli-installer_winx64/cf*zip
+          signed/cf-cli-windows-packages/cf*zip
 
     - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
@@ -917,8 +920,8 @@ jobs:
           signed/cf-cli-linux-rpm-packages/cf*rpm
           signed/cf-cli-linux-deb-packages/cf*deb
           signed/cf-cli-macos-packages/cf*pkg
-          signed/cf-windows-binaries/*.exe
-          signed/cf8-cli-installer_winx64/cf8_installer.exe
+          signed/cf-cli-windows-binaries/*.exe
+          signed/cf-cli-windows-packages/*.zip
 
   # list_s3:
   #   environment: DEV
