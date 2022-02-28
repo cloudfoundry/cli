@@ -828,6 +828,7 @@ jobs:
 #################################
 
   s3-upload:
+    if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     needs:
       - build-linux
@@ -837,6 +838,12 @@ jobs:
     permissions:
       actions: read
     steps:
+    - name: get semver version
+      # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      run: |
+        INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
+        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
+
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
       with:
