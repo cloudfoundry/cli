@@ -775,7 +775,7 @@ jobs:
       - name: zip windows artifact
         run: |
           # strip leading v to go from tag -> semver
-          $installer_release_version="${{ github.ref_name }}".Replace("v", "")
+          $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
           pushd "$env:RUNNER_TEMP\winx64"
             $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_winx64.zip"
             Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
@@ -854,7 +854,7 @@ jobs:
     - name: get semver version
       # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
-        INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
+        INSTALLER_RELEASE_VERSION=$(cat BUILD_VERSION | tr -d v)
         echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
 
     - name: Download signed artifacts
@@ -899,7 +899,7 @@ jobs:
     - name: list S3
       uses: docker://amazon/aws-cli:latest
       with:
-        args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/"
+        args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/${{ env.INSTALLER_RELEASE_VERSION }}"
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
