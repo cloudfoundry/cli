@@ -472,9 +472,10 @@ jobs:
 
     - name: Update Homebrew
       run: |
-        brew tap mitchellh/gon
+        # brew tap mitchellh/gon
+        brew tap pivotalsoftware/gon
         brew update --preinstall
-        cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
+        cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
 
     - name: Configure Homebrew cache
       uses: actions/cache@v2
@@ -487,7 +488,7 @@ jobs:
 
     - name: Install Homebrew dependencies
       run: |
-        env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
+        env HOMEBREW_NO_AUTO_UPDATE=1 brew install pivotalsoftware/gon/gon coreutils
 
     - name: Print go environment
       id: go-cache-paths
