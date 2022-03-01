@@ -967,6 +967,7 @@ jobs:
   github-release-draft:
     # if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
+    environment: DEV
     permissions:
       actions: read
       contents: write
@@ -993,6 +994,7 @@ jobs:
       with:
         draft: true
         repository: pivotalsoftware/cli-wip
+        token: ${{ secrets.GIT_PUBLIC_REPO_ACCESS_TOKEN }}
         fail_on_unmatched_files: true
         files: |
           signed/cf-cli-linux-binaries/cf-cli*
