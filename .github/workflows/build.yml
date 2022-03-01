@@ -880,8 +880,7 @@ jobs:
     - name: archive linux binaries for upload
       run: |
         pushd signed
-          mkdir linux_i686
-          mkdir linux_x86-64
+          mkdir linux_i686 linux_x86-64
           mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf8
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
           pushd linux_i686
@@ -896,6 +895,33 @@ jobs:
             cp ../../.github/license/CF_NOTICE  NOTICE
             tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
           popd
+
+          mkdir osx
+          mv cf-cli-macos-binaries/cf-cli_osx osx/cf8
+          pushd osx
+            ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
+          popd
+
+          mkdir win32 winx64
+          mv cf-cli-windows-binaries/cf-cli_win32.exe win32/cf8.exe
+          mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
+          pushd win32
+            ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
+          popd
+          pushd winx64
+            ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
+          popd
         popd
       env:
         INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
@@ -909,7 +935,10 @@ jobs:
           signed/cf-cli-macos-packages/cf*pkg \
           signed/cf-cli-windows-packages/cf*zip \
           signed/linux_i686/*tgz \
-          signed/linux_x86-64/*tgz
+          signed/linux_x86-64/*tgz \
+          signed/osx/*tgz \
+          signed/win32/*zip \
+          signed/winx64/*zip
 
     - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
