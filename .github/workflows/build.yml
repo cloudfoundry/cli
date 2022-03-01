@@ -855,7 +855,6 @@ jobs:
       actions: read
       contents: read
     steps:
-      # only needed for BUILD_VERSION
     - name: Checkout cli
       uses: actions/checkout@v2
     - name: get semver version
@@ -877,6 +876,26 @@ jobs:
     - name: debug
       run: ls -R signed
 
+
+    - name: archive linux binaries for upload
+      run: |
+        pushd signed
+          mkdir linux_i686
+          mkdir linux_x86-64
+          mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf8
+          mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
+          pushd linux_i686
+            ln -s cf8 cf
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
+          popd
+          pushd linux_x86-64
+            ln -s cf8 cf
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
+          popd
+        popd
+      env:
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
     - name: rearrange artifacts before upload
       run: |
         mkdir upload
@@ -884,7 +903,9 @@ jobs:
           signed/cf-cli-linux-rpm-packages/cf*rpm \
           signed/cf-cli-linux-deb-packages/cf*deb \
           signed/cf-cli-macos-packages/cf*pkg \
-          signed/cf-cli-windows-packages/cf*zip
+          signed/cf-cli-windows-packages/cf*zip \
+          signed/linux_i686/*tgz \
+          signed/linux_x86-64/*tgz
 
     - name: Upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
