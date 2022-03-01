@@ -44,6 +44,7 @@ jobs:
         echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
   preflight-check:
+    if: false
     runs-on: ubuntu-latest
     steps:
 
@@ -964,15 +965,15 @@ jobs:
 
 
   github-release-draft:
-    if: ${{ github.ref_type == 'tag' }}
+    # if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: write
-    needs:
-      - build-linux
-      - build-macos
-      - windows-signing
+    # needs:
+    #   - build-linux
+    #   - build-macos
+    #   - windows-signing
     steps:
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
@@ -992,14 +993,15 @@ jobs:
       with:
         draft: true
         fail_on_unmatched_files: true
-        files: |
-          signed/cf-cli-linux-binaries/cf-cli*
-          signed/cf-cli-linux-deb-packages/cf*deb
-          signed/cf-cli-linux-rpm-packages/cf*rpm
-          signed/cf-cli-macos-binaries/cf-cli*
-          signed/cf-cli-macos-packages/cf*pkg
-          signed/cf-cli-windows-binaries/cf-cli*.exe
-          signed/cf-cli-windows-packages/*.zip
+        files: BUILD_VERSION
+
+          # signed/cf-cli-linux-binaries/cf-cli*
+          # signed/cf-cli-linux-deb-packages/cf*deb
+          # signed/cf-cli-linux-rpm-packages/cf*rpm
+          # signed/cf-cli-macos-binaries/cf-cli*
+          # signed/cf-cli-macos-packages/cf*pkg
+          # signed/cf-cli-windows-binaries/cf-cli*.exe
+          # signed/cf-cli-windows-packages/*.zip
 
   # list_s3:
   #   environment: DEV
