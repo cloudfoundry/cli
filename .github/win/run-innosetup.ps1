@@ -5,13 +5,16 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 # see https://github.com/PowerShell/PowerShell/issues/3415 and https://github.com/PowerShell/PowerShell-RFC/pull/277
 
+$innoSetupWorkDir = "$PSScriptRoot"
+$licenseDir = "${PSScriptRoot}\..\license"
+
 Move-Item -Force "$CfBinary" win\cf8.exe
 
 # convert line-endings
-Get-Content win\LICENSE-WITH-3RD-PARTY-LICENSES | Set-Content win\LICENSE
-Get-Content win\CF_NOTICE | Set-Content win\NOTICE
+Get-Content ${licenseDir}\LICENSE-WITH-3RD-PARTY-LICENSES | Set-Content "${innoSetupWorkDir}\LICENSE"
+Get-Content ${licenseDir}\CF_NOTICE | Set-Content "${innoSetupWorkDir}\NOTICE"
 
 iscc "$InnoSetupConfig"
-Move-Item win\Output\mysetup.exe "$InstallerOutput"
+Move-Item "${innoSetupWorkDir}\Output\mysetup.exe" "$InstallerOutput"
 
-Get-ChildItem win\Output
+Get-ChildItem "${innoSetupWorkDir}\Output"

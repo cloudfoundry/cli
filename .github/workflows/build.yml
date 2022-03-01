@@ -692,8 +692,8 @@ jobs:
 
       - name: Sign windows binaries
         run: |
-          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
-          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
@@ -724,19 +724,19 @@ jobs:
           path: out/cf-cli_win*.exe
 
       - name: Install innosetup
-        run: .\win\install-innosetup.ps1
+        run: .\.github\win\install-innosetup.ps1
 
       - name: Run innosetup
         run: |
           mkdir "$env:RUNNER_TEMP\winx64"
-          .\win\run-innosetup.ps1 -InnoSetupConfig "win\windows-installer-v8-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
           mkdir "$env:RUNNER_TEMP\win32"
-          .\win\run-innosetup.ps1 -InnoSetupConfig "win\windows-installer-v8-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\cf8_installer.exe"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\cf8_installer.exe"
 
       - name: Sign windows installer
         run: |
-          .\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
-          .\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\win32\cf8_installer.exe"
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\win32\cf8_installer.exe"
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
@@ -749,8 +749,8 @@ jobs:
       - name: Arrange files for upload
         # note the -Path flag takes comma-delimited args
         run: |
-          Copy-Item -Destination "$env:RUNNER_TEMP\winx64" -Path win\LICENSE,win\NOTICE
-          Copy-Item -Destination "$env:RUNNER_TEMP\win32" -Path win\LICENSE,win\NOTICE
+          Copy-Item -Destination "$env:RUNNER_TEMP\winx64" -Path .github\win\LICENSE,.github\win\NOTICE
+          Copy-Item -Destination "$env:RUNNER_TEMP\win32" -Path .github\win\LICENSE,.github\win\NOTICE
 
       # - name: name windows edge artifact
       #   if: ${{ github.ref_type != 'tag' }}
