@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-set -e
+set -eo pipefail
 
 component=$1
+script_dir=$(dirname $0)
+version_file="$script_dir/../BUILD_VERSION"
 
-old_version=$(cat BUILD_VERSION)
+old_version=$(cat $version_file)
 major=$(echo $old_version | cut -d'.' -f 1)
 minor=$(echo $old_version | cut -d'.' -f 2)
 patch=$(echo $old_version | cut -d'.' -f 3)
@@ -28,14 +30,15 @@ case "$component" in
     exit 1
     ;;
 esac
+set -u
 
 version=$major.$minor.$patch
 
 echo "Updating BUILD_VERSION file to $version"
-echo $version > BUILD_VERSION
+echo $version > $version_file
 
 echo "Committing change"
 git reset .
-git add BUILD_VERSION
+git add $version_file
 
 git commit -m "Bump version to $version"
