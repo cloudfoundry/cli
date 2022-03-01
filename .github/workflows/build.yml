@@ -44,7 +44,6 @@ jobs:
         echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
   preflight-check:
-    if: false
     runs-on: ubuntu-latest
     steps:
 
@@ -965,27 +964,27 @@ jobs:
 
 
   github-release-draft:
-    # if: ${{ github.ref_type == 'tag' }}
+    if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     environment: DEV
     permissions:
       actions: read
       contents: write
-    # needs:
-    #   - build-linux
-    #   - build-macos
-    #   - windows-signing
+    needs:
+      - build-linux
+      - build-macos
+      - windows-signing
     steps:
-    # - name: Download signed artifacts
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     path: signed # download all artifacts to 'signed/'
-    - name: Download previous artifacts
-      uses: pivotalsoftware/action-download-artifact@v2
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
       with:
-        workflow: Build-Sign-Release
-        run_id: 1915228301
-        path: signed
+        path: signed # download all artifacts to 'signed/'
+    # - name: Download previous artifacts
+    #   uses: pivotalsoftware/action-download-artifact@v2
+    #   with:
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
+    #     path: signed
     - name: debug
       run: ls -R signed
 
