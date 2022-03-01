@@ -903,7 +903,7 @@ jobs:
     - name: list S3
       uses: docker://amazon/aws-cli:latest
       with:
-        args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/${{ env.INSTALLER_RELEASE_VERSION }}"
+        args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
