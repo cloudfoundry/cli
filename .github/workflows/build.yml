@@ -992,6 +992,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         draft: true
+        repository: pivotalsoftware/cli-wip
         fail_on_unmatched_files: true
         files: BUILD_VERSION
 
