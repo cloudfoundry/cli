@@ -975,16 +975,16 @@ jobs:
     #   - build-macos
     #   - windows-signing
     steps:
-    - name: Download signed artifacts
-      uses: actions/download-artifact@v2
-      with:
-        path: signed # download all artifacts to 'signed/'
-    # - name: Download previous artifacts
-    #   uses: pivotalsoftware/action-download-artifact@v2
+    # - name: Download signed artifacts
+    #   uses: actions/download-artifact@v2
     #   with:
-    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
-    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
-    #     path: signed
+    #     path: signed # download all artifacts to 'signed/'
+    - name: Download previous artifacts
+      uses: pivotalsoftware/action-download-artifact@v2
+      with:
+        workflow: Build-Sign-Release
+        run_id: 1915228301
+        path: signed
     - name: debug
       run: ls -R signed
 
@@ -994,15 +994,14 @@ jobs:
         draft: true
         repository: pivotalsoftware/cli-wip
         fail_on_unmatched_files: true
-        files: BUILD_VERSION
-
-          # signed/cf-cli-linux-binaries/cf-cli*
-          # signed/cf-cli-linux-deb-packages/cf*deb
-          # signed/cf-cli-linux-rpm-packages/cf*rpm
-          # signed/cf-cli-macos-binaries/cf-cli*
-          # signed/cf-cli-macos-packages/cf*pkg
-          # signed/cf-cli-windows-binaries/cf-cli*.exe
-          # signed/cf-cli-windows-packages/*.zip
+        files: |
+          signed/cf-cli-linux-binaries/cf-cli*
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-macos-binaries/cf-cli*
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-cli-windows-binaries/cf-cli*.exe
+          signed/cf-cli-windows-packages/*.zip
 
   # list_s3:
   #   environment: DEV
