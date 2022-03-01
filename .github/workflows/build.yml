@@ -993,10 +993,12 @@ jobs:
         draft: true
         fail_on_unmatched_files: true
         files: |
-          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-linux-binaries/cf-cli*
           signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-macos-binaries/cf-cli*
           signed/cf-cli-macos-packages/cf*pkg
-          signed/cf-cli-windows-binaries/*.exe
+          signed/cf-cli-windows-binaries/cf-cli*.exe
           signed/cf-cli-windows-packages/*.zip
 
   # list_s3:
