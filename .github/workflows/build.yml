@@ -886,10 +886,14 @@ jobs:
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
           pushd linux_i686
             ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
             tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
           popd
           pushd linux_x86-64
             ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
             tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
           popd
         popd
