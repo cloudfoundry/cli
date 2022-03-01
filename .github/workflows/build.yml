@@ -990,7 +990,7 @@ jobs:
       run: ls -R signed
 
     - name: Create draft release
-      uses: softprops/action-gh-release@v1
+      uses: pivotalsoftware/action-gh-release@v1
       with:
         draft: true
         repository: pivotalsoftware/cli-wip
