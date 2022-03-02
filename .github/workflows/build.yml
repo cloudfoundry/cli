@@ -944,7 +944,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         SOURCE_DIR: upload
-        DEST_DIR: "v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
 
     - name: Instruct human to update CLAW
       run: |
