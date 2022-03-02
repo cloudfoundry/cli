@@ -231,7 +231,7 @@ jobs:
         	echo "Version: ${RPM_VERSION}" > cf-cli.spec
         	cat cf8-cli.spec.template >> cf-cli.spec
         	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        	mv build/RPMS/i386/cf8-cli*.rpm $root/packaged/cf8-cli-installer_i686.rpm
+        	mv build/RPMS/i386/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_i686.rpm
           popd
         )
 
@@ -246,7 +246,7 @@ jobs:
         	echo "Version: ${RPM_VERSION}" > cf-cli.spec
         	cat cf8-cli.spec.template >> cf-cli.spec
         	rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_x86-64.rpm
+        	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_x86-64.rpm
           popd
         )
 
@@ -370,8 +370,8 @@ jobs:
             cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
             ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-            fakeroot dpkg --build cf cf8-cli-installer_i686.deb
-            mv cf8-cli-installer_i686.deb $root/packaged-deb
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_i686.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_i686.deb $root/packaged-deb
             rm -rf cf
           popd
         )
@@ -403,8 +403,8 @@ jobs:
             cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
             ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-            fakeroot dpkg --build cf cf8-cli-installer_x86-64.deb
-            mv cf8-cli-installer_x86-64.deb $root/packaged-deb
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_x86-64.deb $root/packaged-deb
           popd
         )
 
