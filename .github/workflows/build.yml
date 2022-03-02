@@ -992,8 +992,8 @@ jobs:
       uses: pivotalsoftware/action-gh-release@v1
       with:
         draft: true
-        repository: pivotalsoftware/cli-wip
-        token: ${{ secrets.GIT_PUBLIC_REPO_ACCESS_TOKEN }}
+        repository: ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
+        token: ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
         fail_on_unmatched_files: true
         files: |
           signed/cf-cli-linux-binaries/cf-cli*
