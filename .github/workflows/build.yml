@@ -8,7 +8,7 @@ on:
     - main
     - "v?"
     tags:
-    - 'v8.0.1*-test'
+    - 'v8.0.*'
 
 permissions:
   contents: read
