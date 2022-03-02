@@ -850,7 +850,7 @@ jobs:
       - build-linux
       - build-macos
       - windows-signing
-    environment: DEV
+    environment: PROD
     permissions:
       actions: read
       contents: read
@@ -966,7 +966,7 @@ jobs:
   github-release-draft:
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
-    environment: DEV
+    environment: PROD
     permissions:
       actions: read
       contents: write
