@@ -2303,6 +2303,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateDestinationStub        func(string, string, string) (ccv3.Warnings, error)
+	updateDestinationMutex       sync.RWMutex
+	updateDestinationArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	updateDestinationReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	updateDestinationReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UpdateEnvironmentVariableGroupStub        func(constant.EnvironmentVariableGroupName, resources.EnvironmentVariables) (resources.EnvironmentVariables, ccv3.Warnings, error)
 	updateEnvironmentVariableGroupMutex       sync.RWMutex
 	updateEnvironmentVariableGroupArgsForCall []struct {
@@ -12694,6 +12709,71 @@ func (fake *FakeCloudControllerClient) UpdateBuildpackReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateDestination(arg1 string, arg2 string, arg3 string) (ccv3.Warnings, error) {
+	fake.updateDestinationMutex.Lock()
+	ret, specificReturn := fake.updateDestinationReturnsOnCall[len(fake.updateDestinationArgsForCall)]
+	fake.updateDestinationArgsForCall = append(fake.updateDestinationArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateDestination", []interface{}{arg1, arg2, arg3})
+	fake.updateDestinationMutex.Unlock()
+	if fake.UpdateDestinationStub != nil {
+		return fake.UpdateDestinationStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateDestinationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateDestinationCallCount() int {
+	fake.updateDestinationMutex.RLock()
+	defer fake.updateDestinationMutex.RUnlock()
+	return len(fake.updateDestinationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateDestinationCalls(stub func(string, string, string) (ccv3.Warnings, error)) {
+	fake.updateDestinationMutex.Lock()
+	defer fake.updateDestinationMutex.Unlock()
+	fake.UpdateDestinationStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateDestinationArgsForCall(i int) (string, string, string) {
+	fake.updateDestinationMutex.RLock()
+	defer fake.updateDestinationMutex.RUnlock()
+	argsForCall := fake.updateDestinationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCloudControllerClient) UpdateDestinationReturns(result1 ccv3.Warnings, result2 error) {
+	fake.updateDestinationMutex.Lock()
+	defer fake.updateDestinationMutex.Unlock()
+	fake.UpdateDestinationStub = nil
+	fake.updateDestinationReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateDestinationReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.updateDestinationMutex.Lock()
+	defer fake.updateDestinationMutex.Unlock()
+	fake.UpdateDestinationStub = nil
+	if fake.updateDestinationReturnsOnCall == nil {
+		fake.updateDestinationReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.updateDestinationReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateEnvironmentVariableGroup(arg1 constant.EnvironmentVariableGroupName, arg2 resources.EnvironmentVariables) (resources.EnvironmentVariables, ccv3.Warnings, error) {
 	fake.updateEnvironmentVariableGroupMutex.Lock()
 	ret, specificReturn := fake.updateEnvironmentVariableGroupReturnsOnCall[len(fake.updateEnvironmentVariableGroupArgsForCall)]
@@ -14611,6 +14691,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateApplicationStopMutex.RUnlock()
 	fake.updateBuildpackMutex.RLock()
 	defer fake.updateBuildpackMutex.RUnlock()
+	fake.updateDestinationMutex.RLock()
+	defer fake.updateDestinationMutex.RUnlock()
 	fake.updateEnvironmentVariableGroupMutex.RLock()
 	defer fake.updateEnvironmentVariableGroupMutex.RUnlock()
 	fake.updateFeatureFlagMutex.RLock()

@@ -112,6 +112,7 @@ const (
 	PatchApplicationFeaturesRequest                             = "PatchApplicationFeatures"
 	PatchEnvironmentVariableGroupRequest                        = "PatchEnvironmentVariableGroup"
 	PatchBuildpackRequest                                       = "PatchBuildpack"
+	PatchDestinationRequest                                     = "PatchDestination"
 	PatchDomainRequest                                          = "PatchDomain"
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
@@ -275,6 +276,7 @@ var APIRoutes = map[string]Route{
 	GetRouteDestinationsRequest:                                 {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodGet},
 	MapRouteRequest:                                             {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodPost},
 	UnmapRouteRequest:                                           {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodDelete},
+	PatchDestinationRequest:                                     {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodPatch},
 	GetSecurityGroupsRequest:                                    {Path: "/v3/security_groups", Method: http.MethodGet},
 	PostSecurityGroupRequest:                                    {Path: "/v3/security_groups", Method: http.MethodPost},
 	DeleteSecurityGroupRequest:                                  {Path: "/v3/security_groups/:security_group_guid", Method: http.MethodDelete},

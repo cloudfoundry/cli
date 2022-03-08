@@ -131,3 +131,20 @@ func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warni
 
 	return warnings, err
 }
+
+func (client Client) UpdateDestination(routeGUID string, destinationGUID string, protocol string) (Warnings, error) {
+	type body struct {
+		Protocol string `json:"protocol"`
+	}
+	requestBody := body{
+		Protocol: protocol,
+	}
+	var responseBody resources.Build
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.PatchDestinationRequest,
+		URIParams:    internal.Params{"route_guid": routeGUID, "destination_guid": destinationGUID},
+		RequestBody:  &requestBody,
+		ResponseBody: &responseBody,
+	})
+	return warnings, err
+}
