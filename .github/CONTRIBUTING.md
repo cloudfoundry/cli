@@ -8,7 +8,8 @@ mailing list.
 
 ## CLI Versions
 The cf CLI follows a branching model:
-- V8 of the cf CLI is built from the [master branch](https://github.com/cloudfoundry/cli/tree/master). **This branch is under active development**.
+- V9 (Next major release) of the cf CLI is built from the [master branch](https://github.com/cloudfoundry/cli/tree/master). **This branch is under active development**.
+- V8 of the cf CLI is built from the [v8 branch](https://github.com/cloudfoundry/cli/tree/v8). **This branch is under active development**.
 - V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is maintenance only** and will only be updated to patch CVEs and very severe blocking defects.
 - V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is maintenance only** and will only be updated to patch CVEs and very severe blocking defects.
 
