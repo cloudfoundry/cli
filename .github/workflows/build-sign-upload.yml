@@ -1,4 +1,4 @@
-name: Build-Sign-Release
+name: Build-Sign-Upload
 
 on:
   push:
