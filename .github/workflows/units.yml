@@ -13,101 +13,110 @@ defaults:
     shell: bash
 
 jobs:
+  shared-values:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - id: set-go-version
+      run: |
+        echo "::set-output name=go-version::1.17"
+
   lint:
     name: Lint code
     runs-on: ubuntu-latest
+    needs: shared-values
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
-    -
-      name: Run go fmt
+        go-version: ${{ needs.shared-values.outputs.go-version }}
+
+    - name: Run go fmt
       run: go fmt && git diff --exit-code
 
-  units-linux:
-    name: Units Linux
-    runs-on: ubuntu-latest
+  units:
+    name: Units
+    needs: shared-values
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-18.04
+          - macos-latest
+          - macos-10.15
+    runs-on: ${{ matrix.os }}
     steps:
-    -
-      name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    -
-      name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
-    -
-      name: Set up Test
-      run: |
-        go get -u github.com/onsi/ginkgo/ginkgo
-        go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run Linux Units
-      run: make units
-      env:
-        ACK_GINKGO_RC: true
 
-  units-macos:
-    name: Units OS X
-    runs-on: macos-latest
-    steps:
-    -
-      name: Checkout
+    - name: Checkout
       uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
-    -
-      name: Set up Test
+        go-version: ${{ needs.shared-values.outputs.go-version }}
+
+    - name: Set up Test
       run: |
         go get -u github.com/onsi/ginkgo/ginkgo
         go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run MacOS Units
+
+    - name: Run Linux Units
       run: make units
       env:
         ACK_GINKGO_RC: true
 
   units-windows:
     name: Units Windows
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os:
+          - windows-2022
+          - windows-2019
+          - windows-2016
+    runs-on: ${{ matrix.os }}
+    needs: shared-values
+    defaults:
+      run:
+        shell: pwsh
     steps:
-    -
-      name: Checkout
+
+    - name: Checkout
       uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    -
-      name: Set up Go
+
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
-    -
-      name: Set up Test
+        go-version: ${{ needs.shared-values.outputs.go-version }}
+
+    - name: Set up Test
       run: |
         go get -u github.com/onsi/ginkgo/ginkgo
         go get github.com/onsi/gomega/matchers@v1.10.5
-    -
-      name: Run Windows Units
-      shell: pwsh
+
+    - name: Get build-time dependencies
+      run: |
+        choco install --no-progress --limit-output -y make
+
+    - name: Run Windows Units
+      env:
+        ACK_GINKGO_RC: true
       run: >
+        # Get-Command make
+        # Get-Item Makefile
+        # make units-non-plugin
+
         ginkgo -r -p
         -randomizeAllSpecs
         -randomizeSuites
         -skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
         -flakeAttempts=2
-      env:
-        ACK_GINKGO_RC: true
+
+# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

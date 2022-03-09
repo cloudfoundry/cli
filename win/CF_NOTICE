@@ -1,0 +1,36 @@
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+This product contains software that is Copyright (c) 2013-2015 Pivotal Software, Inc.
+
+This product is licensed to you under the Apache License, Version 2.0 (the "License").
+
+You may not use this project except in compliance with the License.
+
+
+Attribution notices:
+
+This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/code.cloudfoundry.org/gofileutils/fileutils that is:
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+Copyright (c) 2014-2015 Pivotal Software, Inc.
+and is licensed under the Apache License, Version 2.0.
+
+This product includes software from https://github.com/code.cloudfoundry.org/cli/tree/master/vendor/code.cloudfoundry.org/ykk that is:
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+and is licensed under the Apache License, Version 2.0.
+
+This product includes software from https://github.com/code.cloudfoundry.org/cli/tree/master/vendor/code.cloudfoundry.org/cfnetworking-cli-api that is:
+Copyright (c) 2016-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+and is licensed under the Apache License, Version 2.0.
+
+This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/github.com/cloudfoundry/cli-plugin-repo/web that is:
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+Copyright (c) 2015 Pivotal Software, Inc.
+and is licensed under the Apache License, Version 2.0.
+
+This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/github.com/cloudfoundry/dropsonde that is:
+Copyright (c) 2014-2015 Pivotal Software, Inc.
+and is licensed under the Apache License, Version 2.0.
+
+This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/github.com/docker/docker/pkg/term that is:
+Copyright 2012-2016 Docker, Inc.
+and is licensed under the Apache License, Version 2.0.
