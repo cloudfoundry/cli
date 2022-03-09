@@ -1,10 +1,6 @@
 name: Update Repositories
 
 on:
-  push:
-    branches:
-    - gh-actions*
-
   workflow_dispatch:
     inputs:
       build_version:
@@ -12,11 +8,6 @@ on:
         required: true
         default: '8.0.100-test'
         type: string
-      environment:
-        description: 'Environment to run agains'
-        type: environment
-        default: 'PROD'
-        required: true
 
 permissions:
   contents: write
@@ -29,6 +20,7 @@ jobs:
   shared-values:
     name: Setup
     runs-on: ubuntu-latest
+    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       build-version: ${{ steps.set-build-version.outputs.build-version }}
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
@@ -45,7 +37,6 @@ jobs:
       id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
-        version=8.2.0 #TODO: remove dev shim
         echo "::set-output name=build-version::$version"
 
   update-homebrew:
