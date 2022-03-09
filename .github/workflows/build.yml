@@ -1,16 +1,14 @@
-name: Build and Sign - DEV
+name: Build-Sign-Release
 
 on:
   push:
     branches:
-    - gha-allplatforms
-    - gh-actions
+    - gh-actions*
     - master
     - main
     - "v?"
     tags:
-    - 'v0.0.*-test'
-    - 'v8.100.*-test'
+    - 'v8.0.*'
 
 permissions:
   contents: read
@@ -25,7 +23,7 @@ jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
   reuse-artifacts:
-    environment: DEV
+    environment: PROD
     runs-on: ubuntu-latest
     outputs:
       reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
@@ -45,35 +43,48 @@ jobs:
       run: |
         echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
+  preflight-check:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
+
+    - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
+      run: |
+        echo "Git Ref: ${{ github.ref }}"
+        echo "BUILD_VERSION: $(cat BUILD_VERSION)"
+
+        # [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
+        # temporary short circut for the development
+        exit 0
+
   shared-values:
     runs-on: ubuntu-latest
+    needs: preflight-check
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
       build-version: ${{ steps.set-build-version.outputs.build-version }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
-    - id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::DEV"
-    - name: Checkout
+
+    - name: Set environment
+      id: set-secrets-environment
+      run: echo "::set-output name=secrets-environment::PROD"
+
+    - name: Checkout cli
       uses: actions/checkout@v2
-    - id: set-build-version
+
+    - name: Set build version
+      id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
-        echo "::set-build-version=build-version::$version"
+        echo "::set-output name=build-version::$version"
 
-  print_secrets:
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo "Releasing versino: ${{ github.event.inputs.future_version }}!"
-        echo "Key container pass phrase: ${{ github.event.inputs.key_passphrase }}!"
-        echo "bucket var is: ${{ secrets.AWS_BUCKET_STAGING }}"
-        echo "aws key id is: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-        echo "all envs are:"
-        env
-      env:
-        AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    - name: Set go version
+      id: set-go-version
+      run: echo "::set-output name=go-version::1.17"
 
   test-rpm-package:
     name: Test RPM Packages
@@ -86,23 +97,14 @@ jobs:
     - name: Download Signed Linux Packages
       uses: actions/download-artifact@v2
       with:
-        name: signed-linux-rpm-packages
+        name: cf-cli-linux-rpm-packages
 
     - name: Display structure of downloaded files
       run: ls -R
 
     - name: Test RPMs
-      env:
-        RELEASE_VERSION: ${{ inputs.version }}
       run: |
-        echo "RELEASE_VERSION: $RELEASE_VERSION"
-        RELEASE_VERSION=8.100.0
-
-        rpm_location="*.rpm"
-
-        rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $rpm_location
-        rpm -i $rpm_location
-        cf -v
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
 
   test-deb-package:
     name: Test Debian Packages
@@ -115,14 +117,12 @@ jobs:
     - name: Download Signed Linux Packages
       uses: actions/download-artifact@v2
       with:
-        name: store-linux-deb-packages
+        name: cf-cli-linux-deb-packages
 
     - name: Display structure of downloaded files
       run: |
         ls -R
-        for f in store-linux-deb-packages/*.deb; do
-          dpkg --info "$f"
-        done
+        ls *.deb | xargs -n1 dpkg --info
 
   test-macos:
     name: Test macOS Packages
@@ -133,7 +133,7 @@ jobs:
     - name: Download Signed macOS Packages
       uses: actions/download-artifact@v2
       with:
-        name: macos-signed-packages
+        name: cf-cli-macos-packages
 
     - name: Inspect macOS packages
       run: |
@@ -148,17 +148,18 @@ jobs:
     if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
-    steps:
 
-    - name: Checkout cli
-      uses: actions/checkout@v2
+    env:
+      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+
+    steps:
 
     - name: Get Build Version
       id: get_build_version
-      run: echo "::set-output name=build_version::$(cat BUILD_VERSION)"
+      run: echo "BUILD_VERSION $BUILD_VERSION"
 
-    - name: Print Build Version
-      run: echo "${{ steps.get_build_version.outputs.build_version }}"
+    - name: Checkout cli
+      uses: actions/checkout@v2
 
     - name: Checkout cli-ci
       uses: actions/checkout@v2
@@ -168,11 +169,11 @@ jobs:
         ref: master
 
     - name: Install Linux Packages
-      run: sudo apt update && sudo apt install -y --no-install-recommends expect fakeroot
+      run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Print go environment
       id: go-cache-paths
@@ -191,14 +192,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: View GPG keys
-      run: |
-        gpg --list-keys
-
     - name: Build Linux
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
+
+    - name: Store Linux Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-binaries
+        path: out/cf-cli_linux*
 
     - name: Build RedHat Packages
       env:
@@ -213,8 +217,7 @@ jobs:
         $SIGNING_KEY_GPG_ID
         EOF
 
-        VERSION=$(cat BUILD_VERSION)
-        RPM_VERSION=${VERSION//-/_}
+        RPM_VERSION=${BUILD_VERSION//-/_}
 
         mkdir -pv $root/packaged
 
@@ -228,7 +231,7 @@ jobs:
         	echo "Version: ${RPM_VERSION}" > cf-cli.spec
         	cat cf8-cli.spec.template >> cf-cli.spec
         	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        	mv build/RPMS/i386/cf8-cli*.rpm $root/packaged/cf8-cli-installer_i686.rpm
+        	mv build/RPMS/i386/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_i686.rpm
           popd
         )
 
@@ -243,7 +246,7 @@ jobs:
         	echo "Version: ${RPM_VERSION}" > cf-cli.spec
         	cat cf8-cli.spec.template >> cf-cli.spec
         	rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_x86-64.rpm
+        	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_x86-64.rpm
           popd
         )
 
@@ -253,6 +256,10 @@ jobs:
       run: |
         echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
 
+    - name: View GPG keys
+      run: |
+        gpg --list-keys
+
     - name: Sign RedHat Packages
       env:
         SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
@@ -260,19 +267,6 @@ jobs:
       run: |
         set -ex
         set -o pipefail
-
-        cat<< EOF >sign-rpm
-        #!/usr/bin/expect -f
-        spawn rpmsign --addsign {*}\$argv
-        expect -exact "Enter pass phrase: "
-        send -- "$SIGNING_KEY_GPG_PASSPHRASE\r"
-        expect eof
-        EOF
-
-        chmod 700 sign-rpm
-
-        VERSION=$(cat BUILD_VERSION)
-        echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
         SUFFIX=8
 
@@ -282,47 +276,32 @@ jobs:
         %_gpg_name $SIGNING_KEY_GPG_ID
         EOF
 
-        mkdir gpg-dir
-        export GNUPGHOME=$PWD/gpg-dir
-        chmod 700 $GNUPGHOME
+        # mkdir gpg-dir
+        # export GNUPGHOME=$PWD/gpg-dir
+        # chmod 700 $GNUPGHOME
         # TODO: restore
         # trap "rm -rf $GNUPGHOME" 0
 
         cp packaged/cf*.rpm   signed-redhat-installer/
 
-        # ./sign-rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_i686.rpm
-        # ./sign-rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_x86-64.rpm
-
-        # echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
-
         # gpg-connect-agent RELOADAGENT /bye
 
+        # echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
         # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset B94FA54D4D79041DD7966A6E7AE4622DAA833376 #pvt
         # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset 5E2EA1C9C49415D8F15E7509A151D2E521CC07EA # pub
 
         # TODO: consider to add --key-id
-        # rpmsign --addsign signed-redhat-installer/*.rpm
-
-        for r in signed-redhat-installer/*.rpm; do
-          echo $r
-          # rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $r
-          # rpmsign --addsign $r
-          # rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $r
-        done
+        rpmsign --addsign signed-redhat-installer/*.rpm
 
     - name: Print RPM Signature
-      run: |
-        for f in *.rpm; do
-          echo $f
-          rpm -q --qf '%{SIGPGP:pgpsig} %{SIGGPG:pgpsig}\n' -p $f
-        done
+      run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
       working-directory: signed-redhat-installer
 
-    - name: Store Signed Linux Packages
+    - name: Store Signed Linux RPM Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: signed-linux-rpm-packages
+        name: cf-cli-linux-rpm-packages
         path: signed-redhat-installer/*.rpm
 
     # - name: Setup upterm session
@@ -362,89 +341,88 @@ jobs:
 
         root=$PWD
 
-        VERSION=$(cat BUILD_VERSION)
-
-        mkdir -pv $root/packaged
+        mkdir -pv $root/packaged-deb
 
         echo "Build 32-bit Debian package"
         (
-        	SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
 
-        	pushd cli-ci/ci/installers/deb
-        	  mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
-        	  cp copyright_preamble cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-        	  cat copyright_comment_header >> cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-        	  cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
 
-        	  cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
-        	  cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
 
-        	  cp control_v8.template cf/DEBIAN/control
-        	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${VERSION}" >> cf/DEBIAN/control
-        	  echo "Architecture: i386" >> cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: i386" >> cf/DEBIAN/control
 
-        	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
-        	  cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
-        	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+            cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-        	  fakeroot dpkg --build cf cf8-cli-installer_i686.deb
-        	  mv cf8-cli-installer_i686.deb $root/packaged
-        	  rm -rf cf
-        	popd
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_i686.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_i686.deb $root/packaged-deb
+            rm -rf cf
+          popd
         )
 
         echo "Build 64-bit Debian package"
         (
-        	SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
 
-        	pushd cli-ci/ci/installers/deb
-        	  mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
-        	  cp copyright_preamble cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-        	  cat copyright_comment_header >> cf/DEBIAN/copyright
-        	  sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-        	  cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
 
-        	  cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
-        	  cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
 
-        	  cp control_v8.template cf/DEBIAN/control
-        	  echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-        	  echo "Version: ${VERSION}" >> cf/DEBIAN/control
-        	  echo "Architecture: amd64" >> cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: amd64" >> cf/DEBIAN/control
 
-        	  cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
-        	  cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
-        	  ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+            cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-        	  fakeroot dpkg --build cf cf8-cli-installer_x86-64.deb
-        	  mv cf8-cli-installer_x86-64.deb $root/packaged
-        	popd
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_x86-64.deb $root/packaged-deb
+          popd
         )
 
     - name: Print DEB Packages Info
       run: |
+        ls -R
         for f in *.deb; do
           echo $f
           dpkg --info $f
         done
-      working-directory: packaged
+      working-directory: packaged-deb
 
     - name: Store Debian Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: store-linux-deb-packages
-        path: packaged/*.deb
+        name: cf-cli-linux-deb-packages
+        path: packaged-deb/*.deb
 
   build-macos:
     name: Build macOS
@@ -456,7 +434,15 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
 
-    - name: Checkout
+    - name: Setup
+      run: |
+        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build-version }}" >> $GITHUB_ENV
+
+    - name: Get Build Version
+      id: get_build_version
+      run: echo "BUILD_VERSION $BUILD_VERSION"
+
+    - name: Checkout cli
       uses: actions/checkout@v2
       # with:
       #   fetch-depth: 0
@@ -482,13 +468,14 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: ${{ needs.shared-values.outputs.go-version }}
 
     - name: Update Homebrew
       run: |
-        brew tap mitchellh/gon
+        # brew tap mitchellh/gon
+        brew tap pivotalsoftware/gon
         brew update --preinstall
-        cat "$(brew --repository)/Library/Taps/mitchellh/homebrew-gon/gon.rb" > .github/brew-formulae
+        cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
 
     - name: Configure Homebrew cache
       uses: actions/cache@v2
@@ -501,7 +488,7 @@ jobs:
 
     - name: Install Homebrew dependencies
       run: |
-        env HOMEBREW_NO_AUTO_UPDATE=1 brew install mitchellh/gon/gon coreutils
+        env HOMEBREW_NO_AUTO_UPDATE=1 brew install pivotalsoftware/gon/gon coreutils
 
     - name: Print go environment
       id: go-cache-paths
@@ -525,6 +512,13 @@ jobs:
         make out/cf-cli_osx
         make out/cf-cli_osx_arm
 
+    - name: Store macOS Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-macos-binaries
+        path: out/cf-cli*
+
     - name: Build macOS Installer
       run: |
         set -ex
@@ -534,37 +528,31 @@ jobs:
 
         mkdir -pv $root/packaged
 
-        VERSION=$(cat BUILD_VERSION)
         echo "Building OS X installer"
         (
-          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
+        SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
 
-          pushd cli-ci/ci/installers/osx_v8
-            sed -i -e "s/VERSION/${VERSION}/g" Distribution
-            sed -i -e "s/SIZE/${SIZE}/g" Distribution
-            mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
+        pushd cli-ci/ci/installers/osx_v8
+          sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
+          sed -i -e "s/SIZE/${SIZE}/g" Distribution
+          mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
 
-            cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
-            gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
-            cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
-            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
-            chmod -R go-w cf-cli
-            pushd cf-cli
-              find usr | cpio -o --format=odc | gzip -c > ../Payload
-            popd
-
-            $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
-            mkbom -i bom_list Bom
-            mv Bom Payload com.cloudfoundry.cf8-cli.pkg
-            xar -c --compression none -f cf8-cli-installer_osx.pkg com.cloudfoundry.cf8-cli.pkg Distribution
-            mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
+          cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
+          gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
+          cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
+          chmod -R go-w cf-cli
+          pushd cf-cli
+            find usr | cpio -o --format=odc | gzip -c > ../Payload
           popd
-        )
 
-    - name: Print go environment
-      id: get-version
-      run: |
-        echo "::set-output name=version::$(cat BUILD_VERSION)"
+          $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+          mkbom -i bom_list Bom
+          mv Bom Payload com.cloudfoundry.cf8-cli.pkg
+          xar -c --compression none -f cf8-cli-installer_osx.pkg com.cloudfoundry.cf8-cli.pkg Distribution
+          mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
+        popd
+        )
 
     - name: Load macos key
       env:
@@ -622,7 +610,6 @@ jobs:
     - name: Sign macOS
       env:
         SUFFIX: 8
-        VERSION: ${{ steps.get-version.outputs.version }}
         SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
       run: |
@@ -634,13 +621,13 @@ jobs:
         productsign --timestamp \
           --sign "$SIGNING_KEY_MAC_ID" \
           "$root/packaged/cf${SUFFIX}-cli-installer_osx.pkg" \
-          "signed-osx-installer/cf${SUFFIX}-cli-installer_${VERSION}_osx.pkg"
+          "signed-osx-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
 
     - name: Store macOS Signed Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
-        name: macos-signed-packages
+        name: cf-cli-macos-packages
         path: signed-osx-installer/*.pkg
 
 
@@ -667,7 +654,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ needs.shared-values.outputs.go-version }}
 
       - name: Get build-time dependencies
         run: |
@@ -705,8 +692,8 @@ jobs:
 
       - name: Sign windows binaries
         run: |
-          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
-          .\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
@@ -715,6 +702,11 @@ jobs:
         run: |
           Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_win32.exe
           Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_winx64.exe
+
+      - name: Make symlinks
+        run: |
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_win32.exe -Path .\out\cf-cli_win32-link.exe
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
 
       # - name: enable ssh
       #   if: always()
@@ -727,39 +719,82 @@ jobs:
       - name: Save signed binaries as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cf-windows-binaries
+          name: cf-cli-windows-binaries
           if-no-files-found: error
-          path: |
-            out/cf-cli_win32.exe
-            out/cf-cli_winx64.exe
+          path: out/cf-cli_win*.exe
 
       - name: Install innosetup
-        run: .\win\install-innosetup.ps1
+        run: .\.github\win\install-innosetup.ps1
 
       - name: Run innosetup
         run: |
-          mkdir "$env:RUNNER_TEMP\x64"
-          .\win\run-innosetup.ps1 -InstallerOutputFilePath "$env:RUNNER_TEMP\x64\cf8_installer.exe"
+          mkdir "$env:RUNNER_TEMP\winx64"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          mkdir "$env:RUNNER_TEMP\win32"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\cf8_installer.exe"
 
       - name: Sign windows installer
-        run: .\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\x64\cf8_installer.exe"
+        run: |
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\win32\cf8_installer.exe"
         env:
           SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
       - name: View installer signature
-        run: Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\x64\cf8_installer.exe"
+        run: |
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\win32\cf8_installer.exe"
 
       - name: Arrange files for upload
         # note the -Path flag takes comma-delimited args
-        run: Copy-Item -Destination "$env:RUNNER_TEMP\x64" -Path win\LICENSE,win\NOTICE
+        run: |
+          Copy-Item -Destination "$env:RUNNER_TEMP\winx64" -Path .github\win\LICENSE,.github\win\NOTICE
+          Copy-Item -Destination "$env:RUNNER_TEMP\win32" -Path .github\win\LICENSE,.github\win\NOTICE
 
-      - name: Save 64-bit installer and dist files as a GitHub Action Artifact
+      # - name: name windows edge artifact
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      #   run: |
+      #     echo "INSTALLER_RELEASE_VERSION=edge" >> $GITHUB_ENV
+      #     echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_edge_winx64.zip" >> $GITHUB_ENV
+      #     # echo "BINARY_ZIP_FILENAME: " >> ENV
+      # - name: name windows release artifact
+      #   if: ${{ github.ref_type == 'tag' }}
+      #   # set environment vars for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      #   run: |
+      #     # strip leading v to go from tag -> semver
+      #     INSTALLER_RELEASE_VERSION=$(echo ${{ github.ref_name }} | tr -d v)
+      #     echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
+      #     echo "INSTALLER_ZIP_FILENAME=cf8-cli-installer_${INSTALLER_RELEASE_VERSION}_winx64.zip" >> $GITHUB_ENV
+      #     cat $GITHUB_ENV
+      # - name: zip windows artifact
+      #   run: |
+      #     pushd signed/cf8-cli-installer_winx64
+      #       zip "$INSTALLER_ZIP_FILENAME" *
+      #       ls
+      #     popd
+
+      - name: zip windows artifact
+        run: |
+          # strip leading v to go from tag -> semver
+          $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
+          pushd "$env:RUNNER_TEMP\winx64"
+            $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_winx64.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          pushd "$env:RUNNER_TEMP\win32"
+            $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_win32.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          Get-ChildItem "$env:RUNNER_TEMP"
+
+      - name: Save installer and dist files as a GitHub Action Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cf8-cli-installer_winx64
+          name: cf-cli-windows-packages
           if-no-files-found: error
-          path: ${{ runner.temp }}/x64/*
+          path: ${{ runner.temp }}/cf8-cli-installer*win*.zip
 
       # - name: ssh session
       #   if: always()
@@ -779,33 +814,213 @@ jobs:
       # #     version: latest
       # #     args: jsonschema
 
-  upload-artifacts:
-    if: false
-    name: Upload to S3
+  # upload-artifacts:
+  #   if: false
+  #   name: Upload to S3
+  #   runs-on: ubuntu-latest
+  #   needs: [ build-linux, test-macos, test-rpm-package, test-deb-package ]
+
+  #   steps:
+  #   - name: Upload to S3
+  #     run: |
+  #       echo "Upload to S3"
+  #       # set -ex
+
+  #       # if [ "$TARGET_MAJOR_VERSION" == "7" ]; then
+  #       #  BUCKET_PREFIX=v7-
+  #       # elif [ "$TARGET_MAJOR_VERSION" == "8" ]; then
+  #       #  BUCKET_PREFIX=v8-
+  #       # else
+  #       #  BUCKET_PREFIX=
+  #       # fi
+
+  #       # aws s3 cp repackaged-binaries-and-installers/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+  #       # aws s3 cp signed-osx-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+  #       # aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+  #       # aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${BUILD_VERSION}/ --recursive
+
+#################################
+######## Release Section ########
+#################################
+
+  s3-upload:
+    if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
-    needs: [ build-linux, test-macos, test-rpm-package, test-deb-package ]
-
+    needs:
+      - build-linux
+      - build-macos
+      - windows-signing
+    environment: PROD
+    permissions:
+      actions: read
+      contents: read
     steps:
-    - name: Upload to S3
+    - name: Checkout cli
+      uses: actions/checkout@v2
+    - name: get semver version
+      # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
-        echo "Upload to S3"
-        # set -ex
+        INSTALLER_RELEASE_VERSION=$(cat BUILD_VERSION | tr -d v)
+        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
 
-        # if [ "$TARGET_MAJOR_VERSION" == "7" ]; then
-        #  VERSION=$(cat cli/BUILD_VERSION)
-        #  BUCKET_PREFIX=v7-
-        # elif [ "$TARGET_MAJOR_VERSION" == "8" ]; then
-        #  VERSION=$(cat cli/BUILD_VERSION)
-        #  BUCKET_PREFIX=v8-
-        # else
-        #  VERSION=$(cat cli/BUILD_VERSION)
-        #  BUCKET_PREFIX=
-        # fi
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: signed # download all artifacts to 'signed/'
+    # - name: Download previous artifacts
+    #   uses: pivotalsoftware/action-download-artifact@v2
+    #   with:
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
+    #     path: signed
+    - name: debug
+      run: ls -R signed
 
-        # aws s3 cp repackaged-binaries-and-installers/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-osx-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
-        # aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
+
+    - name: archive linux binaries for upload
+      run: |
+        symlink_and_copy_license() {
+            ln -s cf8 cf
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+        }
+        pushd signed
+          mkdir linux_i686 linux_x86-64
+          mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf8
+          mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
+          pushd linux_i686
+            symlink_and_copy_license
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
+          popd
+          pushd linux_x86-64
+            symlink_and_copy_license
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
+          popd
+
+          mkdir osx
+          mv cf-cli-macos-binaries/cf-cli_osx osx/cf8
+          pushd osx
+            symlink_and_copy_license
+            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
+          popd
+
+          mkdir win32 winx64
+          mv cf-cli-windows-binaries/cf-cli_win32.exe win32/cf8.exe
+          mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
+          pushd win32
+            symlink_and_copy_license
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
+          popd
+          pushd winx64
+            symlink_and_copy_license
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
+          popd
+        popd
+      env:
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+    - name: rearrange artifacts before upload
+      run: |
+        mkdir upload
+        cp -t upload  \
+          signed/cf-cli-linux-rpm-packages/cf*rpm \
+          signed/cf-cli-linux-deb-packages/cf*deb \
+          signed/cf-cli-macos-packages/cf*pkg \
+          signed/cf-cli-windows-packages/cf*zip \
+          signed/linux_i686/*tgz \
+          signed/linux_x86-64/*tgz \
+          signed/osx/*tgz \
+          signed/win32/*zip \
+          signed/winx64/*zip
+
+    - name: Upload installers to CLAW S3 bucket
+      if: ${{ github.ref_type == 'tag' }}
+      # forked for security considerations
+      uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        SOURCE_DIR: upload
+        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+
+    - name: Instruct human to update CLAW
+      run: |
+        echo "Please go to https://github.com/cloudfoundry/CLAW/blob/develop/claw-variables.yml and add the following line to the file:"
+        echo
+        echo "- ${INSTALLER_RELEASE_VERSION}"
+
+    - name: list S3
+      uses: docker://amazon/aws-cli:latest
+      with:
+        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+
+  github-release-draft:
+    if: ${{ github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    environment: PROD
+    permissions:
+      actions: read
+      contents: write
+    needs:
+      - build-linux
+      - build-macos
+      - windows-signing
+    steps:
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: signed # download all artifacts to 'signed/'
+    # - name: Download previous artifacts
+    #   uses: pivotalsoftware/action-download-artifact@v2
+    #   with:
+    #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
+    #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
+    #     path: signed
+    - name: debug
+      run: ls -R signed
+
+    - name: Create draft release
+      uses: pivotalsoftware/action-gh-release@v1
+      with:
+        draft: true
+        repository: ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
+        token: ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
+        fail_on_unmatched_files: true
+        files: |
+          signed/cf-cli-linux-binaries/cf-cli*
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-macos-binaries/cf-cli*
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-cli-windows-binaries/cf-cli*.exe
+          signed/cf-cli-windows-packages/*.zip
+
+  # list_s3:
+  #   environment: DEV
+  #   runs-on: ubuntu-latest
+  #   needs: s3-upload
+  #   steps:
+  #     - uses: docker://amazon/aws-cli:latest
+  #       with:
+  #         args: s3 ls --region us-east-1 "${{ env.AWS_S3_BUCKET }}/v8-cf-cli-releases/releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+  #       env:
+  #         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+#######################################################################
+# ------------------------------------------------------------------- #
+#######################################################################
 
 
 # Update:
