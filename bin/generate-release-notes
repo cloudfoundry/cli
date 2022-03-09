@@ -5,7 +5,7 @@ VERSION=$(cat BUILD_VERSION)
 cat <<-NOTES
 Package Manager Installation
 ----------
-- [apt-get, yum, homebrew](https://github.com/cloudfoundry/cli#installing-using-a-package-manager)
+- [apt-get, yum, homebrew](https://github.com/cloudfoundry/cli#getting-started)
 
 Installers
 ----------

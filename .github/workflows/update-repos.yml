@@ -1,22 +1,13 @@
 name: Update Repositories
 
 on:
-  push:
-    branches:
-    - gh-actions*
-
   workflow_dispatch:
     inputs:
       build_version:
         description: 'Build Version'
         required: true
-        default: '8.0.100-test'
+        default: '8.3.0'
         type: string
-      environment:
-        description: 'Environment to run agains'
-        type: environment
-        default: 'PROD'
-        required: true
 
 permissions:
   contents: write
@@ -29,6 +20,7 @@ jobs:
   shared-values:
     name: Setup
     runs-on: ubuntu-latest
+    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       build-version: ${{ steps.set-build-version.outputs.build-version }}
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
@@ -45,7 +37,6 @@ jobs:
       id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
-        version=8.2.0 #TODO: remove dev shim
         echo "::set-output name=build-version::$version"
 
   update-homebrew:
@@ -64,21 +55,13 @@ jobs:
         ref: master
         path: cli-ci
 
-    ############ - name: Checkout homebrew-tap
-    ############   uses: actions/checkout@v2
-    ############   with:
-    ############     repository: cloudfoundry/homebrew-tap.git
-    ############     ref: master
-    ############     path: homebrew-tap
-
     - name: Checkout homebrew-tap
       uses: actions/checkout@v2
       with:
-        repository: pivotal-cf/homebrew-tap-test
+        repository: cloudfoundry/homebrew-tap
         ref: master
         path: homebrew-tap
-        ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP_TEST }}
-
+        ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP }}
 
     - name: Setup
       run: |
@@ -86,6 +69,7 @@ jobs:
 
     - name: Calculate checksums
       run: |
+        set -x
 
         curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${BUILD_VERSION}&source=github-rel" \
           > cf8-cli-osx-tarball/cf8-cli_${BUILD_VERSION}_osx.tgz
@@ -210,7 +194,7 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     env:
       BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
-      AWS_BUCKET_NAME: cf-cli-debian-repo-dev
+      AWS_BUCKET_NAME: cf-cli-debian-repo
       AWS_DEFAULT_REGION: us-west-2
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -398,7 +382,7 @@ jobs:
         args: >
           s3 sync --delete
           repodata
-          s3://cf-cli-dev/rpm/
+          s3://cf-cli-rpm-repo/repodata
 
   test-rpm-repo:
     name: Test RPM Repository
