@@ -1,0 +1,14 @@
+{
+    "source" : [
+        "./dist/hello-darwin_darwin_amd64/hello",
+        "./dist/hello-darwin_darwin_arm64/hello"
+    ],
+    "bundle_id" : "com.example.hello",
+    "apple_id": {
+        "username" : "none@example.com",
+        "password":  "@env:AC_PASSWORD"
+    },
+    "sign" :{
+        "application_identity" : "test-sign"
+    }
+}
