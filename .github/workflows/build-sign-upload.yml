@@ -3,7 +3,7 @@ name: Build-Sign-Upload
 on:
   push:
     tags:
-    - 'v8.0.*'
+    - 'v8.*'
 
 permissions:
   contents: read
