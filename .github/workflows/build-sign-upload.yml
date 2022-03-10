@@ -948,15 +948,15 @@ jobs:
         echo
         echo "- ${INSTALLER_RELEASE_VERSION}"
 
-    - name: list S3
-      uses: docker://amazon/aws-cli:latest
-      with:
-        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
-      env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+    # - name: list S3
+    #   uses: docker://amazon/aws-cli:latest
+    #   with:
+    #     args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+    #   env:
+    #     AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
 
 
   github-release-draft:
