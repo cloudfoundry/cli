@@ -17,26 +17,26 @@ defaults:
 jobs:
   # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
   # see https://github.community/t/if-expression-with-context-variable/16558/4
-  reuse-artifacts:
-    environment: PROD
-    runs-on: ubuntu-latest
-    outputs:
-      reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
-    steps:
-    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
-    - id: set-reuse-artifacts
-      run: |
-        if [ "$REUSE_ARTIFACTS" == "true" ] || [ "$REUSE_ARTIFACTS" == "True" ]; then
-          reuse="TRUE"
-        else
-          reuse="FALSE"
-        fi
-        echo "::set-output name=reuse-artifacts::$reuse"
-      env:
-        REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
-    - name: debug
-      run: |
-        echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
+  # reuse-artifacts:
+  #   environment: PROD
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
+  #   steps:
+  #   # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+  #   - id: set-reuse-artifacts
+  #     run: |
+  #       if [ "$REUSE_ARTIFACTS" == "true" ] || [ "$REUSE_ARTIFACTS" == "True" ]; then
+  #         reuse="TRUE"
+  #       else
+  #         reuse="FALSE"
+  #       fi
+  #       echo "::set-output name=reuse-artifacts::$reuse"
+  #     env:
+  #       REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
+  #   - name: debug
+  #     run: |
+  #       echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
   preflight-check:
     runs-on: ubuntu-latest
@@ -139,9 +139,9 @@ jobs:
   build-linux:
     name: Build Linux
     needs:
-    - reuse-artifacts
+    # - reuse-artifacts
     - shared-values
-    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
+    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
 
@@ -423,9 +423,9 @@ jobs:
   build-macos:
     name: Build macOS
     needs:
-    - reuse-artifacts
+    # - reuse-artifacts
     - shared-values
-    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
+    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: macos-latest
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     steps:
@@ -629,9 +629,9 @@ jobs:
 
   windows-signing:
     needs:
-    - reuse-artifacts
+    # - reuse-artifacts
     - shared-values
-    if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
+    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: windows-2019
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     defaults:
