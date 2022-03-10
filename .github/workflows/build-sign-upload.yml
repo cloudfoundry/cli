@@ -2,11 +2,6 @@ name: Build-Sign-Upload
 
 on:
   push:
-    branches:
-    - gh-actions*
-    - master
-    - main
-    - "v?"
     tags:
     - 'v8.0.*'
 
