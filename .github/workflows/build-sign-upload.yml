@@ -193,6 +193,11 @@ jobs:
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
 
+    - name: Make Binaries Executable
+      run: |
+        chmod +x out/cf-cli_linux_i686
+        chmod +x out/cf-cli_linux_x86-64
+
     - name: Store Linux Binaries
       uses: actions/upload-artifact@v2
       with:
@@ -507,6 +512,11 @@ jobs:
       run: |
         make out/cf-cli_osx
         make out/cf-cli_osx_arm
+
+    - name: Make Binaries Executable
+      run: |
+        chmod +x out/cf-cli_osx
+        chmod +x out/cf-cli_osx_arm
 
     - name: Store macOS Binaries
       uses: actions/upload-artifact@v2
