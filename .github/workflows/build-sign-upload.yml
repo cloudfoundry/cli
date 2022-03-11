@@ -664,6 +664,7 @@ jobs:
 
 
   build-windows:
+    name: Build Windows
     needs:
     # - reuse-artifacts
     - setup
