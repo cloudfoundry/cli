@@ -703,7 +703,7 @@ jobs:
       #     SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
       #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
 
-      - name: write windows cert
+      - name: Write windows cert
         run: |
           $pass = ConvertTo-SecureString -String "$env:SIGNING_KEY_WINDOWS_PASSPHRASE" -AsPlainText
           [Convert]::FromBase64String($env:SIGNING_KEY_WINDOWS_PFX) | Set-Content -Path $env:RUNNER_TEMP\cert.pfx -AsByteStream
@@ -801,7 +801,7 @@ jobs:
       #       ls
       #     popd
 
-      - name: zip windows artifact
+      - name: Zip windows artifact
         run: |
           # strip leading v to go from tag -> semver
           $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
@@ -901,12 +901,22 @@ jobs:
     #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
     #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
     #     path: signed
-    - name: debug
-      run: ls -R signed
+
+    # - name: debug
+    #   run: ls -R signed
 
 
-    - name: archive linux binaries for upload
+    - name: Archive linux binaries for upload
       run: |
+        symlink_and_copy_license() {
+            extension=$1
+
+            chmod +x "cf8$extension"
+            ln -s "cf8$extension" "cf$extension"
+
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+        }
         symlink_and_copy_license() {
             extension=$1
 
@@ -952,7 +962,7 @@ jobs:
       env:
         INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
 
-    - name: rearrange artifacts before upload
+    - name: Rearrange artifacts before upload
       run: |
         mkdir upload
         cp -t upload  \
@@ -1018,8 +1028,9 @@ jobs:
     #     workflow: ${{ env.REUSE_ARTIFACT_WORKFLOW }}
     #     run_id: ${{ env.REUSE_ARTIFACT_RUN_ID }}
     #     path: signed
-    - name: debug
-      run: ls -R signed
+
+    # - name: debug
+    #   run: ls -R signed
 
     - name: Create draft release
       uses: pivotalsoftware/action-gh-release@v1
