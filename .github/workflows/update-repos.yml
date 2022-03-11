@@ -58,7 +58,7 @@ jobs:
     - name: Checkout homebrew-tap
       uses: actions/checkout@v2
       with:
-        repository: cloudfoundry/homebrew-tap.git
+        repository: cloudfoundry/homebrew-tap
         ref: master
         path: homebrew-tap
         ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP }}
