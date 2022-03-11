@@ -76,7 +76,7 @@ jobs:
       run: echo "::set-output name=go-version::1.17"
 
   test-rpm-package:
-    name: Test RPM Packages
+    name: Test RPM Artifacts
     needs: build-linux
     runs-on: ubuntu-latest
     container:
@@ -96,7 +96,7 @@ jobs:
         rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
 
   test-deb-package:
-    name: Test Debian Packages
+    name: Test Debian Artifacts
     needs: build-linux
     runs-on: ubuntu-latest
     container:
@@ -114,7 +114,7 @@ jobs:
         ls *.deb | xargs -n1 dpkg --info
 
   test-macos:
-    name: Test macOS Packages
+    name: Test macOS Artifacts
     needs: build-macos
     runs-on: macos-latest
     steps:
@@ -130,7 +130,7 @@ jobs:
         pkgutil --check-signature *
 
   test-windows:
-    name: Test Windows Packages
+    name: Test Windows Artifacts
     needs: build-windows
     runs-on: windows-latest
     defaults:
