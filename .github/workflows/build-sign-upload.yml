@@ -908,8 +908,10 @@ jobs:
     - name: archive linux binaries for upload
       run: |
         symlink_and_copy_license() {
-            chmod +x cf8
-            ln -s cf8 cf
+            extension=$1
+
+            echo chmod +x "cf8$extension"
+            echo ln -s "cf8$extension" "cf$extension"
             cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
             cp ../../.github/license/CF_NOTICE  NOTICE
         }
@@ -937,12 +939,12 @@ jobs:
           mv cf-cli-windows-binaries/cf-cli_win32.exe win32/cf8.exe
           mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
           pushd win32
-            symlink_and_copy_license
+            symlink_and_copy_license .exe
             # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
             zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
           popd
           pushd winx64
-            symlink_and_copy_license
+            symlink_and_copy_license .exe
             # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
             zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
           popd
