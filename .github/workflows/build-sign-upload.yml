@@ -38,25 +38,9 @@ jobs:
   #     run: |
   #       echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
 
-  preflight-check:
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
-    steps:
-
-    - name: Checkout cli
-      uses: actions/checkout@v2
-
-    - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
-      run: |
-        echo "Git Ref: ${{ github.ref }}"
-        echo "BUILD_VERSION: $(cat BUILD_VERSION)"
-
-        # [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
-        # temporary short circut for the development
-        exit 0
-
-  shared-values:
-    runs-on: ubuntu-latest
-    needs: preflight-check
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
@@ -71,6 +55,15 @@ jobs:
 
     - name: Checkout cli
       uses: actions/checkout@v2
+
+    - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
+      run: |
+        echo "Git Ref: ${{ github.ref }}"
+        echo "BUILD_VERSION: $(cat BUILD_VERSION)"
+
+        # [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
+        # temporary short circut for the development
+        exit 0
 
     - name: Set build version
       id: set-build-version
@@ -140,13 +133,13 @@ jobs:
     name: Build Linux
     needs:
     # - reuse-artifacts
-    - shared-values
+    - setup
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
 
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      BUILD_VERSION: ${{ needs.setup.outputs.build-version }}
 
     steps:
 
@@ -169,7 +162,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.shared-values.outputs.go-version }}
+        go-version: ${{ needs.setup.outputs.go-version }}
 
     - name: Print go environment
       id: go-cache-paths
@@ -429,15 +422,15 @@ jobs:
     name: Build macOS
     needs:
     # - reuse-artifacts
-    - shared-values
+    - setup
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: macos-latest
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
 
     - name: Setup
       run: |
-        echo "BUILD_VERSION=${{ needs.shared-values.outputs.build-version }}" >> $GITHUB_ENV
+        echo "BUILD_VERSION=${{ needs.setup.outputs.build-version }}" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
@@ -469,7 +462,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ needs.shared-values.outputs.go-version }}
+        go-version: ${{ needs.setup.outputs.go-version }}
 
     - name: Update Homebrew
       run: |
@@ -640,10 +633,10 @@ jobs:
   windows-signing:
     needs:
     # - reuse-artifacts
-    - shared-values
+    - setup
     # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: windows-2019
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     defaults:
       run:
         shell: pwsh
@@ -660,7 +653,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: ${{ needs.shared-values.outputs.go-version }}
+          go-version: ${{ needs.setup.outputs.go-version }}
 
       - name: Get build-time dependencies
         run: |
