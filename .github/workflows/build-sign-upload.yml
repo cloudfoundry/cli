@@ -157,10 +157,14 @@ jobs:
       with:
         name: cf-cli-windows-packages
 
-    - name: View installer signature
+    - name: Inspect Windows files
       run: |
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
+        Get-ChildItem -Force
+
+    # - name: View installer signature
+    #   run: |
+    #     Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
+    #     Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
 
   build-linux:
     name: Build Linux
@@ -999,7 +1003,7 @@ jobs:
 
 
   github-release-draft:
-    name: Create GitHub Draft Release
+    name: Create GitHub Release Draft
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     environment: PROD
