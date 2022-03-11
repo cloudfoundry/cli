@@ -970,8 +970,9 @@ jobs:
       actions: read
       contents: write
     needs:
-      - build-linux
-      - build-macos
+      - test-rpm-package
+      - test-deb-package
+      - test-macos
       - windows-signing
     steps:
     - name: Download signed artifacts
