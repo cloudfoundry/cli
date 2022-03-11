@@ -55,21 +55,13 @@ jobs:
         ref: master
         path: cli-ci
 
-    ############ - name: Checkout homebrew-tap
-    ############   uses: actions/checkout@v2
-    ############   with:
-    ############     repository: cloudfoundry/homebrew-tap.git
-    ############     ref: master
-    ############     path: homebrew-tap
-
     - name: Checkout homebrew-tap
       uses: actions/checkout@v2
       with:
-        repository: pivotal-cf/homebrew-tap-test
+        repository: cloudfoundry/homebrew-tap.git
         ref: master
         path: homebrew-tap
-        ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP_TEST }}
-
+        ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP }}
 
     - name: Setup
       run: |
@@ -202,7 +194,7 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     env:
       BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
-      AWS_BUCKET_NAME: cf-cli-debian-repo-dev
+      AWS_BUCKET_NAME: cf-cli-debian-repo
       AWS_DEFAULT_REGION: us-west-2
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -390,7 +382,7 @@ jobs:
         args: >
           s3 sync --delete
           repodata
-          s3://cf-cli-dev/rpm/
+          s3://cf-cli-rpm-repo/repodata
 
   test-rpm-repo:
     name: Test RPM Repository
