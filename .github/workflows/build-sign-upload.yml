@@ -143,10 +143,6 @@ jobs:
       with:
         name: cf-cli-windows-binaries
 
-    - name: Inspect Windows files
-      run: |
-        Get-ChildItem -Force
-
     - name: Inspect Windows packages
       run: |
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_win32.exe
@@ -161,10 +157,13 @@ jobs:
       run: |
         Get-ChildItem -Force
 
-    # - name: View installer signature
-    #   run: |
-    #     Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
-    #     Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
+    - name: View installer signature
+      run: |
+        Expand-Archive -DestinationPath winx64 -Path cf8-cli_*_winx64.zip
+        Expand-Archive -DestinationPath win32  -Path cf8-cli_*_win32.zip
+
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
 
   build-linux:
     name: Build Linux
