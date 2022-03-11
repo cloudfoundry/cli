@@ -889,18 +889,18 @@ jobs:
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
           pushd linux_i686
             symlink_and_copy_license
-            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
           popd
           pushd linux_x86-64
             symlink_and_copy_license
-            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
           popd
 
           mkdir osx
           mv cf-cli-macos-binaries/cf-cli_osx osx/cf8
           pushd osx
             symlink_and_copy_license
-            tar -cf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
           popd
 
           mkdir win32 winx64
