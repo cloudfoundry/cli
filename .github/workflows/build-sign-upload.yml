@@ -159,8 +159,8 @@ jobs:
 
     - name: View installer signature
       run: |
-        Expand-Archive -DestinationPath winx64 -Path cf8-cli_*_winx64.zip
-        Expand-Archive -DestinationPath win32  -Path cf8-cli_*_win32.zip
+        Expand-Archive -DestinationPath winx64 -Path cf8-cli-installer_*_winx64.zip
+        Expand-Archive -DestinationPath win32  -Path cf8-cli-installer_*_win32.zip
 
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
