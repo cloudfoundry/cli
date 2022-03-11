@@ -877,6 +877,7 @@ jobs:
 #################################
 
   s3-upload:
+    name: Upload Artifacts to S3 bucket
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     needs:
@@ -998,6 +999,7 @@ jobs:
 
 
   github-release-draft:
+    name: Create GitHub Draft Release
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     environment: PROD
