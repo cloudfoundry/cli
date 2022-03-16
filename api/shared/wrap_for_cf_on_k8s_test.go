@@ -1,4 +1,4 @@
-package wrapper_test
+package shared_test
 
 import (
 	"encoding/base64"
@@ -12,18 +12,18 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/shared"
+	"code.cloudfoundry.org/cli/api/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientauthenticationv1beta1 "k8s.io/client-go/pkg/apis/clientauthentication/v1beta1"
 	"k8s.io/client-go/tools/clientcmd/api"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 const (
@@ -31,16 +31,16 @@ const (
 	clientKeyData  = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ3VTNlVxYitNelpwNSsKVy8zNHpjRTRpeDM5UytRVFEzaUZXakZISjBDVXpVREZYQzBOb2F6L0I5TGl5Z3VmaXNQblhBOHhFVklpUDZrcgpzVnFRT0JrWXZFOWVTUC9ORVUwN3Y5S3U4Ty9ST1Z4dllQdmNFcWFPS240S0VCa2srNkVzRlhwWEpMc2xZaUUzCmRnMHF1TjNJMm5MU3pBbmJreWdHYWFXSWtTeTYrMzRLRWVYRU9OYzRuT3E1S1BTUmM0QlNWZ0JMdFluNDRqVTQKYWpoSHYrM0FaOUJMbWlGck5CUmdJYUpnbGhldmxEb1FrMXMxUkhnWHVJVDVweEgwV2dYcXdrbUw0RDRNNVFJOQpCSDZhZmoxK2FLbFFZZVF1eWx1cmNTQUFQUTNoU2R5dHZiSUVQUkpRMkFvRnR5dFhrcUd1VS9vcjNUb1gzZ21lCmpjYVlmQkdsQWdNQkFBRUNnZ0VBZG80WndLM3VteTM0TFBjaDM3VUU4eE1keVFkd0VmSlk3a3dWTE5MMFNNTDgKaGNKWEd1aVlKYmtLcHh6TG55L2laV0xuS25jZnFSQW9ZQUg1R2hRdWJmYlkvY2NseURVMmxhZTdCU2Y1MkJUdQpYUXhaQks3aS85ekRjdERVYWFXSFVkY2lLbGhmdStQdHVDM2ljdWJnWlJqQjljUzRCOVVtNm9XK0JSREtuandICkduQ0lEZlNNQWt4VXdTaUwwa2NXelNpZ1BYMVN3UHcxOEZvZWgzTmJEd1VXTHhxUWZLVThydVlSTUsxYUg5M3cKcjFtbjlDWUwvd0hiVWRqcmtZMlIxTjVUR21ab2Vldm5qUXgyQVc2NkYzdEg1cGg4RTF6TEFQVTl4TFdRTW9KcwpXM0gzSTdUaEYvRnJuNERQa3hQbThUUVVhQUdvQ09SSWFUQkN5VlgxQVFLQmdRREkxbkRmNWYySHdHaldrTStpCk9YbGE1R1VnRUtXaGZpeGhidE5OclNpMDU5VnZQUEJwNXdtbGQzMHJKUDhWem8vbnFnUW5ISmpmaEQ2Y3NSMTQKL2VlMHZ1Um0zYzZwZzMrODdwOHhWY3lLNHhDd0JmdFFuMGRZWWFLMkRMOEtYb0liYThpN09EQmFoNW5OZWQwcgpKa1RPcE5NRGRkL0p0bEpPZ25jRXBlUk9oUUtCZ1FEZUt1L0R1MXU1QVR3Y3p5STRXOWV1L1YwTXRwMHdqM3RpClF2MmpObW83QU1zS3BwK0ZKVDFqWFhUKzZCTm02OWpxUVJwdlAyd2RhVUdqV1dLa1lHVEVpbUZCc2ZuKzJDOFAKOEc3Uk50YWpRdEV2QlR1ZDZPN0tZUkFoTU56dm9RcDkrZmJKY1ZsRG13Nlk0bUYzUTJXS3NmZU51TGtpY3VqNQpYVFV1ekVMd29RS0JnUUREU0IvQTFYVEx4cjhwd3V6aHBGam5sQ1R3Skwrb1kzTHIya01EeUZkSWNCUU1jWWlpCnNNK2tZS2NJaUpTdnM0WWhrQ014bEpEZzVVbXNPbHVhQmVpQ3l3cHpLMEdEZWlWK285ZU90UXFLRVhkc2NLU0oKSkJiUFRVQlZHOWUyVVdiWkd0aTNrazhSOThBSkYzR0NQMWV3Um53WFpVb1FiSU5qYTJBbTJOZEJzUUtCZ0Q4eApOVXVXTWl1NE56SDJsTVExRTI4NXI4cmE4bkVLanN6UFF6ZTJWWmI4emNQMHl2RGpPOGZVb0YrVkFWZklBOFgxCnlLQVdDUm1BZytRRG03UW5tdUh3Zm1OaVRUcDRvVUpHWUM3d0N6TWE0VWNmbE9xQWc5TmFzbXpPYWpsYXRCSkwKRkRBT0pwYTlOdlN6aDRlVnl2OGRTYzJzMmpQN1BWc1ljUFVqc25LaEFvR0JBSy9kQjlnVEFpME5nczVmaVNtWQovWkp3Yk52MjcyTHdKbWV4Vit2eWtjN3J5LzRraTRQb2xRd1BHNzQ5eFZ0T2NNc2FhRlVNMVVkclN2NlIwbjlkCmpTbXhCeTl2YWdzc1FmVDNSc3BvUUJKM0w5YWxiNHM2V2ZtUEpzNkFrQkhIZHNpVXFaaElYT2J2WE1lQ0k2aVMKOTQ2R0toekFxMlVGbjhFUGxXaFVNeEFiCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
 )
 
-var _ = Describe("KubernetesAuthentication", func() {
+var _ = Describe("WrapForCFOnK8sAuth", func() {
 	var (
-		k8sAuthWrapper    *wrapper.KubernetesAuthentication
-		config            *commandfakes.FakeConfig
-		k8sConfigGetter   *v7actionfakes.FakeKubernetesConfigGetter
-		wrappedConnection *ccv3fakes.FakeConnectionWrapper
-		req               *cloudcontroller.Request
-		resp              *cloudcontroller.Response
-		kubeConfig        *api.Config
-		makeErr           error
+		config              *commandfakes.FakeConfig
+		k8sConfigGetter     *v7actionfakes.FakeKubernetesConfigGetter
+		req                 *http.Request
+		res                 *http.Response
+		actualRes           *http.Response
+		kubeConfig          *api.Config
+		wrapErr             error
+		wrappedRoundTripper *sharedfakes.FakeRoundTripper
 	)
 
 	BeforeEach(func() {
@@ -69,24 +69,24 @@ var _ = Describe("KubernetesAuthentication", func() {
 		config = new(commandfakes.FakeConfig)
 		config.CurrentUserNameReturns("auth-test", nil)
 
-		wrappedConnection = new(ccv3fakes.FakeConnectionWrapper)
-
-		httpReq, err := http.NewRequest(http.MethodPost, "", strings.NewReader("hello"))
+		var err error
+		req, err = http.NewRequest(http.MethodPost, "", strings.NewReader("hello"))
 		Expect(err).NotTo(HaveOccurred())
-		req = cloudcontroller.NewRequest(httpReq, nil)
 
-		resp = &cloudcontroller.Response{
-			HTTPResponse: &http.Response{
-				StatusCode: http.StatusTeapot,
-			},
-		}
+		wrappedRoundTripper = new(sharedfakes.FakeRoundTripper)
+		res = &http.Response{StatusCode: http.StatusTeapot}
+
+		wrappedRoundTripper.RoundTripReturns(res, nil)
+		actualRes = nil
 	})
 
 	JustBeforeEach(func() {
-		k8sAuthWrapper = wrapper.NewKubernetesAuthentication(config, k8sConfigGetter)
-		k8sAuthWrapper.Wrap(wrappedConnection)
+		var roundTripper http.RoundTripper
+		roundTripper, wrapErr = shared.WrapForCFOnK8sAuth(config, k8sConfigGetter, wrappedRoundTripper)
 
-		makeErr = k8sAuthWrapper.Make(req, resp)
+		if wrapErr == nil {
+			actualRes, wrapErr = roundTripper.RoundTrip(req)
+		}
 	})
 
 	When("getting the k8s config fails", func() {
@@ -95,7 +95,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 
 		It("returns the error", func() {
-			Expect(makeErr).To(MatchError("boom!"))
+			Expect(wrapErr).To(MatchError("boom!"))
 		})
 	})
 
@@ -105,7 +105,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 
 		It("errors", func() {
-			Expect(makeErr).To(MatchError(ContainSubstring("current user not set")))
+			Expect(wrapErr).To(MatchError(ContainSubstring("current user not set")))
 		})
 	})
 
@@ -115,7 +115,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 
 		It("errors", func() {
-			Expect(makeErr).To(MatchError(ContainSubstring("boom")))
+			Expect(wrapErr).To(MatchError(ContainSubstring("boom")))
 		})
 	})
 
@@ -125,20 +125,21 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 
 		It("errors", func() {
-			Expect(makeErr).To(MatchError(ContainSubstring(`auth info "not-present" does not exist`)))
+			Expect(wrapErr).To(MatchError(ContainSubstring(`auth info "not-present" does not exist`)))
 		})
 	})
 
-	checkCalls := func() *cloudcontroller.Request {
-		Expect(makeErr).NotTo(HaveOccurred())
-		Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
+	checkCalls := func() *http.Request {
+		Expect(wrapErr).NotTo(HaveOccurred())
+		Expect(wrappedRoundTripper.RoundTripCallCount()).To(Equal(1))
 
-		actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-		Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+		actualReq := wrappedRoundTripper.RoundTripArgsForCall(0)
 
 		body, err := ioutil.ReadAll(actualReq.Body)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(body)).To(Equal("hello"))
+
+		Expect(actualRes).To(Equal(res))
 
 		return actualReq
 	}
@@ -146,7 +147,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 	checkBearerTokenInAuthHeader := func() {
 		actualReq := checkCalls()
 
-		token, err := jws.ParseJWTFromRequest(actualReq.Request)
+		token, err := jws.ParseJWTFromRequest(actualReq)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(token.Validate(keyPair.Public(), crypto.SigningMethodRS256)).To(Succeed())
 
@@ -250,7 +251,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 				})
 
 				It("returns an error", func() {
-					Expect(makeErr).To(MatchError(ContainSubstring(certFilePath)))
+					Expect(wrapErr).To(MatchError(ContainSubstring(certFilePath)))
 				})
 			})
 
@@ -260,7 +261,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 				})
 
 				It("returns an error", func() {
-					Expect(makeErr).To(MatchError(ContainSubstring(keyFilePath)))
+					Expect(wrapErr).To(MatchError(ContainSubstring(keyFilePath)))
 				})
 			})
 		})
@@ -275,7 +276,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 			})
 
 			It("complains about invalid configuration", func() {
-				Expect(makeErr).To(MatchError(ContainSubstring("client-cert-data and client-cert are both specified")))
+				Expect(wrapErr).To(MatchError(ContainSubstring("client-cert-data and client-cert are both specified")))
 			})
 		})
 
@@ -289,7 +290,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 			})
 
 			It("complains about invalid configuration", func() {
-				Expect(makeErr).To(MatchError(ContainSubstring("client-key-data and client-key are both specified")))
+				Expect(wrapErr).To(MatchError(ContainSubstring("client-key-data and client-key are both specified")))
 			})
 		})
 
@@ -339,12 +340,13 @@ var _ = Describe("KubernetesAuthentication", func() {
 			})
 
 			It("uses the exec command to generate the Bearer token", func() {
-				Expect(makeErr).NotTo(HaveOccurred())
-				Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
+				Expect(wrapErr).NotTo(HaveOccurred())
+				Expect(wrappedRoundTripper.RoundTripCallCount()).To(Equal(1))
 
-				actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
-				Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
+				actualReq := wrappedRoundTripper.RoundTripArgsForCall(0)
 				Expect(actualReq.Header.Get("Authorization")).To(Equal("Bearer a-token"))
+
+				Expect(actualRes).To(Equal(res))
 			})
 		})
 
