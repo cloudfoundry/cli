@@ -1,3 +1,4 @@
+
 name: Build-Sign-Upload
 
 on:
@@ -15,29 +16,6 @@ defaults:
     shell: bash
 
 jobs:
-  # enable switching on the REUSE_ARTIFACTS GitHub environment secret variable
-  # see https://github.community/t/if-expression-with-context-variable/16558/4
-  # reuse-artifacts:
-  #   environment: PROD
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     reuse-artifacts: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}
-  #   steps:
-  #   # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
-  #   - id: set-reuse-artifacts
-  #     run: |
-  #       if [ "$REUSE_ARTIFACTS" == "true" ] || [ "$REUSE_ARTIFACTS" == "True" ]; then
-  #         reuse="TRUE"
-  #       else
-  #         reuse="FALSE"
-  #       fi
-  #       echo "::set-output name=reuse-artifacts::$reuse"
-  #     env:
-  #       REUSE_ARTIFACTS: ${{ secrets.REUSE_ARTIFACTS }}
-  #   - name: debug
-  #     run: |
-  #       echo "reuse: ${{ steps.set-reuse-artifacts.outputs.reuse-artifacts }}"
-
   setup:
     name: Setup
     runs-on: ubuntu-latest
@@ -61,8 +39,6 @@ jobs:
         echo "Git Ref: ${{ github.ref }}"
         echo "BUILD_VERSION: $(cat BUILD_VERSION)"
 
-        # [[ ${{ github.ref }} =~ refs\/tags\/v$(cat BUILD_VERSION) ]]
-        # temporary short circut for the development
         exit 0
 
     - name: Set build version
@@ -74,6 +50,14 @@ jobs:
     - name: Set go version
       id: set-go-version
       run: echo "::set-output name=go-version::1.17"
+
+    # This is for debugging. It's equivalent to fly intecept
+    # - name: Setup upterm session
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
 
   test-rpm-package:
     name: Test RPM Artifacts
@@ -168,9 +152,7 @@ jobs:
   build-linux:
     name: Build Linux
     needs:
-    # - reuse-artifacts
     - setup
-    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.secrets-environment }}
 
@@ -301,19 +283,7 @@ jobs:
         %_gpg_name $SIGNING_KEY_GPG_ID
         EOF
 
-        # mkdir gpg-dir
-        # export GNUPGHOME=$PWD/gpg-dir
-        # chmod 700 $GNUPGHOME
-        # TODO: restore
-        # trap "rm -rf $GNUPGHOME" 0
-
         cp packaged/cf*.rpm   signed-redhat-installer/
-
-        # gpg-connect-agent RELOADAGENT /bye
-
-        # echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
-        # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset B94FA54D4D79041DD7966A6E7AE4622DAA833376 #pvt
-        # echo ${{secrets.SIGNING_KEY_GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset 5E2EA1C9C49415D8F15E7509A151D2E521CC07EA # pub
 
         # TODO: consider to add --key-id
         rpmsign --addsign signed-redhat-installer/*.rpm
@@ -328,35 +298,6 @@ jobs:
         if-no-files-found: error
         name: cf-cli-linux-rpm-packages
         path: signed-redhat-installer/*.rpm
-
-    # - name: Setup upterm session
-    #   env:
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_BUCKET_INTEGRATION: ${{ secrets.AWS_BUCKET_INTEGRATION }}
-    #     AWS_BUCKET_STAGING: ${{ secrets.AWS_BUCKET_STAGING }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     #
-    #     DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    #     DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-    #     #
-    #     SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
-    #     SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
-    #     SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
-    #     #
-    #     SIGNING_CER_MAC: ${{ secrets.SIGNING_CER_MAC }}
-    #     SIGNING_KEYCHAIN_PASSPHRASE: ${{ secrets.SIGNING_KEYCHAIN_PASSPHRASE }}
-    #     #
-    #     SIGNING_KEY_MAC: ${{ secrets.SIGNING_KEY_MAC }}
-    #     SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
-    #     SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
-    #     SIGNING_KEY_MAC_PFX: ${{ secrets.SIGNING_KEY_MAC_PFX }}
-    #     #
-    #     SIGNING_KEY_WINDOWS_ID: ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
-    #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
-    #     SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
-    #   if: always()
-    #   uses: lhotari/action-upterm@v1
-    #   timeout-minutes: 60
 
 
     - name: Build Debian Packages
@@ -452,9 +393,7 @@ jobs:
   build-macos:
     name: Build macOS
     needs:
-    # - reuse-artifacts
     - setup
-    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: macos-latest
     environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
@@ -469,8 +408,6 @@ jobs:
 
     - name: Checkout cli
       uses: actions/checkout@v2
-      # with:
-      #   fetch-depth: 0
 
     - name: Checkout cli-ci
       uses: actions/checkout@v2
@@ -497,7 +434,6 @@ jobs:
 
     - name: Update Homebrew
       run: |
-        # brew tap mitchellh/gon
         brew tap pivotalsoftware/gon
         brew update --preinstall
         cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
@@ -591,7 +527,6 @@ jobs:
 
       run: |
         echo -n "$SIGNING_KEY_MAC_PFX" | base64 --decode > mac-signing-key.p12
-        # security delete-keychain test-keychain || echo test-keychain not found
         security list-keychains -d user -s login
 
         ORIGINAL_KEYCHAIN="$(security default-keychain | sed -e 's/[ "]*\([^"]*\)[ "]*/\1/')"
@@ -615,22 +550,11 @@ jobs:
 
         # Enable codesigning from a non user interactive shell
         security set-key-partition-list -S apple-tool:,apple:, -s -k "$SIGNING_KEYCHAIN_PASSPHRASE" -D "${IDENTITY_CERTIFICATE}" -t private "$KEYCHAIN_PATH" || echo set-key-partition-list private failed
-        # security set-key-partition-list -S apple-tool:,apple: -s -k "$SIGNING_KEYCHAIN_PASSPHRASE" "$KEYCHAIN_PATH"
-        # swap keychains
-        # BACKUP_KEYCHAIN="${ORIGINAL_KEYCHAIN}.bak"
-        # cp "$ORIGINAL_KEYCHAIN" "$BACKUP_KEYCHAIN"
-        # cp "$KEYCHAIN_PATH" "$ORIGINAL_KEYCHAIN"
-        # security find-key | grep '0x00000001'
-        # cleanup keys
-        # rm ca.crt
         rm mac-signing-key.p12
 
+        #TODO: clean keychain in a separate step
         # Delete build keychain
         # security delete-keychain "$KEYCHAIN_PATH"
-
-        # default again user login keychain
-        # security list-keychains -d user -s login.keychain
-
 
     - name: Sign macOS
       env:
@@ -659,20 +583,13 @@ jobs:
   build-windows:
     name: Build Windows
     needs:
-    # - reuse-artifacts
     - setup
-    # if: ${{ needs.reuse-artifacts.outputs.reuse-artifacts != 'TRUE' }}
     runs-on: windows-2019
     environment: ${{ needs.setup.outputs.secrets-environment }}
     defaults:
       run:
         shell: pwsh
     steps:
-      # - name: debug
-      #   run: |
-      #     Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\x64"
-      #     echo "---"
-      #     Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64"
       - name: Checkout
         uses: actions/checkout@v2
         with:
