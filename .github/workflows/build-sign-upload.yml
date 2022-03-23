@@ -5,6 +5,8 @@ on:
   push:
     tags:
     - 'v8.*'
+    branches:
+    - 'wip-gh-actions-v8-squashed'
 
 permissions:
   contents: read
@@ -29,7 +31,7 @@ jobs:
 
     - name: Set environment
       id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::PROD"
+      run: echo "::set-output name=secrets-environment::DEV"
 
     - name: Checkout cli
       uses: actions/checkout@v2
@@ -724,7 +726,7 @@ jobs:
       - test-deb-package
       - test-macos
       - test-windows
-    environment: PROD
+    environment: DEV
     permissions:
       actions: read
       contents: read
@@ -845,7 +847,7 @@ jobs:
     name: Create GitHub Release Draft
     if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
-    environment: PROD
+    environment: DEV
     permissions:
       actions: read
       contents: write
