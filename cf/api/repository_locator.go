@@ -2,6 +2,8 @@ package api
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	v7action2 "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/cf/api/appevents"
 	api_appfiles "code.cloudfoundry.org/cli/cf/api/appfiles"
 	"code.cloudfoundry.org/cli/cf/api/appinstances"
@@ -26,7 +28,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
@@ -100,7 +101,11 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	}
 
 	logCacheURL := configV3.ConfigFile.LogCacheEndpoint
-	logCacheClient := command.NewLogCacheClient(logCacheURL, configV3, nil)
+	logCacheClient, err := logcache.NewClient(logCacheURL, configV3, nil, v7action2.NewDefaultKubernetesConfigGetter())
+	if err != nil {
+		panic("handle this error!")
+	}
+
 	loc.logsRepo = logs.NewLogCacheRepository(logCacheClient, sharedaction.GetRecentLogs, sharedaction.GetStreamingLogs)
 
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)

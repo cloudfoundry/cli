@@ -6,12 +6,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry/bosh-cli/director/template"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -21,9 +26,6 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"github.com/cloudfoundry/bosh-cli/director/template"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ProgressBar
@@ -127,7 +129,10 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.VersionActor = cmd.Actor
 	cmd.PushActor = v7pushaction.NewActor(cmd.Actor, sharedaction.NewActor(config))
 
-	cmd.LogCacheClient = command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
+	cmd.LogCacheClient, err = logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
+	if err != nil {
+		return err
+	}
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir

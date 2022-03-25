@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -30,7 +32,10 @@ func (cmd *StagePackageCommand) Setup(config command.Config, ui command.UI) erro
 		return err
 	}
 
-	cmd.LogCacheClient = command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
+	cmd.LogCacheClient, err = logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
