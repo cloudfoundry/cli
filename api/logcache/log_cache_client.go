@@ -12,7 +12,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/shared"
-	"code.cloudfoundry.org/cli/command"
+	commandconfig "code.cloudfoundry.org/cli/command/config"
+	commandui "code.cloudfoundry.org/cli/command/ui"
 	"code.cloudfoundry.org/cli/util"
 )
 
@@ -106,7 +107,7 @@ func (c *httpDebugClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 // NewClient returns back a configured Log Cache Client.
-func NewClient(logCacheEndpoint string, config command.Config, ui command.UI, k8sConfigGetter v7action.KubernetesConfigGetter) (*logcache.Client, error) {
+func NewClient(logCacheEndpoint string, config commandconfig, ui commandui, k8sConfigGetter v7action.KubernetesConfigGetter) (*logcache.Client, error) {
 	var tr http.RoundTripper = &http.Transport{
 		Proxy:           http.ProxyFromEnvironment,
 		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation()),
