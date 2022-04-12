@@ -1,4 +1,4 @@
-package v7_test
+package command_test
 
 import (
 	"context"
