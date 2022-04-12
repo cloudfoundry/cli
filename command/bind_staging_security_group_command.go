@@ -1,4 +1,4 @@
-package v7
+package command
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"

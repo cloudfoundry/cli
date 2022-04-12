@@ -1,4 +1,4 @@
-package v7
+package command
 
 type SSHCodeCommand struct {
 	BaseCommand

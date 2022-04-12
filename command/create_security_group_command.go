@@ -1,4 +1,4 @@
-package v7
+package command
 
 import (
 	"encoding/json"
