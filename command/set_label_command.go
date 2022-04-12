@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
 )

@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/clock"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/shared"
 )

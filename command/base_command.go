@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/shared"
 	"code.cloudfoundry.org/clock"
 )

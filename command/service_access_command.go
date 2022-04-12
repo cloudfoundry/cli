@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 )
 
 type ServiceAccessCommand struct {
