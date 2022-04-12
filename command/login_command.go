@@ -18,7 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/command/shared"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ActorReloader

@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	v7 "code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"

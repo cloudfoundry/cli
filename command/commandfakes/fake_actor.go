@@ -14,7 +14,7 @@ import (
 	constanta "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	v7 "code.cloudfoundry.org/cli/command/v7"
+	v7 "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"

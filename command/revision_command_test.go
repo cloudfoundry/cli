@@ -2,8 +2,8 @@ package v7_test
 
 import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	v7 "code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

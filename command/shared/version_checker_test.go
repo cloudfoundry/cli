@@ -1,7 +1,7 @@
 package shared_test
 
 import (
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/command/shared"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
