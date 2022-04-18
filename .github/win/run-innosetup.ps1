@@ -8,7 +8,7 @@ $PSNativeCommandUseErrorActionPreference = $true
 $innoSetupWorkDir = "$PSScriptRoot"
 $licenseDir = "${PSScriptRoot}\..\license"
 
-Move-Item -Force "$CfBinary" $innoSetupWorkDir\cf8.exe
+Move-Item -Force "$CfBinary" $innoSetupWorkDir\cf7.exe
 
 # convert line-endings
 Get-Content ${licenseDir}\LICENSE-WITH-3RD-PARTY-LICENSES | Set-Content "${innoSetupWorkDir}\LICENSE"

@@ -689,9 +689,9 @@ jobs:
       - name: Run innosetup
         run: |
           mkdir "$env:RUNNER_TEMP\winx64"
-          & .\.github\win\run-innosetup-v${env:MAJOR_VERSION}.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:MAJOR_VERSION}-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\${env:CF_VERSION}_installer.exe"
+          & .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:MAJOR_VERSION}-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\${env:CF_VERSION}_installer.exe"
           mkdir "$env:RUNNER_TEMP\win32"
-          & .\.github\win\run-innosetup-v${env:MAJOR_VERSION}.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:MAJOR_VERSION}-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\${env:CF_VERSION}_installer.exe"
+          & .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:MAJOR_VERSION}-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\${env:CF_VERSION}_installer.exe"
         env:
           MAJOR_VERSION: ${{ needs.setup.outputs.major-version }}
           CF_VERSION: cf${{ needs.setup.outputs.major-version }}
