@@ -1,4 +1,3 @@
-SHELL := env PATH=$(PATH) /bin/bash
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 PACKAGES ?= api actor command types util version integration/helpers
@@ -17,15 +16,13 @@ REQUIRED_FOR_STATIC_BINARY =-a -tags "netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
-
-TARGET = v7
 SLOW_SPEC_THRESHOLD=120
 
-GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite
-GINKGO_INT_FLAGS=$(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
+GINKGO_FLAGS ?= -r -randomizeAllSpecs -requireSuite
+GINKGO_INT_FLAGS = $(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
-GINKGO_UNITS_FLAGS=$(GINKGO_FLAGS) -randomizeSuites -p
+GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomizeSuites -p
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
 GOFLAGS := -mod=mod
 
@@ -88,7 +85,7 @@ integration-shared-experimental: build integration-cleanup ## Run experimental i
 ive: integration-versioned-experimental
 integration-experimental-versioned: integration-versioned-experimental
 integration-versioned-experimental: build integration-cleanup ## Run experimental integration tests that are specific to your CLI version
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
+	$(ginkgo_int) -nodes $(NODES) integration/v7/experimental
 
 ig: integration-global
 integration-global: build integration-cleanup integration-shared-global integration-global-versioned ## Run all unparallelizable integration tests that make cross-cutting changes to their test CF foundation
@@ -101,7 +98,7 @@ integration-shared-global: build integration-cleanup ## Serially run integration
 ivg: integration-versioned-global
 integration-global-versioned: integration-versioned-global
 integration-versioned-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
-	$(ginkgo_int) integration/$(TARGET)/global
+	$(ginkgo_int) integration/v7/global
 
 ii: integration-isolated
 integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned ## Run all parallel-enabled integration tests, both versioned and shared across versions
@@ -121,14 +118,14 @@ integration-shared-performance: build integration-cleanup
 ivi: integration-versioned-isolated
 integration-isolated-versioned: integration-versioned-isolated
 integration-versioned-isolated: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
+	$(ginkgo_int) -nodes $(NODES) integration/v7/isolated
 
 integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
+	$(ginkgo_int) -nodes $(NODES) integration/v7/push
 
 integration-selfcontained: build
 	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
