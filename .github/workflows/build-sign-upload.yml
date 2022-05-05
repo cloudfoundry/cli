@@ -5,6 +5,8 @@ on:
   push:
     tags:
     - 'v8.*'
+    branches:
+    - "gh-actions-arm"
 
 permissions:
   contents: read
