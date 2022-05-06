@@ -31,7 +31,7 @@ jobs:
 
     - name: Set environment
       id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::PROD"
+      run: echo "::set-output name=secrets-environment::DEV"
 
     - name: Checkout cli
       uses: actions/checkout@v2
