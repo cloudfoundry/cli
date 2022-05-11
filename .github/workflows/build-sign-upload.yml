@@ -1,5 +1,41 @@
-
 name: Build-Sign-Upload
+
+# List of env variables
+
+# GitHub Actions specific
+#
+#    ACTIONS_RUNNER_DEBUG
+#    ACTIONS_STEP_DEBUG
+#
+# AWS credentials
+# To upload artifacts to S3 for CLAW
+#
+#    AWS_ACCESS_KEY_ID
+#    AWS_REGION
+#    AWS_S3_BUCKET
+#    AWS_SECRET_ACCESS_KEY
+#
+# GitHub details
+# To publish release draft
+#
+#    GIT_DEPLOY_HOMEBREW_TAP
+#    GIT_RELEASE_TARGET_REPO
+#    GIT_REPO_ACCESS_TOKEN
+#
+# Signing keys
+#
+#    SIGNING_KEY_GPG
+#    SIGNING_KEY_GPG_ID
+#    SIGNING_KEY_GPG_PASSPHRASE
+#
+#    SIGNING_KEY_MAC_ID
+#    SIGNING_KEY_MAC_PASSPHRASE
+#    SIGNING_KEY_MAC_PFX
+#
+#    SIGNING_KEY_WINDOWS_ID
+#    SIGNING_KEY_WINDOWS_PASSPHRASE
+#    SIGNING_KEY_WINDOWS_PFX
+
 
 on:
   push:
@@ -18,14 +54,42 @@ defaults:
     shell: bash
 
 jobs:
+
+  # test:
+  #   environment: DEV
+  #   runs-on: ubuntu-latest
+  #   steps:
+    # - name: Setup upterm session
+    #   env:
+    #     AWS_ACCESS_KEY_ID:              ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_REGION:                     ${{ secrets.AWS_REGION }}
+    #     AWS_S3_BUCKET:                  ${{ secrets.AWS_S3_BUCKET }}
+    #     AWS_SECRET_ACCESS_KEY:          ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     GIT_RELEASE_TARGET_REPO:        ${{ secrets.GIT_RELEASE_TARGET_REPO }}
+    #     GIT_REPO_ACCESS_TOKEN:          ${{ secrets.GIT_REPO_ACCESS_TOKEN }}
+    #     SIGNING_KEY_GPG:                ${{ secrets.SIGNING_KEY_GPG }}
+    #     SIGNING_KEY_GPG_ID:             ${{ secrets.SIGNING_KEY_GPG_ID }}
+    #     SIGNING_KEY_GPG_PASSPHRASE:     ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_ID:             ${{ secrets.SIGNING_KEY_MAC_ID }}
+    #     SIGNING_KEY_MAC_PASSPHRASE:     ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_PFX:            ${{ secrets.SIGNING_KEY_MAC_PFX }}
+    #     SIGNING_KEY_WINDOWS_ID:         ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
+    #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+    #     SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+    #     SIGNING_TEST_CA_MAC:            ${{ secrets.SIGNING_TEST_CA_MAC }}
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
+
   setup:
     name: Setup
+    # needs: test
     runs-on: ubuntu-latest
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-      build-version: ${{ steps.set-build-version.outputs.build-version }}
-      go-version: ${{ steps.set-go-version.outputs.go-version }}
+      build-version:       ${{ steps.set-build-version.outputs.build-version }}
+      go-version:          ${{ steps.set-go-version.outputs.go-version }}
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
 
@@ -60,96 +124,6 @@ jobs:
     #   if: always()
     #   uses: lhotari/action-upterm@v1
     #   timeout-minutes: 60
-
-  test-rpm-package:
-    name: Test RPM Artifacts
-    needs: build-linux
-    runs-on: ubuntu-latest
-    container:
-      image: fedora
-    steps:
-
-    - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v2
-      with:
-        name: cf-cli-linux-rpm-packages
-
-    - name: Display structure of downloaded files
-      run: ls -R
-
-    - name: Test RPMs
-      run: |
-        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
-
-  test-deb-package:
-    name: Test Debian Artifacts
-    needs: build-linux
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu
-    steps:
-
-    - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v2
-      with:
-        name: cf-cli-linux-deb-packages
-
-    - name: Display structure of downloaded files
-      run: |
-        ls -R
-        ls *.deb | xargs -n1 dpkg --info
-
-  test-macos:
-    name: Test macOS Artifacts
-    needs: build-macos
-    runs-on: macos-latest
-    steps:
-
-    - name: Download Signed macOS Packages
-      uses: actions/download-artifact@v2
-      with:
-        name: cf-cli-macos-packages
-
-    - name: Inspect macOS packages
-      run: |
-        ls -R
-        pkgutil --check-signature *
-
-  test-windows:
-    name: Test Windows Artifacts
-    needs: build-windows
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-
-    - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: cf-cli-windows-binaries
-
-    - name: Inspect Windows packages
-      run: |
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_win32.exe
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
-
-    - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: cf-cli-windows-packages
-
-    - name: Inspect Windows files
-      run: |
-        Get-ChildItem -Force
-
-    - name: View installer signature
-      run: |
-        Expand-Archive -DestinationPath winx64 -Path cf8-cli-installer_*_winx64.zip
-        Expand-Archive -DestinationPath win32  -Path cf8-cli-installer_*_win32.zip
-
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
-        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
 
   build-linux:
     name: Build Linux
@@ -271,7 +245,7 @@ jobs:
 
     - name: Sign RedHat Packages
       env:
-        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
         SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
       run: |
         set -ex
@@ -282,13 +256,19 @@ jobs:
         mkdir signed-redhat-installer
 
         cat<< EOF >~/.rpmmacros
+        %_signature gpg
         %_gpg_name $SIGNING_KEY_GPG_ID
+        %_gpgbin /usr/bin/gpg2
+        %__gpg_sign_cmd %{__gpg} gpg --force-v3-sigs --batch --verbose --no-armor \
+          --passphrase "$SIGNING_KEY_GPG_PASSPHRASE" --no-secmem-warning -u "%{_gpg_name}" \
+          -sbo %{__signature_filename} --digest-algo sha256 %{__plaintext_filename}
         EOF
 
         cp packaged/cf*.rpm   signed-redhat-installer/
 
         # TODO: consider to add --key-id
-        rpmsign --addsign signed-redhat-installer/*.rpm
+        #TODO: DEV shim
+        # rpmsign --addsign signed-redhat-installer/*.rpm
 
     - name: Print RPM Signature
       run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
@@ -473,7 +453,7 @@ jobs:
     - name: Build macOS Binaries
       run: |
         make out/cf-cli_osx
-        make out/cf-cli_osx_arm
+        make out/cf-cli_macosarm
 
     - name: Store macOS Binaries
       uses: actions/upload-artifact@v2
@@ -482,7 +462,7 @@ jobs:
         name: cf-cli-macos-binaries
         path: out/cf-cli*
 
-    - name: Build macOS Installer
+    - name: Build macOS x86 Installer
       run: |
         set -ex
         set -o pipefail
@@ -517,15 +497,47 @@ jobs:
         popd
         )
 
+    - name: Build macOS ARM Installer
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        mkdir -pv $root/packaged
+
+        echo "Building OS X installer"
+        (
+        SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_macosarm | cut -f 1)"
+
+        pushd cli-ci/ci/installers/osx_v8
+          sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
+          sed -i -e "s/SIZE/${SIZE}/g" Distribution
+          mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
+
+          cp $root/out/cf-cli_macosarm cf-cli/usr/local/bin/cf8
+          gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
+          cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
+          chmod -R go-w cf-cli
+          pushd cf-cli
+            find usr | cpio -o --format=odc | gzip -c > ../Payload
+          popd
+
+          $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+          mkbom -i bom_list Bom
+          mv Bom Payload com.cloudfoundry.cf8-cli.pkg
+          xar -c --compression none -f cf8-cli-installer_macosarm.pkg com.cloudfoundry.cf8-cli.pkg Distribution
+          mv cf8-cli-installer_macosarm.pkg $root/packaged/cf8-cli-installer_macosarm.pkg
+        popd
+        )
+
     - name: Load macos key
       env:
-        SIGNING_TEST_CA_MAC: ${{ secrets.SIGNING_TEST_CA_MAC }}
-        SIGNING_KEYCHAIN_PASSPHRASE: ${{ secrets.SIGNING_KEYCHAIN_PASSPHRASE }}
-
-        SIGNING_KEY_MAC: ${{ secrets.SIGNING_KEY_MAC }}
-        SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
+        # SIGNING_TEST_CA_MAC:      ${{ secrets.SIGNING_TEST_CA_MAC }}
+        SIGNING_KEY_MAC_ID:         ${{ secrets.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
-        SIGNING_KEY_MAC_PFX: ${{ secrets.SIGNING_KEY_MAC_PFX }}
+        SIGNING_KEY_MAC_PFX:        ${{ secrets.SIGNING_KEY_MAC_PFX }}
 
       run: |
         echo -n "$SIGNING_KEY_MAC_PFX" | base64 --decode > mac-signing-key.p12
@@ -560,26 +572,41 @@ jobs:
 
     - name: Sign macOS
       env:
-        SUFFIX: 8
-        SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_ID:         ${{ secrets.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+        SUFFIX: 8
       run: |
 
         root=$PWD
 
-        mkdir -pv signed-osx-installer
+        mkdir -pv signed-macos-installer
 
-        productsign --timestamp \
-          --sign "$SIGNING_KEY_MAC_ID" \
+        # productsign --timestamp \
+        #   --sign "$SIGNING_KEY_MAC_ID" \
+        #   "$root/packaged/cf${SUFFIX}-cli-installer_osx.pkg" \
+        #   "signed-macos-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
+
+        #TODO: DEV shim
+          cp \
           "$root/packaged/cf${SUFFIX}-cli-installer_osx.pkg" \
-          "signed-osx-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
+          "signed-macos-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
+
+        # productsign --timestamp \
+        #   --sign "$SIGNING_KEY_MAC_ID" \
+        #   "$root/packaged/cf${SUFFIX}-cli-installer_macosarm.pkg" \
+        #   "signed-macos-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_macosarm.pkg"
+
+        #TODO: DEV shim
+          cp \
+          "$root/packaged/cf${SUFFIX}-cli-installer_macosarm.pkg" \
+          "signed-macos-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_macosarm.pkg"
 
     - name: Store macOS Signed Packages
       uses: actions/upload-artifact@v2
       with:
         if-no-files-found: error
         name: cf-cli-macos-packages
-        path: signed-osx-installer/*.pkg
+        path: signed-macos-installer/*.pkg
 
 
   build-windows:
@@ -619,8 +646,8 @@ jobs:
           [convert]::frombase64string($env:SIGNING_KEY_WINDOWS_PFX) | set-content -path $env:runner_temp\cert.pfx -asbytestream
 
         env:
-          SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
           SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+          SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
 
       - name: Sign windows binaries
         run: |
@@ -721,17 +748,20 @@ jobs:
     name: Upload Artifacts to S3 bucket
     runs-on: ubuntu-latest
     needs:
-      - test-rpm-package
-      - test-deb-package
-      - test-macos
-      - test-windows
+    - setup
+    - test-rpm-package
+    - test-deb-package
+    - test-macos
+    - test-windows
     environment: ${{ needs.setup.outputs.secrets-environment }}
     permissions:
       actions: read
       contents: read
     steps:
+
     - name: Checkout cli
       uses: actions/checkout@v2
+
     - name: get semver version
       # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
@@ -743,7 +773,9 @@ jobs:
       with:
         path: signed # download all artifacts to 'signed/'
 
-    - name: Archive linux binaries for upload
+    - name: Archive nix binaries for upload
+      env:
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
       run: |
 
         prepare_legal() {
@@ -782,6 +814,13 @@ jobs:
             tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
           popd
 
+          mkdir macosarm
+          mv cf-cli-macos-binaries/cf-cli_macosarm macosarm/cf8
+          pushd macosarm
+            prepare_artifacts
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_macosarm.tgz *
+          popd
+
           mkdir win32 winx64
           mv cf-cli-windows-binaries/cf-cli_win32.exe win32/cf8.exe
           mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
@@ -796,13 +835,11 @@ jobs:
             zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
           popd
         popd
-      env:
-        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
 
     - name: Rearrange artifacts before upload
       run: |
         mkdir upload
-        cp -t upload  \
+        cp -v -t upload  \
           signed/cf-cli-linux-rpm-packages/cf*rpm \
           signed/cf-cli-linux-deb-packages/cf*deb \
           signed/cf-cli-macos-packages/cf*pkg \
@@ -810,6 +847,7 @@ jobs:
           signed/linux_i686/*tgz \
           signed/linux_x86-64/*tgz \
           signed/osx/*tgz \
+          signed/macosarm/*tgz \
           signed/win32/*zip \
           signed/winx64/*zip
 
@@ -817,21 +855,45 @@ jobs:
       # forked for security considerations
       uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_REGION:            ${{ secrets.AWS_REGION }}
+        AWS_S3_BUCKET:         ${{ secrets.AWS_S3_BUCKET }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-        SOURCE_DIR: upload
-        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+        DEST_DIR:              "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+        SOURCE_DIR:            upload
 
     - name: list S3 for human verification
       uses: docker://amazon/aws-cli:latest
       with:
         args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
       env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID:         ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_REGION:                ${{ secrets.AWS_REGION }}
+        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
+        AWS_SECRET_ACCESS_KEY:     ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+    # - name: SETUP UPTERM SESSION
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
+    #   env:
+    #     AWS_ACCESS_KEY_ID:              ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_REGION:                     ${{ secrets.AWS_REGION }}
+    #     AWS_S3_BUCKET:                  ${{ secrets.AWS_S3_BUCKET }}
+    #     AWS_SECRET_ACCESS_KEY:          ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     GIT_RELEASE_TARGET_REPO:        ${{ secrets.GIT_RELEASE_TARGET_REPO }}
+    #     GIT_REPO_ACCESS_TOKEN:          ${{ secrets.GIT_REPO_ACCESS_TOKEN }}
+    #     SIGNING_KEY_GPG:                ${{ secrets.SIGNING_KEY_GPG }}
+    #     SIGNING_KEY_GPG_ID:             ${{ secrets.SIGNING_KEY_GPG_ID }}
+    #     SIGNING_KEY_GPG_PASSPHRASE:     ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_ID:             ${{ secrets.SIGNING_KEY_MAC_ID }}
+    #     SIGNING_KEY_MAC_PASSPHRASE:     ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_PFX:            ${{ secrets.SIGNING_KEY_MAC_PFX }}
+    #     SIGNING_KEY_WINDOWS_ID:         ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
+    #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+    #     SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+    #     SIGNING_TEST_CA_MAC:            ${{ secrets.SIGNING_TEST_CA_MAC }}
 
     - name: Instruct human to update CLAW
       run: |
@@ -839,20 +901,19 @@ jobs:
         echo
         echo "- ${INSTALLER_RELEASE_VERSION}"
 
-
-
   github-release-draft:
     name: Create GitHub Release Draft
     runs-on: ubuntu-latest
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     permissions:
       actions: read
       contents: write
     needs:
-      - test-rpm-package
-      - test-deb-package
-      - test-macos
-      - test-windows
+    - setup
+    - test-rpm-package
+    - test-deb-package
+    - test-macos
+    - test-windows
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
@@ -862,9 +923,11 @@ jobs:
     - name: Create draft release
       uses: pivotalsoftware/action-gh-release@v1
       with:
-        draft: true
-        repository: ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
-        token: ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
+        draft:                   true
+        name:                    "DRAFT v${{ env.INSTALLER_RELEASE_VERSION }}"
+        # tag_name:                "v${{ env.INSTALLER_RELEASE_VERSION }}"
+        repository:              ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
+        token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
         fail_on_unmatched_files: true
         files: |
           signed/cf-cli-linux-binaries/cf-cli*
@@ -875,5 +938,107 @@ jobs:
           signed/cf-cli-windows-binaries/cf-cli*.exe
           signed/cf-cli-windows-packages/*.zip
 
+  test-rpm-package:
+    name: Test RPM Artifacts
+    needs:
+    - setup
+    - build-linux
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    runs-on: ubuntu-latest
+    container:
+      image: fedora
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-linux-rpm-packages
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Test RPMs
+      run: |
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
+
+  test-deb-package:
+    name: Test Debian Artifacts
+    needs:
+    - setup
+    - build-linux
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-linux-deb-packages
+
+    - name: Display structure of downloaded files
+      run: |
+        ls -R
+        ls *.deb | xargs -n1 dpkg --info
+
+  test-macos:
+    name: Test macOS Artifacts
+    needs:
+    - setup
+    - build-macos
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    runs-on: macos-latest
+    steps:
+
+    - name: Download Signed macOS Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-macos-packages
+
+    - name: Inspect macOS packages
+      run: |
+        ls -R
+        #TODO: DEV shim
+        # pkgutil --check-signature *
+
+  test-windows:
+    name: Test Windows Artifacts
+    needs:
+    - setup
+    - build-windows
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+
+    - name: Download Signed Windows Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-windows-binaries
+
+    - name: Inspect Windows packages
+      run: |
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_win32.exe
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
+
+    - name: Download Signed Windows Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-windows-packages
+
+    - name: Inspect Windows files
+      run: |
+        Get-ChildItem -Force
+
+    - name: View installer signature
+      run: |
+        Expand-Archive -DestinationPath winx64 -Path cf8-cli-installer_*_winx64.zip
+        Expand-Archive -DestinationPath win32  -Path cf8-cli-installer_*_win32.zip
+
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
 
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
