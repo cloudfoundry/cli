@@ -1,4 +1,3 @@
-//go:build !windows && !darwin
 // +build !windows,!darwin
 
 package sharedaction_test

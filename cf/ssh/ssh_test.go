@@ -1,4 +1,3 @@
-//go:build !windows && !386
 // +build !windows,!386
 
 // skipping 386 because lager uses UInt64 in Session()

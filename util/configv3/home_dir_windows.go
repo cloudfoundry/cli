@@ -1,4 +1,3 @@
-//go:build windows
 // +build windows
 
 package configv3
