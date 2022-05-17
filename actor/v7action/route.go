@@ -398,10 +398,6 @@ func (actor Actor) MapRoute(routeGUID string, appGUID string, destinationProtoco
 	return Warnings(warnings), err
 }
 
-func (actor Actor) UpdateDestination(routeGUID string, destinationGUID string, protocol string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.UpdateDestination(routeGUID, destinationGUID, protocol)
-	return Warnings(warnings), err
-}
 func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
 	return Warnings(warnings), err

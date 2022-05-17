@@ -3213,21 +3213,6 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateDestinationStub        func(string, string, string) (v7action.Warnings, error)
-	updateDestinationMutex       sync.RWMutex
-	updateDestinationArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-	}
-	updateDestinationReturns struct {
-		result1 v7action.Warnings
-		result2 error
-	}
-	updateDestinationReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
-	}
 	UpdateDomainLabelsByDomainNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
 	updateDomainLabelsByDomainNameMutex       sync.RWMutex
 	updateDomainLabelsByDomainNameArgsForCall []struct {
@@ -17354,71 +17339,6 @@ func (fake *FakeActor) UpdateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateDestination(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
-	fake.updateDestinationMutex.Lock()
-	ret, specificReturn := fake.updateDestinationReturnsOnCall[len(fake.updateDestinationArgsForCall)]
-	fake.updateDestinationArgsForCall = append(fake.updateDestinationArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("UpdateDestination", []interface{}{arg1, arg2, arg3})
-	fake.updateDestinationMutex.Unlock()
-	if fake.UpdateDestinationStub != nil {
-		return fake.UpdateDestinationStub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.updateDestinationReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeActor) UpdateDestinationCallCount() int {
-	fake.updateDestinationMutex.RLock()
-	defer fake.updateDestinationMutex.RUnlock()
-	return len(fake.updateDestinationArgsForCall)
-}
-
-func (fake *FakeActor) UpdateDestinationCalls(stub func(string, string, string) (v7action.Warnings, error)) {
-	fake.updateDestinationMutex.Lock()
-	defer fake.updateDestinationMutex.Unlock()
-	fake.UpdateDestinationStub = stub
-}
-
-func (fake *FakeActor) UpdateDestinationArgsForCall(i int) (string, string, string) {
-	fake.updateDestinationMutex.RLock()
-	defer fake.updateDestinationMutex.RUnlock()
-	argsForCall := fake.updateDestinationArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeActor) UpdateDestinationReturns(result1 v7action.Warnings, result2 error) {
-	fake.updateDestinationMutex.Lock()
-	defer fake.updateDestinationMutex.Unlock()
-	fake.UpdateDestinationStub = nil
-	fake.updateDestinationReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeActor) UpdateDestinationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.updateDestinationMutex.Lock()
-	defer fake.updateDestinationMutex.Unlock()
-	fake.UpdateDestinationStub = nil
-	if fake.updateDestinationReturnsOnCall == nil {
-		fake.updateDestinationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
-		})
-	}
-	fake.updateDestinationReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeActor) UpdateDomainLabelsByDomainName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateDomainLabelsByDomainNameMutex.Lock()
 	ret, specificReturn := fake.updateDomainLabelsByDomainNameReturnsOnCall[len(fake.updateDomainLabelsByDomainNameArgsForCall)]
@@ -19346,8 +19266,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
 	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()
 	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
-	fake.updateDestinationMutex.RLock()
-	defer fake.updateDestinationMutex.RUnlock()
 	fake.updateDomainLabelsByDomainNameMutex.RLock()
 	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
 	fake.updateManagedServiceInstanceMutex.RLock()

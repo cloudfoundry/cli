@@ -194,7 +194,7 @@ PLATFORMS
 DEPENDENCIES
 
 BUNDLED WITH
-   2.1.4
+   1.15.0
 	`), 0666)
 	Expect(err).ToNot(HaveOccurred())
 

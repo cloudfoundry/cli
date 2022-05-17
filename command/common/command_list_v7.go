@@ -187,7 +187,6 @@ type commandList struct {
 	UnsharePrivateDomain               v7.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with a specific org"`
 	UnshareService                     v7.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
 	UpdateBuildpack                    v7.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
-	UpdateDestination                  v7.UpdateDestinationCommand                  `command:"update-destination" description:"Updates the destination protocol for a route"`
 	UpdateOrgQuota                     v7.UpdateOrgQuotaCommand                     `command:"update-org-quota" alias:"update-quota" description:"Update an existing organization quota"`
 	UpdateSecurityGroup                v7.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
 	UpdateService                      v7.UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
