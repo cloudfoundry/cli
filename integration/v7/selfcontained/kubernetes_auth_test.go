@@ -4,15 +4,14 @@ import (
 	"net/http"
 	"path/filepath"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
-	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/v7/selfcontained/fake"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
+	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 var _ = Describe("auth-provider", func() {
@@ -30,19 +29,13 @@ var _ = Describe("auth-provider", func() {
 						"resources":  []resources.Application{},
 					},
 				},
-				"GET /whoami": {
-					Code: http.StatusOK, Body: map[string]interface{}{
-						"name": "my-user",
-						"kind": "User",
-					},
-				},
 			},
 		}
 		apiServer.SetConfiguration(apiConfig)
 		helpers.SetConfig(func(config *configv3.Config) {
 			config.ConfigFile.Target = apiServer.URL()
 			config.ConfigFile.CFOnK8s.Enabled = true
-			config.ConfigFile.CFOnK8s.AuthInfo = "my-user"
+			config.ConfigFile.CFOnK8s.AuthInfo = "one"
 			config.ConfigFile.TargetedOrganization = configv3.Organization{
 				GUID: "my-org",
 				Name: "My Org",
@@ -59,8 +52,7 @@ var _ = Describe("auth-provider", func() {
 			APIVersion: "v1",
 			AuthInfos: []apiv1.NamedAuthInfo{
 				{
-					Name: "my-user",
-					AuthInfo: apiv1.AuthInfo{
+					Name: "one", AuthInfo: apiv1.AuthInfo{
 						AuthProvider: &apiv1.AuthProviderConfig{
 							Name: "oidc",
 							Config: map[string]string{

@@ -6,17 +6,16 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
-	"github.com/onsi/gomega/gexec"
-	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/v7/selfcontained/fake"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
+	"github.com/onsi/gomega/gexec"
+	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 var _ = Describe("LoginCommand", func() {
@@ -44,12 +43,6 @@ var _ = Describe("LoginCommand", func() {
 						Code: http.StatusOK, Body: map[string]interface{}{
 							"pagination": map[string]interface{}{},
 							"resources":  []resources.Organization{},
-						},
-					},
-					"GET /whoami": {
-						Code: http.StatusOK, Body: map[string]interface{}{
-							"name": "two",
-							"kind": "User",
 						},
 					},
 				},
