@@ -539,7 +539,7 @@ var _ = Describe("Route", func() {
 		var (
 			routeGUID           = "route-guid"
 			appGUID             = "app-guid"
-			destinationProtocol string
+			destinationProtocol = "http2"
 			expectedBody        string
 			warnings            Warnings
 			executeErr          error
@@ -559,7 +559,6 @@ var _ = Describe("Route", func() {
 
 		When("the request is successful", func() {
 			BeforeEach(func() {
-				destinationProtocol = "http2"
 				expectedBody = fmt.Sprintf(`
 					{
 						"destinations": [
