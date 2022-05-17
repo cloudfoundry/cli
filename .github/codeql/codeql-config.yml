@@ -1,3 +1,0 @@
-paths-ignore:
-  - cf
-  - util/ui/request_logger_terminal_display.go
