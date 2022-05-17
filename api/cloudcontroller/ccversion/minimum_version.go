@@ -2,7 +2,7 @@ package ccversion
 
 const (
 	MinSupportedV2ClientVersion = "2.128.0"
-	MinSupportedClientVersionV8 = "3.99.0"
+	MinSupportedV3ClientVersion = "3.63.0"
 
 	MinVersionUpdateServiceNameWhenPlanNotVisibleV2  = "2.131.0"
 	MinVersionUpdateServiceInstanceMaintenanceInfoV2 = "2.135.0"
