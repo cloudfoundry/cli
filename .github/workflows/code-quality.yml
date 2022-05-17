@@ -12,7 +12,6 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository == 'cloudfoundry/cli' }}
     permissions:
       actions: read
       contents: read
@@ -34,5 +33,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
-
-# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

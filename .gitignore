@@ -46,8 +46,6 @@ tmp/
 
 .hg/
 
-.envrc
-
 *.test
 /tags
 
