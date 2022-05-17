@@ -39,10 +39,10 @@ jobs:
     - name: Linux Unit tests
       run: |
         export TARGET_V7=true
-        export GOPATH=$PWD/gopath
+        # export GOPATH=$PWD/gopath
         export PATH=$GOPATH/bin:$PATH
         export GOFLAGS="-mod=mod"
-
+        echo "PWD=$PWD"
         cd $GOPATH/src/code.cloudfoundry.org/cli
 
         export LC_ALL="en_US.UTF-8"
