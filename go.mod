@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli
 
-go 1.17
+go 1.16
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
@@ -16,89 +16,49 @@ require (
 	code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be
 	code.cloudfoundry.org/tlsconfig v0.0.0-20210615191307-5d92ef3894a7
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
+	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver v3.5.1+incompatible
+	github.com/bmatcuk/doublestar v1.3.1 // indirect
+	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
 	github.com/cloudfoundry/bosh-cli v5.5.1+incompatible
+	github.com/cloudfoundry/bosh-utils v0.0.0-20180315210917-c6a922e299b8 // indirect
+	github.com/cppforlife/go-patch v0.1.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.1
 	github.com/docker/distribution v2.6.0-rc.1.0.20171109224904-e5b5e44386f7+incompatible
+	github.com/docker/docker v1.4.2-0.20171120205147-9de84a78d76e // indirect
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
 	github.com/kr/pty v1.1.1
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.0
+	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/moby/moby v1.4.2-0.20171120205147-9de84a78d76e
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
+	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
 	github.com/sirupsen/logrus v1.2.0
+	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e
-	golang.org/x/text v0.3.7
-	gopkg.in/cheggaaa/pb.v1 v1.0.28
-	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/apimachinery v0.22.2
-	k8s.io/client-go v0.22.2
-)
-
-require (
-	cloud.google.com/go v0.65.0 // indirect
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest v0.11.18 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.13 // indirect
-	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
-	github.com/Azure/go-autorest/logger v0.2.1 // indirect
-	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/bmatcuk/doublestar v1.3.1 // indirect
-	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40 // indirect
-	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
-	github.com/cloudfoundry/bosh-utils v0.0.0-20180315210917-c6a922e299b8 // indirect
-	github.com/cppforlife/go-patch v0.1.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/docker v1.4.2-0.20171120205147-9de84a78d76e // indirect
-	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/logr v0.4.0 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/google/gofuzz v1.1.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0 // indirect
-	github.com/imdario/mergo v0.3.5 // indirect
-	github.com/json-iterator/go v1.1.11 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
-	github.com/mattn/go-isatty v0.0.3 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
-	golang.org/x/mod v0.4.2 // indirect
-	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
 	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
+	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.6-0.20210908190839-cf92b39a962c // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4 // indirect
 	google.golang.org/grpc v1.41.0 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/inf.v0 v0.9.1 // indirect
-	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	k8s.io/klog/v2 v2.9.0 // indirect
-	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
+	gopkg.in/cheggaaa/pb.v1 v1.0.28
+	gopkg.in/yaml.v2 v2.4.0
+	k8s.io/client-go v0.22.2
 )
 
 replace gopkg.in/fsnotify.v1 v1.4.7 => github.com/fsnotify/fsnotify v1.4.7
