@@ -3,7 +3,7 @@ name: Integration Tests
 on:
   push:
     branches:
-    - "gha-integration"
+    - "ga-integration"
 
 # permissions:
 #   contents: write
