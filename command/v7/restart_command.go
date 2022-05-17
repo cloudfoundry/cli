@@ -1,9 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -28,12 +26,7 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-
-	logCacheClient, err := logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
-	if err != nil {
-		return err
-	}
-
+	logCacheClient := command.NewLogCacheClient(config.LogCacheEndpoint(), config, ui)
 	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
 
 	return nil

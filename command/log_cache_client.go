@@ -1,4 +1,4 @@
-package logcache
+package command
 
 import (
 	"fmt"
@@ -8,12 +8,8 @@ import (
 	"strings"
 	"time"
 
-	logcache "code.cloudfoundry.org/go-log-cache"
-
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/shared"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util"
+	logcache "code.cloudfoundry.org/go-log-cache"
 )
 
 type RequestLoggerOutput interface {
@@ -66,23 +62,15 @@ func (p *DebugPrinter) addOutput(output RequestLoggerOutput) {
 	p.outputs = append(p.outputs, output)
 }
 
-type userAgentHTTPClient struct {
-	c         logcache.HTTPClient
-	userAgent string
-}
-
-func (c *userAgentHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	req.Header.Set("User-Agent", c.userAgent)
-	return c.c.Do(req)
-}
-
 type tokenHTTPClient struct {
 	c           logcache.HTTPClient
 	accessToken func() string
+	userAgent   string
 }
 
 func (c *tokenHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", c.accessToken())
+	req.Header.Set("User-Agent", c.userAgent)
 	return c.c.Do(req)
 }
 
@@ -105,9 +93,9 @@ func (c *httpDebugClient) Do(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-// NewClient returns back a configured Log Cache Client.
-func NewClient(logCacheEndpoint string, config command.Config, ui command.UI, k8sConfigGetter v7action.KubernetesConfigGetter) (*logcache.Client, error) {
-	var tr http.RoundTripper = &http.Transport{
+// NewLogCacheClient returns back a configured Log Cache Client.
+func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.Client {
+	tr := &http.Transport{
 		Proxy:           http.ProxyFromEnvironment,
 		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation()),
 		DialContext: (&net.Dialer{
@@ -116,19 +104,8 @@ func NewClient(logCacheEndpoint string, config command.Config, ui command.UI, k8
 		}).DialContext,
 	}
 
-	if config.IsCFOnK8s() {
-		var err error
-		tr, err = shared.WrapForCFOnK8sAuth(config, k8sConfigGetter, tr)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	var client logcache.HTTPClient //nolint
-	client = &userAgentHTTPClient{
-		c:         &http.Client{Transport: tr},
-		userAgent: fmt.Sprintf("%s/%s (%s; %s %s)", config.BinaryName(), config.BinaryVersion(), runtime.Version(), runtime.GOARCH, runtime.GOOS),
-	}
+	client = &http.Client{Transport: tr}
 
 	verbose, location := config.Verbose()
 	if verbose && ui != nil {
@@ -141,19 +118,16 @@ func NewClient(logCacheEndpoint string, config command.Config, ui command.UI, k8
 		client = &httpDebugClient{printer: printer, c: client}
 	}
 
-	if !config.IsCFOnK8s() {
-		client = &tokenHTTPClient{
-			c:           client,
-			accessToken: config.AccessToken,
-		}
-	}
-
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.BinaryName(), config.BinaryVersion(), runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return logcache.NewClient(
 		logCacheEndpoint,
-		logcache.WithHTTPClient(client),
-	), nil
+		logcache.WithHTTPClient(&tokenHTTPClient{
+			c:           client,
+			accessToken: config.AccessToken,
+			userAgent:   userAgent,
+		}),
+	)
 }
-
 func headersString(header http.Header) string {
 	var result string
 	for name, values := range header {

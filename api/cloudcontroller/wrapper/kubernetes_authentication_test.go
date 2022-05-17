@@ -119,7 +119,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 		})
 	})
 
-	When("the chosen kubernetes auth info is not present in kubeconfig", func() {
+	When("the chosen kubeernetes auth info is not present in kubeconfig", func() {
 		BeforeEach(func() {
 			config.CurrentUserNameReturns("not-present", nil)
 		})
