@@ -66,7 +66,7 @@ var _ = Describe("unbind-staging-security-group Command", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say("Unbinding security group %s from defaults for staging as some-user...", cmd.RequiredArgs.SecurityGroup))
 			Expect(testUI.Out).To(Say("OK"))
-			Expect(testUI.Out).To(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+			Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 			Expect(testUI.Err).To(Say("get security group warning"))
 		})

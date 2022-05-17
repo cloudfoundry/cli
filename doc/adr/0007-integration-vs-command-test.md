@@ -38,7 +38,7 @@ output/functionality:
 > Security group my-group not bound to space my-space for lifecycle phase 'running'.
 > OK
 >
-> TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.
+> TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.
 > ```
 
 To do so, we would have to make a `BeforeEach()` that creates the scenario
@@ -62,7 +62,7 @@ When("the space isn't bound to the security group in any lifecycle", func() {
 		Eventually(session).Should(Say(`Unbinding security group %s from org %s / space %s as %s\.\.\.`, securityGroupName, orgName, spaceName, username))
 		Eventually(session.Err).Should(Say(`Security group %s not bound to space %s for lifecycle phase 'running'\.`, securityGroupName, spaceName))
 		Eventually(session).Should(Say("OK"))
-		Eventually(session).Should(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+		Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 		Eventually(session).Should(Exit(0))
 	})
 })

@@ -10,7 +10,7 @@ type UnbindRunningSecurityGroupCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
-	usage           interface{}        `usage:"CF_NAME unbind-running-security-group SECURITY_GROUP\n\nTIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	usage           interface{}        `usage:"CF_NAME unbind-running-security-group SECURITY_GROUP\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}        `related_commands:"apps, restart, running-security-groups, security-groups"`
 }
 
@@ -45,7 +45,7 @@ func (cmd UnbindRunningSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
+	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
 
 	return nil
 }
