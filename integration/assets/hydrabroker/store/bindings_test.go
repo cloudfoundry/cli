@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
 	uuid "github.com/nu7hatch/gouuid"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
