@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	. "code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
