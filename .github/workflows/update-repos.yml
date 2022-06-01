@@ -1,12 +1,14 @@
 name: Update Repositories
 
 on:
+  push:
+    branches: "v*"
+
   workflow_dispatch:
     inputs:
       build_version:
-        description: 'Build Version'
+        description: 'build version format: n.n.n'
         required: true
-        default: '8.3.0'
         type: string
 
 permissions:
@@ -17,35 +19,65 @@ defaults:
     shell: bash
 
 jobs:
-  shared-values:
+  setup:
     name: Setup
     runs-on: ubuntu-latest
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
-      build-version: ${{ steps.set-build-version.outputs.build-version }}
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-    steps:
 
+      version-build: ${{ steps.parse-semver.outputs.version-build }}
+      version-major: ${{ steps.parse-semver.outputs.version-major }}
+      version-minor: ${{ steps.parse-semver.outputs.version-minor }}
+      version-patch: ${{ steps.parse-semver.outputs.version-patch }}
+      claw-url: ${{ steps.set-claw-url.outputs.claw-url }}
+
+    steps:
     - name: Set environment
       id: set-secrets-environment
       run: echo "::set-output name=secrets-environment::PROD"
 
+    - name: Set CLAW URL
+      id: set-claw-url
+      run: echo "::set-output name=claw-url::https://packages.cloudfoundry.org"
+
     - name: Checkout cli
       uses: actions/checkout@v2
 
-    - name: Set build version
-      id: set-build-version
+    - name: Parse semver
+      id: parse-semver
       run: |
-        version=$(cat BUILD_VERSION)
-        echo "::set-output name=build-version::$version"
+        VERSION=$(cat BUILD_VERSION)
+        VERSION="${VERSION#[vV]}"
+
+        VERSION_MINOR="${VERSION#*.}"
+        VERSION_MINOR="${VERSION_MINOR%.*}"
+
+        echo "::set-output name=version-build::${VERSION}"
+        echo "::set-output name=version-major::${VERSION%%\.*}"
+        echo "::set-output name=version-minor::${VERSION_MINOR}"
+        echo "::set-output name=version-patch::${VERSION##*.}"
+
+        echo "VERSION_BUILD=${VERSION}" >> ${GITHUB_ENV}
+
+    - name: Test if CLAW serve this version
+      env:
+        CLAW_URL: ${{ steps.set-claw-url.outputs.claw-url }}
+      run: >
+        set -vx
+
+        curl --head "${CLAW_URL}/stable?release=linux64-binary&version=${VERSION_BUILD}&source=test" 2>&1 |
+        grep --quiet --regexp 'HTTP.*302'
 
   update-homebrew:
     name: Update Homebrew Repository
     runs-on: ubuntu-latest
-    needs: shared-values
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    needs: setup
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Checkout cli-ci
@@ -64,70 +96,82 @@ jobs:
         ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP }}
 
     - name: Setup
-      run: |
-        mkdir cf8-cli-osx-tarball cf8-cli-linux-tarball
+      run: >
+        mkdir
+        cf-cli-osx-tarball
+        cf-cli-macosarm-tarball
+        cf-cli-linux-tarball
 
     - name: Calculate checksums
       run: |
         set -x
 
-        curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${BUILD_VERSION}&source=github-rel" \
-          > cf8-cli-osx-tarball/cf8-cli_${BUILD_VERSION}_osx.tgz
+        curl -L "${CLAW_URL}/stable?release=macosx64-binary&version=${VERSION_BUILD}&source=github-rel" \
+          > cf-cli-osx-tarball/cf-cli_osx.tgz
+
+        curl -L "${CLAW_URL}/stable?release=macosarm-binary&version=${VERSION_BUILD}&source=github-rel" \
+          > cf-cli-macosarm-tarball/cf-cli_macosarm.tgz
+
+        curl -L "${CLAW_URL}/stable?release=linux64-binary&version=${VERSION_BUILD}&source=github-rel" \
+          > cf-cli-linux-tarball/cf-cli_linux64.tgz
 
         # Because CLAW always returns 200 we have to check if we got archive
-        file cf8-cli-osx-tarball/cf8-cli_${BUILD_VERSION}_osx.tgz | grep -q gzip || exit 1
+        file cf-cli-osx-tarball/cf-cli_osx.tgz | grep -q gzip || exit 1
+        file cf-cli-macosarm-tarball/cf-cli_macosarm.tgz | grep -q gzip || exit 1
+        file cf-cli-linux-tarball/cf-cli_linux64.tgz | grep -q gzip || exit 1
 
-        curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${BUILD_VERSION}&source=github-rel" \
-          > cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linux64.tgz
-
-        # Because CLAW always returns 200 we have to check if we got archive
-        file cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linux64.tgz | grep -q gzip || exit 1
-
-        pushd cf8-cli-osx-tarball
-          CLI_OSX_SHA256=$(shasum -a 256 cf8-cli_*_osx.tgz | cut -d ' ' -f 1)
+        pushd cf-cli-osx-tarball
+          CLI_OSX_SHA256=$(shasum -a 256 cf-cli_osx.tgz | cut -d ' ' -f 1)
         popd
 
-        pushd cf8-cli-linux-tarball
-          CLI_LINUX_64_SHA256=$(shasum -a 256 cf8-cli_*_linux64.tgz | cut -d ' ' -f 1)
+        pushd cf-cli-macosarm-tarball
+          CLI_MACOSARM_SHA256=$(shasum -a 256 cf-cli_macosarm.tgz | cut -d ' ' -f 1)
         popd
 
-        echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}" >> $GITHUB_ENV
-        echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> $GITHUB_ENV
+        pushd cf-cli-linux-tarball
+          CLI_LINUX_64_SHA256=$(shasum -a 256 cf-cli_linux64.tgz | cut -d ' ' -f 1)
+        popd
+
+        echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}" >> ${GITHUB_ENV}
+        echo "CLI_MACOSARM_SHA256=${CLI_MACOSARM_SHA256}" >> ${GITHUB_ENV}
+        echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> ${GITHUB_ENV}
 
     - name: Generate Homebrew formula file
       run: |
         set -ex
 
         pushd homebrew-tap
-          cat <<EOF > cf-cli@8.rb
-        require 'formula'
-
-        class CfCliAT8 < Formula
-          homepage 'https://code.cloudfoundry.org/cli'
-          version '${BUILD_VERSION}'
+          cat <<EOF > cf-cli@${VERSION_MAJOR}.rb
+        class CfCliAT${VERSION_MAJOR} < Formula
+          desc     "Cloud Foundry CLI"
+          homepage "https://code.cloudfoundry.org/cli"
+          version  "${VERSION_BUILD}"
 
           if OS.mac?
-            url 'https://packages.cloudfoundry.org/homebrew/cf8-${BUILD_VERSION}.tgz'
-            sha256 '${CLI_OSX_SHA256}'
+            if Hardware::CPU.arm?
+              url "${CLAW_URL}/homebrew?arch=macosarm&version=${VERSION_BUILD}"
+              sha256 "${CLI_MACOSARM_SHA256}"
+            elsif
+              url "${CLAW_URL}/homebrew?arch=macosx64&version=${VERSION_BUILD}"
+              sha256 "${CLI_OSX_SHA256}"
+            end
           elsif OS.linux?
-            url 'https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${BUILD_VERSION}&source=homebrew'
-            sha256 '${CLI_LINUX_64_SHA256}'
+            url "${CLAW_URL}/stable?release=linux64-binary&version=${VERSION_BUILD}&source=homebrew"
+            sha256 "${CLI_LINUX_64_SHA256}"
           end
 
-          depends_on :arch => :x86_64
-
           def install
-            bin.install 'cf8'
-            bin.install_symlink 'cf8' => 'cf'
-            (bash_completion/"cf8-cli").write <<-completion
-        $(cat ../cli-ci/ci/installers/completion/cf8)
+            bin.install "cf${VERSION_MAJOR}"
+            bin.install_symlink "cf${VERSION_MAJOR}" => "cf"
+            (bash_completion/"cf${VERSION_MAJOR}-cli").write <<-completion
+        $(cat ../cli-ci/ci/installers/completion/cf${VERSION_MAJOR})
             completion
-            doc.install 'LICENSE'
-            doc.install 'NOTICE'
+            doc.install "LICENSE"
+            doc.install "NOTICE"
           end
 
           test do
-            system "#{bin}/cf8"
+            system "#{bin}/cf${VERSION_MAJOR}"
           end
         end
         EOF
@@ -137,20 +181,20 @@ jobs:
     - name: Commit new homebrew formula
       run: |
         pushd homebrew-tap
-          git add cf-cli@8.rb
+          git add cf-cli@${VERSION_MAJOR}.rb
 
           if ! [ -z "$(git status --porcelain)"]; then
             git config user.name github-actions
             git config user.email github-actions@github.com
-            git commit -m "Release CF CLI $BUILD_VERSION"
+            git commit -m "Release CF CLI ${VERSION_BUILD}"
           else
               echo "no new version to commit"
           fi
 
           git push
 
-          echo "::group::cf-cli@8.rb"
-          cat cf-cli@8.rb
+          echo "::group::cf-cli@${VERSION_MAJOR}.rb"
+          cat cf-cli@${VERSION_MAJOR}.rb
           echo "::endgroup::"
 
           echo "::group::git show"
@@ -163,47 +207,51 @@ jobs:
     name: Test Homebrew Repository
     runs-on: macos-latest
     needs:
-    - shared-values
+    - setup
     - update-homebrew
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Install CF CLI via Homebrew
       run: |
         set -evx
 
-        brew install cloudfoundry/tap/cf-cli@8
-        installed_cf_version=$(cf8 version)
+        brew install cloudfoundry/tap/cf-cli@${VERSION_MAJOR}
+        installed_cf_version=$(cf${VERSION_MAJOR} version)
 
         cf_location=$(which cf)
 
         echo $cf_location
         echo $installed_cf_version
-        echo $BUILD_VERSION
+        echo ${VERSION_BUILD}
 
         codesign --verify $cf_location || echo ---
 
-        cf -v | grep "$BUILD_VERSION"
+        cf -v | grep "${VERSION_BUILD}"
 
   update-deb:
     name: Update Debian Repository
     runs-on: ubuntu-latest
-    needs: shared-values
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    needs: setup
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
-      AWS_BUCKET_NAME: cf-cli-debian-repo
-      AWS_DEFAULT_REGION: us-west-2
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_BUCKET_NAME:       cf-cli-debian-repo
+      AWS_DEFAULT_REGION:    us-west-2
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Setup
       run: |
-        echo "BUILD_VERSION: $BUILD_VERSION"
-        echo "Environment: $ENVIRONMENT"
+        echo "VERSION_BUILD: ${VERSION_BUILD}"
+        echo "Environment: ${ENVIRONMENT}"
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -217,10 +265,10 @@ jobs:
 
     - name: Load GPG key
       env:
-        SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+        SIGNING_KEY_GPG:            ${{ secrets.SIGNING_KEY_GPG }}
         SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
       run: |
-        echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+        echo -n "${SIGNING_KEY_GPG}" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
 
     - name: View GPG keys
       run: gpg --list-keys
@@ -230,10 +278,10 @@ jobs:
         echo "Configure GPG"
 
         # mkdir gpg-dir
-        # export GNUPGHOME=$PWD/gpg-dir
-        # chmod 700 $GNUPGHOME
+        # export GNUPGHOME=${PWD}/gpg-dir
+        # chmod 700 ${GNUPGHOME}
         # TODO: restore
-        # trap "rm -rf $GNUPGHOME" 0
+        # trap "rm -rf ${GNUPGHOME}" 0
 
         cat >> ~/gpg.conf <<EOF
         personal-digest-preferences SHA256
@@ -244,12 +292,12 @@ jobs:
     - name: Download New Debian Packages From CLAW
       run: |
         mkdir installers
-        curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${BUILD_VERSION}&source=github-rel" > installers/cf8-cli-installer_${BUILD_VERSION}_i686.deb
-        curl -L "https://cli.run.pivotal.io/stable?release=debian64&version=${BUILD_VERSION}&source=github-rel" > installers/cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
+        curl -L "${CLAW_URL}/stable?release=debian32&version=${VERSION_BUILD}&source=github-rel" > installers/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
+        curl -L "${CLAW_URL}/stable?release=debian64&version=${VERSION_BUILD}&source=github-rel" > installers/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
 
     - name: Update Debian Repository
       env:
-        DEBIAN_FRONTEND: noninteractive
+        DEBIAN_FRONTEND:    noninteractive
         SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
       run: |
         deb-s3 upload installers/*.deb \
@@ -261,11 +309,13 @@ jobs:
     name: Test Debian Repository
     runs-on: ubuntu-latest
     needs:
-    - shared-values
+    - setup
     - update-deb
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Install CF CLI via apt
@@ -275,45 +325,48 @@ jobs:
         sudo apt update
         sudo apt install -y wget gnupg
 
-        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-        echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        echo "deb ${CLAW_URL}/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 
         sudo apt update
-        sudo apt install -y cf8-cli
+        sudo apt install -y cf${VERSION_MAJOR}-cli
 
         which cf
 
         set -x
 
         cf  -v
-        cf8 -v
+        cf${VERSION_MAJOR} -v
 
-        cf -v | grep "$BUILD_VERSION"
+        cf -v | grep "${VERSION_BUILD}"
 
   update-rpm:
     name: Update RPM Repository
     runs-on: ubuntu-18.04
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
-    needs: shared-values
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    needs: setup
     env:
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_DEFAULT_REGION:    us-east-1
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Setup
       env:
-        BUILD_VERSION: ${{ github.event.inputs.build_version }}
-        ENVIRONMENT: ${{ github.event.inputs.environment }}
+        ENVIRONMENT:   ${{ github.event.inputs.environment }}
+        VERSION_BUILD: ${{ github.event.inputs.build_version }}
       run: |
-        echo "BUILD_VERSION: $BUILD_VERSION"
-        echo "Environment: $ENVIRONMENT"
+        echo "VERSION_BUILD: ${VERSION_BUILD}"
+        echo "Environment: ${ENVIRONMENT}"
 
     # TODO: fix backup
     # - name: Download current RPM repodata
     #   env:
-    #     AWS_DEFAULT_REGION: us-east-1
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_DEFAULT_REGION:    us-east-1
     #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     #   uses: docker://amazon/aws-cli:latest
     #   with:
@@ -387,30 +440,32 @@ jobs:
   test-rpm-repo:
     name: Test RPM Repository
     needs:
-    - shared-values
+    - setup
     - update-rpm
     runs-on: ubuntu-latest
     container:
       image: fedora
-    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Configure Custom CF Repository
       run: |
         curl -sL -o /etc/yum.repos.d/cloudfoundry-cli.repo  \
-        https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+        ${CLAW_URL}/fedora/cloudfoundry-cli.repo
 
-    - name: Install cf8-cli package
-      run: dnf install -y cf8-cli
+    - name: Install cf cli package
+      run: dnf install -y cf${VERSION_MAJOR}-cli
 
     - name: Print CF CLI Versions
       run: |
         cf -v
-        cf8 -v
+        cf${VERSION_MAJOR} -v
 
     - name: Test Version Match
-      run: cf -v | grep -q "$BUILD_VERSION"
+      run: cf -v | grep -q "${VERSION_BUILD}"
 
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
