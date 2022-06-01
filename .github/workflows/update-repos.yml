@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       build_version:
-        description: 'Build Version'
+        description: 'build version format: 8.4.0'
         required: true
-        default: '8.3.0'
         type: string
 
 permissions:
@@ -38,6 +37,14 @@ jobs:
       run: |
         version=$(cat BUILD_VERSION)
         echo "::set-output name=build-version::$version"
+        echo "BUILD_VERSION=${version}" >> $GITHUB_ENV
+
+    - name: Test if CLAW serve this version
+      env:
+        CLAW_URL: https://packages.cloudfoundry.org
+      run: >
+        curl --head "${CLAW_URL}/stable?release=linux64-binary&version=${BUILD_VERSION}&source=test" 2>&1 |
+        grep --quiet --regexp 'HTTP.*302'
 
   update-homebrew:
     name: Update Homebrew Repository
@@ -46,6 +53,7 @@ jobs:
     environment: ${{ needs.shared-values.outputs.secrets-environment }}
     env:
       BUILD_VERSION: ${{ needs.shared-values.outputs.build-version }}
+      CLAW_URL: https://packages.cloudfoundry.org
     steps:
 
     - name: Checkout cli-ci
@@ -64,27 +72,38 @@ jobs:
         ssh-key: ${{ secrets.GIT_DEPLOY_HOMEBREW_TAP }}
 
     - name: Setup
-      run: |
-        mkdir cf8-cli-osx-tarball cf8-cli-linux-tarball
+      run: >
+        mkdir
+        cf8-cli-osx-tarball
+        cf8-cli-macosarm-tarball
+        cf8-cli-linux-tarball
 
     - name: Calculate checksums
       run: |
         set -x
 
-        curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${BUILD_VERSION}&source=github-rel" \
+        curl -L "${CLAW_URL}/stable?release=macosx64-binary&version=${BUILD_VERSION}&source=github-rel" \
           > cf8-cli-osx-tarball/cf8-cli_${BUILD_VERSION}_osx.tgz
 
         # Because CLAW always returns 200 we have to check if we got archive
         file cf8-cli-osx-tarball/cf8-cli_${BUILD_VERSION}_osx.tgz | grep -q gzip || exit 1
 
-        curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${BUILD_VERSION}&source=github-rel" \
+        curl -L "${CLAW_URL}/stable?release=macosarm-binary&version=${BUILD_VERSION}&source=github-rel" \
+          > cf8-cli-macosarm-tarball/cf8-cli_${BUILD_VERSION}_macosarm.tgz
+
+        file cf8-cli-macosarm-tarball/cf8-cli_${BUILD_VERSION}_macosarm.tgz | grep -q gzip || exit 1
+
+        curl -L "${CLAW_URL}/stable?release=linux64-binary&version=${BUILD_VERSION}&source=github-rel" \
           > cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linux64.tgz
 
-        # Because CLAW always returns 200 we have to check if we got archive
         file cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linux64.tgz | grep -q gzip || exit 1
 
         pushd cf8-cli-osx-tarball
           CLI_OSX_SHA256=$(shasum -a 256 cf8-cli_*_osx.tgz | cut -d ' ' -f 1)
+        popd
+
+        pushd cf8-cli-macosarm-tarball
+          CLI_MACOSARM_SHA256=$(shasum -a 256 cf8-cli_*_macosarm.tgz | cut -d ' ' -f 1)
         popd
 
         pushd cf8-cli-linux-tarball
@@ -92,6 +111,7 @@ jobs:
         popd
 
         echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}" >> $GITHUB_ENV
+        echo "CLI_MACOSARM_SHA256=${CLI_MACOSARM_SHA256}" >> $GITHUB_ENV
         echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> $GITHUB_ENV
 
     - name: Generate Homebrew formula file
@@ -107,14 +127,17 @@ jobs:
           version '${BUILD_VERSION}'
 
           if OS.mac?
-            url 'https://packages.cloudfoundry.org/homebrew/cf8-${BUILD_VERSION}.tgz'
-            sha256 '${CLI_OSX_SHA256}'
+            if Hardware::CPU.arm?
+              url '${CLAW_URL}/homebrew?arch=macosarm&version=${BUILD_VERSION}'
+              sha256 '${CLI_MACOSARM_SHA256}'
+            elsif
+              url '${CLAW_URL}/homebrew?arch=macosx64&version=${BUILD_VERSION}'
+              sha256 '${CLI_OSX_SHA256}'
+            end
           elsif OS.linux?
-            url 'https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${BUILD_VERSION}&source=homebrew'
+            url '${CLAW_URL}/stable?release=linux64-binary&version=${BUILD_VERSION}&source=homebrew'
             sha256 '${CLI_LINUX_64_SHA256}'
           end
-
-          depends_on :arch => :x86_64
 
           def install
             bin.install 'cf8'
@@ -275,8 +298,8 @@ jobs:
         sudo apt update
         sudo apt install -y wget gnupg
 
-        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-        echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        echo "deb ${CLAW_URL}/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 
         sudo apt update
         sudo apt install -y cf8-cli
@@ -400,7 +423,7 @@ jobs:
     - name: Configure Custom CF Repository
       run: |
         curl -sL -o /etc/yum.repos.d/cloudfoundry-cli.repo  \
-        https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+        ${CLAW_URL}/fedora/cloudfoundry-cli.repo
 
     - name: Install cf8-cli package
       run: dnf install -y cf8-cli
