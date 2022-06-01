@@ -171,6 +171,10 @@ out/cf-cli_osx: $(GOSRC)
 	GOARCH=amd64 GOOS=darwin go build \
 				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx .
 
+out/cf-cli_macosarm: $(GOSRC)
+	GOARCH=arm64 GOOS=darwin go build \
+				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_macosarm .
+
 out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
 	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
 	rm rsrc.syso
