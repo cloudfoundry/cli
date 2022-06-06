@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli
 
-go 1.17
+go 1.18
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
@@ -39,8 +39,8 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/net v0.0.0-20220531201128-c960675eff93
 	golang.org/x/text v0.3.7
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
@@ -84,8 +84,8 @@ require (
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/tools v0.1.6-0.20210908190839-cf92b39a962c // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
