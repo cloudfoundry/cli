@@ -127,7 +127,7 @@ jobs:
 
     - name: Set go version
       id: set-go-version
-      run: echo "::set-output name=go-version::1.17"
+      run: echo "::set-output name=go-version::1.18"
 
   build-linux:
     name: Build Linux
