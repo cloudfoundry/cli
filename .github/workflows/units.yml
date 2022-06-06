@@ -19,11 +19,16 @@ jobs:
     outputs:
       go-version: ${{ steps.set-go-version.outputs.go-version }}
     steps:
+
     - name: Checkout
       uses: actions/checkout@v2
+
     - id: set-go-version
+      name: Parse Golang Version
       run: |
-        echo "::set-output name=go-version::1.18"
+        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+        echo "golang version: ${go_version[1]}"
+        echo "::set-output name=go-version::${go_version[1]}"
 
   lint:
     name: Lint code
