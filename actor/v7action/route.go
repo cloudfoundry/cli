@@ -406,7 +406,10 @@ func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warning
 	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
 	return Warnings(warnings), err
 }
-
+func (actor Actor) ShareRoute(routeGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.ShareRoute(routeGUID, spaceGUID)
+	return Warnings(warnings), err
+}
 func (actor Actor) GetApplicationRoutes(appGUID string) ([]resources.Route, Warnings, error) {
 	allWarnings := Warnings{}
 
