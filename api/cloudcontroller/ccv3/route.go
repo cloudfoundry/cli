@@ -148,3 +148,28 @@ func (client Client) UpdateDestination(routeGUID string, destinationGUID string,
 	})
 	return warnings, err
 }
+
+func (client Client) ShareRoute(routeGUID string, spaceGUID string) (Warnings, error) {
+	type space struct {
+		GUID string `json:"guid"`
+	}
+
+	type body struct {
+		Data []space `json:"data"`
+	}
+
+	requestBody := body{
+		Data: []space{
+			{GUID: spaceGUID},
+		},
+	}
+
+	var responseBody resources.Build
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.ShareRouteRequest,
+		URIParams:    internal.Params{"route_guid": routeGUID},
+		RequestBody:  &requestBody,
+		ResponseBody: &responseBody,
+	})
+	return warnings, err
+}

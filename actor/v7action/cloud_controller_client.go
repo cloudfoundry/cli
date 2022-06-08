@@ -149,6 +149,7 @@ type CloudControllerClient interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)
 	SharePrivateDomainToOrgs(domainGuid string, sharedOrgs ccv3.SharedOrgs) (ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
+	ShareRoute(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	TargetCF(settings ccv3.TargetSettings)
 	UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)

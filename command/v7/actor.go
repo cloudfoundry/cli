@@ -216,6 +216,7 @@ type Actor interface {
 	SetTarget(settings v7action.TargetSettings) (v7action.Warnings, error)
 	SharePrivateDomain(domainName string, orgName string) (v7action.Warnings, error)
 	ShareServiceInstanceToSpaceAndOrg(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID string, sharedToDetails v7action.ServiceInstanceSharingParams) (v7action.Warnings, error)
+	ShareRoute(routeGUID string, spaceGUID string) (v7action.Warnings, error)
 	StageApplicationPackage(pkgGUID string) (resources.Build, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
