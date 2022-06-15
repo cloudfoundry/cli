@@ -51,6 +51,8 @@ jobs:
     name: Units
     needs: shared-values
     strategy:
+      fail-fast: false
+      max-parallel: 4
       matrix:
         os:
           - ubuntu-latest
@@ -81,6 +83,8 @@ jobs:
   units-windows:
     name: Units Windows
     strategy:
+      fail-fast: false
+      max-parallel: 4
       matrix:
         os:
           - windows-2022
