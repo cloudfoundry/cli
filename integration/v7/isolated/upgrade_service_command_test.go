@@ -24,6 +24,7 @@ var _ = Describe("upgrade-service command", func() {
 				Say(`\s+cf upgrade-service SERVICE_INSTANCE`),
 				Say(`OPTIONS:`),
 				Say(`\s+--force, -f\s+Force upgrade without asking for confirmation`),
+				Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 				Say(`SEE ALSO:`),
 				Say(`\s+services, update-service, update-user-provided-service`),
 			)
@@ -107,7 +108,7 @@ var _ = Describe("upgrade-service command", func() {
 				})
 			})
 
-			When("the service instance exist", func() {
+			When("the service instance exists", func() {
 				var broker *servicebrokerstub.ServiceBrokerStub
 
 				BeforeEach(func() {
@@ -151,7 +152,6 @@ var _ = Describe("upgrade-service command", func() {
 						Expect(session.Out).To(Say("Upgrade in progress"))
 					})
 				})
-
 			})
 		})
 	})
