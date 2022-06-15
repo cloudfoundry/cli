@@ -155,6 +155,9 @@ var _ = Describe("Plugin Connection", func() {
 			When("the server does not have a verified certificate", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
+						if runtime.GOOS == "darwin" {
+							Skip("ssl verification is different on darwin")
+						}
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest(http.MethodGet, "/list"),
@@ -178,8 +181,8 @@ var _ = Describe("Plugin Connection", func() {
 			When("the server's certificate does not match the hostname", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
-						if runtime.GOOS == "windows" {
-							Skip("ssl validation has a different order on windows, will not be returned properly")
+						if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+							Skip("ssl validation has a different order on windows/darwin, will not be returned properly")
 						}
 						server.AppendHandlers(
 							CombineHandlers(
