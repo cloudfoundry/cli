@@ -1631,6 +1631,49 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("UpdateDestination", func() {
+		var (
+			routeGUID       string
+			destinationGUID string
+			protocol        string
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateDestination(routeGUID, destinationGUID, protocol)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+			destinationGUID = "destination-guid"
+			protocol = "http2"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateDestinationReturns(ccv3.Warnings{"unmap-route-warning"}, errors.New("unmap-route-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("unmap-route-error")))
+				Expect(warnings).To(ConsistOf("unmap-route-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateDestinationReturns(ccv3.Warnings{"unmap-route-warning"}, nil)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("unmap-route-warning"))
+			})
+		})
+	})
+
 	Describe("DeleteOrphanedRoutes", func() {
 		var (
 			spaceGUID string

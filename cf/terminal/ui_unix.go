@@ -1,5 +1,6 @@
 // Copied from https://code.google.com/p/gopass/
 
+//go:build !windows
 // +build !windows
 
 package terminal

@@ -486,6 +486,27 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the service instance name is taken", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The service instance name is taken",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns an ServiceInstanceNameTakenError", func() {
+							Expect(makeError).To(MatchError(ccerror.ServiceInstanceNameTakenError{
+								Message: "The service instance name is taken",
+							}))
+						})
+					})
+
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `

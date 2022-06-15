@@ -1,0 +1,883 @@
+
+name: Build-Sign-Upload
+
+on:
+  push:
+    tags:
+    - 'v8.*'
+
+permissions:
+  contents: read
+
+defaults:
+  # top-level defaults subkeys apply to jobs
+  # run subkeys apply to all steps within all jobs
+  run:
+    shell: bash
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      build-version: ${{ steps.set-build-version.outputs.build-version }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+    steps:
+    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+
+    - name: Set environment
+      id: set-secrets-environment
+      run: echo "::set-output name=secrets-environment::PROD"
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
+
+    - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
+      run: |
+        echo "Git Ref: ${{ github.ref }}"
+        echo "BUILD_VERSION: $(cat BUILD_VERSION)"
+
+        exit 0
+
+    - name: Parse Build Version
+      id: set-build-version
+      run: |
+        version=$(cat BUILD_VERSION)
+        echo "::set-output name=build-version::$version"
+
+    - name: Parse Golang Version
+      id: set-go-version
+      run: |
+        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+        echo "golang version: ${go_version[1]}"
+        echo "::set-output name=go-version::${go_version[1]}"
+
+    # This is for debugging. It's equivalent to fly intecept
+    # - name: Setup upterm session
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
+
+  test-rpm-package:
+    name: Test RPM Artifacts
+    needs: build-linux
+    runs-on: ubuntu-latest
+    container:
+      image: fedora
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-linux-rpm-packages
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Test RPMs
+      run: |
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
+
+  test-deb-package:
+    name: Test Debian Artifacts
+    needs: build-linux
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-linux-deb-packages
+
+    - name: Display structure of downloaded files
+      run: |
+        ls -R
+        ls *.deb | xargs -n1 dpkg --info
+
+  test-macos:
+    name: Test macOS Artifacts
+    needs: build-macos
+    runs-on: macos-latest
+    steps:
+
+    - name: Download Signed macOS Packages
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-macos-packages
+
+    - name: Inspect macOS packages
+      run: |
+        ls -R
+        pkgutil --check-signature *
+
+  test-windows:
+    name: Test Windows Artifacts
+    needs: build-windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+
+    - name: Download Signed Windows Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-windows-binaries
+
+    - name: Inspect Windows packages
+      run: |
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_win32.exe
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
+
+    - name: Download Signed Windows Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: cf-cli-windows-packages
+
+    - name: Inspect Windows files
+      run: |
+        Get-ChildItem -Force
+
+    - name: View installer signature
+      run: |
+        Expand-Archive -DestinationPath winx64 -Path cf8-cli-installer_*_winx64.zip
+        Expand-Archive -DestinationPath win32  -Path cf8-cli-installer_*_win32.zip
+
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf8_installer.exe"
+        Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf8_installer.exe"
+
+  build-linux:
+    name: Build Linux
+    needs:
+    - setup
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+
+    env:
+      BUILD_VERSION: ${{ needs.setup.outputs.build-version }}
+
+    steps:
+
+    - name: Get Build Version
+      id: get_build_version
+      run: echo "BUILD_VERSION $BUILD_VERSION"
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
+
+    - name: Checkout cli-ci
+      uses: actions/checkout@v2
+      with:
+        repository: cloudfoundry/cli-ci.git
+        path: cli-ci
+        ref: master
+
+    - name: Install Linux Packages
+      run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ needs.setup.outputs.go-version }}
+
+    - name: Print go environment
+      id: go-cache-paths
+      run: |
+        echo "::set-output name=go-build::$(go env GOCACHE)"
+        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        go env
+
+    - name: Go Assets Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+          ${{ steps.go-cache-paths.outputs.go-build }}
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Build Linux
+      run: |
+        make out/cf-cli_linux_i686
+        make out/cf-cli_linux_x86-64
+
+    - name: Store Linux Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-binaries
+        path: out/cf-cli_linux*
+
+    - name: Build RedHat Packages
+      env:
+        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        cat<< EOF >~/.rpmmacros
+        $SIGNING_KEY_GPG_ID
+        EOF
+
+        RPM_VERSION=${BUILD_VERSION//-/_}
+
+        mkdir -pv $root/packaged
+
+        echo "Build 32-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+        	cp $root/out/cf-cli_linux_i686 cf8
+        	cp ../../license/NOTICE .
+        	cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+        	cp ../completion/cf8 cf8.bash
+        	echo "Version: ${RPM_VERSION}" > cf-cli.spec
+        	cat cf8-cli.spec.template >> cf-cli.spec
+        	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+        	mv build/RPMS/i386/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_i686.rpm
+          popd
+        )
+
+
+        echo "Build 64-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+        	cp $root/out/cf-cli_linux_x86-64 cf8
+        	cp ../../license/NOTICE .
+        	cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+        	cp ../completion/cf8 cf8.bash
+        	echo "Version: ${RPM_VERSION}" > cf-cli.spec
+        	cat cf8-cli.spec.template >> cf-cli.spec
+        	rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+        	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_x86-64.rpm
+          popd
+        )
+
+    - name: Load GPG key
+      env:
+        SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+      run: |
+        echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+    - name: View GPG keys
+      run: |
+        gpg --list-keys
+
+    - name: Sign RedHat Packages
+      env:
+        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+      run: |
+        set -ex
+        set -o pipefail
+
+        SUFFIX=8
+
+        mkdir signed-redhat-installer
+
+        cat<< EOF >~/.rpmmacros
+        %_gpg_name $SIGNING_KEY_GPG_ID
+        EOF
+
+        cp packaged/cf*.rpm   signed-redhat-installer/
+
+        # TODO: consider to add --key-id
+        rpmsign --addsign signed-redhat-installer/*.rpm
+
+    - name: Print RPM Signature
+      run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
+      working-directory: signed-redhat-installer
+
+    - name: Store Signed Linux RPM Packages
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-rpm-packages
+        path: signed-redhat-installer/*.rpm
+
+
+    - name: Build Debian Packages
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        mkdir -pv $root/packaged-deb
+
+        echo "Build 32-bit Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
+
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: i386" >> cf/DEBIAN/control
+
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+
+            cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_i686.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_i686.deb $root/packaged-deb
+            rm -rf cf
+          popd
+        )
+
+        echo "Build 64-bit Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
+
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: amd64" >> cf/DEBIAN/control
+
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+
+            cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_x86-64.deb $root/packaged-deb
+          popd
+        )
+
+    - name: Print DEB Packages Info
+      run: |
+        ls -R
+        for f in *.deb; do
+          echo $f
+          dpkg --info $f
+        done
+      working-directory: packaged-deb
+
+    - name: Store Debian Packages
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-deb-packages
+        path: packaged-deb/*.deb
+
+  build-macos:
+    name: Build macOS
+    needs:
+    - setup
+    runs-on: macos-latest
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    steps:
+
+    - name: Setup
+      run: |
+        echo "BUILD_VERSION=${{ needs.setup.outputs.build-version }}" >> $GITHUB_ENV
+
+    - name: Get Build Version
+      id: get_build_version
+      run: echo "BUILD_VERSION $BUILD_VERSION"
+
+    - name: Checkout cli
+      uses: actions/checkout@v2
+
+    - name: Checkout cli-ci
+      uses: actions/checkout@v2
+      with:
+        repository: cloudfoundry/cli-ci.git
+        path: cli-ci
+        ref: master
+
+    - name: Checkout bomutils
+      uses: actions/checkout@v2
+      with:
+        repository: hogliux/bomutils.git
+        ref: 0.2
+        path: bomutils
+
+    - name: Build bomutils
+      working-directory: bomutils
+      run: make
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ needs.setup.outputs.go-version }}
+
+    - name: Update Homebrew
+      run: |
+        brew tap pivotalsoftware/gon
+        brew update --preinstall
+        cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
+
+    - name: Configure Homebrew cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/Library/Caches/Homebrew/gon--*
+          ~/Library/Caches/Homebrew/downloads/*--gon-*
+        key: brew-${{ hashFiles('.github/brew-formulae') }}
+        restore-keys: brew-
+
+    - name: Install Homebrew dependencies
+      run: |
+        env HOMEBREW_NO_AUTO_UPDATE=1 brew install pivotalsoftware/gon/gon coreutils
+
+    - name: Print go environment
+      id: go-cache-paths
+      run: |
+        echo "::set-output name=go-build::$(go env GOCACHE)"
+        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        go env
+
+    - name: Go Assets Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+          ${{ steps.go-cache-paths.outputs.go-build }}
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Build macOS Binaries
+      run: |
+        make out/cf-cli_osx
+        make out/cf-cli_osx_arm
+
+    - name: Store macOS Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-macos-binaries
+        path: out/cf-cli*
+
+    - name: Build macOS Installer
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        mkdir -pv $root/packaged
+
+        echo "Building OS X installer"
+        (
+        SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
+
+        pushd cli-ci/ci/installers/osx_v8
+          sed -i -e "s/VERSION/${BUILD_VERSION}/g" Distribution
+          sed -i -e "s/SIZE/${SIZE}/g" Distribution
+          mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf8-cli
+
+          cp $root/out/cf-cli_osx cf-cli/usr/local/bin/cf8
+          gln -frs cf-cli/usr/local/bin/cf8 cf-cli/usr/local/bin/cf
+          cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf8-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf8-cli/LICENSE
+          chmod -R go-w cf-cli
+          pushd cf-cli
+            find usr | cpio -o --format=odc | gzip -c > ../Payload
+          popd
+
+          $root/bomutils/build/bin/ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+          mkbom -i bom_list Bom
+          mv Bom Payload com.cloudfoundry.cf8-cli.pkg
+          xar -c --compression none -f cf8-cli-installer_osx.pkg com.cloudfoundry.cf8-cli.pkg Distribution
+          mv cf8-cli-installer_osx.pkg $root/packaged/cf8-cli-installer_osx.pkg
+        popd
+        )
+
+    - name: Load macos key
+      env:
+        SIGNING_TEST_CA_MAC: ${{ secrets.SIGNING_TEST_CA_MAC }}
+        SIGNING_KEYCHAIN_PASSPHRASE: ${{ secrets.SIGNING_KEYCHAIN_PASSPHRASE }}
+
+        SIGNING_KEY_MAC: ${{ secrets.SIGNING_KEY_MAC }}
+        SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+        SIGNING_KEY_MAC_PFX: ${{ secrets.SIGNING_KEY_MAC_PFX }}
+
+      run: |
+        echo -n "$SIGNING_KEY_MAC_PFX" | base64 --decode > mac-signing-key.p12
+        security list-keychains -d user -s login
+
+        ORIGINAL_KEYCHAIN="$(security default-keychain | sed -e 's/[ "]*\([^"]*\)[ "]*/\1/')"
+        KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain-db"
+
+        # Create build keychain
+        security create-keychain -p "$SIGNING_KEYCHAIN_PASSPHRASE" "$KEYCHAIN_PATH"
+        # trap "security delete-keychain $KEYCHAIN_PATH" 0
+
+        # Append build keychain to the user domain
+        security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed s/\"//g)
+
+        # Remove relock timeout
+        security set-keychain-settings "$KEYCHAIN_PATH"
+
+        # Unlock build keychain
+        security unlock-keychain -p "$SIGNING_KEYCHAIN_PASSPHRASE" "$KEYCHAIN_PATH"
+
+        # Add certificate to keychain
+        security import mac-signing-key.p12 -k "$KEYCHAIN_PATH" -P "$SIGNING_KEY_MAC_PASSPHRASE" -A -T $(which codesign) -T $(which productsign)
+
+        # Enable codesigning from a non user interactive shell
+        security set-key-partition-list -S apple-tool:,apple:, -s -k "$SIGNING_KEYCHAIN_PASSPHRASE" -D "${IDENTITY_CERTIFICATE}" -t private "$KEYCHAIN_PATH" || echo set-key-partition-list private failed
+        rm mac-signing-key.p12
+
+        #TODO: clean keychain in a separate step
+        # Delete build keychain
+        # security delete-keychain "$KEYCHAIN_PATH"
+
+    - name: Sign macOS
+      env:
+        SUFFIX: 8
+        SIGNING_KEY_MAC_ID: ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+      run: |
+
+        root=$PWD
+
+        mkdir -pv signed-osx-installer
+
+        productsign --timestamp \
+          --sign "$SIGNING_KEY_MAC_ID" \
+          "$root/packaged/cf${SUFFIX}-cli-installer_osx.pkg" \
+          "signed-osx-installer/cf${SUFFIX}-cli-installer_${BUILD_VERSION}_osx.pkg"
+
+    - name: Store macOS Signed Packages
+      uses: actions/upload-artifact@v2
+      with:
+        if-no-files-found: error
+        name: cf-cli-macos-packages
+        path: signed-osx-installer/*.pkg
+
+
+  build-windows:
+    name: Build Windows
+    needs:
+    - setup
+    runs-on: windows-2019
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ needs.setup.outputs.go-version }}
+
+      - name: Get build-time dependencies
+        run: |
+          choco install --no-progress --limit-output -y make
+          go install github.com/akavel/rsrc@v0.10.2
+
+      - name: Build CF CLI for Windows
+        run: |
+          Get-Command make
+          Get-Item Makefile
+          make out/cf-cli_win32.exe
+          make out/cf-cli_winx64.exe
+
+      - name: write windows cert
+        run: |
+          $pass = convertto-securestring -string "$env:SIGNING_KEY_WINDOWS_PASSPHRASE" -asplaintext
+          [convert]::frombase64string($env:SIGNING_KEY_WINDOWS_PFX) | set-content -path $env:runner_temp\cert.pfx -asbytestream
+
+        env:
+          SIGNING_KEY_WINDOWS_PFX: ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      - name: Sign windows binaries
+        run: |
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
+        env:
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      - name: View binary signatures
+        run: |
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_win32.exe
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_winx64.exe
+
+      - name: Make symlinks
+        run: |
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_win32.exe -Path .\out\cf-cli_win32-link.exe
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
+
+      # This is for debugging windows
+      # - name: enable ssh
+      #   if: always()
+      #   run: |
+      #     Get-WindowsCapability -Online
+      #     $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
+      #     Add-WindowsCapability -Online -Name $componentName
+      #     Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
+
+      # - name: ssh session
+      #   if: always()
+      #   run: |
+      #     Start-Service sshd
+      #     echo "IP address below:"
+      #     Get-NetIPAddress | Select-Object -Property IPAddress
+      #     sleep 3600
+      #     Stop-Service sshd
+
+      - name: Save signed binaries as a GitHub Action Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cf-cli-windows-binaries
+          if-no-files-found: error
+          path: out/cf-cli_win*.exe
+
+      - name: Install innosetup
+        run: .\.github\win\install-innosetup.ps1
+
+      - name: Run innosetup
+        run: |
+          mkdir "$env:RUNNER_TEMP\winx64"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          mkdir "$env:RUNNER_TEMP\win32"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "$env:RUNNER_TEMP\win32\cf8_installer.exe"
+
+      - name: Sign windows installer
+        run: |
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "$env:RUNNER_TEMP\win32\cf8_installer.exe"
+        env:
+          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+
+      - name: View installer signature
+        run: |
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\winx64\cf8_installer.exe"
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "$env:RUNNER_TEMP\win32\cf8_installer.exe"
+
+      - name: Arrange files for upload
+        # note the -Path flag takes comma-delimited args
+        run: |
+          Copy-Item -Destination "$env:RUNNER_TEMP\winx64" -Path .github\win\LICENSE,.github\win\NOTICE
+          Copy-Item -Destination "$env:RUNNER_TEMP\win32" -Path .github\win\LICENSE,.github\win\NOTICE
+
+      - name: Zip windows artifact
+        run: |
+          # strip leading v to go from tag -> semver
+          $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
+          pushd "$env:RUNNER_TEMP\winx64"
+            $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_winx64.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          pushd "$env:RUNNER_TEMP\win32"
+            $installer_zip_filename="$env:RUNNER_TEMP\cf8-cli-installer_${installer_release_version}_win32.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          Get-ChildItem "$env:RUNNER_TEMP"
+
+      - name: Save installer and dist files as a GitHub Action Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cf-cli-windows-packages
+          if-no-files-found: error
+          path: ${{ runner.temp }}/cf8-cli-installer*win*.zip
+
+#################################
+######## Release Section ########
+#################################
+
+  s3-upload:
+    name: Upload Artifacts to S3 bucket
+    if: ${{ github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-rpm-package
+      - test-deb-package
+      - test-macos
+      - test-windows
+    environment: PROD
+    permissions:
+      actions: read
+      contents: read
+    steps:
+    - name: Checkout cli
+      uses: actions/checkout@v2
+    - name: get semver version
+      # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      run: |
+        INSTALLER_RELEASE_VERSION=$(cat BUILD_VERSION | tr -d v)
+        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
+
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: signed # download all artifacts to 'signed/'
+
+    - name: Archive linux binaries for upload
+      run: |
+
+        prepare_legal() {
+            cp ../../.github/license/LICENSE-WITH-3RD-PARTY-LICENSES  LICENSE
+            cp ../../.github/license/CF_NOTICE  NOTICE
+        }
+
+        prepare_artifacts() {
+            chmod +x cf8
+            ln -s cf8 cf
+            prepare_legal
+        }
+
+        prepare_win_artifacts() {
+            cp cf8.exe cf.exe
+            prepare_legal
+        }
+
+        pushd signed
+          mkdir linux_i686 linux_x86-64
+          mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf8
+          mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
+          pushd linux_i686
+            prepare_artifacts
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
+          popd
+          pushd linux_x86-64
+            prepare_artifacts
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
+          popd
+
+          mkdir osx
+          mv cf-cli-macos-binaries/cf-cli_osx osx/cf8
+          pushd osx
+            prepare_artifacts
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
+          popd
+
+          mkdir win32 winx64
+          mv cf-cli-windows-binaries/cf-cli_win32.exe win32/cf8.exe
+          mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
+          pushd win32
+            prepare_win_artifacts
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
+          popd
+          pushd winx64
+            prepare_win_artifacts
+            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
+          popd
+        popd
+      env:
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+    - name: Rearrange artifacts before upload
+      run: |
+        mkdir upload
+        cp -t upload  \
+          signed/cf-cli-linux-rpm-packages/cf*rpm \
+          signed/cf-cli-linux-deb-packages/cf*deb \
+          signed/cf-cli-macos-packages/cf*pkg \
+          signed/cf-cli-windows-packages/cf*zip \
+          signed/linux_i686/*tgz \
+          signed/linux_x86-64/*tgz \
+          signed/osx/*tgz \
+          signed/win32/*zip \
+          signed/winx64/*zip
+
+    - name: Upload installers to CLAW S3 bucket
+      if: ${{ github.ref_type == 'tag' }}
+      # forked for security considerations
+      uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        SOURCE_DIR: upload
+        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+
+    - name: list S3 for human verification
+      uses: docker://amazon/aws-cli:latest
+      with:
+        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+    - name: Instruct human to update CLAW
+      run: |
+        echo "Please go to https://github.com/cloudfoundry/CLAW/blob/develop/claw-variables.yml and add the following line to the file:"
+        echo
+        echo "- ${INSTALLER_RELEASE_VERSION}"
+
+
+
+  github-release-draft:
+    name: Create GitHub Release Draft
+    if: ${{ github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    environment: PROD
+    permissions:
+      actions: read
+      contents: write
+    needs:
+      - test-rpm-package
+      - test-deb-package
+      - test-macos
+      - test-windows
+    steps:
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: signed # download all artifacts to 'signed/'
+
+    - name: Create draft release
+      uses: pivotalsoftware/action-gh-release@v1
+      with:
+        draft: true
+        repository: ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
+        token: ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
+        fail_on_unmatched_files: true
+        files: |
+          signed/cf-cli-linux-binaries/cf-cli*
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-macos-binaries/cf-cli*
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-cli-windows-binaries/cf-cli*.exe
+          signed/cf-cli-windows-packages/*.zip
+
+
+# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

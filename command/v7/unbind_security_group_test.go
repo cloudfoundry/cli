@@ -126,7 +126,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycle("some-lifecycle")))
 				Expect(testUI.Err).To(Say("Security group some-security-group not bound to space some-space for lifecycle phase 'some-lifecycle'."))
 				Expect(testUI.Out).To(Say("OK\n\n"))
-				Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+				Expect(testUI.Out).To(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
 		})
@@ -143,7 +143,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	It("indicates it successfully unbound the security group", func() {
 		Expect(testUI.Out).To(Say("OK\n\n"))
-		Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+		Expect(testUI.Out).To(Say(`TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 	})
 
 })

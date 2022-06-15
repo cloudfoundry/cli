@@ -9,7 +9,7 @@ type BindRunningSecurityGroupCommand struct {
 	BaseCommand
 
 	SecurityGroup   flag.SecurityGroup `positional-args:"yes"`
-	usage           interface{}        `usage:"CF_NAME bind-running-security-group SECURITY_GROUP\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	usage           interface{}        `usage:"CF_NAME bind-running-security-group SECURITY_GROUP\n\nTIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}        `related_commands:"apps, bind-security-group, bind-staging-security-group, restart, running-security-groups, security-groups"`
 }
 
@@ -38,7 +38,7 @@ func (cmd BindRunningSecurityGroupCommand) Execute(args []string) error {
 	}
 	cmd.UI.DisplayOK()
 
-	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
+	cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
 
 	return nil
 }
