@@ -528,7 +528,13 @@ var _ = Describe("Gateway", func() {
 		})
 
 		Context("when SSL validation is enabled", func() {
+			BeforeEach(func() {
+				if runtime.GOOS == "darwin" {
+					Skip("ssl verification is different on darwin")
+				}
+			})
 			It("returns an invalid cert error if the server's CA is unknown (e.g. cert is self-signed)", func() {
+
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeSelfSignedTLSCert()}
 
 				_, apiErr := ccGateway.PerformRequest(request)
