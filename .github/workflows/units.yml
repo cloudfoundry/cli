@@ -122,6 +122,22 @@ jobs:
         # Get-Item Makefile
         # make units-non-plugin
 
+        function Get-Env-Info {
+          echo "Powershell: $((Get-Host).Version)"
+          echo "Working Directory: $pwd"
+          echo "GOPATH:            $Env:GOPATH"
+          echo "TEMP:              $Env:TEMP"
+          echo "TMP:               $Env:TMP"
+          echo "PATH:"
+          $Env:PATH.split(";")
+
+          echo "-------------"
+
+          Get-ChildItem Env: | Format-Table -Wrap -AutoSize
+        }
+
+        Get-Env-Info 
+
         ginkgo -r -p
         -randomizeAllSpecs
         -randomizeSuites
