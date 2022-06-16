@@ -105,6 +105,23 @@ jobs:
       with:
         go-version: ${{ needs.shared-values.outputs.go-version }}
 
+    - name: Print go environment
+      id: go-cache-paths
+      run: |
+        echo "::set-output name=go-build::$(go env GOCACHE)"
+        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        go env
+
+    - name: Go Assets Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+          ${{ steps.go-cache-paths.outputs.go-build }}
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - name: Set up Test
       run: |
         go install github.com/onsi/ginkgo/ginkgo@v1.16.4
