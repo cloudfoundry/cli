@@ -131,6 +131,24 @@ jobs:
       run: |
         choco install --no-progress --limit-output -y make
 
+# This is for debugging windows
+    - name: enable ssh
+      if: always()
+      run: |
+        Get-WindowsCapability -Online
+        $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
+        Add-WindowsCapability -Online -Name $componentName
+        Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
+
+    - name: ssh session
+      if: always()
+      run: |
+        Start-Service sshd
+        echo "IP address below:"
+        Get-NetIPAddress | Select-Object -Property IPAddress
+        sleep 3600
+        Stop-Service sshd
+
     - name: Run Windows Units
       env:
         ACK_GINKGO_RC: true
