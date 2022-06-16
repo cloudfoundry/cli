@@ -122,7 +122,7 @@ jobs:
         # Get-Item Makefile
         # make units-non-plugin
 
-        ginkgo -r
+        ginkgo -r -p
         -randomizeAllSpecs
         -randomizeSuites
         -skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
