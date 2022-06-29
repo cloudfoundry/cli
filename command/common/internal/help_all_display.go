@@ -68,6 +68,7 @@ var HelpCategoryList = []HelpCategory{
 			{"create-route", "check-route", "map-route", "unmap-route", "delete-route"},
 			{"delete-orphaned-routes"},
 			{"update-destination"},
+			{"share-route"},
 		},
 	},
 	{
