@@ -276,18 +276,6 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
-func getIndent(depth int, addHyphen bool) string {
-	if depth == 0 {
-		return ""
-	}
-	indent := strings.Repeat("  ", depth-1)
-	if addHyphen {
-		return indent + "- "
-	} else {
-		return indent + "  "
-	}
-}
-
 // DisplayDiffAddition displays added lines in a diff, colored green and prefixed with '+'
 func (ui *UI) DisplayDiffAddition(lines string, depth int, addHyphen bool) {
 	ui.terminalLock.Lock()
@@ -508,4 +496,16 @@ func sum(intSlice []int) int {
 	}
 
 	return sum
+}
+
+func getIndent(depth int, addHyphen bool) string {
+	if depth == 0 {
+		return ""
+	}
+	indent := strings.Repeat("  ", depth-1)
+	if addHyphen {
+		return indent + "- "
+	} else {
+		return indent + "  "
+	}
 }

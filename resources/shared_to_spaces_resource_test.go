@@ -1,8 +1,9 @@
 package resources_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"encoding/json"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
