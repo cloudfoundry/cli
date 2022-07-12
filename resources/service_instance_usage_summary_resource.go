@@ -13,7 +13,7 @@ func (s *ServiceInstanceUsageSummaryList) UnmarshalJSON(data []byte) error {
 }
 
 type ServiceInstanceUsageSummary struct {
-	SpaceGUID     string `jsonry:"space.guid""`
+	SpaceGUID     string `jsonry:"space.guid"`
 	BoundAppCount int    `jsonry:"bound_app_count"`
 }
 
