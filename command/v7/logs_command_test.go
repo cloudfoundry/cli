@@ -248,6 +248,16 @@ var _ = Describe("logs command", func() {
 					})
 				})
 
+				When("isCFOnK8s is true", func() {
+					BeforeEach(func() {
+						fakeConfig.IsCFOnK8sReturns(true)
+					})
+
+					It("does not call ScheduleTokenRefresh", func() {
+						Expect(fakeActor.ScheduleTokenRefreshCallCount()).To(Equal(0))
+					})
+				})
+
 				It("displays the error and all warnings", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Err).To(Say("steve for all I care"))

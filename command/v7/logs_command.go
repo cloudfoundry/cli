@@ -58,19 +58,22 @@ func (cmd LogsCommand) Execute(args []string) error {
 		return cmd.displayRecentLogs()
 	}
 
-	stop := make(chan struct{})
-	stoppedRefreshing := make(chan struct{})
-	stoppedOutputtingRefreshErrors := make(chan struct{})
-	err = cmd.refreshTokenPeriodically(stop, stoppedRefreshing, stoppedOutputtingRefreshErrors)
-	if err != nil {
-		return err
+	if !cmd.Config.IsCFOnK8s() {
+		stop := make(chan struct{})
+		stoppedRefreshing := make(chan struct{})
+		stoppedOutputtingRefreshErrors := make(chan struct{})
+		err = cmd.refreshTokenPeriodically(stop, stoppedRefreshing, stoppedOutputtingRefreshErrors)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			close(stop)
+			<-stoppedRefreshing
+			<-stoppedOutputtingRefreshErrors
+		}()
 	}
 
 	err = cmd.streamLogs()
-
-	close(stop)
-	<-stoppedRefreshing
-	<-stoppedOutputtingRefreshErrors
 
 	return err
 }
