@@ -52,7 +52,6 @@ var _ = Describe("create-org-quota Command", func() {
 	})
 
 	JustBeforeEach(func() {
-
 		executeErr = cmd.Execute(nil)
 	})
 
@@ -110,6 +109,7 @@ var _ = Describe("create-org-quota Command", func() {
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
+				cmd.TotalLogVolume = flag.BytesWithUnlimited{IsSet: true, Value: 8}
 				fakeActor.CreateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
 					nil)
@@ -141,6 +141,9 @@ var _ = Describe("create-org-quota Command", func() {
 
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
+
+				Expect(quotaLimits.TotalLogVolume.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalLogVolume.Value).To(Equal(8))
 
 				Expect(testUI.Out).To(Say("Creating org quota %s as bob...", orgQuotaName))
 				Expect(testUI.Out).To(Say("OK"))

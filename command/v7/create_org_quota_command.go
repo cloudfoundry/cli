@@ -18,8 +18,10 @@ type CreateOrgQuotaCommand struct {
 	TotalRoutes           flag.IntegerLimit           `short:"r" description:"Total number of routes. -1 represents an unlimited amount. (Default: 0)."`
 	TotalReservedPorts    flag.IntegerLimit           `long:"reserved-route-ports" description:"Maximum number of routes that may be created with ports. -1 represents an unlimited amount. (Default: 0)."`
 	TotalServiceInstances flag.IntegerLimit           `short:"s" description:"Total number of service instances. -1 represents an unlimited amount. (Default: 0)."`
-	usage                 interface{}                 `usage:"CF_NAME create-org-quota ORG_QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
-	relatedCommands       interface{}                 `related_commands:"create-org, org-quotas, set-org-quota"`
+	TotalLogVolume        flag.BytesWithUnlimited     `short:"l" description:"Total log volume per second all processes can have (e.g. 128B, 4K, 1M). -1 represents an unlimited amount. (Default: -1)."`
+
+	usage           interface{} `usage:"CF_NAME create-org-quota ORG_QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS] [-l LOG_VOLUME]"`
+	relatedCommands interface{} `related_commands:"create-org, org-quotas, set-org-quota"`
 }
 
 func (cmd CreateOrgQuotaCommand) Execute(args []string) error {
@@ -49,6 +51,7 @@ func (cmd CreateOrgQuotaCommand) Execute(args []string) error {
 		TotalServiceInstances: convertIntegerLimitFlagToNullInt(cmd.TotalServiceInstances),
 		TotalRoutes:           convertIntegerLimitFlagToNullInt(cmd.TotalRoutes),
 		TotalReservedPorts:    convertIntegerLimitFlagToNullInt(cmd.TotalReservedPorts),
+		TotalLogVolume:        convertBytesFlagToNullInt(cmd.TotalLogVolume),
 	})
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -64,6 +67,14 @@ func (cmd CreateOrgQuotaCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+func convertBytesFlagToNullInt(flag flag.BytesWithUnlimited) *types.NullInt {
+	if !flag.IsSet {
+		return nil
+	}
+
+	return &types.NullInt{IsSet: true, Value: flag.Value}
 }
 
 func convertMegabytesFlagToNullInt(flag flag.MegabytesWithUnlimited) *types.NullInt {
