@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	MEGABYTE = 1024 * 1024
+	KILOBYTE = 1024
+	MEGABYTE = 1024 * KILOBYTE
 	GIGABYTE = 1024 * MEGABYTE
 	TERABYTE = 1024 * GIGABYTE
 )
@@ -60,6 +61,7 @@ func (displayer QuotaDisplayer) DisplaySingleQuota(quota resources.Quota) {
 		{displayer.ui.TranslateText("paid service plans:"), displayer.presentBooleanValue(*quota.Services.PaidServicePlans)},
 		{displayer.ui.TranslateText("app instances:"), displayer.presentQuotaValue(*quota.Apps.TotalAppInstances)},
 		{displayer.ui.TranslateText("route ports:"), displayer.presentQuotaValue(*quota.Routes.TotalReservedPorts)},
+		{displayer.ui.TranslateText("log volume per second:"), displayer.presentQuotaBytesValue(*quota.Apps.TotalLogVolume)},
 	}
 
 	displayer.ui.DisplayKeyValueTable("", quotaTable, 3)
@@ -78,6 +80,14 @@ func (displayer QuotaDisplayer) presentQuotaValue(limit types.NullInt) string {
 		return "unlimited"
 	} else {
 		return strconv.Itoa(limit.Value)
+	}
+}
+
+func (displayer QuotaDisplayer) presentQuotaBytesValue(limit types.NullInt) string {
+	if !limit.IsSet {
+		return "unlimited"
+	} else {
+		return addMemoryUnits(float64(limit.Value))
 	}
 }
 
@@ -103,6 +113,11 @@ func addMemoryUnits(bytes float64) string {
 	case bytes >= MEGABYTE:
 		unit = "M"
 		value /= MEGABYTE
+	case bytes >= KILOBYTE:
+		unit = "K"
+		value /= KILOBYTE
+	case bytes >= 1:
+		unit = "B"
 	case bytes == 0:
 		return "0"
 	}
