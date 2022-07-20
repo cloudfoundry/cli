@@ -582,6 +582,7 @@ var _ = Describe("Organization Quota Actions", func() {
 				PaidServicesAllowed:   &trueValue,
 				TotalRoutes:           &types.NullInt{Value: 6, IsSet: true},
 				TotalReservedPorts:    &types.NullInt{Value: 5, IsSet: true},
+				TotalLogVolume:        &types.NullInt{Value: 64, IsSet: true},
 			}
 
 			fakeCloudControllerClient.GetOrganizationQuotasReturns(
@@ -627,6 +628,7 @@ var _ = Describe("Organization Quota Actions", func() {
 							TotalMemory:       nil,
 							InstanceMemory:    nil,
 							TotalAppInstances: nil,
+							TotalLogVolume:    nil,
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: nil,
@@ -674,6 +676,7 @@ var _ = Describe("Organization Quota Actions", func() {
 					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
 					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
+					TotalLogVolume:        &types.NullInt{Value: -1, IsSet: true},
 				}
 				ccv3Quota = resources.OrganizationQuota{
 					Quota: resources.Quota{
@@ -682,6 +685,7 @@ var _ = Describe("Organization Quota Actions", func() {
 							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+							TotalLogVolume:    &types.NullInt{Value: 0, IsSet: false},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
@@ -727,6 +731,7 @@ var _ = Describe("Organization Quota Actions", func() {
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+							TotalLogVolume:    &types.NullInt{Value: 64, IsSet: true},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},

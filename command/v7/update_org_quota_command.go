@@ -19,8 +19,10 @@ type UpdateOrgQuotaCommand struct {
 	TotalRoutes           flag.IntegerLimit           `short:"r" description:"Total number of routes. -1 represents an unlimited amount."`
 	TotalReservedPorts    flag.IntegerLimit           `long:"reserved-route-ports" description:"Maximum number of routes that may be created with ports. -1 represents an unlimited amount."`
 	TotalServiceInstances flag.IntegerLimit           `short:"s" description:"Total number of service instances. -1 represents an unlimited amount."`
-	usage                 interface{}                 `usage:"CF_NAME update-org-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
-	relatedCommands       interface{}                 `related_commands:"org, org-quota"`
+	TotalLogVolume        flag.BytesWithUnlimited     `short:"l" description:"Total log volume per second all processes can have (e.g. 128B, 4K, 1M). -1 represents an unlimited amount."`
+
+	usage           interface{} `usage:"CF_NAME update-org-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS] [-l LOG_VOLUME]"`
+	relatedCommands interface{} `related_commands:"org, org-quota"`
 }
 
 func (cmd UpdateOrgQuotaCommand) Execute(args []string) error {
@@ -61,6 +63,7 @@ func (cmd UpdateOrgQuotaCommand) Execute(args []string) error {
 		TotalServiceInstances: convertIntegerLimitFlagToNullInt(cmd.TotalServiceInstances),
 		TotalRoutes:           convertIntegerLimitFlagToNullInt(cmd.TotalRoutes),
 		TotalReservedPorts:    convertIntegerLimitFlagToNullInt(cmd.TotalReservedPorts),
+		TotalLogVolume:        convertBytesFlagToNullInt(cmd.TotalLogVolume),
 	}
 
 	warnings, err := cmd.Actor.UpdateOrganizationQuota(oldQuotaName, cmd.NewName, updatedQuotaLimits)

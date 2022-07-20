@@ -16,7 +16,7 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("update-org-quota - Update an existing organization quota"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf update-org-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] \[-n NEW_NAME\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans | --disallow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
+				Eventually(session).Should(Say(`cf update-org-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] \[-n NEW_NAME\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans | --disallow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\] \[-l LOG_VOLUME\]`))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("update-quota"))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -29,6 +29,7 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Say(`-r\s+Total number of routes. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`--reserved-route-ports\s+Maximum number of routes that may be created with ports. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`-s\s+Total number of service instances. -1 represents an unlimited amount.`))
+				Eventually(session).Should(Say(`-l\s+Total log volume per second all processes can have \(e.g. 128B, 4K, 1M\). -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("org, org-quota"))
 				Eventually(session).Should(Exit(0))
@@ -57,7 +58,8 @@ var _ = Describe("update-org-quota command", func() {
 			serviceInstances := "2"
 			appInstances := "3"
 			reservedRoutePorts := "1"
-			session := helpers.CF("create-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
+			totalLogVolume := "1M"
+			session := helpers.CF("create-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts, "-l", totalLogVolume)
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -71,7 +73,8 @@ var _ = Describe("update-org-quota command", func() {
 			serviceInstances := "1"
 			appInstances := "2"
 			reservedRoutePorts := "0"
-			session := helpers.CF("update-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-s", serviceInstances, "-a", appInstances, "--disallow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
+			totalLogVolume := "500K"
+			session := helpers.CF("update-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-s", serviceInstances, "-a", appInstances, "--disallow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts, "-l", totalLogVolume)
 			Eventually(session).Should(Say(`Updating org quota %s as %s\.\.\.`, quotaName, username))
 			Eventually(session).Should(Exit(0))
 
@@ -83,6 +86,7 @@ var _ = Describe("update-org-quota command", func() {
 			Eventually(session).Should(Say(`paid service plans:\s+%s`, "disallowed"))
 			Eventually(session).Should(Say(`app instances:\s+%s`, appInstances))
 			Eventually(session).Should(Say(`route ports:\s+%s`, reservedRoutePorts))
+			//TODO: add an assertion for log quota information
 			Eventually(session).Should(Exit(0))
 		})
 
