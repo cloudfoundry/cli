@@ -91,8 +91,8 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 				cmd.NewName = "new-org-quota-name"
 				cmd.PaidServicePlans = true
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 10}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 9}
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 9}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
@@ -137,7 +137,7 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 
 		When("only some org quota limits are updated", func() {
 			BeforeEach(func() {
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
 				fakeActor.UpdateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
