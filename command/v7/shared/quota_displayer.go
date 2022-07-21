@@ -33,7 +33,7 @@ func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []resources.Quota, emp
 	}
 
 	var keyValueTable = [][]string{
-		{"name", "total memory", "instance memory", "routes", "service instances", "paid service plans", "app instances", "route ports"},
+		{"name", "total memory", "instance memory", "routes", "service instances", "paid service plans", "app instances", "route ports", "log volume per second"},
 	}
 
 	for _, quota := range quotas {
@@ -46,6 +46,7 @@ func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []resources.Quota, emp
 			displayer.presentBooleanValue(*quota.Services.PaidServicePlans),
 			displayer.presentQuotaValue(*quota.Apps.TotalAppInstances),
 			displayer.presentQuotaValue(*quota.Routes.TotalReservedPorts),
+			displayer.presentQuotaBytesValue(*quota.Apps.TotalLogVolume),
 		})
 	}
 
