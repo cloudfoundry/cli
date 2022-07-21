@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -58,8 +59,7 @@ var _ = Describe("update-org-quota command", func() {
 			serviceInstances := "2"
 			appInstances := "3"
 			reservedRoutePorts := "1"
-			totalLogVolume := "1M"
-			session := helpers.CF("create-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts, "-l", totalLogVolume)
+			session := helpers.CF("create-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -73,8 +73,7 @@ var _ = Describe("update-org-quota command", func() {
 			serviceInstances := "1"
 			appInstances := "2"
 			reservedRoutePorts := "0"
-			totalLogVolume := "500K"
-			session := helpers.CF("update-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-s", serviceInstances, "-a", appInstances, "--disallow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts, "-l", totalLogVolume)
+			session := helpers.CF("update-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-s", serviceInstances, "-a", appInstances, "--disallow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
 			Eventually(session).Should(Say(`Updating org quota %s as %s\.\.\.`, quotaName, username))
 			Eventually(session).Should(Exit(0))
 
@@ -88,6 +87,24 @@ var _ = Describe("update-org-quota command", func() {
 			Eventually(session).Should(Say(`route ports:\s+%s`, reservedRoutePorts))
 			//TODO: add an assertion for log quota information
 			Eventually(session).Should(Exit(0))
+		})
+
+		When("CAPI supports log rate limits", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+			})
+
+			It("updates a quota", func() {
+				logVolume := "500B"
+				session := helpers.CF("update-org-quota", quotaName, "-l", logVolume)
+				Eventually(session).Should(Say(`Updating org quota %s as %s\.\.\.`, quotaName, username))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("org-quota", quotaName)
+				// Eventually(session).Should(Say(`log volume per second:\s+%s`, logVolume))
+				//TODO: add an assertion for log quota information
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
 		When("the -n rename flag is provided", func() {

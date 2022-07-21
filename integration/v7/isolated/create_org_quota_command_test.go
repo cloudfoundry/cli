@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -121,7 +122,6 @@ var _ = Describe("create-org-quota command", func() {
 						"-r", "6",
 						"--reserved-route-ports", "5",
 						"-s", "7",
-						"-l", "32K",
 					)
 					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
@@ -139,6 +139,28 @@ var _ = Describe("create-org-quota command", func() {
 					//TODO: add an assertion for log quota information
 					Eventually(session).Should(Exit(0))
 				})
+
+				When("CAPI supports log rate limits", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
+					It("creates the quota with the specified values", func() {
+
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CF("create-org-quota", orgQuotaName,
+							"-l", "32K",
+						)
+						Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("org-quota", orgQuotaName)
+						// Eventually(session).Should(Say(`log volume per second:\s+32K`))
+						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 
 			When("The flags are all set to -1", func() {
@@ -151,7 +173,6 @@ var _ = Describe("create-org-quota command", func() {
 						"-r", "-1",
 						"-s", "-1",
 						"--reserved-route-ports", "-1",
-						"-l", "-1",
 					)
 					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
@@ -166,6 +187,27 @@ var _ = Describe("create-org-quota command", func() {
 					Eventually(session).Should(Say(`route ports:\s+unlimited`))
 					//TODO: add an assertion for log quota information
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("CAPI supports log rate limits", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
+					It("creates the quota with the specified values", func() {
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CF("create-org-quota", orgQuotaName,
+							"-l", "-1",
+						)
+						Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("org-quota", orgQuotaName)
+						// Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
+						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
