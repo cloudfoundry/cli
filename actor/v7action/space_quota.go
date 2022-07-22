@@ -31,6 +31,7 @@ func (actor Actor) CreateSpaceQuota(spaceQuotaName string, orgGuid string, limit
 				TotalMemory:       limits.TotalMemoryInMB,
 				InstanceMemory:    limits.PerProcessMemoryInMB,
 				TotalAppInstances: limits.TotalInstances,
+				TotalLogVolume:    limits.TotalLogVolume,
 			},
 			Services: resources.ServiceLimit{
 				TotalServiceInstances: limits.TotalServiceInstances,
