@@ -19,11 +19,16 @@ jobs:
     outputs:
       go-version: ${{ steps.set-go-version.outputs.go-version }}
     steps:
+
     - name: Checkout
       uses: actions/checkout@v2
+
     - id: set-go-version
+      name: Parse Golang Version
       run: |
-        echo "::set-output name=go-version::1.17"
+        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+        echo "golang version: ${go_version[1]}"
+        echo "::set-output name=go-version::${go_version[1]}"
 
   lint:
     name: Lint code
@@ -65,8 +70,8 @@ jobs:
 
     - name: Set up Test
       run: |
-        go get -u github.com/onsi/ginkgo/ginkgo
-        go get github.com/onsi/gomega/matchers@v1.10.5
+        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+        go install github.com/onsi/gomega/matchers
 
     - name: Run Linux Units
       run: make units
@@ -98,8 +103,8 @@ jobs:
 
     - name: Set up Test
       run: |
-        go get -u github.com/onsi/ginkgo/ginkgo
-        go get github.com/onsi/gomega/matchers@v1.10.5
+        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+        go install github.com/onsi/gomega/matchers
 
     - name: Get build-time dependencies
       run: |

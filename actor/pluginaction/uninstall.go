@@ -55,7 +55,7 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 				break
 			}
 
-			if err != nil && !os.IsNotExist(err) {
+			if !os.IsNotExist(err) {
 				if _, isPathError := err.(*os.PathError); isPathError {
 					time.Sleep(50 * time.Millisecond)
 				} else {

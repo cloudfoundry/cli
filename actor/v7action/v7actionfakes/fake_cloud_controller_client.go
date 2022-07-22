@@ -2076,6 +2076,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	ShareRouteStub        func(string, string) (ccv3.Warnings, error)
+	shareRouteMutex       sync.RWMutex
+	shareRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	shareRouteReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	shareRouteReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	ShareServiceInstanceToSpacesStub        func(string, []string) (resources.RelationshipList, ccv3.Warnings, error)
 	shareServiceInstanceToSpacesMutex       sync.RWMutex
 	shareServiceInstanceToSpacesArgsForCall []struct {
@@ -11688,6 +11702,70 @@ func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsReturnsOnCall(i i
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) ShareRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.shareRouteMutex.Lock()
+	ret, specificReturn := fake.shareRouteReturnsOnCall[len(fake.shareRouteArgsForCall)]
+	fake.shareRouteArgsForCall = append(fake.shareRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ShareRoute", []interface{}{arg1, arg2})
+	fake.shareRouteMutex.Unlock()
+	if fake.ShareRouteStub != nil {
+		return fake.ShareRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.shareRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) ShareRouteCallCount() int {
+	fake.shareRouteMutex.RLock()
+	defer fake.shareRouteMutex.RUnlock()
+	return len(fake.shareRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) ShareRouteCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.shareRouteMutex.Lock()
+	defer fake.shareRouteMutex.Unlock()
+	fake.ShareRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) ShareRouteArgsForCall(i int) (string, string) {
+	fake.shareRouteMutex.RLock()
+	defer fake.shareRouteMutex.RUnlock()
+	argsForCall := fake.shareRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) ShareRouteReturns(result1 ccv3.Warnings, result2 error) {
+	fake.shareRouteMutex.Lock()
+	defer fake.shareRouteMutex.Unlock()
+	fake.ShareRouteStub = nil
+	fake.shareRouteReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) ShareRouteReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.shareRouteMutex.Lock()
+	defer fake.shareRouteMutex.Unlock()
+	fake.ShareRouteStub = nil
+	if fake.shareRouteReturnsOnCall == nil {
+		fake.shareRouteReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.shareRouteReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (resources.RelationshipList, ccv3.Warnings, error) {
 	var arg2Copy []string
 	if arg2 != nil {
@@ -14659,6 +14737,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.sharePrivateDomainToOrgsMutex.RLock()
 	defer fake.sharePrivateDomainToOrgsMutex.RUnlock()
+	fake.shareRouteMutex.RLock()
+	defer fake.shareRouteMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.targetCFMutex.RLock()

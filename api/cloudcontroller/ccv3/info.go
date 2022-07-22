@@ -95,11 +95,6 @@ func (info Info) Login() string {
 	return info.Links.Login.HREF
 }
 
-// ccv3Link returns the HREF of the CloudController v3 API.
-func (info Info) ccV3Link() string {
-	return info.Links.CCV3.HREF
-}
-
 // ResourceLinks represents the information returned back from /v3.
 type ResourceLinks map[string]resources.APILink
 

@@ -41,15 +41,18 @@ jobs:
 
         exit 0
 
-    - name: Set build version
+    - name: Parse Build Version
       id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
         echo "::set-output name=build-version::$version"
 
-    - name: Set go version
+    - name: Parse Golang Version
       id: set-go-version
-      run: echo "::set-output name=go-version::1.17"
+      run: |
+        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+        echo "golang version: ${go_version[1]}"
+        echo "::set-output name=go-version::${go_version[1]}"
 
     # This is for debugging. It's equivalent to fly intecept
     # - name: Setup upterm session
