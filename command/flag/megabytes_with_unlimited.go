@@ -4,9 +4,9 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-type MemoryWithUnlimited types.NullInt
+type MegabytesWithUnlimited types.NullInt
 
-func (m *MemoryWithUnlimited) UnmarshalFlag(val string) error {
+func (m *MegabytesWithUnlimited) UnmarshalFlag(val string) error {
 	if val == "" {
 		return nil
 	}
@@ -28,6 +28,6 @@ func (m *MemoryWithUnlimited) UnmarshalFlag(val string) error {
 	return nil
 }
 
-func (m *MemoryWithUnlimited) IsValidValue(val string) error {
+func (m *MegabytesWithUnlimited) IsValidValue(val string) error {
 	return m.UnmarshalFlag(val)
 }
