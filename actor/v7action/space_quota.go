@@ -138,6 +138,7 @@ func (actor Actor) UpdateSpaceQuota(currentName, orgGUID, newName string, limits
 				TotalMemory:       limits.TotalMemoryInMB,
 				InstanceMemory:    limits.PerProcessMemoryInMB,
 				TotalAppInstances: limits.TotalInstances,
+				TotalLogVolume:    limits.TotalLogVolume,
 			},
 			Services: resources.ServiceLimit{
 				TotalServiceInstances: limits.TotalServiceInstances,

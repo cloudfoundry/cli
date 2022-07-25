@@ -612,6 +612,7 @@ var _ = Describe("Space Quota Actions", func() {
 				PaidServicesAllowed:   &trueValue,
 				TotalRoutes:           &types.NullInt{Value: 6, IsSet: true},
 				TotalReservedPorts:    &types.NullInt{Value: 5, IsSet: true},
+				TotalLogVolume:        &types.NullInt{Value: 512, IsSet: true},
 			}
 
 			fakeCloudControllerClient.GetSpaceQuotasReturns(
@@ -657,6 +658,7 @@ var _ = Describe("Space Quota Actions", func() {
 							TotalMemory:       nil,
 							InstanceMemory:    nil,
 							TotalAppInstances: nil,
+							TotalLogVolume:    nil,
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: nil,
@@ -704,6 +706,7 @@ var _ = Describe("Space Quota Actions", func() {
 					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
 					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
+					TotalLogVolume:        &types.NullInt{Value: -1, IsSet: true},
 				}
 
 				ccv3Quota = resources.SpaceQuota{
@@ -713,6 +716,7 @@ var _ = Describe("Space Quota Actions", func() {
 							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+							TotalLogVolume:    &types.NullInt{Value: 0, IsSet: false},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
@@ -759,6 +763,7 @@ var _ = Describe("Space Quota Actions", func() {
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+							TotalLogVolume:    &types.NullInt{Value: 512, IsSet: true},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
@@ -807,6 +812,7 @@ var _ = Describe("Space Quota Actions", func() {
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+							TotalLogVolume:    &types.NullInt{Value: 512, IsSet: true},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
