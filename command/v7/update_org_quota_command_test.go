@@ -91,11 +91,12 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 				cmd.NewName = "new-org-quota-name"
 				cmd.PaidServicePlans = true
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 10}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 9}
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 9}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
+				cmd.TotalLogVolume = flag.BytesWithUnlimited{IsSet: true, Value: 8}
 				fakeActor.UpdateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
 					nil)
@@ -130,6 +131,9 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
 
+				Expect(quotaLimits.TotalLogVolume.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalLogVolume.Value).To(Equal(8))
+
 				Expect(testUI.Out).To(Say("Updating org quota %s as bob...", orgQuotaName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -137,7 +141,7 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 
 		When("only some org quota limits are updated", func() {
 			BeforeEach(func() {
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
 				fakeActor.UpdateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
@@ -168,6 +172,8 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 				Expect(quotaLimits.TotalRoutes).To(BeNil())
 
 				Expect(quotaLimits.TotalReservedPorts).To(BeNil())
+
+				Expect(quotaLimits.TotalLogVolume).To(BeNil())
 
 				Expect(testUI.Out).To(Say("Updating org quota %s as bob...", orgQuotaName))
 				Expect(testUI.Out).To(Say("OK"))

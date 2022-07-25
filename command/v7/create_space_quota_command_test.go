@@ -135,8 +135,8 @@ var _ = Describe("create-space-quota Command", func() {
 
 		When("all flag limits are given", func() {
 			BeforeEach(func() {
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 47}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 23}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 47}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 23}
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 4}
 				cmd.PaidServicePlans = true
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 9}

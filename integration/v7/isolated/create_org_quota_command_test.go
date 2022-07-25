@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -32,7 +33,7 @@ var _ = Describe("create-org-quota command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("create-org-quota - Define a new quota for an organization"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf create-org-quota ORG_QUOTA \[-m TOTAL_MEMORY\] \[-i INSTANCE_MEMORY\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
+				Eventually(session).Should(Say(`cf create-org-quota ORG_QUOTA \[-m TOTAL_MEMORY\] \[-i INSTANCE_MEMORY\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\] \[-l LOG_VOLUME\]`))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("create-quota"))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -43,6 +44,7 @@ var _ = Describe("create-org-quota command", func() {
 				Eventually(session).Should(Say(`-r\s+Total number of routes. -1 represents an unlimited amount. \(Default: 0\)`))
 				Eventually(session).Should(Say(`--reserved-route-ports\s+Maximum number of routes that may be created with ports. -1 represents an unlimited amount. \(Default: 0\)`))
 				Eventually(session).Should(Say(`-s\s+Total number of service instances. -1 represents an unlimited amount. \(Default: 0\)`))
+				Eventually(session).Should(Say(`-l\s+Total log volume per second all processes can have, in bytes \(e.g. 128B, 4K, 1M\). -1 represents an unlimited amount. \(Default: -1\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("create-org, org-quotas, set-org-quota"))
 				Eventually(session).Should(Exit(0))
@@ -119,7 +121,8 @@ var _ = Describe("create-org-quota command", func() {
 						"-m", "4M",
 						"-r", "6",
 						"--reserved-route-ports", "5",
-						"-s", "7")
+						"-s", "7",
+					)
 					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -133,7 +136,30 @@ var _ = Describe("create-org-quota command", func() {
 					Eventually(session).Should(Say(`paid service plans:\s+allowed`))
 					Eventually(session).Should(Say(`app instances:\s+2`))
 					Eventually(session).Should(Say(`route ports:\s+5`))
+					//TODO: add an assertion for log quota information
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("CAPI supports log rate limits", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
+					It("creates the quota with the specified values", func() {
+
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CF("create-org-quota", orgQuotaName,
+							"-l", "32K",
+						)
+						Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("org-quota", orgQuotaName)
+						// Eventually(session).Should(Say(`log volume per second:\s+32K`))
+						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
@@ -146,7 +172,8 @@ var _ = Describe("create-org-quota command", func() {
 						"-m", "-1",
 						"-r", "-1",
 						"-s", "-1",
-						"--reserved-route-ports", "-1")
+						"--reserved-route-ports", "-1",
+					)
 					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -158,7 +185,29 @@ var _ = Describe("create-org-quota command", func() {
 					Eventually(session).Should(Say(`service instances:\s+unlimited`))
 					Eventually(session).Should(Say(`app instances:\s+unlimited`))
 					Eventually(session).Should(Say(`route ports:\s+unlimited`))
+					//TODO: add an assertion for log quota information
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("CAPI supports log rate limits", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
+					It("creates the quota with the specified values", func() {
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CF("create-org-quota", orgQuotaName,
+							"-l", "-1",
+						)
+						Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("org-quota", orgQuotaName)
+						// Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
+						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
