@@ -30,7 +30,7 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Say(`-r\s+Total number of routes. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`--reserved-route-ports\s+Maximum number of routes that may be created with ports. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`-s\s+Total number of service instances. -1 represents an unlimited amount.`))
-				Eventually(session).Should(Say(`-l\s+Total log volume per second all processes can have \(e.g. 128B, 4K, 1M\). -1 represents an unlimited amount.`))
+				Eventually(session).Should(Say(`-l\s+Total log volume per second all processes can have, in bytes \(e.g. 128B, 4K, 1M\). -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("org, org-quota"))
 				Eventually(session).Should(Exit(0))
