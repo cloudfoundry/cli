@@ -16,6 +16,7 @@ type Process struct {
 	Instances               *int                     `yaml:"instances,omitempty"`
 	Memory                  string                   `yaml:"memory,omitempty"`
 	Type                    string                   `yaml:"type"`
+	LogRateLimit            string                   `yaml:"log_rate_limit_per_second,omitempty"`
 	RemainingManifestFields map[string]interface{}   `yaml:"-,inline"`
 }
 

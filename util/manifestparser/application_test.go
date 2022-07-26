@@ -349,6 +349,22 @@ processes:
 				})
 			})
 
+			Context("when a log rate limit is provided", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+processes:
+- log_rate_limit_per_second: 512M
+`)
+				})
+
+				It("unmarshals the processes property with the log rate limit", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(application.Processes).To(Equal([]Process{
+						{LogRateLimit: "512M", RemainingManifestFields: emptyMap},
+					}))
+				})
+			})
+
 			Context("when an unknown field is provided", func() {
 				BeforeEach(func() {
 					rawYAML = []byte(`---
@@ -390,6 +406,19 @@ processes:
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(remarshalledYaml).To(MatchYAML(rawYAML))
+			})
+		})
+
+		Context("when a log rate limit is provided", func() {
+			BeforeEach(func() {
+				rawYAML = []byte(`---
+log_rate_limit_per_second: 5K
+`)
+			})
+
+			It("unmarshals the log rate limit", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(application.LogRateLimit).To(Equal("5K"))
 			})
 		})
 	})

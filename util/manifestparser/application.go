@@ -30,6 +30,7 @@ type Application struct {
 	RandomRoute             bool                     `yaml:"random-route,omitempty"`
 	DefaultRoute            bool                     `yaml:"default-route,omitempty"`
 	Stack                   string                   `yaml:"stack,omitempty"`
+	LogRateLimit            string                   `yaml:"log_rate_limit_per_second,omitempty"`
 	RemainingManifestFields map[string]interface{}   `yaml:"-,inline"`
 }
 

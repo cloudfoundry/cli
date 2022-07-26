@@ -37,6 +37,7 @@ var _ = Describe("help", func() {
 				"[--task TASK]",
 				"[-u (process | port | http)]",
 				"[--no-route | --random-route]",
+				"[-l LOG_RATE_LIMIT]",
 				"[--var KEY=VALUE]",
 				"[--vars-file VARS_FILE_PATH]...",
 			}
@@ -61,6 +62,7 @@ var _ = Describe("help", func() {
 				"[--task TASK]",
 				"[-u (process | port | http)]",
 				"[--no-route | --random-route ]",
+				"[-l LOG_RATE_LIMIT]",
 				"[--var KEY=VALUE]",
 				"[--vars-file VARS_FILE_PATH]...",
 			}
@@ -68,9 +70,9 @@ var _ = Describe("help", func() {
 			assertUsage(session, buildpackAppUsage, dockerAppUsage)
 
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say(`app-start-timeout, -t`))
+			Eventually(session).Should(Say(`--app-start-timeout, -t`))
 			Eventually(session).Should(Say(`--buildpack, -b`))
-			Eventually(session).Should(Say(`disk, -k`))
+			Eventually(session).Should(Say(`--disk, -k`))
 			Eventually(session).Should(Say(`--docker-image, -o`))
 			Eventually(session).Should(Say(`--docker-username`))
 			Eventually(session).Should(Say(`--droplet`))
@@ -89,6 +91,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say(`--start-command, -c`))
 			Eventually(session).Should(Say(`--strategy`))
 			Eventually(session).Should(Say(`--task`))
+			Eventually(session).Should(Say(`--log-rate-limit, -l\s+Log rate limit per second, in bytes \(e.g. 128B, 4K, 1M\). -1 represents unlimited.`))
 			Eventually(session).Should(Say(`--var`))
 			Eventually(session).Should(Say(`--vars-file`))
 			Eventually(session).Should(Say("ENVIRONMENT:"))
