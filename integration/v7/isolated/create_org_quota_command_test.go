@@ -136,7 +136,7 @@ var _ = Describe("create-org-quota command", func() {
 					Eventually(session).Should(Say(`paid service plans:\s+allowed`))
 					Eventually(session).Should(Say(`app instances:\s+2`))
 					Eventually(session).Should(Say(`route ports:\s+5`))
-					//TODO: add an assertion for log quota information
+					Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -156,8 +156,7 @@ var _ = Describe("create-org-quota command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("org-quota", orgQuotaName)
-						// Eventually(session).Should(Say(`log volume per second:\s+32K`))
-						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Say(`log volume per second:\s+32K`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -185,7 +184,7 @@ var _ = Describe("create-org-quota command", func() {
 					Eventually(session).Should(Say(`service instances:\s+unlimited`))
 					Eventually(session).Should(Say(`app instances:\s+unlimited`))
 					Eventually(session).Should(Say(`route ports:\s+unlimited`))
-					//TODO: add an assertion for log quota information
+					Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -204,8 +203,7 @@ var _ = Describe("create-org-quota command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("org-quota", orgQuotaName)
-						// Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
-						//TODO: add an assertion for log quota information
+						Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

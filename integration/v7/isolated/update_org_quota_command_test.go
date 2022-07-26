@@ -85,7 +85,7 @@ var _ = Describe("update-org-quota command", func() {
 			Eventually(session).Should(Say(`paid service plans:\s+%s`, "disallowed"))
 			Eventually(session).Should(Say(`app instances:\s+%s`, appInstances))
 			Eventually(session).Should(Say(`route ports:\s+%s`, reservedRoutePorts))
-			//TODO: add an assertion for log quota information
+			Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -101,8 +101,7 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("org-quota", quotaName)
-				// Eventually(session).Should(Say(`log volume per second:\s+%s`, logVolume))
-				//TODO: add an assertion for log quota information
+				Eventually(session).Should(Say(`log volume per second:\s+%s`, logVolume))
 				Eventually(session).Should(Exit(0))
 			})
 		})
