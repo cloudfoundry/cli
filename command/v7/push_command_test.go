@@ -319,7 +319,7 @@ var _ = Describe("push Command", func() {
 							})
 						})
 
-						When("marsahlling the manifest succeeds", func() {
+						When("marshalling the manifest succeeds", func() {
 							BeforeEach(func() {
 								fakeManifestParser.MarshalManifestReturns([]byte("our-manifest"), nil)
 							})
@@ -1078,6 +1078,7 @@ var _ = Describe("push Command", func() {
 			cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{"/vars1", "/vars2"}
 			cmd.Vars = []template.VarKV{{Name: "key", Value: "val"}}
 			cmd.Task = true
+			cmd.LogRateLimit = "512M"
 		})
 
 		JustBeforeEach(func() {
@@ -1106,6 +1107,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.PathsToVarsFiles).To(Equal([]string{"/vars1", "/vars2"}))
 			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
 			Expect(overrides.Task).To(BeTrue())
+			Expect(overrides.LogRateLimit).To(Equal("512M"))
 		})
 
 		When("a docker image is provided", func() {

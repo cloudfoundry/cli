@@ -59,6 +59,7 @@ type FlagOverrides struct {
 	Vars                []template.VarKV
 	NoManifest          bool
 	Task                bool
+	LogRateLimit        string
 }
 
 func (state PushPlan) String() string {
