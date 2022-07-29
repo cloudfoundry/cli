@@ -134,7 +134,7 @@ type commandList struct {
 	SSH                                v7.SSHCommand                                `command:"ssh" description:"SSH to an application container instance"`
 	SSHCode                            v7.SSHCodeCommand                            `command:"ssh-code" description:"Get a one time password for ssh clients"`
 	SSHEnabled                         v7.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
-	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, memory limit, and log rate limit for an app"`
 	SecurityGroup                      v7.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	SecurityGroups                     v7.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	Service                            v7.ServiceCommand                            `command:"service" description:"Show service instance info"`

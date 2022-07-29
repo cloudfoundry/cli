@@ -21,6 +21,7 @@ type Process struct {
 	Instances                    types.NullInt
 	MemoryInMB                   types.NullUint64
 	DiskInMB                     types.NullUint64
+	LogRateLimitInBPS            types.NullInt
 	AppGUID                      string
 }
 
@@ -31,6 +32,7 @@ func (p Process) MarshalJSON() ([]byte, error) {
 	marshalInstances(p, &ccProcess)
 	marshalMemory(p, &ccProcess)
 	marshalDisk(p, &ccProcess)
+	marshalLogRateLimit(p, &ccProcess)
 	marshalHealthCheck(p, &ccProcess)
 
 	return json.Marshal(ccProcess)
@@ -38,13 +40,14 @@ func (p Process) MarshalJSON() ([]byte, error) {
 
 func (p *Process) UnmarshalJSON(data []byte) error {
 	var ccProcess struct {
-		Command       types.FilteredString `json:"command"`
-		DiskInMB      types.NullUint64     `json:"disk_in_mb"`
-		GUID          string               `json:"guid"`
-		Instances     types.NullInt        `json:"instances"`
-		MemoryInMB    types.NullUint64     `json:"memory_in_mb"`
-		Type          string               `json:"type"`
-		Relationships Relationships        `json:"relationships"`
+		Command           types.FilteredString `json:"command"`
+		DiskInMB          types.NullUint64     `json:"disk_in_mb"`
+		GUID              string               `json:"guid"`
+		Instances         types.NullInt        `json:"instances"`
+		MemoryInMB        types.NullUint64     `json:"memory_in_mb"`
+		LogRateLimitInBPS types.NullInt        `json:"log_rate_limit_in_bytes_per_second"`
+		Type              string               `json:"type"`
+		Relationships     Relationships        `json:"relationships"`
 
 		HealthCheck struct {
 			Type constant.HealthCheckType `json:"type"`
@@ -70,6 +73,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	p.HealthCheckType = ccProcess.HealthCheck.Type
 	p.Instances = ccProcess.Instances
 	p.MemoryInMB = ccProcess.MemoryInMB
+	p.LogRateLimitInBPS = ccProcess.LogRateLimitInBPS
 	p.Type = ccProcess.Type
 	p.AppGUID = ccProcess.Relationships[constant.RelationshipTypeApplication].GUID
 
@@ -86,10 +90,11 @@ type healthCheck struct {
 }
 
 type marshalProcess struct {
-	Command    interface{} `json:"command,omitempty"`
-	Instances  json.Number `json:"instances,omitempty"`
-	MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
-	DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
+	Command           interface{} `json:"command,omitempty"`
+	Instances         json.Number `json:"instances,omitempty"`
+	MemoryInMB        json.Number `json:"memory_in_mb,omitempty"`
+	DiskInMB          json.Number `json:"disk_in_mb,omitempty"`
+	LogRateLimitInBPS json.Number `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 
 	HealthCheck *healthCheck `json:"health_check,omitempty"`
 }
@@ -127,5 +132,11 @@ func marshalInstances(p Process, ccProcess *marshalProcess) {
 func marshalMemory(p Process, ccProcess *marshalProcess) {
 	if p.MemoryInMB.IsSet {
 		ccProcess.MemoryInMB = json.Number(fmt.Sprint(p.MemoryInMB.Value))
+	}
+}
+
+func marshalLogRateLimit(p Process, ccProcess *marshalProcess) {
+	if p.LogRateLimitInBPS.IsSet {
+		ccProcess.LogRateLimitInBPS = json.Number(fmt.Sprint(p.LogRateLimitInBPS.Value))
 	}
 }

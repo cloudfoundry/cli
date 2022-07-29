@@ -41,6 +41,7 @@ var _ = Describe("Process", func() {
 					"instances": 22,
 					"memory_in_mb": 32,
 					"disk_in_mb": 1024,
+					"log_rate_limit_in_bytes_per_second": 512, 
 					"relationships": {
 						"app": {
 							"data": {
@@ -76,6 +77,7 @@ var _ = Describe("Process", func() {
 					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
 					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"LogRateLimitInBPS":            Equal(types.NullInt{Value: 512, IsSet: true}),
 					"HealthCheckType":              Equal(constant.HTTP),
 					"HealthCheckEndpoint":          Equal("/health"),
 					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
@@ -135,15 +137,17 @@ var _ = Describe("Process", func() {
 		When("providing all scale options", func() {
 			BeforeEach(func() {
 				passedProcess = resources.Process{
-					Type:       constant.ProcessTypeWeb,
-					Instances:  types.NullInt{Value: 2, IsSet: true},
-					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
-					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
+					Type:              constant.ProcessTypeWeb,
+					Instances:         types.NullInt{Value: 2, IsSet: true},
+					MemoryInMB:        types.NullUint64{Value: 100, IsSet: true},
+					DiskInMB:          types.NullUint64{Value: 200, IsSet: true},
+					LogRateLimitInBPS: types.NullInt{Value: 256, IsSet: true},
 				}
 				expectedBody := `{
 					"instances": 2,
 					"memory_in_mb": 100,
-					"disk_in_mb": 200
+					"disk_in_mb": 200,
+					"log_rate_limit_in_bytes_per_second": 256
 				}`
 				response := `{
 					"guid": "some-process-guid"
@@ -168,15 +172,17 @@ var _ = Describe("Process", func() {
 		When("providing all scale options with 0 values", func() {
 			BeforeEach(func() {
 				passedProcess = resources.Process{
-					Type:       constant.ProcessTypeWeb,
-					Instances:  types.NullInt{Value: 0, IsSet: true},
-					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
-					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
+					Type:              constant.ProcessTypeWeb,
+					Instances:         types.NullInt{Value: 0, IsSet: true},
+					MemoryInMB:        types.NullUint64{Value: 0, IsSet: true},
+					DiskInMB:          types.NullUint64{Value: 0, IsSet: true},
+					LogRateLimitInBPS: types.NullInt{Value: 0, IsSet: true},
 				}
 				expectedBody := `{
 					"instances": 0,
 					"memory_in_mb": 0,
-					"disk_in_mb": 0
+					"disk_in_mb": 0,
+					"log_rate_limit_in_bytes_per_second": 0
 				}`
 				response := `{
 					"guid": "some-process-guid"
@@ -296,6 +302,7 @@ var _ = Describe("Process", func() {
 					"instances": 22,
 					"memory_in_mb": 32,
 					"disk_in_mb": 1024,
+					"log_rate_limit_in_bytes_per_second": 64,
 					"relationships": {
 						"app": {
 							"data": {
@@ -331,6 +338,7 @@ var _ = Describe("Process", func() {
 					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
 					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"LogRateLimitInBPS":            Equal(types.NullInt{Value: 64, IsSet: true}),
 					"HealthCheckType":              Equal(constant.HTTP),
 					"HealthCheckEndpoint":          Equal("/health"),
 					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
@@ -425,6 +433,7 @@ var _ = Describe("Process", func() {
 								"type": "web",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 32,
+								"log_rate_limit_in_bytes_per_second": 64,
 								"health_check": {
                   "type": "port",
                   "data": {
@@ -438,6 +447,7 @@ var _ = Describe("Process", func() {
 								"type": "worker",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 64,
+								"log_rate_limit_in_bytes_per_second": 128,
 								"health_check": {
                   "type": "http",
                   "data": {
@@ -459,6 +469,7 @@ var _ = Describe("Process", func() {
 								"type": "console",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 128,
+								"log_rate_limit_in_bytes_per_second": 256,
 								"health_check": {
                   "type": "process",
                   "data": {
@@ -493,6 +504,7 @@ var _ = Describe("Process", func() {
 						Type:               constant.ProcessTypeWeb,
 						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:         types.NullUint64{Value: 32, IsSet: true},
+						LogRateLimitInBPS:  types.NullInt{Value: 64, IsSet: true},
 						HealthCheckType:    constant.Port,
 						HealthCheckTimeout: 0,
 					},
@@ -501,6 +513,7 @@ var _ = Describe("Process", func() {
 						Type:                "worker",
 						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
+						LogRateLimitInBPS:   types.NullInt{Value: 128, IsSet: true},
 						HealthCheckType:     constant.HTTP,
 						HealthCheckEndpoint: "/health",
 						HealthCheckTimeout:  60,
@@ -510,6 +523,7 @@ var _ = Describe("Process", func() {
 						Type:               "console",
 						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:         types.NullUint64{Value: 128, IsSet: true},
+						LogRateLimitInBPS:  types.NullInt{Value: 256, IsSet: true},
 						HealthCheckType:    constant.Process,
 						HealthCheckTimeout: 90,
 					},
@@ -560,6 +574,7 @@ var _ = Describe("Process", func() {
 								"type": "web",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 32,
+								"log_rate_limit_in_bytes_per_second": 64,
 								"health_check": {
 								   "type": "port",
 								   "data": {
@@ -573,6 +588,7 @@ var _ = Describe("Process", func() {
 								"type": "web",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 32,
+								"log_rate_limit_in_bytes_per_second": 64,
 								"health_check": {
 									"type": "port",
 									"data": {
@@ -586,6 +602,7 @@ var _ = Describe("Process", func() {
 								"type": "worker",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 64,
+								"log_rate_limit_in_bytes_per_second": 128,
 								"health_check": {
 									"type": "http",
 									"data": {
@@ -608,6 +625,7 @@ var _ = Describe("Process", func() {
 								"type": "console",
 								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 128,
+								"log_rate_limit_in_bytes_per_second": 256,
 								"health_check": {
 								    "type": "process",
 								    "data": {
@@ -661,6 +679,7 @@ var _ = Describe("Process", func() {
 						Type:               constant.ProcessTypeWeb,
 						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:         types.NullUint64{Value: 32, IsSet: true},
+						LogRateLimitInBPS:  types.NullInt{Value: 64, IsSet: true},
 						HealthCheckType:    constant.Port,
 						HealthCheckTimeout: 0,
 					},
@@ -669,6 +688,7 @@ var _ = Describe("Process", func() {
 						Type:                "worker",
 						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
+						LogRateLimitInBPS:   types.NullInt{Value: 128, IsSet: true},
 						HealthCheckType:     constant.HTTP,
 						HealthCheckEndpoint: "/health",
 						HealthCheckTimeout:  60,
@@ -678,6 +698,7 @@ var _ = Describe("Process", func() {
 						Type:               "console",
 						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:         types.NullUint64{Value: 128, IsSet: true},
+						LogRateLimitInBPS:  types.NullInt{Value: 256, IsSet: true},
 						HealthCheckType:    constant.Process,
 						HealthCheckTimeout: 90,
 					},

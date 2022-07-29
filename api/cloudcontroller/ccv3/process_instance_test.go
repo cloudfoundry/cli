@@ -93,10 +93,12 @@ var _ = Describe("ProcessInstance", func() {
 							"usage": {
 								"cpu": 0.01,
 								"mem": 1000000,
-								"disk": 2000000
+								"disk": 2000000,
+								"log_rate": 5000
 							},
 							"mem_quota": 2000000,
 							"disk_quota": 4000000,
+							"log_rate_limit": 10000,
 							"isolation_segment": "example_iso_segment",
 							"index": 0,
 							"uptime": 123,
@@ -108,10 +110,12 @@ var _ = Describe("ProcessInstance", func() {
 							"usage": {
 								"cpu": 0.02,
 								"mem": 8000000,
-								"disk": 16000000
+								"disk": 16000000,
+								"log_rate": 32000
 							},
 							"mem_quota": 16000000,
 							"disk_quota": 32000000,
+							"log_rate_limit": 64000,
 							"isolation_segment": "example_iso_segment",
 							"index": 1,
 							"uptime": 456
@@ -139,6 +143,8 @@ var _ = Describe("ProcessInstance", func() {
 						IsolationSegment: "example_iso_segment",
 						MemoryQuota:      2000000,
 						MemoryUsage:      1000000,
+						LogRateLimit:     10000,
+						LogRate:          5000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
 						Uptime:           123 * time.Second,
@@ -151,6 +157,8 @@ var _ = Describe("ProcessInstance", func() {
 						IsolationSegment: "example_iso_segment",
 						MemoryQuota:      16000000,
 						MemoryUsage:      8000000,
+						LogRateLimit:     64000,
+						LogRate:          32000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
 						Uptime:           456 * time.Second,

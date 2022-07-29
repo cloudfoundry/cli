@@ -369,3 +369,17 @@ func WaitForAppDiskToTakeEffect(appName string, processIndex int, instanceIndex 
 		return appTable.Processes[processIndex].Instances[instanceIndex].Disk
 	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, expectedDisk)))
 }
+
+func WaitForLogRateLimitToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool, expectedLogRateLimit string) {
+	if shouldRestartFirst {
+		session := CF("restart", appName)
+		Eventually(session).Should(Exit(0))
+	}
+
+	Eventually(func() string {
+		session := CF("app", appName)
+		Eventually(session).Should(Exit(0))
+		appTable := ParseV3AppProcessTable(session.Out.Contents())
+		return appTable.Processes[processIndex].Instances[instanceIndex].Disk
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]?/s of %s/s`, expectedLogRateLimit)))
+}
