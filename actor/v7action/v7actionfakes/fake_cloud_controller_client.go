@@ -2111,6 +2111,20 @@ type FakeCloudControllerClient struct {
 	targetCFArgsForCall []struct {
 		arg1 ccv3.TargetSettings
 	}
+	TransferRouteOwnerStub        func(string, string) (ccv3.Warnings, error)
+	transferRouteOwnerMutex       sync.RWMutex
+	transferRouteOwnerArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	transferRouteOwnerReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	transferRouteOwnerReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UnbindSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
 	unbindSecurityGroupRunningSpaceMutex       sync.RWMutex
 	unbindSecurityGroupRunningSpaceArgsForCall []struct {
@@ -11869,6 +11883,70 @@ func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) ccv3.TargetSet
 	return argsForCall.arg1
 }
 
+func (fake *FakeCloudControllerClient) TransferRouteOwner(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.transferRouteOwnerMutex.Lock()
+	ret, specificReturn := fake.transferRouteOwnerReturnsOnCall[len(fake.transferRouteOwnerArgsForCall)]
+	fake.transferRouteOwnerArgsForCall = append(fake.transferRouteOwnerArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("TransferRouteOwner", []interface{}{arg1, arg2})
+	fake.transferRouteOwnerMutex.Unlock()
+	if fake.TransferRouteOwnerStub != nil {
+		return fake.TransferRouteOwnerStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.transferRouteOwnerReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) TransferRouteOwnerCallCount() int {
+	fake.transferRouteOwnerMutex.RLock()
+	defer fake.transferRouteOwnerMutex.RUnlock()
+	return len(fake.transferRouteOwnerArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) TransferRouteOwnerCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.transferRouteOwnerMutex.Lock()
+	defer fake.transferRouteOwnerMutex.Unlock()
+	fake.TransferRouteOwnerStub = stub
+}
+
+func (fake *FakeCloudControllerClient) TransferRouteOwnerArgsForCall(i int) (string, string) {
+	fake.transferRouteOwnerMutex.RLock()
+	defer fake.transferRouteOwnerMutex.RUnlock()
+	argsForCall := fake.transferRouteOwnerArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) TransferRouteOwnerReturns(result1 ccv3.Warnings, result2 error) {
+	fake.transferRouteOwnerMutex.Lock()
+	defer fake.transferRouteOwnerMutex.Unlock()
+	fake.TransferRouteOwnerStub = nil
+	fake.transferRouteOwnerReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) TransferRouteOwnerReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.transferRouteOwnerMutex.Lock()
+	defer fake.transferRouteOwnerMutex.Unlock()
+	fake.TransferRouteOwnerStub = nil
+	if fake.transferRouteOwnerReturnsOnCall == nil {
+		fake.transferRouteOwnerReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.transferRouteOwnerReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UnbindSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
 	fake.unbindSecurityGroupRunningSpaceMutex.Lock()
 	ret, specificReturn := fake.unbindSecurityGroupRunningSpaceReturnsOnCall[len(fake.unbindSecurityGroupRunningSpaceArgsForCall)]
@@ -14743,6 +14821,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
+	fake.transferRouteOwnerMutex.RLock()
+	defer fake.transferRouteOwnerMutex.RUnlock()
 	fake.unbindSecurityGroupRunningSpaceMutex.RLock()
 	defer fake.unbindSecurityGroupRunningSpaceMutex.RUnlock()
 	fake.unbindSecurityGroupStagingSpaceMutex.RLock()

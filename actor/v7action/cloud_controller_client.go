@@ -151,6 +151,7 @@ type CloudControllerClient interface {
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
 	ShareRoute(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	TargetCF(settings ccv3.TargetSettings)
+	TransferRouteOwner(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (ccv3.Warnings, error)

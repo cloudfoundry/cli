@@ -173,6 +173,7 @@ type commandList struct {
 	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
 	Tasks                              v7.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
 	TerminateTask                      v7.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
+	TransferRouteOwner                 v7.TransferRouteOwnerCommand                 `command:"transfer-route-owner" description:"Assign a route to a different space"`
 	UnbindRouteService                 v7.UnbindRouteServiceCommand                 `command:"unbind-route-service" alias:"urs" description:"Unbind a service instance from an HTTP route"`
 	UnbindRunningSecurityGroup         v7.UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group" description:"Unbind a security group from the set of security groups for running applications globally"`
 	UnbindSecurityGroup                v7.UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
