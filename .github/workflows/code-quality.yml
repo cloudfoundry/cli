@@ -12,7 +12,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository == 'cloudfoundry/cli' }}
+    if: ${{ github.repository == 'cloudfoundry/cli' }}
     permissions:
       actions: read
       contents: read

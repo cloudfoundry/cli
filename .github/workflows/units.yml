@@ -1,10 +1,6 @@
 name: Units Tests
 
-on:
-  push:
-    branches:
-    - "*"
-
+on: [push]
 permissions:
   contents: write
 
