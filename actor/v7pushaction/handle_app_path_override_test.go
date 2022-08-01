@@ -103,7 +103,10 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 					fmt.Println(flagOverrides.ProvidedAppPath)
 					fmt.Println(absoluteAppFilehandle.Name())
-					relativeAppFilePath = filepath.Join("./", absoluteAppFilehandle.Name())
+					var basePath = filepath.Base("./")
+					var cleanedPath = filepath.Clean(absoluteAppFilehandle.Name())
+					fmt.Println(cleanedPath)
+					relativeAppFilePath = filepath.Join(basePath, cleanedPath)
 					fmt.Println(relativeAppFilePath)
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
