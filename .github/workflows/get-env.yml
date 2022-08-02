@@ -1,0 +1,205 @@
+name: Build an edge toolsmiths environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      edge-capi:
+        required: false
+        type: boolean
+      test-name:
+        required: true
+        type: string
+
+jobs:
+  build-env:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Claim Toolsmiths Environment
+        id: claim-env
+        run: |
+          if ! curl --fail -X POST "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release" > metadata.json
+          then
+              echo "UNABLE TO CLAIM AN ENVIRONMENT, PLEASE RETRY LATER"
+              exit 1
+          fi
+          eval "$(bbl print-env --metadata-file ./metadata.json)"
+
+      - name: 'Upload Metadata'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.test-name }}-metadata
+          path: metadata.json
+
+  edge-capi:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+    needs: build-env
+    if: ${{ inputs.edge-capi != 'false'}}
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.test-name }}-metadata
+
+      - name: Get S3 CLI
+        run: |
+          mkdir tmp
+          cd tmp
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+
+      - name: Upload Edge CAPI
+        run: |
+          FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
+          aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1
+
+          eval "$(bbl print-env --metadata-file metadata.json)"
+          bosh upload-release --sha2 "$FILENAME"
+          rm $FILENAME
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cli-ci
+          path: cli-ci
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cf-deployment
+          path: cf-deployment
+
+      - name: Update CF Deployment
+        env:
+            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: |
+          chmod +x cli/.github/workflows/scripts/update-cf-deployment.sh
+          ./cli/.github/workflows/scripts/update-cf-deployment.sh       
+
+  linux-min-capi-setup-env:
+    needs: build-env
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+    if: ${{ inputs.edge-capi == 'false' }}
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-min-capi-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cf-deployment
+          ref: v16.11.0
+          path: cf-deployment
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cf-deployment-concourse-tasks
+          path: cf-deployment-concourse-tasks
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cli-ci
+          path: cli-ci
+
+      - name: Create vars file
+        run: |
+          mkdir vars-files
+          echo "cs = ${{ secrets.CLIENT_SECRET }}"
+          cat << EOF > vars-files/vars.yml
+            client-secret: ${{ secrets.CLIENT_SECRET }}
+          EOF
+
+      - name: Copy Ops Files
+        run: |
+          mkdir ops-files
+          cp cf-deployment/operations/scale-to-one-az.yml ops-files/
+          cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
+          cp cf-deployment/operations/use-compiled-releases.yml ops-files/
+          cp cf-deployment/operations/use-internal-lookup-for-route-services.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-dummy-windows-stack.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-uaa-client-cf-custom.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/adjust-user-retry-attempts.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/cli-isolation-cell-overrides.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/default-app-memory.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/doppler-instances.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/enable-v3-deployments-endpoint.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/reduce-async-service-polling.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/skip-ssl-override.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/uaa-vm_type-override.yml ops-files/
+
+      - name: Delete CF-D
+        run: |
+          eval "$(bbl print-env --metadata-file metadata.json)"
+          bosh -d cf delete-deployment -n
+
+      - name: Deploy CF-D 
+        run: |
+          mkdir toolsmiths-env
+          cp metadata.json toolsmiths-env/metadata
+          cat metadata.json | jq -r .name > toolsmiths-env/name
+
+          export VARS_FILES="vars.yml"
+
+          export MANIFEST_FILE="cf-deployment.yml"
+          export SYSTEM_DOMAIN=""
+          export REGENERATE_CREDENTIALS=false
+          export DEPLOY_WITH_UPTIME_MEASUREMENTS=false
+          export MEASURE_SYSLOG_AVAILABILITY=false
+          export TCP_DOMAIN=""
+          export AVAILABLE_PORT=""
+          export FAIL_ON_DOWNTIME=false
+          export APP_PUSHABILITY_THRESHOLD=0
+          export HTTP_AVAILABILITY_THRESHOLD=0
+          export RECENT_LOGS_THRESHOLD=0
+          export STREAMING_LOGS_THRESHOLD=0
+          export APP_SYSLOG_AVAILABILITY_THRESHOLD=0
+          export USE_SINGLE_APP_INSTANCE=false
+          export BOSH_DEPLOY_ARGS=""
+          export BOSH_LITE=false
+          export BBL_JSON_CONFIG=""
+
+          export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
+          use-compiled-releases.yml \
+          cli-isolation-cell-overrides.yml \
+          default-app-memory.yml \
+          skip-ssl-override.yml \
+          scale-to-one-az.yml \
+          diego-cell-instances.yml \
+          doppler-instances.yml \
+          uaa-vm_type-override.yml \
+          add-uaa-client-credentials.yml \
+          add-dummy-windows-stack.yml \
+          reduce-async-service-polling.yml \
+          add-oidc-provider.yml \
+          adjust-user-retry-attempts.yml \
+          enable-v3-deployments-endpoint.yml \
+          give-cf-admin-clients-read-scope.yml \
+          add-uaa-client-cf-custom.yml \
+          use-internal-lookup-for-route-services.yml"
+
+          ./cf-deployment-concourse-tasks/bosh-deploy/task  

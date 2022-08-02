@@ -1,0 +1,308 @@
+name: Integration Tests
+
+on:
+  push:
+    branches:
+    - "ga-integration"
+  schedule:
+    - cron: '0 */3 * * 1-5' #'5 * * * *'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  shared-values:
+    name: Shared Values
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+
+    steps:
+    - name: Set environment
+      id: set-secrets-environment
+      run: echo "::set-output name=secrets-environment::DEV"
+
+    - name: Set go version
+      id: set-go-version
+      run: echo "::set-output name=go-version::1.18"
+
+  # Linux Edge CAPI integration tests run
+  get-linux-env:
+    needs: shared-values
+    uses: ./.github/workflows/get-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-integration
+    secrets: inherit
+
+  run-linux-integration:
+    needs: [shared-values, get-linux-env]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Run Integration Tests
+        run: sh ./cli/.github/workflows/scripts/integration-linux.sh
+
+  unclaim-linux-env:
+    needs: [shared-values, run-linux-integration]
+    if: always()
+    uses: ./.github/workflows/unclaim-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-integration
+    secrets: inherit
+
+  # Windows Edge CAPI integration tests run
+  get-windows-env:
+    needs: shared-values
+    uses: ./.github/workflows/get-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: windows-integration
+    secrets: inherit
+
+  setup-windows-integration:
+    needs: [shared-values, get-windows-env]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Setup Integration
+        id: setup-windows-integration-step
+        run: sh ./cli/.github/workflows/scripts/windows-setup.sh
+
+      - name: 'Upload CF data'
+        uses: actions/upload-artifact@v3
+        with:
+          name: cf-windows-data
+          path: ${{ steps.setup-windows-integration-step.outputs.data }}
+
+  run-windows-integration:
+    needs: [shared-values, setup-windows-integration]
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+   
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-integration-metadata
+
+      - name: Download CF data
+        uses: actions/download-artifact@v3
+        with:
+          name: cf-windows-data
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ needs.shared-values.outputs.go-version }}
+
+      - name: Run Integration Tests
+        run: cli/.github/win/integration-windows.ps1
+
+      # - name: Setup tmate session
+      #   if: always()
+      #   uses: mxschmitt/action-tmate@v3 
+      #   with:
+      #     sudo: false 
+
+  unclaim-windows-env:
+    needs: [shared-values, run-windows-integration]
+    if: always()
+    uses: ./.github/workflows/unclaim-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: windows-integration
+    secrets: inherit
+
+  # Linux Client creds integration tests run
+  get-linux-client-creds-env:
+    needs: shared-values
+    uses: ./.github/workflows/get-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-cc-integration
+    secrets: inherit
+
+  run-linux-client-creds-integration:
+    needs: [shared-values, get-linux-client-creds-env]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-cc-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Run Integration Tests
+        env:
+          CF_INT_CLIENT_ID: potato-face
+          CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+        run: sh ./cli/.github/workflows/scripts/integration-linux.sh
+
+  unclaim-linux-client-creds-env:
+    needs: [shared-values, run-linux-client-creds-integration]
+    if: always()
+    uses: ./.github/workflows/unclaim-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-cc-integration
+    secrets: inherit
+
+  # Windows Edge CAPI integration tests run
+  get-windows-client-creds-env:
+    needs: shared-values
+    uses: ./.github/workflows/get-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: windows-cc-integration
+    secrets: inherit
+
+  setup-windows-client-creds-integration:
+    needs: [shared-values, get-windows-client-creds-env]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-cc-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Setup Integration
+        id: setup-windows-cc-integration-step
+        run: sh ./cli/.github/workflows/scripts/windows-setup.sh
+
+      - name: 'Upload CF data'
+        uses: actions/upload-artifact@v3
+        with:
+          name: cf-windows-cc-data
+          path: ${{ steps.setup-windows-cc-integration-step.outputs.data }}
+
+  run-windows-client-creds-integration:
+    needs: [shared-values, setup-windows-client-creds-integration]
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+   
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-cc-integration-metadata
+
+      - name: Download CF data
+        uses: actions/download-artifact@v3
+        with:
+          name: cf-windows-cc-data
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ needs.shared-values.outputs.go-version }}
+
+      - name: Run Integration Tests
+        run: cli/.github/win/integration-windows.ps1
+
+  unclaim-windows-client-creds-env:
+    needs: [shared-values, run-windows-client-creds-integration]
+    if: always()
+    uses: ./.github/workflows/unclaim-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: windows-cc-integration
+    secrets: inherit
+
+  # Linux Edge CAPI integration tests run
+  get-linux-min-capi-env:
+    needs: shared-values
+    uses: ./.github/workflows/get-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-min-capi-integration
+      edge-capi: false
+    secrets: inherit
+
+  run-linux-min-capi-integration:
+    needs: [shared-values, get-linux-min-capi-env]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-min-capi-integration-metadata
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Run Integration Tests
+        run: sh ./cli/.github/workflows/scripts/integration-linux.sh
+
+  unclaim-linux-min-capi-env:
+    needs: [shared-values, run-linux-min-capi-integration]
+    if: always()
+    uses: ./.github/workflows/unclaim-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      test-name: linux-min-capi-integration
+    secrets: inherit

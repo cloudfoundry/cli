@@ -1,0 +1,28 @@
+name: Unclaim an environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      test-name:
+        required: true
+        type: string
+
+jobs:
+  build-env:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container: cloudfoundry/cf-deployment-concourse-tasks:latest
+
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.test-name }}-metadata
+
+      - name: Unclaim environment
+        if: always()
+        run: |
+          curl -X POST "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/unclaim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&name=$(cat metadata.json | jq -r .name)"
