@@ -3,9 +3,9 @@ name: Integration Tests
 on:
   push:
     branches:
-    - "ga-integration"
+    - '*'
   schedule:
-    - cron: '0 */3 * * 1-5' #'5 * * * *'
+    - cron: '0 */1 * * 1-5'
 
 defaults:
   run:
@@ -276,6 +276,7 @@ jobs:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       test-name: linux-min-capi-integration
       edge-capi: false
+      capi-version: v16.11.0
     secrets: inherit
 
   run-linux-min-capi-integration:
