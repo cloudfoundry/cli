@@ -79,7 +79,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say(`--endpoint`))
 			Eventually(session).Should(Say(`--health-check-type, -u`))
 			Eventually(session).Should(Say(`--instances, -i`))
-			Eventually(session).Should(Say(`--log-rate-limit, -l\s+Log rate limit per second, in bytes \(e.g. 128B, 4K, 1M\). -1 represents unlimited.`))
+			Eventually(session).Should(Say(`--log-rate-limit, -l\s+Log rate limit per second, in bytes \(e.g. 128B, 4K, 1M\). -l=-1 represents unlimited`))
 			Eventually(session).Should(Say(`--manifest, -f`))
 			Eventually(session).Should(Say(`--memory, -m`))
 			Eventually(session).Should(Say(`--no-manifest`))

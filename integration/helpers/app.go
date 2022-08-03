@@ -380,6 +380,6 @@ func WaitForLogRateLimitToTakeEffect(appName string, processIndex int, instanceI
 		session := CF("app", appName)
 		Eventually(session).Should(Exit(0))
 		appTable := ParseV3AppProcessTable(session.Out.Contents())
-		return appTable.Processes[processIndex].Instances[instanceIndex].Disk
+		return appTable.Processes[processIndex].Instances[instanceIndex].LogRate
 	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]?/s of %s/s`, expectedLogRateLimit)))
 }

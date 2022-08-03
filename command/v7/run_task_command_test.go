@@ -197,6 +197,49 @@ var _ = Describe("run-task Command", func() {
 					})
 				})
 
+				When("task log rate limit is provided", func() {
+					BeforeEach(func() {
+						cmd.Name = "some-task-name"
+						cmd.LogRateLimit = flag.BytesWithUnlimited{Value: 1024 * 5, IsSet: true}
+						fakeActor.RunTaskReturns(
+							resources.Task{
+								Name:       "some-task-name",
+								SequenceID: 3,
+							},
+							v7action.Warnings{"get-application-warning-3"},
+							nil)
+					})
+
+					It("creates a new task and outputs all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(appName).To(Equal("some-app-name"))
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+
+						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
+						appGUID, task := fakeActor.RunTaskArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(task).To(Equal(resources.Task{
+							Command:           "some command",
+							Name:              "some-task-name",
+							LogRateLimitInBPS: 1024 * 5,
+						}))
+
+						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
+						Expect(testUI.Out).To(Say(`task id:\s+3`))
+
+						Expect(testUI.Err).To(Say("get-application-warning-1"))
+						Expect(testUI.Err).To(Say("get-application-warning-2"))
+						Expect(testUI.Err).To(Say("get-application-warning-3"))
+					})
+				})
+
 				When("process is provided", func() {
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"

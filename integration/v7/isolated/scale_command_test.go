@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -30,13 +31,13 @@ var _ = Describe("scale command", func() {
 
 	Describe("help", func() {
 		When("--help flag is set", func() {
-			FIt("appears in cf help -a", func() {
+			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(HaveCommandInCategoryWithDescription("scale", "APPS", "Change or view the instance count, disk space limit, memory limit, and log rate limit for an app"))
 			})
 
-			FIt("displays command usage to output", func() {
+			It("displays command usage to output", func() {
 				session := helpers.CF("scale", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
@@ -50,7 +51,7 @@ var _ = Describe("scale command", func() {
 				Eventually(session).Should(Say(`-f\s+Force restart of app without prompt`))
 				Eventually(session).Should(Say(`-i\s+Number of instances`))
 				Eventually(session).Should(Say(`-k\s+Disk limit \(e\.g\. 256M, 1024M, 1G\)`))
-				Eventually(session).Should(Say(`-l\s+Log rate limit \(e\.g\. 256M, 1024M, 1G\)`))
+				Eventually(session).Should(Say(`-l\s+Log rate limit per second, in bytes \(e\.g\. 128B, 4K, 1M\). -l=-1 represents unlimited`))
 				Eventually(session).Should(Say(`-m\s+Memory limit \(e\.g\. 256M, 1024M, 1G\)`))
 				Eventually(session).Should(Say(`--process\s+App process to scale \(Default: web\)`))
 
@@ -231,6 +232,10 @@ var _ = Describe("scale command", func() {
 				})
 
 				When("Scaling the log rate limit", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
 					It("scales log rate limit to 1M", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
@@ -243,7 +248,7 @@ var _ = Describe("scale command", func() {
 						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Expect(session).To(Say(`Instances starting\.\.\.`))
 
-						helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "512M")
+						helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "1M")
 					})
 
 					When("-f flag provided", func() {
@@ -252,7 +257,7 @@ var _ = Describe("scale command", func() {
 							Eventually(session).Should(Exit(0))
 							Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "512M")
+							helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "1M")
 						})
 					})
 				})
