@@ -1966,6 +1966,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	MoveRouteStub        func(string, string) (ccv3.Warnings, error)
+	moveRouteMutex       sync.RWMutex
+	moveRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	moveRouteReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	moveRouteReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	PollJobStub        func(ccv3.JobURL) (ccv3.Warnings, error)
 	pollJobMutex       sync.RWMutex
 	pollJobArgsForCall []struct {
@@ -2110,20 +2124,6 @@ type FakeCloudControllerClient struct {
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
 		arg1 ccv3.TargetSettings
-	}
-	TransferRouteOwnerStub        func(string, string) (ccv3.Warnings, error)
-	transferRouteOwnerMutex       sync.RWMutex
-	transferRouteOwnerArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	transferRouteOwnerReturns struct {
-		result1 ccv3.Warnings
-		result2 error
-	}
-	transferRouteOwnerReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
 	}
 	UnbindSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
 	unbindSecurityGroupRunningSpaceMutex       sync.RWMutex
@@ -11206,6 +11206,70 @@ func (fake *FakeCloudControllerClient) MapRouteReturnsOnCall(i int, result1 ccv3
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) MoveRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.moveRouteMutex.Lock()
+	ret, specificReturn := fake.moveRouteReturnsOnCall[len(fake.moveRouteArgsForCall)]
+	fake.moveRouteArgsForCall = append(fake.moveRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("MoveRoute", []interface{}{arg1, arg2})
+	fake.moveRouteMutex.Unlock()
+	if fake.MoveRouteStub != nil {
+		return fake.MoveRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.moveRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) MoveRouteCallCount() int {
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
+	return len(fake.moveRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) MoveRouteCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) MoveRouteArgsForCall(i int) (string, string) {
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
+	argsForCall := fake.moveRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) MoveRouteReturns(result1 ccv3.Warnings, result2 error) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = nil
+	fake.moveRouteReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) MoveRouteReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = nil
+	if fake.moveRouteReturnsOnCall == nil {
+		fake.moveRouteReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.moveRouteReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) PollJob(arg1 ccv3.JobURL) (ccv3.Warnings, error) {
 	fake.pollJobMutex.Lock()
 	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
@@ -11881,70 +11945,6 @@ func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) ccv3.TargetSet
 	defer fake.targetCFMutex.RUnlock()
 	argsForCall := fake.targetCFArgsForCall[i]
 	return argsForCall.arg1
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwner(arg1 string, arg2 string) (ccv3.Warnings, error) {
-	fake.transferRouteOwnerMutex.Lock()
-	ret, specificReturn := fake.transferRouteOwnerReturnsOnCall[len(fake.transferRouteOwnerArgsForCall)]
-	fake.transferRouteOwnerArgsForCall = append(fake.transferRouteOwnerArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("TransferRouteOwner", []interface{}{arg1, arg2})
-	fake.transferRouteOwnerMutex.Unlock()
-	if fake.TransferRouteOwnerStub != nil {
-		return fake.TransferRouteOwnerStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.transferRouteOwnerReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwnerCallCount() int {
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
-	return len(fake.transferRouteOwnerArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwnerCalls(stub func(string, string) (ccv3.Warnings, error)) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = stub
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwnerArgsForCall(i int) (string, string) {
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
-	argsForCall := fake.transferRouteOwnerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwnerReturns(result1 ccv3.Warnings, result2 error) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = nil
-	fake.transferRouteOwnerReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCloudControllerClient) TransferRouteOwnerReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = nil
-	if fake.transferRouteOwnerReturnsOnCall == nil {
-		fake.transferRouteOwnerReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
-		})
-	}
-	fake.transferRouteOwnerReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) UnbindSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
@@ -14799,6 +14799,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.pollJobForStateMutex.RLock()
@@ -14821,8 +14823,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
 	fake.unbindSecurityGroupRunningSpaceMutex.RLock()
 	defer fake.unbindSecurityGroupRunningSpaceMutex.RUnlock()
 	fake.unbindSecurityGroupStagingSpaceMutex.RLock()

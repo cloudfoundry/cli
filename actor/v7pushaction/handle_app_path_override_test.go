@@ -92,23 +92,36 @@ var _ = Describe("HandleAppPathOverride", func() {
 				var cwd string
 				var absoluteAppFilehandle *os.File
 				BeforeEach(func() {
+					// absoluteAppFilehandle, err = ioutil.TempFile("", "")
+					// Expect(err).NotTo(HaveOccurred())
+					// defer absoluteAppFilehandle.Close()
+
+					// var relPath = filepath.Join("/", filepath.Dir(absoluteAppFilehandle.Name()))
+					// // var basePath = filepath.Base(relPath)
+					// // var rel, err = filepath.Rel(filepath.Dir("/"), relPath)
+					// //var relPathCwd = filepath.Join(cwd, absoluteAppFilehandle.Name())
+					// fmt.Println(relPath)
+					// //fmt.Println(relPathCwd)
+					// flagOverrides.ProvidedAppPath = relPath
+
+					// // TODO: Do NOT use Chdir! it affects ALL other threads
+					// // Save the current working directory so you can return to it later
+					// cwd, err = os.Getwd()
+					// Expect(err).NotTo(HaveOccurred())
+
+					// // Go to root directory before executing HandleAppPathOverride()
+					// err = os.Chdir("/")
+					// Expect(err).NotTo(HaveOccurred())
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
+					relativeAppFilePath = filepath.Join(filepath.Dir("/"), absoluteAppFilehandle.Name())
+					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads
 					// Save the current working directory so you can return to it later
 					cwd, err = os.Getwd()
 					Expect(err).NotTo(HaveOccurred())
-
-					fmt.Println(flagOverrides.ProvidedAppPath)
-					fmt.Println(absoluteAppFilehandle.Name())
-					var cleanedPath = filepath.Clean(absoluteAppFilehandle.Name())
-					fmt.Println(cleanedPath)
-					relativeAppFilePath = filepath.Join(filepath.FromSlash("/"), cleanedPath)
-					fmt.Println(relativeAppFilePath)
-					flagOverrides.ProvidedAppPath = relativeAppFilePath
-
 					// Go to root directory before executing HandleAppPathOverride()
 					err = os.Chdir("/")
 					Expect(err).NotTo(HaveOccurred())
@@ -119,6 +132,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 				})
 
 				It("doesn't override the path for the first app in the manifest", func() {
+					fmt.Println("\n", "Expected Path: ", transformedManifest.Applications[0].Path, "test path: ", relativeAppFilePath)
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
 				})

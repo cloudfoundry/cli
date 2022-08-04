@@ -426,8 +426,8 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]resources.Route, Warn
 	return routes, allWarnings, nil
 }
 
-func (actor Actor) TransferRouteOwner(routeGUID string, spaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.TransferRouteOwner(routeGUID, spaceGUID)
+func (actor Actor) MoveRoute(routeGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.MoveRoute(routeGUID, spaceGUID)
 	return Warnings(warnings), err
 }
 

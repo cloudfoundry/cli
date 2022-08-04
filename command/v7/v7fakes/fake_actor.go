@@ -2489,6 +2489,20 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	MoveRouteStub        func(string, string) (v7action.Warnings, error)
+	moveRouteMutex       sync.RWMutex
+	moveRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	moveRouteReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	moveRouteReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	ParseAccessTokenStub        func(string) (jwt.JWT, error)
 	parseAccessTokenMutex       sync.RWMutex
 	parseAccessTokenArgsForCall []struct {
@@ -3059,20 +3073,6 @@ type FakeActor struct {
 		result1 resources.Task
 		result2 v7action.Warnings
 		result3 error
-	}
-	TransferRouteOwnerStub        func(string, string) (v7action.Warnings, error)
-	transferRouteOwnerMutex       sync.RWMutex
-	transferRouteOwnerArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	transferRouteOwnerReturns struct {
-		result1 v7action.Warnings
-		result2 error
-	}
-	transferRouteOwnerReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
 	}
 	UnbindSecurityGroupStub        func(string, string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
 	unbindSecurityGroupMutex       sync.RWMutex
@@ -14194,6 +14194,70 @@ func (fake *FakeActor) MarketplaceReturnsOnCall(i int, result1 []v7action.Servic
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) MoveRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.moveRouteMutex.Lock()
+	ret, specificReturn := fake.moveRouteReturnsOnCall[len(fake.moveRouteArgsForCall)]
+	fake.moveRouteArgsForCall = append(fake.moveRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("MoveRoute", []interface{}{arg1, arg2})
+	fake.moveRouteMutex.Unlock()
+	if fake.MoveRouteStub != nil {
+		return fake.MoveRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.moveRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) MoveRouteCallCount() int {
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
+	return len(fake.moveRouteArgsForCall)
+}
+
+func (fake *FakeActor) MoveRouteCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = stub
+}
+
+func (fake *FakeActor) MoveRouteArgsForCall(i int) (string, string) {
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
+	argsForCall := fake.moveRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) MoveRouteReturns(result1 v7action.Warnings, result2 error) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = nil
+	fake.moveRouteReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) MoveRouteReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.moveRouteMutex.Lock()
+	defer fake.moveRouteMutex.Unlock()
+	fake.MoveRouteStub = nil
+	if fake.moveRouteReturnsOnCall == nil {
+		fake.moveRouteReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.moveRouteReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
 	fake.parseAccessTokenMutex.Lock()
 	ret, specificReturn := fake.parseAccessTokenReturnsOnCall[len(fake.parseAccessTokenArgsForCall)]
@@ -16725,70 +16789,6 @@ func (fake *FakeActor) TerminateTaskReturnsOnCall(i int, result1 resources.Task,
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) TransferRouteOwner(arg1 string, arg2 string) (v7action.Warnings, error) {
-	fake.transferRouteOwnerMutex.Lock()
-	ret, specificReturn := fake.transferRouteOwnerReturnsOnCall[len(fake.transferRouteOwnerArgsForCall)]
-	fake.transferRouteOwnerArgsForCall = append(fake.transferRouteOwnerArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("TransferRouteOwner", []interface{}{arg1, arg2})
-	fake.transferRouteOwnerMutex.Unlock()
-	if fake.TransferRouteOwnerStub != nil {
-		return fake.TransferRouteOwnerStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.transferRouteOwnerReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeActor) TransferRouteOwnerCallCount() int {
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
-	return len(fake.transferRouteOwnerArgsForCall)
-}
-
-func (fake *FakeActor) TransferRouteOwnerCalls(stub func(string, string) (v7action.Warnings, error)) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = stub
-}
-
-func (fake *FakeActor) TransferRouteOwnerArgsForCall(i int) (string, string) {
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
-	argsForCall := fake.transferRouteOwnerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeActor) TransferRouteOwnerReturns(result1 v7action.Warnings, result2 error) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = nil
-	fake.transferRouteOwnerReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeActor) TransferRouteOwnerReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.transferRouteOwnerMutex.Lock()
-	defer fake.transferRouteOwnerMutex.Unlock()
-	fake.TransferRouteOwnerStub = nil
-	if fake.transferRouteOwnerReturnsOnCall == nil {
-		fake.transferRouteOwnerReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
-		})
-	}
-	fake.transferRouteOwnerReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
 }
 
 func (fake *FakeActor) UnbindSecurityGroup(arg1 string, arg2 string, arg3 string, arg4 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
@@ -19404,6 +19404,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.mapRouteMutex.RUnlock()
 	fake.marketplaceMutex.RLock()
 	defer fake.marketplaceMutex.RUnlock()
+	fake.moveRouteMutex.RLock()
+	defer fake.moveRouteMutex.RUnlock()
 	fake.parseAccessTokenMutex.RLock()
 	defer fake.parseAccessTokenMutex.RUnlock()
 	fake.pollBuildMutex.RLock()
@@ -19482,8 +19484,6 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.stopApplicationMutex.RUnlock()
 	fake.terminateTaskMutex.RLock()
 	defer fake.terminateTaskMutex.RUnlock()
-	fake.transferRouteOwnerMutex.RLock()
-	defer fake.transferRouteOwnerMutex.RUnlock()
 	fake.unbindSecurityGroupMutex.RLock()
 	defer fake.unbindSecurityGroupMutex.RUnlock()
 	fake.unmapRouteMutex.RLock()

@@ -16,9 +16,9 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("transfer-route-owner Command", func() {
+var _ = Describe("move-route Command", func() {
 	var (
-		cmd             v7.TransferRouteOwnerCommand
+		cmd             v7.MoveRouteCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -47,7 +47,7 @@ var _ = Describe("transfer-route-owner Command", func() {
 		hostname = "myHostname"
 		path = "myPath"
 
-		cmd = v7.TransferRouteOwnerCommand{
+		cmd = v7.MoveRouteCommand{
 			BaseCommand: v7.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -121,7 +121,7 @@ var _ = Describe("transfer-route-owner Command", func() {
 
 				Expect(fakeActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(0))
 
-				Expect(fakeActor.TransferRouteOwnerCallCount()).To(Equal(0))
+				Expect(fakeActor.MoveRouteCallCount()).To(Equal(0))
 			})
 		})
 
@@ -203,7 +203,7 @@ var _ = Describe("transfer-route-owner Command", func() {
 						Expect(spaceName).To(Equal("space-name-a"))
 						Expect(orgGuid).To(Equal("org-guid-a"))
 
-						Expect(fakeActor.TransferRouteOwnerCallCount()).To(Equal(0))
+						Expect(fakeActor.MoveRouteCallCount()).To(Equal(0))
 					})
 				})
 				When("getting the target org errors", func() {
@@ -232,7 +232,7 @@ var _ = Describe("transfer-route-owner Command", func() {
 						orgName := fakeActor.GetOrganizationByNameArgsForCall(0)
 						Expect(orgName).To(Equal("org-name-a"))
 
-						Expect(fakeActor.TransferRouteOwnerCallCount()).To(Equal(0))
+						Expect(fakeActor.MoveRouteCallCount()).To(Equal(0))
 					})
 				})
 				When("getting the target space succeeds", func() {
@@ -270,7 +270,7 @@ var _ = Describe("transfer-route-owner Command", func() {
 						spaceName, orgGuid := fakeActor.GetSpaceByNameAndOrganizationArgsForCall(0)
 						Expect(spaceName).To(Equal("space-name-a"))
 						Expect(orgGuid).To(Equal("org-guid-a"))
-						Expect(fakeActor.TransferRouteOwnerCallCount()).To(Equal(1))
+						Expect(fakeActor.MoveRouteCallCount()).To(Equal(1))
 					})
 				})
 			})

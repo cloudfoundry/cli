@@ -69,7 +69,7 @@ var HelpCategoryList = []HelpCategory{
 			{"delete-orphaned-routes"},
 			{"update-destination"},
 			{"share-route"},
-			{"transfer-route-owner"},
+			{"move-route"},
 		},
 	},
 	{

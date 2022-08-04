@@ -140,6 +140,7 @@ type CloudControllerClient interface {
 	GetUsers(query ...ccv3.Query) ([]resources.User, ccv3.Warnings, error)
 	MakeRequestSendReceiveRaw(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string, destinationProtocol string) (ccv3.Warnings, error)
+	MoveRoute(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	PollJobForState(jobURL ccv3.JobURL, state constant.JobState) (ccv3.Warnings, error)
 	PollJobToEventStream(jobURL ccv3.JobURL) chan ccv3.PollJobEvent
@@ -151,7 +152,6 @@ type CloudControllerClient interface {
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
 	ShareRoute(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	TargetCF(settings ccv3.TargetSettings)
-	TransferRouteOwner(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (ccv3.Warnings, error)

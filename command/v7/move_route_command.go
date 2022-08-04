@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
-type TransferRouteOwnerCommand struct {
+type MoveRouteCommand struct {
 	BaseCommand
 
 	RequireArgs      flag.Domain      `positional-args:"yes"`
@@ -17,20 +17,20 @@ type TransferRouteOwnerCommand struct {
 	relatedCommands interface{} `related_commands:"create-route, map-route, unmap-route, routes"`
 }
 
-func (cmd TransferRouteOwnerCommand) Usage() string {
+func (cmd MoveRouteCommand) Usage() string {
 	return `
 	Transfers the ownership of a route to a another space:
-	CF_NAME transfer-route-owner DOMAIN [--hostname HOSTNAME] [--path PATH] -s OTHER_SPACE [-o OTHER_ORG]`
+	CF_NAME move-route DOMAIN [--hostname HOSTNAME] [--path PATH] -s OTHER_SPACE [-o OTHER_ORG]`
 }
 
-func (cmd TransferRouteOwnerCommand) Examples() string {
+func (cmd MoveRouteCommand) Examples() string {
 	return `
-	CF_NAME transfer-route-owner example.com --hostname myHost --path foo -s TargetSpace -o TargetOrg        # myhost.example.com/foo
-	CF_NAME transfer-route-owner example.com --hostname myHost -s TargetSpace                                # myhost.example.com
-	CF_NAME transfer-route-owner example.com --hostname myHost -s TargetSpace -o TargetOrg                   # myhost.example.com`
+	CF_NAME move-route example.com --hostname myHost --path foo -s TargetSpace -o TargetOrg        # myhost.example.com/foo
+	CF_NAME move-route example.com --hostname myHost -s TargetSpace                                # myhost.example.com
+	CF_NAME move-route example.com --hostname myHost -s TargetSpace -o TargetOrg                   # myhost.example.com`
 }
 
-func (cmd TransferRouteOwnerCommand) Execute(args []string) error {
+func (cmd MoveRouteCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -81,13 +81,13 @@ func (cmd TransferRouteOwnerCommand) Execute(args []string) error {
 	}
 
 	url := desiredURL(domain.Name, cmd.Hostname, path, 0)
-	cmd.UI.DisplayTextWithFlavor("Transfering ownership of route {{.URL}} to space {{.DestinationSpace}} as {{.User}}",
+	cmd.UI.DisplayTextWithFlavor("Move ownership of route {{.URL}} to space {{.DestinationSpace}} as {{.User}}",
 		map[string]interface{}{
 			"URL":              url,
 			"DestinationSpace": cmd.DestinationSpace,
 			"User":             user.Name,
 		})
-	warnings, err = cmd.Actor.TransferRouteOwner(
+	warnings, err = cmd.Actor.MoveRoute(
 		route.GUID,
 		targetedSpace.GUID,
 	)

@@ -174,7 +174,7 @@ func (client Client) ShareRoute(routeGUID string, spaceGUID string) (Warnings, e
 	return warnings, err
 }
 
-func (client Client) TransferRouteOwner(routeGUID string, spaceGUID string) (Warnings, error) {
+func (client Client) MoveRoute(routeGUID string, spaceGUID string) (Warnings, error) {
 	type space struct {
 		GUID string `json:"guid"`
 	}
@@ -191,7 +191,7 @@ func (client Client) TransferRouteOwner(routeGUID string, spaceGUID string) (War
 
 	var responseBody resources.Build
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchTransferRouteOwnerRequest,
+		RequestName:  internal.PatchMoveRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID},
 		RequestBody:  &requestBody,
 		ResponseBody: &responseBody,
