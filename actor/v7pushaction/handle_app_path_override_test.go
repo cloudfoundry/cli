@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -92,30 +93,14 @@ var _ = Describe("HandleAppPathOverride", func() {
 				var cwd string
 				var absoluteAppFilehandle *os.File
 				BeforeEach(func() {
-					// absoluteAppFilehandle, err = ioutil.TempFile("", "")
-					// Expect(err).NotTo(HaveOccurred())
-					// defer absoluteAppFilehandle.Close()
-
-					// var relPath = filepath.Join("/", filepath.Dir(absoluteAppFilehandle.Name()))
-					// // var basePath = filepath.Base(relPath)
-					// // var rel, err = filepath.Rel(filepath.Dir("/"), relPath)
-					// //var relPathCwd = filepath.Join(cwd, absoluteAppFilehandle.Name())
-					// fmt.Println(relPath)
-					// //fmt.Println(relPathCwd)
-					// flagOverrides.ProvidedAppPath = relPath
-
-					// // TODO: Do NOT use Chdir! it affects ALL other threads
-					// // Save the current working directory so you can return to it later
-					// cwd, err = os.Getwd()
-					// Expect(err).NotTo(HaveOccurred())
-
-					// // Go to root directory before executing HandleAppPathOverride()
-					// err = os.Chdir("/")
-					// Expect(err).NotTo(HaveOccurred())
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
-					relativeAppFilePath = filepath.Join(filepath.Dir("/"), absoluteAppFilehandle.Name())
+					if runtime.GOOS == "windows" {
+						relativeAppFilePath = absoluteAppFilehandle.Name()
+					} else {
+						relativeAppFilePath = filepath.Join(filepath.Dir("/"), absoluteAppFilehandle.Name())
+					}
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads
