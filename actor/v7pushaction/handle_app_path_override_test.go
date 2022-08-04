@@ -1,7 +1,6 @@
 package v7pushaction_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -117,7 +116,6 @@ var _ = Describe("HandleAppPathOverride", func() {
 				})
 
 				It("doesn't override the path for the first app in the manifest", func() {
-					fmt.Println("\n", "Expected Path: ", transformedManifest.Applications[0].Path, "test path: ", relativeAppFilePath)
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
 				})
