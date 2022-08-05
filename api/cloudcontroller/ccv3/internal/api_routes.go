@@ -280,7 +280,7 @@ var APIRoutes = map[string]Route{
 	UnmapRouteRequest:                                           {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodDelete},
 	PatchDestinationRequest:                                     {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodPatch},
 	ShareRouteRequest:                                           {Path: "/v3/routes/:route_guid/relationships/shared_spaces", Method: http.MethodPost},
-	PatchMoveRouteRequest:                                       {Path: "/v3/routes/:route-guid/transfer_owner", Method: http.MethodPatch},
+	PatchMoveRouteRequest:                                       {Path: "/v3/routes/:route-guid/relationships/space", Method: http.MethodPatch},
 	GetSecurityGroupsRequest:                                    {Path: "/v3/security_groups", Method: http.MethodGet},
 	PostSecurityGroupRequest:                                    {Path: "/v3/security_groups", Method: http.MethodPost},
 	DeleteSecurityGroupRequest:                                  {Path: "/v3/security_groups/:security_group_guid", Method: http.MethodDelete},
