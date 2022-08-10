@@ -10,19 +10,19 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("move route command", func() {
+var _ = FDescribe("move route command", func() {
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("move-route", "ROUTES", "Transfers the ownership of a route to a another space:"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("move-route", "ROUTES", "Assign a route to a different space"))
 		})
 
 		It("displays the help information", func() {
 			session := helpers.CF("move-route", "--help")
 			Eventually(session).Should(Say(`NAME:`))
-			Eventually(session).Should(Say("move-route - Transfers the ownership of a route to a another space:"))
+			Eventually(session).Should(Say("move-route - Assign a route to a different space"))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
@@ -56,7 +56,7 @@ var _ = Describe("move route command", func() {
 		})
 	})
 
-	When("the environment is set up conrrectly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			userName  string
 			orgName   string
@@ -76,7 +76,7 @@ var _ = Describe("move route command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the domain extists", func() {
+		When("the domain exists", func() {
 			var (
 				domainName      string
 				targetSpaceName string
@@ -107,7 +107,7 @@ var _ = Describe("move route command", func() {
 
 					It("transfers the route to the destination space", func() {
 						session := helpers.CF("move-route", domainName, "--hostname", hostname, "-s", targetSpaceName)
-						Eventually(session).Should(Say(`Transfering ownership of route %s.%s to space %s as %s`, hostname, domainName, targetSpaceName, userName))
+						Eventually(session).Should(Say(`Move ownership of route %s.%s to space %s as %s`, hostname, domainName, targetSpaceName, userName))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
 					})
@@ -149,9 +149,9 @@ var _ = Describe("move route command", func() {
 						domain.Delete()
 					})
 
-					It("Transfers ownership the route to the destination space", func() {
+					It("Transfers ownership of the route to the destination space", func() {
 						session := helpers.CF("move-route", domainName, "--hostname", hostname, "-o", targetOrgName, "-s", targetSpaceName)
-						Eventually(session).Should(Say(`Transfering ownership of route %s.%s to space %s as %s`, hostname, domainName, targetSpaceName, userName))
+						Eventually(session).Should(Say(`Move ownership of route %s.%s to space %s as %s`, hostname, domainName, targetSpaceName, userName))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
 					})
