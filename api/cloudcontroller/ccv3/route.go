@@ -180,12 +180,12 @@ func (client Client) MoveRoute(routeGUID string, spaceGUID string) (Warnings, er
 	}
 
 	type body struct {
-		Data []space `json:"data"`
+		Data space `json:"data"`
 	}
 
 	requestBody := body{
-		Data: []space{
-			{GUID: spaceGUID},
+		Data: space{
+			GUID: spaceGUID,
 		},
 	}
 
