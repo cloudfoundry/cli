@@ -97,12 +97,12 @@ var _ = Describe("move route command", func() {
 						hostname = "panera-bread"
 						targetSpaceName = helpers.NewSpaceName()
 						helpers.CreateSpace(targetSpaceName)
-						domain.Create()
+						domain.CreateShared()
 						Eventually(helpers.CF("create-route", domain.Name, "--hostname", hostname)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						domain.Delete()
+						domain.DeleteShared()
 					})
 
 					It("transfers the route to the destination space", func() {
@@ -120,7 +120,7 @@ var _ = Describe("move route command", func() {
 						hostname = "panera-bread"
 						targetSpaceName = helpers.NewSpaceName()
 						targetOrgName = helpers.NewOrgName()
-						domain.Create()
+						domain.CreateShared()
 						Eventually(helpers.CF("create-route", domain.Name, "--hostname", hostname)).Should(Exit(0))
 					})
 
@@ -141,12 +141,12 @@ var _ = Describe("move route command", func() {
 						targetSpaceName = helpers.NewSpaceName()
 						helpers.CreateOrgAndSpace(targetOrgName, targetSpaceName)
 						helpers.SetupCF(orgName, spaceName)
-						domain.Create()
+						domain.CreateShared()
 						Eventually(helpers.CF("create-route", domain.Name, "--hostname", hostname)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						domain.Delete()
+						domain.DeleteShared()
 					})
 
 					It("Transfers ownership of the route to the destination space", func() {
@@ -163,7 +163,7 @@ var _ = Describe("move route command", func() {
 						domain = helpers.NewDomain(orgName, domainName)
 						hostname = "menchies-icecream"
 						destinationSpaceName = "doesNotExistSpace"
-						domain.Create()
+						domain.CreateShared()
 						Eventually(helpers.CF("create-route", domain.Name, "--hostname", hostname)).Should(Exit(0))
 					})
 
@@ -188,7 +188,7 @@ var _ = Describe("move route command", func() {
 						hostname = "panera-bread"
 						targetSpaceName = helpers.NewSpaceName()
 						helpers.CreateSpace(targetSpaceName)
-						domain.Create()
+						domain.CreateShared()
 					})
 
 					It("exits with 1 with an error message", func() {
