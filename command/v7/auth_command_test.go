@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -18,12 +19,13 @@ import (
 
 var _ = Describe("auth Command", func() {
 	var (
-		cmd        AuthCommand
-		testUI     *ui.UI
-		fakeActor  *v7fakes.FakeActor
-		fakeConfig *commandfakes.FakeConfig
-		binaryName string
-		err        error
+		cmd             AuthCommand
+		testUI          *ui.UI
+		fakeActor       *v7fakes.FakeActor
+		fakeConfig      *commandfakes.FakeConfig
+		binaryName      string
+		err             error
+		k8sLoginPrompts map[string]coreconfig.AuthPrompt
 	)
 
 	BeforeEach(func() {
@@ -43,6 +45,11 @@ var _ = Describe("auth Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.UAAOAuthClientReturns("cf")
 		fakeConfig.APIVersionReturns("3.99.0")
+		k8sLoginPrompts = map[string]coreconfig.AuthPrompt{
+			"k8s-auth-info": {
+				Entries: []string{"myuser"},
+			},
+		}
 	})
 
 	JustBeforeEach(func() {
@@ -112,6 +119,17 @@ var _ = Describe("auth Command", func() {
 				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
 					MissingPassword: true,
 				}))
+			})
+
+			When("authenticating against Korifi", func() {
+				BeforeEach(func() {
+					fakeConfig.IsCFOnK8sReturns(true)
+					fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
+				})
+
+				It("succeeds", func() {
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 		})
 	})
@@ -297,6 +315,41 @@ var _ = Describe("auth Command", func() {
 						Expect(origin).To(BeEmpty())
 					})
 				})
+			})
+
+			When("authenticating against Korifi", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs.Username = "myuser"
+					fakeConfig.IsCFOnK8sReturns(true)
+					fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
+				})
+
+				When("the specified username doesn't match any k8s context", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs.Username = "some-unknown-user"
+					})
+
+					It("errors", func() {
+						Expect(err).To(MatchError(errors.New("kubernetes user not found in configuration: some-unknown-user")))
+					})
+				})
+
+				When("the prompts don't contain k8s authentication information", func() {
+					BeforeEach(func() {
+						k8sLoginPrompts = map[string]coreconfig.AuthPrompt{
+							"some-other-auth-info": {
+								Entries: []string{"myuser"},
+							},
+						}
+						fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
+					})
+
+					It("errors", func() {
+						Expect(err).To(MatchError(errors.New("kubernetes login context is missing")))
+					})
+
+				})
+
 			})
 		})
 
