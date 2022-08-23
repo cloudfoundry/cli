@@ -56,10 +56,12 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 
 		switch {
 		case strings.HasPrefix(row, "#"):
+			const columnCount = 8
+
 			// instance row
 			columns := splitColumns(row)
 			details := ""
-			if len(columns) >= 8 {
+			if len(columns) >= columnCount {
 				details = columns[7]
 			}
 
