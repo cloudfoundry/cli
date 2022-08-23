@@ -16,6 +16,9 @@ import (
 )
 
 var _ = Describe("app summary displayer", func() {
+
+	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`
+
 	var (
 		appSummaryDisplayer *AppSummaryDisplayer
 		output              *Buffer
@@ -249,7 +252,7 @@ var _ = Describe("app summary displayer", func() {
 				It("lists instance stats for process types that have > 0 instances", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`sidecars: `))
-					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
 				})
 
 				It("does not show the instance stats table for process types with 0 instances", func() {
@@ -279,7 +282,7 @@ var _ = Describe("app summary displayer", func() {
 				It("displays the instances table", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`sidecars: `))
-					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
 				})
 			})
 
@@ -394,7 +397,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 
@@ -432,7 +435,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 
@@ -473,7 +476,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 
