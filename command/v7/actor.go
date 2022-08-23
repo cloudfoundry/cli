@@ -183,6 +183,7 @@ type Actor interface {
 	MakeCurlRequest(httpMethod string, path string, customHeaders []string, httpData string, failOnHTTPError bool) ([]byte, *http.Response, error)
 	MapRoute(routeGUID string, appGUID string, destinationProtocol string) (v7action.Warnings, error)
 	Marketplace(filter v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
+	MoveRoute(routeGUID string, spaceGUID string) (v7action.Warnings, error)
 	ParseAccessToken(accessToken string) (jwt.JWT, error)
 	PollBuild(buildGUID string, appName string) (resources.Droplet, v7action.Warnings, error)
 	PollPackage(pkg resources.Package) (resources.Package, v7action.Warnings, error)

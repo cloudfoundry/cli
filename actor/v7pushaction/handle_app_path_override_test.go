@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -94,7 +95,11 @@ var _ = Describe("HandleAppPathOverride", func() {
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
-					relativeAppFilePath = filepath.Join(".", absoluteAppFilehandle.Name())
+					if runtime.GOOS == "windows" {
+						relativeAppFilePath = absoluteAppFilehandle.Name()
+					} else {
+						relativeAppFilePath = filepath.Join(filepath.Dir("/"), absoluteAppFilehandle.Name())
+					}
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads
