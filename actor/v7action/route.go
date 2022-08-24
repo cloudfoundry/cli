@@ -426,6 +426,11 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]resources.Route, Warn
 	return routes, allWarnings, nil
 }
 
+func (actor Actor) MoveRoute(routeGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.MoveRoute(routeGUID, spaceGUID)
+	return Warnings(warnings), err
+}
+
 func getDomainName(fullURL, host, path string, port int) string {
 	domainWithoutHost := strings.TrimPrefix(fullURL, host+".")
 	domainWithoutPath := strings.TrimSuffix(domainWithoutHost, path)
