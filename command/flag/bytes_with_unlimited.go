@@ -1,6 +1,7 @@
 package flag
 
 import (
+	"regexp"
 	"strings"
 
 	"code.cloudfoundry.org/bytefmt"
@@ -10,13 +11,22 @@ import (
 
 type BytesWithUnlimited types.NullInt
 
+var zeroBytes *regexp.Regexp = regexp.MustCompile(`^0[KMGT]?B?$`)
+var negativeOneBytes *regexp.Regexp = regexp.MustCompile(`^-1[KMGT]?B?$`)
+
 func (m *BytesWithUnlimited) UnmarshalFlag(val string) error {
 	if val == "" {
 		return nil
 	}
 
-	if val == "-1" {
+	if negativeOneBytes.MatchString(val) {
 		m.Value = -1
+		m.IsSet = true
+		return nil
+	}
+
+	if zeroBytes.MatchString(val) {
+		m.Value = 0
 		m.IsSet = true
 		return nil
 	}

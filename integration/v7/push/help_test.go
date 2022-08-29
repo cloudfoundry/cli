@@ -31,6 +31,7 @@ var _ = Describe("help", func() {
 				"[-i NUM_INSTANCES]",
 				"[-k DISK]",
 				"[-m MEMORY]",
+				"[-l LOG_RATE_LIMIT]",
 				"[-p PATH]",
 				"[-s STACK]",
 				"[-t HEALTH_TIMEOUT]",
@@ -55,6 +56,7 @@ var _ = Describe("help", func() {
 				"[-i NUM_INSTANCES]",
 				"[-k DISK]",
 				"[-m MEMORY]",
+				"[-l LOG_RATE_LIMIT]",
 				"[-p PATH]",
 				"[-s STACK]",
 				"[-t HEALTH_TIMEOUT]",
@@ -68,15 +70,16 @@ var _ = Describe("help", func() {
 			assertUsage(session, buildpackAppUsage, dockerAppUsage)
 
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say(`app-start-timeout, -t`))
+			Eventually(session).Should(Say(`--app-start-timeout, -t`))
 			Eventually(session).Should(Say(`--buildpack, -b`))
-			Eventually(session).Should(Say(`disk, -k`))
+			Eventually(session).Should(Say(`--disk, -k`))
 			Eventually(session).Should(Say(`--docker-image, -o`))
 			Eventually(session).Should(Say(`--docker-username`))
 			Eventually(session).Should(Say(`--droplet`))
 			Eventually(session).Should(Say(`--endpoint`))
 			Eventually(session).Should(Say(`--health-check-type, -u`))
 			Eventually(session).Should(Say(`--instances, -i`))
+			Eventually(session).Should(Say(`--log-rate-limit, -l\s+Log rate limit per second, in bytes \(e.g. 128B, 4K, 1M\). -l=-1 represents unlimited`))
 			Eventually(session).Should(Say(`--manifest, -f`))
 			Eventually(session).Should(Say(`--memory, -m`))
 			Eventually(session).Should(Say(`--no-manifest`))

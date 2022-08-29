@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -33,23 +34,24 @@ var _ = Describe("scale command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("scale", "APPS", "Change or view the instance count, disk space limit, and memory limit for an app"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("scale", "APPS", "Change or view the instance count, disk space limit, memory limit, and log rate limit for an app"))
 			})
 
 			It("displays command usage to output", func() {
 				session := helpers.CF("scale", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("scale - Change or view the instance count, disk space limit, and memory limit for an app"))
+				Eventually(session).Should(Say("scale - Change or view the instance count, disk space limit, memory limit, and log rate limit for an app"))
 
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf scale APP_NAME \[--process PROCESS\] \[-i INSTANCES\] \[-k DISK\] \[-m MEMORY\]`))
-				Eventually(session).Should(Say("Modifying the app's disk or memory will cause the app to restart."))
+				Eventually(session).Should(Say(`cf scale APP_NAME \[--process PROCESS\] \[-i INSTANCES\] \[-k DISK\] \[-m MEMORY\] \[-l LOG_RATE_LIMIT\]`))
+				Eventually(session).Should(Say("Modifying the app's disk, memory, or log rate will cause the app to restart."))
 
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-f\s+Force restart of app without prompt`))
 				Eventually(session).Should(Say(`-i\s+Number of instances`))
 				Eventually(session).Should(Say(`-k\s+Disk limit \(e\.g\. 256M, 1024M, 1G\)`))
+				Eventually(session).Should(Say(`-l\s+Log rate limit per second, in bytes \(e\.g\. 128B, 4K, 1M\). -l=-1 represents unlimited`))
 				Eventually(session).Should(Say(`-m\s+Memory limit \(e\.g\. 256M, 1024M, 1G\)`))
 				Eventually(session).Should(Say(`--process\s+App process to scale \(Default: web\)`))
 
@@ -225,6 +227,37 @@ var _ = Describe("scale command", func() {
 							Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
 							helpers.WaitForAppDiskToTakeEffect(appName, 0, 0, false, "512M")
+						})
+					})
+				})
+
+				When("Scaling the log rate limit", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+					})
+
+					It("scales log rate limit to 1M", func() {
+						buffer := NewBuffer()
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
+						session := helpers.CFWithStdin(buffer, "scale", appName, "-l", "1M")
+						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say(`Scaling app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
+						Expect(session).To(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Expect(session).To(Say(`Instances starting\.\.\.`))
+
+						helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "1M")
+					})
+
+					When("-f flag provided", func() {
+						It("scales without prompt", func() {
+							session := helpers.CF("scale", appName, "-l", "1M", "-f")
+							Eventually(session).Should(Exit(0))
+							Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+
+							helpers.WaitForLogRateLimitToTakeEffect(appName, 0, 0, false, "1M")
 						})
 					})
 				})

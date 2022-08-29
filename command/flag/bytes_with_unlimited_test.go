@@ -77,6 +77,26 @@ var _ = Describe("BytesWithUnlimited", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(bytesWithUnlimited.Value).To(BeEquivalentTo(-1))
 			})
+
+			It("accepts units", func() {
+				err := bytesWithUnlimited.UnmarshalFlag("-1T")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(bytesWithUnlimited.Value).To(BeEquivalentTo(-1))
+			})
+		})
+
+		When("the value is 0", func() {
+			It("set's the value to 0", func() {
+				err := bytesWithUnlimited.UnmarshalFlag("0")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(bytesWithUnlimited.Value).To(BeEquivalentTo(0))
+			})
+
+			It("accepts units", func() {
+				err := bytesWithUnlimited.UnmarshalFlag("0TB")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(bytesWithUnlimited.Value).To(BeEquivalentTo(0))
+			})
 		})
 
 		When("the suffix is lowercase", func() {

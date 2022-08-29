@@ -5,18 +5,18 @@ import (
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func HandleMemoryOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
-	if overrides.Memory != "" {
+func HandleLogRateLimitOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
+	if overrides.LogRateLimit != "" {
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
 		}
 
 		webProcess := manifest.GetFirstAppWebProcess()
 		if webProcess != nil {
-			webProcess.Memory = overrides.Memory
+			webProcess.LogRateLimit = overrides.LogRateLimit
 		} else {
 			app := manifest.GetFirstApp()
-			app.Memory = overrides.Memory
+			app.LogRateLimit = overrides.LogRateLimit
 		}
 	}
 
