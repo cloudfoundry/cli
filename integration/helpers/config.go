@@ -62,16 +62,10 @@ func setHomeDirsTo(homeDir string, pluginHomeDir string) {
 	Expect(os.Setenv("CF_PLUGIN_HOME", pluginHomeDir)).To(Succeed())
 }
 
-// func debugPath() {
-// 	path := os.Getenv("PATH")
-// 	GinkgoWriter.Write([]byte(fmt.Sprintln("\nPATH>", path)))
-// }
-
 // SetupSynchronizedSuite runs a setup function in its own CF context, creating
 // and destroying a home directory around it.
 func SetupSynchronizedSuite(setup func()) {
 	homeDir := SetHomeDir()
-	// debugPath()
 	SetAPI()
 	LoginCF()
 	setup()
