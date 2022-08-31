@@ -104,7 +104,7 @@ var _ = Describe("disable-ssh command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"enabled": %s`, "false"))
+					Eventually(session).Should(Say(`"enabled":%s`, "false"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -123,7 +123,7 @@ var _ = Describe("disable-ssh command", func() {
 					Eventually(session).Should(Say("OK"))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"enabled": %s`, "false"))
+					Eventually(session).Should(Say(`"enabled":%s`, "false"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
