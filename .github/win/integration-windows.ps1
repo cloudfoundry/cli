@@ -22,20 +22,6 @@ function Refresh-Choco-Env {
 
 Refresh-Choco-Env
 
-# if ((Get-Command "git" -ErrorAction SilentlyContinue) -eq $null) {
-#   choco install --no-progress -r -y git --force
-# }
-
-# if ((Get-Command "openssl" -ErrorAction SilentlyContinue) -eq $null) {
-#   choco install --no-progress -r -y openssl --force
-# }
-
-# if ((Get-Command "make" -ErrorAction SilentlyContinue) -eq $null) {
-#   choco install --no-progress -r -y make --force
-# }
-
-# Refresh-Choco-Env
-
 $Env:GOPATH="$Env:ROOT\go"
 
 $Env:PATH="$Env:HOME\go\bin;" + "$Env:PATH"
@@ -45,19 +31,19 @@ $Env:PATH="$pwd;" + "$Env:PATH"
 $Env:PATH="$pwd\cli\out;" + "$Env:PATH"
 
 # This is for DEBUG
-function Get-Env-Info {
-  echo "Powershell: $((Get-Host).Version)"
-  echo "Working Directory: $pwd"
-  echo "GOPATH:            $Env:GOPATH"
-  echo "PATH:"
-  $Env:PATH.split(";")
+# function Get-Env-Info {
+#   echo "Powershell: $((Get-Host).Version)"
+#   echo "Working Directory: $pwd"
+#   echo "GOPATH:            $Env:GOPATH"
+#   echo "PATH:"
+#   $Env:PATH.split(";")
 
-  echo "-------------"
+#   echo "-------------"
 
-  Get-ChildItem Env: | Format-Table -Wrap -AutoSize
-}
+#   Get-ChildItem Env: | Format-Table -Wrap -AutoSize
+# }
 
-Get-Env-Info
+# Get-Env-Info
 
 $Env:RUN_ID=(openssl rand -hex 16)
 $Env:GOFLAGS = "-mod=mod"
@@ -83,7 +69,6 @@ New-Item -ItemType SymbolicLink -Path "$pwd/go/src/code.cloudfoundry.org/cli" -T
 cd go/src/code.cloudfoundry.org/cli
 
 go install github.com/akavel/rsrc@v0.10.2
-# $Env:PATH="$Env:GOPATH\bin;" + "$Env:PATH"
 
 make out/cf-cli_winx64.exe
 Move-Item -Path ./out/cf-cli_winx64.exe  -Destination ./out/cf.exe -Force
