@@ -773,6 +773,73 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("UpdateApplicationName", func() {
+		var (
+			newAppName, appGUID   string
+			warnings             Warnings
+			err                  error
+		)
+
+		JustBeforeEach(func() {
+			newAppName = "some-new-app-name"
+			appGUID = "some-app-guid"
+
+			resultApp, warnings, err = actor.UpdateApplicationName(newAppName, appGUID)
+		})
+
+		When("the app successfully gets updated", func() {
+			var apiResponseApp resources.Application
+
+			BeforeEach(func() {
+				apiResponseApp = resources.Application{
+					GUID:                "response-app-guid",
+					StackName:           "response-stack-name",
+					Name:                "response-app-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"response-buildpack-1", "response-buildpack-2"},
+				}
+				fakeCloudControllerClient.UpdateApplicationNameReturns(
+					apiResponseApp,
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("creates and returns the application and warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resultApp).To(Equal(resources.Application{
+					Name:                apiResponseApp.Name,
+					GUID:                apiResponseApp.GUID,
+					StackName:           apiResponseApp.StackName,
+					LifecycleType:       apiResponseApp.LifecycleType,
+					LifecycleBuildpacks: apiResponseApp.LifecycleBuildpacks,
+				}))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationNameCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)).To(Equal("some-new-app-name", "some-space-guid"))
+			})
+		})
+
+		When("the cc client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.UpdateApplicationNameReturns(
+					resources.Application{},
+					ccv3.Warnings{"some-warning"},
+					expectedError,
+				)
+			})
+
+			It("raises the error and warnings", func() {
+				Expect(err).To(MatchError(expectedError))
+				Expect(warnings).To(ConsistOf("some-warning"))
+			})
+		})
+	})
+
 	Describe("PollStart", func() {
 		var (
 			app                   resources.Application
@@ -2016,7 +2083,7 @@ var _ = Describe("Application Actions", func() {
 					},
 					ccv3.Warnings{"get-app-warning"},
 					nil)
-				fakeCloudControllerClient.UpdateApplicationReturns(
+				fakeCloudControllerClient.UpdateApplicationNameReturns(
 					resources.Application{},
 					ccv3.Warnings{"update-app-warning"},
 					expectedError)
@@ -2042,7 +2109,7 @@ var _ = Describe("Application Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.UpdateApplicationReturns(
+				fakeCloudControllerClient.UpdateApplicationNameReturns(
 					resources.Application{
 						Name: "new-app-name",
 						GUID: "old-app-guid",
@@ -2061,7 +2128,7 @@ var _ = Describe("Application Actions", func() {
 				}))
 				Expect(warnings).To(ConsistOf("get-app-warning", "update-app-warning"))
 
-				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(
+				Expect(fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)).To(Equal(
 					resources.Application{
 						Name: "new-app-name",
 						GUID: "old-app-guid",

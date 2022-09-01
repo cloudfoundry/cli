@@ -614,6 +614,103 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("UpdateApplicationName", func() {
+		var (
+			newAppName string
+			appGUID string
+
+			updatedApp resources.Application
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			newAppName = "some-new-app-name"
+			appGUID = "some-app-guid"
+
+			updatedApp, warnings, executeErr = client.UpdateApplicationName(newAppName, appGUID)
+		})
+
+		When("the application successfully is updated", func() {
+			BeforeEach(func() {
+				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+					requestParams.ResponseBody.(*resources.Application).GUID = appGUID
+					requestParams.ResponseBody.(*resources.Application).Name = requestParams.RequestBody.name
+					requestParams.ResponseBody.(*resources.Application).StackName = "some-stack-name"
+					requestParams.ResponseBody.(*resources.Application).LifecycleType = constant.AppLifecycleTypeBuildpack
+					requestParams.ResponseBody.(*resources.Application).LifecycleBuildpacks = []string{"some-buildpack"}
+					requestParams.ResponseBody.(*resources.Application).SpaceGUID = "some-space-guid"
+					return "", Warnings{"this is a warning"}, nil
+				})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				actualParams := requester.MakeRequestArgsForCall(0)
+				Expect(actualParams.RequestName).To(Equal(internal.PatchApplicationRequest))
+				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
+				Expect(actualParams.RequestBody).To(Equal({"name": newAppName}))
+				_, ok := actualParams.ResponseBody.name
+				Expect(ok).To(BeTrue())
+			})
+
+			It("returns the updated app and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(updatedApp).To(Equal(resources.Application{
+					GUID:                "some-app-guid",
+					StackName:           "some-stack-name",
+					LifecycleBuildpacks: []string{"some-buildpack"},
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					Name:                "some-new-app-name",
+					SpaceGUID:           "some-space-guid",
+				}))
+			})
+		})
+
+		When("cc returns back an error or warnings", func() {
+			BeforeEach(func() {
+				errors := []ccerror.V3Error{
+					{
+						Code:   10008,
+						Detail: "The request is semantically invalid: command presence",
+						Title:  "CF-UnprocessableEntity",
+					},
+					{
+						Code:   10010,
+						Detail: "App not found",
+						Title:  "CF-ResourceNotFound",
+					},
+				}
+
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("UpdateApplicationStop", func() {
 		var (
 			responseApp resources.Application
