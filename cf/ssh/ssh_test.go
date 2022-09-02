@@ -381,25 +381,25 @@ var _ = Describe("SSH", func() {
 		})
 
 		Context("when stdin is a terminal", func() {
-			var master, slave *os.File
+			var pseudoterminal, terminal *os.File
 
 			BeforeEach(func() {
 				_, stdout, stderr := terminalHelper.StdStreams()
 
 				var err error
-				master, slave, err = pty.Open()
+				pseudoterminal, terminal, err = pty.Open()
 				Expect(err).NotTo(HaveOccurred())
 
 				fakeTerminalHelper.IsTerminalStub = terminalHelper.IsTerminal
 				fakeTerminalHelper.GetFdInfoStub = terminalHelper.GetFdInfo
 				fakeTerminalHelper.GetWinsizeStub = terminalHelper.GetWinsize
-				fakeTerminalHelper.StdStreamsReturns(slave, stdout, stderr)
+				fakeTerminalHelper.StdStreamsReturns(terminal, stdout, stderr)
 				terminalHelper = fakeTerminalHelper
 			})
 
 			AfterEach(func() {
-				master.Close()
-				// slave.Close() // race
+				pseudoterminal.Close()
+				// terminal.Close() // race
 			})
 
 			Context("when a command is not specified", func() {
@@ -733,23 +733,23 @@ var _ = Describe("SSH", func() {
 		})
 
 		Context("when stdout is a terminal and a window size change occurs", func() {
-			var master, slave *os.File
+			var pseudoterminal, terminal *os.File
 
 			BeforeEach(func() {
 				stdin, _, stderr := terminalHelper.StdStreams()
 
 				var err error
-				master, slave, err = pty.Open()
+				pseudoterminal, terminal, err = pty.Open()
 				Expect(err).NotTo(HaveOccurred())
 
 				fakeTerminalHelper.IsTerminalStub = terminalHelper.IsTerminal
 				fakeTerminalHelper.GetFdInfoStub = terminalHelper.GetFdInfo
 				fakeTerminalHelper.GetWinsizeStub = terminalHelper.GetWinsize
-				fakeTerminalHelper.StdStreamsReturns(stdin, slave, stderr)
+				fakeTerminalHelper.StdStreamsReturns(stdin, terminal, stderr)
 				terminalHelper = fakeTerminalHelper
 
 				winsize := &term.Winsize{Height: 100, Width: 100}
-				err = term.SetWinsize(slave.Fd(), winsize)
+				err = term.SetWinsize(terminal.Fd(), winsize)
 				Expect(err).NotTo(HaveOccurred())
 
 				fakeSecureSession.WaitStub = func() error {
@@ -759,12 +759,12 @@ var _ = Describe("SSH", func() {
 					// No dimension change
 					for i := 0; i < 3; i++ {
 						winsize := &term.Winsize{Height: 100, Width: 100}
-						err = term.SetWinsize(slave.Fd(), winsize)
+						err = term.SetWinsize(terminal.Fd(), winsize)
 						Expect(err).NotTo(HaveOccurred())
 					}
 
 					winsize := &term.Winsize{Height: 100, Width: 200}
-					err = term.SetWinsize(slave.Fd(), winsize)
+					err = term.SetWinsize(terminal.Fd(), winsize)
 					Expect(err).NotTo(HaveOccurred())
 
 					err = syscall.Kill(syscall.Getpid(), syscall.SIGWINCH)
@@ -776,8 +776,8 @@ var _ = Describe("SSH", func() {
 			})
 
 			AfterEach(func() {
-				master.Close()
-				slave.Close()
+				pseudoterminal.Close()
+				terminal.Close()
 			})
 
 			It("sends window change events when the window dimensions change", func() {

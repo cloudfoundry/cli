@@ -381,11 +381,11 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		When("stdin is a terminal", func() {
-			var master *os.File
+			var terminal *os.File
 
 			BeforeEach(func() {
 				var err error
-				master, _, err = pty.Open()
+				terminal, _, err = pty.Open()
 				Expect(err).NotTo(HaveOccurred())
 
 				terminalRequest = RequestTTYForce
@@ -396,7 +396,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 
 			AfterEach(func() {
-				master.Close()
+				terminal.Close()
 			})
 
 			When("a command is not specified", func() {
@@ -716,20 +716,20 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		When("stdout is a terminal and a window size change occurs", func() {
-			var master, slave *os.File
+			var pseudoterminal, terminal *os.File
 
 			BeforeEach(func() {
 				var err error
-				master, slave, err = pty.Open()
+				pseudoterminal, terminal, err = pty.Open()
 				Expect(err).NotTo(HaveOccurred())
 
 				terminalHelper := DefaultTerminalHelper()
 				fakeTerminalHelper.GetFdInfoStub = terminalHelper.GetFdInfo
 				fakeTerminalHelper.GetWinsizeStub = terminalHelper.GetWinsize
-				fakeTerminalHelper.StdStreamsReturns(stdin, slave, stderr)
+				fakeTerminalHelper.StdStreamsReturns(stdin, terminal, stderr)
 
 				winsize := &term.Winsize{Height: 100, Width: 100}
-				err = term.SetWinsize(slave.Fd(), winsize)
+				err = term.SetWinsize(terminal.Fd(), winsize)
 				Expect(err).NotTo(HaveOccurred())
 
 				fakeSecureSession.WaitStub = func() error {
@@ -739,12 +739,12 @@ var _ = Describe("CLI SSH", func() {
 					// No dimension change
 					for i := 0; i < 3; i++ {
 						winsize := &term.Winsize{Height: 100, Width: 100}
-						err = term.SetWinsize(slave.Fd(), winsize)
+						err = term.SetWinsize(terminal.Fd(), winsize)
 						Expect(err).NotTo(HaveOccurred())
 					}
 
 					winsize := &term.Winsize{Height: 100, Width: 200}
-					err = term.SetWinsize(slave.Fd(), winsize)
+					err = term.SetWinsize(terminal.Fd(), winsize)
 					Expect(err).NotTo(HaveOccurred())
 
 					err = syscall.Kill(syscall.Getpid(), syscall.SIGWINCH)
@@ -756,8 +756,8 @@ var _ = Describe("CLI SSH", func() {
 			})
 
 			AfterEach(func() {
-				master.Close()
-				slave.Close()
+				pseudoterminal.Close()
+				terminal.Close()
 			})
 
 			It("sends window change events when the window dimensions change", func() {
