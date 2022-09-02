@@ -130,8 +130,12 @@ var _ = Describe("set-env command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s":"%s"`, envVarName, envVarValue))
 					Eventually(session).Should(Exit(0))
+
+					bytes := session.Out.Contents()
+
+					actualEnvVarValue := helpers.GetsDefaultEnvVarValue(bytes)
+					Expect(actualEnvVarValue).To(Equal(envVarValue))
 				})
 
 				// This is to prevent the '-' being read in as another flag
@@ -149,8 +153,12 @@ var _ = Describe("set-env command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-						Eventually(session).Should(Say(`"%s":"%s"`, envVarName, envVarValue))
 						Eventually(session).Should(Exit(0))
+
+						bytes := session.Out.Contents()
+
+						actualEnvVarValue := helpers.GetsDefaultEnvVarValue(bytes)
+						Expect(actualEnvVarValue).To(Equal(envVarValue))
 					})
 				})
 			})
@@ -170,8 +178,11 @@ var _ = Describe("set-env command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s":"%s"`, envVarName, someOtherValue))
 					Eventually(session).Should(Exit(0))
+					bytes := session.Out.Contents()
+
+					actualEnvVarValue := helpers.GetsDefaultEnvVarValue(bytes)
+					Expect(actualEnvVarValue).To(Equal(someOtherValue))
 				})
 			})
 
