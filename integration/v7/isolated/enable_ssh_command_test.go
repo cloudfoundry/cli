@@ -104,8 +104,12 @@ var _ = Describe("enable-ssh command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"enabled": %s`, "true"))
 					Eventually(session).Should(Exit(0))
+
+					bytes := session.Out.Contents()
+
+					actualEnablementValue := helpers.GetsEnablementValue(bytes)
+					Expect(actualEnablementValue).To(Equal(true))
 				})
 			})
 
@@ -123,8 +127,12 @@ var _ = Describe("enable-ssh command", func() {
 					Eventually(session).Should(Say("OK"))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"enabled": %s`, "true"))
 					Eventually(session).Should(Exit(0))
+
+					bytes := session.Out.Contents()
+
+					actualEnablementValue := helpers.GetsEnablementValue(bytes)
+					Expect(actualEnablementValue).To(Equal(true))
 				})
 			})
 

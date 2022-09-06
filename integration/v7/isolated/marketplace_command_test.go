@@ -102,7 +102,7 @@ var _ = Describe("marketplace command", func() {
 					Unit:   "MONTHLY",
 				},
 				{
-					Amount: map[string]float64{"usd": 0.999},
+					Amount: map[string]float64{"usd": 1.00},
 					Unit:   "1GB of messages over 20GB",
 				},
 			}
