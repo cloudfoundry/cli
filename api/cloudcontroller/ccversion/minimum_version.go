@@ -13,4 +13,6 @@ const (
 
 	MinVersionHTTP2RoutingV3   = "3.104.0"
 	MinVersionSpaceSupporterV3 = "3.104.0"
+
+	MinVersionLogRateLimitingV3 = "3.124.0" // TODO: update this when we have a CAPI release
 )

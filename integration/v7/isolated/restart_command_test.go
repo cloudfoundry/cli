@@ -12,6 +12,12 @@ import (
 )
 
 var _ = Describe("restart command", func() {
+
+	const (
+		instanceStatsTitles = `\s+state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`
+		instanceStatsValues = `#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`
+	)
+
 	var (
 		orgName   string
 		spaceName string
@@ -105,8 +111,8 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
 					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
-					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Eventually(session).Should(Say(instanceStatsTitles))
+					Eventually(session).Should(Say(instanceStatsValues))
 				})
 			})
 
@@ -128,8 +134,8 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
 					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
-					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Eventually(session).Should(Say(instanceStatsTitles))
+					Eventually(session).Should(Say(instanceStatsValues))
 
 					Expect(session.Out.Contents()).NotTo(ContainSubstring("Staging app and tracing logs..."))
 
@@ -165,8 +171,8 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
 					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
-					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Eventually(session).Should(Say(instanceStatsTitles))
+					Eventually(session).Should(Say(instanceStatsValues))
 
 					Eventually(session).Should(Exit(0))
 					Expect(session.Err).ToNot(Say(`timeout connecting to log server, no log will be shown`))
@@ -193,8 +199,8 @@ var _ = Describe("restart command", func() {
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+1/1`))
 						Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
-						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+						Eventually(session).Should(Say(instanceStatsTitles))
+						Eventually(session).Should(Say(instanceStatsValues))
 
 						Expect(session.Out.Contents()).NotTo(ContainSubstring("Staging app and tracing logs..."))
 						Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
@@ -222,8 +228,8 @@ var _ = Describe("restart command", func() {
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+1/1`))
 						Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
-						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+						Eventually(session).Should(Say(instanceStatsTitles))
+						Eventually(session).Should(Say(instanceStatsValues))
 
 						Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
 

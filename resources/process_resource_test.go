@@ -64,6 +64,17 @@ var _ = Describe("Process", func() {
 			})
 		})
 
+		When("log rate limit is provided", func() {
+			BeforeEach(func() {
+				process = resources.Process{
+					LogRateLimitInBPS: types.NullInt{Value: 1024, IsSet: true},
+				}
+			})
+
+			It("sets the log rate limit to be set", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"log_rate_limit_in_bytes_per_second": 1024}`))
+			})
+		})
 		When("health check type http is provided", func() {
 			BeforeEach(func() {
 				process = resources.Process{
@@ -125,6 +136,17 @@ var _ = Describe("Process", func() {
 		JustBeforeEach(func() {
 			err = json.Unmarshal(processBytes, &process)
 			Expect(err).ToNot(HaveOccurred())
+		})
+		When("log rate limit is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"log_rate_limit_in_bytes_per_second": 512}`)
+			})
+
+			It("sets the log rate limit", func() {
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{
+					"LogRateLimitInBPS": Equal(types.NullInt{Value: 512, IsSet: true}),
+				}))
+			})
 		})
 		When("health check type http is provided", func() {
 			BeforeEach(func() {

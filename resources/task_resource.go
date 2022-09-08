@@ -15,6 +15,8 @@ type Task struct {
 	DiskInMB uint64 `json:"disk_in_mb,omitempty"`
 	// GUID represents the unique task identifier.
 	GUID string `json:"guid,omitempty"`
+	// LogRateLimitInBPS represents the log rate limit in bytes allocated for the task.
+	LogRateLimitInBPS int `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 	// MemoryInMB represents the memory in MB allocated for the task.
 	MemoryInMB uint64 `json:"memory_in_mb,omitempty"`
 	// Name represents the name of the task.

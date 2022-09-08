@@ -209,6 +209,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 			Entry("health check type", "-u", "port"),
 			Entry("instances", "-i", "10"),
 			Entry("memory", "-m", "100M"),
+			Entry("log rate limit", "-l", "5K"),
 			Entry("no route", "--no-route"),
 			Entry("stack", "-s", "something"),
 		)
