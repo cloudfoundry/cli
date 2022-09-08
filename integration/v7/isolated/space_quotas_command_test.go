@@ -62,8 +62,8 @@ var _ = Describe("space-quotas command", func() {
 		It("lists the space quotas", func() {
 			session := helpers.CF("space-quotas")
 			Eventually(session).Should(Say(`Getting space quotas for org %s as %s\.\.\.`, orgName, userName))
-			Eventually(session).Should(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
-			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, quotaName, totalMemory, instanceMemory, routes, serviceInstances, "allowed", "unlimited", reservedRoutePorts))
+			Eventually(session).Should(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports\s+log volume per second`))
+			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, quotaName, totalMemory, instanceMemory, routes, serviceInstances, "allowed", "unlimited", reservedRoutePorts, "unlimited"))
 			Eventually(session).Should(Exit(0))
 		})
 

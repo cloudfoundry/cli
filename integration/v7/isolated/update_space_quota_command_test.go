@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,7 @@ var _ = Describe("update-space-quota command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("update-space-quota - Update an existing space quota"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf update-space-quota QUOTA \[-m TOTAL_MEMORY\] \[-i INSTANCE_MEMORY\] \[-n NEW_NAME\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans | --disallow-paid-service-plans\] \[--allow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
+				Eventually(session).Should(Say(`cf update-space-quota QUOTA \[-m TOTAL_MEMORY\] \[-i INSTANCE_MEMORY\] \[-n NEW_NAME\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans | --disallow-paid-service-plans\] \[--allow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\] \[-l LOG_VOLUME\]`))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-a\s+Total number of application instances. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`--allow-paid-service-plans\s+Allow provisioning instances of paid service plans.`))
@@ -35,6 +36,7 @@ var _ = Describe("update-space-quota command", func() {
 				Eventually(session).Should(Say(`-r\s+Total number of routes. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`--reserved-route-ports\s+Maximum number of routes that may be created with ports. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`-s\s+Total number of service instances. -1 represents an unlimited amount.`))
+				Eventually(session).Should(Say(`-l\s+Total log volume per second all processes can have, in bytes \(e.g. 128B, 4K, 1M\). -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("space, space-quota, space-quotas"))
 				Eventually(session).Should(Exit(0))
@@ -94,7 +96,26 @@ var _ = Describe("update-space-quota command", func() {
 			Eventually(session).Should(Say(`paid service plans:\s+%s`, "allowed"))
 			Eventually(session).Should(Say(`app instances:\s+%s`, appInstances))
 			Eventually(session).Should(Say(`route ports:\s+%s`, reservedRoutePorts))
+			Eventually(session).Should(Say(`log volume per second:\s+%s`, "unlimited"))
 			Eventually(session).Should(Exit(0))
+		})
+
+		When("CAPI supports log rate limits", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionLogRateLimitingV3)
+			})
+
+			It("updates a quota", func() {
+				logVolume := "500B"
+				session := helpers.CF("update-space-quota", quotaName, "-l", logVolume)
+				Eventually(session).Should(Say("Updating space quota %s for org %s as %s...", quotaName, orgName, userName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("space-quota", quotaName)
+				Eventually(session).Should(Say(`log volume per second:\s+%s`, logVolume))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
 		When("the named quota does not exist", func() {

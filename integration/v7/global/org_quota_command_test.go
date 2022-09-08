@@ -70,6 +70,7 @@ var _ = Describe("org-quota command", func() {
 					Eventually(session).Should(Say(`paid service plans:\s+allowed`))
 					Eventually(session).Should(Say(`app instances:\s+unlimited`))
 					Eventually(session).Should(Say(`route ports:\s+100`))
+					Eventually(session).Should(Say(`log volume per second:\s+unlimited`))
 
 					Eventually(session).Should(Exit(0))
 				})

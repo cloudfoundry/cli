@@ -20,6 +20,9 @@ var _ = Describe("quota limits", func() {
 			Entry("total memory", AppLimit{TotalMemory: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"total_memory_in_mb":1}`)),
 			Entry("total memory", AppLimit{TotalMemory: nil}, []byte(`{}`)),
 			Entry("total memory", AppLimit{TotalMemory: &types.NullInt{IsSet: false}}, []byte(`{"total_memory_in_mb":null}`)),
+			Entry("total log volume", AppLimit{TotalLogVolume: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"log_rate_limit_in_bytes_per_second":1}`)),
+			Entry("total log volume", AppLimit{TotalLogVolume: nil}, []byte(`{}`)),
+			Entry("total log volume", AppLimit{TotalLogVolume: &types.NullInt{IsSet: false}}, []byte(`{"log_rate_limit_in_bytes_per_second":null}`)),
 			Entry("instance memory", AppLimit{InstanceMemory: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"per_process_memory_in_mb":1}`)),
 			Entry("instance memory", AppLimit{InstanceMemory: nil}, []byte(`{}`)),
 			Entry("instance memory", AppLimit{InstanceMemory: &types.NullInt{IsSet: false}}, []byte(`{"per_process_memory_in_mb":null}`)),
@@ -37,35 +40,48 @@ var _ = Describe("quota limits", func() {
 			},
 			Entry(
 				"no null values",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
+					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
 				}),
 			Entry(
 				"total memory is null",
-				[]byte(`{"total_memory_in_mb":null,"per_process_memory_in_mb":2,"total_instances":3}`),
+				[]byte(`{"total_memory_in_mb":null,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: false, Value: 0},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
+					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
 				}),
 			Entry(
 				"per process memory is null",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":null,"total_instances":3}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":null,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: false, Value: 0},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
+					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
 				}),
 			Entry(
 				"total instances is null",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":null}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":null,"log_rate_limit_in_bytes_per_second":4}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
+					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+				}),
+			Entry(
+				"total log volume is null",
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":null}`),
+				AppLimit{
+					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
+					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
+					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
+					TotalLogVolume:    &types.NullInt{IsSet: false, Value: 0},
 				}),
 		)
 	})
