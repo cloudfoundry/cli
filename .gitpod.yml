@@ -1,9 +1,21 @@
+
 additionalRepositories:
   - url: https://github.com/cloudfoundry/cli-ci    
-    # checkoutLocation: cli-ci
+    checkoutLocation: cli-ci
 
 tasks:
-  - init: go get && go build ./... && go test ./... && make
-    command: go run
+  - name: Setup Workspace
+    before: >
+      sudo apt install --yes 
+      icdiff
+      tldr
+      fzf
+    init: >
+      tldr --update 
+      && make clean build
+    command: out/cf version
 
-
+vscode:
+  extensions:
+    - vscodevim.vim
+    - eamodio.gitlens
