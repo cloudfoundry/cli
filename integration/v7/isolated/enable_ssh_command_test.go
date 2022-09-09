@@ -101,6 +101,7 @@ var _ = Describe("enable-ssh command", func() {
 					Eventually(session).Should(Say(`Enabling ssh support for app %s as %s\.\.\.`, appName, userName))
 
 					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect."))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))
@@ -123,7 +124,8 @@ var _ = Describe("enable-ssh command", func() {
 
 					Eventually(session).Should(Say(`Enabling ssh support for app %s as %s\.\.\.`, appName, userName))
 
-					Eventually(session).Should(Say("ssh support for app '%s' is already enabled.", appName))
+					Eventually(session).Should(Say("ssh support for app '%s' is already enabled.\n"+
+						"An app restart may be required for the change to take effect.", appName))
 					Eventually(session).Should(Say("OK"))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/ssh_enabled", helpers.AppGUID(appName)))

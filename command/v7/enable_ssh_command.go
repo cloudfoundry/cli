@@ -42,7 +42,8 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(getAppFeatureWarnings)
 
 	if appFeature.Enabled {
-		cmd.UI.DisplayTextWithFlavor("ssh support for app '{{.AppName}}' is already enabled.", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("ssh support for app '{{.AppName}}' is already enabled.\n"+
+			"TIP: An app restart may be required for the change to take effect.", map[string]interface{}{
 			"AppName": cmd.RequiredArgs.AppName,
 		})
 	}
@@ -63,6 +64,10 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 
 	if !sshEnabled.Enabled {
 		cmd.UI.DisplayText("TIP: Ensure ssh is also enabled on the space and global level.")
+	}
+
+	if sshEnabled.Enabled && !appFeature.Enabled {
+		cmd.UI.DisplayText("TIP: An app restart is required for the change to take effect.")
 	}
 
 	return nil

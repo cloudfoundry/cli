@@ -125,6 +125,7 @@ var _ = Describe("enable-ssh Command", func() {
 				Expect(testUI.Err).To(Say("some-get-ssh-enabled-warnings"))
 				Expect(testUI.Out).To(Say(`Enabling ssh support for app %s as %s\.\.\.`, appName, currentUserName))
 				Expect(testUI.Out).To(Say("OK"))
+				Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take effect."))
 			})
 
 			When("SSH is disabled at a level above the app level", func() {
@@ -158,7 +159,8 @@ var _ = Describe("enable-ssh Command", func() {
 			})
 
 			It("shows the app ssh is already enabled", func() {
-				Expect(testUI.Out).To(Say("ssh support for app 'some-app' is already enabled."))
+				Expect(testUI.Out).To(Say("ssh support for app 'some-app' is already enabled.\n" +
+					"TIP: An app restart may be required for the change to take effect."))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
