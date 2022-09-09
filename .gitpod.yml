@@ -12,9 +12,13 @@ tasks:
       icdiff
       tldr
       fzf
+
+      brew install
+      asdf
     init: >
       tldr --update 
-      && make clean build
+      
+      make clean build
     command: out/cf version
 
 vscode:
