@@ -86,7 +86,7 @@ var _ = Describe("BytesWithUnlimited", func() {
 		})
 
 		When("the value is 0", func() {
-			It("set's the value to 0", func() {
+			It("sets the value to 0", func() {
 				err := bytesWithUnlimited.UnmarshalFlag("0")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(bytesWithUnlimited.Value).To(BeEquivalentTo(0))
@@ -120,6 +120,16 @@ var _ = Describe("BytesWithUnlimited", func() {
 		When("a decimal is used", func() {
 			It("returns an error", func() {
 				err := bytesWithUnlimited.UnmarshalFlag("1.2M")
+				Expect(err).To(MatchError(&flags.Error{
+					Type:    flags.ErrRequired,
+					Message: `Byte quantity must be an integer with a unit of measurement like B, K, KB, M, MB, G, or GB`,
+				}))
+			})
+		})
+
+		When("the value is too large", func() {
+			It("returns an error", func() {
+				err := bytesWithUnlimited.UnmarshalFlag("9999999TB")
 				Expect(err).To(MatchError(&flags.Error{
 					Type:    flags.ErrRequired,
 					Message: `Byte quantity must be an integer with a unit of measurement like B, K, KB, M, MB, G, or GB`,

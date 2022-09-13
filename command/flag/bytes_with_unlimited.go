@@ -1,6 +1,7 @@
 package flag
 
 import (
+	"math"
 	"regexp"
 	"strings"
 
@@ -36,7 +37,7 @@ func (m *BytesWithUnlimited) UnmarshalFlag(val string) error {
 		return err
 	}
 
-	m.Value = int(size)
+	m.Value = size
 	m.IsSet = true
 
 	return nil
@@ -46,14 +47,14 @@ func (m *BytesWithUnlimited) IsValidValue(val string) error {
 	return m.UnmarshalFlag(val)
 }
 
-func ConvertToBytes(val string) (uint64, error) {
+func ConvertToBytes(val string) (int, error) {
 	size, err := bytefmt.ToBytes(val)
 
-	if err != nil || strings.Contains(strings.ToLower(val), ".") {
-		return size, &flags.Error{
+	if err != nil || strings.Contains(strings.ToLower(val), ".") || size > math.MaxInt {
+		return 0, &flags.Error{
 			Type:    flags.ErrRequired,
 			Message: `Byte quantity must be an integer with a unit of measurement like B, K, KB, M, MB, G, or GB`,
 		}
 	}
-	return size, nil
+	return int(size), nil
 }
