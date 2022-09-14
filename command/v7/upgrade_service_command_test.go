@@ -76,6 +76,7 @@ var _ = Describe("upgrade-service command", func() {
 		When("the service instance does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.UpgradeManagedServiceInstanceReturns(
+					nil,
 					v7action.Warnings{"upgrade warning"},
 					actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName},
 				)
@@ -89,28 +90,10 @@ var _ = Describe("upgrade-service command", func() {
 			})
 		})
 
-		When("the service instance upgrade starts successfully", func() {
-			BeforeEach(func() {
-				fakeActor.UpgradeManagedServiceInstanceReturns(
-					v7action.Warnings{"upgrade warning"},
-					nil,
-				)
-			})
-
-			It("succeeds with a message", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Err).To(Say("upgrade warning"))
-				Expect(testUI.Out).To(SatisfyAll(
-					Say("\n"),
-					Say(`Upgrade in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
-					Say("OK\n"),
-				))
-			})
-		})
-
 		When("the actor returns an unexpected error", func() {
 			BeforeEach(func() {
 				fakeActor.UpgradeManagedServiceInstanceReturns(
+					make(chan v7action.PollJobEvent),
 					v7action.Warnings{"upgrade warning"},
 					errors.New("bang"),
 				)
@@ -120,6 +103,113 @@ var _ = Describe("upgrade-service command", func() {
 				Expect(executeErr).To(MatchError("bang"))
 				Expect(testUI.Err).To(Say("upgrade warning"))
 				Expect(testUI.Out).NotTo(Say("OK"))
+			})
+		})
+
+		When("stream goes to polling", func() {
+			BeforeEach(func() {
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpgradeManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"actor warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+				}()
+			})
+
+			It("prints messages and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Upgrading service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Upgrade in progress. Use 'cf services' or 'cf service %s' to check operation status\.`, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("actor warning"),
+					Say("poll warning"),
+				))
+			})
+		})
+
+		When("error in event stream", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--wait")
+
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpgradeManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobFailed,
+						Warnings: v7action.Warnings{"failed warning"},
+						Err:      errors.New("boom"),
+					}
+				}()
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("boom"))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("poll warning"),
+					Say("failed warning"),
+				))
+			})
+		})
+
+		When("--wait flag specified", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "--wait")
+
+				fakeStream := make(chan v7action.PollJobEvent)
+				fakeActor.UpgradeManagedServiceInstanceReturns(
+					fakeStream,
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+
+				go func() {
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobPolling,
+						Warnings: v7action.Warnings{"poll warning"},
+					}
+					fakeStream <- v7action.PollJobEvent{
+						State:    v7action.JobComplete,
+						Warnings: v7action.Warnings{"failed warning"},
+					}
+					close(fakeStream)
+				}()
+			})
+
+			It("prints messages and warnings", func() {
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`Upgrading service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`Waiting for the operation to complete\.\.\n`),
+					Say(`\n`),
+					Say(`Upgrade of service instance %s complete\.\n`, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("a warning"),
+					Say("poll warning"),
+					Say("failed warning"),
+				))
 			})
 		})
 	}
