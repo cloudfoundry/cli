@@ -146,13 +146,10 @@ func (actor Actor) UpdateManagedServiceInstance(params UpdateManagedServiceInsta
 	return stream, Warnings(warnings), err
 }
 
-func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spaceGUID string) (chan PollJobEvent, Warnings, error) {
-	var (
-		serviceInstance resources.ServiceInstance
-		servicePlan     resources.ServicePlan
-		jobURL          ccv3.JobURL
-		stream          chan PollJobEvent
-	)
+func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spaceGUID string) (Warnings, error) {
+	var serviceInstance resources.ServiceInstance
+	var servicePlan resources.ServicePlan
+	var jobURL ccv3.JobURL
 
 	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
@@ -176,12 +173,11 @@ func (actor Actor) UpgradeManagedServiceInstance(serviceInstanceName string, spa
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			stream = actor.PollJobToEventStream(jobURL)
-			return
+			return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
 		},
 	)
 
-	return stream, Warnings(warnings), err
+	return Warnings(warnings), err
 }
 
 func (actor Actor) RenameServiceInstance(currentServiceInstanceName, spaceGUID, newServiceInstanceName string) (Warnings, error) {
