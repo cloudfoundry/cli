@@ -62,7 +62,7 @@ for stack in $(cf stacks | awk '/INTEGRATION-STACK/ { print $1 }'); do
   cf curl -X DELETE "/v3/stacks/$(cf stack --guid $stack)"
 done
 
-USER_PAGES=$(cf curl /v3/users | jq -r .pagination.total_pages
+USER_PAGES=$(cf curl /v3/users | jq -r .pagination.total_pages)
 
 for ((i=1; i<=${USER_PAGES}; i++)) ; do
   cf curl "/v3/users?per_page=50&page=${i}" | \
