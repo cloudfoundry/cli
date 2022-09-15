@@ -617,7 +617,7 @@ var _ = Describe("Application", func() {
 	Describe("UpdateApplicationName", func() {
 		var (
 			newAppName string
-			appGUID string
+			appGUID    string
 
 			updatedApp resources.Application
 			warnings   Warnings
@@ -635,21 +635,22 @@ var _ = Describe("Application", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
 					requestParams.ResponseBody.(*resources.Application).GUID = appGUID
-					requestParams.ResponseBody.(*resources.Application).Name = requestParams.RequestBody.name
+					requestParams.ResponseBody.(*resources.Application).Name = requestParams.RequestBody.(struct{ Name string }).Name
 					requestParams.ResponseBody.(*resources.Application).StackName = "some-stack-name"
 					requestParams.ResponseBody.(*resources.Application).LifecycleType = constant.AppLifecycleTypeBuildpack
 					requestParams.ResponseBody.(*resources.Application).LifecycleBuildpacks = []string{"some-buildpack"}
 					requestParams.ResponseBody.(*resources.Application).SpaceGUID = "some-space-guid"
 					return "", Warnings{"this is a warning"}, nil
 				})
+			})
 
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.PatchApplicationRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
-				Expect(actualParams.RequestBody).To(Equal({"name": newAppName}))
-				_, ok := actualParams.ResponseBody.name
+				Expect(actualParams.RequestBody).To(Equal(struct{ Name string }{Name: newAppName}))
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 

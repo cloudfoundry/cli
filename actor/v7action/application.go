@@ -456,7 +456,7 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 		return resources.Application{}, allWarnings, err
 	}
 	appGUID := application.GUID
-	application, warnings, err = actor.UpdateApplication(newAppName, appGUID)
+	application, warnings, err = actor.UpdateApplicationName(newAppName, appGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return resources.Application{}, allWarnings, err

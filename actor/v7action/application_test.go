@@ -775,9 +775,10 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("UpdateApplicationName", func() {
 		var (
-			newAppName, appGUID   string
-			warnings             Warnings
-			err                  error
+			resultApp           resources.Application
+			newAppName, appGUID string
+			warnings            Warnings
+			err                 error
 		)
 
 		JustBeforeEach(func() {
@@ -817,7 +818,9 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.UpdateApplicationNameCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)).To(Equal("some-new-app-name", "some-space-guid"))
+				appName, appGuid := fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)
+				Expect(appName).To(Equal("some-new-app-name"))
+				Expect(appGuid).To(Equal("some-app-guid"))
 			})
 		})
 
@@ -2127,13 +2130,9 @@ var _ = Describe("Application Actions", func() {
 					GUID: "old-app-guid",
 				}))
 				Expect(warnings).To(ConsistOf("get-app-warning", "update-app-warning"))
-
-				Expect(fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)).To(Equal(
-					resources.Application{
-						Name: "new-app-name",
-						GUID: "old-app-guid",
-					}))
-
+				appName, appGuid := fakeCloudControllerClient.UpdateApplicationNameArgsForCall(0)
+				Expect(appName).To(Equal("new-app-name"))
+				Expect(appGuid).To(Equal("old-app-guid"))
 			})
 		})
 
