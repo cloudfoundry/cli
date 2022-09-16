@@ -65,7 +65,7 @@ done
 USER_PAGES=$(cf curl /v3/users | jq -r .pagination.total_pages)
 
 for ((i=1; i<=${USER_PAGES}; i++)) ; do
-  cf curl "/v3/users?per_page=50&page=${i}" | \
+  cf curl "/v3/users?&page=${i}" | \
   jq -r .resources[].username | \
   grep -i -e ^integration-user -e CATS- | \
   xargs_func cf delete-user -f || echo
