@@ -1,0 +1,56 @@
+# 13. Provide a Plugin API backed by CAPI V3
+
+Date: 2022-09-16
+
+## Status
+
+Submitted
+
+## Context
+
+_The issue motivating this decision, and any context that influences or constrains the decision._
+
+Although all V8 CLI commands now call [V3](https://v3-apidocs.cloudfoundry.org/) of the CAPI API, CLI plugins are only able to call a Plugin API Interface whose methods invoke a 'legacy' version of the CLI that currently exists in the [`cf`](../../cf/) directory. This is, in effect, V6 of the CLI, which exclusively uses CAPI [V2](https://apidocs.cloudfoundry.org/). The last V6 release was in October 2020, and the `cf` directory has had few commits since then.
+
+The Plugin API exposes ten common CLI commands (e.g. `cf services`) via [methods](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin.go#L17-L48) which return Go structs in the shape of CAPI V2 API resources. Other V6 CLI commands can be invoked by making a [CliCommand](https://github.com/cloudfoundry/cli/blob/d3bb1ecfc94ee12432f8defb30ab9459e83cc727/plugin/cli_connection.go#L72-L74) or [CliCommandWithoutTerminalOutput](https://github.com/cloudfoundry/cli/blob/d3bb1ecfc94ee12432f8defb30ab9459e83cc727/plugin/cli_connection.go#L68-L70), which both take string arguments and return a slice of strings. These methods can be used with `cf curl`, which allows users to make authenticated CAPI API calls, and some plugin authors do so for both [V2](https://github.com/orange-cloudfoundry/cf-plugin-bg-restage/blob/bcb1c4c712a43119d63d849b4b368eb65a86eb3b/repo.go#L72-L80) and [V3](https://github.com/generalmotors/cf-restage-all/blob/d6d9747182881a2b50c7bc601f4762778bb1cbfd/restage_all.go#L211-L237) calls.
+
+In early 2020 the CLI team developed a working POC for a new Plugin API backed by CAPI V3. Although included in beta releases of V7 of the CLI, these changes were mostly [reverted](https://www.pivotaltracker.com/n/projects/892938/stories/171032219) before general availability due to concerns at the scale of breaking changes for plugins, many of which are no longer maintained.
+
+## Decision
+
+_The change that we're proposing or have agreed to implement._
+
+Create a Plugin API V2 that exposes methods that plugins can use to call the same CLI commands used by V8 of the CLI today. Defer making a decision on how long to continue supporting the legacy Plugin API until the uptake of Plugin API V2 is apparent.
+
+The Plugin API V2 will be similar to that developed in early 2020, making use of the same `V7Actor` that V8 of the CLI uses to make V3 CAPI calls. Plugin metadata will declare whether the plugin in question supports the Plugin API V2. If it does not it will be run with the legacy Plugin API.
+
+## Consequences
+
+_What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated._
+
+### Benefits
+
+* **Avoids a hard switch that would break a large proportion of plugins**
+    * A hard switch to an entirely new Plugin API serving CAPI V3-shaped structs would break most plugins that invoke CLI commands.
+    * Introducing a new Plugin API that attempted to mimic its legacy predecessor by transforming V3 CAPI resources into V2-shaped structs would be disproportionately complex. 
+    * Both strategies would also cause breaking changes for the many plugins that use CliCommand or CliCommandWithoutTerminalOutput to make freeform calls to CLI commands other than the ten implemented by the API; such plugins will have a brittle dependency on the exact STDOUT of V6 commands. Of the 80 plugins listed on plugins.cloudfoundry.org, 63 appear to invoke at least one of these two methods.
+    * There's a better chance of getting a smoother transition later if plugin authors and users are given longer to adapt.
+
+* **Plugins can start benefitting from new CLI features, and bug/security fixes**
+    * This includes taking advantage of improved performance of CAPI V3 as compared with V2.
+    * Although CAPI V3 is technically already available through `curl`, parsing the returned strings is cumbersome, brittle and performed via V6 of the CLI.
+
+* **Removes a key obstacle to platform operators disabling CAPI V2**
+    * Although the community currently plans to continue supporting CAPI V2 indefinitely, its endpoints are nonetheless deprecated and it receives bug and security fixes only rarely. It is also less efficient that V3.
+    * Some operators have signalled a desire to disable CAPI V2, which has [been configurable since 2019](https://github.com/cloudfoundry/capi-release/commit/66d63a8d7d658d50e1e80012dd5fef4f22b01620), but this is not a realistic choice where platform users rely on CLI plugins.
+
+* **Much of the work is already done**
+    * The work in 2020 was extensive and resulted in a working POC for a new Plugin API. It should be possible to reuse at least some of this.
+
+### Risks
+
+* **We're left with both the legacy and V2 Plugin APIs long-term because not enough authors adopt V2**
+    * This is plausible. However the actual _cost_ of this would be relatively low, since the legacy CLI is seldom touched anyway.
+    * A proactive effort will be needed to contact authors - particularly those whose plugins seem most popular - and encourage them to adopt the new API. The wider community might help with some of this work (both the advocacy and the coding) where companies are motivated to disable V2 on their foundations.
+    * Good documentation, such as that [published for the 2020 POC](https://github.com/cloudfoundry/cli/blob/master/doc/v7-plugin-api-changes.md), should be published explaining the differences between the two Plugin APIs. A repo with a simple example the same plugin twice, for each API, could be useful.
+    * The CLI team can still decide to remove the legacy API in the near future if it wants to
