@@ -72,7 +72,7 @@ func (client *Client) UpdateApplicationName(newAppName string, appGUID string) (
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
-		RequestBody:  struct{ Name string }{Name: newAppName},
+		RequestBody:  resources.ApplicationNameOnly{Name: newAppName},
 		ResponseBody: &responseBody,
 	})
 
