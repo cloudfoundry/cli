@@ -66,6 +66,19 @@ func (client *Client) UpdateApplication(app resources.Application) (resources.Ap
 	return responseBody, warnings, err
 }
 
+// UpdateApplicationName updates an application with the new name given
+func (client *Client) UpdateApplicationName(newAppName string, appGUID string) (resources.Application, Warnings, error) {
+	var responseBody resources.Application
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.PatchApplicationRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		RequestBody:  resources.ApplicationNameOnly{Name: newAppName},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
+}
+
 // UpdateApplicationRestart restarts the given application.
 func (client *Client) UpdateApplicationRestart(appGUID string) (resources.Application, Warnings, error) {
 	var responseBody resources.Application

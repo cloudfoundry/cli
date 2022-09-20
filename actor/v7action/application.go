@@ -400,6 +400,17 @@ func (actor Actor) UpdateApplication(app resources.Application) (resources.Appli
 	return updatedApp, Warnings(warnings), nil
 }
 
+// UpdateApplicationName updates the name of an application
+func (actor Actor) UpdateApplicationName(newAppName string, appGUID string) (resources.Application, Warnings, error) {
+
+	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplicationName(newAppName, appGUID)
+	if err != nil {
+		return resources.Application{}, Warnings(warnings), err
+	}
+
+	return updatedApp, Warnings(warnings), nil
+}
+
 func (actor Actor) getDeployment(deploymentGUID string) (resources.Deployment, Warnings, error) {
 	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
 	if err != nil {
@@ -444,8 +455,8 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 	if err != nil {
 		return resources.Application{}, allWarnings, err
 	}
-	application.Name = newAppName
-	application, warnings, err = actor.UpdateApplication(application)
+	appGUID := application.GUID
+	application, warnings, err = actor.UpdateApplicationName(newAppName, appGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return resources.Application{}, allWarnings, err
