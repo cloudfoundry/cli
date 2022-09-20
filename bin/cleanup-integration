@@ -62,11 +62,10 @@ for stack in $(cf stacks | awk '/INTEGRATION-STACK/ { print $1 }'); do
   cf curl -X DELETE "/v3/stacks/$(cf stack --guid $stack)"
 done
 
-CF_USERS=$(cf curl /v3/users | grep -oP '(?<="total_results":)[^"]*' |grep -o '[0-9]\+')
-USER_PAGES=$(( $CF_USERS / 50 + 1))
+USER_PAGES=$(cf curl /v3/users | jq -r .pagination.total_pages)
 
 for ((i=1; i<=${USER_PAGES}; i++)) ; do
-  cf curl "/v3/users?per_page=50&page=${i}" | \
+  cf curl "/v3/users?&page=${i}" | \
   jq -r .resources[].username | \
   grep -i -e ^integration-user -e CATS- | \
   xargs_func cf delete-user -f || echo
