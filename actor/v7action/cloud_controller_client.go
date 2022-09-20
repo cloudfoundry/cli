@@ -159,6 +159,7 @@ type CloudControllerClient interface {
 	UnshareServiceInstanceFromSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	UpdateAppFeature(appGUID string, enabled bool, featureName string) (ccv3.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, ccv3.Warnings, error)
+	UpdateApplicationName(newAppName string, appGUID string) (resources.Application, ccv3.Warnings, error)
 	UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateApplicationEnvironmentVariables(appGUID string, envVars resources.EnvironmentVariables) (resources.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateApplicationRestart(appGUID string) (resources.Application, ccv3.Warnings, error)

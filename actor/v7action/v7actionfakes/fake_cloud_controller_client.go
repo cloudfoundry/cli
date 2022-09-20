@@ -2271,6 +2271,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateApplicationNameStub        func(string, string) (resources.Application, ccv3.Warnings, error)
+	updateApplicationNameMutex       sync.RWMutex
+	updateApplicationNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	updateApplicationNameReturns struct {
+		result1 resources.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationNameReturnsOnCall map[int]struct {
+		result1 resources.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateApplicationRestartStub        func(string) (resources.Application, ccv3.Warnings, error)
 	updateApplicationRestartMutex       sync.RWMutex
 	updateApplicationRestartArgsForCall []struct {
@@ -12601,6 +12617,73 @@ func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariablesRetu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateApplicationName(arg1 string, arg2 string) (resources.Application, ccv3.Warnings, error) {
+	fake.updateApplicationNameMutex.Lock()
+	ret, specificReturn := fake.updateApplicationNameReturnsOnCall[len(fake.updateApplicationNameArgsForCall)]
+	fake.updateApplicationNameArgsForCall = append(fake.updateApplicationNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateApplicationName", []interface{}{arg1, arg2})
+	fake.updateApplicationNameMutex.Unlock()
+	if fake.UpdateApplicationNameStub != nil {
+		return fake.UpdateApplicationNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateApplicationNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationNameCallCount() int {
+	fake.updateApplicationNameMutex.RLock()
+	defer fake.updateApplicationNameMutex.RUnlock()
+	return len(fake.updateApplicationNameArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationNameCalls(stub func(string, string) (resources.Application, ccv3.Warnings, error)) {
+	fake.updateApplicationNameMutex.Lock()
+	defer fake.updateApplicationNameMutex.Unlock()
+	fake.UpdateApplicationNameStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationNameArgsForCall(i int) (string, string) {
+	fake.updateApplicationNameMutex.RLock()
+	defer fake.updateApplicationNameMutex.RUnlock()
+	argsForCall := fake.updateApplicationNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationNameReturns(result1 resources.Application, result2 ccv3.Warnings, result3 error) {
+	fake.updateApplicationNameMutex.Lock()
+	defer fake.updateApplicationNameMutex.Unlock()
+	fake.UpdateApplicationNameStub = nil
+	fake.updateApplicationNameReturns = struct {
+		result1 resources.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationNameReturnsOnCall(i int, result1 resources.Application, result2 ccv3.Warnings, result3 error) {
+	fake.updateApplicationNameMutex.Lock()
+	defer fake.updateApplicationNameMutex.Unlock()
+	fake.UpdateApplicationNameStub = nil
+	if fake.updateApplicationNameReturnsOnCall == nil {
+		fake.updateApplicationNameReturnsOnCall = make(map[int]struct {
+			result1 resources.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationNameReturnsOnCall[i] = struct {
+		result1 resources.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateApplicationRestart(arg1 string) (resources.Application, ccv3.Warnings, error) {
 	fake.updateApplicationRestartMutex.Lock()
 	ret, specificReturn := fake.updateApplicationRestartReturnsOnCall[len(fake.updateApplicationRestartArgsForCall)]
@@ -14843,6 +14926,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateApplicationApplyManifestMutex.RUnlock()
 	fake.updateApplicationEnvironmentVariablesMutex.RLock()
 	defer fake.updateApplicationEnvironmentVariablesMutex.RUnlock()
+	fake.updateApplicationNameMutex.RLock()
+	defer fake.updateApplicationNameMutex.RUnlock()
 	fake.updateApplicationRestartMutex.RLock()
 	defer fake.updateApplicationRestartMutex.RUnlock()
 	fake.updateApplicationStartMutex.RLock()
