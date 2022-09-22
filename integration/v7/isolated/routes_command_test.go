@@ -186,8 +186,8 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Expect(session).To(Say(tableHeaders))
-				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+http1, http2\s+%s\s+\n`, spaceName, domainName, fmt.Sprintf("%s, %s", appName1, appName2)))
-				Expect(session).To(Say(`%s\s+route2\s+%s\s+http\s+http1\s+%s\s+\n`, spaceName, domainName, appName2))
+				Eventually(session).Should(Say(`%s\s+route1\s+%s\s+http\s+http1, http2\s+%s\s+\n`, spaceName, domainName, fmt.Sprintf("%s, %s", appName1, appName2)))
+				Eventually(session).Should(Say(`%s\s+route2\s+%s\s+http\s+http1\s+%s\s+\n`, spaceName, domainName, appName2))
 			})
 		})
 
