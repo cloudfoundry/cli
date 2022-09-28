@@ -2,8 +2,6 @@
 additionalRepositories:
   - url: https://github.com/cloudfoundry/cli-ci    
     checkoutLocation: cli-ci
-  - url: https://github.com/cloudfoundry/cli-private    
-    checkoutLocation: cli-private
 
 tasks:
   - name: Setup Workspace
