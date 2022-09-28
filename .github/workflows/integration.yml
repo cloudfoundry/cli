@@ -1,11 +1,30 @@
 name: Integration Tests
 
 on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
   push:
     branches:
-    - '*'
-  # schedule:
-  #   - cron: '0 */1 * * 1-5'
+      - master
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+
+permissions:
+  contents: read
 
 defaults:
   run:
