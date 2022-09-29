@@ -39,13 +39,20 @@ jobs:
       go-version: ${{ steps.set-go-version.outputs.go-version }}
 
     steps:
-    - name: Set environment
-      id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::DEV"
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Set go version
-      id: set-go-version
-      run: echo "::set-output name=go-version::1.18"
+    - id: set-secrets-environment
+      name: Set environment
+      run: echo "::set-output name=secrets-environment::PROD"
+
+    - id: set-go-version
+      name: Parse Golang Version
+      run: |
+        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+        echo "golang version: ${go_version[1]}"
+        echo "::set-output name=go-version::${go_version[1]}"
+
 
   # Linux Edge CAPI integration tests run
   get-linux-env:
