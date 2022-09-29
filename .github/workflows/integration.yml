@@ -1,0 +1,117 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+  push:
+    branches:
+      - master
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+
+permissions:
+  contents: read
+
+jobs:
+  shared-values:
+    name: Shared Values
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: set-secrets-environment
+        name: Set environment
+        run: echo "::set-output name=secrets-environment::PROD"
+
+      - id: set-go-version
+        name: Parse Golang Version
+        run: |
+          go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+          echo "golang version: ${go_version[1]}"
+          echo "::set-output name=go-version::${go_version[1]}"
+
+  get-linux-env-with-edge-capi:
+    needs: shared-values
+    uses: ./.github/reusable-workflows/setup-cf-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      capi-version: edge
+      identifier-for-metadata-file: linux-env-with-edge-capi
+    secrets: inherit
+
+  run-integration-tests-linux-env-with-edge-capi:
+    needs:
+      - shared-values
+      - get-linux-env-with-edge-capi
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set Up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ needs.shared-values.outputs.go-version}}
+          check-latest: true
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-env-with-edge-capi
+      - name: Run Integration Tests
+        run: |
+          # tools
+          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp && \
+          mv /tmp/bbl-* /usr/local/bin/bbl && \
+          chmod +x /usr/local/bin/bbl
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh" && \
+          chmod +x /usr/bin/bosh
+          wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P /tmp && \
+          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /usr/local/bin && \
+          chmod +x /usr/local/bin/credhub
+
+          # test setup
+          ENV=$(cat metadata.json | jq -r '.name')
+          eval "$(bbl print-env --metadata-file ./metadata.json)"
+          export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+          export CF_INT_OIDC_USERNAME="admin-oidc"
+          export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+          export CF_INT_API="https://api.${ENV}.cf-app.com"
+          export CF_DIAL_TIMEOUT=15
+          export CF_USERNAME=admin
+          export FLAKE_ATTEMPTS=2
+          export NODES=16
+          cd cli
+          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
+          make integration-tests-full-ci
+
+  unclaim-linux-env-with-edge-capi:
+    needs:
+      - shared-values
+      - run-integration-tests-linux-env-with-edge-capi
+    if: always()
+    uses: ./.github/reusable-workflows/unclaim-cf-env.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      identifier-for-metadata-file: linux-env-with-edge-capi
+    secrets: inherit
