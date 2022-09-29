@@ -51,7 +51,7 @@ jobs:
 
   get-linux-env-with-edge-capi:
     needs: shared-values
-    uses: ./.github/reusable-workflows/setup-cf-env.yml
+    uses: ./.github/workflows/reusable-workflows/setup-cf-env.yml
     with:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       capi-version: edge
@@ -110,7 +110,7 @@ jobs:
       - shared-values
       - run-integration-tests-linux-env-with-edge-capi
     if: always()
-    uses: ./.github/reusable-workflows/unclaim-cf-env.yml
+    uses: ./.github/workflows/reusable-workflows/unclaim-cf-env.yml
     with:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       identifier-for-metadata-file: linux-env-with-edge-capi
