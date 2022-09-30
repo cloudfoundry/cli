@@ -19,16 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
+      - name: Install Tools
+        run: |
+          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
+          mv /tmp/bbl-* /usr/local/bin/bbl
+          chmod +x /usr/local/bin/bbl
+
       - id: claim-toolsmiths-env
         name: Claim Toolsmiths Environment
         run: |
-          # tools
-          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp && \
-          mv /tmp/bbl-* /usr/local/bin/bbl && \
-          chmod +x /usr/local/bin/bbl
-          
-          # claim
-          if ! curl --fail -X POST " https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release" > metadata.json
+          if ! curl --fail -X POST "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release" > metadata.json
           then
               echo "UNABLE TO CLAIM AN ENVIRONMENT, PLEASE RETRY LATER"
               exit 1
