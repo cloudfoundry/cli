@@ -48,10 +48,10 @@ jobs:
         if: ${{ inputs.capi-version == 'edge' }}
         run: |
           # tools
-          wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -P /tmp && \
-          unzip -d /tmp /tmp/awscli-exe-linux-x86_64.zip && \
+          wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -P /tmp
+          unzip -d /tmp /tmp/awscli-exe-linux-x86_64.zip
           ./tmp/aws/install
-          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh" && \
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh"
           chmod +x /usr/bin/bosh
           
           # find latest capi

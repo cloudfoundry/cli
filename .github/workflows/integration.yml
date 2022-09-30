@@ -76,19 +76,18 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ needs.get-linux-env-with-edge-capi.outputs.environment-name }}
+      - name: Install Tools
+        run: |
+          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
+          mv /tmp/bbl-* /usr/local/bin/bbl
+          chmod +x /usr/local/bin/bbl
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh"
+          chmod +x /usr/bin/bosh
+          wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P /tmp
+          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /usr/local/bin
+          chmod +x /usr/local/bin/credhub
       - name: Run Integration Tests
         run: |
-          # tools
-          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp && \
-          mv /tmp/bbl-* /usr/local/bin/bbl && \
-          chmod +x /usr/local/bin/bbl
-          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh" && \
-          chmod +x /usr/bin/bosh
-          wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P /tmp && \
-          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /usr/local/bin && \
-          chmod +x /usr/local/bin/credhub
-
-          # test setup
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
