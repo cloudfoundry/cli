@@ -24,7 +24,7 @@ jobs:
       - name: Unclaim environment
         env:
           api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-          hostname:  environments.toolsmiths.cf-app.com
+          hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
         run: |
           env_name=$(cat metadata.json | jq -r .name)
 

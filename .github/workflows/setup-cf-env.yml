@@ -23,7 +23,7 @@ jobs:
         name: Claim Toolsmiths Environment
         env:
           api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-          hostname:  environments.toolsmiths.cf-app.com
+          hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
           notes:     CF CLI Github Actions Integration Tests
           pool_name: cf-deployment
         run: |
