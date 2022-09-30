@@ -55,7 +55,6 @@ jobs:
     with:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       capi-version: edge
-      identifier-for-metadata-file: linux-env-with-edge-capi
     secrets: inherit
 
   run-integration-tests-linux-env-with-edge-capi:
@@ -76,7 +75,7 @@ jobs:
       - name: Download metadata
         uses: actions/download-artifact@v3
         with:
-          name: linux-env-with-edge-capi
+          name: ${{ needs.get-linux-env-with-edge-capi.outputs.environment-name }}
       - name: Run Integration Tests
         run: |
           # tools
@@ -108,10 +107,11 @@ jobs:
   unclaim-linux-env-with-edge-capi:
     needs:
       - shared-values
+      - get-linux-env-with-edge-capi
       - run-integration-tests-linux-env-with-edge-capi
     if: always()
     uses: ./.github/workflows/reusable-workflows/unclaim-cf-env.yml
     with:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      identifier-for-metadata-file: linux-env-with-edge-capi
+      identifier-for-metadata-file: ${{ needs.get-linux-env-with-edge-capi.outputs.environment-name }}
     secrets: inherit

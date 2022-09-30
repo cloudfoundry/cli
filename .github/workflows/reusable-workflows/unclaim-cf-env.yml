@@ -19,7 +19,7 @@ jobs:
       - name: Download metadata
         uses: actions/download-artifact@v3
         with:
-          name: ${{ inputs.test-name }}
+          name: ${{ inputs.identifier-for-metadata-file }}
 
       - name: Unclaim environment
         run: |

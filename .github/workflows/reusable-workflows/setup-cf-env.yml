@@ -9,63 +9,69 @@ on:
       capi-version:
         required: true
         type: string
-      identifier-for-metadata-file:
-        required: true
-        type: string
+    outputs:
+      environment-name:
+        description: "Name of claimed environment"
+        value: ${{ jobs.setup-cf-env.outputs.environment-name }}
 
 jobs:
-  runs-on: ubuntu-latest
-  environment: ${{ inputs.environment }}
-  steps:
-    - name: Claim Toolsmiths Environment
-      env:
-        - TOOLSMITHS_URL: https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release
-      run: |
-        # tools
-        wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp && \
-        mv /tmp/bbl-* /usr/local/bin/bbl && \
-        chmod +x /usr/local/bin/bbl
-        
-        # claim
-        if ! curl --fail -X POST "$TOOLSMITHS_URL" > metadata.json
-        then
-            echo "UNABLE TO CLAIM AN ENVIRONMENT, PLEASE RETRY LATER"
-            exit 1
-        fi
-        eval "$(bbl print-env --metadata-file ./metadata.json)"
+  setup-cf-env:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - id: claim-toolsmiths-env
+        name: Claim Toolsmiths Environment
+        env:
+          - TOOLSMITHS_URL: https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release
+        run: |
+          # tools
+          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp && \
+          mv /tmp/bbl-* /usr/local/bin/bbl && \
+          chmod +x /usr/local/bin/bbl
+          
+          # claim
+          if ! curl --fail -X POST "$TOOLSMITHS_URL" > metadata.json
+          then
+              echo "UNABLE TO CLAIM AN ENVIRONMENT, PLEASE RETRY LATER"
+              exit 1
+          fi
+          eval "$(bbl print-env --metadata-file ./metadata.json)"
+          
+          ENV=$(cat metadata.json | jq -r '.name')
+          echo "::set-output name=environment-name::${ENV}"
 
-    - name: Checkout cli-ci
-      uses: actions/checkout@v3
-      with:
-        repository: cloudfoundry/cli-ci
-        path: cli-ci
+      - name: Checkout cli-ci
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cli-ci
+          path: cli-ci
 
-    - name: Deploy edge CAPI
-      if: ${{ inputs.capi-version == 'edge' }}
-      run: |
-        # tools
-        wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -P /tmp && \
-        unzip -d /tmp /tmp/awscli-exe-linux-x86_64.zip && \
-        ./tmp/aws/install
-        wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh" && \
-        chmod +x /usr/bin/bosh
-        
-        # find latest capi
-        FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
-        aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1
-        eval "$(bbl print-env --metadata-file metadata.json)"
-        bosh upload-release --sha2 "$FILENAME"
-        rm $FILENAME
-        
-        # deploy
-        bosh -d cf manifest > /tmp/manifest.json
-        bosh -d cf deploy /tmp/manifest.json -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml -n
-        
-        echo "Deployed CAPI version:"
-        bosh -d cf releases | grep capi
+      - name: Deploy edge CAPI
+        if: ${{ inputs.capi-version == 'edge' }}
+        run: |
+          # tools
+          wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -P /tmp && \
+          unzip -d /tmp /tmp/awscli-exe-linux-x86_64.zip && \
+          ./tmp/aws/install
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh" && \
+          chmod +x /usr/bin/bosh
+          
+          # find latest capi
+          FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
+          aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1
+          eval "$(bbl print-env --metadata-file metadata.json)"
+          bosh upload-release --sha2 "$FILENAME"
+          rm $FILENAME
 
-    - name: 'Upload Metadata'
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ inputs.identifier-for-metadata-file }}
-        path: metadata.json
+          # deploy
+          bosh -d cf manifest > /tmp/manifest.json
+          bosh -d cf deploy /tmp/manifest.json -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml -n
+
+          echo "Deployed CAPI version:"
+          bosh -d cf releases | grep capi
+
+      - name: 'Upload Metadata'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
+          path: metadata.json
