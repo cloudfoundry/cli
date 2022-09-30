@@ -22,5 +22,22 @@ jobs:
           name: ${{ inputs.identifier-for-metadata-file }}
 
       - name: Unclaim environment
+        env:
+          api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+          hostname:  environments.toolsmiths.cf-app.com
         run: |
-          curl -X POST "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/unclaim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&name=$(cat metadata.json | jq -r .name)"
+          env_name=$(cat metadata.json | jq -r .name)
+
+          while true; do
+            output=$(curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
+            -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
+            --data-urlencode "api_token=${api_token}" \
+            --data-urlencode "name=${env_name}")
+
+            ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
+
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500" && sleep 30 && continue
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 1
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 2
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 202" headers.txt && break
+          done

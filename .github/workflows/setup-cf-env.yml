@@ -19,24 +19,44 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Install Tools
-        run: |
-          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
-          mv /tmp/bbl-* /usr/local/bin/bbl
-          chmod +x /usr/local/bin/bbl
-
       - id: claim-toolsmiths-env
         name: Claim Toolsmiths Environment
+        env:
+          api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+          hostname:  environments.toolsmiths.cf-app.com
+          notes:     CF CLI Github Actions Integration Tests
+          pool_name: cf-deployment
         run: |
-          if ! curl --fail -X POST "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${{ secrets.TOOLSMITHS_API_TOKEN }}&pool_name=cf-deployment&notes=github-actions-syslog-release" > metadata.json
-          then
-              echo "UNABLE TO CLAIM AN ENVIRONMENT, PLEASE RETRY LATER"
-              exit 1
-          fi
-          eval "$(bbl print-env --metadata-file ./metadata.json)"
+          while true; do
+            curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
+            -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
+            --data-urlencode "api_token=${api_token}" \
+            --data-urlencode "pool_name=${pool_name}" \
+            --data-urlencode "notes=${notes}" > metadata.json \
+            || echo "Unable to reach server, trying again in 30 seconds..."
+
+            ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
+            ERR_429="Sorry, Toolsmiths are out of environments in your requested pool. New environments are on their way but you can stop by the Toolsmiths slack channel for more help."
+            ERR_409="Sorry, was not able to claim an environment. Trying again in 30 seconds..."
+
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && exit 1
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && exit 2
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500"
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 200" headers.txt && break
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 429" && echo "$ERR_429"
+            grep -q -E "HTTP/[[:digit:]\.]{1,3} 409" && echo "$ERR_409"
+
+            sleep 30
+          done
           
           ENV=$(cat metadata.json | jq -r '.name')
           echo "::set-output name=environment-name::${ENV}"
+
+      - name: 'Upload Metadata'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
+          path: metadata.json
 
       - name: Checkout cli-ci
         uses: actions/checkout@v3
@@ -44,16 +64,22 @@ jobs:
           repository: cloudfoundry/cli-ci
           path: cli-ci
 
-      - name: Deploy edge CAPI
-        if: ${{ inputs.capi-version == 'edge' }}
+      - name: Install Tools
         run: |
-          # tools
+          wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
+          mv /tmp/bbl-* /usr/local/bin/bbl
+          chmod +x /usr/local/bin/bbl
+
           wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -P /tmp
           unzip -d /tmp /tmp/awscli-exe-linux-x86_64.zip
           ./tmp/aws/install
+
           wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh"
           chmod +x /usr/bin/bosh
-          
+
+      - name: Deploy edge CAPI
+        if: ${{ inputs.capi-version == 'edge' }}
+        run: |
           # find latest capi
           FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
           aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1
@@ -67,9 +93,3 @@ jobs:
 
           echo "Deployed CAPI version:"
           bosh -d cf releases | grep capi
-
-      - name: 'Upload Metadata'
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
-          path: metadata.json
