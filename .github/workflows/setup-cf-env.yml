@@ -71,9 +71,11 @@ jobs:
           wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
           mv /tmp/bbl-* /usr/local/bin/bbl
           chmod +x /usr/local/bin/bbl
+          bbl --version
 
-          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/bin/bosh"
-          chmod +x /usr/bin/bosh
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --output-document="/usr/local/bin/bosh"
+          chmod +x /usr/local/bin/bosh
+          bosh --version
 
       - name: Deploy edge CAPI
         if: ${{ inputs.capi-version == 'edge' }}
