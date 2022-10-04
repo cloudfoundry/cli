@@ -12,12 +12,14 @@ on:
     outputs:
       environment-name:
         description: "Name of claimed environment"
-        value: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
+        value: ${{ jobs.setup-cf-env.outputs.environment-name }}
 
 jobs:
   setup-cf-env:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      environment-name: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
     steps:
       - id: claim-toolsmiths-env
         name: Claim Toolsmiths Environment
