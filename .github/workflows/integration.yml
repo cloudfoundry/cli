@@ -87,11 +87,12 @@ jobs:
           chmod +x /usr/local/bin/bosh
           bosh --version
 
-          wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P /tmp
-          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /tmp
-          mv /tmp/credhub /usr/local/bin/credhub
+          wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P ~/
+          tar xzvf ~/credhub-linux-2.9.4.tgz
+          mv credhub /usr/local/bin/credhub
           chmod +x /usr/local/bin/credhub
           credhub --version
+          rm ~/credhub-linux-2.9.4.tgz
       - name: Run Integration Tests
         run: |
           ENV=$(cat metadata.json | jq -r '.name')
