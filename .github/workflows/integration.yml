@@ -114,7 +114,6 @@ jobs:
     needs:
       - shared-values
       - get-linux-env-with-edge-capi
-      - run-integration-tests-linux-env-with-edge-capi
     if: always()
     uses: ./.github/workflows/unclaim-cf-env.yml
     with:
