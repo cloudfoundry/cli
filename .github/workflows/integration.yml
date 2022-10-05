@@ -88,7 +88,8 @@ jobs:
           bosh --version
 
           wget https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz -P /tmp
-          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /usr/local/bin
+          tar xzvf /tmp/credhub-linux-2.9.4.tgz -C /tmp
+          mv /tmp/credhub /usr/local/bin/credhub
           chmod +x /usr/local/bin/credhub
           credhub --version
       - name: Run Integration Tests
