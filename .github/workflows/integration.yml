@@ -97,15 +97,14 @@ jobs:
         run: |
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
-          export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+          export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
           export CF_INT_OIDC_USERNAME="admin-oidc"
-          export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+          export CF_INT_OIDC_PASSWORD="$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)"
           export CF_INT_API="https://api.${ENV}.cf-app.com"
           export CF_DIAL_TIMEOUT=15
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
-          cd cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           make integration-tests-full-ci
