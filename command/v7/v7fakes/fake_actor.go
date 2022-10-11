@@ -3148,6 +3148,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UnshareRouteStub        func(string, string) (v7action.Warnings, error)
+	unshareRouteMutex       sync.RWMutex
+	unshareRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	unshareRouteReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	unshareRouteReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UnshareServiceInstanceFromSpaceAndOrgStub        func(string, string, string, v7action.ServiceInstanceSharingParams) (v7action.Warnings, error)
 	unshareServiceInstanceFromSpaceAndOrgMutex       sync.RWMutex
 	unshareServiceInstanceFromSpaceAndOrgArgsForCall []struct {
@@ -17115,6 +17129,70 @@ func (fake *FakeActor) UnsharePrivateDomainReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UnshareRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.unshareRouteMutex.Lock()
+	ret, specificReturn := fake.unshareRouteReturnsOnCall[len(fake.unshareRouteArgsForCall)]
+	fake.unshareRouteArgsForCall = append(fake.unshareRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UnshareRoute", []interface{}{arg1, arg2})
+	fake.unshareRouteMutex.Unlock()
+	if fake.UnshareRouteStub != nil {
+		return fake.UnshareRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unshareRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UnshareRouteCallCount() int {
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
+	return len(fake.unshareRouteArgsForCall)
+}
+
+func (fake *FakeActor) UnshareRouteCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = stub
+}
+
+func (fake *FakeActor) UnshareRouteArgsForCall(i int) (string, string) {
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
+	argsForCall := fake.unshareRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) UnshareRouteReturns(result1 v7action.Warnings, result2 error) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = nil
+	fake.unshareRouteReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UnshareRouteReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = nil
+	if fake.unshareRouteReturnsOnCall == nil {
+		fake.unshareRouteReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.unshareRouteReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrg(arg1 string, arg2 string, arg3 string, arg4 v7action.ServiceInstanceSharingParams) (v7action.Warnings, error) {
 	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Lock()
 	ret, specificReturn := fake.unshareServiceInstanceFromSpaceAndOrgReturnsOnCall[len(fake.unshareServiceInstanceFromSpaceAndOrgArgsForCall)]
@@ -19494,6 +19572,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.unsetSpaceQuotaMutex.RUnlock()
 	fake.unsharePrivateDomainMutex.RLock()
 	defer fake.unsharePrivateDomainMutex.RUnlock()
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
 	fake.unshareServiceInstanceFromSpaceAndOrgMutex.RLock()
 	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.RUnlock()
 	fake.updateAppFeatureMutex.RLock()

@@ -175,6 +175,7 @@ const (
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
 	ShareRouteRequest                                           = "ShareRouteRequest"
 	UnmapRouteRequest                                           = "UnmapRoute"
+	UnshareRouteRequest                                         = "UnshareRoute"
 	WhoAmI                                                      = "WhoAmI"
 )
 
@@ -280,6 +281,7 @@ var APIRoutes = map[string]Route{
 	UnmapRouteRequest:                                           {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodDelete},
 	PatchDestinationRequest:                                     {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodPatch},
 	ShareRouteRequest:                                           {Path: "/v3/routes/:route_guid/relationships/shared_spaces", Method: http.MethodPost},
+	UnshareRouteRequest:                                         {Path: "/v3/routes/:route_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete},
 	PatchMoveRouteRequest:                                       {Path: "/v3/routes/:route_guid/relationships/space", Method: http.MethodPatch},
 	GetSecurityGroupsRequest:                                    {Path: "/v3/security_groups", Method: http.MethodGet},
 	PostSecurityGroupRequest:                                    {Path: "/v3/security_groups", Method: http.MethodPost},

@@ -132,6 +132,17 @@ func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warni
 	return warnings, err
 }
 
+func (client Client) UnshareRoute(routeGUID string, spaceGUID string) (Warnings, error) {
+	var responseBody resources.Build
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.UnshareRouteRequest,
+		URIParams:    internal.Params{"route_guid": routeGUID, "space_guid": spaceGUID},
+		ResponseBody: &responseBody,
+	})
+	return warnings, err
+}
+
 func (client Client) UpdateDestination(routeGUID string, destinationGUID string, protocol string) (Warnings, error) {
 	type body struct {
 		Protocol string `json:"protocol"`

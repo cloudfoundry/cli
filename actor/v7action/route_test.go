@@ -1590,6 +1590,46 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("UnshareRoute", func() {
+		var (
+			routeGUID string
+			spaceGUID string
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UnshareRoute(routeGUID, spaceGUID)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+			spaceGUID = "space-guid"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnshareRouteReturns(ccv3.Warnings{"unshare-route-warning"}, errors.New("unshare-route-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("unshare-route-error")))
+				Expect(warnings).To(ConsistOf("unshare-route-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnshareRouteReturns(ccv3.Warnings{"unshare-route-warning"}, nil)
+			})
+
+			It("returns the warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("unshare-route-warning"))
+			})
+		})
+	})
 	Describe("UnmapRoute", func() {
 		var (
 			routeGUID       string
