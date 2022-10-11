@@ -11,23 +11,23 @@ type UnshareRouteCommand struct {
 	RequireArgs      flag.Domain      `positional-args:"yes"`
 	Hostname         string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path             flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
-	DestinationOrg   string           `short:"o" description:"The org of the destination app (Default: targeted org)"`
-	DestinationSpace string           `short:"s" description:"The space of the destination app (Default: targeted space)"`
+	DestinationOrg   string           `short:"o" description:"The org of the destination space (Default: targeted org)"`
+	DestinationSpace string           `short:"s" description:"The space to be unshared (Default: targeted space)"`
 
-	relatedCommands interface{} `related_commands:"create-route, map-route, unmap-route, routes"`
+	relatedCommands interface{} `related_commands:" share-route, delete-route, map-route, unmap-route, routes"`
 }
 
 func (cmd UnshareRouteCommand) Usage() string {
 	return `
-Share an existing route in between two spaces:
-	CF_NAME share-route DOMAIN [--hostname HOSTNAME] [--path PATH] -s OTHER_SPACE [-o OTHER_ORG]`
+Unshare an existing route from a space:
+	CF_NAME unshare-route DOMAIN [--hostname HOSTNAME] [--path PATH] -s OTHER_SPACE [-o OTHER_ORG]`
 }
 
 func (cmd UnshareRouteCommand) Examples() string {
 	return `
-CF_NAME share-route example.com --hostname myHost --path foo -s TargetSpace -o TargetOrg        # myhost.example.com/foo
-CF_NAME share-route example.com --hostname myHost -s TargetSpace                                # myhost.example.com
-CF_NAME share-route example.com --hostname myHost -s TargetSpace -o TargetOrg                   # myhost.example.com`
+CF_NAME unshare-route example.com --hostname myHost --path foo -s TargetSpace -o TargetOrg        # myhost.example.com/foo
+CF_NAME unshare-route example.com --hostname myHost -s TargetSpace                                # myhost.example.com
+CF_NAME unshare-route example.com --hostname myHost -s TargetSpace -o TargetOrg                   # myhost.example.com`
 }
 
 func (cmd UnshareRouteCommand) Execute(args []string) error {
@@ -52,7 +52,7 @@ func (cmd UnshareRouteCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); ok {
-			cmd.UI.DisplayText("Can not share route:")
+			cmd.UI.DisplayText("Can not unshare route:")
 			return err
 		}
 	}
@@ -67,7 +67,7 @@ func (cmd UnshareRouteCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(actionerror.OrganizationNotFoundError); ok {
-			cmd.UI.DisplayText("Can not share route:")
+			cmd.UI.DisplayText("Can not unshare route:")
 			return err
 		}
 	}
@@ -75,7 +75,7 @@ func (cmd UnshareRouteCommand) Execute(args []string) error {
 	targetedSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destinationOrg.GUID)
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceNotFoundError); ok {
-			cmd.UI.DisplayText("Can not share route:")
+			cmd.UI.DisplayText("Can not unshare route:")
 			return err
 		}
 	}

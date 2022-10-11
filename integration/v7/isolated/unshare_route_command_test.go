@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("unshare route command", func() {
+var _ = Describe("unshare route command", func() {
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -20,7 +20,7 @@ var _ = FDescribe("unshare route command", func() {
 			fmt.Println(session)
 
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("unshare-route", "ROUTES", "Unshare a route in between spaces"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("unshare-route", "ROUTES", "Unshare an existing route from a space"))
 		})
 
 		It("displays the help information", func() {
@@ -30,7 +30,7 @@ var _ = FDescribe("unshare route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`Unshare an existing route from a spaces:`))
+			Eventually(session).Should(Say(`Unshare an existing route from a space:`))
 			Eventually(session).Should(Say(`cf unshare-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] -s OTHER_SPACE \[-o OTHER_ORG\]`))
 			Eventually(session).Should(Say(`\n`))
 
@@ -43,12 +43,12 @@ var _ = FDescribe("unshare route command", func() {
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
-			Eventually(session).Should(Say(`-o\s+The org of the destination app \(Default: targeted org\)`))
-			Eventually(session).Should(Say(`-s\s+The space of the destination app \(Default: targeted space\)`))
+			Eventually(session).Should(Say(`-o\s+The org of the destination space \(Default: targeted org\)`))
+			Eventually(session).Should(Say(`-s\s+The space to be unshared \(Default: targeted space\)`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`create-route, map-route, routes, unmap-route`))
+			Eventually(session).Should(Say(`share-route, delete-route, map-route, routes, unmap-route`))
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -95,7 +95,7 @@ var _ = FDescribe("unshare route command", func() {
 					domain   helpers.Domain
 					hostname string
 				)
-				When("the target space exists in targeted org", func() {
+				When("the target space is shared in the targedted space", func() {
 					BeforeEach(func() {
 						domain = helpers.NewDomain(orgName, domainName)
 						hostname = "panera-bread"
@@ -103,6 +103,7 @@ var _ = FDescribe("unshare route command", func() {
 						helpers.CreateSpace(targetSpaceName)
 						domain.Create()
 						Eventually(helpers.CF("create-route", domain.Name, "--hostname", hostname)).Should(Exit(0))
+						Eventually(helpers.CF("share-route", domain.Name, "--hostname", hostname, "-s", targetSpaceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
