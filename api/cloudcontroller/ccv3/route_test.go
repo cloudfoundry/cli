@@ -798,6 +798,84 @@ var _ = Describe("Route", func() {
 		})
 	})
 
+	Describe("UnshareRoute", func() {
+		var (
+			routeGUID  string
+			spaceGUID  string
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UnshareRoute(routeGUID, spaceGUID)
+		})
+
+		When("aroute exists and is shared with the space", func() {
+			routeGUID = "route-guid"
+			spaceGUID = "space-guid"
+
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/routes/route-guid/relationships/shared_spaces/space-guid"),
+						RespondWith(http.StatusNoContent, nil, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+						}),
+					),
+				)
+			})
+
+			It("returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Route not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/routes/route-guid/relationships/shared_spaces/space-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Route not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("UpdateDestination", func() {
 		var (
 			routeGUID       string

@@ -155,6 +155,7 @@ type CloudControllerClient interface {
 	UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (ccv3.Warnings, error)
+	UnshareRoute(routeGUID string, spaceGUID string) (ccv3.Warnings, error)
 	UnsharePrivateDomainFromOrg(domainGUID string, sharedOrgGUID string) (ccv3.Warnings, error)
 	UnshareServiceInstanceFromSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	UpdateAppFeature(appGUID string, enabled bool, featureName string) (ccv3.Warnings, error)

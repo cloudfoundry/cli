@@ -2195,6 +2195,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	UnshareRouteStub        func(string, string) (ccv3.Warnings, error)
+	unshareRouteMutex       sync.RWMutex
+	unshareRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	unshareRouteReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	unshareRouteReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UnshareServiceInstanceFromSpaceStub        func(string, string) (ccv3.Warnings, error)
 	unshareServiceInstanceFromSpaceMutex       sync.RWMutex
 	unshareServiceInstanceFromSpaceArgsForCall []struct {
@@ -12283,6 +12297,70 @@ func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgReturnsOnCall(
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UnshareRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.unshareRouteMutex.Lock()
+	ret, specificReturn := fake.unshareRouteReturnsOnCall[len(fake.unshareRouteArgsForCall)]
+	fake.unshareRouteArgsForCall = append(fake.unshareRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UnshareRoute", []interface{}{arg1, arg2})
+	fake.unshareRouteMutex.Unlock()
+	if fake.UnshareRouteStub != nil {
+		return fake.UnshareRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unshareRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UnshareRouteCallCount() int {
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
+	return len(fake.unshareRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UnshareRouteCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UnshareRouteArgsForCall(i int) (string, string) {
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
+	argsForCall := fake.unshareRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UnshareRouteReturns(result1 ccv3.Warnings, result2 error) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = nil
+	fake.unshareRouteReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UnshareRouteReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.unshareRouteMutex.Lock()
+	defer fake.unshareRouteMutex.Unlock()
+	fake.UnshareRouteStub = nil
+	if fake.unshareRouteReturnsOnCall == nil {
+		fake.unshareRouteReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.unshareRouteReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
 	fake.unshareServiceInstanceFromSpaceMutex.Lock()
 	ret, specificReturn := fake.unshareServiceInstanceFromSpaceReturnsOnCall[len(fake.unshareServiceInstanceFromSpaceArgsForCall)]
@@ -14916,6 +14994,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.unsetSpaceQuotaMutex.RUnlock()
 	fake.unsharePrivateDomainFromOrgMutex.RLock()
 	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
+	fake.unshareRouteMutex.RLock()
+	defer fake.unshareRouteMutex.RUnlock()
 	fake.unshareServiceInstanceFromSpaceMutex.RLock()
 	defer fake.unshareServiceInstanceFromSpaceMutex.RUnlock()
 	fake.updateAppFeatureMutex.RLock()
