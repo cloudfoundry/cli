@@ -39,8 +39,8 @@ var _ = Describe("share route command", func() {
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
-			Eventually(session).Should(Say(`-o\s+The org of the destination app \(Default: targeted org\)`))
-			Eventually(session).Should(Say(`-s\s+The space of the destination app \(Default: targeted space\)`))
+			Eventually(session).Should(Say(`-o\s+The org of the destination space \(Default: targeted org\)`))
+			Eventually(session).Should(Say(`-s\s+The space the route will be shared with \(Default: targeted space\)`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
