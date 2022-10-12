@@ -11,7 +11,7 @@ type ShareRouteCommand struct {
 	RequireArgs      flag.Domain      `positional-args:"yes"`
 	Hostname         string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path             flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
-	DestinationOrg   string           `short:"o" description:"The org of the destination space (Default: targeted org)"` // ToDo: fix me
+	DestinationOrg   string           `short:"o" description:"The org of the destination space (Default: targeted org)"`
 	DestinationSpace string           `short:"s" description:"The space the route will be shared with (Default: targeted space)"`
 
 	relatedCommands interface{} `related_commands:"create-route, map-route, unmap-route, routes"`
