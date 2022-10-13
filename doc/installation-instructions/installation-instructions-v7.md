@@ -55,7 +55,7 @@ curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version
 # ...move it to /usr/local/bin or a location you know is in your $PATH
 mv cf /usr/local/bin
 # ...copy tab completion file on Ubuntu (takes affect after re-opening your shell)
-sudo curl -o /usr/share/bash-completion/completions/cf7 https://raw.githubusercontent.com/cloudfoundry/cli-ci/master/ci/installers/completion/cf7
+sudo curl -o /usr/share/bash-completion/completions/cf7 https://raw.githubusercontent.com/cloudfoundry/cli-ci/main/ci/installers/completion/cf7
 # ...and to confirm your cf CLI version
 cf version
 ```

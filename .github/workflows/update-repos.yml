@@ -52,7 +52,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: cloudfoundry/cli-ci.git
-        ref: master
+        ref: main
         path: cli-ci
 
     - name: Checkout homebrew-tap
