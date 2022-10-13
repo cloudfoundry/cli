@@ -1,15 +1,15 @@
 package helpers
 
 import (
+	"embed"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
+	"net/http"
 )
+
+//go:embed fixtures
+var content embed.FS
 
 // AddFiftyOneOrgs adds a mock handler to the given server which returns
 // 51 orgs on GET requests to /v3/organizations?order_by=name. It also
@@ -81,9 +81,7 @@ func AddEmptyPaginatedResponse(server *ghttp.Server, path string) {
 }
 
 func fixtureData(name string) []byte {
-	wd := os.Getenv("GOPATH")
-	fp := filepath.Join(wd, "src", "code.cloudfoundry.org", "cli", "integration", "helpers", "fixtures", name)
-	b, err := ioutil.ReadFile(fp)
+	b, err := content.ReadFile("fixtures/" + name)
 	Expect(err).ToNot(HaveOccurred())
 	return b
 }
