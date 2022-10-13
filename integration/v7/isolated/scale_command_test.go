@@ -102,7 +102,7 @@ var _ = Describe("scale command", func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
-				helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "32M")
+				helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "1G")
 			})
 
 			When("scale option flags are not provided", func() {
@@ -159,7 +159,7 @@ var _ = Describe("scale command", func() {
 						Consistently(session).ShouldNot(Say("Stopping"))
 						Consistently(session).ShouldNot(Say("Starting"))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true, "32M")
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true, "1G")
 
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Exit(0))
