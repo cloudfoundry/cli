@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	noaaErrors "github.com/cloudfoundry/noaa/errors"
+	noaaErrors "github.com/cloudfoundry/noaa/v2/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	log "github.com/sirupsen/logrus"
 )

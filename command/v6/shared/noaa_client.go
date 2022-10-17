@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util"
-	"github.com/cloudfoundry/noaa/consumer"
+	"github.com/cloudfoundry/noaa/v2/consumer"
 )
 
 type RequestLoggerOutput interface {
