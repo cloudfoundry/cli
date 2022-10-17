@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/types"
+	"github.com/onsi/gomega/types"
 
 	"testing"
 
@@ -25,8 +25,8 @@ var _ = BeforeEach(func() {
 	log.SetLevel(log.PanicLevel)
 })
 
-func EqualEither(events ...Event) GomegaMatcher {
-	var equals []GomegaMatcher
+func EqualEither(events ...Event) types.GomegaMatcher {
+	var equals []types.GomegaMatcher
 	for _, event := range events {
 		equals = append(equals, Equal(event))
 	}

@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
-	noaaErrors "github.com/cloudfoundry/noaa/errors"
+	noaaErrors "github.com/cloudfoundry/noaa/v2/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
