@@ -69,8 +69,6 @@ var _ = Describe("share route command", func() {
 			spaceName = helpers.NewSpaceName()
 
 			helpers.SetupCF(orgName, spaceName)
-			session := helpers.CF("enable-feature-flag", "route_sharing")
-			Eventually(session).Should(Exit(0))
 			userName, _ = helpers.GetCredentials()
 		})
 
