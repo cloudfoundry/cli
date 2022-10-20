@@ -95,7 +95,9 @@ jobs:
 
           # deploy
           bosh -d cf manifest > /tmp/manifest.json
-          bosh -d cf deploy /tmp/manifest.json -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml -n
+          bosh -n -d cf deploy /tmp/manifest.json \
+               -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
+               -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
 
           echo "Deployed CAPI version:"
           bosh -d cf releases | grep capi
