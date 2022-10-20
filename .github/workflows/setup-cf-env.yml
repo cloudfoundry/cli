@@ -21,6 +21,16 @@ jobs:
     outputs:
       environment-name: ${{ steps.claim-toolsmiths-env.outputs.environment-name }}
     steps:
+      - name: Setup upterm session
+        env:
+          dev_api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+          dev_hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
+          dev_notes:     CF CLI Github Actions Integration Tests
+          dev_pool_name: cf-deployment
+        if: always()
+        uses: lhotari/action-upterm@v1
+        timeout-minutes: 60
+
       - id: claim-toolsmiths-env
         name: Claim Toolsmiths Environment
         env:
