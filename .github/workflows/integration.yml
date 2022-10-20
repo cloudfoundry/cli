@@ -98,6 +98,8 @@ jobs:
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+          export CF_INT_OIDC_USERNAME="admin-oidc"
+          export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
           export CF_INT_API="https://api.${ENV}.cf-app.com"
           export CF_DIAL_TIMEOUT=15
           export CF_USERNAME=admin
