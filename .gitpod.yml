@@ -13,6 +13,9 @@ tasks:
 
       brew install
       asdf
+      cloudfoundry/tap/credhub-cli
+      cloudfoundry/tap/bbl
+      cloudfoundry/tap/bosh-cli
     init: >
       tldr --update 
       
