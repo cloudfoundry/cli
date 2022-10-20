@@ -9,7 +9,6 @@ on:
       - v7
     paths-ignore:
       - 'doc/**'
-      - '.github/**'
       - '.gitpod.yml'
       - 'README.md'
   push:
