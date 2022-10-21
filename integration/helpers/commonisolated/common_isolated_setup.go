@@ -41,7 +41,7 @@ func CommonGinkgoSetup(
 		helpers.SetupSynchronizedSuite(func() {
 			helpers.EnableFeatureFlag("diego_docker")
 			helpers.EnableFeatureFlag("service_instance_sharing")
-                       helpers.EnableFeatureFlag("route_sharing")
+            helpers.EnableFeatureFlag("route_sharing")
 		})
 
 		_, _ = GinkgoWriter.Write([]byte("==============================End of Global FIRST Node Synchronized Before Each=============================="))
