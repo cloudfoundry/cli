@@ -1,0 +1,28 @@
+
+additionalRepositories:
+  - url: https://github.com/cloudfoundry/cli-ci    
+    checkoutLocation: cli-ci
+
+tasks:
+  - name: Setup Workspace
+    before: >
+      sudo apt install --yes 
+      icdiff
+      tldr
+      fzf
+
+      brew install
+      asdf
+      cloudfoundry/tap/credhub-cli
+      cloudfoundry/tap/bbl
+      cloudfoundry/tap/bosh-cli
+    init: >
+      tldr --update 
+      
+      make clean build
+    command: out/cf version
+
+vscode:
+  extensions:
+    - vscodevim.vim
+    - eamodio.gitlens
