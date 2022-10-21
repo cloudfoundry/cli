@@ -83,7 +83,7 @@ jobs:
           chmod +x /usr/local/bin/bosh
           bosh --version
 
-      - name: Deploy edge CAPI and Isolation Segment
+      - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
         if: ${{ inputs.capi-version == 'edge' }}
         run: |
           # find latest capi
@@ -97,7 +97,8 @@ jobs:
           bosh -d cf manifest > /tmp/manifest.json
           bosh -n -d cf deploy /tmp/manifest.json \
                -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
-               -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
+               -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
+               -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml
 
           echo "Deployed CAPI version:"
           bosh -d cf releases | grep capi
