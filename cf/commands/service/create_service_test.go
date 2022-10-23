@@ -252,7 +252,7 @@ var _ = Describe("create-service command", func() {
 				[]string{"Creating service instance", "my-free-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"will incurr a cost"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"will incur a cost"}))
 		})
 
 		It("warns the user when the service is not free", func() {
