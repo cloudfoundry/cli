@@ -109,7 +109,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	Context("when passing in tags", func() {
-		It("sucessfully creates a service and passes the tags as json", func() {
+		It("successfully creates a service and passes the tags as json", func() {
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-t", "tag1, tag2,tag3,  tag4"})
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
