@@ -143,7 +143,7 @@ var _ = Describe("create-space-quota", func() {
 					))
 				})
 
-				It("sets the instance memory limit to unlimiited", func() {
+				It("sets the instance memory limit to unlimited", func() {
 					Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
 				})
 
