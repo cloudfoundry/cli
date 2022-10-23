@@ -481,7 +481,7 @@ var _ = Describe("SSH", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 					})
 
-					It("does not not restore the terminal", func() {
+					It("does not restore the terminal", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.SetRawTerminalCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.RestoreTerminalCallCount()).To(Equal(0))
