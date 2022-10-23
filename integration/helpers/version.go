@@ -99,7 +99,7 @@ func GetAPIVersionV2() string {
 	return fetchAPIVersion().Links.CloudControllerV2.Meta.Version
 }
 
-// SkipIfVersionLessThan is used to skip tests if the the API version < the specified version. If
+// SkipIfVersionLessThan is used to skip tests if the API version < the specified version. If
 // minVersion contains the prefix 3 then the v3 version is checked, otherwise the v2 version is used.
 func SkipIfVersionLessThan(minVersion string) {
 	if ignoreAPIVersion() {
@@ -112,7 +112,7 @@ func SkipIfVersionLessThan(minVersion string) {
 	}
 }
 
-// SkipIfVersionLessThan is used to skip tests if the the API version >= the specified version. If
+// SkipIfVersionLessThan is used to skip tests if the API version >= the specified version. If
 // maxVersion contains the prefix 3 then the v3 version is checked, otherwise the v2 version is used.
 func SkipIfVersionAtLeast(maxVersion string) {
 	version := matchMajorAPIVersion(maxVersion)
