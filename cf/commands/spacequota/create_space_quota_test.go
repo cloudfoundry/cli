@@ -272,7 +272,7 @@ var _ = Describe("create-space-quota", func() {
 				cmd.SetDependency(deps, false)
 			})
 
-			It("alets the user when creating the quota fails", func() {
+			It("alerts the user when creating the quota fails", func() {
 				Expect(runCLIErr).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating space quota", "my-quota", "my-org"},
