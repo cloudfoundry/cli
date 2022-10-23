@@ -572,7 +572,7 @@ var _ = Describe("Domain Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UnsharePrivateDomainFromOrgReturns(
 						ccv3.Warnings{"unshare-domain-warning"},
-						errors.New("unsahre-domain-error"),
+						errors.New("unshare-domain-error"),
 					)
 				})
 
@@ -582,7 +582,7 @@ var _ = Describe("Domain Actions", func() {
 					Expect(actualDomainGUID).To(Equal("private-domain-guid"))
 					Expect(actualOrgGUID).To(Equal("org-guid"))
 
-					Expect(executeErr).To(MatchError(errors.New("unsahre-domain-error")))
+					Expect(executeErr).To(MatchError(errors.New("unshare-domain-error")))
 					Expect(warnings).To(ConsistOf("get-orgs-warning", "get-domains-warning", "unshare-domain-warning"))
 				})
 			})
