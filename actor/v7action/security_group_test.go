@@ -1038,7 +1038,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		When("the seurity group is not bound to the space", func() {
+		When("the security group is not bound to the space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
 					ccv3.Warnings{"get-security-group-warning"},
