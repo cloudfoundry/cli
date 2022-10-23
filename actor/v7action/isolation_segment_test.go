@@ -711,7 +711,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 		})
 
-		When("fetching the resourece fails", func() {
+		When("fetching the resource fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
 					resources.Relationship{},
