@@ -789,12 +789,12 @@ jobs:
           mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf8.exe
           pushd win32
             prepare_win_artifacts
-            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
             zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
           popd
           pushd winx64
             prepare_win_artifacts
-            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
             zip -y cf8-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
           popd
         popd
