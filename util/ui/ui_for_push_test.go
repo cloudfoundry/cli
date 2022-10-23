@@ -35,7 +35,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("DisplayChangesForPush", func() {
-		It("alings all the string types", func() {
+		It("aligns all the string types", func() {
 			changeSet := []Change{
 				{
 					Header:       "h1",
