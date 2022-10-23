@@ -210,7 +210,7 @@ var _ = Describe("ssh Command", func() {
 			}},
 			sharedaction.TTYOption(0),
 		),
-		Entry("disable and requst tty", true, false, true,
+		Entry("disable and request tty", true, false, true,
 			translatableerror.ArgumentCombinationError{Args: []string{
 				"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
 			}},
