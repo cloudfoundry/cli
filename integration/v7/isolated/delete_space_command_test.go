@@ -194,7 +194,7 @@ var _ = Describe("delete-space command", func() {
 		})
 	})
 
-	When("the -o organzation does not exist", func() {
+	When("the -o organization does not exist", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
