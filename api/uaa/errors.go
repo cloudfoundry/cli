@@ -52,7 +52,7 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
-// UnauthorizedError is returned when the authentication informatin is invalid.
+// UnauthorizedError is returned when the authentication information is invalid.
 type UnauthorizedError struct {
 	Message string
 }
