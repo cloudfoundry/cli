@@ -697,7 +697,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			It("makes mutiple calls to get spaces", func() {
+			It("makes multiple calls to get spaces", func() {
 				Expect(len(securityGroupSummaries)).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
