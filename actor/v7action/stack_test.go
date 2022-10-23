@@ -157,7 +157,7 @@ var _ = Describe("Stack", func() {
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
 					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
 				})
-				When("a label selctor is passed in", func() {
+				When("a label selector is passed in", func() {
 					BeforeEach(func() {
 						labelSelector = "some-label-selector"
 					})
