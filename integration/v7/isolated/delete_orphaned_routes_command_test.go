@@ -114,7 +114,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				})
 			})
 
-			When("the user's inpiut is invalud", func() {
+			When("the user's input is invalud", func() {
 				BeforeEach(func() {
 					_, err := buffer.Write([]byte("abc\n"))
 					Expect(err).ToNot(HaveOccurred())
