@@ -131,7 +131,7 @@ This is quite similar to the loop through `actor.PreparePushPlanSequence` above.
 
 _Note: The rest of that code uses streams to report progress, errors, and warnings, but this is not the focus of this ADR (and we may end up changing this as well)._
 
-The **biggest difference** from `Conceputalize` is that instead of being a static list of functions (like `actor.PreparePushPlanSequence`), `actor.ChangeApplicationSequence` is a function that takes in a push plan and returns an array of `ChangeApplicationFunc`s. This allows us to dynamically build up the sequence of actions we run based on the push plan, rather than run the same sequence every time.
+The **biggest difference** from `Conceptualize` is that instead of being a static list of functions (like `actor.PreparePushPlanSequence`), `actor.ChangeApplicationSequence` is a function that takes in a push plan and returns an array of `ChangeApplicationFunc`s. This allows us to dynamically build up the sequence of actions we run based on the push plan, rather than run the same sequence every time.
 
 Let's look at how that works:
 
