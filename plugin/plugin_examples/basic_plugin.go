@@ -35,7 +35,7 @@ func (c *BasicPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 // GetMetadata() returns a PluginMetadata struct. The first field, Name,
 // determines the name of the plugin which should generally be without spaces.
 // If there are spaces in the name a user will need to properly quote the name
-// during uninstall otherwise the name will be treated as seperate arguments.
+// during uninstall otherwise the name will be treated as separate arguments.
 // The second value is a slice of Command structs. Our slice only contains one
 // Command Struct, but could contain any number of them. The first field Name
 // defines the command `cf basic-plugin-command` once installed into the CLI. The
