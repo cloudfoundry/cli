@@ -31,7 +31,7 @@ var _ = Describe("Prompts", func() {
 
 		out = NewBuffer()
 		ui.Out = out
-		ui.OutForInteration = out
+		ui.OutForInteraction = out
 		errBuff = NewBuffer()
 		ui.Err = errBuff
 
@@ -145,7 +145,7 @@ var _ = Describe("Prompts", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				ui.Out = out
-				ui.OutForInteration = out
+				ui.OutForInteraction = out
 
 				inBuffer = NewBuffer()
 				ui.In = inBuffer
@@ -190,7 +190,7 @@ var _ = Describe("Prompts", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				ui.Out = out
-				ui.OutForInteration = out
+				ui.OutForInteraction = out
 
 				inBuffer = NewBuffer()
 				ui.In = inBuffer
