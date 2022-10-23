@@ -73,7 +73,7 @@ var _ = Describe("Flags", func() {
 				Ω(fCtx.Bool("skip2")).To(Equal(true), "skip2 should be true")
 				Ω(fCtx.Bool("name")).To(Equal(false), "name should be false")
 				Ω(fCtx.String("name")).To(Equal("johndoe"), "name should be johndoe")
-				Expect(fCtx.Bool("non-exisit-flag")).To(Equal(false))
+				Expect(fCtx.Bool("non-exist-flag")).To(Equal(false))
 			})
 
 			It("sets Bool(<flag>) to return true if bool flag is provided with invalid value", func() {
@@ -90,7 +90,7 @@ var _ = Describe("Flags", func() {
 
 				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
 				Ω(fCtx.Bool("name")).To(Equal(false), "name should be false")
-				Expect(fCtx.Bool("non-exisit-flag")).To(Equal(false))
+				Expect(fCtx.Bool("non-exist-flag")).To(Equal(false))
 			})
 
 			It("sets String(<flag>) to return provided value when a string flag is provided", func() {
