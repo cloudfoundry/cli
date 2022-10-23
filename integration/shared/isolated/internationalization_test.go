@@ -64,11 +64,11 @@ var _ = XDescribe("internationalization", func() {
 			return helpers.CF("push", "--help")
 		}),
 
-		Entry("when the the LANG environment variable is set to a non-supported langauge", func() *Session {
+		Entry("when the the LANG environment variable is set to a non-supported language", func() *Session {
 			return helpers.CFWithEnv(map[string]string{"LANG": "jj-FF"}, "push", "--help")
 		}),
 
-		Entry("when the the LC_ALL environment variable is set to a non-supported langauge", func() *Session {
+		Entry("when the the LC_ALL environment variable is set to a non-supported language", func() *Session {
 			return helpers.CFWithEnv(map[string]string{"LC_ALL": "jj-FF"}, "push", "--help")
 		}),
 	)
