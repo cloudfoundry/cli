@@ -31,7 +31,7 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Say("ENVIRONMENT VARIABLES:"))
 			Eventually(session).Should(Say(`CF_USERNAME=user\s+Authenticating user. Overridden if USERNAME argument is provided.`))
-			Eventually(session).Should(Say(`CF_PASSWORD=password\s+Password associated with user. Overriden if PASSWORD argument is provided.`))
+			Eventually(session).Should(Say(`CF_PASSWORD=password\s+Password associated with user. Overridden if PASSWORD argument is provided.`))
 
 			Eventually(session).Should(Say("WARNING:"))
 			Eventually(session).Should(Say("Providing your password as a command line option is highly discouraged"))
