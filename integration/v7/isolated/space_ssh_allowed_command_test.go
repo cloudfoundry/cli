@@ -65,7 +65,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 		When("the space does not exist", func() {
 			BeforeEach(func() {
-				spaceName = "non-existent-space"
+				spaceName = "nonexistent-space"
 			})
 
 			It("displays a missing space error message and fails", func() {

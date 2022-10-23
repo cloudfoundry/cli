@@ -129,19 +129,19 @@ var _ = Describe("delete-space-quota command", func() {
 		Context("when finding the quota fails", func() {
 			Context("when the quota provided does not exist", func() {
 				BeforeEach(func() {
-					quotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.NewModelNotFoundError("Quota", "non-existent-quota"))
+					quotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.NewModelNotFoundError("Quota", "nonexistent-quota"))
 				})
 
 				It("warns the user when that the quota does not exist", func() {
-					runCommand("-f", "non-existent-quota")
+					runCommand("-f", "nonexistent-quota")
 
 					Expect(ui.Outputs()).To(ContainSubstrings(
-						[]string{"Deleting", "non-existent-quota"},
+						[]string{"Deleting", "nonexistent-quota"},
 						[]string{"OK"},
 					))
 
 					Expect(ui.WarnOutputs).To(ContainSubstrings(
-						[]string{"non-existent-quota", "does not exist"},
+						[]string{"nonexistent-quota", "does not exist"},
 					))
 				})
 			})

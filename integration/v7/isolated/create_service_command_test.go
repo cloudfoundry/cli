@@ -356,7 +356,7 @@ var _ = Describe("create-service command", func() {
 				})
 
 				It("displays an informative message and exits 1", func() {
-					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", filepath.Join(emptyDir, "non-existent-file"))
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", filepath.Join(emptyDir, "nonexistent-file"))
 					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 					Eventually(session).Should(Exit(1))
 				})
