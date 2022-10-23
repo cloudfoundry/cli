@@ -121,7 +121,7 @@ var _ = Describe("SSHOptions", func() {
 			BeforeEach(func() {
 				args = append(args, "app-name", "-tt")
 			})
-			It("foces tty allocation", func() {
+			It("forces tty allocation", func() {
 				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYForce))
 			})
 		})
