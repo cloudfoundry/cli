@@ -41,7 +41,7 @@ func urlQueryContains(container, containee url.Values) bool {
 
 	//Example: "foo:bar;baz:qux" is semantically the same as "baz:qux;foo:bar". CC doesn't care about order.
 
-	//Therefore, we crack apart "q" params on their seperator (a colon) and compare the resulting
+	//Therefore, we crack apart "q" params on their separator (a colon) and compare the resulting
 	//substrings.  No other params seem to use semicolon separators AND are order-dependent, so we just
 	//run all params through the same process.
 	for key := range containee {
