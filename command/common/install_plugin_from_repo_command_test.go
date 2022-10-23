@@ -307,7 +307,7 @@ var _ = Describe("install-plugin command", func() {
 									})
 								})
 
-								When("creating an exectuable copy succeeds", func() {
+								When("creating an executable copy succeeds", func() {
 									BeforeEach(func() {
 										fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 									})
