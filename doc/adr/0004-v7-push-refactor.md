@@ -127,7 +127,7 @@ for _, changeAppFunc := range actor.ChangeApplicationSequence(plan) {
 }
 ```
 
-This is quite similar to the loop through `actor.PreparePushPlanSequence` above. We loop through `actor.ChangeApplicationSequence(plan)`, which returns an array of functions, and we call each one with the push plan. Each one returns a push plan that then gets passed in to the next function.
+This is quite similar to the loop through `actor.PreparePushPlanSequence` above. We loop through `actor.ChangeApplicationSequence(plan)`, which returns an array of functions, and we call each one with the push plan. Each one returns a push plan that then gets passed into the next function.
 
 _Note: The rest of that code uses streams to report progress, errors, and warnings, but this is not the focus of this ADR (and we may end up changing this as well)._
 

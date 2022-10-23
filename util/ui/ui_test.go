@@ -155,7 +155,7 @@ var _ = Describe("UI", func() {
 
 	// Covers the happy paths, additional cases are tested in TranslateText
 	Describe("DisplayText", func() {
-		It("displays the template with map values substituted in to ui.Out with a newline", func() {
+		It("displays the template with map values substituted into ui.Out with a newline", func() {
 			ui.DisplayText(
 				"template with {{.SomeMapValue}}",
 				map[string]interface{}{
@@ -175,7 +175,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values substituted in to ui.Out", func() {
+			It("displays the translated template with map values substituted into ui.Out", func() {
 				ui.DisplayText(
 					"\nTIP: Use '{{.Command}}' to target new org",
 					map[string]interface{}{
@@ -219,7 +219,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("DeferText", func() {
-		It("defers the template with map values substituted in to ui.Out with a newline", func() {
+		It("defers the template with map values substituted into ui.Out with a newline", func() {
 			ui.DeferText(
 				"template with {{.SomeMapValue}}",
 				map[string]interface{}{
@@ -241,7 +241,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("defers the translated template with map values substituted in to ui.Out", func() {
+			It("defers the translated template with map values substituted into ui.Out", func() {
 				ui.DeferText(
 					"\nTIP: Use '{{.Command}}' to target new org",
 					map[string]interface{}{
@@ -263,7 +263,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("an optional map is passed in", func() {
-			It("displays the template with map values bolded and substituted in to ui.Out", func() {
+			It("displays the template with map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}}",
 					map[string]interface{}{
@@ -274,7 +274,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("multiple optional maps are passed in", func() {
-			It("displays the template with only the first map values bolded and substituted in to ui.Out", func() {
+			It("displays the template with only the first map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
 					map[string]interface{}{
@@ -298,7 +298,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values bolded and substituted in to ui.Out", func() {
+			It("displays the translated template with map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"App {{.AppName}} does not exist.",
 					map[string]interface{}{
@@ -316,7 +316,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("an optional map is passed in", func() {
-			It("displays the template with map values colorized, bolded, and substituted in to ui.Out", func() {
+			It("displays the template with map values colorized, bolded, and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}}",
 					map[string]interface{}{
@@ -327,7 +327,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("multiple optional maps are passed in", func() {
-			It("displays the template with only the first map values colorized, bolded, and substituted in to ui.Out", func() {
+			It("displays the template with only the first map values colorized, bolded, and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
 					map[string]interface{}{
@@ -351,7 +351,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values colorized, bolded and substituted in to ui.Out", func() {
+			It("displays the translated template with map values colorized, bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"App {{.AppName}} does not exist.",
 					map[string]interface{}{
