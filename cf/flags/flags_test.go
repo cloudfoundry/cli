@@ -8,7 +8,7 @@ import (
 
 var _ = Describe("Flags", func() {
 	Describe("FlagContext", func() {
-		Describe("Parsing and retriving values", func() {
+		Describe("Parsing and retrieving values", func() {
 			var (
 				fCtx       flags.FlagContext
 				cmdFlagMap map[string]flags.FlagSet
