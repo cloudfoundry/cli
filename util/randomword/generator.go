@@ -83,7 +83,7 @@ wacky
 wise
 zany`
 
-const nouns = `ardvark
+const nouns = `aardvark
 alligator
 antelope
 baboon
