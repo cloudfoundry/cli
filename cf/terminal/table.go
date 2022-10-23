@@ -174,7 +174,7 @@ func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row [
 	return nil
 }
 
-// printRow is responsible for the layouting, transforming and
+// printRow is responsible for the laying-out, transforming and
 // printing of the string in a single row
 func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) error {
 
