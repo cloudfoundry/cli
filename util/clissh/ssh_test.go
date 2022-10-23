@@ -578,7 +578,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		When("a command is specifed", func() {
+		When("a command is specified", func() {
 			BeforeEach(func() {
 				commands = []string{"echo", "-n", "hello"}
 			})

@@ -7,5 +7,5 @@ type AppNotFoundInManifestError struct {
 }
 
 func (e AppNotFoundInManifestError) Error() string {
-	return fmt.Sprintf("specfied app: %s not found in manifest", e.Name)
+	return fmt.Sprintf("specified app: %s not found in manifest", e.Name)
 }

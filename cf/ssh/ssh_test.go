@@ -581,7 +581,7 @@ var _ = Describe("SSH", func() {
 			})
 		})
 
-		Context("when a command is specifed", func() {
+		Context("when a command is specified", func() {
 			BeforeEach(func() {
 				opts.Command = []string{"echo", "-n", "hello"}
 			})
