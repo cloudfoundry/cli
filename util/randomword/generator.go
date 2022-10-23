@@ -170,7 +170,7 @@ rabbit
 ratel
 raven
 reedbuck
-rhinocerous
+rhinoceros
 roan
 sable
 serval
