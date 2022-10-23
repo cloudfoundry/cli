@@ -94,7 +94,7 @@ var _ = Describe("create-user-provided-service command", func() {
 		})
 	})
 
-	When("targetting a space", func() {
+	When("targeting a space", func() {
 		var (
 			userName    string
 			orgName     string
