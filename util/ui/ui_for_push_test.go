@@ -113,9 +113,9 @@ var _ = Describe("UI", func() {
 					})
 
 					When("the values are a different type", func() {
-						It("should return an ErrValueMissmatch", func() {
+						It("should return an ErrValueMismatch", func() {
 							err := ui.DisplayChangeForPush("asdf", 2, false, "asdf", 7)
-							Expect(err).To(MatchError(ErrValueMissmatch))
+							Expect(err).To(MatchError(ErrValueMismatch))
 						})
 					})
 				})
@@ -153,9 +153,9 @@ var _ = Describe("UI", func() {
 					})
 
 					When("the values are a different type", func() {
-						It("should return an ErrValueMissmatch", func() {
+						It("should return an ErrValueMismatch", func() {
 							err := ui.DisplayChangeForPush("asdf", 2, true, "asdf", 7)
-							Expect(err).To(MatchError(ErrValueMissmatch))
+							Expect(err).To(MatchError(ErrValueMismatch))
 						})
 					})
 				})
@@ -175,9 +175,9 @@ var _ = Describe("UI", func() {
 				})
 
 				When("the values are a different type", func() {
-					It("should return an ErrValueMissmatch", func() {
+					It("should return an ErrValueMismatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, []string{"route4", "route2", "route3"}, 7)
-						Expect(err).To(MatchError(ErrValueMissmatch))
+						Expect(err).To(MatchError(ErrValueMismatch))
 					})
 				})
 
@@ -221,9 +221,9 @@ var _ = Describe("UI", func() {
 				})
 
 				When("the values are a different type", func() {
-					It("should return an ErrValueMissmatch", func() {
+					It("should return an ErrValueMismatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, 7, "asdf")
-						Expect(err).To(MatchError(ErrValueMissmatch))
+						Expect(err).To(MatchError(ErrValueMismatch))
 					})
 				})
 			})
@@ -275,9 +275,9 @@ var _ = Describe("UI", func() {
 				})
 
 				When("the values are a different type", func() {
-					It("should return an ErrValueMissmatch", func() {
+					It("should return an ErrValueMismatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, types.NullInt{}, "asdf")
-						Expect(err).To(MatchError(ErrValueMissmatch))
+						Expect(err).To(MatchError(ErrValueMismatch))
 					})
 				})
 			})
@@ -311,9 +311,9 @@ var _ = Describe("UI", func() {
 				})
 
 				When("the values are a different type", func() {
-					It("should return an ErrValueMissmatch", func() {
+					It("should return an ErrValueMismatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, uint64(7), "asdf")
-						Expect(err).To(MatchError(ErrValueMissmatch))
+						Expect(err).To(MatchError(ErrValueMismatch))
 					})
 				})
 			})
@@ -333,9 +333,9 @@ var _ = Describe("UI", func() {
 				})
 
 				When("the values are a different type", func() {
-					It("should return an ErrValueMissmatch", func() {
+					It("should return an ErrValueMismatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, map[string]string{}, map[string]int{})
-						Expect(err).To(MatchError(ErrValueMissmatch))
+						Expect(err).To(MatchError(ErrValueMismatch))
 					})
 				})
 
