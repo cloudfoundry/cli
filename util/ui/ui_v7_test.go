@@ -54,15 +54,15 @@ var _ = Describe("UI", func() {
 
 			When("there are multiple warnings", func() {
 				It("displays translated warnings to ui.Err", func() {
-					ui.DisplayWarnings([]string{"un-translateable warning", "FEATURE FLAGS", "Number of instances"})
-					Expect(string(errBuff.Contents())).To(Equal("un-translateable warning\nINDICATEURS DE FONCTION\nNombre d'instances\n"))
+					ui.DisplayWarnings([]string{"un-translatable warning", "FEATURE FLAGS", "Number of instances"})
+					Expect(string(errBuff.Contents())).To(Equal("un-translatable warning\nINDICATEURS DE FONCTION\nNombre d'instances\n"))
 				})
 			})
 
 			When("there is a single warning ", func() {
 				It("displays the translated warning to ui.Err", func() {
-					ui.DisplayWarnings([]string{"un-translateable warning"})
-					Expect(string(errBuff.Contents())).To(Equal("un-translateable warning\n"))
+					ui.DisplayWarnings([]string{"un-translatable warning"})
+					Expect(string(errBuff.Contents())).To(Equal("un-translatable warning\n"))
 				})
 			})
 
