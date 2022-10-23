@@ -76,7 +76,7 @@ var _ = Describe("share route command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the domain extists", func() {
+		When("the domain exists", func() {
 			var (
 				domainName      string
 				targetSpaceName string
