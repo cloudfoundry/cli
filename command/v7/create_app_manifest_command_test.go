@@ -116,7 +116,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
 			})
 
-			It("creates application manifest in current directry as <app-name>-manifest.yml", func() {
+			It("creates application manifest in current directory as <app-name>-manifest.yml", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeActor.GetRawApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
