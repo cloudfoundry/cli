@@ -54,7 +54,7 @@ jobs:
         echo "golang version: ${go_version[1]}"
         echo "::set-output name=go-version::${go_version[1]}"
 
-    # This is for debugging. It's equivalent to fly intecept
+    # This is for debugging. It's equivalent to fly intercept
     # - name: Setup upterm session
     #   env:
     #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
