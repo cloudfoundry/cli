@@ -79,7 +79,7 @@ func SkipIfUAAVersionLessThan(version string) {
 	}
 }
 
-// SkipIfUAAVersionAtLeast is used to skip tests if the UAA varsion >= the specified version.
+// SkipIfUAAVersionAtLeast is used to skip tests if the UAA version >= the specified version.
 func SkipIfUAAVersionAtLeast(version string) {
 	if IsUAAVersionAtLeast(version) {
 		Skip(fmt.Sprintf("Test requires UAA version less than %s", version))
