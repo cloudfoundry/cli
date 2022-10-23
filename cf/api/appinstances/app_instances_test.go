@@ -64,7 +64,7 @@ var _ = Describe("AppInstancesRepo", func() {
 
 		It("returns the error if the response is unsuccessful", func() {
 			ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
-				deleteInstanceFromUnkownApp,
+				deleteInstanceFromUnknownApp,
 			})
 			defer ts.Close()
 			appGUID := "some-wrong-app-guid"
@@ -128,7 +128,7 @@ var deleteInstanceRequest = apifakes.NewCloudControllerTestRequest(testnet.TestR
 	Response: testnet.TestResponse{Status: http.StatusNoContent, Body: `{}`},
 })
 
-var deleteInstanceFromUnkownApp = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+var deleteInstanceFromUnknownApp = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "DELETE",
 	Path:     "/v2/apps/some-wrong-app-guid/instances/0",
 	Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{}`},
