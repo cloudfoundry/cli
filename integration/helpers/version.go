@@ -96,7 +96,7 @@ func matchMajorAPIVersion(minVersion string) string {
 
 // GetAPIVersionV2 returns the V2 api version of the targeted API
 func GetAPIVersionV2() string {
-	return fetchAPIVersion().Links.CloudContollerV2.Meta.Version
+	return fetchAPIVersion().Links.CloudControllerV2.Meta.Version
 }
 
 // SkipIfVersionLessThan is used to skip tests if the the API version < the specified version. If
@@ -134,13 +134,13 @@ func ignoreAPIVersion() bool {
 
 type ccRoot struct {
 	Links struct {
-		CloudContollerV2 struct {
+		CloudControllerV2 struct {
 			Meta struct {
 				Version string
 			}
 		} `json:"cloud_controller_v2"`
 
-		CloudContollerV3 struct {
+		CloudControllerV3 struct {
 			Meta struct {
 				Version string
 			}
@@ -172,7 +172,7 @@ func fetchAPIVersion() ccRoot {
 }
 
 func getAPIVersionV3() string {
-	return fetchAPIVersion().Links.CloudContollerV3.Meta.Version
+	return fetchAPIVersion().Links.CloudControllerV3.Meta.Version
 }
 
 // SkipIfNoRoutingAPI is used to skip tests if the routing API is not present
