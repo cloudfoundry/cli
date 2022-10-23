@@ -67,7 +67,7 @@ var _ = Describe("create-user-provided-service command", func() {
 			})
 		})
 
-		When("an superflous argument is provided", func() {
+		When("an superfluous argument is provided", func() {
 			It("fails and displays command usage", func() {
 				session := helpers.CF("create-user-provided-service", "name", "extraparam")
 				Eventually(session).Should(Exit(1))
