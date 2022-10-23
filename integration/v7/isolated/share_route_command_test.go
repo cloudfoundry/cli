@@ -56,7 +56,7 @@ var _ = Describe("share route command", func() {
 		})
 	})
 
-	When("the environment is set up conrrectly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			userName  string
 			orgName   string
