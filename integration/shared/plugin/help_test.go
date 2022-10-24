@@ -18,7 +18,7 @@ var _ = Describe("help", func() {
 		uninstallTestPlugin()
 	})
 
-	It("displays the plugin commands in master help", func() {
+	It("displays the plugin commands in main help", func() {
 		session := helpers.CF("help")
 		Eventually(session).Should(Say("TestPluginCommandWithAlias"))
 		Eventually(session).Should(Exit(0))

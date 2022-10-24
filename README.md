@@ -11,7 +11,7 @@ View the latest help for [**The v8 CLI**](https://cli.cloudfoundry.org/en-US/v8)
 [![Documentation](https://img.shields.io/badge/docs-online-ff69b4.svg)](https://docs.cloudfoundry.org/cf-cli)
 [![Command help pages](https://img.shields.io/badge/command-help-lightgrey.svg)](https://cli.cloudfoundry.org)
 [![Slack](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/main/LICENSE)
 
 CF CLI Binary Download Server's uptime:
 
@@ -55,7 +55,7 @@ on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/89293
 ## Contributing & Build Instructions
 Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
-If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
+If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/main/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
 ![Example](.github/cf_example.gif)
 
@@ -94,7 +94,7 @@ If the error remains or feature still missing, check the [open issues](https://g
 The CF CLI supports external code execution via the plugins API. For more
 information follow:
 
-* [The CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples)
+* [The CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/main/plugin/plugin_examples)
 * [The official plugins repository](https://plugins.cloudfoundry.org/)
 
 When importing the plugin code use `import "code.cloudfoundry.org/cli/plugin"`.

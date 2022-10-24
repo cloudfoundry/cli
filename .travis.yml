@@ -8,7 +8,7 @@ script:
 - NODES=1 make units-full
 branches:
   only:
-  - master
+  - main
   - travis
 os:
   - linux
