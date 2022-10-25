@@ -228,6 +228,7 @@ type Actor interface {
 	UnsetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, EnvironmentVariableName string) (v7action.Warnings, error)
 	UnsetSpaceQuota(spaceQuotaName, spaceName, orgGUID string) (v7action.Warnings, error)
 	UnsharePrivateDomain(domainName string, orgName string) (v7action.Warnings, error)
+	UnshareRoute(routeGUID string, spaceGUID string) (v7action.Warnings, error)
 	UnshareServiceInstanceFromSpaceAndOrg(serviceInstanceName, targetedSpaceGUID, targetedOrgGUID string, unshareFromDetails v7action.ServiceInstanceSharingParams) (v7action.Warnings, error)
 	UpdateAppFeature(app resources.Application, enabled bool, featureName string) (v7action.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, v7action.Warnings, error)
