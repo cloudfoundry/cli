@@ -64,6 +64,12 @@ var _ = Describe("routes command", func() {
 			Expect(runCommand()).To(BeFalse())
 		})
 
+		It("does not fail when an org is not targeted and --orglevel is an argument", func() {
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not logged in"})
+
+			Expect(runCommand("--orglevel")).To(BeTrue())
+		})
+
 		Context("when arguments are provided", func() {
 			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
