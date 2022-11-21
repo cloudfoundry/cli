@@ -80,6 +80,12 @@ jobs:
         with:
           repository: cloudfoundry/cf-deployment
           path: cf-deployment
+      
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cf-deployment-concourse-tasks
+          path: cf-deployment-concourse-tasks
 
       - name: Checkout
         uses: actions/checkout@v3
