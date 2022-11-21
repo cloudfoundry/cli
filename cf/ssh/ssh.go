@@ -23,7 +23,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/ssh/options"
 	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
 	"code.cloudfoundry.org/cli/cf/ssh/terminal"
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 )
 
 const (
