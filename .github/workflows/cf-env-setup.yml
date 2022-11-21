@@ -66,11 +66,26 @@ jobs:
           repository: cloudfoundry/cli-ci
           path: cli-ci
 
-      - name: Checkout cf-deployment
+      - name: Checkout cf-deployment Min CAPI
+        if: ${{ inputs.capi-version != 'edge' }}
         uses: actions/checkout@v3
         with:
           repository: cloudfoundry/cf-deployment
           path: cf-deployment
+          ref: v16.11.0
+      
+      - name: Checkout cf-deployment
+        uses: actions/checkout@v3
+        if: ${{ inputs.capi-version == 'edge' }}
+        with:
+          repository: cloudfoundry/cf-deployment
+          path: cf-deployment
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cf-deployment-concourse-tasks
+          path: cf-deployment-concourse-tasks
 
       - name: Checkout cli
         uses: actions/checkout@v3
@@ -113,14 +128,76 @@ jobs:
       - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
         if: ${{ inputs.capi-version != 'edge' }}
         run: |
-          eval "$(bbl print-env --metadata-file metadata.json)"
-          export BOSHENV_capi_version="${{ inputs.capi-version }}"
-          bosh -d cf manifest > /tmp/manifest.json
-          bosh -n -d cf deploy /tmp/manifest.json \
-               -o cli-ci/ci/infrastructure/operations/use-version-of-capi.yml \
-               -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
-               -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
-               --vars-env=BOSHENV
+          # Creates vars files
+          mkdir vars-files
+          echo "cs = ${{ secrets.CLIENT_SECRET }}"
+          cat << EOF > vars-files/vars.yml
+            client-secret: ${{ secrets.CLIENT_SECRET }}
+          EOF
 
-          echo "Deployed CAPI version: ${{ inputs.capi-version }}"
-          bosh -d cf releases | grep capi
+          # Copy Ops files
+          mkdir ops-files
+          cp cf-deployment/operations/scale-to-one-az.yml ops-files/
+          cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
+          cp cf-deployment/operations/use-compiled-releases.yml ops-files/
+          cp cf-deployment/operations/use-internal-lookup-for-route-services.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-dummy-windows-stack.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/add-uaa-client-cf-custom.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/adjust-user-retry-attempts.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/cli-isolation-cell-overrides.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/default-app-memory.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/doppler-instances.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/enable-v3-deployments-endpoint.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/reduce-async-service-polling.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/skip-ssl-override.yml ops-files/
+          cp cli-ci/ci/infrastructure/operations/uaa-vm_type-override.yml ops-files/
+        
+          # Deletes CF-D
+          eval "$(bbl print-env --metadata-file metadata.json)"
+          bosh -d cf delete-deployment -n
+
+          # Deploy CF-D
+          mkdir toolsmiths-env
+          cp metadata.json toolsmiths-env/metadata
+          cat metadata.json | jq -r .name > toolsmiths-env/name
+          export VARS_FILES="vars.yml"
+          export MANIFEST_FILE="cf-deployment.yml"
+          export SYSTEM_DOMAIN=""
+          export REGENERATE_CREDENTIALS=false
+          export DEPLOY_WITH_UPTIME_MEASUREMENTS=false
+          export MEASURE_SYSLOG_AVAILABILITY=false
+          export TCP_DOMAIN=""
+          export AVAILABLE_PORT=""
+          export FAIL_ON_DOWNTIME=false
+          export APP_PUSHABILITY_THRESHOLD=0
+          export HTTP_AVAILABILITY_THRESHOLD=0
+          export RECENT_LOGS_THRESHOLD=0
+          export STREAMING_LOGS_THRESHOLD=0
+          export APP_SYSLOG_AVAILABILITY_THRESHOLD=0
+          export USE_SINGLE_APP_INSTANCE=false
+          export BOSH_DEPLOY_ARGS=""
+          export BOSH_LITE=false
+          export BBL_JSON_CONFIG=""
+          export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
+          use-compiled-releases.yml \
+          cli-isolation-cell-overrides.yml \
+          default-app-memory.yml \
+          skip-ssl-override.yml \
+          scale-to-one-az.yml \
+          diego-cell-instances.yml \
+          doppler-instances.yml \
+          uaa-vm_type-override.yml \
+          add-uaa-client-credentials.yml \
+          add-dummy-windows-stack.yml \
+          reduce-async-service-polling.yml \
+          add-oidc-provider.yml \
+          adjust-user-retry-attempts.yml \
+          enable-v3-deployments-endpoint.yml \
+          give-cf-admin-clients-read-scope.yml \
+          add-uaa-client-cf-custom.yml \
+          use-internal-lookup-for-route-services.yml"
+          ./cf-deployment-concourse-tasks/bosh-deploy/task 

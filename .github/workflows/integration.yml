@@ -16,6 +16,7 @@ on:
       - main
       - v8
       - v7
+      - linux-min-capi-int-test
     paths-ignore:
       - 'doc/**'
       - '.github/**'
@@ -216,3 +217,107 @@ jobs:
     secrets: inherit
 
 ## END min CAPI
+
+## START windows  
+  get-windows-cf-env-with-edge-capi:
+    name: Setup CF env with EDGE CAPI for windows
+    needs: shared-values
+    uses: ./.github/workflows/cf-env-setup.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      capi-version: edge
+    secrets: inherit
+
+  setup-windows-integration:
+    name: Setup Integration Tests Windows
+    needs: 
+     - shared-values
+     - get-windows-cf-env-with-edge-capi
+    runs-on: ubuntu-latest
+    environment: ${{ needs.shared-values.outputs.secrets-environment}}
+    steps:
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.get-windows-cf-env-with-edge-capi.environment-name }} 
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+
+      - name: Setup Integration Tests
+        id: setup-windows-integration-step
+        run: |
+          ENV=$(cat metadata.json | jq -r '.name')
+          DATA_DIR=$PWD/cf-data
+          mkdir -p $DATA_DIR
+          eval "$(bbl print-env --metadata-file metadata.json)"
+
+          credhub login
+          CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+          CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+
+          credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $DATA_DIR/$ENV.router.ca
+
+          echo "Deployed CAPI version:"
+          bosh -d cf releases | grep capi
+
+          # set -x
+
+          # output password into a temp file for consumption by Windows
+          echo $CF_INT_PASSWORD > $DATA_DIR/cf-password
+          echo $CF_INT_OIDC_PASSWORD > $DATA_DIR/uaa-oidc-password
+
+          echo "::set-output name=data::$DATA_DIR"
+      - name: 'Upload CF Data'
+        uses: actions/download-artifact@v3
+        with:
+          name: cf-windows-data
+          path: ${{ steps.setup-windows-integration-step.outputs.data }}
+
+  run-windows-integration-tests:
+    name: Run Integration tests Windows 
+    needs:
+      - shared-values
+      - get-windows-cf-env-with-edge-capi
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+      - name: Set Up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ needs.shared-values.outputs.go-version}}
+          check-latest: true
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.get-windows-cf-env-with-edge-capi.environment-name }} 
+
+      - name: Download CF data
+        uses: actions/download-artifact@v3
+        with:
+          name: cf-windows-data 
+      
+      - name: Run Integration Tests
+        run: cli/.github/win/integrations/integration-tests.ps1
+
+  unclaim-cf-windows-env-with-edge-capi:
+    name: Unclaim CF windows env with edge CAPI
+    needs:
+      - shared-values
+      - get-windows-cf-env-with-edge-capi
+      - run-windows-integration-tests
+    if: always()
+    uses: ./.github/workflows/cf-env-unclaim.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      toolsmith-env-name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
+    secrets: inherit
