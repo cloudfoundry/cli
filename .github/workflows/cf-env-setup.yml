@@ -12,10 +12,10 @@ on:
     outputs:
       environment-name:
         description: "Name of claimed environment"
-        value: ${{ jobs.setup-cf-env.outputs.environment-name }}
+        value: ${{ jobs.cf-env-setup.outputs.environment-name }}
 
 jobs:
-  setup-cf-env:
+  cf-env-setup:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
@@ -50,7 +50,7 @@ jobs:
 
             sleep 30
           done
-          
+
           ENV=$(cat metadata.json | jq -r '.name')
           echo "::set-output name=environment-name::${ENV}"
 
@@ -71,6 +71,13 @@ jobs:
         with:
           repository: cloudfoundry/cf-deployment
           path: cf-deployment
+
+      - name: Checkout cli
+        uses: actions/checkout@v3
+        with:
+          repository: cloudfoundry/cli
+          path: cli
+          ref: linux-min-capi-int-test
 
       - name: Install Tools
         run: |
@@ -101,4 +108,19 @@ jobs:
                -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml
 
           echo "Deployed CAPI version:"
+          bosh -d cf releases | grep capi
+
+      - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
+        if: ${{ inputs.capi-version != 'edge' }}
+        run: |
+          eval "$(bbl print-env --metadata-file metadata.json)"
+          export BOSHENV_capi_version="${{ inputs.capi-version }}"
+          bosh -d cf manifest > /tmp/manifest.json
+          bosh -n -d cf deploy /tmp/manifest.json \
+               -o cli-ci/ci/infrastructure/operations/use-version-of-capi.yml \
+               -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
+               -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
+               --vars-env=BOSHENV
+
+          echo "Deployed CAPI version: ${{ inputs.capi-version }}"
           bosh -d cf releases | grep capi
