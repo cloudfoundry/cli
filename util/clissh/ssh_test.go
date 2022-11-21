@@ -28,7 +28,7 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
 	"code.cloudfoundry.org/lager/lagertest"
 	"github.com/kr/pty"
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/crypto/ssh"
