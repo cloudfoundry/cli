@@ -79,7 +79,7 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 
 			Context("when the force flag is provided", func() {
-				It("does not prompt the user to delete the buildback", func() {
+				It("does not prompt the user to delete the buildpack", func() {
 					runCommand("-f", "my-buildpack")
 
 					Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))

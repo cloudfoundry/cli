@@ -277,7 +277,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 				flagContext.Parse("service-instance", "-t", "tag1, tag2, tag3, tag4")
 			})
 
-			It("sucessfully creates a service instance and passes the tags as json", func() {
+			It("successfully creates a service instance and passes the tags as json", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, _, _, tags := serviceInstanceRepo.CreateArgsForCall(0)

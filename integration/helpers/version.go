@@ -79,7 +79,7 @@ func SkipIfUAAVersionLessThan(version string) {
 	}
 }
 
-// SkipIfUAAVersionAtLeast is used to skip tests if the UAA varsion >= the specified version.
+// SkipIfUAAVersionAtLeast is used to skip tests if the UAA version >= the specified version.
 func SkipIfUAAVersionAtLeast(version string) {
 	if IsUAAVersionAtLeast(version) {
 		Skip(fmt.Sprintf("Test requires UAA version less than %s", version))
@@ -96,10 +96,10 @@ func matchMajorAPIVersion(minVersion string) string {
 
 // GetAPIVersionV2 returns the V2 api version of the targeted API
 func GetAPIVersionV2() string {
-	return fetchAPIVersion().Links.CloudContollerV2.Meta.Version
+	return fetchAPIVersion().Links.CloudControllerV2.Meta.Version
 }
 
-// SkipIfVersionLessThan is used to skip tests if the the API version < the specified version. If
+// SkipIfVersionLessThan is used to skip tests if the API version < the specified version. If
 // minVersion contains the prefix 3 then the v3 version is checked, otherwise the v2 version is used.
 func SkipIfVersionLessThan(minVersion string) {
 	if ignoreAPIVersion() {
@@ -112,7 +112,7 @@ func SkipIfVersionLessThan(minVersion string) {
 	}
 }
 
-// SkipIfVersionLessThan is used to skip tests if the the API version >= the specified version. If
+// SkipIfVersionLessThan is used to skip tests if the API version >= the specified version. If
 // maxVersion contains the prefix 3 then the v3 version is checked, otherwise the v2 version is used.
 func SkipIfVersionAtLeast(maxVersion string) {
 	version := matchMajorAPIVersion(maxVersion)
@@ -134,13 +134,13 @@ func ignoreAPIVersion() bool {
 
 type ccRoot struct {
 	Links struct {
-		CloudContollerV2 struct {
+		CloudControllerV2 struct {
 			Meta struct {
 				Version string
 			}
 		} `json:"cloud_controller_v2"`
 
-		CloudContollerV3 struct {
+		CloudControllerV3 struct {
 			Meta struct {
 				Version string
 			}
@@ -172,7 +172,7 @@ func fetchAPIVersion() ccRoot {
 }
 
 func getAPIVersionV3() string {
-	return fetchAPIVersion().Links.CloudContollerV3.Meta.Version
+	return fetchAPIVersion().Links.CloudControllerV3.Meta.Version
 }
 
 // SkipIfNoRoutingAPI is used to skip tests if the routing API is not present

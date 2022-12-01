@@ -37,7 +37,7 @@ var _ = Describe("HandleStackOverride", func() {
 				}
 			})
 
-			It("will retain the origional stack value", func() {
+			It("will retain the original stack value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications[0].Stack).To(Equal("og_cflinuxfs"))
 			})

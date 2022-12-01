@@ -107,7 +107,7 @@ var _ = Describe("Organization Repository", func() {
 					Expect(len(orgs)).To(Equal(3))
 				})
 
-				It("lists the orgs from the the /v2/orgs endpoint in alphabetical order", func() {
+				It("lists the orgs from the /v2/orgs endpoint in alphabetical order", func() {
 					orgs, apiErr := repo.ListOrgs(0)
 
 					Expect(len(orgs)).To(Equal(3))

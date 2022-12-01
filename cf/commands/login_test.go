@@ -760,7 +760,7 @@ var _ = Describe("Login Command", func() {
 				})
 			})
 
-			Describe("and the login fails authenticaton", func() {
+			Describe("and the login fails authentication", func() {
 				BeforeEach(func() {
 					authRepo.AuthenticateReturns(errors.New("Error authenticating."))
 

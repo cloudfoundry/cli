@@ -12,7 +12,7 @@ import (
 // Params map path keys to values.  For example, if your route has the path
 // pattern:
 //   /person/:person_id/pets/:pet_type
-// Then a correct Params map would lool like:
+// Then a correct Params map would look like:
 //   router.Params{
 //     "person_id": "123",
 //     "pet_type": "cats",

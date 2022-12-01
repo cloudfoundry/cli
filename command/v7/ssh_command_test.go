@@ -203,14 +203,14 @@ var _ = Describe("ssh Command", func() {
 		Entry("default - auto TTY", false, false, false, nil, sharedaction.RequestTTYAuto),
 		Entry("disable tty - no TTY", true, false, false, nil, sharedaction.RequestTTYNo),
 		Entry("force tty - forced TTY", false, true, false, nil, sharedaction.RequestTTYForce),
-		Entry("psudo tty - yes TTY", false, false, true, nil, sharedaction.RequestTTYYes),
+		Entry("pseudo tty - yes TTY", false, false, true, nil, sharedaction.RequestTTYYes),
 		Entry("disable and force tty", true, true, false,
 			translatableerror.ArgumentCombinationError{Args: []string{
 				"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
 			}},
 			sharedaction.TTYOption(0),
 		),
-		Entry("disable and requst tty", true, false, true,
+		Entry("disable and request tty", true, false, true,
 			translatableerror.ArgumentCombinationError{Args: []string{
 				"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
 			}},
