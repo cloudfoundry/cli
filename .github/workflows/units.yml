@@ -1,8 +1,29 @@
 name: Units Tests
 
-on: [push]
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.gitpod.yml'
+      - 'README.md'
+  push:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+
 permissions:
-  contents: write
+  contents: read
 
 defaults:
   run:
