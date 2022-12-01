@@ -29,7 +29,7 @@ var _ = Describe("Log Message", func() {
 
 		out = NewBuffer()
 		ui.Out = out
-		ui.OutForInteration = out
+		ui.OutForInteraction = out
 		errBuff = NewBuffer()
 		ui.Err = errBuff
 	})
@@ -72,7 +72,7 @@ var _ = Describe("Log Message", func() {
 					message.MessageReturns("This is a log message\nThis is also a log message")
 				})
 
-				It("prints out mutliple lines to STDOUT", func() {
+				It("prints out multiple lines to STDOUT", func() {
 					ui.DisplayLogMessage(message, true)
 					Expect(out).To(Say(`2016-07-19T16:08:12.00-0700 \[APP/PROC/WEB/12\] OUT This is a log message\n`))
 					Expect(out).To(Say(`2016-07-19T16:08:12.00-0700 \[APP/PROC/WEB/12\] OUT This is also a log message\n`))
@@ -97,7 +97,7 @@ var _ = Describe("Log Message", func() {
 					message.MessageReturns("This is a log message\nThis is also a log message")
 				})
 
-				It("prints out mutliple lines to STDOUT", func() {
+				It("prints out multiple lines to STDOUT", func() {
 					ui.DisplayLogMessage(message, false)
 					Expect(out).To(Say("This is a log message\n"))
 					Expect(out).To(Say("This is also a log message\n"))

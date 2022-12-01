@@ -104,7 +104,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		When("the repository name is the same and repostiroy URL is the same except for trailing slash", func() {
+		When("the repository name is the same and repository URL is the same except for trailing slash", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{

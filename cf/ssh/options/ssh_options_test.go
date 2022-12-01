@@ -121,7 +121,7 @@ var _ = Describe("SSHOptions", func() {
 			BeforeEach(func() {
 				args = append(args, "app-name", "-tt")
 			})
-			It("foces tty allocation", func() {
+			It("forces tty allocation", func() {
 				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYForce))
 			})
 		})
@@ -190,7 +190,7 @@ var _ = Describe("SSHOptions", func() {
 				})
 			})
 
-			Context("with an explit bind address", func() {
+			Context("with an explicit bind address", func() {
 				BeforeEach(func() {
 					args = append(args, "-L", "explicit:9999:remote:8888")
 				})

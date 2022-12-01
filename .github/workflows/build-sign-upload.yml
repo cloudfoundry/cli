@@ -134,7 +134,7 @@ jobs:
         echo "golang version: ${go_version[1]}"
         echo "::set-output name=go-version::${go_version[1]}"
 
-    # This is for debugging. It's equivalent to fly intecept
+    # This is for debugging. It's equivalent to fly intercept
     # - name: Setup upterm session
     #   env:
     #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -850,12 +850,12 @@ jobs:
           mv cf-cli-windows-binaries/cf-cli_winx64.exe winx64/cf${VERSION_MAJOR}.exe
           pushd win32
             prepare_win_artifacts
-            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
             zip -y cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
           popd
           pushd winx64
             prepare_win_artifacts
-            # -y flag avoids the default behavior of derefencing the link, so we archive the symlink as-is
+            # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
             zip -y cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
           popd
         popd

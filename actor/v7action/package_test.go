@@ -617,7 +617,7 @@ var _ = Describe("Package Actions", func() {
 
 											Expect(tableWarnings).To(ConsistOf("some-app-warning", "some-package-warning", "upload-package-warning", "poll-package-warning", "poll-package-warning"))
 
-											// hacky, get packages is called an extry time cause the
+											// hacky, get packages is called an extra time cause the
 											// JustBeforeEach executes everything once as well
 											Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(3))
 											Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(3))

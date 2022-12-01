@@ -41,7 +41,7 @@ func (installer *pluginInstallerWithRepo) Install(inputSourceFilepath string) st
 
 	found := false
 	sha1 := ""
-	for _, plugin := range findRepoCaseInsensity(pluginList, installer.RepoName) {
+	for _, plugin := range findRepoCaseIntensity(pluginList, installer.RepoName) {
 		if strings.ToLower(plugin.Name) == targetPluginName {
 			found = true
 			outputSourceFilepath, sha1 = installer.PluginDownloader.downloadFromPlugin(plugin)
@@ -73,7 +73,7 @@ func (installer *pluginInstallerWithRepo) getRepoFromConfig(repoName string) (mo
 	return models.PluginRepo{}, errors.New(repoName + T(" not found"))
 }
 
-func findRepoCaseInsensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
+func findRepoCaseIntensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
 	target := strings.ToLower(repoName)
 	for k, repo := range repoList {
 		if strings.ToLower(k) == target {

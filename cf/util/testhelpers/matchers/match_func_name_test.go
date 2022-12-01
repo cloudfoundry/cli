@@ -99,7 +99,7 @@ var _ = Describe("MatchChangeAppFuncsByName", func() {
 		})
 	})
 
-	Describe("NegatedFaileureMessage", func() {
+	Describe("NegatedFailureMessage", func() {
 		It("shows expected and actual", func() {
 			matcher = MatchFuncsByName(dummyFunc)
 			matcher.Match([]func(){dummyNotMatchFunc})

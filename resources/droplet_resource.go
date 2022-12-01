@@ -28,7 +28,7 @@ type Droplet struct {
 type DropletBuildpack struct {
 	// Name is the buildpack name.
 	Name string `json:"name"`
-	// BuildpackName is the the name reported by the buildpack.
+	// BuildpackName is the name reported by the buildpack.
 	BuildpackName string `json:"buildpack_name"`
 	// DetectOutput is the output of the buildpack detect script.
 	DetectOutput string `json:"detect_output"`

@@ -150,7 +150,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	}
 
 	// "null" values are identical to non-existant values in YAML. In order to
-	// detect if an explicit null is given, a manual existance check is required.
+	// detect if an explicit null is given, a manual existence check is required.
 	exists := map[string]interface{}{}
 	err = unmarshaller(&exists)
 	if err != nil {

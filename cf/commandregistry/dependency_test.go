@@ -13,7 +13,7 @@ import (
 var _ = Describe("Dependency", func() {
 	var dependency commandregistry.Dependency
 
-	It("populates all fields by calling all the dependency contructors", func() {
+	It("populates all fields by calling all the dependency constructors", func() {
 		fakeLogger := new(tracefakes.FakePrinter)
 		dependency = commandregistry.NewDependency(os.Stdout, fakeLogger, "")
 

@@ -49,28 +49,28 @@ var _ = Describe("service-access command", func() {
 
 		When("-b is provided with a broker name that does not exist", func() {
 			It("shows an error message", func() {
-				session := helpers.CF("service-access", "-b", "non-existent-broker")
+				session := helpers.CF("service-access", "-b", "nonexistent-broker")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say(`Getting service access for broker non-existent-broker as %s\.\.\.`, userName))
-				Expect(session.Err).To(Say(`(Service broker 'non-existent-broker' not found|No service offerings found for service broker 'non-existent-broker')\.`))
+				Expect(session).To(Say(`Getting service access for broker nonexistent-broker as %s\.\.\.`, userName))
+				Expect(session.Err).To(Say(`(Service broker 'nonexistent-broker' not found|No service offerings found for service broker 'nonexistent-broker')\.`))
 			})
 		})
 
 		When("-e is provided with a service name that does not exist", func() {
 			It("shows an error message", func() {
-				session := helpers.CF("service-access", "-e", "non-existent-service")
+				session := helpers.CF("service-access", "-e", "nonexistent-service")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say(`Getting service access for service offering non-existent-service as %s\.\.\.`, userName))
-				Expect(session.Err).To(Say(`Service offering 'non-existent-service' not found\.`))
+				Expect(session).To(Say(`Getting service access for service offering nonexistent-service as %s\.\.\.`, userName))
+				Expect(session.Err).To(Say(`Service offering 'nonexistent-service' not found\.`))
 			})
 		})
 
 		When("-o is provided with a org name that does not exist", func() {
 			It("shows an error message", func() {
-				session := helpers.CF("service-access", "-o", "non-existent-org")
+				session := helpers.CF("service-access", "-o", "nonexistent-org")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say(`Getting service access for organization non-existent-org as %s\.\.\.`, userName))
-				Expect(session.Err).To(Say(`Organization 'non-existent-org' not found`))
+				Expect(session).To(Say(`Getting service access for organization nonexistent-org as %s\.\.\.`, userName))
+				Expect(session.Err).To(Say(`Organization 'nonexistent-org' not found`))
 			})
 		})
 

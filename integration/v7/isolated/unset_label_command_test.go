@@ -139,9 +139,9 @@ var _ = Describe("unset-label command", func() {
 
 			When("the buildpack is unknown", func() {
 				It("displays an error", func() {
-					session := helpers.CF("unset-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
+					session := helpers.CF("unset-label", "buildpack", "nonexistent-buildpack", "some-key=some-value")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).Should(Say("Buildpack 'non-existent-buildpack' not found"))
+					Expect(session.Err).Should(Say("Buildpack 'nonexistent-buildpack' not found"))
 					Expect(session).Should(Say("FAILED"))
 				})
 			})

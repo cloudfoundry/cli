@@ -197,7 +197,7 @@ var _ = Describe("list-apps command", func() {
 		})
 
 		Context("when an app's running instances is unknown", func() {
-			It("dipslays a '?' for running instances", func() {
+			It("displays a '?' for running instances", func() {
 				appRoutes := []models.RouteSummary{
 					{
 						Host:   "app1",

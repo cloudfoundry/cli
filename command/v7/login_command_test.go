@@ -1380,7 +1380,7 @@ var _ = Describe("login Command", func() {
 							fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space"})
 						})
 
-						It("displays that the spacce has been targeted", func() {
+						It("displays that the space has been targeted", func() {
 							Expect(testUI.Out).To(Say(`space:\s+some-space`))
 						})
 					})

@@ -94,7 +94,7 @@ var _ = Describe("delete command", func() {
 						Expect(err).ToNot(HaveOccurred())
 					})
 
-					It("shows more information when confiriming", func() {
+					It("shows more information when confirming", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CFWithStdin(buffer, "delete", "-r", appName)
 						Eventually(session).Should(Say(
