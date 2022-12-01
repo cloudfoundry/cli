@@ -53,7 +53,7 @@ jobs:
           done
 
           ENV=$(cat metadata.json | jq -r '.name')
-          echo "::set-output name=environment-name::${ENV}"
+          echo "environment-name=${ENV}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Metadata'
         uses: actions/upload-artifact@v3

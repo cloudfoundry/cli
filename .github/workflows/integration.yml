@@ -40,21 +40,21 @@ jobs:
 
       - id: set-secrets-environment
         name: Set environment
-        run: echo "::set-output name=secrets-environment::PROD"
+        run: echo "secrets-environment=PROD" >> $GITHUB_OUTPUT
 
       - id: set-go-version
         name: Parse Golang Version
         run: |
           go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
           echo "golang version: ${go_version[1]}"
-          echo "::set-output name=go-version::${go_version[1]}"
+          echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
       - id: get-min-capi
         name: Get Minimum CAPI Version
         run: |
           min_capi=($(yq .cf-d-capi-version-min build_data.yml))
           echo "Minimum CAPI version: ${min_capi}"
-          echo "::set-output name=min-capi::${min_capi}"
+          echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
 
 ## START edge CAPI
 

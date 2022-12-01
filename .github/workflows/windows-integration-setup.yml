@@ -64,7 +64,7 @@ jobs:
           echo $CF_INT_PASSWORD > $DATA_DIR/cf-password
           echo $CF_INT_OIDC_PASSWORD > $DATA_DIR/uaa-oidc-password
 
-          echo "::set-output name=data::$DATA_DIR"
+          echo "data=$DATA_DIR" >> $GITHUB_OUTPUT
       - name: 'Upload CF Data'
         uses: actions/upload-artifact@v3
         with:
