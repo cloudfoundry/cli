@@ -191,7 +191,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 		Context("When connection could not be established", func() {
 			It("prints a tip", func() {
-				callAddPluginRepo([]string{"repo", "https://broccoli.nonexistanttld:"})
+				callAddPluginRepo([]string{"repo", "https://broccoli.nonexistenttld:"})
 
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},

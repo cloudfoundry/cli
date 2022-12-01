@@ -51,7 +51,7 @@ var _ = Describe("UAA Client", func() {
 			})
 		})
 
-		Describe("Conection", func() {
+		Describe("Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(

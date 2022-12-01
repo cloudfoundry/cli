@@ -1764,7 +1764,7 @@ var _ = Describe("Push Command", func() {
 						args = []string{"--no-hostname", "existing-app"}
 					})
 
-					It("binds the root domain route to an app with a pre-existing route", func() {
+					It("binds the root domain route to an app with a preexisting route", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
 						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))

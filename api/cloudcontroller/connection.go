@@ -1,4 +1,4 @@
-// Package cloudcontroller contains shared utilies between the V2 and V3
+// Package cloudcontroller contains shared utilities between the V2 and V3
 // clients.
 //
 // These sets of packages are still under development/pre-pre-pre...alpha. Use

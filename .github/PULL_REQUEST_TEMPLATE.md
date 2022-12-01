@@ -31,7 +31,7 @@ Explain why this functionality should be in the cf CLI, as opposed to a plugin.
 
 ## Applicable Issues
 
-List any applicable Github Issues here
+List any applicable GitHub Issues here
 
 ## How Urgent Is The Change?
 

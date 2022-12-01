@@ -485,7 +485,7 @@ log-rate-limit-per-second: 5K
 				app.RemainingManifestFields = map[string]interface{}{}
 			})
 
-			It("sets the buildpackks in the map", func() {
+			It("sets the buildpacks in the map", func() {
 				Expect(app.RemainingManifestFields["buildpacks"]).To(ConsistOf("bp1", "bp2"))
 			})
 

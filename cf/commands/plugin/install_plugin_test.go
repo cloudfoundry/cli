@@ -111,7 +111,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		// run command has races becuase it writes and erases temporary files, so the test runner should
+		// run command has races because it writes and erases temporary files, so the test runner should
 		// really only run one of these at a time. Often the files are actual compiled exes in the test
 		// fixtures path, so it's not easy to prevent the tests from sharing file handles
 		runCmdMutex.Lock()

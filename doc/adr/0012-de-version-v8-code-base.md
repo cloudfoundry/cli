@@ -22,7 +22,7 @@ After [PR #2180](https://github.com/cloudfoundry/cli/pull/2180) we should be in 
 * integration/v7 => integration/tests
 * Makefile ivi (integration versioned isolated) command => change to ii (integration isolated)
 * Makefile integration versioned global (ivg) => see above
-* cf/ legacy directory => maybe rename it to something like legacy-cf, and put a README descring 
+* cf/ legacy directory => maybe rename it to something like legacy-cf, and put a README describing 
 
 ## Decision
 

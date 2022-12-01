@@ -109,7 +109,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	Context("when passing in tags", func() {
-		It("sucessfully creates a service and passes the tags as json", func() {
+		It("successfully creates a service and passes the tags as json", func() {
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-t", "tag1, tag2,tag3,  tag4"})
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
@@ -252,7 +252,7 @@ var _ = Describe("create-service command", func() {
 				[]string{"Creating service instance", "my-free-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"will incurr a cost"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"will incur a cost"}))
 		})
 
 		It("warns the user when the service is not free", func() {

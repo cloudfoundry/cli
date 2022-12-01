@@ -34,7 +34,7 @@ func (process *Process) SetStartCommand(command string) {
 
 func (process *Process) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	// This prevents infinite recursion. The Alias type does not implement the unmarshaller interface
-	// so by casting application to a alias pointer, it will unmarshal in to the same memory without calling
+	// so by casting application to a alias pointer, it will unmarshal into the same memory without calling
 	// UnmarshalYAML on itself infinite times
 	type Alias Process
 	aliasPntr := (*Alias)(process)

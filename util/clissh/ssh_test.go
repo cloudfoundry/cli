@@ -478,7 +478,7 @@ var _ = Describe("CLI SSH", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 					})
 
-					It("does not not restore the terminal", func() {
+					It("does not restore the terminal", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.SetRawTerminalCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.RestoreTerminalCallCount()).To(Equal(0))
@@ -578,7 +578,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		When("a command is specifed", func() {
+		When("a command is specified", func() {
 			BeforeEach(func() {
 				commands = []string{"echo", "-n", "hello"}
 			})

@@ -92,7 +92,7 @@ var _ = Describe("Feature Flags Repository", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		Context("when given a non-existent feature flag", func() {
+		Context("when given a nonexistent feature flag", func() {
 			BeforeEach(func() {
 				setupTestServer(featureFlagsUpdateErrorRequest)
 			})

@@ -85,7 +85,7 @@ var _ = Describe("org-users command", func() {
 			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 		})
 
-		Context("shows friendly messaage when no users in ORG_MANAGER role", func() {
+		Context("shows friendly message when no users in ORG_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
 					userFields := map[models.Role][]models.UserFields{
@@ -117,7 +117,7 @@ var _ = Describe("org-users command", func() {
 			})
 		})
 
-		Context("shows friendly messaage when no users in BILLING_MANAGER role", func() {
+		Context("shows friendly message when no users in BILLING_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
 					userFields := map[models.Role][]models.UserFields{
@@ -149,7 +149,7 @@ var _ = Describe("org-users command", func() {
 			})
 		})
 
-		Context("shows friendly messaage when no users in ORG_AUDITOR role", func() {
+		Context("shows friendly message when no users in ORG_AUDITOR role", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
 					userFields := map[models.Role][]models.UserFields{

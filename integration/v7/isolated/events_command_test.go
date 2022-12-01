@@ -75,7 +75,7 @@ var _ = Describe("events command", func() {
 
 			It("displays events in the list", func() {
 
-				// Order of output is hard to assert here so we will just asseert we output only the events we expect and then rely on the unit
+				// Order of output is hard to assert here so we will just assert we output only the events we expect and then rely on the unit
 				// tests to validate we are passing the `order_by=-created_at` query param to CAPI. The actual ordering is CAPIs concern.
 				session := helpers.CF("events", appName)
 
