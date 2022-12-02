@@ -121,7 +121,7 @@ When("an error is encountered getting the provided security group", func() {
 ## Consequences
 
 - Since this is not a very big change, we are not expecting to lose any
-  converage or increase run times. This is mostly for organization
+  coverage or increase run times. This is mostly for organization
   purposes.
 
 - There are no plans to retrofit existing tests to adhere to this ADR.

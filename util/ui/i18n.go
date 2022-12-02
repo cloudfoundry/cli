@@ -63,7 +63,7 @@ func GetTranslationFunc(reader LocaleReader) (TranslateFunc, error) {
 }
 
 // ParseLocale will return a locale formatted as "<language code>-<region
-// code>" for all non-Chinese lanagues. For Chinese, it will return
+// code>" for all non-Chinese languages. For Chinese, it will return
 // "zh-<script>", defaulting to "hant" if script is unspecified.
 func ParseLocale(locale string) (string, error) {
 	lang, err := language.Parse(locale)

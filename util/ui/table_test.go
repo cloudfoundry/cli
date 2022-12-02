@@ -29,7 +29,7 @@ var _ = Describe("Table", func() {
 
 		out = NewBuffer()
 		ui.Out = out
-		ui.OutForInteration = out
+		ui.OutForInteraction = out
 		errBuff = NewBuffer()
 		ui.Err = errBuff
 	})

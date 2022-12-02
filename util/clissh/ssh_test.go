@@ -28,7 +28,7 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
 	"code.cloudfoundry.org/lager/lagertest"
 	"github.com/kr/pty"
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/crypto/ssh"
@@ -478,7 +478,7 @@ var _ = Describe("CLI SSH", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 					})
 
-					It("does not not restore the terminal", func() {
+					It("does not restore the terminal", func() {
 						Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.SetRawTerminalCallCount()).To(Equal(1))
 						Expect(fakeTerminalHelper.RestoreTerminalCallCount()).To(Equal(0))
@@ -578,7 +578,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		When("a command is specifed", func() {
+		When("a command is specified", func() {
 			BeforeEach(func() {
 				commands = []string{"echo", "-n", "hello"}
 			})

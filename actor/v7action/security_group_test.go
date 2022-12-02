@@ -697,7 +697,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			It("makes mutiple calls to get spaces", func() {
+			It("makes multiple calls to get spaces", func() {
 				Expect(len(securityGroupSummaries)).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
@@ -1038,7 +1038,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		When("the seurity group is not bound to the space", func() {
+		When("the security group is not bound to the space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
 					ccv3.Warnings{"get-security-group-warning"},
@@ -1240,7 +1240,7 @@ var _ = Describe("Security Group Actions", func() {
 		var (
 			securityGroupName = "tom"
 			globallyEnabled   bool
-			lifeycle          constant.SecurityGroupLifecycle
+			lifecycle         constant.SecurityGroupLifecycle
 			executeErr        error
 
 			trueValue  = true
@@ -1248,7 +1248,7 @@ var _ = Describe("Security Group Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.UpdateSecurityGroupGloballyEnabled(securityGroupName, lifeycle, globallyEnabled)
+			warnings, executeErr = actor.UpdateSecurityGroupGloballyEnabled(securityGroupName, lifecycle, globallyEnabled)
 		})
 
 		When("the request succeeds", func() {
@@ -1273,7 +1273,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating staging to true", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleStaging
+					lifecycle = constant.SecurityGroupLifecycleStaging
 					globallyEnabled = true
 				})
 
@@ -1298,7 +1298,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating staging to false", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleStaging
+					lifecycle = constant.SecurityGroupLifecycleStaging
 					globallyEnabled = false
 				})
 
@@ -1323,7 +1323,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating running to true", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleRunning
+					lifecycle = constant.SecurityGroupLifecycleRunning
 					globallyEnabled = true
 				})
 
@@ -1348,7 +1348,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating running to false", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleRunning
+					lifecycle = constant.SecurityGroupLifecycleRunning
 					globallyEnabled = false
 				})
 
@@ -1374,7 +1374,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to get the security group errors", func() {
 			BeforeEach(func() {
-				lifeycle = constant.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 				globallyEnabled = false
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
@@ -1398,7 +1398,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to update the security group errors", func() {
 			BeforeEach(func() {
-				lifeycle = constant.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 				globallyEnabled = false
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(

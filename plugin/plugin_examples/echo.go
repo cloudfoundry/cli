@@ -25,7 +25,7 @@ func main() {
 func (pluginDemo *PluginDemonstratingParams) Run(cliConnection plugin.CliConnection, args []string) {
 	// Initialize flags
 	echoFlagSet := flag.NewFlagSet("echo", flag.ExitOnError)
-	uppercase := echoFlagSet.Bool("uppercase", false, "displayes all provided text in uppercase")
+	uppercase := echoFlagSet.Bool("uppercase", false, "displayed all provided text in uppercase")
 
 	// Parse starting from [1] because the [0]th element is the
 	// name of the command

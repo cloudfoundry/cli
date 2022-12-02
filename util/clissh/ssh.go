@@ -19,7 +19,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )

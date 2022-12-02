@@ -124,7 +124,7 @@ var _ = Describe("delete-user command", func() {
 			}, nil)
 		})
 
-		It("returns a muliple users found error", func() {
+		It("returns a multiple users found error", func() {
 			runCommand("user-name")
 
 			Expect(ui.Outputs()).To(ContainSubstrings(

@@ -187,7 +187,7 @@ var _ = Describe("create-org command", func() {
 			})
 		})
 
-		Context("when allowing a non-defualt quota", func() {
+		Context("when allowing a non-default quota", func() {
 			var (
 				quota models.QuotaFields
 			)

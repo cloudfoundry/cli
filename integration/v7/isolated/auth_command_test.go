@@ -31,7 +31,7 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Say("ENVIRONMENT VARIABLES:"))
 			Eventually(session).Should(Say(`CF_USERNAME=user\s+Authenticating user. Overridden if USERNAME argument is provided.`))
-			Eventually(session).Should(Say(`CF_PASSWORD=password\s+Password associated with user. Overriden if PASSWORD argument is provided.`))
+			Eventually(session).Should(Say(`CF_PASSWORD=password\s+Password associated with user. Overridden if PASSWORD argument is provided.`))
 
 			Eventually(session).Should(Say("WARNING:"))
 			Eventually(session).Should(Say("Providing your password as a command line option is highly discouraged"))
@@ -276,7 +276,7 @@ var _ = Describe("auth command", func() {
 				helpers.SkipIfUAAVersionAtLeast(uaaversion.MinUAAClientVersion)
 			})
 			It("prints an error message", func() {
-				session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "--origin", "garbaje")
+				session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "--origin", "garbage")
 				Eventually(session.Err).Should(Say("Option '--origin' requires UAA API version 4.19.0 or higher. Update your Cloud Foundry instance."))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -289,7 +289,7 @@ var _ = Describe("auth command", func() {
 			})
 			When("--client-credentials is also set", func() {
 				It("displays the appropriate error message", func() {
-					session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "--origin", "garbaje")
+					session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "--origin", "garbage")
 
 					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --client-credentials, --origin"))
 					Eventually(session).Should(Exit(1))

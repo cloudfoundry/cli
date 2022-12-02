@@ -54,7 +54,7 @@ func GetAPI() string {
 	return apiURL
 }
 
-// LoginAs logs in to the CLI with 'cf auth' and the given username and password,
+// LoginAs logs into the CLI with 'cf auth' and the given username and password,
 // retrying up to 3 times on failures.
 func LoginAs(username, password string) {
 	env := map[string]string{
@@ -75,7 +75,7 @@ func LoginAs(username, password string) {
 	Expect(session.ExitCode()).To(Equal(0))
 }
 
-// LoginCF logs in to the CLI using the username and password from the CF_INT_USERNAME
+// LoginCF logs into the CLI using the username and password from the CF_INT_USERNAME
 // and CF_INT_PASSWORD environment variables, respectively, defaulting to "admin" for
 // each if either is not set.
 func LoginCF() string {
@@ -87,7 +87,7 @@ func LoginCF() string {
 	return username
 }
 
-// LoginCFWithClientCredentials logs in to the CLI using client credentials from the CF_INT_CLIENT_ID and
+// LoginCFWithClientCredentials logs into the CLI using client credentials from the CF_INT_CLIENT_ID and
 // CF_INT_CLIENT_SECRET environment variables and returns the client ID. If these environment variables
 // are not set, it skips the current test.
 func LoginCFWithClientCredentials() string {
@@ -146,13 +146,13 @@ func TargetOrg(org string) {
 	Eventually(CF("target", "-o", org)).Should(Exit(0))
 }
 
-// ClearTarget logs out and logs back in to the CLI using LogoutCF and LoginCF.
+// ClearTarget logs out and logs back into the CLI using LogoutCF and LoginCF.
 func ClearTarget() {
 	LogoutCF()
 	LoginCF()
 }
 
-// SetupCF logs in to the CLI with LoginCF, creates the given org and space, and targets that
+// SetupCF logs into the CLI with LoginCF, creates the given org and space, and targets that
 // org and space.
 func SetupCF(org string, space string) {
 	LoginCF()
@@ -160,14 +160,14 @@ func SetupCF(org string, space string) {
 	TargetOrgAndSpace(org, space)
 }
 
-// SetupCFWithOrgOnly logs in to the CLI with LoginCF, creates the given org, and targets it.
+// SetupCFWithOrgOnly logs into the CLI with LoginCF, creates the given org, and targets it.
 func SetupCFWithOrgOnly(org string) {
 	LoginCF()
 	CreateOrg(org)
 	TargetOrg(org)
 }
 
-// SetupCFWithGeneratedOrgAndSpaceNames logs in to the CLI with LoginCF, creates the org and
+// SetupCFWithGeneratedOrgAndSpaceNames logs into the CLI with LoginCF, creates the org and
 // space with generated names, and targets that org and space. Returns the generated org so
 // that it can be deleted easily in cleanup step of the test.
 func SetupCFWithGeneratedOrgAndSpaceNames() string {

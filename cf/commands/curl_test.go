@@ -148,7 +148,7 @@ var _ = Describe("curl command", func() {
 			Expect(ui.Outputs()).To(ContainSubstrings([]string{"The requested URL returned error: 500"}))
 		})
 
-		It("does not fail on HTTP erros if --fail is false", func() {
+		It("does not fail on HTTP errors if --fail is false", func() {
 			runCurlWithInputs([]string{"--fail", "false", "/foo"})
 
 			Expect(curlRepo.FailOnHTTPError).To(Equal(false))

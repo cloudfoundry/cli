@@ -12,7 +12,7 @@ func (e NoEligiblePackagesError) Error() string {
 	case e.AppName != "":
 		return fmt.Sprintf("App '%s' has no eligible packages.", e.AppName)
 	default:
-		return fmt.Sprintf("No eligible pacakges available for app.")
+		return fmt.Sprintf("No eligible packages available for app.")
 	}
 
 }
