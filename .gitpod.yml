@@ -1,7 +1,9 @@
-
 additionalRepositories:
   - url: https://github.com/cloudfoundry/cli-ci    
-    checkoutLocation: cli-ci
+  - url: https://github.com/cloudfoundry/cli-private    
+  - url: https://github.com/cloudfoundry/cli-workstation    
+
+workspaceLocation: cli/.devcontainer/cli.code-workspace
 
 tasks:
   - name: Setup Workspace
@@ -16,6 +18,9 @@ tasks:
       cloudfoundry/tap/credhub-cli
       cloudfoundry/tap/bbl
       cloudfoundry/tap/bosh-cli
+      act
+      tmux
+      neovim
     init: >
       tldr --update 
       
@@ -26,3 +31,4 @@ vscode:
   extensions:
     - vscodevim.vim
     - eamodio.gitlens
+    - golang.go

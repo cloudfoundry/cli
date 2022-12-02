@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{ "path": ".." },
+		{ "path": "../../cli-ci" },
+		{ "path": "../../cli-private" },   
+		{ "path": "../../cli-workstation" }   
+
+	],
+	"settings": {
+		"github-actions.workflows.pinned.workflows": [
+			"cli/.github/workflows/integration.yml"
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"gitpod.gitpod-remote-ssh",
+			"ms-vsliveshare.vsliveshare",
+			"redhat.vscode-yaml",
+			"golang.go",
+			"vscodevim.vim",
+			"ms-vscode.makefile-tools"
+		]
+	}
+}
