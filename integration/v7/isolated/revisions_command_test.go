@@ -49,7 +49,7 @@ var _ = Describe("revisions command", func() {
 		})
 	})
 
-	When("targetting and org and space", func() {
+	When("targeting and org and space", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})

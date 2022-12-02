@@ -171,7 +171,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		When("an error occures while trying to log the request", func() {
+		When("an error occurs while trying to log the request", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -348,7 +348,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		When("an error occures while trying to log the response", func() {
+		When("an error occurs while trying to log the response", func() {
 			var (
 				originalErr error
 				expectedErr error

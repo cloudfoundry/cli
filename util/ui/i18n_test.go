@@ -59,7 +59,7 @@ var _ = Describe("i18n", func() {
 				Entry("Chinese (Traditional and using Hong Kong terms)", "zh-HK", "\n已啟動應用程式\n"),
 			)
 
-			When("provided keys to iterpolate", func() {
+			When("provided keys to interpolate", func() {
 				BeforeEach(func() {
 					fakeConfig.LocaleReturns("fr-FR")
 				})

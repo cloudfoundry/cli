@@ -57,7 +57,7 @@ var _ = Describe("config command", func() {
 			))
 		})
 
-		It("fails with usage when a negative timout is passed", func() {
+		It("fails with usage when a negative timeout is passed", func() {
 			runCommand("--async-timeout", "-555")
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage"},

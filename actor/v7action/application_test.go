@@ -286,7 +286,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns an ApplicationNotFoundError and the warnings", func() {
-				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid", "non-existent-app-guid"})
+				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid", "nonexistent-app-guid"})
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(actionerror.ApplicationsNotFoundError{}))
 			})

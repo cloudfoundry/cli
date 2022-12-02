@@ -52,7 +52,7 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
-// UnauthorizedError is returned when the authentication informatin is invalid.
+// UnauthorizedError is returned when the authentication information is invalid.
 type UnauthorizedError struct {
 	Message string
 }
@@ -80,7 +80,7 @@ func (e InsufficientScopeError) Error() string {
 	return e.Message
 }
 
-// InvalidSCIMResourceError is returned usually when the client tries to create an inproperly formatted username
+// InvalidSCIMResourceError is returned usually when the client tries to create an improperly formatted username
 type InvalidSCIMResourceError struct {
 	Message string
 }

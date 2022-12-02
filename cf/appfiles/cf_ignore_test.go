@@ -59,7 +59,7 @@ stuff/exclude.c`)
 		Expect(ignore.FileShouldBeIgnored("stuff/include.c")).To(BeFalse())
 	})
 
-	It("ignores certain commonly ingored files by default", func() {
+	It("ignores certain commonly ignored files by default", func() {
 		ignore := NewCfIgnore(``)
 		Expect(ignore.FileShouldBeIgnored(".git/objects")).To(BeTrue())
 

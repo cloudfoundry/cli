@@ -143,7 +143,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 			parsedManifest = manifestparser.Manifest{
 				Applications: []manifestparser.Application{
 					{
-						Path: "some-non-existent-path",
+						Path: "some-nonexistent-path",
 					},
 				},
 			}
@@ -151,7 +151,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(manifestparser.InvalidManifestApplicationPathError{
-				Path: "some-non-existent-path",
+				Path: "some-nonexistent-path",
 			}))
 		})
 	})

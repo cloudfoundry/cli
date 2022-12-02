@@ -175,7 +175,7 @@ var _ = Describe("network-policies command", func() {
 			})
 		})
 
-		When("policies are filtered by a non-existent source app", func() {
+		When("policies are filtered by a nonexistent source app", func() {
 			It("returns an error", func() {
 				session := helpers.CF("network-policies", "--source", "pineapple")
 

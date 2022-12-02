@@ -407,7 +407,7 @@ func (cmd InstallPluginCommand) installPluginPrompt(template string, templateVal
 	}
 
 	if !really {
-		log.Debug("plugin confirmation - 'no' inputed")
+		log.Debug("plugin confirmation - 'no' inputted")
 		return cancelInstall{}
 	}
 

@@ -57,7 +57,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	When("not targetting", func() {
+	When("not targeting", func() {
 		It("does not target", func() {
 			ccClient := NewWrappedCloudControllerClient(fakeConfig, testUI)
 			Expect(ccClient).ToNot(BeNil())

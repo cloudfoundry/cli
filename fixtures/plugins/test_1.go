@@ -95,7 +95,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 				Alias:    "test_1_cmd1_alias",
 				HelpText: "help text for test_1_cmd1",
 				UsageDetails: plugin.Usage{
-					Usage: "Test plugin command\n   cf test_1_cmd1 [-a] [-b] [--no-ouput]",
+					Usage: "Test plugin command\n   cf test_1_cmd1 [-a] [-b] [--no-output]",
 					Options: map[string]string{
 						"a":         "flag to do nothing",
 						"b":         "another flag to do nothing",

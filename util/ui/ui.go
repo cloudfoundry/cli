@@ -74,10 +74,10 @@ type UI struct {
 	In io.Reader
 	// Out is the output buffer
 	Out io.Writer
-	// OutForInteration is the output buffer when working with go-interact. When
+	// OutForInteraction is the output buffer when working with go-interact. When
 	// working with Windows, color.Output does not work with TTY detection. So
 	// real STDOUT is required or go-interact will not properly work.
-	OutForInteration io.Writer
+	OutForInteraction io.Writer
 	// Err is the error buffer
 	Err io.Writer
 
@@ -109,19 +109,19 @@ func NewUI(config Config) (*UI, error) {
 	location := time.Now().Location()
 
 	return &UI{
-		In:               os.Stdin,
-		Out:              color.Output,
-		OutForInteration: os.Stdout,
-		Err:              os.Stderr,
-		colorEnabled:     config.ColorEnabled(),
-		translate:        translateFunc,
-		terminalLock:     &sync.Mutex{},
-		Exiter:           realExiter,
-		fileLock:         &sync.Mutex{},
-		Interactor:       realInteract,
-		IsTTY:            config.IsTTY(),
-		TerminalWidth:    config.TerminalWidth(),
-		TimezoneLocation: location,
+		In:                os.Stdin,
+		Out:               color.Output,
+		OutForInteraction: os.Stdout,
+		Err:               os.Stderr,
+		colorEnabled:      config.ColorEnabled(),
+		translate:         translateFunc,
+		terminalLock:      &sync.Mutex{},
+		Exiter:            realExiter,
+		fileLock:          &sync.Mutex{},
+		Interactor:        realInteract,
+		IsTTY:             config.IsTTY(),
+		TerminalWidth:     config.TerminalWidth(),
+		TimezoneLocation:  location,
 	}, nil
 }
 
@@ -135,19 +135,19 @@ func NewPluginUI(config Config, outBuffer io.Writer, errBuffer io.Writer) (*UI, 
 	location := time.Now().Location()
 
 	return &UI{
-		In:               nil,
-		Out:              outBuffer,
-		OutForInteration: outBuffer,
-		Err:              errBuffer,
-		colorEnabled:     configv3.ColorDisabled,
-		translate:        translateFunc,
-		terminalLock:     &sync.Mutex{},
-		Exiter:           realExiter,
-		fileLock:         &sync.Mutex{},
-		Interactor:       realInteract,
-		IsTTY:            config.IsTTY(),
-		TerminalWidth:    config.TerminalWidth(),
-		TimezoneLocation: location,
+		In:                nil,
+		Out:               outBuffer,
+		OutForInteraction: outBuffer,
+		Err:               errBuffer,
+		colorEnabled:      configv3.ColorDisabled,
+		translate:         translateFunc,
+		terminalLock:      &sync.Mutex{},
+		Exiter:            realExiter,
+		fileLock:          &sync.Mutex{},
+		Interactor:        realInteract,
+		IsTTY:             config.IsTTY(),
+		TerminalWidth:     config.TerminalWidth(),
+		TimezoneLocation:  location,
 	}, nil
 }
 
@@ -160,17 +160,17 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	}
 
 	return &UI{
-		In:               in,
-		Out:              out,
-		OutForInteration: out,
-		Err:              err,
-		Exiter:           realExiter,
-		colorEnabled:     configv3.ColorDisabled,
-		translate:        translationFunc,
-		Interactor:       realInteract,
-		terminalLock:     &sync.Mutex{},
-		fileLock:         &sync.Mutex{},
-		TimezoneLocation: time.UTC,
+		In:                in,
+		Out:               out,
+		OutForInteraction: out,
+		Err:               err,
+		Exiter:            realExiter,
+		colorEnabled:      configv3.ColorDisabled,
+		translate:         translationFunc,
+		Interactor:        realInteract,
+		terminalLock:      &sync.Mutex{},
+		fileLock:          &sync.Mutex{},
+		TimezoneLocation:  time.UTC,
 	}
 }
 

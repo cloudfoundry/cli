@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("delte-plugin-repo", func() {
+var _ = Describe("delete-plugin-repo", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository

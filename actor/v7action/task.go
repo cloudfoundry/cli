@@ -25,7 +25,7 @@ func (actor Actor) RunTask(appGUID string, task resources.Task) (resources.Task,
 }
 
 // GetApplicationTasks returns a list of tasks associated with the provided
-// appplication GUID.
+// application GUID.
 func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]resources.Task, Warnings, error) {
 	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID)
 	actorWarnings := Warnings(warnings)

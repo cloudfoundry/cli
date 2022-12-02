@@ -50,7 +50,7 @@ func CaptureOutput(block func()) []string {
 	doneWriting := make(chan bool)
 	result := make(chan []string)
 
-	go captureOutputAsyncronously(doneWriting, result, r)
+	go captureOutputAsynchronously(doneWriting, result, r)
 
 	block()
 	w.Close()
@@ -64,7 +64,7 @@ func CaptureOutput(block func()) []string {
  (looking at you, Windows). To counteract this, we need to read in a goroutine from one end of
  the pipe and return the result across a channel.
 */
-func captureOutputAsyncronously(doneWriting <-chan bool, result chan<- []string, reader io.Reader) {
+func captureOutputAsynchronously(doneWriting <-chan bool, result chan<- []string, reader io.Reader) {
 	var readingString string
 
 	for {

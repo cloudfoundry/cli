@@ -26,13 +26,13 @@ var _ = Describe("curl Command", func() {
 		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 
-		CustomHeaders         []string
-		HTTPMethod            string
-		HTTPData              flag.PathWithAt
-		FailOnHTTPError       bool
-		IncludeReponseHeaders bool
-		OutputFile            flag.Path
-		executeErr            error
+		CustomHeaders          []string
+		HTTPMethod             string
+		HTTPData               flag.PathWithAt
+		FailOnHTTPError        bool
+		IncludeResponseHeaders bool
+		OutputFile             flag.Path
+		executeErr             error
 	)
 
 	BeforeEach(func() {
@@ -49,13 +49,13 @@ var _ = Describe("curl Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-			RequiredArgs:          flag.APIPath{Path: "/"},
-			CustomHeaders:         CustomHeaders,
-			HTTPMethod:            HTTPMethod,
-			HTTPData:              HTTPData,
-			FailOnHTTPError:       FailOnHTTPError,
-			IncludeReponseHeaders: IncludeReponseHeaders,
-			OutputFile:            OutputFile,
+			RequiredArgs:           flag.APIPath{Path: "/"},
+			CustomHeaders:          CustomHeaders,
+			HTTPMethod:             HTTPMethod,
+			HTTPData:               HTTPData,
+			FailOnHTTPError:        FailOnHTTPError,
+			IncludeResponseHeaders: IncludeResponseHeaders,
+			OutputFile:             OutputFile,
 		}
 
 		binaryName = "faceman"
@@ -128,7 +128,7 @@ var _ = Describe("curl Command", func() {
 
 		When("the include-response-headers flag is set", func() {
 			BeforeEach(func() {
-				cmd.IncludeReponseHeaders = true
+				cmd.IncludeResponseHeaders = true
 			})
 
 			It("includes the headers in the output", func() {

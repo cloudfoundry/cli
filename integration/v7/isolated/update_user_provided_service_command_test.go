@@ -108,10 +108,10 @@ var _ = Describe("update-user-provided-service command", func() {
 
 		When("the user-provided service instance does not exist", func() {
 			It("displays an informative error and exits 1", func() {
-				session := helpers.CF("update-user-provided-service", "non-existent-service", "-l", "syslog://example.com")
+				session := helpers.CF("update-user-provided-service", "nonexistent-service", "-l", "syslog://example.com")
 				Eventually(session).Should(Exit(1))
 
-				Expect(session.Err).To(Say("Service instance 'non-existent-service' not found"))
+				Expect(session.Err).To(Say("Service instance 'nonexistent-service' not found"))
 				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
