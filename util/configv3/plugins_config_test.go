@@ -308,7 +308,7 @@ var _ = Describe("PluginsConfig", func() {
 				setPluginConfig(pluginsPath, rawConfig)
 			})
 
-			It("returns the pluging sorted by name", func() {
+			It("returns the plugins sorted by name", func() {
 				config, err := LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(config.Plugins()).To(Equal([]Plugin{

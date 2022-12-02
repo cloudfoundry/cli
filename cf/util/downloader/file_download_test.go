@@ -154,7 +154,7 @@ var _ = Describe("Downloader", func() {
 
 		Context("when the URL is invalid", func() {
 			It("returns an error", func() {
-				_, _, err := d.DownloadFile("http://going.nowwhere/abc.zip")
+				_, _, err := d.DownloadFile("http://going.nowhere/abc.zip")
 				Expect(err).To(HaveOccurred())
 			})
 		})

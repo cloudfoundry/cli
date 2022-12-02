@@ -50,7 +50,7 @@ var _ = Describe("delete-shared-domain command", func() {
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 
-		It("fails if an organiztion is not targeted", func() {
+		It("fails if an organization is not targeted", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			targetedOrganizationReq := new(requirementsfakes.FakeTargetedOrgRequirement)
@@ -86,7 +86,7 @@ var _ = Describe("delete-shared-domain command", func() {
 		})
 	})
 
-	Context("when logged in and targeted an organiztion", func() {
+	Context("when logged in and targeted an organization", func() {
 		BeforeEach(func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))

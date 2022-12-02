@@ -115,7 +115,7 @@ var _ = Describe("add-network-policy Command", func() {
 			})
 		})
 
-		When("both protocol and port are specificed", func() {
+		When("both protocol and port are specified", func() {
 			BeforeEach(func() {
 				cmd.Protocol = flag.NetworkProtocol{Protocol: protocol}
 				cmd.Port = flag.NetworkPort{StartPort: 8080, EndPort: 8081}

@@ -100,7 +100,7 @@ var _ = Describe("create-private-domain command", func() {
 					})
 				})
 
-				When("pre-existing domain", func() {
+				When("preexisting domain", func() {
 					var privateDomain1 helpers.Domain
 					BeforeEach(func() {
 						privateDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName())

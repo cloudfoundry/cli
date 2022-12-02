@@ -75,7 +75,7 @@ var _ = Describe("buildpacks Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
 		})
 
-		It("should print text indicating its runnning", func() {
+		It("should print text indicating its running", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Getting buildpacks as apple\.\.\.`))
 		})

@@ -130,7 +130,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	When("not targetting", func() {
+	When("not targeting", func() {
 		It("does not target and returns no UAA client", func() {
 			ccClient, authWrapper := NewWrappedCloudControllerClient(fakeConfig, testUI)
 			Expect(authWrapper).ToNot(BeNil())

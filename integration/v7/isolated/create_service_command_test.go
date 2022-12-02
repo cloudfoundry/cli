@@ -157,7 +157,7 @@ var _ = Describe("create-service command", func() {
 					})
 
 					It("displays an informative message and exits 1", func() {
-						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", filepath.Join(emptyDir, "non-existent-file"))
+						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", filepath.Join(emptyDir, "nonexistent-file"))
 						Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object\\."))
 						Eventually(session).Should(Exit(1))
 					})
@@ -378,10 +378,10 @@ var _ = Describe("create-service command", func() {
 
 						Context("the broker is not accessible by that user", func() {
 							It("displays an informative error message, exits 1", func() {
-								session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "non-existent-broker")
+								session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "nonexistent-broker")
 								Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 									"my-service", org, space, username))
-								Eventually(session.Err).Should(Say("Service '%s' provided by service broker '%s' not found\\.", service, "non-existent-broker"))
+								Eventually(session.Err).Should(Say("Service '%s' provided by service broker '%s' not found\\.", service, "nonexistent-broker"))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})

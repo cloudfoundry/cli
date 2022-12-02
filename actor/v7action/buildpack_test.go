@@ -120,7 +120,7 @@ var _ = Describe("Buildpack", func() {
 					nil)
 			})
 
-			It("returns warnings and a BuilpackNotFoundError", func() {
+			It("returns warnings and a BuildpackNotFoundError", func() {
 				Expect(executeErr).To(MatchError(actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack}))
 				Expect(warnings).To(ConsistOf("some-warning-1", "some-warning-2"))
 			})
@@ -319,7 +319,7 @@ var _ = Describe("Buildpack", func() {
 
 	Describe("UpdateBuildpackByNameAndStack", func() {
 		var (
-			buildpackName  = "my-buidpack"
+			buildpackName  = "my-buildpack"
 			buildpackStack = "my-stack"
 			buildpack      = resources.Buildpack{
 				Stack: "new-stack",

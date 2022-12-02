@@ -174,7 +174,7 @@ func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row [
 	return nil
 }
 
-// printRow is responsible for the layouting, transforming and
+// printRow is responsible for the laying-out, transforming and
 // printing of the string in a single row
 func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) error {
 
@@ -255,7 +255,7 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 }
 
 // printCellValue pads the specified string to the width of the given
-// column, adds the spacing bewtween columns, and returns the result.
+// column, adds the spacing between columns, and returns the result.
 func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col, last int, value string) error {
 	value = trim(transformer.Transform(col, trim(value)))
 	fmt.Fprint(result, value)

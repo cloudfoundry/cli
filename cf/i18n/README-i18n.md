@@ -8,7 +8,7 @@ If you are interested in submitting translations for a currently unsupported lan
 
 ## How can you contribute?
 
-If you see typos, errors in grammar, ambiguous strings or English after setting your locale, please find the appropriate entry in the corresponding `i18n/resources/<language>_<locale>.all.json` file and submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) with the fix(es). It is much better to submit small pull requests as you complete translations, rather than submitting a large one. This makes it much easier to rapidly merge your changes in. You can also report translations needing fixes as an issue in Github.
+If you see typos, errors in grammar, ambiguous strings or English after setting your locale, please find the appropriate entry in the corresponding `i18n/resources/<language>_<locale>.all.json` file and submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) with the fix(es). It is much better to submit small pull requests as you complete translations, rather than submitting a large one. This makes it much easier to rapidly merge your changes in. You can also report translations needing fixes as an issue in GitHub.
 
 Pull requests should only contain changes to "translation" values; the "id" value should not change as it is the key which is used to find the translations, and will always be English. For example:
 

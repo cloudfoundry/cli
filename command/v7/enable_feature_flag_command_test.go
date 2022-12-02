@@ -96,7 +96,7 @@ var _ = Describe("Enable Feature Flag Command", func() {
 					fakeActor.EnableFeatureFlagReturns(v7action.Warnings{"this is a warning"}, nil)
 				})
 
-				It("diaplays the feature flag was enabled", func() {
+				It("displays the feature flag was enabled", func() {
 					featureFlagArgs := fakeActor.EnableFeatureFlagArgsForCall(0)
 					Expect(featureFlagArgs).To(Equal(featureFlagName))
 					Expect(executeErr).NotTo(HaveOccurred())

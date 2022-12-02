@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("HandleDefualtRouteOverride", func() {
+var _ = Describe("HandleDefaultRouteOverride", func() {
 	var (
 		originalManifest    manifestparser.Manifest
 		transformedManifest manifestparser.Manifest
@@ -57,8 +57,8 @@ var _ = Describe("HandleDefualtRouteOverride", func() {
 
 	})
 
-	// CLI doesnt know about the routes field but CAPI ignores defualt route if routes is specified
-	// so we are ok adding defualt route even with the presence of a routes field
+	// CLI doesnt know about the routes field but CAPI ignores default route if routes is specified
+	// so we are ok adding default route even with the presence of a routes field
 
 	When("the manifest has no routing fields", func() {
 		BeforeEach(func() {

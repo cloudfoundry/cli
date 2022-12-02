@@ -67,7 +67,7 @@ var _ = Describe("set-label command", func() {
 
 		testExpectedBehaviors := func(resourceType, resourceTypeFormatted, resourceName string) {
 			By("checking the behavior when the resource does not exist", func() {
-				unknownResourceName := "non-existent-" + resourceType
+				unknownResourceName := "nonexistent-" + resourceType
 				session := helpers.CF("set-label", resourceType, unknownResourceName, "some-key=some-value")
 				Eventually(session.Err).Should(Say("%s '%s' not found", resourceTypeFormatted, unknownResourceName))
 				Eventually(session).Should(Say("FAILED"))
@@ -330,9 +330,9 @@ var _ = Describe("set-label command", func() {
 
 			When("the route is unknown", func() {
 				It("displays an error", func() {
-					invalidRoute := "non-existent-host." + domainName
+					invalidRoute := "nonexistent-host." + domainName
 					session := helpers.CF("set-label", "route", invalidRoute, "some-key=some-value")
-					Eventually(session.Err).Should(Say(fmt.Sprintf("Route with host 'non-existent-host' and domain '%s' not found", domainName)))
+					Eventually(session.Err).Should(Say(fmt.Sprintf("Route with host 'nonexistent-host' and domain '%s' not found", domainName)))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
@@ -509,7 +509,7 @@ var _ = Describe("set-label command", func() {
 						})
 					})
 
-					When("a non-existent stack is specified", func() {
+					When("a nonexistent stack is specified", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
@@ -574,7 +574,7 @@ var _ = Describe("set-label command", func() {
 						})
 					})
 
-					When("a non-existent stack is specified", func() {
+					When("a nonexistent stack is specified", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
