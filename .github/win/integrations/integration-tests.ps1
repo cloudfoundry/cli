@@ -73,6 +73,10 @@ go install github.com/akavel/rsrc@v0.10.2
 make out/cf-cli_winx64.exe
 Move-Item -Path ./out/cf-cli_winx64.exe  -Destination ./out/cf.exe -Force
 
+cf.exe api $Env:CF_INT_API --skip-ssl-validation
+cf.exe auth admin $Env:CF_INT_PASSWORD
+cf.exe enable-feature-flag route_sharing
+
 ginkgo.exe -r `
 	-nodes=16 `
 	-flakeAttempts=2 `
