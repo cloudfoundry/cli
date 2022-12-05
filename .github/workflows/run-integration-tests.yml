@@ -67,6 +67,10 @@ jobs:
 
           make build
           export PATH="$(pwd)/out:$PATH"
+          export CF_PASSWORD=${CF_INT_PASSWORD}
+          cf api ${CF_INT_API} --skip-ssl-validation
+          cf auth
+          cf enable-feature-flag route_sharing
           make integration-tests-full-ci
       - name: Run Integration Tests with client credentials
         if: ${{ inputs.run-with-client-creds }}
@@ -89,4 +93,8 @@ jobs:
 
           make build
           export PATH="$(pwd)/out:$PATH"
+          export CF_PASSWORD=${CF_INT_PASSWORD}
+          cf api ${CF_INT_API} --skip-ssl-validation
+          cf auth
+          cf enable-feature-flag route_sharing
           make integration-tests-full-ci
