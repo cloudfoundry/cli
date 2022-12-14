@@ -65,8 +65,10 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
-          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+          export GOPATH=$PWD/go
 
+          cd $GOPATH/src/code.cloudfoundry.org/cli
+          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           make build
           export PATH="$(pwd)/out:$PATH"
@@ -90,8 +92,10 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
-          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+          export GOPATH=$PWD/go
 
+          cd $GOPATH/src/code.cloudfoundry.org/cli
+          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           make build
           export PATH="$(pwd)/out:$PATH"
