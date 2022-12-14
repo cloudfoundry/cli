@@ -52,6 +52,9 @@ jobs:
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
+          mkdir -p go/src/code.cloudfoundry.org
+          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -77,6 +80,9 @@ jobs:
           CF_INT_CLIENT_ID: 'potato-face'
           CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: |
+          mkdir -p go/src/code.cloudfoundry.org
+          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
