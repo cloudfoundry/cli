@@ -52,9 +52,6 @@ jobs:
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
-          mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
-
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -65,10 +62,8 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
-          export GOPATH=$PWD/go
-
-          cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
 
           make build
           export PATH="$(pwd)/out:$PATH"
@@ -82,9 +77,6 @@ jobs:
           CF_INT_CLIENT_ID: 'potato-face'
           CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: |
-          mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
-
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -95,10 +87,8 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
-          export GOPATH=$PWD/go
-
-          cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
 
           make build
           export PATH="$(pwd)/out:$PATH"
