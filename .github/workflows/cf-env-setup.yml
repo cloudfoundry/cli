@@ -88,13 +88,6 @@ jobs:
           repository: cloudfoundry/cf-deployment-concourse-tasks
           path: cf-deployment-concourse-tasks
 
-      - name: Checkout cli
-        uses: actions/checkout@v3
-        with:
-          repository: cloudfoundry/cli
-          path: cli
-          ref: linux-min-capi-int-test
-
       - name: Install Tools
         run: |
           wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 -P /tmp
