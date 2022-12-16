@@ -62,6 +62,8 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
+          export GOPATH=$PWD/go
+          export PATH=$GOPATH/bin:$PATH
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
 
@@ -84,8 +86,9 @@ jobs:
           export CF_USERNAME=admin
           export FLAKE_ATTEMPTS=2
           export NODES=16
+          export GOPATH=$PWD/go
+          export PATH=$GOPATH/bin:$PATH
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
-
 
           make build
           export PATH="$(pwd)/out:$PATH"
