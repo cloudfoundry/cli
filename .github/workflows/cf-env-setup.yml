@@ -147,7 +147,6 @@ jobs:
           cp cli-ci/ci/infrastructure/operations/add-uaa-client-cf-custom.yml ops-files/
           cp cli-ci/ci/infrastructure/operations/adjust-user-retry-attempts.yml ops-files/
           cp cli-ci/ci/infrastructure/operations/cli-isolation-cell-overrides.yml ops-files/
-          cp cli-ci/ci/infrastructure/operations/default-app-memory.yml ops-files/
           cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
           cp cli-ci/ci/infrastructure/operations/doppler-instances.yml ops-files/
           cp cli-ci/ci/infrastructure/operations/enable-v3-deployments-endpoint.yml ops-files/
@@ -184,7 +183,6 @@ jobs:
           export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
           use-compiled-releases.yml \
           cli-isolation-cell-overrides.yml \
-          default-app-memory.yml \
           skip-ssl-override.yml \
           scale-to-one-az.yml \
           diego-cell-instances.yml \
