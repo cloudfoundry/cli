@@ -45,7 +45,7 @@ jobs:
       run: |
         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
         echo "golang version: ${go_version[1]}"
-        echo "::set-output name=go-version::${go_version[1]}"
+        echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
   lint:
     name: Lint code

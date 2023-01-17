@@ -29,7 +29,7 @@ jobs:
 
     - name: Set environment
       id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::PROD"
+      run: echo "secrets-environment=PROD" >> $GITHUB_OUTPUT
 
     - name: Checkout cli
       uses: actions/checkout@v2
@@ -45,14 +45,14 @@ jobs:
       id: set-build-version
       run: |
         version=$(cat BUILD_VERSION)
-        echo "::set-output name=build-version::$version"
+        echo "build-version=$version" >> $GITHUB_OUTPUT
 
     - name: Parse Golang Version
       id: set-go-version
       run: |
         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
         echo "golang version: ${go_version[1]}"
-        echo "::set-output name=go-version::${go_version[1]}"
+        echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
     # This is for debugging. It's equivalent to fly intercept
     # - name: Setup upterm session
@@ -188,8 +188,8 @@ jobs:
     - name: Print go environment
       id: go-cache-paths
       run: |
-        echo "::set-output name=go-build::$(go env GOCACHE)"
-        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+        echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
         go env
 
     - name: Go Assets Cache
@@ -457,8 +457,8 @@ jobs:
     - name: Print go environment
       id: go-cache-paths
       run: |
-        echo "::set-output name=go-build::$(go env GOCACHE)"
-        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+        echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
         go env
 
     - name: Go Assets Cache
