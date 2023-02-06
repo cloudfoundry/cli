@@ -29,7 +29,7 @@ var _ = Describe("push with instances flag", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			time.Sleep(5 * time.Second)
+			time.Sleep(10 * time.Second)
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
 			Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
