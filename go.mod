@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli
 
-go 1.18
+go 1.19
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
@@ -41,9 +41,9 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b
-	golang.org/x/text v0.3.8
+	golang.org/x/crypto v0.4.0
+	golang.org/x/net v0.3.0
+	golang.org/x/text v0.5.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.27
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -70,8 +70,8 @@ require (
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/genproto v0.0.0-20200304201815-d429ff31ee6c // indirect
 	google.golang.org/grpc v1.27.1 // indirect

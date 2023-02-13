@@ -142,7 +142,10 @@ console: bundle exec irb`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
+	//TODO: Remove the ruby version once bundler issue(https://github.com/rubygems/rubygems/issues/6280)
+	// is solved
 	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), []byte(`source 'http://rubygems.org'
+ruby '~> 2.7.0'
 gem 'irb'`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
