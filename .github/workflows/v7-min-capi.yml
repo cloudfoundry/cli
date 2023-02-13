@@ -1,4 +1,4 @@
-name: Integration Tests
+name: Min Capi
 
 on:
   workflow_dispatch:
