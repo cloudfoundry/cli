@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - v7
+      - '*'
     paths-ignore:
       - 'doc/**'
       - '.github/**'
