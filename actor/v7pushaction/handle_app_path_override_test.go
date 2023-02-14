@@ -111,7 +111,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 					Expect(err).NotTo(HaveOccurred())
 				})
 
-				FIt("doesn't override the path for the first app in the manifest", func() {
+				It("doesn't override the path for the first app in the manifest", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
 				})
