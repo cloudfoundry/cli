@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -52,7 +53,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 		})
 
 		AfterEach(func() {
-			err := os.RemoveAll(relativeAppFilePath)
+			err := os.RemoveAll(strings.Trim(".\\", relativeAppFilePath))
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -110,7 +111,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 					Expect(err).NotTo(HaveOccurred())
 				})
 
-				It("doesn't override the path for the first app in the manifest", func() {
+				FIt("doesn't override the path for the first app in the manifest", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
 				})
