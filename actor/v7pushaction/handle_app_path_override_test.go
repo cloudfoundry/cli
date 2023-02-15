@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -53,7 +52,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 		})
 
 		AfterEach(func() {
-			err := os.RemoveAll(strings.Trim(".\\", relativeAppFilePath))
+			err := os.RemoveAll(relativeAppFilePath)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -95,7 +94,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
-					relativeAppFilePath = filepath.Join(".", absoluteAppFilehandle.Name())
+					relativeAppFilePath = filepath.Join("", absoluteAppFilehandle.Name())
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads
