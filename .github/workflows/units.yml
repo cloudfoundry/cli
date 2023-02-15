@@ -85,7 +85,6 @@ jobs:
         os:
           - windows-2022
           - windows-2019
-          - windows-2016
     runs-on: ${{ matrix.os }}
     needs: shared-values
     defaults:
