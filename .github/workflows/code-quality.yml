@@ -2,9 +2,9 @@ name: "Code Quality"
 
 on:
   push:
-    branches: [ master, '*' ]
+    branches: [ main, '*' ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   schedule:
     - cron: '45 5 * * *'
 
