@@ -153,18 +153,18 @@ jobs:
       environment-name: ${{ needs.get-cf-env-with-min-capi.outputs.environment-name }}
       run-with-client-creds: false
 
-  # unclaim-cf-env-with-min-capi:
-  #   name: Unclaim CF env with MIN CAPI
-  #   needs:
-  #     - shared-values
-  #     - get-cf-env-with-min-capi
-  #     - run-integration-tests-cf-env-with-min-capi
-  #   if: always()
-  #   uses: ./.github/workflows/cf-env-unclaim.yml
-  #   with:
-  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
-  #     toolsmith-env-name: ${{ needs.get-cf-env-with-min-capi.outputs.environment-name }}
-  #   secrets: inherit
+  unclaim-cf-env-with-min-capi:
+    name: Unclaim CF env with MIN CAPI
+    needs:
+      - shared-values
+      - get-cf-env-with-min-capi
+      - run-integration-tests-cf-env-with-min-capi
+    if: always()
+    uses: ./.github/workflows/cf-env-unclaim.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      toolsmith-env-name: ${{ needs.get-cf-env-with-min-capi.outputs.environment-name }}
+    secrets: inherit
 
 ## END min CAPI
 
