@@ -54,7 +54,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-18.04
           - macos-latest
           - macos-10.15
     runs-on: ${{ matrix.os }}
