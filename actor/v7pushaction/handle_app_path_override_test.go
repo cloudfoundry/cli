@@ -94,7 +94,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
-					relativeAppFilePath = filepath.Join(".", absoluteAppFilehandle.Name())
+					relativeAppFilePath = filepath.Join("", absoluteAppFilehandle.Name())
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads

@@ -54,7 +54,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-18.04
           - macos-latest
           - macos-10.15
     runs-on: ${{ matrix.os }}
@@ -83,9 +82,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - windows-2022
+          - windows-latest
           - windows-2019
-          - windows-2016
     runs-on: ${{ matrix.os }}
     needs: shared-values
     defaults:
@@ -123,5 +121,4 @@ jobs:
         -randomizeSuites
         -skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
         -flakeAttempts=2
-
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

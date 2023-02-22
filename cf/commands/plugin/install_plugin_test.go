@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo/pluginrepofakes"
@@ -541,7 +542,7 @@ var _ = Describe("Install", func() {
 				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Installing plugin"},
-					[]string{"The file", pluginFile.Name(), "already exists"},
+					[]string{"The file ", strings.Trim(pluginFile.Name(), "./"), "already exists"},
 					[]string{"FAILED"},
 				))
 			})
