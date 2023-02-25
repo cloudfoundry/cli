@@ -6,8 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+
 	. "github.com/onsi/gomega"
 )
 

@@ -4,7 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/cf/ssh/options"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

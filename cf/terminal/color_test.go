@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
 	"github.com/fatih/color"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

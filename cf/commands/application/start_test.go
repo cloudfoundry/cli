@@ -30,7 +30,7 @@ import (
 
 	"sync/atomic"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

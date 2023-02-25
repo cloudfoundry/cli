@@ -7,7 +7,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/trace"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

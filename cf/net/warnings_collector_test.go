@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/net/netfakes"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
