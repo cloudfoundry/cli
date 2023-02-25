@@ -2,7 +2,7 @@ package help_test
 
 import (
 	"code.cloudfoundry.org/cli/cf/commandsloader"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"testing"

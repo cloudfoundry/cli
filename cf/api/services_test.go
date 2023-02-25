@@ -20,7 +20,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/api"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
