@@ -157,7 +157,7 @@ jobs:
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
-        ref: master
+        ref: main
 
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
@@ -404,7 +404,7 @@ jobs:
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
-        ref: master
+        ref: main
 
     - name: Checkout bomutils
       uses: actions/checkout@v2
