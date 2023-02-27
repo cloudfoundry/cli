@@ -146,7 +146,7 @@ jobs:
     name: Build Linux
     needs:
     - setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     environment: ${{ needs.setup.outputs.secrets-environment }}
 
     env:
@@ -991,9 +991,9 @@ jobs:
     - setup
     - build-linux
     environment: ${{ needs.setup.outputs.secrets-environment }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
-      image: ubuntu
+      image: ubuntu:20.04
     steps:
 
     - name: Download Signed Linux Packages
