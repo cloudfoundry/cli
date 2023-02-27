@@ -227,7 +227,7 @@ jobs:
 
   update-deb:
     name: Update Debian Repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: setup
     environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
@@ -299,7 +299,7 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
     - setup
     - update-deb
