@@ -146,7 +146,7 @@ jobs:
     name: Build Linux
     needs:
     - setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     environment: ${{ needs.setup.outputs.secrets-environment }}
 
     env:
@@ -167,7 +167,7 @@ jobs:
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
-        ref: master
+        ref: main
 
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
@@ -418,7 +418,7 @@ jobs:
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
-        ref: master
+        ref: main
 
     - name: Checkout bomutils
       uses: actions/checkout@v2
@@ -991,9 +991,9 @@ jobs:
     - setup
     - build-linux
     environment: ${{ needs.setup.outputs.secrets-environment }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
-      image: ubuntu
+      image: ubuntu:20.04
     steps:
 
     - name: Download Signed Linux Packages

@@ -171,8 +171,14 @@ var _ = Describe("service command", func() {
 				})
 
 				It("displays the bound apps", func() {
+					//Delay to reduce flakiness
+					time.Sleep(10 * time.Second)
+
 					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
 					Eventually(session).Should(Exit(0))
+
+					//Delay to reduce flakiness
+					time.Sleep(10 * time.Second)
 
 					Expect(session).To(SatisfyAll(
 						Say(`Showing bound apps:\n`),
