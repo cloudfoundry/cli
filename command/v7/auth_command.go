@@ -77,10 +77,6 @@ func (cmd AuthCommand) Execute(args []string) error {
 		grantType = constant.GrantTypeClientCredentials
 		credentials["client_id"] = username
 		credentials["client_secret"] = password
-	} else if cmd.Config.IsCFOnK8s() {
-		credentials = map[string]string{
-			"k8s-auth-info": username,
-		}
 	} else {
 		credentials = map[string]string{
 			"username": username,
