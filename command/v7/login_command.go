@@ -267,7 +267,7 @@ func (cmd *LoginCommand) authenticate() error {
 		return err
 	}
 
-	nonPasswordPrompts, passwordPrompts := cmd.groupPrompts(prompts)
+	nonSensitivePrompts, sensitivePrompts := cmd.groupPrompts(prompts)
 
 	if value, ok := prompts["username"]; ok {
 		credentials["username"], err = cmd.getFlagValOrPrompt(&cmd.Username, value, true)
@@ -276,12 +276,8 @@ func (cmd *LoginCommand) authenticate() error {
 		}
 	}
 
-	for key, prompt := range nonPasswordPrompts {
-		if prompt.Type == coreconfig.AuthPromptTypeMenu {
-			credentials[key], err = cmd.UI.DisplayTextMenu(prompt.Entries, prompt.DisplayName)
-		} else {
-			credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
-		}
+	for key, prompt := range nonSensitivePrompts {
+		credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
 		if err != nil {
 			return err
 		}
@@ -296,7 +292,7 @@ func (cmd *LoginCommand) authenticate() error {
 			}
 		}
 
-		for key, prompt := range passwordPrompts {
+		for key, prompt := range sensitivePrompts {
 			credentials[key], err = cmd.UI.DisplayPasswordPrompt(prompt.DisplayName)
 			if err != nil {
 				return err
@@ -308,17 +304,15 @@ func (cmd *LoginCommand) authenticate() error {
 
 		err = cmd.Actor.Authenticate(credentials, cmd.Origin, constant.GrantTypePassword)
 
-		if err != nil {
-			cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
-			cmd.UI.DisplayNewline()
-
-			if _, ok := err.(uaa.AccountLockedError); ok {
-				break
-			}
-		}
-
 		if err == nil {
 			cmd.UI.DisplayOK()
+			break
+		}
+
+		cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
+		cmd.UI.DisplayNewline()
+
+		if _, ok := err.(uaa.AccountLockedError); ok {
 			break
 		}
 	}
@@ -387,12 +381,16 @@ func (cmd *LoginCommand) getFlagValOrPrompt(field *string, prompt coreconfig.Aut
 		value := *field
 		*field = ""
 		return value, nil
-	} else {
-		if isText {
-			return cmd.UI.DisplayTextPrompt(prompt.DisplayName)
-		}
-		return cmd.UI.DisplayPasswordPrompt(prompt.DisplayName)
 	}
+
+	if prompt.Type == coreconfig.AuthPromptTypeMenu {
+		return cmd.UI.DisplayTextMenu(prompt.Entries, prompt.DisplayName)
+	}
+
+	if isText {
+		return cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+	}
+	return cmd.UI.DisplayPasswordPrompt(prompt.DisplayName)
 }
 
 func (cmd *LoginCommand) showStatus() {
@@ -586,16 +584,14 @@ func (cmd *LoginCommand) validateTargetSpecificFlags() error {
 	}
 
 	if cmd.Password != "" {
-		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-p"}
+		cmd.UI.DisplayWarning("Warning: password is ignored when authenticating against Kubernetes.")
 	}
+
 	if cmd.SSO {
 		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso"}
 	}
 	if cmd.SSOPasscode != "" {
 		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso-passcode"}
-	}
-	if cmd.Username != "" {
-		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-u"}
 	}
 	if cmd.Origin != "" {
 		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--origin"}

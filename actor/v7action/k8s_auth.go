@@ -52,7 +52,7 @@ func NewKubernetesAuthActor(config Config, k8sConfigGetter KubernetesConfigGette
 }
 
 func (actor kubernetesAuthActor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
-	username := credentials["k8s-auth-info"]
+	username := credentials["username"]
 	availableUsernames, err := actor.getAvailableUsernames()
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (actor kubernetesAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPr
 	}
 	sort.Strings(availableUsernames)
 
-	return map[string]coreconfig.AuthPrompt{"k8s-auth-info": {
+	return map[string]coreconfig.AuthPrompt{"username": {
 		Type:        coreconfig.AuthPromptTypeMenu,
 		Entries:     availableUsernames,
 		DisplayName: "Choose your Kubernetes authentication info",

@@ -318,7 +318,7 @@ var _ = Describe("auth Command", func() {
 				It("attempts to authenticate with the correct username", func() {
 					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
-					Expect(credentials).To(Equal(map[string]string{"k8s-auth-info": "myuser"}))
+					Expect(credentials).To(HaveKeyWithValue("username", "myuser"))
 				})
 
 				When("there is an error authenticating with the given username", func() {

@@ -40,7 +40,7 @@ var _ = Describe("KubernetesAuthActor", func() {
 		})
 
 		JustBeforeEach(func() {
-			err = k8sAuthActor.Authenticate(map[string]string{"k8s-auth-info": username}, "", constant.GrantTypePassword)
+			err = k8sAuthActor.Authenticate(map[string]string{"username": username}, "", constant.GrantTypePassword)
 		})
 
 		It("sets the Kubernetes auth-info", func() {
@@ -90,16 +90,16 @@ var _ = Describe("KubernetesAuthActor", func() {
 		It("returns an auth prompt menu", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(authPrompts).To(HaveLen(1))
-			Expect(authPrompts).To(HaveKey("k8s-auth-info"))
+			Expect(authPrompts).To(HaveKey("username"))
 
-			authPrompt := authPrompts["k8s-auth-info"]
+			authPrompt := authPrompts["username"]
 			Expect(authPrompt.Type).To(Equal(coreconfig.AuthPromptTypeMenu))
 			Expect(authPrompt.DisplayName).To(Equal("Choose your Kubernetes authentication info"))
 			Expect(authPrompt.Entries).To(ConsistOf("foo", "bar"))
 		})
 
 		It("sorts the entries", func() {
-			authPrompt := authPrompts["k8s-auth-info"]
+			authPrompt := authPrompts["username"]
 			Expect(authPrompt.Entries).To(Equal([]string{"bar", "foo"}))
 		})
 
