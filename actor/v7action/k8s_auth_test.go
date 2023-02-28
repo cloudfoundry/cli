@@ -34,14 +34,49 @@ var _ = Describe("KubernetesAuthActor", func() {
 	})
 
 	Describe("Authenticate", func() {
+		var username string
+		BeforeEach(func() {
+			username = "bar"
+		})
+
 		JustBeforeEach(func() {
-			err = k8sAuthActor.Authenticate(map[string]string{"k8s-auth-info": "bar"}, "", constant.GrantTypePassword)
+			err = k8sAuthActor.Authenticate(map[string]string{"k8s-auth-info": username}, "", constant.GrantTypePassword)
 		})
 
 		It("sets the Kubernetes auth-info", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.SetKubernetesAuthInfoCallCount()).To(Equal(1))
 			Expect(config.SetKubernetesAuthInfoArgsForCall(0)).To(Equal("bar"))
+		})
+
+		When("the given username is not in the k8s config", func() {
+			BeforeEach(func() {
+				username = "no-such-person"
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError("kubernetes user not found in configuration: " + username))
+			})
+		})
+
+		When("getting the k8s config fails", func() {
+			BeforeEach(func() {
+				k8sConfigGetter.GetReturns(nil, errors.New("oomph!"))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError("oomph!"))
+			})
+		})
+
+		When("no auth infos are in the k8s config", func() {
+			BeforeEach(func() {
+				k8sConfigGetter.GetReturns(&clientcmdapi.Config{}, nil)
+			})
+
+			It("returns an error", func() {
+				Expect(err).To(MatchError("no kubernetes authentication infos configured"))
+			})
 		})
 	})
 
