@@ -124,6 +124,24 @@ var _ = Describe("auth Command", func() {
 				})
 			})
 		})
+
+		When("the password is given", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.Username = "myuser"
+				cmd.RequiredArgs.Password = "mypassword"
+			})
+
+			When("authenticating against korifi", func() {
+				BeforeEach(func() {
+					fakeConfig.IsCFOnK8sReturns(true)
+				})
+
+				It("succeeds but warns", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(testUI.Err).To(Say("Warning: password is ignored when authenticating against Kubernetes."))
+				})
+			})
+		})
 	})
 
 	When("there is an auth error", func() {

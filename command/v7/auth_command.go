@@ -118,9 +118,16 @@ func (cmd AuthCommand) getUsernamePassword() (string, string, error) {
 	if password == "" {
 		if envPassword := cmd.Config.CFPassword(); envPassword != "" {
 			password = envPassword
-		} else if !cmd.Config.IsCFOnK8s() {
+		} else {
 			passwordMissing = true
 		}
+	}
+
+	if cmd.Config.IsCFOnK8s() {
+		if !passwordMissing {
+			cmd.UI.DisplayWarning("Warning: password is ignored when authenticating against Kubernetes.")
+		}
+		passwordMissing = false
 	}
 
 	if userMissing || passwordMissing {
