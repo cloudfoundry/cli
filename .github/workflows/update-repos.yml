@@ -84,7 +84,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: cloudfoundry/cli-ci.git
-        ref: master
+        ref: main
         path: cli-ci
 
     - name: Checkout homebrew-tap
@@ -235,7 +235,7 @@ jobs:
 
   update-deb:
     name: Update Debian Repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: setup
     environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
@@ -259,7 +259,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.3
+        ruby-version: 2.7
     - run: gem install deb-s3
     #RUN apt install -y ruby1.9.1 createrepo
 
@@ -307,7 +307,7 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
     - setup
     - update-deb
