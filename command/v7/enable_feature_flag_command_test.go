@@ -70,7 +70,7 @@ var _ = Describe("Enable Feature Flag Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 		})
 
 		It("should print text indicating its running", func() {
@@ -96,7 +96,7 @@ var _ = Describe("Enable Feature Flag Command", func() {
 					fakeActor.EnableFeatureFlagReturns(v7action.Warnings{"this is a warning"}, nil)
 				})
 
-				It("diaplays the feature flag was enabled", func() {
+				It("displays the feature flag was enabled", func() {
 					featureFlagArgs := fakeActor.EnableFeatureFlagArgsForCall(0)
 					Expect(featureFlagArgs).To(Equal(featureFlagName))
 					Expect(executeErr).NotTo(HaveOccurred())

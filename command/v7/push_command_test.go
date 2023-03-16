@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -26,7 +27,6 @@ import (
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"gopkg.in/yaml.v2"
 )
 
 type Step struct {
@@ -85,6 +85,8 @@ var _ = Describe("push Command", func() {
 		fakeConfig          *commandfakes.FakeConfig
 		fakeSharedActor     *commandfakes.FakeSharedActor
 		fakeActor           *v7fakes.FakePushActor
+		fakeDiffActor       *v7fakes.FakeActor
+		fakeDiffDisplayer   *v7fakes.FakeDiffDisplayer
 		fakeVersionActor    *v7fakes.FakeV7ActorForPush
 		fakeProgressBar     *v7fakes.FakeProgressBar
 		fakeLogCacheClient  *sharedactionfakes.FakeLogCacheClient
@@ -107,6 +109,8 @@ var _ = Describe("push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakePushActor)
+		fakeDiffActor = new(v7fakes.FakeActor)
+		fakeDiffDisplayer = new(v7fakes.FakeDiffDisplayer)
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v7fakes.FakeProgressBar)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
@@ -128,6 +132,7 @@ var _ = Describe("push Command", func() {
 				SharedActor: fakeSharedActor,
 				UI:          testUI,
 				Config:      fakeConfig,
+				Actor:       fakeDiffActor,
 			},
 			PushActor:       fakeActor,
 			VersionActor:    fakeVersionActor,
@@ -136,6 +141,7 @@ var _ = Describe("push Command", func() {
 			CWD:             pwd,
 			ManifestLocator: fakeManifestLocator,
 			ManifestParser:  fakeManifestParser,
+			DiffDisplayer:   fakeDiffDisplayer,
 		}
 	})
 
@@ -182,7 +188,7 @@ var _ = Describe("push Command", func() {
 
 		When("the user is logged in, and org and space are targeted", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+				fakeDiffActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 					Name: orgName,
@@ -224,7 +230,7 @@ var _ = Describe("push Command", func() {
 					BeforeEach(func() {
 						// essentially fakes GetBaseManifest
 						fakeManifestLocator.PathReturns("", true, nil)
-						fakeManifestParser.InterpolateAndParseReturns(
+						fakeManifestParser.ParseManifestReturns(
 							manifestparser.Manifest{
 								Applications: []manifestparser.Application{
 									{
@@ -313,7 +319,7 @@ var _ = Describe("push Command", func() {
 							})
 						})
 
-						When("marsahlling the manifest succeeds", func() {
+						When("marshalling the manifest succeeds", func() {
 							BeforeEach(func() {
 								fakeManifestParser.MarshalManifestReturns([]byte("our-manifest"), nil)
 							})
@@ -325,6 +331,81 @@ var _ = Describe("push Command", func() {
 								Expect(actualManifestBytes).To(Equal([]byte("our-manifest")))
 							})
 
+							When("the manifest is successfully parsed", func() {
+								var expectedDiff resources.ManifestDiff
+
+								BeforeEach(func() {
+									fakeActor.HandleFlagOverridesReturns(
+										manifestparser.Manifest{
+											PathToManifest: "path/to/manifest",
+										},
+										nil,
+									)
+									expectedDiff = resources.ManifestDiff{
+										Diffs: []resources.Diff{
+											{Op: resources.AddOperation, Path: "/path/to/field", Value: "hello"},
+										},
+									}
+
+									fakeVersionActor.SetSpaceManifestReturns(
+										v7action.Warnings{"some-manifest-warning"},
+										nil,
+									)
+
+									fakeDiffActor.DiffSpaceManifestReturns(
+										expectedDiff,
+										nil,
+										nil,
+									)
+								})
+
+								It("shows the manifest diff and sets the manifest", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("Applying manifest file %s...", ("path/to/manifest")))
+									Expect(testUI.Err).To(Say("some-manifest-warning"))
+
+									Expect(fakeDiffActor.DiffSpaceManifestCallCount()).To(Equal(1))
+									spaceGUID, manifestBytes := fakeDiffActor.DiffSpaceManifestArgsForCall(0)
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+									Expect(manifestBytes).To(Equal([]byte("our-manifest")))
+
+									Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(1))
+									manifestBytes, diff := fakeDiffDisplayer.DisplayDiffArgsForCall(0)
+									Expect(manifestBytes).To(Equal([]byte("our-manifest")))
+									Expect(diff).To(Equal(expectedDiff))
+
+									Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
+									spaceGUIDArg, actualBytes := fakeVersionActor.SetSpaceManifestArgsForCall(0)
+									Expect(actualBytes).To(Equal([]byte("our-manifest")))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+								})
+
+								When("the manifest diff fails", func() {
+									BeforeEach(func() {
+										fakeDiffActor.DiffSpaceManifestReturns(resources.ManifestDiff{}, v7action.Warnings{}, ccerror.V3UnexpectedResponseError{})
+									})
+
+									It("reports the 500, does not display the diff, but still applies the manifest", func() {
+										Expect(executeErr).ToNot(HaveOccurred())
+
+										Expect(testUI.Err).To(Say("Unable to generate diff. Continuing to apply manifest..."))
+										Expect(fakeDiffDisplayer.DisplayDiffCallCount()).To(Equal(0))
+										Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
+									})
+								})
+
+								When("displaying the manifest diff fails", func() {
+									BeforeEach(func() {
+										fakeDiffDisplayer.DisplayDiffReturns(errors.New("diff failed"))
+									})
+
+									It("returns the diff error", func() {
+										Expect(executeErr).To(MatchError("diff failed"))
+										Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(0))
+									})
+								})
+							})
+
 							When("applying the manifest fails", func() {
 								BeforeEach(func() {
 									fakeVersionActor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, errors.New("apply-manifest-error"))
@@ -334,7 +415,6 @@ var _ = Describe("push Command", func() {
 									Expect(executeErr).To(MatchError("apply-manifest-error"))
 									Expect(testUI.Err).To(Say("apply-manifest-warnings"))
 								})
-
 							})
 
 							When("applying the manifest succeeds", func() {
@@ -370,15 +450,14 @@ var _ = Describe("push Command", func() {
 										Expect(executeErr).To(MatchError("create-push-plans-error"))
 										Expect(testUI.Err).To(Say("create-push-plans-warnings"))
 									})
-
 								})
 
 								When("creating the push plans succeeds", func() {
 									BeforeEach(func() {
 										fakeActor.CreatePushPlansReturns(
 											[]v7pushaction.PushPlan{
-												v7pushaction.PushPlan{Application: resources.Application{Name: "first-app", GUID: "potato"}},
-												v7pushaction.PushPlan{Application: resources.Application{Name: "second-app", GUID: "potato"}},
+												{Application: resources.Application{Name: "first-app", GUID: "potato"}},
+												{Application: resources.Application{Name: "second-app", GUID: "potato"}},
 											},
 											v7action.Warnings{"create-push-plans-warnings"},
 											nil,
@@ -512,7 +591,6 @@ var _ = Describe("push Command", func() {
 														passedAppName, spaceGUID, _ = fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(1)
 														Expect(passedAppName).To(Equal(appName2))
 														Expect(spaceGUID).To(Equal("some-space-guid"))
-
 													})
 												})
 
@@ -584,7 +662,6 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Err).To(Say("get-application-summary-warnings"))
 												})
 											})
-
 										})
 
 										When("actualize returns an error", func() {
@@ -805,7 +882,7 @@ var _ = Describe("push Command", func() {
 			When("a manifest exists in the current dir", func() {
 				BeforeEach(func() {
 					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-					fakeManifestParser.InterpolateAndParseReturns(
+					fakeManifestParser.ParseManifestReturns(
 						manifestparser.Manifest{
 							Applications: []manifestparser.Application{
 								{Name: "new-app"},
@@ -828,8 +905,12 @@ var _ = Describe("push Command", func() {
 					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.CWD))
 
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+					actualManifestPath, _, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
+					Expect(actualManifestPath).To(Equal("/manifest/path"))
+
+					Expect(fakeManifestParser.ParseManifestCallCount()).To(Equal(1))
+					actualManifestPath, _ = fakeManifestParser.ParseManifestArgsForCall(0)
 					Expect(actualManifestPath).To(Equal("/manifest/path"))
 				})
 			})
@@ -842,7 +923,7 @@ var _ = Describe("push Command", func() {
 
 				It("ignores the file not found error", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(0))
 				})
 
 				It("returns a default empty manifest", func() {
@@ -863,39 +944,37 @@ var _ = Describe("push Command", func() {
 
 				It("returns the error", func() {
 					Expect(executeErr).To(MatchError("err-location"))
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(0))
+				})
+			})
+
+			When("interpolating the manifest fails", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+					fakeManifestParser.InterpolateManifestReturns(
+						nil,
+						errors.New("bad yaml"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("bad yaml"))
+					Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
 				})
 			})
 
 			When("parsing the manifest fails", func() {
-				When("parsing the manifest yields a yaml TypeError", func() {
-					BeforeEach(func() {
-						fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-						fakeManifestParser.InterpolateAndParseReturns(
-							manifestparser.Manifest{},
-							&yaml.TypeError{},
-						)
-					})
-
-					It("returns a special error", func() {
-						Expect(executeErr).To(MatchError("Unable to push app because manifest /manifest/path is not valid yaml."))
-						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					})
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+					fakeManifestParser.ParseManifestReturns(
+						manifestparser.Manifest{},
+						errors.New("bad yaml"),
+					)
 				})
 
-				When("parsing the manifest yields a generic error", func() {
-					BeforeEach(func() {
-						fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-						fakeManifestParser.InterpolateAndParseReturns(
-							manifestparser.Manifest{},
-							errors.New("bad yaml"),
-						)
-					})
-
-					It("returns the error", func() {
-						Expect(executeErr).To(MatchError("bad yaml"))
-						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					})
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("bad yaml"))
+					Expect(fakeManifestParser.ParseManifestCallCount()).To(Equal(1))
 				})
 			})
 		})
@@ -905,7 +984,7 @@ var _ = Describe("push Command", func() {
 				somePath = "some-path"
 				flagOverrides.ManifestPath = somePath
 				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				fakeManifestParser.InterpolateAndParseReturns(
+				fakeManifestParser.ParseManifestReturns(
 					manifestparser.Manifest{
 						Applications: []manifestparser.Application{
 							{Name: "new-app"},
@@ -921,8 +1000,8 @@ var _ = Describe("push Command", func() {
 				Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				actualManifestPath, _, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualManifestPath).To(Equal("/manifest/path"))
 				Expect(manifest).To(Equal(
 					manifestparser.Manifest{
@@ -946,8 +1025,8 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				_, actualVarsFiles, _ := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualVarsFiles).To(Equal(varsFiles))
 			})
 		})
@@ -966,8 +1045,8 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(fakeManifestParser.InterpolateManifestCallCount()).To(Equal(1))
+				_, _, actualVars := fakeManifestParser.InterpolateManifestArgsForCall(0)
 				Expect(actualVars).To(Equal(vars))
 			})
 		})
@@ -999,6 +1078,7 @@ var _ = Describe("push Command", func() {
 			cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{"/vars1", "/vars2"}
 			cmd.Vars = []template.VarKV{{Name: "key", Value: "val"}}
 			cmd.Task = true
+			cmd.LogRateLimit = "512M"
 		})
 
 		JustBeforeEach(func() {
@@ -1027,6 +1107,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.PathsToVarsFiles).To(Equal([]string{"/vars1", "/vars2"}))
 			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
 			Expect(overrides.Task).To(BeTrue())
+			Expect(overrides.LogRateLimit).To(Equal("512M"))
 		})
 
 		When("a docker image is provided", func() {

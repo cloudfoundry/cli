@@ -6,6 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 type Policy struct {
@@ -196,10 +198,7 @@ func (actor Actor) orgNamesBySpaceGUID(spaces []resources.Space) (map[string]str
 		return nil, warnings, err
 	}
 
-	orgNamesByGUID := make(map[string]string, len(orgs))
-	for _, org := range orgs {
-		orgNamesByGUID[org.GUID] = org.Name
-	}
+	orgNamesByGUID := lookuptable.NameFromGUID(orgs)
 
 	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
 	for _, space := range spaces {
@@ -218,7 +217,17 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		srcAppGUIDs = append(srcAppGUIDs, app.GUID)
 	}
 
-	v1Policies, err := actor.NetworkingClient.ListPolicies(srcAppGUIDs...)
+	v1Policies := []cfnetv1.Policy{}
+
+	_, err := batcher.RequestByGUID(srcAppGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, err := actor.NetworkingClient.ListPolicies(guids...)
+		if err != nil {
+			return nil, err
+		}
+		v1Policies = append(v1Policies, batch...)
+		return nil, err
+	})
+
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -229,9 +238,15 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
-	destApplications, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: destAppGUIDs,
+	var destApplications []resources.Application
+
+	warnings, err := batcher.RequestByGUID(destAppGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
+			Key:    ccv3.GUIDFilter,
+			Values: guids,
+		})
+		destApplications = append(destApplications, batch...)
+		return warnings, err
 	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -249,10 +264,7 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		return []Policy{}, allWarnings, err
 	}
 
-	spaceNamesByGUID := make(map[string]string, len(spaces))
-	for _, destSpace := range spaces {
-		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
-	}
+	spaceNamesByGUID := lookuptable.NameFromGUID(spaces)
 
 	orgNamesBySpaceGUID, warnings, err := actor.orgNamesBySpaceGUID(spaces)
 	allWarnings = append(allWarnings, warnings...)
@@ -260,10 +272,7 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 		return []Policy{}, allWarnings, err
 	}
 
-	appByGUID := map[string]resources.Application{}
-	for _, app := range applications {
-		appByGUID[app.GUID] = app
-	}
+	appByGUID := lookuptable.AppFromGUID(applications)
 
 	var policies []Policy
 	for _, v1Policy := range v1Policies {

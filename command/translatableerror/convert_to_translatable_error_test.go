@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -46,10 +45,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 
 		Entry("actionerror.AppNotFoundInManifestError -> AppNotFoundInManifestError",
 			actionerror.AppNotFoundInManifestError{Name: "some-app"},
-			AppNotFoundInManifestError{Name: "some-app"}),
-
-		Entry("manifestparse.AppNotInManifestError -> AppNotFoundInManifestError",
-			v6manifestparser.AppNotInManifestError{Name: "some-app"},
 			AppNotFoundInManifestError{Name: "some-app"}),
 
 		Entry("actionerror.AssignDropletError -> AssignDropletError",
@@ -157,10 +152,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.NonexistentAppPathError{Path: "some-path"},
 			FileNotFoundError{Path: "some-path"}),
 
-		Entry("v6manifestparser.InvalidManifestApplicationPathError -> FileNotFoundError",
-			v6manifestparser.InvalidManifestApplicationPathError{Path: "some-path"},
-			FileNotFoundError{Path: "some-path"}),
-
 		Entry("actionerror.NoOrganizationTargetedError -> NoOrganizationTargetedError",
 			actionerror.NoOrganizationTargetedError{BinaryName: "faceman"},
 			NoOrganizationTargetedError{BinaryName: "faceman"}),
@@ -234,6 +225,14 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("actionerror.RepositoryNotRegisteredError -> RepositoryNotRegisteredError",
 			actionerror.RepositoryNotRegisteredError{Name: "some-repo"},
 			RepositoryNotRegisteredError{Name: "some-repo"}),
+
+		Entry("actionerror.RevisionNotFoundErrors-> RevisionNotFoundError",
+			actionerror.RevisionNotFoundError{Version: 1},
+			RevisionNotFoundError{Version: 1}),
+
+		Entry("actionerror.RevisionAmbiguousError-> RevisionAmbiguousError",
+			actionerror.RevisionAmbiguousError{Version: 1},
+			RevisionAmbiguousError{Version: 1}),
 
 		Entry("actionerror.RouteInDifferentSpaceError -> RouteInDifferentSpaceError",
 			actionerror.RouteInDifferentSpaceError{Route: "some-route"},
@@ -331,6 +330,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),
 
+		Entry("ccerror.JobFailedNoErrorError -> JobFailedNoErrorError",
+			ccerror.JobFailedNoErrorError{JobGUID: "some-job-guid"},
+			JobFailedNoErrorError{JobGUID: "some-job-guid"}),
+
 		Entry("ccerror.MultiError -> MultiError",
 			ccerror.MultiError{ResponseCode: 418, Errors: []ccerror.V3Error{
 				{
@@ -385,7 +388,7 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		// Manifest Errors
 		Entry("manifest.ManifestCreationError -> ManifestCreationError",
 			manifest.ManifestCreationError{Err: errors.New("some-error")},
-			ManifestCreationError{Err: errors.New("some-error")}),
+			FileCreationError{Err: errors.New("some-error")}),
 
 		Entry("manifest.InheritanceFieldError -> TriggerLegacyPushError",
 			manifest.InheritanceFieldError{},
@@ -398,14 +401,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("manifest.InterpolationError -> InterpolationError",
 			manifest.InterpolationError{Err: errors.New("an-error")},
 			InterpolationError{Err: errors.New("an-error")}),
-
-		Entry("v6manifestparser.InterpolationError -> InterpolationError",
-			v6manifestparser.InterpolationError{Err: errors.New("an-error")},
-			InterpolationError{Err: errors.New("an-error")}),
-
-		Entry("v6manifestparser.InvalidYAMLError -> InvalidYAMLError",
-			v6manifestparser.InvalidYAMLError{Err: errors.New("an-error")},
-			InvalidYAMLError{Err: errors.New("an-error")}),
 
 		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",

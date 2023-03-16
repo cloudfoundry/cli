@@ -50,6 +50,7 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		HandleHealthCheckTimeoutOverride,
 		HandleMemoryOverride,
 		HandleDiskOverride,
+		HandleLogRateLimitOverride,
 		HandleNoRouteOverride,
 		HandleRandomRouteOverride,
 		HandleTaskOverride,

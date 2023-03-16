@@ -89,7 +89,7 @@ var _ = Describe("domains Command", func() {
 
 	Context("When the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		When("DomainsActor returns an error", func() {

@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 )
 
 type ApplicationSummary struct {
@@ -47,9 +48,14 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	if err != nil {
 		return nil, allWarnings, err
 	}
+	var processes []resources.Process
 
-	processes, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
-		Key: ccv3.AppGUIDFilter, Values: toAppGUIDs(apps),
+	warnings, err = batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
+			Key: ccv3.AppGUIDFilter, Values: guids,
+		})
+		processes = append(processes, batch...)
+		return warnings, err
 	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -70,17 +76,23 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 		}
 
 		processSummary := ProcessSummary{
-			Process:         Process(process),
+			Process:         resources.Process(process),
 			InstanceDetails: instanceDetails,
 		}
 
 		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
 	}
 
-	routes, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
-		Key: ccv3.AppGUIDFilter, Values: toAppGUIDs(apps),
+	var routes []resources.Route
+
+	warnings, err = batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
+			Key: ccv3.AppGUIDFilter, Values: guids,
+		})
+		routes = append(routes, batch...)
+		return warnings, err
 	})
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}

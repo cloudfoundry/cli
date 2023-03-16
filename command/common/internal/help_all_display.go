@@ -11,7 +11,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS:",
 		CommandList: [][]string{
-			{"apps", "app", "create-app", "revisions"},
+			{"apps", "app", "create-app"},
 			{"push", "scale", "delete", "rename"},
 			{"cancel-deployment"},
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
@@ -29,7 +29,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "SERVICES:",
 		CommandList: [][]string{
 			{"marketplace", "services", "service"},
-			{"create-service", "update-service", "delete-service", "rename-service"},
+			{"create-service", "update-service", "upgrade-service", "delete-service", "rename-service"},
 			{"create-service-key", "service-keys", "service-key", "delete-service-key"},
 			{"bind-service", "unbind-service"},
 			{"bind-route-service", "unbind-route-service"},
@@ -64,7 +64,12 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "ROUTES:",
 		CommandList: [][]string{
-			{"routes", "create-route", "check-route", "map-route", "unmap-route", "delete-route", "delete-orphaned-routes"},
+			{"routes", "route"},
+			{"create-route", "check-route", "map-route", "unmap-route", "delete-route"},
+			{"delete-orphaned-routes"},
+			{"update-destination"},
+			{"share-route", "unshare-route"},
+			{"move-route"},
 		},
 	},
 	{
@@ -167,7 +172,7 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "EXPERIMENTAL COMMANDS:",
 		CommandList: [][]string{
-			{"rollback"},
+			{"revisions", "revision", "rollback"},
 		},
 	},
 }

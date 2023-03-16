@@ -3,10 +3,10 @@ package terminal
 import (
 	"io"
 
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 )
 
-//go:generate counterfeiter . TerminalHelper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalHelper
 
 type TerminalHelper interface {
 	StdStreams() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)

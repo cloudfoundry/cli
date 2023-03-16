@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -24,13 +25,13 @@ var _ = Describe("Isolation Segments", func() {
 		var (
 			name string
 
-			isolationSegment IsolationSegment
+			isolationSegment resources.IsolationSegment
 			warnings         Warnings
 			executeErr       error
 		)
 
 		JustBeforeEach(func() {
-			isolationSegment, warnings, executeErr = client.CreateIsolationSegment(IsolationSegment{Name: name})
+			isolationSegment, warnings, executeErr = client.CreateIsolationSegment(resources.IsolationSegment{Name: name})
 			name = "an_isolation_segment"
 		})
 
@@ -57,7 +58,7 @@ var _ = Describe("Isolation Segments", func() {
 			It("returns the created segment and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(isolationSegment).To(Equal(IsolationSegment{
+				Expect(isolationSegment).To(Equal(resources.IsolationSegment{
 					Name: name,
 					GUID: "some-guid",
 				}))
@@ -114,7 +115,7 @@ var _ = Describe("Isolation Segments", func() {
 		var (
 			queries []Query
 
-			segments   []IsolationSegment
+			segments   []resources.IsolationSegment
 			warnings   Warnings
 			executeErr error
 		)
@@ -175,9 +176,9 @@ var _ = Describe("Isolation Segments", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(segments).To(ConsistOf(
-					IsolationSegment{Name: "iso-name-1", GUID: "iso-guid-1"},
-					IsolationSegment{Name: "iso-name-2", GUID: "iso-guid-2"},
-					IsolationSegment{Name: "iso-name-3", GUID: "iso-guid-3"},
+					resources.IsolationSegment{Name: "iso-name-1", GUID: "iso-guid-1"},
+					resources.IsolationSegment{Name: "iso-name-2", GUID: "iso-guid-2"},
+					resources.IsolationSegment{Name: "iso-name-3", GUID: "iso-guid-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -232,7 +233,7 @@ var _ = Describe("Isolation Segments", func() {
 		var (
 			warnings         Warnings
 			executeErr       error
-			isolationSegment IsolationSegment
+			isolationSegment resources.IsolationSegment
 		)
 
 		JustBeforeEach(func() {
@@ -256,7 +257,7 @@ var _ = Describe("Isolation Segments", func() {
 			It("returns the isolation segment and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(isolationSegment).To(Equal(IsolationSegment{
+				Expect(isolationSegment).To(Equal(resources.IsolationSegment{
 					Name: "an_isolation_segment",
 					GUID: "some-iso-guid",
 				}))

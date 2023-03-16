@@ -114,19 +114,8 @@ func (actor Actor) GetDomain(domainGUID string) (resources.Domain, Warnings, err
 }
 
 func (actor Actor) GetDomainByName(domainName string) (resources.Domain, Warnings, error) {
-	domains, warnings, err := actor.CloudControllerClient.GetDomains(
-		ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
-	)
-
-	if err != nil {
-		return resources.Domain{}, Warnings(warnings), err
-	}
-
-	if len(domains) == 0 {
-		return resources.Domain{}, Warnings(warnings), actionerror.DomainNotFoundError{Name: domainName}
-	}
-
-	return resources.Domain(domains[0]), Warnings(warnings), nil
+	domain, warnings, err := actor.getDomainByName(domainName)
+	return domain, Warnings(warnings), err
 }
 
 func (actor Actor) SharePrivateDomain(domainName string, orgName string) (Warnings, error) {
@@ -178,4 +167,18 @@ func (actor Actor) GetDomainAndOrgGUIDsByName(domainName string, orgName string)
 	}
 
 	return org.GUID, domain.GUID, allWarnings, nil
+}
+
+func (actor Actor) getDomainByName(domainName string) (resources.Domain, ccv3.Warnings, error) {
+	domains, warnings, err := actor.CloudControllerClient.GetDomains(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
+	)
+	switch {
+	case err != nil:
+		return resources.Domain{}, warnings, err
+	case len(domains) == 0:
+		return resources.Domain{}, warnings, actionerror.DomainNotFoundError{Name: domainName}
+	default:
+		return domains[0], warnings, nil
+	}
 }

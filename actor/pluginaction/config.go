@@ -2,7 +2,7 @@ package pluginaction
 
 import "code.cloudfoundry.org/cli/util/configv3"
 
-//go:generate counterfeiter . Config
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Config
 
 // Config is a way of getting basic CF configuration
 type Config interface {

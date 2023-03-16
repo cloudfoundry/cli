@@ -1,49 +1,40 @@
 package helpers
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
+	. "github.com/onsi/gomega/gbytes"
+
+	"code.cloudfoundry.org/jsonry"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
 
-// ServiceInstanceGUID represents a service instance relationship
-type ServiceInstanceGUID struct {
-	Resources []struct {
-		Metadata struct {
-			GUID string `json:"guid"`
-		} `json:"metadata"`
-	} `json:"resources"`
-}
-
-// ManagedServiceInstanceGUID returns the GUID for a managed service instance.
-func ManagedServiceInstanceGUID(managedServiceInstanceName string) string {
-	session := CF("curl", fmt.Sprintf("/v2/service_instances?q=name:%s", managedServiceInstanceName))
+func ServiceInstanceGUID(serviceInstanceName string) string {
+	session := CF("curl", fmt.Sprintf("/v3/service_instances?names=%s", serviceInstanceName))
 	Eventually(session).Should(Exit(0))
 
 	rawJSON := strings.TrimSpace(string(session.Out.Contents()))
 
-	var serviceInstanceGUID ServiceInstanceGUID
-	err := json.Unmarshal([]byte(rawJSON), &serviceInstanceGUID)
+	var serviceInstanceDetails struct {
+		GUIDs []string `jsonry:"resources.guid"`
+	}
+	err := jsonry.Unmarshal([]byte(rawJSON), &serviceInstanceDetails)
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(serviceInstanceGUID.Resources).To(HaveLen(1))
-	return serviceInstanceGUID.Resources[0].Metadata.GUID
+	Expect(serviceInstanceDetails.GUIDs).NotTo(BeEmpty(), fmt.Sprintf("service instance %s not found", serviceInstanceName))
+	Expect(serviceInstanceDetails.GUIDs[0]).To(HaveLen(36), fmt.Sprintf("invalid GUID: '%s'", serviceInstanceDetails.GUIDs[0]))
+	return serviceInstanceDetails.GUIDs[0]
 }
 
-// UserProvidedServiceInstanceGUID returns the GUID for a user provided service instance.
-func UserProvidedServiceInstanceGUID(userProvidedServiceInstanceName string) string {
-	session := CF("curl", fmt.Sprintf("/v2/user_provided_service_instances?q=name:%s", userProvidedServiceInstanceName))
+// CreateManagedServiceInstance also waits for completion
+func CreateManagedServiceInstance(offering, plan, name string, additional ...string) {
+	create := []string{"create-service", offering, plan, name}
+	session := CF(append(create, additional...)...)
 	Eventually(session).Should(Exit(0))
 
-	rawJSON := strings.TrimSpace(string(session.Out.Contents()))
-
-	var serviceInstanceGUID ServiceInstanceGUID
-	err := json.Unmarshal([]byte(rawJSON), &serviceInstanceGUID)
-	Expect(err).NotTo(HaveOccurred())
-
-	Expect(serviceInstanceGUID.Resources).To(HaveLen(1))
-	return serviceInstanceGUID.Resources[0].Metadata.GUID
+	Eventually(func() *Buffer {
+		return CF("service", name).Wait().Out
+	}).Should(Say(`status:\s+create succeeded`))
 }

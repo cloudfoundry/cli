@@ -141,7 +141,7 @@ var _ = Describe("create-security-group command", func() {
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect json format: file:", tempFile.Name()},
-					[]string{"Valid json file exampl"},
+					[]string{"Valid json file example"},
 				))
 			})
 		})

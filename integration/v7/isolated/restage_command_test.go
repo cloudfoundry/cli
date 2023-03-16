@@ -116,7 +116,7 @@ var _ = Describe("restage command", func() {
 					session := helpers.CF("restage", appName)
 					Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-					// The staticfile_buildback does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
+					// The staticfile_buildpack does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
 					Eventually(session.Err).Should(Say("Error staging application: NoAppDetectedError - An app was not successfully detected by any available buildpack"))
 					Eventually(session.Err).Should(Say(`TIP: Use 'cf buildpacks' to see a list of supported buildpacks.`))
 					Eventually(session).Should(Exit(1))

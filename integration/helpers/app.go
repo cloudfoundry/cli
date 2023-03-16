@@ -194,7 +194,7 @@ PLATFORMS
 DEPENDENCIES
 
 BUNDLED WITH
-   1.15.0
+   2.1.4
 	`), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
@@ -254,6 +254,15 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 	Expect(err).ToNot(HaveOccurred())
 	err = ioutil.WriteFile(path, body, 0666)
 	Expect(err).ToNot(HaveOccurred())
+}
+
+func ReadManifest(path string) map[string]interface{} {
+	manifestBytes, err := ioutil.ReadFile(path)
+	Expect(err).ToNot(HaveOccurred())
+	var manifest map[string]interface{}
+	err = yaml.Unmarshal(manifestBytes, &manifest)
+	Expect(err).ToNot(HaveOccurred())
+	return manifest
 }
 
 // Zipit zips the source into a .zip file in the target dir.
@@ -331,4 +340,46 @@ func Zipit(source, target, prefix string) error {
 // indicating that staging is working.
 func ConfirmStagingLogs(session *Session) {
 	Eventually(session).Should(gbytes.Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
+}
+
+func WaitForAppMemoryToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool, expectedMemory string) {
+	if shouldRestartFirst {
+		session := CF("restart", appName)
+		Eventually(session).Should(Exit(0))
+	}
+
+	Eventually(func() string {
+		session := CF("app", appName)
+		Eventually(session).Should(Exit(0))
+		appTable := ParseV3AppProcessTable(session.Out.Contents())
+		return appTable.Processes[processIndex].Instances[instanceIndex].Memory
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, expectedMemory)))
+}
+
+func WaitForAppDiskToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool, expectedDisk string) {
+	if shouldRestartFirst {
+		session := CF("restart", appName)
+		Eventually(session).Should(Exit(0))
+	}
+
+	Eventually(func() string {
+		session := CF("app", appName)
+		Eventually(session).Should(Exit(0))
+		appTable := ParseV3AppProcessTable(session.Out.Contents())
+		return appTable.Processes[processIndex].Instances[instanceIndex].Disk
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, expectedDisk)))
+}
+
+func WaitForLogRateLimitToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool, expectedLogRateLimit string) {
+	if shouldRestartFirst {
+		session := CF("restart", appName)
+		Eventually(session).Should(Exit(0))
+	}
+
+	Eventually(func() string {
+		session := CF("app", appName)
+		Eventually(session).Should(Exit(0))
+		appTable := ParseV3AppProcessTable(session.Out.Contents())
+		return appTable.Processes[processIndex].Instances[instanceIndex].LogRate
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]?/s of %s/s`, expectedLogRateLimit)))
 }

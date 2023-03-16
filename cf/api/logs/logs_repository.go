@@ -2,14 +2,14 @@ package logs
 
 import "time"
 
-//go:generate counterfeiter . Loggable
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Loggable
 type Loggable interface {
 	ToLog(loc *time.Location) string
 	ToSimpleLog() string
 	GetSourceName() string
 }
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	RecentLogsFor(appGUID string) ([]Loggable, error)

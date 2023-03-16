@@ -79,7 +79,7 @@ var _ = Describe("create-space-quota Command", func() {
 				Name: "some-org-name",
 				GUID: "some-org-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{
+			fakeActor.GetCurrentUserReturns(configv3.User{
 				Name:   userName,
 				Origin: "some-user-origin",
 			}, nil)
@@ -135,13 +135,14 @@ var _ = Describe("create-space-quota Command", func() {
 
 		When("all flag limits are given", func() {
 			BeforeEach(func() {
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 47}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 23}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 47}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 23}
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 4}
 				cmd.PaidServicePlans = true
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 9}
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 7}
+				cmd.TotalLogVolume = flag.BytesWithUnlimited{IsSet: true, Value: 512}
 
 				fakeActor.CreateSpaceQuotaReturns(
 					v7action.Warnings{"warnings-1", "warnings-2"},
@@ -163,6 +164,7 @@ var _ = Describe("create-space-quota Command", func() {
 					TotalServiceInstances: &types.NullInt{IsSet: true, Value: 9},
 					TotalRoutes:           &types.NullInt{IsSet: true, Value: 1},
 					TotalReservedPorts:    &types.NullInt{IsSet: true, Value: 7},
+					TotalLogVolume:        &types.NullInt{IsSet: true, Value: 512},
 				}))
 			})
 

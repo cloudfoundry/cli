@@ -21,7 +21,7 @@ func (cmd *SpaceUsersCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -58,6 +58,7 @@ func (cmd *SpaceUsersCommand) Execute(args []string) error {
 func (cmd SpaceUsersCommand) displaySpaceUsers(orgUsersByRoleType map[constant.RoleType][]resources.User) {
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceManagerRole], "SPACE MANAGER")
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceDeveloperRole], "SPACE DEVELOPER")
+	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceSupporterRole], "SPACE SUPPORTER")
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceAuditorRole], "SPACE AUDITOR")
 }
 

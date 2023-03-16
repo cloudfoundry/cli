@@ -27,6 +27,23 @@ var _ = Describe("HandleStackOverride", func() {
 		transformedManifest, executeErr = HandleStackOverride(originalManifest, overrides)
 	})
 
+	When("stack is not set", func() {
+		When("there is a single app in the manifest with the stack specified", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Stack: "og_cflinuxfs",
+					},
+				}
+			})
+
+			It("will retain the original stack value", func() {
+				Expect(executeErr).To(Not(HaveOccurred()))
+				Expect(transformedManifest.Applications[0].Stack).To(Equal("og_cflinuxfs"))
+			})
+		})
+	})
+
 	When("stack flag is set", func() {
 		When("there is a single app in the manifest with a stack specified", func() {
 			BeforeEach(func() {

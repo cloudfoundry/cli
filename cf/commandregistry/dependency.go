@@ -28,7 +28,7 @@ import (
 	"code.cloudfoundry.org/cli/util/randomword"
 )
 
-//go:generate counterfeiter . RandomWordGenerator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RandomWordGenerator
 
 type RandomWordGenerator interface {
 	Babble() string

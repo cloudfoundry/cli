@@ -349,6 +349,22 @@ processes:
 				})
 			})
 
+			Context("when a log rate limit is provided", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+processes:
+- log-rate-limit-per-second: 512M
+`)
+				})
+
+				It("unmarshals the processes property with the log rate limit", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(application.Processes).To(Equal([]Process{
+						{LogRateLimit: "512M", RemainingManifestFields: emptyMap},
+					}))
+				})
+			})
+
 			Context("when an unknown field is provided", func() {
 				BeforeEach(func() {
 					rawYAML = []byte(`---
@@ -390,6 +406,19 @@ processes:
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(remarshalledYaml).To(MatchYAML(rawYAML))
+			})
+		})
+
+		Context("when a log rate limit is provided", func() {
+			BeforeEach(func() {
+				rawYAML = []byte(`---
+log-rate-limit-per-second: 5K
+`)
+			})
+
+			It("unmarshals the log rate limit", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(application.LogRateLimit).To(Equal("5K"))
 			})
 		})
 	})
@@ -456,7 +485,7 @@ processes:
 				app.RemainingManifestFields = map[string]interface{}{}
 			})
 
-			It("sets the buildpackks in the map", func() {
+			It("sets the buildpacks in the map", func() {
 				Expect(app.RemainingManifestFields["buildpacks"]).To(ConsistOf("bp1", "bp2"))
 			})
 

@@ -60,7 +60,7 @@ var _ = Describe("disable-service-access command", func() {
 			Expect(runCommand([]string{"foo"})).To(BeFalse())
 		})
 
-		It("fails with usage when it does not recieve any arguments", func() {
+		It("fails with usage when it does not receive any arguments", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand(nil)
 			Expect(ui.Outputs()).To(ContainSubstrings(

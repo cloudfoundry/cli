@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
-	. "code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,8 +26,8 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetOrganizations", func() {
 		var (
-			returnOrganizations []Organization
-			organizations       []Organization
+			returnOrganizations []resources.Organization
+			organizations       []resources.Organization
 
 			organization1Name string
 			organization1GUID string
@@ -44,7 +43,7 @@ var _ = Describe("Organization Actions", func() {
 		)
 
 		BeforeEach(func() {
-			returnOrganizations = []Organization{
+			returnOrganizations = []resources.Organization{
 				{Name: organization1Name, GUID: organization1GUID},
 				{Name: organization2Name, GUID: organization2GUID},
 				{Name: organization3Name, GUID: organization3GUID},
@@ -82,9 +81,9 @@ var _ = Describe("Organization Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 
 				Expect(organizations).To(ConsistOf(
-					Organization{Name: organization1Name, GUID: organization1GUID},
-					Organization{Name: organization2Name, GUID: organization2GUID},
-					Organization{Name: organization3Name, GUID: organization3GUID},
+					resources.Organization{Name: organization1Name, GUID: organization1GUID},
+					resources.Organization{Name: organization2Name, GUID: organization2GUID},
+					resources.Organization{Name: organization3Name, GUID: organization3GUID},
 				))
 				Expect(warnings).To(ConsistOf("some-organizations-warning"))
 			})
@@ -113,7 +112,7 @@ var _ = Describe("Organization Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{"some-organizations-warning"},
 					errors.New("some-organizations-error"),
 				)
@@ -126,7 +125,7 @@ var _ = Describe("Organization Actions", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(MatchError("some-organizations-error"))
 				Expect(warnings).To(ConsistOf("some-organizations-warning"))
-				Expect(organizations).To(ConsistOf([]Organization{}))
+				Expect(organizations).To(ConsistOf([]resources.Organization{}))
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 			})
@@ -138,7 +137,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationReturns(
-					Organization{
+					resources.Organization{
 						Name: "some-org-name",
 						GUID: "some-org-guid",
 					},
@@ -150,7 +149,7 @@ var _ = Describe("Organization Actions", func() {
 			It("returns the organization and warnings", func() {
 				org, warnings, err := actor.GetOrganizationByGUID("some-org-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(org).To(Equal(Organization{
+				Expect(org).To(Equal(resources.Organization{
 					Name: "some-org-name",
 					GUID: "some-org-guid",
 				}))
@@ -169,7 +168,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetOrganizationReturns(
-					Organization{},
+					resources.Organization{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
@@ -186,7 +185,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{
+					[]resources.Organization{
 						{
 							Name: "some-org-name",
 							GUID: "some-org-guid",
@@ -200,7 +199,7 @@ var _ = Describe("Organization Actions", func() {
 			It("returns the organization and warnings", func() {
 				org, warnings, err := actor.GetOrganizationByName("some-org-name")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(org).To(Equal(Organization{
+				Expect(org).To(Equal(resources.Organization{
 					Name: "some-org-name",
 					GUID: "some-org-guid",
 				}))
@@ -219,7 +218,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
@@ -291,7 +290,7 @@ var _ = Describe("Organization Actions", func() {
 	When("the org does not exist", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]Organization{},
+				[]resources.Organization{},
 				ccv3.Warnings{"some-warning"},
 				nil,
 			)
@@ -306,7 +305,7 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("CreateOrganization", func() {
 		var (
-			org      Organization
+			org      resources.Organization
 			warnings Warnings
 			err      error
 		)
@@ -318,7 +317,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is created successfully", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateOrganizationReturns(
-					Organization{Name: "some-org-name", GUID: "some-org-guid"},
+					resources.Organization{Name: "some-org-name", GUID: "some-org-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -327,14 +326,14 @@ var _ = Describe("Organization Actions", func() {
 			It("returns the org resource", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(org).To(Equal(Organization{Name: "some-org-name", GUID: "some-org-guid"}))
+				Expect(org).To(Equal(resources.Organization{Name: "some-org-name", GUID: "some-org-guid"}))
 			})
 		})
 
 		When("the request fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateOrganizationReturns(
-					Organization{},
+					resources.Organization{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					errors.New("create-org-failed"),
 				)
@@ -360,7 +359,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{
 						"warning-1",
 						"warning-2",
@@ -378,7 +377,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{{Name: "some-org", GUID: "some-org-guid"}},
+					[]resources.Organization{{Name: "some-org", GUID: "some-org-guid"}},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -456,7 +455,7 @@ var _ = Describe("Organization Actions", func() {
 			oldOrgName = "old-and-stale-org-name"
 			newOrgName = "fresh-and-new-org-name"
 
-			org        Organization
+			org        resources.Organization
 			warnings   Warnings
 			executeErr error
 		)
@@ -491,7 +490,7 @@ var _ = Describe("Organization Actions", func() {
 		When("getting the org succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]Organization{{Name: oldOrgName, GUID: "org-guid"}},
+					[]resources.Organization{{Name: oldOrgName, GUID: "org-guid"}},
 					ccv3.Warnings{"get-org-warning"},
 					nil,
 				)
@@ -500,7 +499,7 @@ var _ = Describe("Organization Actions", func() {
 			It("delegates to the client to update the org", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UpdateOrganizationCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateOrganizationArgsForCall(0)).To(Equal(Organization{
+				Expect(fakeCloudControllerClient.UpdateOrganizationArgsForCall(0)).To(Equal(resources.Organization{
 					GUID: "org-guid",
 					Name: newOrgName,
 				}))
@@ -509,7 +508,7 @@ var _ = Describe("Organization Actions", func() {
 			When("updating the org fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateOrganizationReturns(
-						Organization{},
+						resources.Organization{},
 						ccv3.Warnings{"update-org-warning"},
 						errors.New("update-org-error"),
 					)
@@ -525,7 +524,7 @@ var _ = Describe("Organization Actions", func() {
 			When("updating the org succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateOrganizationReturns(
-						Organization{Name: newOrgName, GUID: "org-guid"},
+						resources.Organization{Name: newOrgName, GUID: "org-guid"},
 						ccv3.Warnings{"update-org-warning"},
 						nil,
 					)
@@ -534,7 +533,7 @@ var _ = Describe("Organization Actions", func() {
 				It("returns warnings and no error", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-org-warning", "update-org-warning"))
-					Expect(org).To(Equal(Organization{Name: newOrgName, GUID: "org-guid"}))
+					Expect(org).To(Equal(resources.Organization{Name: newOrgName, GUID: "org-guid"}))
 				})
 			})
 		})

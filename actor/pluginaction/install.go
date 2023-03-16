@@ -16,13 +16,13 @@ import (
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
-//go:generate counterfeiter . PluginMetadata
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginMetadata
 
 type PluginMetadata interface {
 	GetMetadata(pluginPath string) (configv3.Plugin, error)
 }
 
-//go:generate counterfeiter . CommandList
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CommandList
 
 type CommandList interface {
 	HasCommand(string) bool
@@ -102,7 +102,7 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	}
 
 	switch cliVersion.Major {
-	case 6, 7:
+	case 6, 7, 8:
 		if pluginLibraryMajorVersion > 1 {
 			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
 		}

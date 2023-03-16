@@ -48,11 +48,10 @@ var _ = Describe("create-org-quota Command", func() {
 		}
 
 		currentUserName = "bob"
-		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 	})
 
 	JustBeforeEach(func() {
-
 		executeErr = cmd.Execute(nil)
 	})
 
@@ -105,11 +104,12 @@ var _ = Describe("create-org-quota Command", func() {
 			BeforeEach(func() {
 				cmd.PaidServicePlans = true
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 10}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 9}
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 9}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
+				cmd.TotalLogVolume = flag.BytesWithUnlimited{IsSet: true, Value: 8}
 				fakeActor.CreateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
 					nil)
@@ -141,6 +141,9 @@ var _ = Describe("create-org-quota Command", func() {
 
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
+
+				Expect(quotaLimits.TotalLogVolume.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalLogVolume.Value).To(Equal(8))
 
 				Expect(testUI.Out).To(Say("Creating org quota %s as bob...", orgQuotaName))
 				Expect(testUI.Out).To(Say("OK"))

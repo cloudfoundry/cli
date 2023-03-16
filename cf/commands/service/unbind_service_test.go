@@ -99,7 +99,7 @@ var _ = Describe("unbind-service command", func() {
 				serviceBindingRepo.DeleteReturns(false, nil)
 			})
 
-			It("warns the user the the service instance does not exist", func() {
+			It("warns the user the service instance does not exist", func() {
 				callUnbindService([]string{"my-app", "my-service"})
 
 				Expect(ui.Outputs()).To(ContainSubstrings(

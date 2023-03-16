@@ -43,18 +43,18 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateBitsPackageByApplicationStub        func(string) (v7action.Package, v7action.Warnings, error)
+	CreateBitsPackageByApplicationStub        func(string) (resources.Package, v7action.Warnings, error)
 	createBitsPackageByApplicationMutex       sync.RWMutex
 	createBitsPackageByApplicationArgsForCall []struct {
 		arg1 string
 	}
 	createBitsPackageByApplicationReturns struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
 	createBitsPackageByApplicationReturnsOnCall map[int]struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -74,19 +74,19 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateDockerPackageByApplicationStub        func(string, v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
+	CreateDockerPackageByApplicationStub        func(string, v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error)
 	createDockerPackageByApplicationMutex       sync.RWMutex
 	createDockerPackageByApplicationArgsForCall []struct {
 		arg1 string
 		arg2 v7action.DockerImageCredentials
 	}
 	createDockerPackageByApplicationReturns struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
 	createDockerPackageByApplicationReturnsOnCall map[int]struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -234,11 +234,12 @@ type FakeV7Actor struct {
 		result1 resources.RouteDestination
 		result2 error
 	}
-	MapRouteStub        func(string, string) (v7action.Warnings, error)
+	MapRouteStub        func(string, string, string) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	mapRouteReturns struct {
 		result1 v7action.Warnings
@@ -264,18 +265,18 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollPackageStub        func(v7action.Package) (v7action.Package, v7action.Warnings, error)
+	PollPackageStub        func(resources.Package) (resources.Package, v7action.Warnings, error)
 	pollPackageMutex       sync.RWMutex
 	pollPackageArgsForCall []struct {
-		arg1 v7action.Package
+		arg1 resources.Package
 	}
 	pollPackageReturns struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
 	pollPackageReturnsOnCall map[int]struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -339,11 +340,11 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
+	ScaleProcessByApplicationStub        func(string, resources.Process) (v7action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}
 	scaleProcessByApplicationReturns struct {
 		result1 v7action.Warnings
@@ -395,18 +396,18 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	StageApplicationPackageStub        func(string) (v7action.Build, v7action.Warnings, error)
+	StageApplicationPackageStub        func(string) (resources.Build, v7action.Warnings, error)
 	stageApplicationPackageMutex       sync.RWMutex
 	stageApplicationPackageArgsForCall []struct {
 		arg1 string
 	}
 	stageApplicationPackageReturns struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}
 	stageApplicationPackageReturnsOnCall map[int]struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -452,12 +453,12 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	UpdateProcessByTypeAndApplicationStub        func(string, string, v7action.Process) (v7action.Warnings, error)
+	UpdateProcessByTypeAndApplicationStub        func(string, string, resources.Process) (v7action.Warnings, error)
 	updateProcessByTypeAndApplicationMutex       sync.RWMutex
 	updateProcessByTypeAndApplicationArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}
 	updateProcessByTypeAndApplicationReturns struct {
 		result1 v7action.Warnings
@@ -467,21 +468,21 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UploadBitsPackageStub        func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
+	UploadBitsPackageStub        func(resources.Package, []sharedaction.V3Resource, io.Reader, int64) (resources.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
-		arg1 v7action.Package
+		arg1 resources.Package
 		arg2 []sharedaction.V3Resource
 		arg3 io.Reader
 		arg4 int64
 	}
 	uploadBitsPackageReturns struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
 	uploadBitsPackageReturnsOnCall map[int]struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -638,7 +639,7 @@ func (fake *FakeV7Actor) CreateApplicationInSpaceReturnsOnCall(i int, result1 re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateBitsPackageByApplication(arg1 string) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateBitsPackageByApplication(arg1 string) (resources.Package, v7action.Warnings, error) {
 	fake.createBitsPackageByApplicationMutex.Lock()
 	ret, specificReturn := fake.createBitsPackageByApplicationReturnsOnCall[len(fake.createBitsPackageByApplicationArgsForCall)]
 	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
@@ -662,7 +663,7 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplicationCallCount() int {
 	return len(fake.createBitsPackageByApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateBitsPackageByApplicationCalls(stub func(string) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateBitsPackageByApplicationCalls(stub func(string) (resources.Package, v7action.Warnings, error)) {
 	fake.createBitsPackageByApplicationMutex.Lock()
 	defer fake.createBitsPackageByApplicationMutex.Unlock()
 	fake.CreateBitsPackageByApplicationStub = stub
@@ -675,30 +676,30 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplicationArgsForCall(i int) string
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturns(result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.createBitsPackageByApplicationMutex.Lock()
 	defer fake.createBitsPackageByApplicationMutex.Unlock()
 	fake.CreateBitsPackageByApplicationStub = nil
 	fake.createBitsPackageByApplicationReturns = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.createBitsPackageByApplicationMutex.Lock()
 	defer fake.createBitsPackageByApplicationMutex.Unlock()
 	fake.CreateBitsPackageByApplicationStub = nil
 	if fake.createBitsPackageByApplicationReturnsOnCall == nil {
 		fake.createBitsPackageByApplicationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Package
+			result1 resources.Package
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createBitsPackageByApplicationReturnsOnCall[i] = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -771,7 +772,7 @@ func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDockerPackageByApplication(arg1 string, arg2 v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateDockerPackageByApplication(arg1 string, arg2 v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error) {
 	fake.createDockerPackageByApplicationMutex.Lock()
 	ret, specificReturn := fake.createDockerPackageByApplicationReturnsOnCall[len(fake.createDockerPackageByApplicationArgsForCall)]
 	fake.createDockerPackageByApplicationArgsForCall = append(fake.createDockerPackageByApplicationArgsForCall, struct {
@@ -796,7 +797,7 @@ func (fake *FakeV7Actor) CreateDockerPackageByApplicationCallCount() int {
 	return len(fake.createDockerPackageByApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateDockerPackageByApplicationCalls(stub func(string, v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationCalls(stub func(string, v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error)) {
 	fake.createDockerPackageByApplicationMutex.Lock()
 	defer fake.createDockerPackageByApplicationMutex.Unlock()
 	fake.CreateDockerPackageByApplicationStub = stub
@@ -809,30 +810,30 @@ func (fake *FakeV7Actor) CreateDockerPackageByApplicationArgsForCall(i int) (str
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturns(result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.createDockerPackageByApplicationMutex.Lock()
 	defer fake.createDockerPackageByApplicationMutex.Unlock()
 	fake.CreateDockerPackageByApplicationStub = nil
 	fake.createDockerPackageByApplicationReturns = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturnsOnCall(i int, result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.createDockerPackageByApplicationMutex.Lock()
 	defer fake.createDockerPackageByApplicationMutex.Unlock()
 	fake.CreateDockerPackageByApplicationStub = nil
 	if fake.createDockerPackageByApplicationReturnsOnCall == nil {
 		fake.createDockerPackageByApplicationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Package
+			result1 resources.Package
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createDockerPackageByApplicationReturnsOnCall[i] = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1445,17 +1446,18 @@ func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
 	fake.mapRouteArgsForCall = append(fake.mapRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
 	fake.mapRouteMutex.Unlock()
 	if fake.MapRouteStub != nil {
-		return fake.MapRouteStub(arg1, arg2)
+		return fake.MapRouteStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1470,17 +1472,17 @@ func (fake *FakeV7Actor) MapRouteCallCount() int {
 	return len(fake.mapRouteArgsForCall)
 }
 
-func (fake *FakeV7Actor) MapRouteCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) MapRouteCalls(stub func(string, string, string) (v7action.Warnings, error)) {
 	fake.mapRouteMutex.Lock()
 	defer fake.mapRouteMutex.Unlock()
 	fake.MapRouteStub = stub
 }
 
-func (fake *FakeV7Actor) MapRouteArgsForCall(i int) (string, string) {
+func (fake *FakeV7Actor) MapRouteArgsForCall(i int) (string, string, string) {
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	argsForCall := fake.mapRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeV7Actor) MapRouteReturns(result1 v7action.Warnings, result2 error) {
@@ -1576,11 +1578,11 @@ func (fake *FakeV7Actor) PollBuildReturnsOnCall(i int, result1 resources.Droplet
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollPackage(arg1 v7action.Package) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollPackage(arg1 resources.Package) (resources.Package, v7action.Warnings, error) {
 	fake.pollPackageMutex.Lock()
 	ret, specificReturn := fake.pollPackageReturnsOnCall[len(fake.pollPackageArgsForCall)]
 	fake.pollPackageArgsForCall = append(fake.pollPackageArgsForCall, struct {
-		arg1 v7action.Package
+		arg1 resources.Package
 	}{arg1})
 	fake.recordInvocation("PollPackage", []interface{}{arg1})
 	fake.pollPackageMutex.Unlock()
@@ -1600,43 +1602,43 @@ func (fake *FakeV7Actor) PollPackageCallCount() int {
 	return len(fake.pollPackageArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollPackageCalls(stub func(v7action.Package) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollPackageCalls(stub func(resources.Package) (resources.Package, v7action.Warnings, error)) {
 	fake.pollPackageMutex.Lock()
 	defer fake.pollPackageMutex.Unlock()
 	fake.PollPackageStub = stub
 }
 
-func (fake *FakeV7Actor) PollPackageArgsForCall(i int) v7action.Package {
+func (fake *FakeV7Actor) PollPackageArgsForCall(i int) resources.Package {
 	fake.pollPackageMutex.RLock()
 	defer fake.pollPackageMutex.RUnlock()
 	argsForCall := fake.pollPackageArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) PollPackageReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollPackageReturns(result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.pollPackageMutex.Lock()
 	defer fake.pollPackageMutex.Unlock()
 	fake.PollPackageStub = nil
 	fake.pollPackageReturns = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.pollPackageMutex.Lock()
 	defer fake.pollPackageMutex.Unlock()
 	fake.PollPackageStub = nil
 	if fake.pollPackageReturnsOnCall == nil {
 		fake.pollPackageReturnsOnCall = make(map[int]struct {
-			result1 v7action.Package
+			result1 resources.Package
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.pollPackageReturnsOnCall[i] = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1908,12 +1910,12 @@ func (fake *FakeV7Actor) RestartApplicationReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 resources.Process) (v7action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
 	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
 		arg1 string
-		arg2 v7action.Process
+		arg2 resources.Process
 	}{arg1, arg2})
 	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
 	fake.scaleProcessByApplicationMutex.Unlock()
@@ -1933,13 +1935,13 @@ func (fake *FakeV7Actor) ScaleProcessByApplicationCallCount() int {
 	return len(fake.scaleProcessByApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplicationCalls(stub func(string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) ScaleProcessByApplicationCalls(stub func(string, resources.Process) (v7action.Warnings, error)) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	defer fake.scaleProcessByApplicationMutex.Unlock()
 	fake.ScaleProcessByApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) ScaleProcessByApplicationArgsForCall(i int) (string, v7action.Process) {
+func (fake *FakeV7Actor) ScaleProcessByApplicationArgsForCall(i int) (string, resources.Process) {
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	argsForCall := fake.scaleProcessByApplicationArgsForCall[i]
@@ -2174,7 +2176,7 @@ func (fake *FakeV7Actor) SetSpaceManifestReturnsOnCall(i int, result1 v7action.W
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (v7action.Build, v7action.Warnings, error) {
+func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (resources.Build, v7action.Warnings, error) {
 	fake.stageApplicationPackageMutex.Lock()
 	ret, specificReturn := fake.stageApplicationPackageReturnsOnCall[len(fake.stageApplicationPackageArgsForCall)]
 	fake.stageApplicationPackageArgsForCall = append(fake.stageApplicationPackageArgsForCall, struct {
@@ -2198,7 +2200,7 @@ func (fake *FakeV7Actor) StageApplicationPackageCallCount() int {
 	return len(fake.stageApplicationPackageArgsForCall)
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageCalls(stub func(string) (v7action.Build, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) StageApplicationPackageCalls(stub func(string) (resources.Build, v7action.Warnings, error)) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = stub
@@ -2211,30 +2213,30 @@ func (fake *FakeV7Actor) StageApplicationPackageArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageReturns(result1 v7action.Build, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) StageApplicationPackageReturns(result1 resources.Build, result2 v7action.Warnings, result3 error) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = nil
 	fake.stageApplicationPackageReturns = struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 v7action.Build, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 resources.Build, result2 v7action.Warnings, result3 error) {
 	fake.stageApplicationPackageMutex.Lock()
 	defer fake.stageApplicationPackageMutex.Unlock()
 	fake.StageApplicationPackageStub = nil
 	if fake.stageApplicationPackageReturnsOnCall == nil {
 		fake.stageApplicationPackageReturnsOnCall = make(map[int]struct {
-			result1 v7action.Build
+			result1 resources.Build
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.stageApplicationPackageReturnsOnCall[i] = struct {
-		result1 v7action.Build
+		result1 resources.Build
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -2433,13 +2435,13 @@ func (fake *FakeV7Actor) UpdateApplicationReturnsOnCall(i int, result1 resources
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 v7action.Process) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplication(arg1 string, arg2 string, arg3 resources.Process) (v7action.Warnings, error) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	ret, specificReturn := fake.updateProcessByTypeAndApplicationReturnsOnCall[len(fake.updateProcessByTypeAndApplicationArgsForCall)]
 	fake.updateProcessByTypeAndApplicationArgsForCall = append(fake.updateProcessByTypeAndApplicationArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.Process
+		arg3 resources.Process
 	}{arg1, arg2, arg3})
 	fake.recordInvocation("UpdateProcessByTypeAndApplication", []interface{}{arg1, arg2, arg3})
 	fake.updateProcessByTypeAndApplicationMutex.Unlock()
@@ -2459,13 +2461,13 @@ func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCallCount() int {
 	return len(fake.updateProcessByTypeAndApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, v7action.Process) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationCalls(stub func(string, string, resources.Process) (v7action.Warnings, error)) {
 	fake.updateProcessByTypeAndApplicationMutex.Lock()
 	defer fake.updateProcessByTypeAndApplicationMutex.Unlock()
 	fake.UpdateProcessByTypeAndApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, v7action.Process) {
+func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationArgsForCall(i int) (string, string, resources.Process) {
 	fake.updateProcessByTypeAndApplicationMutex.RLock()
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
 	argsForCall := fake.updateProcessByTypeAndApplicationArgsForCall[i]
@@ -2498,7 +2500,7 @@ func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeV7Actor) UploadBitsPackage(arg1 resources.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (resources.Package, v7action.Warnings, error) {
 	var arg2Copy []sharedaction.V3Resource
 	if arg2 != nil {
 		arg2Copy = make([]sharedaction.V3Resource, len(arg2))
@@ -2507,7 +2509,7 @@ func (fake *FakeV7Actor) UploadBitsPackage(arg1 v7action.Package, arg2 []shareda
 	fake.uploadBitsPackageMutex.Lock()
 	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
 	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
-		arg1 v7action.Package
+		arg1 resources.Package
 		arg2 []sharedaction.V3Resource
 		arg3 io.Reader
 		arg4 int64
@@ -2530,43 +2532,43 @@ func (fake *FakeV7Actor) UploadBitsPackageCallCount() int {
 	return len(fake.uploadBitsPackageArgsForCall)
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageCalls(stub func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) UploadBitsPackageCalls(stub func(resources.Package, []sharedaction.V3Resource, io.Reader, int64) (resources.Package, v7action.Warnings, error)) {
 	fake.uploadBitsPackageMutex.Lock()
 	defer fake.uploadBitsPackageMutex.Unlock()
 	fake.UploadBitsPackageStub = stub
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageArgsForCall(i int) (v7action.Package, []sharedaction.V3Resource, io.Reader, int64) {
+func (fake *FakeV7Actor) UploadBitsPackageArgsForCall(i int) (resources.Package, []sharedaction.V3Resource, io.Reader, int64) {
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	argsForCall := fake.uploadBitsPackageArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) UploadBitsPackageReturns(result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.uploadBitsPackageMutex.Lock()
 	defer fake.uploadBitsPackageMutex.Unlock()
 	fake.UploadBitsPackageStub = nil
 	fake.uploadBitsPackageReturns = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) UploadBitsPackageReturnsOnCall(i int, result1 resources.Package, result2 v7action.Warnings, result3 error) {
 	fake.uploadBitsPackageMutex.Lock()
 	defer fake.uploadBitsPackageMutex.Unlock()
 	fake.UploadBitsPackageStub = nil
 	if fake.uploadBitsPackageReturnsOnCall == nil {
 		fake.uploadBitsPackageReturnsOnCall = make(map[int]struct {
-			result1 v7action.Package
+			result1 resources.Package
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.uploadBitsPackageReturnsOnCall[i] = struct {
-		result1 v7action.Package
+		result1 resources.Package
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

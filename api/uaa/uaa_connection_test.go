@@ -3,6 +3,7 @@ package uaa_test
 import (
 	"fmt"
 	"net/http"
+	"runtime"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
 	. "github.com/onsi/ginkgo"
@@ -120,6 +121,9 @@ var _ = Describe("UAA Connection", func() {
 			When("the server does not have a verified certificate", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
+						if runtime.GOOS == "darwin" {
+							Skip("ssl verification is different on darwin")
+						}
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest(http.MethodGet, "/v2/foo"),

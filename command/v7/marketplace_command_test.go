@@ -50,7 +50,7 @@ var _ = Describe("marketplace command", func() {
 			Name: "fake-org-name",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-username"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "fake-username"}, nil)
 	})
 
 	Describe("pre-flight checks", func() {
@@ -70,7 +70,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("gets the user", func() {
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 			})
 
 			It("checks the target", func() {
@@ -82,7 +82,7 @@ var _ = Describe("marketplace command", func() {
 
 			When("getting the user fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
+					fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("fake get user error"))
 				})
 
 				It("returns an error", func() {
@@ -107,7 +107,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("does not try to get the username or check the target", func() {
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(0))
+				Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(0))
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
 			})
 		})
@@ -258,6 +258,16 @@ var _ = Describe("marketplace command", func() {
 			},
 		),
 		Entry(
+			"not logged in with --show-unavailable",
+			false,
+			map[string]interface{}{
+				"--show-unavailable": true,
+			},
+			v7action.MarketplaceFilter{
+				ShowUnavailable: true,
+			},
+		),
+		Entry(
 			"logged in with no flags",
 			true,
 			map[string]interface{}{},
@@ -298,6 +308,17 @@ var _ = Describe("marketplace command", func() {
 				SpaceGUID:           "fake-space-guid",
 				ServiceOfferingName: "fake-service-offering-name",
 				ServiceBrokerName:   "fake-service-broker-name",
+			},
+		),
+		Entry(
+			"logged in with --show-unavailable",
+			true,
+			map[string]interface{}{
+				"--show-unavailable": true,
+			},
+			v7action.MarketplaceFilter{
+				SpaceGUID:       "fake-space-guid",
+				ShowUnavailable: true,
 			},
 		),
 	)
@@ -448,7 +469,99 @@ var _ = Describe("marketplace command", func() {
 								{
 									GUID:        "plan-guid-1",
 									Name:        "plan-1",
-									Description: "best available plan",
+									Description: "best imaginable plan",
+									Available:   true,
+									Free:        true,
+								},
+							},
+						},
+						{
+							GUID:              "offering-guid-2",
+							Name:              "interesting-name",
+							Description:       "about offering 2",
+							ServiceBrokerName: "service-broker-2",
+							Plans: []resources.ServicePlan{
+								{
+									GUID:        "plan-guid-2",
+									Name:        "plan-2",
+									Description: "just another plan",
+									Available:   true,
+									Free:        false,
+									Costs: []resources.ServicePlanCost{
+										{
+											Currency: "USD",
+											Amount:   100,
+											Unit:     "Monthly",
+										},
+										{
+											Currency: "USD",
+											Amount:   0.999,
+											Unit:     "1GB of messages over 20GB",
+										},
+									},
+								},
+								{
+									GUID:      "plan-guid-3",
+									Name:      "plan-3",
+									Free:      true,
+									Available: true,
+								},
+								{
+									GUID:      "plan-guid-4",
+									Name:      "plan-4",
+									Free:      false,
+									Available: true,
+								},
+							},
+						},
+					},
+					v7action.Warnings{"warning 1", "warning 2"},
+					nil,
+				)
+			})
+
+			It("prints a table showing service plans", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(testUI.Out).To(SatisfyAll(
+					Say(`\n\n`),
+					Say(`broker: service-broker-1`),
+					Say(`plan\s+description\s+free or paid\s+costs`),
+					Not(Say(`available`)),
+					Say(`plan-1\s+best imaginable plan\s+free`),
+					Say(`\n\n`),
+					Say(`broker: service-broker-2`),
+					Say(`plan\s+description\s+free or paid\s+costs`),
+					Not(Say(`available`)),
+					Say(`plan-2\s+just another plan\s+paid\s+USD 100.00/Monthly, USD 1.00/1GB of messages over 20GB`),
+					Say(`plan-3\s+free`),
+					Say(`plan-4\s+paid`),
+				))
+
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning 1"),
+					Say("warning 2"),
+				))
+			})
+		})
+
+		When("showing the service plans table with availability", func() {
+			BeforeEach(func() {
+				setFlag(&cmd, "-e", "fake-service-offering-name")
+				setFlag(&cmd, "--show-unavailable", true)
+
+				fakeActor.MarketplaceReturns(
+					[]v7action.ServiceOfferingWithPlans{
+						{
+							GUID:              "offering-guid-1",
+							Name:              "interesting-name",
+							Description:       "about offering 1",
+							ServiceBrokerName: "service-broker-1",
+							Plans: []resources.ServicePlan{
+								{
+									GUID:        "plan-guid-1",
+									Name:        "plan-1",
+									Description: "best imaginable plan",
 									Available:   true,
 									Free:        true,
 								},
@@ -499,13 +612,13 @@ var _ = Describe("marketplace command", func() {
 				)
 			})
 
-			It("prints a table showing service plans", func() {
+			It("prints a table showing service plans with availability", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-1`))
 				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+costs\s+available`))
-				Expect(testUI.Out).To(Say(`plan-1\s+best available plan\s+free\s+yes`))
+				Expect(testUI.Out).To(Say(`plan-1\s+best imaginable plan\s+free\s+yes`))
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-2`))
 				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+costs\s+available`))

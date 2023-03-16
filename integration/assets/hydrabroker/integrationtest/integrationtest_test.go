@@ -3,6 +3,7 @@ package integrationtest_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	uuid2 "github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +22,7 @@ import (
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
-var _ = Describe("Integration Test", func() {
+var _ = Describe("Integration Test For Hydrabroker", func() {
 	var (
 		server      *httptest.Server
 		client      *http.Client
@@ -111,6 +113,10 @@ var _ = Describe("Integration Test", func() {
 			Expect(catalog.Services[0].ID).To(Equal(cfg.Services[0].ID))
 			Expect(catalog.Services[0].Name).To(Equal(cfg.Services[0].Name))
 			Expect(catalog.Services[0].Description).To(Equal(cfg.Services[0].Description))
+			Expect(catalog.Services[0].Metadata.DocumentationUrl).To(Equal(cfg.Services[0].DocumentationURL))
+			Expect(catalog.Services[0].Metadata.Shareable).To(PointTo(Equal(cfg.Services[0].Shareable)))
+			Expect(catalog.Services[0].InstancesRetrievable).To(BeTrue())
+			Expect(catalog.Services[0].PlanUpdatable).To(BeTrue())
 			Expect(catalog.Services[0].Plans).To(HaveLen(2))
 			Expect(catalog.Services[0].Plans[0].ID).To(Equal(cfg.Services[0].Plans[0].ID))
 			Expect(catalog.Services[0].Plans[0].Name).To(Equal(cfg.Services[0].Plans[0].Name))
@@ -126,7 +132,12 @@ var _ = Describe("Integration Test", func() {
 
 		It("allows a service instance to be created", func() {
 			instanceGUID := randomString()
-			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
+
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
 			expectStatusCode(response, http.StatusCreated)
 
 			var r map[string]interface{}
@@ -134,6 +145,114 @@ var _ = Describe("Integration Test", func() {
 			Expect(r).To(Equal(map[string]interface{}{
 				"dashboard_url": "http://example.com",
 			}))
+		})
+
+		When("a service instance exists", func() {
+			var (
+				instanceGUID string
+				parameters   map[string]interface{}
+			)
+
+			BeforeEach(func() {
+				instanceGUID = randomString()
+				parameters = map[string]interface{}{"foo": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					PlanID:     cfg.Services[0].Plans[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+				expectStatusCode(response, http.StatusCreated)
+			})
+
+			It("allows a service instance to be retrieved", func() {
+				response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var instance apiresponses.GetInstanceResponse
+				fromJSON(response.Body, &instance)
+				Expect(instance.Parameters).To(Equal(parameters))
+			})
+
+			It("allows a service instance to be updated", func() {
+				By("trying to update the parameters")
+
+				parameters = map[string]interface{}{"bar": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					PlanID:     cfg.Services[0].Plans[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PATCH", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+				expectStatusCode(response, http.StatusOK)
+
+				By("checking the update happened")
+				response = httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var instance apiresponses.GetInstanceResponse
+				fromJSON(response.Body, &instance)
+				Expect(instance.Parameters).To(Equal(parameters))
+			})
+
+			It("allows a binding to be created", func() {
+				bindingGUID := randomString()
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, toJSON(resources.BindingDetails{}))
+				expectStatusCode(response, http.StatusCreated)
+
+				var r map[string]interface{}
+				fromJSON(response.Body, &r)
+				Expect(r).To(Equal(map[string]interface{}{
+					"credentials": map[string]interface{}{
+						"username": cfg.Username,
+						"password": cfg.Password,
+					},
+				}))
+			})
+
+			It("allows a binding to be retrieved", func() {
+				By("creating the binding")
+				bindingGUID := randomString()
+				details := resources.BindingDetails{
+					Parameters: map[string]interface{}{"foo": "bar"},
+				}
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, toJSON(details))
+				expectStatusCode(response, http.StatusCreated)
+
+				By("retrieving the binding")
+				response = httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var r resources.BindingDetails
+				fromJSON(response.Body, &r)
+				Expect(r.Parameters).To(Equal(details.Parameters))
+				Expect(r.Credentials).To(Equal(resources.JSONObject{
+					"username": cfg.Username,
+					"password": cfg.Password,
+				}))
+			})
+
+			It("allows a binding to be deleted", func() {
+				By("creating the binding")
+				bindingGUID := randomString()
+				details := resources.BindingDetails{
+					Parameters: map[string]interface{}{"foo": "bar"},
+				}
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, toJSON(details))
+				expectStatusCode(response, http.StatusCreated)
+
+				By("deleting the binding")
+				response = httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
+				expectStatusCode(response, http.StatusOK)
+
+				var r map[string]interface{}
+				fromJSON(response.Body, &r)
+				Expect(r).To(BeEmpty())
+			})
 		})
 
 		It("allows a service instance to be deleted", func() {
@@ -146,45 +265,20 @@ var _ = Describe("Integration Test", func() {
 			Expect(r).To(BeEmpty())
 		})
 
-		It("allows a service instance to be updated", func() {
+		It("does not allow a service instance to be updated", func() {
 			instanceGUID := randomString()
 
 			cfg.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "1.2.3"}
 			response := httpRequest(cfg, "PATCH", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(cfg))
-			expectStatusCode(response, http.StatusOK)
+			expectStatusCode(response, http.StatusNotFound)
 		})
 
-		It("allows a binding to be created", func() {
+		It("does not allow a binding to be created", func() {
 			instanceGUID := randomString()
 			bindingGUID := randomString()
 			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
-			expectStatusCode(response, http.StatusCreated)
+			expectStatusCode(response, http.StatusNotFound)
 
-			var r map[string]interface{}
-			fromJSON(response.Body, &r)
-			Expect(r).To(BeEmpty())
-		})
-
-		It("allows a binding to be retrieved", func() {
-			instanceGUID := randomString()
-			bindingGUID := randomString()
-			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
-			expectStatusCode(response, http.StatusOK)
-
-			var r map[string]interface{}
-			fromJSON(response.Body, &r)
-			Expect(r).To(BeEmpty())
-		})
-
-		It("allows a binding to be deleted", func() {
-			instanceGUID := randomString()
-			bindingGUID := randomString()
-			response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
-			expectStatusCode(response, http.StatusOK)
-
-			var r map[string]interface{}
-			fromJSON(response.Body, &r)
-			Expect(r).To(BeEmpty())
 		})
 
 		It("allows the broker to be deleted", func() {
@@ -216,6 +310,15 @@ var _ = Describe("Integration Test", func() {
 		It("allows the broker to be reconfigured", func() {
 			newCfg := randomConfiguration()
 
+			instanceGUID := randomString()
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
+
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(request))
+			expectStatusCode(response, http.StatusCreated)
+
 			By("accepting the reconfigure request", func() {
 				request, err := http.NewRequest("PUT", server.URL+"/config/"+guid, toJSON(newCfg))
 				Expect(err).NotTo(HaveOccurred())
@@ -231,6 +334,11 @@ var _ = Describe("Integration Test", func() {
 				var catalog apiresponses.CatalogResponse
 				fromJSON(response.Body, &catalog)
 				Expect(catalog.Services[0].Name).To(Equal(newCfg.Services[0].Name))
+			})
+
+			By("retaining information about service instances", func() {
+				response := httpRequest(newCfg, "GET", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusOK)
 			})
 		})
 	})
@@ -306,7 +414,7 @@ var _ = Describe("Integration Test", func() {
 			guid = create(toJSON(cfg))
 		})
 
-		getLastOperation := func(cfg config.BrokerConfiguration, op, urlPath string) string {
+		getLastOperation := func(cfg config.BrokerConfiguration, op, urlPath string) (string, string) {
 			response := httpRequest(
 				cfg,
 				"GET",
@@ -318,23 +426,27 @@ var _ = Describe("Integration Test", func() {
 			var lastOperationResponse apiresponses.LastOperationResponse
 			fromJSON(response.Body, &lastOperationResponse)
 
-			return string(lastOperationResponse.State)
+			return string(lastOperationResponse.State), string(lastOperationResponse.Description)
 		}
 
-		getInstanceLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, op string) string {
+		getInstanceLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, op string) (string, string) {
 			return getLastOperation(cfg, op, server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/last_operation")
 		}
 
-		getBindingLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, bindingGUID, op string) string {
+		getBindingLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, bindingGUID, op string) (string, string) {
 			return getLastOperation(cfg, op, server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"/last_operation")
 		}
 
 		It("does async provision", func() {
 			var operation string
 			instanceGUID := randomString()
+			request := resources.ServiceInstanceDetails{
+				ServiceID: cfg.Services[0].ID,
+				PlanID:    cfg.Services[0].Plans[0].ID,
+			}
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", nil)
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", toJSON(request))
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
@@ -345,13 +457,17 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 
@@ -369,63 +485,104 @@ var _ = Describe("Integration Test", func() {
 			})
 
 			By("responding that the operation is still in progress", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("in progress"))
+				Expect(description).To(Equal("very happy service"))
 			})
 
 			time.Sleep(delay)
 
 			By("responding that the operation is complete", func() {
-				Expect(getInstanceLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+				state, description := getInstanceLastOperation(cfg, guid, instanceGUID, operation)
+				Expect(state).To(Equal("succeeded"))
+				Expect(description).To(Equal("very happy service"))
 			})
 		})
 
-		It("does async bind", func() {
-			var operation string
-			instanceGUID := randomString()
-			bindingGUID := randomString()
+		When("a service instance exists", func() {
+			var (
+				instanceGUID string
+				parameters   map[string]interface{}
+			)
 
-			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
+			BeforeEach(func() {
+				instanceGUID = randomString()
+				parameters = map[string]interface{}{"foo": randomString()}
+
+				request := resources.ServiceInstanceDetails{
+					ServiceID:  cfg.Services[0].ID,
+					PlanID:     cfg.Services[0].Plans[0].ID,
+					Parameters: parameters,
+				}
+
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", toJSON(request))
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
 				fromJSON(response.Body, &provisionResponse)
-				operation = provisionResponse.OperationData
+
+				time.Sleep(delay)
+
+				state, _ := getInstanceLastOperation(cfg, guid, instanceGUID, provisionResponse.OperationData)
+				Expect(state).To(Equal("succeeded"))
+
 			})
 
-			By("responding that the operation is still in progress", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("in progress"))
+			It("does async bind", func() {
+				var operation string
+
+				bindingGUID := randomString()
+
+				By("accepting the request", func() {
+					response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", toJSON(resources.BindingDetails{}))
+					expectStatusCode(response, http.StatusAccepted)
+
+					var provisionResponse apiresponses.ProvisioningResponse
+					fromJSON(response.Body, &provisionResponse)
+					operation = provisionResponse.OperationData
+				})
+
+				By("responding that the operation is still in progress", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("in progress"))
+					Expect(description).To(Equal("very happy service"))
+				})
+
+				time.Sleep(delay)
+
+				By("responding that the operation is complete", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("succeeded"))
+					Expect(description).To(Equal("very happy service"))
+				})
 			})
 
-			time.Sleep(delay)
+			It("does async unbind", func() {
+				var operation string
+				bindingGUID := randomString()
 
-			By("responding that the operation is complete", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("succeeded"))
-			})
-		})
+				By("accepting the request", func() {
+					response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
+					expectStatusCode(response, http.StatusAccepted)
 
-		It("does async unbind", func() {
-			var operation string
-			instanceGUID := randomString()
-			bindingGUID := randomString()
+					var provisionResponse apiresponses.ProvisioningResponse
+					fromJSON(response.Body, &provisionResponse)
+					operation = provisionResponse.OperationData
+				})
 
-			By("accepting the request", func() {
-				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
-				expectStatusCode(response, http.StatusAccepted)
+				By("responding that the operation is still in progress", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("in progress"))
+					Expect(description).To(Equal("very happy service"))
+				})
 
-				var provisionResponse apiresponses.ProvisioningResponse
-				fromJSON(response.Body, &provisionResponse)
-				operation = provisionResponse.OperationData
-			})
+				time.Sleep(delay)
 
-			By("responding that the operation is still in progress", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("in progress"))
-			})
-
-			time.Sleep(delay)
-
-			By("responding that the operation is complete", func() {
-				Expect(getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)).To(Equal("succeeded"))
+				By("responding that the operation is complete", func() {
+					state, description := getBindingLastOperation(cfg, guid, instanceGUID, bindingGUID, operation)
+					Expect(state).To(Equal("succeeded"))
+					Expect(description).To(Equal("very happy service"))
+				})
 			})
 		})
 	})
@@ -473,9 +630,12 @@ func randomConfiguration() config.BrokerConfiguration {
 	return config.BrokerConfiguration{
 		Services: []config.Service{
 			{
-				Name:        randomString(),
-				ID:          randomString(),
-				Description: randomString(),
+				Name:                 randomString(),
+				ID:                   randomString(),
+				Description:          randomString(),
+				DocumentationURL:     fmt.Sprintf("https://%s.com", randomString()),
+				InstancesRetrievable: true,
+				PlanUpdatable:        true,
 				Plans: []config.Plan{
 					{
 						Name:        randomString(),

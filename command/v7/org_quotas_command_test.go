@@ -57,7 +57,7 @@ var _ = Describe("org-quotas command", func() {
 
 	When("running the command successfully", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			orgQuotas := []resources.OrganizationQuota{
 				{
 					Quota: resources.Quota{
@@ -66,6 +66,7 @@ var _ = Describe("org-quotas command", func() {
 							TotalMemory:       &types.NullInt{Value: 1048576, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 32, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 3, IsSet: true},
+							TotalLogVolume:    &types.NullInt{Value: 512, IsSet: true},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 3, IsSet: true},
@@ -91,8 +92,8 @@ var _ = Describe("org-quotas command", func() {
 		It("retrieves and displays all quotas", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(fakeActor.GetOrganizationQuotasCallCount()).To(Equal(1))
-			Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
-			Expect(testUI.Out).To(Say(`org-quota-1\s+1T\s+32M\s+5\s+3\s+allowed\s+3\s+2`))
+			Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports\s+log volume per second`))
+			Expect(testUI.Out).To(Say(`org-quota-1\s+1T\s+32M\s+5\s+3\s+allowed\s+3\s+2\s+512B`))
 		})
 
 		When("there are limits that have not been configured", func() {
@@ -105,6 +106,7 @@ var _ = Describe("org-quotas command", func() {
 								TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 								InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 								TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+								TotalLogVolume:    &types.NullInt{Value: 0, IsSet: false},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
@@ -123,9 +125,8 @@ var _ = Describe("org-quotas command", func() {
 
 			It("should convert default values from the API into readable outputs", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
-				Expect(testUI.Out).To(Say(`default\s+unlimited\s+unlimited\s+unlimited\s+unlimited\s+allowed\s+unlimited\s+unlimited`))
-
+				Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports\s+log volume per second`))
+				Expect(testUI.Out).To(Say(`default\s+unlimited\s+unlimited\s+unlimited\s+unlimited\s+allowed\s+unlimited\s+unlimited\s+unlimited`))
 			})
 		})
 	})
@@ -160,7 +161,7 @@ var _ = Describe("org-quotas command", func() {
 
 	When("the quota list is empty", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 			fakeActor.GetOrganizationQuotasReturns([]resources.OrganizationQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 		})
 

@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 
@@ -23,7 +22,7 @@ func (cmd EnvCommand) Execute(_ []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -109,11 +108,10 @@ func sortKeys(group map[string]interface{}) []string {
 
 func (cmd EnvCommand) displaySystem(group map[string]interface{}) error {
 	for key, val := range group {
-		jsonVal, err := json.MarshalIndent(val, "", " ")
+		err := cmd.UI.DisplayJSON(key, val)
 		if err != nil {
 			return err
 		}
-		cmd.UI.DisplayText(fmt.Sprintf("%s: %s", key, jsonVal))
 	}
 	return nil
 }

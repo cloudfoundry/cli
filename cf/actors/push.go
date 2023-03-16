@@ -17,7 +17,7 @@ import (
 
 const windowsPathPrefix = `\\?\`
 
-//go:generate counterfeiter . PushActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PushActor
 
 type PushActor interface {
 	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error

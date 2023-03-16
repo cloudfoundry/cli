@@ -10,7 +10,7 @@ import (
 
 	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-log-cache/rpc/logcache_v1"
-	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -113,6 +113,7 @@ func (b *cliRetryBackoff) OnErr(error) bool {
 }
 
 func (b *cliRetryBackoff) OnEmpty() bool {
+	time.Sleep(b.interval)
 	return true
 }
 

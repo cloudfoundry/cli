@@ -6,387 +6,359 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
+const serviceCommand = "service"
+
 var _ = Describe("create-service command", func() {
 	Describe("help", func() {
-		When("--help flag is set", func() {
-			It("displays command usage to output", func() {
-				session := helpers.CF("create-service", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+create-service - Create a service instance`))
-				Eventually(session).Should(Say(`USAGE:`))
-				Eventually(session).Should(Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE \[-b BROKER\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\]`))
-				Eventually(session).Should(Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:`))
-				Eventually(session).Should(Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'`))
-				Eventually(session).Should(Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.`))
-				Eventually(session).Should(Say(`\s+The path to the parameters file can be an absolute or relative path to a file:`))
-				Eventually(session).Should(Say(`\s+cf create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE`))
-				Eventually(session).Should(Say(`\s+Example of valid JSON object:`))
-				Eventually(session).Should(Say(`\s+{`))
-				Eventually(session).Should(Say(`\s+\"cluster_nodes\": {`))
-				Eventually(session).Should(Say(`\s+\"count\": 5,`))
-				Eventually(session).Should(Say(`\s+\"memory_mb\": 1024`))
-				Eventually(session).Should(Say(`\s+}`))
-				Eventually(session).Should(Say(`\s+}`))
-				Eventually(session).Should(Say(`TIP:`))
-				Eventually(session).Should(Say(`\s+Use 'cf create-user-provided-service' to make user-provided services available to CF apps`))
-				Eventually(session).Should(Say(`EXAMPLES:`))
-				Eventually(session).Should(Say(`\s+Linux/Mac:`))
-				Eventually(session).Should(Say(`\s+cf create-service db-service silver mydb -c '{\"ram_gb\":4}'`))
-				Eventually(session).Should(Say(`\s+Windows Command Line:`))
-				Eventually(session).Should(Say(`\s+cf create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"`))
-				Eventually(session).Should(Say(`\s+Windows PowerShell:`))
-				Eventually(session).Should(Say(`\s+cf create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'`))
-				Eventually(session).Should(Say(`\s+cf create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json`))
-				Eventually(session).Should(Say(`\s+cf create-service db-service silver mydb -t \"list, of, tags\"`))
-				Eventually(session).Should(Say(`ALIAS:`))
-				Eventually(session).Should(Say(`\s+cs`))
-				Eventually(session).Should(Say(`OPTIONS:`))
-				Eventually(session).Should(Say(`\s+-b      Create a service instance from a particular broker\. Required when service name is ambiguous`))
-				Eventually(session).Should(Say(`\s+-c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`))
-				Eventually(session).Should(Say(`\s+-t      User provided tags`))
-				Eventually(session).Should(Say(`SEE ALSO:`))
-				Eventually(session).Should(Say(`\s+bind-service, create-user-provided-service, marketplace, services`))
+
+		matchHelpMessage := SatisfyAll(
+			Say(`NAME:\n`),
+			Say(`\s+create-service - Create a service instance\n`),
+			Say(`\n`),
+			Say(`USAGE:\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE \[-b SERVICE_BROKER\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\]\n`),
+			Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n`),
+			Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.\n`),
+			Say(`\s+The path to the parameters file can be an absolute or relative path to a file:\n`),
+			Say(`\s+cf create-service SERVICE_OFFERING PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n`),
+			Say(`\s+Example of valid JSON object:`),
+			Say(`\s+{`),
+			Say(`\s+\"cluster_nodes\": {`),
+			Say(`\s+\"count\": 5,`),
+			Say(`\s+\"memory_mb\": 1024`),
+			Say(`\s+}`),
+			Say(`\s+}`),
+			Say(`TIP:`),
+			Say(`\s+Use 'cf create-user-provided-service' to make user-provided service instances available to CF apps`),
+			Say(`EXAMPLES:`),
+			Say(`\s+Linux/Mac:\n`),
+			Say(`\s+cf create-service db-service silver mydb -c '{\"ram_gb\":4}`),
+			Say(`\s+Windows Command Line:`),
+			Say(`\s+cf create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"`),
+			Say(`\s+Windows PowerShell:`),
+			Say(`\s+cf create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'`),
+			Say(`\s+cf create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json`),
+			Say(`\s+cf create-service db-service silver mydb -t \"list, of, tags\"`),
+			Say(`ALIAS:`),
+			Say(`\s+cs`),
+			Say(`OPTIONS:`),
+			Say(`\s+-b\s+Create a service instance from a particular broker\. Required when service offering name is ambiguous`),
+			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`),
+			Say(`\s+-t\s+User provided tags`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete`),
+			Say(`SEE ALSO:`),
+			Say(`\s+bind-service, create-user-provided-service, marketplace, services`),
+		)
+
+		When("the -h flag is specified", func() {
+			It("succeeds and prints help", func() {
+				session := helpers.CF("create-service", "-h")
 				Eventually(session).Should(Exit(0))
-			})
-		})
-	})
-
-	When("not logged in", func() {
-		BeforeEach(func() {
-			helpers.LogoutCF()
-		})
-
-		It("displays FAILED, an informative error message, and exits 1", func() {
-			session := helpers.CF("create-service", "service", "plan", "my-service")
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in\\."))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	When("logged in", func() {
-		BeforeEach(func() {
-			helpers.LoginCF()
-		})
-
-		When("the environment is not setup correctly", func() {
-			It("fails with the appropriate errors", func() {
-				helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "create-service", "service-name", "simple", "new-service")
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 
-		When("the environment is setup correctly", func() {
+		When("the --help flag is specified", func() {
+			It("succeeds and prints help", func() {
+				session := helpers.CF("create-service", "--help")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("no arguments are provided", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF("create-service")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `SERVICE_OFFERING`, `SERVICE_PLAN` and `SERVICE_INSTANCE` were not provided"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("unknown flag is passed", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF("create-service", "-u")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: unknown flag `u"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("a flag is passed with no argument", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF("create-service", "-c")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: expected argument for flag `-c'"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+	})
+
+	When("the environment is not setup correctly", func() {
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "create-service", "foo", "foo", "foo")
+		})
+	})
+
+	Context("targeting a space", func() {
+		var (
+			userName  string
+			orgName   string
+			spaceName string
+		)
+		const serviceInstanceName = "my-service"
+
+		assertCreateMessage := func(session *Session) {
+			Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+				serviceInstanceName, orgName, spaceName, userName))
+		}
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
+		})
+
+		When("succeeds", func() {
 			var (
-				org      string
-				space    string
-				username string
+				serviceOffering string
+				servicePlan     string
+				broker          *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
-				org = helpers.NewOrgName()
-				space = helpers.NewSpaceName()
-
-				helpers.SetupCF(org, space)
-
-				username, _ = helpers.GetCredentials()
+				broker = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 			})
 
 			AfterEach(func() {
-				helpers.QuickDeleteOrg(org)
+				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
-			When("not providing any arguments", func() {
-				It("displays an invalid usage error and the help text, and exits 1", func() {
-					session := helpers.CF("create-service")
-					Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SERVICE`, `SERVICE_PLAN` and `SERVICE_INSTANCE` were not provided"))
+			It("displays a message, OK and creates the instance", func() {
+				session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-t", "a-tag,another-tag")
+				assertCreateMessage(session)
+				Eventually(session).Should(Say(`Service instance %s created\.\n`, serviceInstanceName))
+				Eventually(session).Should(Exit(0))
 
-					// checking partial help text, too long and it's tested earlier
-					Eventually(session).Should(Say("NAME:"))
-					Eventually(session).Should(Say(`\s+create-service - Create a service instance`))
-					Eventually(session).Should(Exit(1))
-				})
+				session = helpers.CF(serviceCommand, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(SatisfyAll(
+					Say(`name:\s+%s`, serviceInstanceName),
+					Say(`type:\s+%s`, "managed"),
+					Say(`tags:\s+a-tag,\s*another-tag`),
+				))
 			})
 
-			When("invalid arguments are passed", func() {
-				When("with an invalid json for -c", func() {
-					It("displays an informative error message, exits 1", func() {
-						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", "{")
-						Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object\\."))
-						Eventually(session).Should(Exit(1))
-					})
-				})
+			When("creating with valid params json", func() {
+				const parametersJSON = `{"valid":"json"}`
 
-				When("the provided file contains invalid json", func() {
-					var tempFilePath string
-
-					BeforeEach(func() {
-						tempFilePath = helpers.TempFileWithContent(`{"invalid"}`)
-					})
-
-					AfterEach(func() {
-						Expect(os.Remove(tempFilePath)).To(Succeed())
-					})
-
-					It("displays an informative message and exits 1", func() {
-						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", tempFilePath)
-						Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object\\."))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-
-				When("the provided file cannot be read", func() {
-					var emptyDir string
-
-					BeforeEach(func() {
-						var err error
-						emptyDir, err = ioutil.TempDir("", "")
-						Expect(err).NotTo(HaveOccurred())
-					})
-
-					AfterEach(func() {
-						Expect(os.RemoveAll(emptyDir)).To(Succeed())
-					})
-
-					It("displays an informative message and exits 1", func() {
-						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", filepath.Join(emptyDir, "non-existent-file"))
-						Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object\\."))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-			})
-
-			When("the service provided is not accessible", func() {
-				It("displays an informative message, exits 1", func() {
-					session := helpers.CF("create-service", "some-service", "some-plan", "my-service")
+				It("displays an informative success message, and creates the instance with parameters", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-c", parametersJSON)
 					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-						"my-service", org, space, username))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
-					Eventually(session).Should(Exit(1))
+						serviceInstanceName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF(serviceCommand, serviceInstanceName, "--params")
+					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  "valid": "json"\n`),
+						Say(`\}\n`),
+					))
 				})
 			})
 
-			When("the service provided is accessible", func() {
-				var (
-					service     string
-					servicePlan string
-					broker      *servicebrokerstub.ServiceBrokerStub
-				)
+			When("creating with valid params json in a file", func() {
+				const parametersJSON = `{"valid":"json"}`
+				var tempFilePath string
 
 				BeforeEach(func() {
-					broker = servicebrokerstub.EnableServiceAccess()
-					service = broker.FirstServiceOfferingName()
-					servicePlan = broker.FirstServicePlanName()
+					tempFilePath = helpers.TempFileWithContent(parametersJSON)
 				})
 
 				AfterEach(func() {
-					broker.Forget()
+					Expect(os.Remove(tempFilePath)).To(Succeed())
 				})
 
 				It("displays an informative success message, exits 0", func() {
-					By("creating the service")
-					session := helpers.CF("create-service", service, servicePlan, "my-service")
-					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-						"my-service", org, space, username))
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-c", tempFilePath)
+					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s...",
+						serviceInstanceName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("services")
+					session = helpers.CF(serviceCommand, serviceInstanceName, "--params")
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
-						"my-service",
-						service,
-						servicePlan,
+					Eventually(session).Should(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  "valid": "json"\n`),
+						Say(`\}\n`),
 					))
-
-					By("displaying the service already exists when using a duplicate name")
-					session = helpers.CF("create-service", service, servicePlan, "my-service")
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Service my-service already exists"))
-					Eventually(session).Should(Exit(0))
-				})
-
-				When("the provided plan does not exist", func() {
-					It("displays an informative error message, exits 1", func() {
-						session := helpers.CF("create-service", service, "some-plan", "service-instance")
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"service-instance", org, space, username))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("The plan %s could not be found for service %s", "some-plan", service))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-
-				When("creating with valid params json", func() {
-					It("displays an informative success message, exits 0", func() {
-						session := helpers.CF("create-service", service, servicePlan, "my-service", "-c", "{}")
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"my-service", org, space, username))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("services")
-						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
-							"my-service",
-							service,
-							servicePlan,
-						))
-					})
-				})
-
-				When("creating with valid params json in a file", func() {
-					var tempFilePath string
-
-					BeforeEach(func() {
-						tempFilePath = helpers.TempFileWithContent(`{"valid":"json"}`)
-					})
-
-					AfterEach(func() {
-						Expect(os.Remove(tempFilePath)).To(Succeed())
-					})
-
-					It("displays an informative success message, exits 0", func() {
-						session := helpers.CF("create-service", service, servicePlan, "my-service", "-c", tempFilePath)
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"my-service", org, space, username))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("services")
-						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
-							"my-service",
-							service,
-							servicePlan,
-						))
-					})
-				})
-
-				When("creating with tags", func() {
-					It("displays an informative message, exits 0, and creates the service with tags", func() {
-						session := helpers.CF("create-service", service, servicePlan, "my-service", "-t", "sapi, rocks")
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"my-service", org, space, username))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("service", "my-service")
-						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("tags:\\s+sapi, rocks"))
-					})
 				})
 			})
 
-			When("the service provided is async and accessible", func() {
-				var (
-					service     string
-					servicePlan string
-					broker      *servicebrokerstub.ServiceBrokerStub
-				)
-
+			When("the service broker responds asynchronously", func() {
 				BeforeEach(func() {
-					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
-					service = broker.FirstServiceOfferingName()
-					servicePlan = broker.FirstServicePlanName()
+					broker.WithAsyncDelay(time.Second).Configure()
 				})
 
-				AfterEach(func() {
-					broker.Forget()
-				})
-
-				It("creates the service and displays a message that creation is in progress", func() {
-					session := helpers.CF("create-service", service, servicePlan, "my-service")
-					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-						"my-service", org, space, username))
-					Eventually(session).Should(Say("OK"))
+				It("displays a message, OK and creates the instance", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "-t", "a-tag,another-tag")
+					assertCreateMessage(session)
 					Eventually(session).Should(Say("Create in progress. Use 'cf services' or 'cf service my-service' to check operation status."))
 					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(SatisfyAll(
+						Say(`name:\s+%s`, serviceInstanceName),
+						Say(`type:\s+%s`, "managed"),
+						Say(`tags:\s+a-tag,\s*another-tag`),
+					))
+
 				})
 			})
 
-			When("there are two services with the same name from different brokers", func() {
-				var (
-					service     string
-					servicePlan string
-					broker1     *servicebrokerstub.ServiceBrokerStub
-					broker2     *servicebrokerstub.ServiceBrokerStub
-				)
+			When("creating with --wait flag", func() {
+				BeforeEach(func() {
+					broker.WithAsyncDelay(5 * time.Second).Configure()
+				})
+
+				It("displays a message, OK and creates the instance", func() {
+					session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName, "--wait")
+					Eventually(session).Should(Exit(0))
+					assertCreateMessage(session)
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Service instance %s created\.\n`, serviceInstanceName),
+						Say(`OK\n`),
+					))
+
+					session = helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(SatisfyAll(
+						Say(`name:\s+%s`, serviceInstanceName),
+						Say(`status:\s+create succeeded`),
+					))
+				})
+			})
+		})
+
+		When("there are two offerings with the same name from different brokers", func() {
+			var (
+				serviceOffering string
+				servicePlan     string
+				broker1         *servicebrokerstub.ServiceBrokerStub
+				broker2         *servicebrokerstub.ServiceBrokerStub
+			)
+
+			BeforeEach(func() {
+				broker1 = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker1.FirstServiceOfferingName()
+				servicePlan = broker1.FirstServicePlanName()
+				broker2 = servicebrokerstub.New()
+				broker2.Services[0].Name = serviceOffering
+				broker2.Services[0].Plans[0].Name = servicePlan
+				broker2.EnableServiceAccess()
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+				broker1.Forget()
+				broker2.Forget()
+			})
+
+			It("displays an error message prompting to disambiguate", func() {
+				session := helpers.CF("create-service", serviceOffering, servicePlan, serviceInstanceName)
+				assertCreateMessage(session)
+				Eventually(session.Err).Should(Say("Service offering '%s' is provided by multiple service brokers. Specify a broker name by using the '-b' flag.", serviceOffering))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("there are no plans matching", func() {
+			var (
+				serviceOffering string
+				broker1         *servicebrokerstub.ServiceBrokerStub
+			)
+
+			BeforeEach(func() {
+				broker1 = servicebrokerstub.EnableServiceAccess()
+				serviceOffering = broker1.FirstServiceOfferingName()
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+				broker1.Forget()
+			})
+			It("displays an error message", func() {
+				session := helpers.CF("create-service", serviceOffering, "another-service-plan", serviceInstanceName, "-b", broker1.Name)
+				assertCreateMessage(session)
+				Eventually(session.Err).Should(Say("The plan '%s' could not be found for service offering '%s' and broker '%s'.", "another-service-plan", serviceOffering, broker1.Name))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("invalid arguments are passed", func() {
+			When("with an invalid json for -c", func() {
+				It("displays an informative error message, exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", "{")
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the provided file contains invalid json", func() {
+				var tempFilePath string
 
 				BeforeEach(func() {
-					broker1 = servicebrokerstub.EnableServiceAccess()
-					service = broker1.FirstServiceOfferingName()
-					servicePlan = broker1.FirstServicePlanName()
-					broker2 = servicebrokerstub.New()
-					broker2.Services[0].Name = service
-					broker2.Services[0].Plans[0].Name = servicePlan
-					broker2.EnableServiceAccess()
+					tempFilePath = helpers.TempFileWithContent(`{"invalid"}`)
 				})
 
 				AfterEach(func() {
-					broker1.Forget()
-					broker2.Forget()
+					Expect(os.Remove(tempFilePath)).To(Succeed())
 				})
 
-				When("the user does not specify which broker to use", func() {
-					It("displays an informative error message, exits 1", func() {
-						session := helpers.CF("create-service", service, servicePlan, "my-service")
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"my-service", org, space, username))
-						Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers\\. Specify a broker by using the '-b' flag\\.", service))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
+				It("displays an informative message and exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", tempFilePath)
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the provided file cannot be read", func() {
+				var emptyDir string
+
+				BeforeEach(func() {
+					var err error
+					emptyDir, err = ioutil.TempDir("", "")
+					Expect(err).NotTo(HaveOccurred())
 				})
 
-				When("the user specifies which broker to use", func() {
-					When("the user is a space developer", func() {
-						BeforeEach(func() {
-							username = helpers.SwitchToSpaceRole(org, space, "SpaceDeveloper")
-							helpers.TargetOrgAndSpace(org, space)
-						})
+				AfterEach(func() {
+					Expect(os.RemoveAll(emptyDir)).To(Succeed())
+				})
 
-						AfterEach(func() {
-							helpers.SetupCF(org, space)
-						})
-
-						It("displays an informative success message, exits 0", func() {
-							By("creating the service with -b flag")
-							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
-							Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-								"my-service", org, space, username))
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("services")
-							Eventually(session).Should(Exit(0))
-							Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
-								"my-service",
-								service,
-								servicePlan,
-							))
-						})
-
-						Context("the broker is not accessible by that user", func() {
-							It("displays an informative error message, exits 1", func() {
-								session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "non-existent-broker")
-								Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-									"my-service", org, space, username))
-								Eventually(session.Err).Should(Say("Service '%s' provided by service broker '%s' not found\\.", service, "non-existent-broker"))
-								Eventually(session).Should(Say("FAILED"))
-								Eventually(session).Should(Exit(1))
-							})
-						})
-					})
+				It("displays an informative message and exits 1", func() {
+					session := helpers.CF("create-service", "foo", "bar", serviceInstanceName, "-c", filepath.Join(emptyDir, "nonexistent-file"))
+					Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

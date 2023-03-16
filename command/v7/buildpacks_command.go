@@ -3,7 +3,7 @@ package v7
 import (
 	"strconv"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -21,7 +21,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd BuildpacksCommand) displayTable(buildpacks []v7action.Buildpack) {
+func (cmd BuildpacksCommand) displayTable(buildpacks []resources.Buildpack) {
 	if len(buildpacks) > 0 {
 		var keyValueTable = [][]string{
 			{"position", "name", "stack", "enabled", "locked", "filename"},

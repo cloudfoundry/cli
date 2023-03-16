@@ -30,6 +30,7 @@ type Application struct {
 	RandomRoute             bool                     `yaml:"random-route,omitempty"`
 	DefaultRoute            bool                     `yaml:"default-route,omitempty"`
 	Stack                   string                   `yaml:"stack,omitempty"`
+	LogRateLimit            string                   `yaml:"log-rate-limit-per-second,omitempty"`
 	RemainingManifestFields map[string]interface{}   `yaml:"-,inline"`
 }
 
@@ -60,7 +61,7 @@ func (application *Application) SetStartCommand(command string) {
 
 func (application *Application) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	// This prevents infinite recursion. The alias type does not implement the unmarshaller interface
-	// so by casting application to a alias pointer, it will unmarshal in to the same memory without calling
+	// so by casting application to a alias pointer, it will unmarshal into the same memory without calling
 	// UnmarshalYAML on itself infinite times
 	type Alias Application
 	aliasPntr := (*Alias)(application)

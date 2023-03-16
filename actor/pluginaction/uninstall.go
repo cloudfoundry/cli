@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 )
 
-//go:generate counterfeiter . PluginUninstaller
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginUninstaller
 
 type PluginUninstaller interface {
 	Run(pluginPath string, command string) error
@@ -55,7 +55,7 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 				break
 			}
 
-			if err != nil && !os.IsNotExist(err) {
+			if !os.IsNotExist(err) {
 				if _, isPathError := err.(*os.PathError); isPathError {
 					time.Sleep(50 * time.Millisecond)
 				} else {

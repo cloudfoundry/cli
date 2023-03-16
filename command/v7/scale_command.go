@@ -2,24 +2,27 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type ScaleCommand struct {
 	BaseCommand
 
-	RequiredArgs        flag.AppName   `positional-args:"yes"`
-	Force               bool           `short:"f" description:"Force restart of app without prompt"`
-	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
-	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
-	usage               interface{}    `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]\n\n   Modifying the app's disk or memory will cause the app to restart."`
-	relatedCommands     interface{}    `related_commands:"push"`
-	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs        flag.AppName            `positional-args:"yes"`
+	Force               bool                    `long:"force" short:"f" description:"Force restart of app without prompt"`
+	Instances           flag.Instances          `long:"instances" short:"i" required:"false" description:"Number of instances"`
+	DiskLimit           flag.Megabytes          `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	LogRateLimit        flag.BytesWithUnlimited `short:"l" required:"false" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
+	MemoryLimit         flag.Megabytes          `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	ProcessType         string                  `long:"process" default:"web" description:"App process to scale"`
+	usage               interface{}             `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-f]\n\n   Modifying the app's disk, memory, or log rate will cause the app to restart."`
+	relatedCommands     interface{}             `related_commands:"push"`
+	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 }
 
 func (cmd ScaleCommand) Execute(args []string) error {
@@ -28,7 +31,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -39,7 +42,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return err
 	}
 
-	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
+	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet && !cmd.LogRateLimit.IsSet {
 		return cmd.showCurrentScale(user.Name, err)
 	}
 
@@ -55,9 +58,11 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayWarnings(warnings)
+	if cmd.shouldRestart() || app.State == constant.ApplicationStarted {
+		warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayWarnings(warnings)
+	}
 
 	showErr := cmd.showCurrentScale(user.Name, err)
 	if showErr != nil {
@@ -92,7 +97,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 	})
 	cmd.UI.DisplayNewline()
 
-	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
+	shouldRestart := cmd.shouldRestart()
 	if shouldRestart && !cmd.Force {
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
 			false,
@@ -109,11 +114,12 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 		cmd.UI.DisplayNewline()
 	}
 
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v7action.Process{
-		Type:       cmd.ProcessType,
-		Instances:  cmd.Instances.NullInt,
-		MemoryInMB: cmd.MemoryLimit.NullUint64,
-		DiskInMB:   cmd.DiskLimit.NullUint64,
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, resources.Process{
+		Type:              cmd.ProcessType,
+		Instances:         cmd.Instances.NullInt,
+		MemoryInMB:        cmd.MemoryLimit.NullUint64,
+		DiskInMB:          cmd.DiskLimit.NullUint64,
+		LogRateLimitInBPS: types.NullInt(cmd.LogRateLimit),
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -197,4 +203,8 @@ func shouldShowCurrentScale(err error) bool {
 	}
 
 	return false
+}
+
+func (cmd ScaleCommand) shouldRestart() bool {
+	return cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet || cmd.LogRateLimit.IsSet
 }

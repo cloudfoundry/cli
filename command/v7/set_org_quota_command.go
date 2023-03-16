@@ -18,7 +18,7 @@ func (cmd *SetOrgQuotaCommand) Execute(args []string) error {
 		return err
 	}
 
-	currentUser, err := cmd.Config.CurrentUserName()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (cmd *SetOrgQuotaCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.UserName}}...", map[string]interface{}{
 		"QuotaName": cmd.RequiredArgs.OrganizationQuota,
 		"OrgName":   cmd.RequiredArgs.Organization,
-		"UserName":  currentUser,
+		"UserName":  currentUser.Name,
 	})
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)

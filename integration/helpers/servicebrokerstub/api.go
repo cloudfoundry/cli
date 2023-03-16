@@ -8,10 +8,15 @@ import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 )
 
+type ServiceAccessConfig struct {
+	OfferingName, PlanName, OrgName string
+}
+
 type ServiceBrokerStub struct {
 	Name, URL, GUID     string
 	Username, Password  string
 	Services            []config.Service
+	ServiceAccessConfig []ServiceAccessConfig
 	created             bool
 	registered          bool
 	catalogResponse     int
@@ -139,6 +144,27 @@ func (s *ServiceBrokerStub) WithDeprovisionResponse(statusCode int) *ServiceBrok
 
 func (s *ServiceBrokerStub) WithAsyncDelay(delay time.Duration) *ServiceBrokerStub {
 	s.asyncResponseDelay = delay
+	return s
+}
+
+func (s *ServiceBrokerStub) WithMaintenanceInfo(version string, description ...string) *ServiceBrokerStub {
+	s.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{
+		Version: version,
+	}
+
+	switch len(description) {
+	case 0:
+	case 1:
+		s.Services[0].Plans[0].MaintenanceInfo.Description = description[0]
+	default:
+		panic("too many parameters")
+	}
+
+	return s
+}
+
+func (s *ServiceBrokerStub) WithRouteService() *ServiceBrokerStub {
+	s.Services[0].Requires = []string{"route_forwarding"}
 	return s
 }
 

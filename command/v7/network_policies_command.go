@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . NetworkPoliciesActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NetworkPoliciesActor
 
 type NetworkPoliciesActor interface {
 	NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
@@ -36,7 +36,7 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 
 	ccClient, uaaClient := cmd.BaseCommand.GetClients()
 
-	networkingClient, err := shared.NewNetworkingClient(ccClient.NetworkPolicyV1(), config, uaaClient, ui)
+	networkingClient, err := shared.NewNetworkingClient(config.NetworkPolicyV1Endpoint(), config, uaaClient, ui)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

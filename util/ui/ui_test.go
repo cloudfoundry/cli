@@ -31,7 +31,7 @@ var _ = Describe("UI", func() {
 
 		out = NewBuffer()
 		ui.Out = out
-		ui.OutForInteration = out
+		ui.OutForInteraction = out
 		errBuff = NewBuffer()
 		ui.Err = errBuff
 	})
@@ -155,7 +155,7 @@ var _ = Describe("UI", func() {
 
 	// Covers the happy paths, additional cases are tested in TranslateText
 	Describe("DisplayText", func() {
-		It("displays the template with map values substituted in to ui.Out with a newline", func() {
+		It("displays the template with map values substituted into ui.Out with a newline", func() {
 			ui.DisplayText(
 				"template with {{.SomeMapValue}}",
 				map[string]interface{}{
@@ -175,7 +175,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values substituted in to ui.Out", func() {
+			It("displays the translated template with map values substituted into ui.Out", func() {
 				ui.DisplayText(
 					"\nTIP: Use '{{.Command}}' to target new org",
 					map[string]interface{}{
@@ -186,8 +186,40 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("Display JSON", func() {
+		It("displays the indented JSON object", func() {
+			obj := map[string]interface{}{
+				"str":  "hello",
+				"bool": true,
+				"int":  42,
+				"pass": "abc>&gd!f",
+				"map":  map[string]interface{}{"float": 123.03},
+				"arr":  []string{"a", "b"},
+			}
+
+			_ = ui.DisplayJSON("named_json", obj)
+
+			Expect(out).To(SatisfyAll(
+				Say("named_json: {\n"),
+				Say("  \"arr\": \\[\n"),
+				Say("    \"a\","),
+				Say("    \"b\"\n"),
+				Say("  \\],\n"),
+				Say("  \"bool\": true,\n"),
+				Say("  \"int\": 42,\n"),
+				Say("  \"map\": {\n"),
+				Say("    \"float\": 123.03\n"),
+				Say("  },\n"),
+				Say("  \"pass\": \"abc>&gd!f\",\n"),
+				Say("  \"str\": \"hello\"\n"),
+				Say("}\n"),
+				Say("\n"),
+			))
+		})
+	})
+
 	Describe("DeferText", func() {
-		It("defers the template with map values substituted in to ui.Out with a newline", func() {
+		It("defers the template with map values substituted into ui.Out with a newline", func() {
 			ui.DeferText(
 				"template with {{.SomeMapValue}}",
 				map[string]interface{}{
@@ -209,7 +241,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("defers the translated template with map values substituted in to ui.Out", func() {
+			It("defers the translated template with map values substituted into ui.Out", func() {
 				ui.DeferText(
 					"\nTIP: Use '{{.Command}}' to target new org",
 					map[string]interface{}{
@@ -231,7 +263,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("an optional map is passed in", func() {
-			It("displays the template with map values bolded and substituted in to ui.Out", func() {
+			It("displays the template with map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}}",
 					map[string]interface{}{
@@ -242,7 +274,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("multiple optional maps are passed in", func() {
-			It("displays the template with only the first map values bolded and substituted in to ui.Out", func() {
+			It("displays the template with only the first map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
 					map[string]interface{}{
@@ -266,7 +298,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values bolded and substituted in to ui.Out", func() {
+			It("displays the translated template with map values bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"App {{.AppName}} does not exist.",
 					map[string]interface{}{
@@ -284,7 +316,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("an optional map is passed in", func() {
-			It("displays the template with map values colorized, bolded, and substituted in to ui.Out", func() {
+			It("displays the template with map values colorized, bolded, and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}}",
 					map[string]interface{}{
@@ -295,7 +327,7 @@ var _ = Describe("UI", func() {
 		})
 
 		When("multiple optional maps are passed in", func() {
-			It("displays the template with only the first map values colorized, bolded, and substituted in to ui.Out", func() {
+			It("displays the template with only the first map values colorized, bolded, and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
 					map[string]interface{}{
@@ -319,7 +351,7 @@ var _ = Describe("UI", func() {
 				ui.Out = out
 			})
 
-			It("displays the translated template with map values colorized, bolded and substituted in to ui.Out", func() {
+			It("displays the translated template with map values colorized, bolded and substituted into ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"App {{.AppName}} does not exist.",
 					map[string]interface{}{
@@ -327,6 +359,40 @@ var _ = Describe("UI", func() {
 					})
 				Expect(out).To(Say("L'application \x1b\\[36;1msome-app-name\x1b\\[0m n'existe pas.\n"))
 			})
+		})
+	})
+
+	Describe("DisplayDiffAddition", func() {
+		It("displays a green indented line with a +", func() {
+			ui.DisplayDiffAddition("added", 3, false)
+			Expect(out).To(Say(`\x1b\[32m\+       added\x1b\[0m`))
+		})
+		It("displays a hyphen when the addHyphen is true", func() {
+			ui.DisplayDiffAddition("added", 3, true)
+			Expect(out).To(Say(`\x1b\[32m\+     - added\x1b\[0m`))
+		})
+
+	})
+
+	Describe("DisplayDiffRemoval", func() {
+		It("displays a red indented line with a -", func() {
+			ui.DisplayDiffRemoval("removed", 3, false)
+			Expect(out).To(Say(`\x1b\[31m\-       removed\x1b\[0m`))
+		})
+		It("displays a a hyphen when addHyphen is true", func() {
+			ui.DisplayDiffRemoval("removed", 3, true)
+			Expect(out).To(Say(`\x1b\[31m\-     - removed\x1b\[0m`))
+		})
+	})
+
+	Describe("DisplayDiffUnchanged", func() {
+		It("displays a plain indented line with no prefix", func() {
+			ui.DisplayDiffUnchanged("unchanged", 3, false)
+			Expect(out).To(Say("        unchanged"))
+		})
+		It("displays a a hyphen when addHyphen is true", func() {
+			ui.DisplayDiffUnchanged("unchanged", 3, true)
+			Expect(out).To(Say("      - unchanged"))
 		})
 	})
 

@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -29,7 +30,6 @@ var _ = Describe("Security Group Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
-
 	})
 
 	Describe("BindSecurityGroupToSpaces", func() {
@@ -639,7 +639,72 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(executeErr).To(MatchError(expectedError))
 				})
 			})
+
 		})
+		When("there are many spaces associated", func() {
+			const batches = 10
+			JustBeforeEach(func() {
+				securityGroupSummaries, _, _ = actor.GetSecurityGroups()
+			})
+			BeforeEach(func() {
+				var (
+					securityGroups  []resources.SecurityGroup
+					manySpaces      []resources.Space
+					manySpacesGUIDs []string
+				)
+
+				for i := 0; i < batcher.BatchSize*batches; i++ {
+					guid := fmt.Sprintf("some-space-guid-%d", i)
+					manySpaces = append(manySpaces, resources.Space{
+						Name: fmt.Sprintf("some-space-%d", i),
+						GUID: guid,
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
+						},
+					})
+					manySpacesGUIDs = append(manySpacesGUIDs, guid)
+				}
+
+				securityGroups = append(securityGroups, resources.SecurityGroup{
+					GUID: "some-security-group-guid-1",
+					Name: "some-security-group-1",
+					Rules: []resources.Rule{{
+						Destination: "127.0.0.1",
+						Description: &description,
+						Ports:       &port,
+						Protocol:    "tcp",
+					}},
+					RunningGloballyEnabled: &trueVal,
+					StagingGloballyEnabled: &falseVal,
+					RunningSpaceGUIDs:      manySpacesGUIDs,
+				})
+
+				for b := 0; b < batches; b++ {
+					fakeCloudControllerClient.GetSpacesReturns(
+						manySpaces[:batcher.BatchSize],
+						ccv3.IncludedResources{
+							Organizations: []resources.Organization{{GUID: "some-org-guid"}},
+						},
+						ccv3.Warnings{"get-spaces-warnings"},
+						nil,
+					)
+					manySpaces = manySpaces[batcher.BatchSize:]
+				}
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					securityGroups,
+					ccv3.Warnings{"get-spaces-warnings"},
+					nil,
+				)
+			})
+
+			It("makes multiple calls to get spaces", func() {
+				Expect(len(securityGroupSummaries)).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetSpacesArgsForCall(1)))
+			})
+		})
+
 	})
 
 	Describe("GetSecurityGroup", func() {
@@ -973,7 +1038,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		When("the seurity group is not bound to the space", func() {
+		When("the security group is not bound to the space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
 					ccv3.Warnings{"get-security-group-warning"},
@@ -1175,7 +1240,7 @@ var _ = Describe("Security Group Actions", func() {
 		var (
 			securityGroupName = "tom"
 			globallyEnabled   bool
-			lifeycle          constant.SecurityGroupLifecycle
+			lifecycle         constant.SecurityGroupLifecycle
 			executeErr        error
 
 			trueValue  = true
@@ -1183,7 +1248,7 @@ var _ = Describe("Security Group Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.UpdateSecurityGroupGloballyEnabled(securityGroupName, lifeycle, globallyEnabled)
+			warnings, executeErr = actor.UpdateSecurityGroupGloballyEnabled(securityGroupName, lifecycle, globallyEnabled)
 		})
 
 		When("the request succeeds", func() {
@@ -1208,7 +1273,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating staging to true", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleStaging
+					lifecycle = constant.SecurityGroupLifecycleStaging
 					globallyEnabled = true
 				})
 
@@ -1233,7 +1298,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating staging to false", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleStaging
+					lifecycle = constant.SecurityGroupLifecycleStaging
 					globallyEnabled = false
 				})
 
@@ -1258,7 +1323,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating running to true", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleRunning
+					lifecycle = constant.SecurityGroupLifecycleRunning
 					globallyEnabled = true
 				})
 
@@ -1283,7 +1348,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			When("updating running to false", func() {
 				BeforeEach(func() {
-					lifeycle = constant.SecurityGroupLifecycleRunning
+					lifecycle = constant.SecurityGroupLifecycleRunning
 					globallyEnabled = false
 				})
 
@@ -1309,7 +1374,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to get the security group errors", func() {
 			BeforeEach(func() {
-				lifeycle = constant.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 				globallyEnabled = false
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
@@ -1333,7 +1398,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to update the security group errors", func() {
 			BeforeEach(func() {
-				lifeycle = constant.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 				globallyEnabled = false
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(

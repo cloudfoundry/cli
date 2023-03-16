@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -16,12 +15,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . ActorReloader
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ActorReloader
 
 type ActorReloader interface {
 	Reload(command.Config, command.UI) (Actor, error)
@@ -60,7 +60,7 @@ type LoginCommand struct {
 }
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
+	ccClient := shared.NewWrappedCloudControllerClient(config, ui)
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	cmd.ActorReloader = ActualActorReloader{}
 
@@ -95,6 +95,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			invalidSSLErr.SuggestedCommand = "login"
 			return invalidSSLErr
 		}
+		return err
+	}
+
+	err = cmd.validateTargetSpecificFlags()
+	if err != nil {
 		return err
 	}
 
@@ -208,7 +213,7 @@ func (cmd *LoginCommand) determineAPIEndpoint() (v7action.TargetSettings, error)
 	endpoint := cmd.APIEndpoint
 	skipSSLValidation := cmd.SkipSSLValidation
 
-	var configTarget = cmd.Config.Target()
+	configTarget := cmd.Config.Target()
 
 	if endpoint == "" && configTarget != "" {
 		endpoint = configTarget
@@ -255,9 +260,13 @@ func (cmd *LoginCommand) targetAPI(settings v7action.TargetSettings) error {
 
 func (cmd *LoginCommand) authenticate() error {
 	var err error
-	var credentials = make(map[string]string)
+	credentials := make(map[string]string)
 
-	prompts := cmd.Actor.GetLoginPrompts()
+	prompts, err := cmd.Actor.GetLoginPrompts()
+	if err != nil {
+		return err
+	}
+
 	nonPasswordPrompts, passwordPrompts := cmd.groupPrompts(prompts)
 
 	if value, ok := prompts["username"]; ok {
@@ -268,7 +277,11 @@ func (cmd *LoginCommand) authenticate() error {
 	}
 
 	for key, prompt := range nonPasswordPrompts {
-		credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+		if prompt.Type == coreconfig.AuthPromptTypeMenu {
+			credentials[key], err = cmd.UI.DisplayTextMenu(prompt.Entries, prompt.DisplayName)
+		} else {
+			credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+		}
 		if err != nil {
 			return err
 		}
@@ -314,9 +327,11 @@ func (cmd *LoginCommand) authenticate() error {
 }
 
 func (cmd *LoginCommand) authenticateSSO() error {
-	prompts := cmd.Actor.GetLoginPrompts()
+	prompts, err := cmd.Actor.GetLoginPrompts()
+	if err != nil {
+		return err
+	}
 
-	var err error
 	for i := 0; i < maxLoginTries; i++ {
 		var passcode string
 
@@ -392,13 +407,13 @@ func (cmd *LoginCommand) showStatus() {
 		},
 	}
 
-	user, err := cmd.Config.CurrentUserName()
-	if user == "" || err != nil {
+	user, err := cmd.Actor.GetCurrentUser()
+	if user.Name == "" || err != nil {
 		cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 		return
 	}
-	tableContent = append(tableContent, []string{cmd.UI.TranslateText("user:"), user})
+	tableContent = append(tableContent, []string{cmd.UI.TranslateText("user:"), user.Name})
 
 	orgName := cmd.Config.TargetedOrganizationName()
 	if orgName == "" {
@@ -453,7 +468,6 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []resources.Organization) (resourc
 	}
 
 	chosenOrgName, err := cmd.promptMenu(orgNames, "Select an org:", "Org")
-
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
 			if cmd.Space != "" {
@@ -563,6 +577,29 @@ func (cmd *LoginCommand) validateFlags() error {
 		}
 	}
 
+	return nil
+}
+
+func (cmd *LoginCommand) validateTargetSpecificFlags() error {
+	if !cmd.Config.IsCFOnK8s() {
+		return nil
+	}
+
+	if cmd.Password != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-p"}
+	}
+	if cmd.SSO {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso"}
+	}
+	if cmd.SSOPasscode != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--sso-passcode"}
+	}
+	if cmd.Username != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-u"}
+	}
+	if cmd.Origin != "" {
+		return translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "--origin"}
+	}
 	return nil
 }
 

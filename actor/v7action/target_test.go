@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,6 @@ var _ = Describe("Targeting", func() {
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, fakeConfig, _, _, _, _ = NewTestActor()
-
 	})
 
 	Describe("SetTarget", func() {
@@ -59,24 +59,24 @@ var _ = Describe("Targeting", func() {
 
 			rootResponse := ccv3.Info{
 				Links: ccv3.InfoLinks{
-					CCV3: ccv3.APILink{
+					CCV3: resources.APILink{
 						Meta: meta,
 					},
-					Logging: ccv3.APILink{
+					Logging: resources.APILink{
 						HREF: expectedDoppler,
 					},
-					LogCache: ccv3.APILink{
+					LogCache: resources.APILink{
 						HREF: expectedLogCache,
 					},
-					Routing: ccv3.APILink{
+					Routing: resources.APILink{
 						HREF: expectedRouting,
 					},
-					Login: ccv3.APILink{
+					Login: resources.APILink{
 						HREF: expectedAuth,
 					},
 				},
 			}
-			fakeCloudControllerClient.TargetCFReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
+			fakeCloudControllerClient.GetInfoReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -94,14 +94,14 @@ var _ = Describe("Targeting", func() {
 			Expect(connectionSettings.SkipSSLValidation).To(BeTrue())
 		})
 
-		When("targeting CF fails", func() {
+		When("getting root info fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.TargetCFReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("target-error"))
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("info-error"))
 			})
 
 			It("returns an error and all warnings", func() {
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("target-error"))
+				Expect(err).To(MatchError("info-error"))
 				Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 
 				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
@@ -119,6 +119,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
 			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
 			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
+			Expect(targetInfoArgs.CFOnK8s).To(BeFalse())
 		})
 
 		It("clears all the token information", func() {
@@ -130,9 +131,28 @@ var _ = Describe("Targeting", func() {
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
 
+		It("clears the Kubernetes auth-info", func() {
+			Expect(fakeConfig.SetKubernetesAuthInfoCallCount()).To(Equal(1))
+			authInfo := fakeConfig.SetKubernetesAuthInfoArgsForCall(0)
+
+			Expect(authInfo).To(BeEmpty())
+		})
+
 		It("succeeds and returns all warnings", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
+		})
+
+		When("deployed on Kubernetes", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{CFOnK8s: true}, nil, nil)
+			})
+
+			It("sets the CFOnK8s target information", func() {
+				Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
+				targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
+				Expect(targetInfoArgs.CFOnK8s).To(BeTrue())
+			})
 		})
 	})
 
@@ -162,6 +182,15 @@ var _ = Describe("Targeting", func() {
 			Expect(accessToken).To(BeEmpty())
 			Expect(refreshToken).To(BeEmpty())
 			Expect(sshOAuthClient).To(BeEmpty())
+		})
+
+		It("clears the Kubernetes auth-info", func() {
+			actor.ClearTarget()
+
+			Expect(fakeConfig.SetKubernetesAuthInfoCallCount()).To(Equal(1))
+			authInfo := fakeConfig.SetKubernetesAuthInfoArgsForCall(0)
+
+			Expect(authInfo).To(BeEmpty())
 		})
 	})
 })

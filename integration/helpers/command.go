@@ -39,14 +39,14 @@ func CF(args ...string) *Session {
 type CFEnv struct {
 	WorkingDirectory string
 	EnvVars          map[string]string
-	stdin            io.Reader
+	Stdin            io.Reader
 }
 
 // CustomCF runs a 'cf' command with a custom environment and given arguments.
 func CustomCF(cfEnv CFEnv, args ...string) *Session {
 	command := exec.Command("cf", args...)
-	if cfEnv.stdin != nil {
-		command.Stdin = cfEnv.stdin
+	if cfEnv.Stdin != nil {
+		command.Stdin = cfEnv.Stdin
 	}
 	if cfEnv.WorkingDirectory != "" {
 		command.Dir = cfEnv.WorkingDirectory

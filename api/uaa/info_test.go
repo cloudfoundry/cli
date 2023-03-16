@@ -10,16 +10,6 @@ import (
 var _ = Describe("Info", func() {
 	var info Info
 
-	Describe("APIVersion", func() {
-		BeforeEach(func() {
-			info.App.Version = "api-version"
-		})
-
-		It("returns the version", func() {
-			Expect(info.APIVersion()).To(Equal("api-version"))
-		})
-	})
-
 	Describe("LoginLink", func() {
 		BeforeEach(func() {
 			info.Links.Login = "login-something"
@@ -27,16 +17,6 @@ var _ = Describe("Info", func() {
 
 		It("returns the Login Link", func() {
 			Expect(info.LoginLink()).To(Equal("login-something"))
-		})
-	})
-
-	Describe("Prompts", func() {
-		BeforeEach(func() {
-			info.Prompts = map[string][]string{"hi": []string{"fake type", "show prompt"}}
-		})
-
-		It("returns the UAA Link", func() {
-			Expect(info.LoginPrompts()).To(Equal(map[string][]string{"hi": []string{"fake type", "show prompt"}}))
 		})
 	})
 
@@ -53,10 +33,9 @@ var _ = Describe("Info", func() {
 	Describe("NewInfo", func() {
 		When("provided a default link", func() {
 			It("sets the links to the provided link", func() {
-				link := "something-else-i-don't know"
-				info = NewInfo(link)
-				Expect(info.LoginLink()).To(Equal(link))
-				Expect(info.UAALink()).To(Equal(link))
+				info = NewInfo("uaa-url", "auth-url")
+				Expect(info.LoginLink()).To(Equal("auth-url"))
+				Expect(info.UAALink()).To(Equal("uaa-url"))
 			})
 		})
 	})

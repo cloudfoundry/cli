@@ -8,11 +8,16 @@ import (
 type TargetSettings ccv3.TargetSettings
 
 // SetTarget targets the Cloud Controller using the client and sets target
-// information in the actor based on the response.
+// information in the config based on the response.
 func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
-	rootInfo, warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
+	var allWarnings Warnings
+
+	actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
+
+	rootInfo, warnings, err := actor.CloudControllerClient.GetInfo()
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Warnings(warnings), err
+		return allWarnings, err
 	}
 
 	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
@@ -22,15 +27,22 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		MinCLIVersion:     "", // Oldest supported V3 version should be OK
 		Doppler:           rootInfo.Logging(),
 		LogCache:          rootInfo.LogCache(),
+		NetworkPolicyV1:   rootInfo.NetworkPolicyV1(),
 		Routing:           rootInfo.Routing(),
 		SkipSSLValidation: settings.SkipSSLValidation,
+		UAA:               rootInfo.UAA(),
+		CFOnK8s:           rootInfo.CFOnK8s,
 	})
+
 	actor.Config.SetTokenInformation("", "", "")
-	return Warnings(warnings), nil
+	actor.Config.SetKubernetesAuthInfo("")
+
+	return allWarnings, nil
 }
 
-// ClearTarget clears target information from the actor.
+// ClearTarget clears target information from the config.
 func (actor Actor) ClearTarget() {
 	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{})
 	actor.Config.SetTokenInformation("", "", "")
+	actor.Config.SetKubernetesAuthInfo("")
 }

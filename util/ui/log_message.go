@@ -11,7 +11,7 @@ import (
 // LogTimestampFormat is the timestamp formatting for log lines.
 const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
 
-//go:generate counterfeiter . LogMessage
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LogMessage
 
 // LogMessage is a log response representing one to many joined lines of a log
 // message.

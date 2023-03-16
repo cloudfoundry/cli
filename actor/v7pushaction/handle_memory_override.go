@@ -1,7 +1,6 @@
 package v7pushaction
 
 import (
-	//"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )

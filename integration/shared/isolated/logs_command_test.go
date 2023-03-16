@@ -17,7 +17,6 @@ import (
 )
 
 var _ = Describe("logs command", func() {
-
 	var server *ghttp.Server
 
 	BeforeEach(func() {

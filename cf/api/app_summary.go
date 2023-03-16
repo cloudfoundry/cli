@@ -125,7 +125,7 @@ type DomainSummary struct {
 	OwningOrganizationGUID string
 }
 
-//go:generate counterfeiter . AppSummaryRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AppSummaryRepository
 
 type AppSummaryRepository interface {
 	GetSummariesInCurrentSpace() (apps []models.Application, apiErr error)

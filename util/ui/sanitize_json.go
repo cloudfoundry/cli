@@ -39,9 +39,10 @@ func iterateAndRedact(blob interface{}) interface{} {
 	case string:
 		return sanitizeURL(v)
 	case []interface{}:
-		var list []interface{}
-		for _, val := range v {
-			list = append(list, iterateAndRedact(val))
+		list := make([]interface{}, len(v))
+
+		for index, val := range v {
+			list[index] = iterateAndRedact(val)
 		}
 
 		return list

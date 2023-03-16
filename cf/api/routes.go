@@ -15,7 +15,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-//go:generate counterfeiter . RouteRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RouteRepository
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)

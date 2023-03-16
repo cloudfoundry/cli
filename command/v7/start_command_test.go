@@ -54,7 +54,7 @@ var _ = Describe("start Command", func() {
 			Name: "some-space",
 			GUID: "some-space-guid",
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		fakeActor.GetApplicationByNameAndSpaceReturns(app, v7action.Warnings{"get-app-warning"}, nil)
 
 		cmd = v7.StartCommand{
@@ -94,7 +94,7 @@ var _ = Describe("start Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -171,9 +171,9 @@ var _ = Describe("start Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
-				inputApp, inputDroplet, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
+				inputApp, inputDropletGuid, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
 				Expect(inputApp).To(Equal(app))
-				Expect(inputDroplet).To(Equal(resources.Droplet{}))
+				Expect(inputDropletGuid).To(Equal(""))
 				Expect(inputStrategy).To(Equal(constant.DeploymentStrategyDefault))
 				Expect(inputNoWait).To(Equal(false))
 				Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
@@ -202,9 +202,9 @@ var _ = Describe("start Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
-			inputApp, inputDroplet, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
+			inputApp, inputDropletGuid, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
 			Expect(inputApp).To(Equal(app))
-			Expect(inputDroplet).To(Equal(resources.Droplet{}))
+			Expect(inputDropletGuid).To(Equal(""))
 			Expect(inputStrategy).To(Equal(constant.DeploymentStrategyDefault))
 			Expect(inputNoWait).To(Equal(false))
 			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))

@@ -49,7 +49,7 @@ var _ = Describe("rename-space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -78,7 +78,7 @@ var _ = Describe("rename-space Command", func() {
 
 			BeforeEach(func() {
 				returnedErr = errors.New("some error")
-				fakeConfig.CurrentUserReturns(configv3.User{}, returnedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, returnedErr)
 			})
 
 			It("returns the error", func() {
@@ -88,7 +88,7 @@ var _ = Describe("rename-space Command", func() {
 
 		When("when the command succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "username"}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-targeted-org", GUID: "org-guid"})
 				fakeActor.RenameSpaceByNameAndOrganizationGUIDReturns(
 					resources.Space{GUID: "old-space-guid", Name: "new-space-name"},

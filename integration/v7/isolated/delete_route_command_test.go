@@ -157,7 +157,7 @@ var _ = Describe("delete-route command", func() {
 				It("warns the user that it has already been deleted and runs to completion without failing", func() {
 					session := helpers.CF("delete-route", domainName, "-f")
 					Eventually(session).Should(Say(`Deleting route %s\.\.\.`, domainName))
-					Eventually(session).Should(Say(`Unable to delete\. Route with domain '%s' not found\.`, domainName))
+					Eventually(session).Should(Say(`Unable to delete\. Route with host '', domain '%s', and path '/' not found\.`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -321,7 +321,7 @@ var _ = Describe("delete-route command", func() {
 						It("fails with a helpful message", func() {
 							session := helpers.CF("delete-route", domainName, "-f")
 							Eventually(session).Should(Say(`Deleting route %s\.\.\.`, domainName))
-							Eventually(session).Should(Say(`Unable to delete\. Route with domain '%s' not found\.`, domainName))
+							Eventually(session).Should(Say(`Unable to delete\. Route with host '', domain '%s', and path '/' not found\.`, domainName))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
 						})

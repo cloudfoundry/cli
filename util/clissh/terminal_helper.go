@@ -3,10 +3,10 @@ package clissh
 import (
 	"io"
 
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 )
 
-//go:generate counterfeiter . TerminalHelper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalHelper
 
 type TerminalHelper interface {
 	GetFdInfo(in interface{}) (fd uintptr, isTerminal bool)

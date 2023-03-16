@@ -1,0 +1,34 @@
+additionalRepositories:
+  - url: https://github.com/cloudfoundry/cli-ci    
+  - url: https://github.com/cloudfoundry/cli-private    
+  - url: https://github.com/cloudfoundry/cli-workstation    
+
+workspaceLocation: cli/.devcontainer/cli.code-workspace
+
+tasks:
+  - name: Setup Workspace
+    before: >
+      sudo apt install --yes 
+      icdiff
+      tldr
+      fzf
+
+      brew install
+      asdf
+      cloudfoundry/tap/credhub-cli
+      cloudfoundry/tap/bbl
+      cloudfoundry/tap/bosh-cli
+      act
+      tmux
+      neovim
+    init: >
+      tldr --update 
+      
+      make clean build
+    command: out/cf version
+
+vscode:
+  extensions:
+    - vscodevim.vim
+    - eamodio.gitlens
+    - golang.go

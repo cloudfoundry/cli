@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . SecurityGroupRepo
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecurityGroupRepo
 
 type SecurityGroupRepo interface {
 	Create(name string, rules []map[string]interface{}) error

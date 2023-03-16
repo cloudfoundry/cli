@@ -7,7 +7,7 @@ type configRefreshingRequirement struct {
 	configRefresher ConfigRefresher
 }
 
-//go:generate counterfeiter . ConfigRefresher
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConfigRefresher
 
 type ConfigRefresher interface {
 	Refresh() (coreconfig.Warning, error)

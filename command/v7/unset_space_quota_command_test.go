@@ -73,7 +73,7 @@ var _ = Describe("unset-space-quota Command", func() {
 
 	When("getting the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserNameReturns("", errors.New("current-user-error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("current-user-error"))
 		})
 
 		It("returns the error", func() {
@@ -96,8 +96,7 @@ var _ = Describe("unset-space-quota Command", func() {
 				GUID: "some-org-guid",
 			})
 
-			fakeConfig.CurrentUserNameReturns(currentUser, nil)
-
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUser}, nil)
 		})
 
 		It("unsets the quota to the organization", func() {
@@ -136,8 +135,7 @@ var _ = Describe("unset-space-quota Command", func() {
 				GUID: "some-org-guid",
 			})
 
-			fakeConfig.CurrentUserNameReturns(currentUser, nil)
-
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUser}, nil)
 		})
 
 		It("unsets the quota to the organization", func() {

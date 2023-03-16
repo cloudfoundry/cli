@@ -26,17 +26,22 @@ func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[stri
 	return actor.extractLabels((*resources.Metadata)(resource.Metadata), warnings, err)
 }
 
-func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
+func (actor *Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
 	serviceBroker, warnings, err := actor.GetServiceBrokerByName(serviceBrokerName)
 	return actor.extractLabels(serviceBroker.Metadata, warnings, err)
 }
 
-func (actor Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
+func (actor *Actor) GetServiceInstanceLabels(serviceInstanceName, spaceGUID string) (map[string]types.NullString, Warnings, error) {
+	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+	return actor.extractLabels(serviceInstance.Metadata, warnings, err)
+}
+
+func (actor *Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
 	serviceOffering, warnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
 	return actor.extractLabels(serviceOffering.Metadata, Warnings(warnings), actionerror.EnrichAPIErrors(err))
 }
 
-func (actor Actor) GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
+func (actor *Actor) GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
 	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(servicePlanName, serviceOfferingName, serviceBrokerName)
 	return actor.extractLabels(servicePlan.Metadata, warnings, err)
 }
@@ -130,6 +135,14 @@ func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerNa
 		return warnings, err
 	}
 	return actor.updateResourceMetadata("service-broker", serviceBroker.GUID, resources.Metadata{Labels: labels}, warnings)
+}
+
+func (actor *Actor) UpdateServiceInstanceLabels(serviceInstanceName, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
+	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
+	if err != nil {
+		return warnings, err
+	}
+	return actor.updateResourceMetadata("service-instance", serviceInstance.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {

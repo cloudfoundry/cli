@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServiceBindingRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceBindingRepository
 
 type ServiceBindingRepository interface {
 	Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) error

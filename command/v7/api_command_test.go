@@ -144,9 +144,7 @@ API version:    100.200.300`,
 		})
 
 		When("the URL host does not exist", func() {
-			var (
-				requestErr ccerror.RequestError
-			)
+			var requestErr ccerror.RequestError
 
 			BeforeEach(func() {
 				CCAPI = "i.do.not.exist.com"

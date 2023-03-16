@@ -56,6 +56,11 @@ func (job Job) IsComplete() bool {
 	return job.State == constant.JobComplete
 }
 
+// IsAt returns true when the job has reached the desired state.
+func (job Job) IsAt(state constant.JobState) bool {
+	return job.State == state
+}
+
 type jobWarning struct {
 	Detail string `json:"detail"`
 }
@@ -90,6 +95,14 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 // error is encountered, or config.OverallPollingTimeout is reached. In the
 // last case, a JobTimeoutError is returned.
 func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
+	return client.PollJobForState(jobURL, constant.JobComplete)
+}
+
+func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (Warnings, error) {
+	if jobURL == "" {
+		return nil, nil
+	}
+
 	var (
 		err         error
 		warnings    Warnings
@@ -106,11 +119,21 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		}
 
 		if job.HasFailed() {
-			firstError := job.Errors()[0]
-			return allWarnings, firstError
+			if len(job.Errors()) > 0 {
+				firstError := job.Errors()[0]
+				return allWarnings, firstError
+			} else {
+				return allWarnings, ccerror.JobFailedNoErrorError{
+					JobGUID: job.GUID,
+				}
+			}
 		}
 
 		if job.IsComplete() {
+			return allWarnings, nil
+		}
+
+		if job.IsAt(state) {
 			return allWarnings, nil
 		}
 
@@ -121,4 +144,56 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		JobGUID: job.GUID,
 		Timeout: client.jobPollingTimeout,
 	}
+}
+
+type PollJobEvent struct {
+	State    constant.JobState
+	Err      error
+	Warnings Warnings
+}
+
+func (client *Client) PollJobToEventStream(jobURL JobURL) chan PollJobEvent {
+	stream := make(chan PollJobEvent)
+
+	if jobURL == "" {
+		close(stream)
+		return stream
+	}
+
+	go func() {
+		var end bool
+
+		startTime := client.clock.Now()
+		for !end {
+			job, warnings, err := client.GetJob(jobURL)
+			event := PollJobEvent{
+				State:    job.State,
+				Err:      err,
+				Warnings: warnings,
+			}
+
+			switch {
+			case event.Err != nil:
+				end = true
+			case job.IsComplete():
+				end = true
+			case job.HasFailed():
+				event.Err = job.Errors()[0]
+				end = true
+			case client.clock.Now().Sub(startTime) > client.jobPollingTimeout:
+				event.Err = ccerror.JobTimeoutError{
+					JobGUID: job.GUID,
+					Timeout: client.jobPollingTimeout,
+				}
+				end = true
+			}
+
+			stream <- event
+			time.Sleep(client.jobPollingInterval)
+		}
+
+		close(stream)
+	}()
+
+	return stream
 }

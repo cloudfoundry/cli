@@ -65,7 +65,7 @@ var _ = Describe("Org Quota Command", func() {
 
 	When("getting the org quota fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},
@@ -90,7 +90,7 @@ var _ = Describe("Org Quota Command", func() {
 
 	When("getting the org quota succeeds", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
+			fakeActor.GetCurrentUserReturns(
 				configv3.User{
 					Name: "some-user",
 				},
@@ -105,6 +105,7 @@ var _ = Describe("Org Quota Command", func() {
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
 							TotalAppInstances: &types.NullInt{IsSet: true, Value: 2},
+							TotalLogVolume:    &types.NullInt{IsSet: true, Value: 512},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: false},
@@ -138,6 +139,7 @@ var _ = Describe("Org Quota Command", func() {
 			Expect(testUI.Out).To(Say(`paid service plans:\s+disallowed`))
 			Expect(testUI.Out).To(Say(`app instances:\s+2`))
 			Expect(testUI.Out).To(Say(`route ports:\s+unlimited`))
+			Expect(testUI.Out).To(Say(`log volume per second:\s+512B`))
 		})
 	})
 })

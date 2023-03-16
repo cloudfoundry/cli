@@ -3,22 +3,22 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type RunTaskCommand struct {
 	BaseCommand
 
-	RequiredArgs    flag.RunTaskArgsV7 `positional-args:"yes"`
-	Command         string             `long:"command" short:"c" description:"The command to execute"`
-	Disk            flag.Megabytes     `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	Memory          flag.Megabytes     `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	Name            string             `long:"name" description:"Name to give the task (generated if omitted)"`
-	Process         string             `long:"process" description:"Process type to use as a template for command, memory, and disk for the created task."`
-	usage           interface{}        `usage:"CF_NAME run-task APP_NAME [--command COMMAND] [-k DISK] [-m MEMORY] [--name TASK_NAME] [--process PROCESS_TYPE]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app --command \"bundle exec rake db:migrate\" --name migrate\n\n   CF_NAME run-task my-app --process batch_job\n\n   CF_NAME run-task my-app"`
-	relatedCommands interface{}        `related_commands:"logs, tasks, terminate-task"`
+	RequiredArgs    flag.RunTaskArgsV7      `positional-args:"yes"`
+	Command         string                  `long:"command" short:"c" description:"The command to execute"`
+	Disk            flag.Megabytes          `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	LogRateLimit    flag.BytesWithUnlimited `short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
+	Memory          flag.Megabytes          `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Name            string                  `long:"name" description:"Name to give the task (generated if omitted)"`
+	Process         string                  `long:"process" description:"Process type to use as a template for command, memory, and disk for the created task."`
+	usage           interface{}             `usage:"CF_NAME run-task APP_NAME [--command COMMAND] [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [--name TASK_NAME] [--process PROCESS_TYPE]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app --command \"bundle exec rake db:migrate\" --name migrate\n\n   CF_NAME run-task my-app --process batch_job\n\n   CF_NAME run-task my-app"`
+	relatedCommands interface{}             `related_commands:"logs, tasks, terminate-task"`
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {
@@ -29,7 +29,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 
 	space := cmd.Config.TargetedSpace()
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	inputTask := v7action.Task{
+	inputTask := resources.Task{
 		Command: cmd.Command,
 	}
 
@@ -60,6 +60,9 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	if cmd.Memory.IsSet {
 		inputTask.MemoryInMB = cmd.Memory.Value
 	}
+	if cmd.LogRateLimit.IsSet {
+		inputTask.LogRateLimitInBPS = cmd.LogRateLimit.Value
+	}
 	if cmd.Command == "" && cmd.Process == "" {
 		cmd.Process = "task"
 	}
@@ -70,8 +73,8 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 			return err
 		}
 
-		inputTask.Template = &ccv3.TaskTemplate{
-			Process: ccv3.TaskProcessTemplate{
+		inputTask.Template = &resources.TaskTemplate{
+			Process: resources.TaskProcessTemplate{
 				Guid: process.GUID,
 			},
 		}

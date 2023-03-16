@@ -8,12 +8,25 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
+	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"github.com/jessevdk/go-flags"
 )
 
 type Path string
 
+type Locator struct {
+	FilesToCheckFor []string
+}
+
+func NewLocator() *Locator {
+	return &Locator{
+		FilesToCheckFor: []string{
+			"manifest.yml",
+			"manifest.yaml",
+		},
+	}
+}
 func (p Path) String() string {
 	return string(p)
 }
@@ -56,7 +69,7 @@ func (p *ManifestPathWithExistenceCheck) UnmarshalFlag(path string) error {
 	}
 
 	if fileInfo.IsDir() {
-		locator := v6manifestparser.NewLocator()
+		locator := manifestparser.NewLocator()
 		pathToFile, existsInDirectory, err := locator.Path(path)
 		if err != nil {
 			return err
@@ -77,7 +90,7 @@ func (p *ManifestPathWithExistenceCheck) UnmarshalFlag(path string) error {
 	return nil
 }
 
-type JSONOrFileWithValidation map[string]interface{}
+type JSONOrFileWithValidation types.OptionalObject
 
 func (JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
@@ -101,13 +114,11 @@ func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
 		jsonBytes = []byte(pathOrJSON)
 	}
 
-	var jsonMap map[string]interface{}
-
-	if jsonIsInvalid := json.Unmarshal(jsonBytes, &jsonMap); jsonIsInvalid != nil {
+	if jsonIsInvalid := json.Unmarshal(jsonBytes, &p.Value); jsonIsInvalid != nil {
 		return errorToReturn
 	}
 
-	*p = JSONOrFileWithValidation(jsonMap)
+	p.IsSet = true
 	return nil
 }
 

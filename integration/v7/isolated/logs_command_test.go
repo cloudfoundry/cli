@@ -123,8 +123,8 @@ var _ = Describe("logs Command", func() {
 
 				It("it can get at least 1000 recent log messages", func() {
 					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
-					// 3 lines of logs for each call to curl + a few lines during the push
-					for i := 0; i < 333; i += 1 {
+					// 3 lines of logs for each call to curl + a few lines during the push, 1500 for some overhead
+					for i := 0; i < 500; i += 1 {
 						command := exec.Command("curl", route)
 						session, err := Start(command, GinkgoWriter, GinkgoWriter)
 						Expect(err).NotTo(HaveOccurred())

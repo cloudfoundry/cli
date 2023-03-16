@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreatePackageCommand struct {
@@ -38,13 +39,17 @@ func (cmd CreatePackageCommand) Execute(args []string) error {
 	}
 
 	isDockerImage := (cmd.DockerImage.Path != "")
-	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
+	user, err := cmd.Actor.GetCurrentUser()
+	if err != nil {
+		return err
+	}
+	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, user.Name, isDockerImage)
 	if err != nil {
 		return err
 	}
 
 	var (
-		pkg      v7action.Package
+		pkg      resources.Package
 		warnings v7action.Warnings
 	)
 	if isDockerImage {

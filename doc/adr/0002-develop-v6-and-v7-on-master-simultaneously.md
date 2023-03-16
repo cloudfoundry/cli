@@ -1,4 +1,4 @@
-# 2. Develop v6 and v7 on master simultaneously
+# 2. Develop v6 and v7 on main simultaneously
 
 Date: 2018-09-25
 
@@ -18,12 +18,12 @@ VAT is doing so in v7 releases of the CLI.
 For the last three weeks, 
 VAT has been developing on a long-running _vat_ branch based on v6.39. 
 Part of the goals for VAT include 
-incorporating all 7-10 new epics that will be built on _master_,
+incorporating all 7-10 new epics that will be built on _main_,
 along with sharing any bugfixes back and forth between the two branches.
 VAT has been tracking which commits should be cherry-picked back and forth each day, 
 resulting in significant overhead and bookkeeping.
 Rather than continuously merging two long-running branches into each other, 
-the VAT team proposes to develop on _master_ simultaneously with CLI.
+the VAT team proposes to develop on _main_ simultaneously with CLI.
 This would allow the CAPI v3 acceleration work to proceed faster.
 
 The CLI team is constrained by needing to continue shipping stable versions of v6. 
@@ -37,7 +37,7 @@ and would reap most of the benefit.
 
 _The change that we're proposing or have agreed to implement._
 
-VAT is proposing to have both teams develop in the _master_ branch simultaneously.
+VAT is proposing to have both teams develop in the _main_ branch simultaneously.
  
 One code base would be building two different versions of the binary.
 The v6 binary would not include any v7 actors or commands.

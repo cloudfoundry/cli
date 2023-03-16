@@ -1,4 +1,4 @@
-// Package cloudcontroller contains shared utilies between the V2 and V3
+// Package cloudcontroller contains shared utilities between the V2 and V3
 // clients.
 //
 // These sets of packages are still under development/pre-pre-pre...alpha. Use
@@ -10,7 +10,7 @@
 // the V2 and V3 api respectively.
 package cloudcontroller
 
-//go:generate counterfeiter . Connection
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Connection
 
 // Connection creates and executes http requests
 type Connection interface {

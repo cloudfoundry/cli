@@ -93,7 +93,7 @@ var _ = Describe("oauth-token command", func() {
 		When("the oauth client ID and secret combination is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
-					conf.ConfigFile.UAAOAuthClient = "non-existent-client"
+					conf.ConfigFile.UAAOAuthClient = "nonexistent-client"
 					conf.ConfigFile.UAAOAuthClientSecret = "some-secret"
 				})
 			})
@@ -151,7 +151,7 @@ var _ = Describe("oauth-token command", func() {
 			When("the oauth client ID and secret combination is invalid", func() {
 				BeforeEach(func() {
 					helpers.SetConfig(func(conf *configv3.Config) {
-						conf.ConfigFile.UAAOAuthClient = "non-existent-client"
+						conf.ConfigFile.UAAOAuthClient = "nonexistent-client"
 						conf.ConfigFile.UAAOAuthClientSecret = "some-secret"
 					})
 				})

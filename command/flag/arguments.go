@@ -33,12 +33,12 @@ type ParamsAsJSON struct {
 	JSON string `positional-arg-name:"JSON" required:"true" description:"Parameters as JSON"`
 }
 
-type Service struct {
-	ServiceOffering string `positional-arg-name:"SERVICE" required:"true" description:"The service offering name"`
+type ServiceOffering struct {
+	ServiceOffering string `positional-arg-name:"SERVICE_OFFERING" required:"true" description:"The service offering name"`
 }
 
 type ServiceInstance struct {
-	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
+	ServiceInstance TrimmedString `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance name"`
 }
 
 type Organization struct {
@@ -193,7 +193,7 @@ type CopySourceArgs struct {
 }
 
 type CreateServiceArgs struct {
-	Service         string `positional-arg-name:"SERVICE" required:"true" description:"The service offering"`
+	ServiceOffering string `positional-arg-name:"SERVICE_OFFERING" required:"true" description:"The service offering"`
 	ServicePlan     string `positional-arg-name:"SERVICE_PLAN" required:"true" description:"The service plan that the service instance will use"`
 	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance"`
 }
@@ -201,6 +201,10 @@ type CreateServiceArgs struct {
 type RenameServiceArgs struct {
 	ServiceInstance        string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance to rename"`
 	NewServiceInstanceName string `positional-arg-name:"NEW_SERVICE_INSTANCE" required:"true" description:"The new name of the service instance"`
+}
+
+type ShareServiceArgs struct {
+	ServiceInstance string `positional-arg-name:"SERVICE_INSTANCE" required:"true" description:"The service instance to rename"`
 }
 
 type BindServiceArgs struct {

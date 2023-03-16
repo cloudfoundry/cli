@@ -75,7 +75,7 @@ var _ = Describe("space-users Command", func() {
 
 		When("getting the current user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-current-user-error"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("get-current-user-error"))
 			})
 
 			It("returns the error", func() {
@@ -85,7 +85,7 @@ var _ = Describe("space-users Command", func() {
 
 		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(
+				fakeActor.GetCurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
@@ -167,6 +167,11 @@ var _ = Describe("space-users Command", func() {
 								PresentationName: "billing-manager",
 								GUID:             "spaceDeveloper-guid",
 							}
+							spaceSupporter := resources.User{
+								Origin:           "uaa",
+								PresentationName: "fred",
+								GUID:             "spaceSupporter-guid",
+							}
 							spaceAuditor := resources.User{
 								Origin:           "uaa",
 								PresentationName: "org-auditor",
@@ -176,6 +181,7 @@ var _ = Describe("space-users Command", func() {
 							spaceUsersByRole := map[constant.RoleType][]resources.User{
 								constant.SpaceManagerRole:   {uaaAdmin, ldapAdmin, abbyUser, client},
 								constant.SpaceDeveloperRole: {spaceDeveloper},
+								constant.SpaceSupporterRole: {spaceSupporter},
 								constant.SpaceAuditorRole:   {spaceAuditor},
 							}
 
@@ -198,6 +204,9 @@ var _ = Describe("space-users Command", func() {
 							Expect(testUI.Out).To(Say(`\n`))
 							Expect(testUI.Out).To(Say(`\nSPACE DEVELOPER`))
 							Expect(testUI.Out).To(Say(`\n  billing-manager \(uaa\)`))
+							Expect(testUI.Out).To(Say(`\n`))
+							Expect(testUI.Out).To(Say(`\nSPACE SUPPORTER`))
+							Expect(testUI.Out).To(Say(`\n  fred \(uaa\)`))
 							Expect(testUI.Out).To(Say(`\n`))
 							Expect(testUI.Out).To(Say(`\nSPACE AUDITOR`))
 							Expect(testUI.Out).To(Say(`\n  org-auditor \(uaa\)`))

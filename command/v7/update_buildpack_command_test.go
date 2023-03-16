@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -146,7 +147,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		When("getting the current user fails", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error that happened")
-				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+				fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 			})
 
 			It("returns the error", func() {
@@ -159,7 +160,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 			BeforeEach(func() {
 				userName = "some-user"
-				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 			})
 
 			When("preparing buildpack bits causes an error", func() {
@@ -182,7 +183,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					fakeActor.PrepareBuildpackBitsReturns("path/to/prepared/bits", nil)
 					expectedErr = errors.New("update-error")
 					fakeActor.UpdateBuildpackByNameAndStackReturns(
-						v7action.Buildpack{},
+						resources.Buildpack{},
 						v7action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						expectedErr,
 					)
@@ -384,7 +385,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			When("updating the buildpack succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.UpdateBuildpackByNameAndStackReturns(
-						v7action.Buildpack{GUID: buildpackGUID},
+						resources.Buildpack{GUID: buildpackGUID},
 						v7action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						nil,
 					)

@@ -81,7 +81,7 @@ var _ = Describe("restart-app-instance Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -98,7 +98,7 @@ var _ = Describe("restart-app-instance Command", func() {
 				Name: "some-space",
 				GUID: "some-space-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
 		When("restarting the specified instance returns an error", func() {

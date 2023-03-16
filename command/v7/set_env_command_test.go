@@ -78,7 +78,7 @@ var _ = Describe("set-env Command", func() {
 
 		When("getting the current user returns an error", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
+				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("some-error"))
 			})
 
 			It("returns the error", func() {
@@ -88,7 +88,7 @@ var _ = Describe("set-env Command", func() {
 
 		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			})
 
 			When("setting the environment succeeds", func() {

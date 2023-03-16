@@ -16,16 +16,15 @@ REQUIRED_FOR_STATIC_BINARY =-a -tags "netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
-
-TARGET = v7
 SLOW_SPEC_THRESHOLD=120
 
-GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite
-GINKGO_INT_FLAGS=$(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
+GINKGO_FLAGS ?= -r -randomizeAllSpecs -requireSuite
+GINKGO_INT_FLAGS = $(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
-GINKGO_UNITS_FLAGS=$(GINKGO_FLAGS) -randomizeSuites -p
+GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomizeSuites -p
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
+GOFLAGS := -mod=mod
 
 all: lint test build
 
@@ -86,7 +85,7 @@ integration-shared-experimental: build integration-cleanup ## Run experimental i
 ive: integration-versioned-experimental
 integration-experimental-versioned: integration-versioned-experimental
 integration-versioned-experimental: build integration-cleanup ## Run experimental integration tests that are specific to your CLI version
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
+	$(ginkgo_int) -nodes $(NODES) integration/v7/experimental
 
 ig: integration-global
 integration-global: build integration-cleanup integration-shared-global integration-global-versioned ## Run all unparallelizable integration tests that make cross-cutting changes to their test CF foundation
@@ -99,7 +98,7 @@ integration-shared-global: build integration-cleanup ## Serially run integration
 ivg: integration-versioned-global
 integration-global-versioned: integration-versioned-global
 integration-versioned-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
-	$(ginkgo_int) integration/$(TARGET)/global
+	$(ginkgo_int) integration/v7/global
 
 ii: integration-isolated
 integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned ## Run all parallel-enabled integration tests, both versioned and shared across versions
@@ -119,20 +118,29 @@ integration-shared-performance: build integration-cleanup
 ivi: integration-versioned-isolated
 integration-isolated-versioned: integration-versioned-isolated
 integration-versioned-isolated: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
+	$(ginkgo_int) -nodes $(NODES) integration/v7/isolated
 
 integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
+	$(ginkgo_int) -nodes $(NODES) integration/v7/push
 
-integration-tests: build integration-cleanup integration-isolated integration-push integration-global ## Run all isolated, push, and global integration tests
+integration-selfcontained: build
+	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
+
+integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
+
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
-integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
+integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global integration-selfcontained ## Run all isolated, push, experimental, plugin, selfcontained, and global integration tests
+
+integration-tests-full-ci: integration-cleanup
+	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
+		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
+	$(ginkgo_int) -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
 lint: custom-lint ## Runs all linters and formatters
 	@echo "Running linters..."
@@ -162,10 +170,19 @@ out/cf-cli_linux_x86-64: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
 							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
+							
+out/cf-cli_linux_arm64: $(GOSRC)
+	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_arm64 .
 
 out/cf-cli_osx: $(GOSRC)
 	GOARCH=amd64 GOOS=darwin go build \
 				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx .
+
+out/cf-cli_osx_arm: $(GOSRC)
+	GOARCH=arm64 GOOS=darwin go build \
+				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx_arm .
 
 out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
 	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
@@ -176,10 +193,7 @@ out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
 	rm rsrc.syso
 
 rsrc.syso:
-	@# Software for windows icon
-	go get github.com/akavel/rsrc
-	@# Generates icon file
-	rsrc -ico cf.ico
+	rsrc -ico cf.ico -o rsrc.syso
 
 test: units ## (synonym for units)
 
@@ -192,7 +206,7 @@ units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
+		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
 	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
 
 units-full: build units-plugin units-non-plugin

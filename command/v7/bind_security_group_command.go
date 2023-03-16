@@ -15,7 +15,7 @@ type BindSecurityGroupCommand struct {
 	RequiredArgs    flag.BindSecurityGroupV7Args `positional-args:"yes"`
 	Lifecycle       flag.SecurityGroupLifecycle  `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to."`
 	Space           string                       `long:"space" description:"Space to bind the security group to. (Default: all existing spaces in org)"`
-	usage           interface{}                  `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [--lifecycle (running | staging)] [--space SPACE]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	usage           interface{}                  `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [--lifecycle (running | staging)] [--space SPACE]\n\nTIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}                  `related_commands:"apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"`
 }
 
@@ -27,7 +27,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 
 		cmd.UI.DisplayOK()
 
-		cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
+		cmd.UI.DisplayText("TIP: If Dynamic ASG's are enabled, changes will automatically apply for running and staging applications. Otherwise, changes will require an app restart (for running) or restage (for staging) to apply to existing applications.")
 	}
 
 	return nil

@@ -50,22 +50,6 @@ var _ = Describe("UAA Authentication", func() {
 	})
 
 	Describe("Make", func() {
-		When("the client is nil", func() {
-			BeforeEach(func() {
-				inner.SetClient(nil)
-
-				fakeConnection.MakeReturns(ccerror.InvalidAuthTokenError{})
-			})
-
-			It("calls the connection without any side effects", func() {
-				err := wrapper.Make(request, nil)
-				Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{}))
-
-				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
-				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
-			})
-		})
-
 		When("no tokens are set", func() {
 			BeforeEach(func() {
 				inMemoryCache.SetAccessToken("")
@@ -149,6 +133,29 @@ var _ = Describe("UAA Authentication", func() {
 					err := wrapper.Make(request, nil)
 					Expect(err).To(Equal(innerError))
 				})
+			})
+		})
+
+		When("the authorization header is already provided", func() {
+			var (
+				accessToken string
+			)
+
+			BeforeEach(func() {
+				var err error
+				accessToken, err = buildTokenString(time.Now().AddDate(0, 0, 1))
+				Expect(err).ToNot(HaveOccurred())
+				request.Header.Set("Authorization", accessToken)
+			})
+
+			It("does not overwrite the authentication headers", func() {
+				err := wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
+				headers := authenticatedRequest.Header
+				Expect(headers["Authorization"]).To(ConsistOf([]string{accessToken}))
 			})
 		})
 

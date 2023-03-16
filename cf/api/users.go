@@ -36,7 +36,7 @@ type apiErrResponse struct {
 	Description string `json:"description,omitempty"`
 }
 
-//go:generate counterfeiter . UserRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UserRepository
 
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)

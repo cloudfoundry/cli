@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -71,7 +72,7 @@ var _ = Describe("Feature Flags Command", func() {
 
 	Context("When the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
 		When("FeatureFlagsActor returns an error", func() {
@@ -94,7 +95,7 @@ var _ = Describe("Feature Flags Command", func() {
 
 		When("everything is perfect", func() {
 			BeforeEach(func() {
-				flags := []v7action.FeatureFlag{
+				flags := []resources.FeatureFlag{
 					{Name: "flag2", Enabled: true},
 					{Name: "flag1", Enabled: false},
 				}

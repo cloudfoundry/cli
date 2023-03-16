@@ -5,31 +5,19 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-type Stack struct {
-	// GUID is a unique stack identifier.
-	GUID string `json:"guid"`
-	// Name is the name of the stack.
-	Name string `json:"name"`
-	// Description is the description for the stack
-	Description string `json:"description"`
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *resources.Metadata `json:"metadata,omitempty"`
-}
-
 // GetStacks lists stacks with optional filters.
-func (client *Client) GetStacks(query ...Query) ([]Stack, Warnings, error) {
-	var resources []Stack
+func (client *Client) GetStacks(query ...Query) ([]resources.Stack, Warnings, error) {
+	var stacks []resources.Stack
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetStacksRequest,
 		Query:        query,
-		ResponseBody: Stack{},
+		ResponseBody: resources.Stack{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Stack))
+			stacks = append(stacks, item.(resources.Stack))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return stacks, warnings, err
 }

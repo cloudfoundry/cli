@@ -19,6 +19,9 @@ const (
 	ApplicationStarting ApplicationAction = "Starting"
 	// ApplicationRestarting indicates that the app is being restarted
 	ApplicationRestarting ApplicationAction = "Restarting"
+	// ApplicationRollingBack indicates that the app is being rolled back to a
+	// prior revision
+	ApplicationRollingBack ApplicationAction = "Rolling Back"
 )
 
 // ApplicationState represents the current desired state of the app.

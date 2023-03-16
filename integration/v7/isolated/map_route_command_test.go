@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -28,22 +29,25 @@ var _ = Describe("map-route command", func() {
 
 			Eventually(session).Should(Say(`USAGE:`))
 			Eventually(session).Should(Say(`Map an HTTP route:\n`))
-			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\]\n`))
 			Eventually(session).Should(Say(`Map a TCP route:\n`))
 			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com                              # example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost            # myhost.example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                  # example.com:5000`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com                                                # example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost                              # myhost.example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo                   # myhost.example.com/foo`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-protocol http2 # myhost.example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                                    # example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
+			Eventually(session).Should(Say(`--app-protocol\s+\[Beta flag, subject to change\] Protocol for the route destination \(default: http1\). Only applied to HTTP routes`))
+
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -108,7 +112,7 @@ var _ = Describe("map-route command", func() {
 					session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
 
 					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s.%s%s'\.`, appName, hostName, domainName, path))
+					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s.%s%s'\. Nothing has been updated\.`, appName, hostName, domainName, path))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 
@@ -121,6 +125,20 @@ var _ = Describe("map-route command", func() {
 					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("destination protocol is provided", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionHTTP2RoutingV3)
+					})
+
+					It("maps the route to an app", func() {
+						session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--app-protocol", "http2")
+
+						Eventually(session).Should(Say(`Mapping route %s.%s to app %s with protocol http2 in org %s / space %s as %s\.\.\.`, hostName, domainName, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
@@ -159,7 +177,7 @@ var _ = Describe("map-route command", func() {
 					session := helpers.CF("map-route", appName, domainName, "--port", fmt.Sprintf("%d", route.Port))
 
 					Eventually(session).Should(Say(`Mapping route %s:%d to app %s in org %s / space %s as %s\.\.\.`, domainName, route.Port, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s:%d'\.`, appName, domainName, route.Port))
+					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s:%d'\. Nothing has been updated\.`, appName, domainName, route.Port))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -201,6 +219,21 @@ var _ = Describe("map-route command", func() {
 					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("destination protocol is provided", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionHTTP2RoutingV3)
+					})
+
+					It("maps the route to an app", func() {
+						session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--app-protocol", "http2")
+						Eventually(session).Should(Say(`Creating route %s.%s for org %s / space %s as %s\.\.\.`, hostName, domainName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Say(`Mapping route %s.%s to app %s with protocol http2 in org %s / space %s as %s\.\.\.`, hostName, domainName, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 

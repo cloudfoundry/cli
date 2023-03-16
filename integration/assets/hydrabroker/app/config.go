@@ -5,15 +5,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
-
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"github.com/go-playground/validator/v10"
 )
 
 var validate = validator.New()
 
-func configCreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configCreateBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	c, err := configParse(r.Body)
 	if err != nil {
 		return err
@@ -22,39 +21,39 @@ func configCreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWr
 	guid := store.CreateBroker(c)
 
 	w.WriteHeader(http.StatusCreated)
-	return respondWithJSON(w, config.NewBrokerResponse{GUID: guid})
+	return respondWithJSON(w, config.NewBrokerResponse{GUID: string(guid)})
 }
 
-func configRecreateBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configUpdateBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	c, err := configParse(r.Body)
 	if err != nil {
 		return err
 	}
 
-	guid, err := readGUID(r)
+	guid, err := readGUIDs(r)
 	if err != nil {
 		return err
 	}
 
-	store.UpdateBroker(guid, c)
+	store.UpdateBroker(guid.brokerGUID, c)
 
 	w.WriteHeader(http.StatusNoContent)
 	return nil
 }
 
-func configDeleteBroker(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	guid, err := readGUID(r)
+func configDeleteBroker(store *store.Store, w http.ResponseWriter, r *http.Request) error {
+	guid, err := readGUIDs(r)
 	if err != nil {
 		return err
 	}
 
-	store.DeleteBroker(guid)
+	store.DeleteBroker(guid.brokerGUID)
 
 	w.WriteHeader(http.StatusNoContent)
 	return nil
 }
 
-func configListBrokers(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func configListBrokers(store *store.Store, w http.ResponseWriter, r *http.Request) error {
 	guids := store.ListBrokers()
 	return respondWithJSON(w, guids)
 }

@@ -17,7 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . RequestDumperInterface
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RequestDumperInterface
 
 type RequestDumperInterface interface {
 	DumpRequest(*http.Request)

@@ -1,9 +1,8 @@
 package ccv3_test
 
 import (
-	"net/http"
-
 	"fmt"
+	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -34,14 +33,14 @@ var _ = Describe("User", func() {
 		When("no error occurs", func() {
 			BeforeEach(func() {
 				response := `{
-				"guid": "some-uaa-guid",
-				"username": "some-user-name",
-                "presentation_name": "some-user-name",
-                "origin": "ldap",
-				"created_at": "2016-12-07T18:18:30Z",
-				"updated_at": null
+                    "guid": "some-uaa-guid",
+                    "username": "some-user-name",
+                    "presentation_name": "some-user-name",
+                    "origin": "ldap",
+                    "created_at": "2016-12-07T18:18:30Z",
+                    "updated_at": null
 
-				}`
+                }`
 				expectedBody := `{"guid":"some-uaa-guid"}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -351,6 +350,65 @@ var _ = Describe("User", func() {
 
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
+
+	Describe("Who am I", func() {
+		var (
+			k8sUser    resources.K8sUser
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			k8sUser, warnings, executeErr = client.WhoAmI()
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+                    "name": "bob",
+                    "kind": "User"
+                }`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/whoami"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the expected user and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(k8sUser.Name).To(Equal("bob"))
+				Expect(k8sUser.Kind).To(Equal("User"))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+                    "errors": [
+                        {
+                            "code": 1000,
+                            "detail": "Not authenticated",
+                            "title": "CF-InvalidAuthToken"
+                        }
+                    ]
+                }`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/whoami"),
+						RespondWith(http.StatusUnauthorized, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Not authenticated"}))
 				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})

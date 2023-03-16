@@ -2,11 +2,12 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/resources"
 )
 
 type StartCommand struct {
@@ -28,11 +29,11 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
+	cmd.LogCacheClient, err = logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
 	if err != nil {
 		return err
 	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+
 	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, cmd.LogCacheClient)
 
 	return nil
@@ -44,7 +45,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -75,7 +76,7 @@ func (cmd StartCommand) Execute(args []string) error {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, resources.Droplet{}, constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
+		err = cmd.Stager.StartApp(app, "", constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
 		if err != nil {
 			return err
 		}

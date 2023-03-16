@@ -78,7 +78,7 @@ var _ = Describe("delete-org Command", func() {
 
 				BeforeEach(func() {
 					returnedErr = errors.New("some error")
-					fakeConfig.CurrentUserReturns(configv3.User{}, returnedErr)
+					fakeActor.GetCurrentUserReturns(configv3.User{}, returnedErr)
 				})
 
 				It("returns the error", func() {
@@ -88,7 +88,7 @@ var _ = Describe("delete-org Command", func() {
 
 			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(
+					fakeActor.GetCurrentUserReturns(
 						configv3.User{Name: "some-user"},
 						nil)
 				})

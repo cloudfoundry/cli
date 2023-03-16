@@ -22,7 +22,7 @@ func (cmd *TargetCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		cmd.clearTargets()
 		return err
@@ -149,7 +149,7 @@ func (cmd *TargetCommand) setSpace() error {
 func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 	table := [][]string{
 		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("API version:"), cmd.Actor.CloudControllerAPIVersion()},
+		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 		{cmd.UI.TranslateText("user:"), user.Name},
 	}
 

@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -71,10 +72,10 @@ var _ = Describe("buildpacks Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 		})
 
-		It("should print text indicating its runnning", func() {
+		It("should print text indicating its running", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Getting buildpacks as apple\.\.\.`))
 		})
@@ -107,7 +108,7 @@ var _ = Describe("buildpacks Command", func() {
 		When("getting buildpacks succeeds", func() {
 			When("buildpacks exist", func() {
 				BeforeEach(func() {
-					buildpacks := []v7action.Buildpack{
+					buildpacks := []resources.Buildpack{
 						{
 							Name:     "buildpack-1",
 							Position: types.NullInt{Value: 1, IsSet: true},
@@ -139,7 +140,7 @@ var _ = Describe("buildpacks Command", func() {
 			})
 			When("there are no buildpacks", func() {
 				BeforeEach(func() {
-					buildpacks := []v7action.Buildpack{}
+					buildpacks := []resources.Buildpack{}
 					fakeActor.GetBuildpacksReturns(buildpacks, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 				})
 				It("prints a table of buildpacks", func() {

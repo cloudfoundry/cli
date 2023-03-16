@@ -213,8 +213,8 @@ var _ = Describe("Auth", func() {
 
 			It("makes a call to find the jti and uses that jti to revoke the token", func() {
 				Expect(actualError).To(BeNil())
-				Expect(len(server.ReceivedRequests())).To(Equal(2))
-				Expect(server.ReceivedRequests()[1].RequestURI).To(Equal("/oauth/token/revoke/55fb95e3c99642f1841152eb06aca386"))
+				Expect(len(server.ReceivedRequests())).To(Equal(1))
+				Expect(server.ReceivedRequests()[0].RequestURI).To(Equal("/oauth/token/revoke/55fb95e3c99642f1841152eb06aca386"))
 			})
 		})
 

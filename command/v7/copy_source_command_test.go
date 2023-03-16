@@ -35,7 +35,7 @@ var _ = Describe("copy-source Command", func() {
 		sourceApp     resources.Application
 		targetApp     resources.Application
 		actorError    error
-		targetPackage v7action.Package
+		targetPackage resources.Package
 	)
 
 	BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("copy-source Command", func() {
 			Name: "target-app-name",
 			GUID: "target-app-guid",
 		}
-		targetPackage = v7action.Package{
+		targetPackage = resources.Package{
 			GUID: "target-package-guid",
 		}
 
@@ -72,7 +72,7 @@ var _ = Describe("copy-source Command", func() {
 
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeSharedActor.CheckTargetReturns(nil)
-		fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: userName}, nil)
 
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -112,12 +112,12 @@ var _ = Describe("copy-source Command", func() {
 	})
 
 	It("retrieves the current user", func() {
-		Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+		Expect(fakeActor.GetCurrentUserCallCount()).To(Equal(1))
 	})
 
 	When("retrieving the current user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("not-logged-in"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("not-logged-in"))
 		})
 
 		It("returns an error", func() {
@@ -316,7 +316,7 @@ var _ = Describe("copy-source Command", func() {
 	When("copying the package fails", func() {
 		BeforeEach(func() {
 			actorError = errors.New("copy-package-error")
-			fakeActor.CopyPackageReturns(v7action.Package{}, v7action.Warnings{}, actorError)
+			fakeActor.CopyPackageReturns(resources.Package{}, v7action.Warnings{}, actorError)
 		})
 
 		It("returns an error", func() {

@@ -16,6 +16,9 @@ import (
 )
 
 var _ = Describe("app summary displayer", func() {
+
+	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`
+
 	var (
 		appSummaryDisplayer *AppSummaryDisplayer
 		output              *Buffer
@@ -53,60 +56,70 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
-										Type:       constant.ProcessTypeWeb,
-										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+									Process: resources.Process{
+										Type:              constant.ProcessTypeWeb,
+										MemoryInMB:        types.NullUint64{Value: 32, IsSet: true},
+										DiskInMB:          types.NullUint64{Value: 1024, IsSet: true},
+										LogRateLimitInBPS: types.NullInt{Value: 1024 * 5, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
-											Index:       0,
-											State:       constant.ProcessInstanceRunning,
-											MemoryUsage: 1000000,
-											DiskUsage:   1000000,
-											MemoryQuota: 33554432,
-											DiskQuota:   2000000,
-											Uptime:      uptime,
-											Details:     "Some Details 1",
+											Index:        0,
+											State:        constant.ProcessInstanceRunning,
+											MemoryUsage:  1000000,
+											DiskUsage:    1000000,
+											LogRate:      1024,
+											MemoryQuota:  33554432,
+											DiskQuota:    2000000,
+											LogRateLimit: 1024 * 5,
+											Uptime:       uptime,
+											Details:      "Some Details 1",
 										},
 										v7action.ProcessInstance{
-											Index:       1,
-											State:       constant.ProcessInstanceRunning,
-											MemoryUsage: 2000000,
-											DiskUsage:   2000000,
-											MemoryQuota: 33554432,
-											DiskQuota:   4000000,
-											Uptime:      time.Since(time.Unix(330480000, 0)),
-											Details:     "Some Details 2",
+											Index:        1,
+											State:        constant.ProcessInstanceRunning,
+											MemoryUsage:  2000000,
+											DiskUsage:    2000000,
+											LogRate:      1024 * 2,
+											MemoryQuota:  33554432,
+											DiskQuota:    4000000,
+											LogRateLimit: 1024 * 5,
+											Uptime:       time.Since(time.Unix(330480000, 0)),
+											Details:      "Some Details 2",
 										},
 										v7action.ProcessInstance{
-											Index:       2,
-											State:       constant.ProcessInstanceRunning,
-											MemoryUsage: 3000000,
-											DiskUsage:   3000000,
-											MemoryQuota: 33554432,
-											DiskQuota:   6000000,
-											Uptime:      time.Since(time.Unix(1277164800, 0)),
+											Index:        2,
+											State:        constant.ProcessInstanceRunning,
+											MemoryUsage:  3000000,
+											DiskUsage:    3000000,
+											LogRate:      1024 * 3,
+											MemoryQuota:  33554432,
+											DiskQuota:    6000000,
+											LogRateLimit: 1024 * 5,
+											Uptime:       time.Since(time.Unix(1277164800, 0)),
 										},
 									},
 								},
 								{
-									Process: v7action.Process{
-										Type:       "console",
-										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
-										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+									Process: resources.Process{
+										Type:              "console",
+										MemoryInMB:        types.NullUint64{Value: 16, IsSet: true},
+										DiskInMB:          types.NullUint64{Value: 512, IsSet: true},
+										LogRateLimitInBPS: types.NullInt{Value: 256, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
-											Index:       0,
-											State:       constant.ProcessInstanceRunning,
-											MemoryUsage: 1000000,
-											DiskUsage:   1000000,
-											MemoryQuota: 33554432,
-											DiskQuota:   8000000,
-											Uptime:      time.Since(time.Unix(167572800, 0)),
+											Index:        0,
+											State:        constant.ProcessInstanceRunning,
+											MemoryUsage:  1000000,
+											DiskUsage:    1000000,
+											LogRate:      128,
+											MemoryQuota:  33554432,
+											DiskQuota:    8000000,
+											LogRateLimit: 256,
+											Uptime:       time.Since(time.Unix(167572800, 0)),
 										},
 									},
 								},
@@ -130,16 +143,19 @@ var _ = Describe("app summary displayer", func() {
 					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[0].LogRate).To(Equal("1K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[0].Details).To(Equal("Some Details 1"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
 					Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[1].LogRate).To(Equal("2K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[1].Details).To(Equal("Some Details 2"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
 					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[2].LogRate).To(Equal("3K/s of 5K/s"))
 
 					consoleProcessSummary := processTable.Processes[1]
 					Expect(consoleProcessSummary.Type).To(Equal("console"))
@@ -150,6 +166,45 @@ var _ = Describe("app summary displayer", func() {
 					Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
 					Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(consoleProcessSummary.Instances[0].LogRate).To(Equal("128B/s of 256B/s"))
+				})
+			})
+
+			When("the log rate is unlimited", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: resources.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+									},
+									Sidecars: []resources.Sidecar{},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:        0,
+											State:        constant.ProcessInstanceRunning,
+											LogRate:      1024,
+											LogRateLimit: -1,
+										},
+									},
+								},
+							},
+						},
+					}
+				})
+
+				It("renders unlimited log rate limits correctly", func() {
+					processTable := helpers.ParseV3AppProcessTable(output.Contents())
+					webProcessSummary := processTable.Processes[0]
+
+					Expect(webProcessSummary.Instances[0].LogRate).To(Equal("1K/s of unlimited"))
 				})
 			})
 
@@ -163,12 +218,12 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -182,12 +237,12 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       "console",
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 							},
 						},
@@ -197,7 +252,7 @@ var _ = Describe("app summary displayer", func() {
 				It("lists instance stats for process types that have > 0 instances", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`sidecars: `))
-					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
 				})
 
 				It("does not show the instance stats table for process types with 0 instances", func() {
@@ -213,11 +268,11 @@ var _ = Describe("app summary displayer", func() {
 						ApplicationSummary: v7action.ApplicationSummary{
 							ProcessSummaries: []v7action.ProcessSummary{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									},
-									Sidecars:        []v7action.Sidecar{},
+									Sidecars:        []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
 								}},
 						},
@@ -227,7 +282,7 @@ var _ = Describe("app summary displayer", func() {
 				It("displays the instances table", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`sidecars: `))
-					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
 				})
 			})
 
@@ -241,24 +296,24 @@ var _ = Describe("app summary displayer", func() {
 							},
 							ProcessSummaries: v7action.ProcessSummaries{
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:    constant.ProcessTypeWeb,
 										Command: *types.NewFilteredString("some-command-1"),
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type:    "console",
 										Command: *types.NewFilteredString("some-command-2"),
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 								{
-									Process: v7action.Process{
+									Process: resources.Process{
 										Type: "random",
 									},
-									Sidecars: []v7action.Sidecar{},
+									Sidecars: []resources.Sidecar{},
 								},
 							},
 						},
@@ -307,20 +362,20 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 						},
 					},
@@ -342,7 +397,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 
@@ -356,12 +411,12 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
-								Sidecars: []v7action.Sidecar{
+								Sidecars: []resources.Sidecar{
 									{Name: "authenticator"},
 									{Name: "clock"},
 								},
@@ -380,7 +435,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 
@@ -394,16 +449,16 @@ var _ = Describe("app summary displayer", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: "console",
 								},
-								Sidecars: []v7action.Sidecar{},
+								Sidecars: []resources.Sidecar{},
 							},
 						},
 					},
@@ -421,7 +476,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+				Expect(testUI.Out).NotTo(Say(instanceStatsTitles))
 			})
 		})
 

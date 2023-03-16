@@ -11,21 +11,25 @@ import (
 
 var _ = Describe("purge-service-offering command", func() {
 	Describe("help", func() {
+		matchHelpMessage := SatisfyAll(
+			Say("NAME:"),
+			Say("purge-service-offering - Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"),
+			Say("USAGE:"),
+			Say(`cf purge-service-offering SERVICE_OFFERING \[-b BROKER\] \[-f\]`),
+			Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service offering will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."),
+			Say("OPTIONS:"),
+			Say("-b\\s+Purge a service offering from a particular service broker. Required when service offering name is ambiguous"),
+			Say("-f\\s+Force deletion without confirmation"),
+			Say("SEE ALSO:"),
+			Say("marketplace, purge-service-instance, service-brokers"),
+		)
+
 		When("the --help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("purge-service-offering", "--help")
 
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("purge-service-offering - Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say(`cf purge-service-offering SERVICE \[-b BROKER\] \[-f\]`))
-				Expect(session).To(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service offering will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("-b\\s+Purge a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("-f\\s+Force deletion without confirmation"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("marketplace, purge-service-instance, service-brokers"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 
@@ -34,18 +38,8 @@ var _ = Describe("purge-service-offering command", func() {
 				session := helpers.CF("purge-service-offering")
 
 				Eventually(session).Should(Exit(1))
-
-				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("purge-service-offering - Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say(`cf purge-service-offering SERVICE \[-b BROKER\] \[-f\]`))
-				Expect(session).To(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service offering will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("-b\\s+Purge a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("-f\\s+Force deletion without confirmation"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("marketplace, purge-service-instance, service-brokers"))
+				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE_OFFERING` was not provided"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 
@@ -55,16 +49,7 @@ var _ = Describe("purge-service-offering command", func() {
 
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "extra"`))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("purge-service-offering - Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say(`cf purge-service-offering SERVICE \[-b BROKER\] \[-f\]`))
-				Expect(session).To(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service offering will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("-b\\s+Purge a service offering from a particular service broker. Required when service offering name is ambiguous"))
-				Expect(session).To(Say("-f\\s+Force deletion without confirmation"))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("marketplace, purge-service-instance, service-brokers"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 	})

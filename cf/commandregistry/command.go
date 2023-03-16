@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 )
 
-//go:generate counterfeiter . Command
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Command
 
 type Command interface {
 	MetaData() CommandMetadata

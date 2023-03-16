@@ -32,14 +32,14 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
 
 	if !cmd.Force {
 		cmd.UI.DisplayText("This action impacts all resources scoped to this space, including apps, service instances, and space-scoped service brokers.")
-		promptMessage := "Really delete the space {{.SpaceName}}?"
+		const promptMessage = "Really delete the space {{.SpaceName}}?"
 		deleteSpace, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{"SpaceName": cmd.RequiredArgs.Space})
 
 		if promptErr != nil {

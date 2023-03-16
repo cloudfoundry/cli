@@ -17,7 +17,7 @@ func (cmd RenameCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

@@ -77,6 +77,5 @@ var _ = Describe("Process", func() {
 				Expect(process).To(Equal(Process{DiskQuota: "5G", RemainingManifestFields: map[string]interface{}{}}))
 			})
 		})
-
 	})
 })

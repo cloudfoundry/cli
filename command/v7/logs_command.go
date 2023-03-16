@@ -7,7 +7,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 )
@@ -20,7 +21,6 @@ type LogsCommand struct {
 	usage           interface{}  `usage:"CF_NAME logs APP_NAME"`
 	relatedCommands interface{}  `related_commands:"app, apps, ssh"`
 
-	CC_Client      *ccv3.Client
 	LogCacheClient sharedaction.LogCacheClient
 }
 
@@ -30,8 +30,8 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.LogCacheClient = command.NewLogCacheClient(cmd.cloudControllerClient.Info.LogCache(), config, ui)
-	return nil
+	cmd.LogCacheClient, err = logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
+	return err
 }
 
 func (cmd LogsCommand) Execute(args []string) error {
@@ -40,7 +40,7 @@ func (cmd LogsCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

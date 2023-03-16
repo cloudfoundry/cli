@@ -23,7 +23,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/ssh/options"
 	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
 	"code.cloudfoundry.org/cli/cf/ssh/terminal"
-	"github.com/moby/moby/pkg/term"
+	"github.com/moby/term"
 )
 
 const (
@@ -32,7 +32,7 @@ const (
 	base64Sha256FingerprintLength = 43
 )
 
-//go:generate counterfeiter . SecureShell
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureShell
 
 type SecureShell interface {
 	Connect(opts *options.SSHOptions) error
@@ -42,13 +42,13 @@ type SecureShell interface {
 	Close() error
 }
 
-//go:generate counterfeiter . SecureDialer
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureDialer
 
 type SecureDialer interface {
 	Dial(network, address string, config *ssh.ClientConfig) (SecureClient, error)
 }
 
-//go:generate counterfeiter . SecureClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureClient
 
 type SecureClient interface {
 	NewSession() (SecureSession, error)
@@ -58,13 +58,13 @@ type SecureClient interface {
 	Close() error
 }
 
-//go:generate counterfeiter . ListenerFactory
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ListenerFactory
 
 type ListenerFactory interface {
 	Listen(network, address string) (net.Listener, error)
 }
 
-//go:generate counterfeiter . SecureSession
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureSession
 
 type SecureSession interface {
 	RequestPty(term string, height, width int, termModes ssh.TerminalModes) error

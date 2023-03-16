@@ -2,7 +2,7 @@ package pluginaction
 
 import "code.cloudfoundry.org/cli/api/plugin"
 
-//go:generate counterfeiter . PluginClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginClient
 
 type PluginClient interface {
 	GetPluginRepository(repositoryURL string) (plugin.PluginRepository, error)

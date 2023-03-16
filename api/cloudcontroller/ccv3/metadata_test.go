@@ -84,7 +84,7 @@ var _ = Describe("Metadata", func() {
 					It("should include the labels in the JSON", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-						Expect(server.ReceivedRequests()).To(HaveLen(3))
+						Expect(server.ReceivedRequests()).To(HaveLen(1))
 						Expect(jobURL).To(Equal(JobURL("fake-job-url")))
 					})
 				})
@@ -131,11 +131,12 @@ var _ = Describe("Metadata", func() {
 		testForResourceType("buildpack", "")
 		testForResourceType("org", "organization")
 		testForResourceType("route", "")
-		testForResourceType("space", "")
-		testForResourceType("stack", "")
+		testForResourceType("service-broker", "service_broker")
+		testForResourceType("service-instance", "service_instance")
 		testForResourceType("service-offering", "service_offering")
 		testForResourceType("service-plan", "service_plan")
-		testForResourceType("service-broker", "service_broker")
+		testForResourceType("space", "")
+		testForResourceType("stack", "")
 
 		When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {

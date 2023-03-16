@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 )
 
-//go:generate counterfeiter . BuildpackRequirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BuildpackRequirement
 
 type BuildpackRequirement interface {
 	Requirement

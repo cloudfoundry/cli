@@ -4,10 +4,12 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -15,22 +17,42 @@ import (
 var _ = Describe("Deployment Actions", func() {
 	var (
 		actor                     *Actor
+		executeErr                error
+		warnings                  v7action.Warnings
+		returnedDeploymentGUID    string
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 	)
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
+		fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+			"some-deployment-guid",
+			ccv3.Warnings{"create-warning-1", "create-warning-2"},
+			errors.New("create-error"),
+		)
 	})
 
 	Describe("CreateDeploymentByApplicationAndRevision", func() {
-		It("delegates to the cloud controller client", func() {
-			fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
-				"some-deployment-guid",
-				ccv3.Warnings{"create-warning-1", "create-warning-2"},
-				errors.New("create-error"),
-			)
+		JustBeforeEach(func() {
+			returnedDeploymentGUID, warnings, executeErr = actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+		})
 
-			returnedDeploymentGUID, warnings, _ := actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+		When("the client fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+					"some-deployment-guid",
+					ccv3.Warnings{"create-warning-1", "create-warning-2"},
+					errors.New("create-deployment-error"),
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).To(MatchError("create-deployment-error"))
+				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2"))
+			})
+		})
+
+		It("delegates to the cloud controller client", func() {
 
 			Expect(fakeCloudControllerClient.CreateApplicationDeploymentByRevisionCallCount()).To(Equal(1), "CreateApplicationDeploymentByRevision call count")
 			givenAppGUID, givenRevisionGUID := fakeCloudControllerClient.CreateApplicationDeploymentByRevisionArgsForCall(0)
@@ -65,7 +87,7 @@ var _ = Describe("Deployment Actions", func() {
 		var (
 			executeErr error
 			warnings   Warnings
-			deployment Deployment
+			deployment resources.Deployment
 
 			appGUID string
 		)
@@ -93,7 +115,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("the cc client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{},
+					[]resources.Deployment{},
 					ccv3.Warnings{"get-deployments-warning"},
 					errors.New("get-deployments-error"),
 				)
@@ -108,7 +130,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("there are no deployments returned", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{},
+					[]resources.Deployment{},
 					ccv3.Warnings{"get-deployments-warning"},
 					nil,
 				)
@@ -124,7 +146,7 @@ var _ = Describe("Deployment Actions", func() {
 		When("everything succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentsReturns(
-					[]ccv3.Deployment{{GUID: "dep-guid"}},
+					[]resources.Deployment{{GUID: "dep-guid"}},
 					ccv3.Warnings{"get-deployments-warning"},
 					nil,
 				)
@@ -133,7 +155,7 @@ var _ = Describe("Deployment Actions", func() {
 			It("returns a deployment not found error and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-deployments-warning"))
-				Expect(deployment).To(Equal(Deployment{GUID: "dep-guid"}))
+				Expect(deployment).To(Equal(resources.Deployment{GUID: "dep-guid"}))
 			})
 
 		})

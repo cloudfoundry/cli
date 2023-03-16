@@ -9,13 +9,14 @@ import (
 )
 
 type Process struct {
-	DiskQuota               string                   `yaml:"disk-quota,omitempty"`
+	DiskQuota               string                   `yaml:"disk_quota,omitempty"`
 	HealthCheckEndpoint     string                   `yaml:"health-check-http-endpoint,omitempty"`
 	HealthCheckType         constant.HealthCheckType `yaml:"health-check-type,omitempty"`
 	HealthCheckTimeout      int64                    `yaml:"timeout,omitempty"`
 	Instances               *int                     `yaml:"instances,omitempty"`
 	Memory                  string                   `yaml:"memory,omitempty"`
 	Type                    string                   `yaml:"type"`
+	LogRateLimit            string                   `yaml:"log-rate-limit-per-second,omitempty"`
 	RemainingManifestFields map[string]interface{}   `yaml:"-,inline"`
 }
 
@@ -33,7 +34,7 @@ func (process *Process) SetStartCommand(command string) {
 
 func (process *Process) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	// This prevents infinite recursion. The Alias type does not implement the unmarshaller interface
-	// so by casting application to a alias pointer, it will unmarshal in to the same memory without calling
+	// so by casting application to a alias pointer, it will unmarshal into the same memory without calling
 	// UnmarshalYAML on itself infinite times
 	type Alias Process
 	aliasPntr := (*Alias)(process)
@@ -52,16 +53,16 @@ func (process *Process) UnmarshalYAML(unmarshal func(v interface{}) error) error
 	removeDuplicateMapKeys(value, process.RemainingManifestFields)
 	// old style was `disk_quota` (underscore not hyphen)
 	// we maintain backwards-compatibility by supporting both flavors
-	if process.RemainingManifestFields["disk_quota"] != nil {
+	if process.RemainingManifestFields["disk-quota"] != nil {
 		if process.DiskQuota != "" {
 			return errors.New("cannot define both `disk_quota` and `disk-quota`")
 		}
-		diskQuota, ok := process.RemainingManifestFields["disk_quota"].(string)
+		diskQuota, ok := process.RemainingManifestFields["disk-quota"].(string)
 		if !ok {
-			return errors.New("`disk_quota` must be a string")
+			return errors.New("`disk-quota` must be a string")
 		}
 		process.DiskQuota = diskQuota
-		delete(process.RemainingManifestFields, "disk_quota")
+		delete(process.RemainingManifestFields, "disk-quota")
 	}
 
 	return nil

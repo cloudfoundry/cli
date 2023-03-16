@@ -1,24 +1,22 @@
 package flag
 
-import "strings"
+import (
+	"strings"
 
-type Tags struct {
-	IsSet bool
-	Value []string
-}
+	"code.cloudfoundry.org/cli/types"
+)
+
+type Tags types.OptionalStringSlice
 
 func (t *Tags) UnmarshalFlag(value string) error {
-	resultTags := []string{}
-
 	tags := strings.Split(value, ",")
 	for _, tag := range tags {
 		trimmed := strings.TrimSpace(tag)
 		if trimmed != "" {
-			resultTags = append(resultTags, trimmed)
+			t.Value = append(t.Value, trimmed)
 		}
 	}
 
 	t.IsSet = true
-	t.Value = resultTags
 	return nil
 }

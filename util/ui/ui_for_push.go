@@ -12,7 +12,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var ErrValueMissmatch = errors.New("values provided were of different types")
+var ErrValueMismatch = errors.New("values provided were of different types")
 
 type Change struct {
 	Header       string
@@ -30,7 +30,7 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenV
 	originalType := reflect.ValueOf(originalValue).Type()
 	newType := reflect.ValueOf(newValue).Type()
 	if originalType != newType {
-		return ErrValueMissmatch
+		return ErrValueMismatch
 	}
 
 	offset := strings.Repeat(" ", stringTypePadding)

@@ -215,7 +215,6 @@ var _ = Describe("Verbose", func() {
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say(`GET /\s+`))
 				Eventually(session).Should(Say(`GET /api/v1/read/.*\?\w+`))
 				Eventually(session).Should(Say(`Host: log-cache\.`))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
@@ -280,7 +279,7 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 					Expect(string(contents)).NotTo(MatchRegexp("HTTP REQUEST:"))
 					Expect(string(contents)).NotTo(MatchRegexp("HTTP RESPONSE:"))
-					Expect(string(contents)).To(MatchRegexp(`GET /\s+`))
+					Expect(string(contents)).To(MatchRegexp(`GET /\w+`))
 					Expect(string(contents)).To(MatchRegexp(`Host: log-cache\.`))
 					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
@@ -339,7 +338,8 @@ var _ = Describe("Verbose", func() {
 
 				helpers.LoginCF()
 
-				command := []string{"target", "-o", ReadOnlyOrg, "-v"}
+				username, password := helpers.GetCredentials()
+				command := []string{"auth", username, password, "-v"}
 
 				session := helpers.CF(command...)
 				Eventually(session).Should(Exit(0))

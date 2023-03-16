@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -58,7 +57,6 @@ var _ = Describe("curl command", func() {
 
 	var ExpectResponseHeaders = func(session *Session) {
 		Eventually(session).Should(Say("HTTP/1.1 200 OK"))
-		Eventually(session).Should(Say(`Connection: .+`))
 		Eventually(session).Should(Say(`Content-Length: .+`))
 		Eventually(session).Should(Say(`Content-Type: .+`))
 		Eventually(session).Should(Say(`Date: .+`))
@@ -128,7 +126,7 @@ var _ = Describe("curl command", func() {
 			session := helpers.CF("curl", "/v2/info", "-v")
 			Eventually(session).Should(Exit(0))
 
-			Expect(session).To(Say(`User-Agent: go-cli %s`, getVersionNumber()))
+			Expect(session).To(Say(`User-Agent: cf/%s`, getVersionNumber()))
 		})
 	})
 
@@ -300,8 +298,7 @@ var _ = Describe("curl command", func() {
 						Eventually(session).Should(Exit(1))
 
 						Expect(session).Should(Say("FAILED"))
-						Expect(session).Should(Say("Error creating request:"))
-						Expect(session).Should(Say(`Error parsing headers:.+not-a-valid-header`))
+						Expect(session.Err).Should(Say(`Error creating request:.+not-a-valid-header`))
 					})
 				})
 			})
@@ -387,15 +384,29 @@ var _ = Describe("curl command", func() {
 			})
 
 			When("--output is passed with a file name", func() {
-				It("writes the response body to the file but the other output to stdout", func() {
+				It("writes the response headers and body to the file", func() {
 					outFile, err := ioutil.TempFile("", "output*.json")
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CF("curl", "/v2/apps", "-i", "--output", outFile.Name())
 					Eventually(session).Should(Exit(0))
-					ExpectResponseHeaders(session)
+					Eventually(session).Should(Say("OK"))
+
 					body, err := ioutil.ReadFile(outFile.Name())
 					Expect(err).ToNot(HaveOccurred())
-					Expect(string(body)).To(MatchJSON(expectedJSON))
+
+					contents := string(body)
+					jsonStartsAt := strings.Index(contents, "{")
+
+					Expect(contents).To(ContainSubstring("HTTP/1.1 200 OK"))
+					Expect(contents).To(MatchRegexp(`Content-Length: .+`))
+					Expect(contents).To(MatchRegexp(`Content-Type: .+`))
+					Expect(contents).To(MatchRegexp(`Date: .+`))
+					Expect(contents).To(MatchRegexp(`Server: .+`))
+					Expect(contents).To(MatchRegexp(`X-Content-Type-Options: .+`))
+					Expect(contents).To(MatchRegexp(`X-Vcap-Request-Id: .+`))
+
+					actualJSON := contents[jsonStartsAt:]
+					Expect(actualJSON).To(MatchJSON(expectedJSON))
 				})
 
 				When("--output is passed and CF_TRACE is set to a file", func() {
@@ -506,15 +517,13 @@ var _ = Describe("curl command", func() {
 					spaceGUID = helpers.GetSpaceGUID(spaceName)
 				})
 
-				It("generates a new auth token by using the refresh token", func() {
+				It("returns an Invalid Auth Token error", func() {
 					path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
 					authHeader := fmt.Sprintf("Authorization: %s", helpers.ExpiredAccessToken())
 					session := helpers.CF("curl", path, "-H", authHeader, "-X", "DELETE", "-v")
 					Eventually(session).Should(Exit(0))
 
-					Expect(session).To(Say("POST /oauth/token"))
-
-					Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
+					Expect(session).To(Say("Invalid Auth Token"))
 				})
 			})
 		})

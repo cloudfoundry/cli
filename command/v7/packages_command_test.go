@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -58,7 +59,7 @@ var _ = Describe("packages Command", func() {
 			GUID: "some-space-guid",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -85,7 +86,7 @@ var _ = Describe("packages Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -98,7 +99,7 @@ var _ = Describe("packages Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationPackagesReturns([]v7action.Package{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetApplicationPackagesReturns([]resources.Package{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -118,7 +119,7 @@ var _ = Describe("packages Command", func() {
 			package1UTC = "2017-08-14T21:16:42Z"
 			package2UTC = "2017-08-16T00:18:24Z"
 
-			packages := []v7action.Package{
+			packages := []resources.Package{
 				{
 					GUID:      "some-package-guid-1",
 					State:     constant.PackageReady,
@@ -159,7 +160,7 @@ var _ = Describe("packages Command", func() {
 
 	When("getting the application packages returns no packages", func() {
 		BeforeEach(func() {
-			fakeActor.GetApplicationPackagesReturns([]v7action.Package{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetApplicationPackagesReturns([]resources.Package{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
 		It("displays there are no packages", func() {

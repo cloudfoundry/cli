@@ -41,6 +41,16 @@ type FakeConfig struct {
 		arg1 string
 		arg2 string
 	}
+	AuthorizationEndpointStub        func() string
+	authorizationEndpointMutex       sync.RWMutex
+	authorizationEndpointArgsForCall []struct {
+	}
+	authorizationEndpointReturns struct {
+		result1 string
+	}
+	authorizationEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct {
@@ -191,6 +201,16 @@ type FakeConfig struct {
 	hasTargetedSpaceReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	IsCFOnK8sStub        func() bool
+	isCFOnK8sMutex       sync.RWMutex
+	isCFOnK8sArgsForCall []struct {
+	}
+	isCFOnK8sReturns struct {
+		result1 bool
+	}
+	isCFOnK8sReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	IsTTYStub        func() bool
 	isTTYMutex       sync.RWMutex
 	isTTYArgsForCall []struct {
@@ -209,6 +229,16 @@ type FakeConfig struct {
 		result1 string
 	}
 	localeReturnsOnCall map[int]struct {
+		result1 string
+	}
+	LogCacheEndpointStub        func() string
+	logCacheEndpointMutex       sync.RWMutex
+	logCacheEndpointArgsForCall []struct {
+	}
+	logCacheEndpointReturns struct {
+		result1 string
+	}
+	logCacheEndpointReturnsOnCall map[int]struct {
 		result1 string
 	}
 	MinCLIVersionStub        func() string
@@ -230,6 +260,16 @@ type FakeConfig struct {
 	}
 	nOAARequestRetryCountReturnsOnCall map[int]struct {
 		result1 int
+	}
+	NetworkPolicyV1EndpointStub        func() string
+	networkPolicyV1EndpointMutex       sync.RWMutex
+	networkPolicyV1EndpointArgsForCall []struct {
+	}
+	networkPolicyV1EndpointReturns struct {
+		result1 string
+	}
+	networkPolicyV1EndpointReturnsOnCall map[int]struct {
+		result1 string
 	}
 	OverallPollingTimeoutStub        func() time.Duration
 	overallPollingTimeoutMutex       sync.RWMutex
@@ -339,6 +379,11 @@ type FakeConfig struct {
 	SetColorEnabledStub        func(string)
 	setColorEnabledMutex       sync.RWMutex
 	setColorEnabledArgsForCall []struct {
+		arg1 string
+	}
+	SetKubernetesAuthInfoStub        func(string)
+	setKubernetesAuthInfoMutex       sync.RWMutex
+	setKubernetesAuthInfoArgsForCall []struct {
 		arg1 string
 	}
 	SetLocaleStub        func(string)
@@ -491,6 +536,16 @@ type FakeConfig struct {
 	}
 	uAADisableKeepAlivesReturnsOnCall map[int]struct {
 		result1 bool
+	}
+	UAAEndpointStub        func() string
+	uAAEndpointMutex       sync.RWMutex
+	uAAEndpointArgsForCall []struct {
+	}
+	uAAEndpointReturns struct {
+		result1 string
+	}
+	uAAEndpointReturnsOnCall map[int]struct {
+		result1 string
 	}
 	UAAGrantTypeStub        func() string
 	uAAGrantTypeMutex       sync.RWMutex
@@ -741,6 +796,58 @@ func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	argsForCall := fake.addPluginRepositoryArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeConfig) AuthorizationEndpoint() string {
+	fake.authorizationEndpointMutex.Lock()
+	ret, specificReturn := fake.authorizationEndpointReturnsOnCall[len(fake.authorizationEndpointArgsForCall)]
+	fake.authorizationEndpointArgsForCall = append(fake.authorizationEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("AuthorizationEndpoint", []interface{}{})
+	fake.authorizationEndpointMutex.Unlock()
+	if fake.AuthorizationEndpointStub != nil {
+		return fake.AuthorizationEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.authorizationEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) AuthorizationEndpointCallCount() int {
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
+	return len(fake.authorizationEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) AuthorizationEndpointCalls(stub func() string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = stub
+}
+
+func (fake *FakeConfig) AuthorizationEndpointReturns(result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	fake.authorizationEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) AuthorizationEndpointReturnsOnCall(i int, result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	if fake.authorizationEndpointReturnsOnCall == nil {
+		fake.authorizationEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.authorizationEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) BinaryName() string {
@@ -1499,6 +1606,58 @@ func (fake *FakeConfig) HasTargetedSpaceReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) IsCFOnK8s() bool {
+	fake.isCFOnK8sMutex.Lock()
+	ret, specificReturn := fake.isCFOnK8sReturnsOnCall[len(fake.isCFOnK8sArgsForCall)]
+	fake.isCFOnK8sArgsForCall = append(fake.isCFOnK8sArgsForCall, struct {
+	}{})
+	fake.recordInvocation("IsCFOnK8s", []interface{}{})
+	fake.isCFOnK8sMutex.Unlock()
+	if fake.IsCFOnK8sStub != nil {
+		return fake.IsCFOnK8sStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isCFOnK8sReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) IsCFOnK8sCallCount() int {
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
+	return len(fake.isCFOnK8sArgsForCall)
+}
+
+func (fake *FakeConfig) IsCFOnK8sCalls(stub func() bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = stub
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturns(result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	fake.isCFOnK8sReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsCFOnK8sReturnsOnCall(i int, result1 bool) {
+	fake.isCFOnK8sMutex.Lock()
+	defer fake.isCFOnK8sMutex.Unlock()
+	fake.IsCFOnK8sStub = nil
+	if fake.isCFOnK8sReturnsOnCall == nil {
+		fake.isCFOnK8sReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isCFOnK8sReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) IsTTY() bool {
 	fake.isTTYMutex.Lock()
 	ret, specificReturn := fake.isTTYReturnsOnCall[len(fake.isTTYArgsForCall)]
@@ -1599,6 +1758,58 @@ func (fake *FakeConfig) LocaleReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.localeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) LogCacheEndpoint() string {
+	fake.logCacheEndpointMutex.Lock()
+	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
+	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
+	fake.logCacheEndpointMutex.Unlock()
+	if fake.LogCacheEndpointStub != nil {
+		return fake.LogCacheEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.logCacheEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) LogCacheEndpointCallCount() int {
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
+	return len(fake.logCacheEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) LogCacheEndpointCalls(stub func() string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = stub
+}
+
+func (fake *FakeConfig) LogCacheEndpointReturns(result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	fake.logCacheEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) LogCacheEndpointReturnsOnCall(i int, result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	if fake.logCacheEndpointReturnsOnCall == nil {
+		fake.logCacheEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.logCacheEndpointReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -1704,6 +1915,58 @@ func (fake *FakeConfig) NOAARequestRetryCountReturnsOnCall(i int, result1 int) {
 	}
 	fake.nOAARequestRetryCountReturnsOnCall[i] = struct {
 		result1 int
+	}{result1}
+}
+
+func (fake *FakeConfig) NetworkPolicyV1Endpoint() string {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	ret, specificReturn := fake.networkPolicyV1EndpointReturnsOnCall[len(fake.networkPolicyV1EndpointArgsForCall)]
+	fake.networkPolicyV1EndpointArgsForCall = append(fake.networkPolicyV1EndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NetworkPolicyV1Endpoint", []interface{}{})
+	fake.networkPolicyV1EndpointMutex.Unlock()
+	if fake.NetworkPolicyV1EndpointStub != nil {
+		return fake.NetworkPolicyV1EndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.networkPolicyV1EndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointCallCount() int {
+	fake.networkPolicyV1EndpointMutex.RLock()
+	defer fake.networkPolicyV1EndpointMutex.RUnlock()
+	return len(fake.networkPolicyV1EndpointArgsForCall)
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointCalls(stub func() string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = stub
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointReturns(result1 string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = nil
+	fake.networkPolicyV1EndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) NetworkPolicyV1EndpointReturnsOnCall(i int, result1 string) {
+	fake.networkPolicyV1EndpointMutex.Lock()
+	defer fake.networkPolicyV1EndpointMutex.Unlock()
+	fake.NetworkPolicyV1EndpointStub = nil
+	if fake.networkPolicyV1EndpointReturnsOnCall == nil {
+		fake.networkPolicyV1EndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.networkPolicyV1EndpointReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
@@ -2296,6 +2559,37 @@ func (fake *FakeConfig) SetColorEnabledArgsForCall(i int) string {
 	fake.setColorEnabledMutex.RLock()
 	defer fake.setColorEnabledMutex.RUnlock()
 	argsForCall := fake.setColorEnabledArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfo(arg1 string) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	fake.setKubernetesAuthInfoArgsForCall = append(fake.setKubernetesAuthInfoArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetKubernetesAuthInfo", []interface{}{arg1})
+	fake.setKubernetesAuthInfoMutex.Unlock()
+	if fake.SetKubernetesAuthInfoStub != nil {
+		fake.SetKubernetesAuthInfoStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCallCount() int {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	return len(fake.setKubernetesAuthInfoArgsForCall)
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoCalls(stub func(string)) {
+	fake.setKubernetesAuthInfoMutex.Lock()
+	defer fake.setKubernetesAuthInfoMutex.Unlock()
+	fake.SetKubernetesAuthInfoStub = stub
+}
+
+func (fake *FakeConfig) SetKubernetesAuthInfoArgsForCall(i int) string {
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
+	argsForCall := fake.setKubernetesAuthInfoArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -3114,6 +3408,58 @@ func (fake *FakeConfig) UAADisableKeepAlivesReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAEndpoint() string {
+	fake.uAAEndpointMutex.Lock()
+	ret, specificReturn := fake.uAAEndpointReturnsOnCall[len(fake.uAAEndpointArgsForCall)]
+	fake.uAAEndpointArgsForCall = append(fake.uAAEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UAAEndpoint", []interface{}{})
+	fake.uAAEndpointMutex.Unlock()
+	if fake.UAAEndpointStub != nil {
+		return fake.UAAEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.uAAEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) UAAEndpointCallCount() int {
+	fake.uAAEndpointMutex.RLock()
+	defer fake.uAAEndpointMutex.RUnlock()
+	return len(fake.uAAEndpointArgsForCall)
+}
+
+func (fake *FakeConfig) UAAEndpointCalls(stub func() string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = stub
+}
+
+func (fake *FakeConfig) UAAEndpointReturns(result1 string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = nil
+	fake.uAAEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAEndpointReturnsOnCall(i int, result1 string) {
+	fake.uAAEndpointMutex.Lock()
+	defer fake.uAAEndpointMutex.Unlock()
+	fake.UAAEndpointStub = nil
+	if fake.uAAEndpointReturnsOnCall == nil {
+		fake.uAAEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) UAAGrantType() string {
 	fake.uAAGrantTypeMutex.Lock()
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
@@ -3541,6 +3887,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()
@@ -3569,14 +3917,20 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.hasTargetedOrganizationMutex.RUnlock()
 	fake.hasTargetedSpaceMutex.RLock()
 	defer fake.hasTargetedSpaceMutex.RUnlock()
+	fake.isCFOnK8sMutex.RLock()
+	defer fake.isCFOnK8sMutex.RUnlock()
 	fake.isTTYMutex.RLock()
 	defer fake.isTTYMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.nOAARequestRetryCountMutex.RLock()
 	defer fake.nOAARequestRetryCountMutex.RUnlock()
+	fake.networkPolicyV1EndpointMutex.RLock()
+	defer fake.networkPolicyV1EndpointMutex.RUnlock()
 	fake.overallPollingTimeoutMutex.RLock()
 	defer fake.overallPollingTimeoutMutex.RUnlock()
 	fake.pluginHomeMutex.RLock()
@@ -3603,6 +3957,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setAsyncTimeoutMutex.RUnlock()
 	fake.setColorEnabledMutex.RLock()
 	defer fake.setColorEnabledMutex.RUnlock()
+	fake.setKubernetesAuthInfoMutex.RLock()
+	defer fake.setKubernetesAuthInfoMutex.RUnlock()
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
 	fake.setMinCLIVersionMutex.RLock()
@@ -3643,6 +3999,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.terminalWidthMutex.RUnlock()
 	fake.uAADisableKeepAlivesMutex.RLock()
 	defer fake.uAADisableKeepAlivesMutex.RUnlock()
+	fake.uAAEndpointMutex.RLock()
+	defer fake.uAAEndpointMutex.RUnlock()
 	fake.uAAGrantTypeMutex.RLock()
 	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.uAAOAuthClientMutex.RLock()

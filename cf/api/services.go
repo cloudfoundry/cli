@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServiceRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceRepository
 
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) error

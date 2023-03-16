@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . CurlRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CurlRepository
 
 type CurlRepository interface {
 	Request(method, path, header, body string, failOnHTTPError bool) (resHeaders string, resBody string, apiErr error)

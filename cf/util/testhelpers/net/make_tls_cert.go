@@ -14,11 +14,11 @@ import (
 )
 
 func MakeSelfSignedTLSCert() tls.Certificate {
-	return generateCert([]string{"127.0.0.1", "::1"}, time.Date(2020, time.December, 1, 0, 0, 0, 0, time.UTC), true)
+	return generateCert([]string{"127.0.0.1", "::1"}, time.Date(2200, time.December, 1, 0, 0, 0, 0, time.UTC), true)
 }
 
 func MakeTLSCertWithInvalidHost() tls.Certificate {
-	return generateCert([]string{"example.com"}, time.Date(2020, time.December, 1, 0, 0, 0, 0, time.UTC), true)
+	return generateCert([]string{"example.com"}, time.Date(2200, time.December, 1, 0, 0, 0, 0, time.UTC), true)
 }
 
 func MakeExpiredTLSCert() tls.Certificate {
@@ -26,11 +26,11 @@ func MakeExpiredTLSCert() tls.Certificate {
 }
 
 func MakeUnauthorizedTLSCert() tls.Certificate {
-	return generateCert([]string{"127.0.0.1", "::1"}, time.Date(2020, time.December, 1, 0, 0, 0, 0, time.UTC), false)
+	return generateCert([]string{"127.0.0.1", "::1"}, time.Date(2200, time.December, 1, 0, 0, 0, 0, time.UTC), false)
 }
 
 func generateCert(hosts []string, notAfter time.Time, isAuthorizedToSign bool) tls.Certificate {
-	priv, err := rsa.GenerateKey(rand.Reader, 1024)
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic(err)
 	}

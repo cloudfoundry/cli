@@ -15,6 +15,7 @@ type QuotaLimits struct {
 	TotalServiceInstances *types.NullInt
 	TotalRoutes           *types.NullInt
 	TotalReservedPorts    *types.NullInt
+	TotalLogVolume        *types.NullInt
 }
 
 func (actor Actor) ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (Warnings, error) {
@@ -119,6 +120,7 @@ func createQuotaStruct(name string, limits QuotaLimits) resources.OrganizationQu
 		TotalMemory:       limits.TotalMemoryInMB,
 		InstanceMemory:    limits.PerProcessMemoryInMB,
 		TotalAppInstances: limits.TotalInstances,
+		TotalLogVolume:    limits.TotalLogVolume,
 	}
 	ServiceLimit := resources.ServiceLimit{
 		TotalServiceInstances: limits.TotalServiceInstances,
@@ -164,6 +166,7 @@ func convertUnlimitedToNil(apps *resources.AppLimit, routes *resources.RouteLimi
 		apps.TotalMemory,
 		apps.InstanceMemory,
 		apps.TotalAppInstances,
+		apps.TotalLogVolume,
 		services.TotalServiceInstances,
 		routes.TotalRoutes,
 		routes.TotalReservedPorts,

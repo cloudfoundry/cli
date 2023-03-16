@@ -11,7 +11,7 @@ type UnsetSpaceRoleCommand struct {
 	Args            flag.SpaceRoleArgs `positional-args:"yes"`
 	IsClient        bool               `long:"client" description:"Remove space role from a client-id of a (non-user) service account"`
 	Origin          string             `long:"origin" description:"Indicates the identity provider to be used for authentication"`
-	usage           interface{}        `usage:"CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
+	usage           interface{}        `usage:"CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space\n   SpaceSupporter [Beta role, subject to change] - Manage app lifecycle and service bindings"`
 	relatedCommands interface{}        `related_commands:"set-space-role, space-users"`
 }
 
@@ -26,7 +26,7 @@ func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {
 		return err
 	}
 
-	currentUser, err := cmd.Config.CurrentUser()
+	currentUser, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

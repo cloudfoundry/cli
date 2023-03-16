@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,8 +27,6 @@ func ConvertToTranslatableError(err error) error {
 	case actionerror.ApplicationNotStartedError:
 		return ApplicationNotStartedError(e)
 	case actionerror.AppNotFoundInManifestError:
-		return AppNotFoundInManifestError(e)
-	case v6manifestparser.AppNotInManifestError:
 		return AppNotFoundInManifestError(e)
 	case actionerror.AssignDropletError:
 		return AssignDropletError(e)
@@ -83,8 +80,6 @@ func ConvertToTranslatableError(err error) error {
 		return NoMatchingDomainError(e)
 	case actionerror.NonexistentAppPathError:
 		return FileNotFoundError(e)
-	case v6manifestparser.InvalidManifestApplicationPathError:
-		return FileNotFoundError(e)
 	case actionerror.NoOrganizationTargetedError:
 		return NoOrganizationTargetedError(e)
 	case actionerror.NoSpaceTargetedError:
@@ -115,6 +110,10 @@ func ConvertToTranslatableError(err error) error {
 		return RepositoryNameTakenError(e)
 	case actionerror.RepositoryNotRegisteredError:
 		return RepositoryNotRegisteredError(e)
+	case actionerror.RevisionNotFoundError:
+		return RevisionNotFoundError(e)
+	case actionerror.RevisionAmbiguousError:
+		return RevisionAmbiguousError(e)
 	case actionerror.RouteInDifferentSpaceError:
 		return RouteInDifferentSpaceError(e)
 	case actionerror.RoutePathWithTCPDomainError:
@@ -180,6 +179,8 @@ func ConvertToTranslatableError(err error) error {
 		return JobFailedError{JobGUID: e.JobGUID, Message: e.Detail}
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
+	case ccerror.JobFailedNoErrorError:
+		return JobFailedNoErrorError{JobGUID: e.JobGUID}
 	case ccerror.MultiError:
 		return MultiError{Messages: e.Details()}
 	case ccerror.UnprocessableEntityError:
@@ -193,19 +194,13 @@ func ConvertToTranslatableError(err error) error {
 
 	// Manifest Errors
 	case manifest.ManifestCreationError:
-		return ManifestCreationError(e)
+		return FileCreationError(e)
 	case manifest.InheritanceFieldError:
 		return TriggerLegacyPushError{InheritanceRelated: true}
 	case manifest.GlobalFieldsError:
 		return TriggerLegacyPushError{GlobalRelated: e.Fields}
 	case manifest.InterpolationError:
 		return InterpolationError(e)
-
-	// ManifestParser Errors
-	case v6manifestparser.InterpolationError:
-		return InterpolationError(e)
-	case v6manifestparser.InvalidYAMLError:
-		return InvalidYAMLError(e)
 
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:

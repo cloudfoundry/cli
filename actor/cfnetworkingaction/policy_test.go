@@ -2,10 +2,12 @@ package cfnetworkingaction_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -310,239 +312,344 @@ var _ = Describe("Policy", func() {
 	})
 
 	Describe("NetworkPoliciesBySpace", func() {
-		var (
-			policies []Policy
-		)
+		Describe("when the number of destination apps is small", func() {
+			var (
+				policies []Policy
+			)
 
-		BeforeEach(func() {
-			fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{{
-				Source: cfnetv1.PolicySource{
-					ID: "appAGUID",
-				},
-				Destination: cfnetv1.PolicyDestination{
-					ID:       "appBGUID",
-					Protocol: "tcp",
-					Ports: cfnetv1.Ports{
-						Start: 8080,
-						End:   8080,
-					},
-				},
-			}, {
-				Source: cfnetv1.PolicySource{
-					ID: "appBGUID",
-				},
-				Destination: cfnetv1.PolicyDestination{
-					ID:       "appBGUID",
-					Protocol: "tcp",
-					Ports: cfnetv1.Ports{
-						Start: 8080,
-						End:   8080,
-					},
-				},
-			}, {
-				Source: cfnetv1.PolicySource{
-					ID: "appAGUID",
-				},
-				Destination: cfnetv1.PolicyDestination{
-					ID:       "appCGUID",
-					Protocol: "tcp",
-					Ports: cfnetv1.Ports{
-						Start: 8080,
-						End:   8080,
-					},
-				},
-			}}, nil)
-
-			fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{
-				{
-					Name:      "appA",
-					GUID:      "appAGUID",
-					SpaceGUID: "spaceAGUID",
-				},
-				{
-					Name:      "appB",
-					GUID:      "appBGUID",
-					SpaceGUID: "spaceAGUID",
-				},
-				{
-					Name:      "appC",
-					GUID:      "appCGUID",
-					SpaceGUID: "spaceCGUID",
-				},
-			}, []string{"filter-apps-by-space-warning"}, nil)
-
-			fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{
-				{
-					GUID:      "appBGUID",
-					Name:      "appB",
-					SpaceGUID: "spaceAGUID",
-				},
-				{
-					GUID:      "appCGUID",
-					Name:      "appC",
-					SpaceGUID: "spaceCGUID",
-				},
-			}, []string{"filter-apps-by-guid-warning"}, nil)
-
-			fakeCloudControllerClient.GetSpacesReturns([]resources.Space{
-				{
-					GUID: "spaceAGUID",
-					Name: "spaceA",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
-					},
-				},
-				{
-					GUID: "spaceCGUID",
-					Name: "spaceC",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
-					},
-				},
-			}, ccv3.IncludedResources{}, []string{"GetSpaceWarning"}, nil)
-
-			fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
-				{
-					GUID: "orgAGUID",
-					Name: "orgA",
-				},
-				{
-					GUID: "orgCGUID",
-					Name: "orgC",
-				},
-			}, []string{"GetOrganizationsWarning"}, nil)
-		})
-
-		JustBeforeEach(func() {
-			spaceGuid := "space"
-			policies, warnings, executeErr = actor.NetworkPoliciesBySpace(spaceGuid)
-		})
-
-		It("lists policies", func() {
-			Expect(policies).To(Equal(
-				[]Policy{{
-					SourceName:           "appA",
-					DestinationName:      "appB",
-					Protocol:             "tcp",
-					StartPort:            8080,
-					EndPort:              8080,
-					DestinationSpaceName: "spaceA",
-					DestinationOrgName:   "orgA",
-				}, {
-					SourceName:           "appB",
-					DestinationName:      "appB",
-					Protocol:             "tcp",
-					StartPort:            8080,
-					EndPort:              8080,
-					DestinationSpaceName: "spaceA",
-					DestinationOrgName:   "orgA",
-				}, {
-					SourceName:           "appA",
-					DestinationName:      "appC",
-					Protocol:             "tcp",
-					StartPort:            8080,
-					EndPort:              8080,
-					DestinationSpaceName: "spaceC",
-					DestinationOrgName:   "orgC",
-				}},
-			))
-			Expect(warnings).To(ConsistOf(
-				"filter-apps-by-space-warning",
-				"filter-apps-by-guid-warning",
-				"GetSpaceWarning",
-				"GetOrganizationsWarning",
-			))
-			Expect(executeErr).NotTo(HaveOccurred())
-
-			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
-			Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(ConsistOf("appAGUID", "appBGUID", "appCGUID"))
-
-			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(2))
-			Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal([]ccv3.Query{
-				{Key: ccv3.SpaceGUIDFilter, Values: []string{"space"}},
-			}))
-			Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(1)).To(Equal([]ccv3.Query{
-				{Key: ccv3.GUIDFilter, Values: []string{"appBGUID", "appCGUID"}},
-			}))
-
-			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-			Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{
-				{Key: ccv3.GUIDFilter, Values: []string{"spaceAGUID", "spaceCGUID"}},
-			}))
-
-			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-			Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{
-				{Key: ccv3.GUIDFilter, Values: []string{"orgAGUID", "orgCGUID"}},
-			}))
-		})
-
-		// policy server returns policies that match the give app guid in the source or destination
-		// we only care about the policies that match the source guid.
-		When("the policy server returns policies that have matching destination app guids", func() {
 			BeforeEach(func() {
-				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{{
-					Source: cfnetv1.PolicySource{
-						ID: "appDGUID",
-					},
-					Destination: cfnetv1.PolicyDestination{
-						ID:       "appAGUID",
-						Protocol: "tcp",
-						Ports: cfnetv1.Ports{
-							Start: 8080,
-							End:   8080,
+				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{
+					{
+						Source: cfnetv1.PolicySource{
+							ID: "appAGUID",
+						},
+						Destination: cfnetv1.PolicyDestination{
+							ID:       "appBGUID",
+							Protocol: "tcp",
+							Ports: cfnetv1.Ports{
+								Start: 8080,
+								End:   8080,
+							},
 						},
 					},
-				}}, nil)
+					{
+						Source: cfnetv1.PolicySource{
+							ID: "appBGUID",
+						},
+						Destination: cfnetv1.PolicyDestination{
+							ID:       "appBGUID",
+							Protocol: "tcp",
+							Ports: cfnetv1.Ports{
+								Start: 8080,
+								End:   8080,
+							},
+						},
+					},
+					{
+						Source: cfnetv1.PolicySource{
+							ID: "appAGUID",
+						},
+						Destination: cfnetv1.PolicyDestination{
+							ID:       "appCGUID",
+							Protocol: "tcp",
+							Ports: cfnetv1.Ports{
+								Start: 8080,
+								End:   8080,
+							},
+						},
+					},
+				}, nil)
+
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{
+					{
+						Name:      "appA",
+						GUID:      "appAGUID",
+						SpaceGUID: "spaceAGUID",
+					},
+					{
+						Name:      "appB",
+						GUID:      "appBGUID",
+						SpaceGUID: "spaceAGUID",
+					},
+					{
+						Name:      "appC",
+						GUID:      "appCGUID",
+						SpaceGUID: "spaceCGUID",
+					},
+				}, []string{"filter-apps-by-space-warning"}, nil)
+
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{
+					{
+						GUID:      "appBGUID",
+						Name:      "appB",
+						SpaceGUID: "spaceAGUID",
+					},
+					{
+						GUID:      "appCGUID",
+						Name:      "appC",
+						SpaceGUID: "spaceCGUID",
+					},
+				}, []string{"filter-apps-by-guid-warning"}, nil)
+
+				fakeCloudControllerClient.GetSpacesReturns([]resources.Space{
+					{
+						GUID: "spaceAGUID",
+						Name: "spaceA",
+						Relationships: map[constant.RelationshipType]resources.Relationship{
+							constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
+						},
+					},
+					{
+						GUID: "spaceCGUID",
+						Name: "spaceC",
+						Relationships: map[constant.RelationshipType]resources.Relationship{
+							constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
+						},
+					},
+				}, ccv3.IncludedResources{}, []string{"GetSpaceWarning"}, nil)
+
+				fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
+					{
+						GUID: "orgAGUID",
+						Name: "orgA",
+					},
+					{
+						GUID: "orgCGUID",
+						Name: "orgC",
+					},
+				}, []string{"GetOrganizationsWarning"}, nil)
 			})
 
-			It("filters them out ", func() {
-				Expect(policies).To(BeEmpty())
+			JustBeforeEach(func() {
+				spaceGuid := "space"
+				policies, warnings, executeErr = actor.NetworkPoliciesBySpace(spaceGuid)
+			})
+
+			It("lists policies", func() {
+				Expect(policies).To(Equal(
+					[]Policy{{
+						SourceName:           "appA",
+						DestinationName:      "appB",
+						Protocol:             "tcp",
+						StartPort:            8080,
+						EndPort:              8080,
+						DestinationSpaceName: "spaceA",
+						DestinationOrgName:   "orgA",
+					}, {
+						SourceName:           "appB",
+						DestinationName:      "appB",
+						Protocol:             "tcp",
+						StartPort:            8080,
+						EndPort:              8080,
+						DestinationSpaceName: "spaceA",
+						DestinationOrgName:   "orgA",
+					}, {
+						SourceName:           "appA",
+						DestinationName:      "appC",
+						Protocol:             "tcp",
+						StartPort:            8080,
+						EndPort:              8080,
+						DestinationSpaceName: "spaceC",
+						DestinationOrgName:   "orgC",
+					}},
+				))
+				Expect(warnings).To(ConsistOf(
+					"filter-apps-by-space-warning",
+					"filter-apps-by-guid-warning",
+					"GetSpaceWarning",
+					"GetOrganizationsWarning",
+				))
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
+				Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(ConsistOf("appAGUID", "appBGUID", "appCGUID"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal([]ccv3.Query{
+					{Key: ccv3.SpaceGUIDFilter, Values: []string{"space"}},
+				}))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(1)).To(Equal([]ccv3.Query{
+					{Key: ccv3.GUIDFilter, Values: []string{"appBGUID", "appCGUID"}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{
+					{Key: ccv3.GUIDFilter, Values: []string{"spaceAGUID", "spaceCGUID"}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{
+					{Key: ccv3.GUIDFilter, Values: []string{"orgAGUID", "orgCGUID"}},
+				}))
+			})
+
+			// policy server returns policies that match the give app guid in the source or destination
+			// we only care about the policies that match the source guid.
+			When("the policy server returns policies that have matching destination app guids", func() {
+				BeforeEach(func() {
+					fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{{
+						Source: cfnetv1.PolicySource{
+							ID: "appDGUID",
+						},
+						Destination: cfnetv1.PolicyDestination{
+							ID:       "appAGUID",
+							Protocol: "tcp",
+							Ports: cfnetv1.Ports{
+								Start: 8080,
+								End:   8080,
+							},
+						},
+					}}, nil)
+				})
+
+				It("filters them out ", func() {
+					Expect(policies).To(BeEmpty())
+				})
+			})
+
+			When("getting the applications with a space guids filter fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{}, []string{"filter-apps-by-space-warning"}, errors.New("banana"))
+				})
+
+				It("returns a sensible error", func() {
+					Expect(policies).To(Equal([]Policy{}))
+					Expect(warnings).To(ConsistOf("filter-apps-by-space-warning"))
+					Expect(executeErr).To(MatchError("banana"))
+				})
+			})
+
+			When("listing the policy fails", func() {
+				BeforeEach(func() {
+					fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
+				})
+				It("returns a sensible error", func() {
+					Expect(executeErr).To(MatchError("apple"))
+				})
+			})
+
+			When("getting the applications by guids fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{}, []string{"filter-apps-by-guid-warning"}, errors.New("banana"))
+				})
+
+				It("returns a sensible error", func() {
+					Expect(policies).To(Equal([]Policy{}))
+					Expect(warnings).To(ContainElement("filter-apps-by-guid-warning"))
+					Expect(executeErr).To(MatchError("banana"))
+				})
+			})
+
+			When("getting the spaces by guids fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns([]resources.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
+				})
+
+				It("returns a sensible error", func() {
+					Expect(policies).To(Equal([]Policy{}))
+					Expect(warnings).To(ContainElement("GetSpacesWarning"))
+					Expect(executeErr).To(MatchError("banana"))
+				})
 			})
 		})
 
-		When("getting the applications with a space guids filter fails", func() {
+		Describe("when the number of destination apps is larger than the batch size", func() {
+			var (
+				expectedPolicies []Policy
+				returnedPolicies []Policy
+			)
+
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{}, []string{"filter-apps-by-space-warning"}, errors.New("banana"))
+				var (
+					policies []cfnetv1.Policy
+					srcApps  []resources.Application
+					destApps []resources.Application
+				)
+
+				for i := 0; i < batcher.BatchSize*2; i++ {
+					srcApp := resources.Application{
+						Name:      fmt.Sprintf("src-app-%d", i),
+						GUID:      fmt.Sprintf("src-app-%d-guid", i),
+						SpaceGUID: "space-guid",
+					}
+
+					destApp := resources.Application{
+						Name:      fmt.Sprintf("dest-app-%d", i),
+						GUID:      fmt.Sprintf("dest-app-%d-guid", i),
+						SpaceGUID: "space-guid",
+					}
+
+					policy := cfnetv1.Policy{
+						Source: cfnetv1.PolicySource{
+							ID: srcApp.GUID,
+						},
+						Destination: cfnetv1.PolicyDestination{
+							ID:       destApp.GUID,
+							Protocol: "tcp",
+							Ports: cfnetv1.Ports{
+								Start: 8080,
+								End:   8080,
+							},
+						},
+					}
+
+					expectedPolicy := Policy{
+						SourceName:           srcApp.Name,
+						DestinationName:      destApp.Name,
+						Protocol:             "tcp",
+						StartPort:            8080,
+						EndPort:              8080,
+						DestinationSpaceName: "space",
+						DestinationOrgName:   "org",
+					}
+
+					srcApps = append(srcApps, srcApp)
+					destApps = append(destApps, destApp)
+					policies = append(policies, policy)
+					expectedPolicies = append(expectedPolicies, expectedPolicy)
+				}
+
+				fakeNetworkingClient.ListPoliciesReturnsOnCall(0, policies[0:batcher.BatchSize], nil)
+				fakeNetworkingClient.ListPoliciesReturnsOnCall(1, policies[batcher.BatchSize:batcher.BatchSize*2], nil)
+
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, srcApps, []string{}, nil)
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, destApps[0:batcher.BatchSize], []string{}, nil)
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(2, destApps[batcher.BatchSize:batcher.BatchSize*2], []string{}, nil)
+
+				fakeCloudControllerClient.GetSpacesReturns([]resources.Space{
+					{
+						GUID: "space-guid",
+						Name: "space",
+						Relationships: map[constant.RelationshipType]resources.Relationship{
+							constant.RelationshipTypeOrganization: {GUID: "org-guid"},
+						},
+					},
+				}, ccv3.IncludedResources{}, []string{}, nil)
+
+				fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
+					{
+						GUID: "org-guid",
+						Name: "org",
+					},
+				}, []string{}, nil)
 			})
 
-			It("returns a sensible error", func() {
-				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ConsistOf("filter-apps-by-space-warning"))
-				Expect(executeErr).To(MatchError("banana"))
-			})
-		})
-
-		When("listing the policy fails", func() {
-			BeforeEach(func() {
-				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
-			})
-			It("returns a sensible error", func() {
-				Expect(executeErr).To(MatchError("apple"))
-			})
-		})
-
-		When("getting the applications by guids fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{}, []string{"filter-apps-by-guid-warning"}, errors.New("banana"))
+			JustBeforeEach(func() {
+				spaceGuid := "space-guid"
+				returnedPolicies, warnings, executeErr = actor.NetworkPoliciesBySpace(spaceGuid)
 			})
 
-			It("returns a sensible error", func() {
-				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("filter-apps-by-guid-warning"))
-				Expect(executeErr).To(MatchError("banana"))
-			})
-		})
+			It("lists policies", func() {
+				Expect(returnedPolicies).To(Equal(expectedPolicies))
+				Expect(warnings).To(BeEmpty())
+				Expect(executeErr).NotTo(HaveOccurred())
 
-		When("getting the spaces by guids fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns([]resources.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
+				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(3))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 			})
 
-			It("returns a sensible error", func() {
-				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("GetSpacesWarning"))
-				Expect(executeErr).To(MatchError("banana"))
-			})
 		})
 	})
 

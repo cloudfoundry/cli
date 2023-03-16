@@ -203,7 +203,7 @@ var _ = Describe("CopySource", func() {
 				})
 
 				Describe("when a space is provided, but not an org", func() {
-					It("sends the correct target appplication for the current org and target space", func() {
+					It("sends the correct target application for the current org and target space", func() {
 						space := models.Space{}
 						space.Name = "space-name"
 						space.GUID = "model-space-guid"

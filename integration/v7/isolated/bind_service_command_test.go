@@ -1,14 +1,12 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -16,54 +14,120 @@ import (
 )
 
 var _ = Describe("bind-service command", func() {
-	Describe("help", func() {
-		When("--help flag is set", func() {
-			It("Displays command usage to output", func() {
-				session := helpers.CF("bind-service", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("bind-service - Bind a service instance to an app"))
+	const command = "bind-service"
 
-				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf bind-service APP_NAME SERVICE_INSTANCE \\[-c PARAMETERS_AS_JSON\\] \\[--binding-name BINDING_NAME\\]"))
-				Eventually(session).Should(Say("Optionally provide service-specific configuration parameters in a valid JSON object in-line:"))
-				Eventually(session).Should(Say("cf bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'"))
-				Eventually(session).Should(Say("Optionally provide a file containing service-specific configuration parameters in a valid JSON object."))
-				Eventually(session).Should(Say("The path to the parameters file can be an absolute or relative path to a file."))
-				Eventually(session).Should(Say("cf bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE"))
-				Eventually(session).Should(Say("Example of valid JSON object:"))
-				Eventually(session).Should(Say("{"))
-				Eventually(session).Should(Say("\"permissions\": \"read-only\""))
-				Eventually(session).Should(Say("}"))
-				Eventually(session).Should(Say("Optionally provide a binding name for the association between an app and a service instance:"))
-				Eventually(session).Should(Say("cf bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME"))
-				Eventually(session).Should(Say("EXAMPLES:"))
-				Eventually(session).Should(Say("Linux/Mac:"))
-				Eventually(session).Should(Say("cf bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'"))
-				Eventually(session).Should(Say("Windows Command Line:"))
-				Eventually(session).Should(Say("cf bind-service myapp mydb -c \"{\\\\\"permissions\\\\\":\\\\\"read-only\\\\\"}\""))
-				Eventually(session).Should(Say("Windows PowerShell:"))
-				Eventually(session).Should(Say("cf bind-service myapp mydb -c '{\\\\\"permissions\\\\\":\\\\\"read-only\\\\\"}'"))
-				Eventually(session).Should(Say("cf bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --binding-name BINDING_NAME"))
-				Eventually(session).Should(Say("ALIAS:"))
-				Eventually(session).Should(Say("bs"))
-				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--binding-name\\s+Name to expose service instance to app process with \\(Default: service instance name\\)"))
-				Eventually(session).Should(Say("-c\\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."))
-				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("services"))
+	Describe("help", func() {
+		matchHelpMessage := SatisfyAll(
+			Say(`NAME:\n`),
+			Say(`\s+bind-service - Bind a service instance to an app\n`),
+			Say(`\n`),
+			Say(`USAGE:\n`),
+			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE \[-c PARAMETERS_AS_JSON\] \[--binding-name BINDING_NAME\]\n`),
+			Say(`\n`),
+			Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n`),
+			Say(`\n`),
+			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE -c '\{"name":"value","name":"value"\}'\n`),
+			Say(`\n`),
+			Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n`),
+			Say(`\s+The path to the parameters file can be an absolute or relative path to a file.\n`),
+			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n`),
+			Say(`\n`),
+			Say(`\s+Example of valid JSON object:\n`),
+			Say(`\s+{\n`),
+			Say(`\s+"permissions": "read-only"\n`),
+			Say(`\s+}\n`),
+			Say(`\n`),
+			Say(`\s+Optionally provide a binding name for the association between an app and a service instance:\n`),
+			Say(`\n`),
+			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME\n`),
+			Say(`\n`),
+			Say(`EXAMPLES:\n`),
+			Say(`\s+Linux/Mac:\n`),
+			Say(`\s+cf bind-service myapp mydb -c '\{"permissions":"read-only"\}'\n`),
+			Say(`\n`),
+			Say(`\s+Windows Command Line:\n`),
+			Say(`\s+cf bind-service myapp mydb -c "\{\\"permissions\\":\\"read-only\\"\}"\n`),
+			Say(`\n`),
+			Say(`\s+Windows PowerShell:\n`),
+			Say(`\s+cf bind-service myapp mydb -c '\{\\"permissions\\":\\"read-only\\"\}'\n`),
+			Say(`\n`),
+			Say(`\s+cf bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --binding-name BINDING_NAME\n`),
+			Say(`\n`),
+			Say(`ALIAS:\n`),
+			Say(`\s+bs\n`),
+			Say(`\n`),
+			Say(`OPTIONS:\n`),
+			Say(`\s+--binding-name\s+Name to expose service instance to app process with \(Default: service instance name\)\n`),
+			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n`),
+			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
+			Say(`\n`),
+			Say(`SEE ALSO:\n`),
+			Say(`\s+services\n`),
+		)
+
+		When("the -h flag is specified", func() {
+			It("succeeds and prints help", func() {
+				session := helpers.CF(command, "-h")
 				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
-	})
 
-	var (
-		serviceInstance string
-		appName         string
-	)
+		When("the --help flag is specified", func() {
+			It("succeeds and prints help", func() {
+				session := helpers.CF(command, "--help")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
 
-	BeforeEach(func() {
-		serviceInstance = helpers.PrefixedRandomName("si")
-		appName = helpers.PrefixedRandomName("app")
+		When("no arguments are provided", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF(command)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `APP_NAME` and `SERVICE_INSTANCE` were not provided"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("unknown flag is passed", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF(command, "-u")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: unknown flag `u"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("-c is provided with invalid JSON", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF(command, "-c", `{"not":json"}`)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("-c is provided with invalid JSON file", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				filename := helpers.TempFileWithContent(`{"not":json"}`)
+				defer os.Remove(filename)
+
+				session := helpers.CF(command, "-c", filename)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("--binding-name is provided with empty value", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF(command, "appName", "serviceInstanceName", "--binding-name", "")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: --binding-name must be at least 1 character in length"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
 	})
 
 	When("the environment is not setup correctly", func() {
@@ -72,285 +136,272 @@ var _ = Describe("bind-service command", func() {
 		})
 	})
 
-	When("provided invalid flag values", func() {
-		When("the --binding-name flag is provided and its value is the empty string", func() {
-			It("returns an invalid usage error and the help text", func() {
-				session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "")
-				Eventually(session.Err).Should(Say("--binding-name must be at least 1 character in length"))
-
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-	})
-
-	When("the environment is setup correctly", func() {
+	When("targeting a space", func() {
 		var (
-			org      string
-			space    string
-			username string
+			orgName   string
+			spaceName string
+			username  string
 		)
 
-		BeforeEach(func() {
-			org = helpers.NewOrgName()
-			space = helpers.NewSpaceName()
-			username, _ = helpers.GetCredentials()
+		getBinding := func(serviceInstanceName string) resources.ServiceCredentialBinding {
+			var receiver struct {
+				Resources []resources.ServiceCredentialBinding `json:"resources"`
+			}
+			helpers.Curl(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
+			Expect(receiver.Resources).To(HaveLen(1))
+			return receiver.Resources[0]
+		}
 
-			helpers.SetupCF(org, space)
+		getParameters := func(serviceInstanceName string) (receiver map[string]interface{}) {
+			binding := getBinding(serviceInstanceName)
+			helpers.Curl(&receiver, "/v3/service_credential_bindings/%s/parameters", binding.GUID)
+			return
+		}
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+
+			username, _ = helpers.GetCredentials()
 		})
 
 		AfterEach(func() {
-			helpers.QuickDeleteOrg(org)
+			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the app does not exist", func() {
-			It("displays FAILED and app not found", func() {
-				session := helpers.CF("bind-service", "does-not-exist", serviceInstance)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("App '%s' not found", "does-not-exist"))
-				Eventually(session).Should(Exit(1))
+		Context("user-provided route service", func() {
+			var (
+				serviceInstanceName string
+				appName             string
+				bindingName         string
+			)
+
+			BeforeEach(func() {
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+
+				appName = helpers.NewAppName()
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+				})
+
+				bindingName = helpers.RandomName()
+			})
+
+			It("creates a binding", func() {
+				session := helpers.CF(command, appName, serviceInstanceName, "--binding-name", bindingName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+					Say(`OK\n`),
+					Say(`\n`),
+					Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect`, appName),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				binding := getBinding(serviceInstanceName)
+				Expect(binding.Name).To(Equal(bindingName))
+				Expect(binding.LastOperation.State).To(BeEquivalentTo("succeeded"))
+			})
+
+			When("parameters are specified", func() {
+				It("fails with an error returned by the CC", func() {
+					session := helpers.CF(command, appName, serviceInstanceName, "-c", `{"foo":"bar"}`)
+					Eventually(session).Should(Exit(1))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+						Say(`FAILED\n`),
+					))
+
+					Expect(session.Err).To(Say(`Binding parameters are not supported for user-provided service instances\n`))
+				})
 			})
 		})
 
-		When("the app exists", func() {
+		Context("managed service instance with synchronous broker response", func() {
+			var (
+				broker              *servicebrokerstub.ServiceBrokerStub
+				serviceInstanceName string
+				appName             string
+				bindingName         string
+			)
+
 			BeforeEach(func() {
+				broker = servicebrokerstub.EnableServiceAccess()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+				appName = helpers.NewAppName()
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+				})
+
+				bindingName = helpers.RandomName()
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("creates a binding", func() {
+				session := helpers.CF(command, appName, serviceInstanceName, "--binding-name", bindingName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+					Say(`OK\n`),
+					Say(`\n`),
+					Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect`, appName),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				binding := getBinding(serviceInstanceName)
+				Expect(binding.Name).To(Equal(bindingName))
+				Expect(binding.LastOperation.State).To(BeEquivalentTo("succeeded"))
+			})
+
+			When("parameters are specified", func() {
+				It("sends the parameters to the broker", func() {
+					session := helpers.CF(command, appName, serviceInstanceName, "-c", `{"foo":"bar"}`)
+					Eventually(session).Should(Exit(0))
+
+					Expect(getParameters(serviceInstanceName)).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
+			})
+		})
+
+		Context("managed service instance with asynchronous broker response", func() {
+			var (
+				broker              *servicebrokerstub.ServiceBrokerStub
+				serviceInstanceName string
+				appName             string
+				bindingName         string
+			)
+
+			BeforeEach(func() {
+				broker = servicebrokerstub.New().WithAsyncDelay(time.Second).EnableServiceAccess()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+				appName = helpers.NewAppName()
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+				})
+
+				bindingName = helpers.RandomName()
+			})
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			It("start to create a binding", func() {
+				session := helpers.CF(command, appName, serviceInstanceName, "--binding-name", bindingName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+					Say(`OK\n`),
+					Say(`\n`),
+					Say(`Binding in progress. Use 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+					Say(`\n`),
+					Say(`TIP: Once this operation succeeds, use 'cf restage %s' to ensure your env variable changes take effect`, appName),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+
+				binding := getBinding(serviceInstanceName)
+				Expect(binding.Name).To(Equal(bindingName))
+				Expect(binding.LastOperation.State).To(BeEquivalentTo("in progress"))
+			})
+
+			When("--wait flag specified", func() {
+				It("waits for completion", func() {
+					session := helpers.CF(command, appName, serviceInstanceName, "--binding-name", bindingName, "--wait")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session.Out).To(SatisfyAll(
+						Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`\n`),
+						Say(`OK\n`),
+					))
+
+					Expect(string(session.Err.Contents())).To(BeEmpty())
+
+					Expect(getBinding(serviceInstanceName).LastOperation.State).To(BeEquivalentTo("succeeded"))
+				})
+			})
+		})
+
+		Context("binding already exists", func() {
+			var (
+				serviceInstanceName string
+				appName             string
+			)
+
+			BeforeEach(func() {
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+
+				appName = helpers.NewAppName()
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+				})
+
+				Eventually(helpers.CF(command, appName, serviceInstanceName)).Should(Exit(0))
+			})
+
+			It("says OK", func() {
+				session := helpers.CF(command, appName, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session.Out).To(SatisfyAll(
+					Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
+					Say(`App %s is already bound to service instance %s.\n`, appName, serviceInstanceName),
+					Say(`OK\n`),
+				))
+
+				Expect(string(session.Err.Contents())).To(BeEmpty())
+			})
+		})
+
+		Context("app does not exist", func() {
+			var serviceInstanceName string
+
+			BeforeEach(func() {
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+			})
+
+			It("displays FAILED and app not found", func() {
+				session := helpers.CF(command, "does-not-exist", serviceInstanceName)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("App 'does-not-exist' not found"))
+			})
+		})
+
+		Context("service instance does not exist", func() {
+			var appName string
+
+			BeforeEach(func() {
+				appName = helpers.NewAppName()
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
 			})
 
-			When("the service does not exist", func() {
-				It("displays FAILED and service not found", func() {
-					session := helpers.CF("bind-service", appName, "does-not-exist")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Service instance %s not found", "does-not-exist"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the service exists", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
-					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-					})
-				})
-
-				AfterEach(func() {
-					Eventually(helpers.CF("unbind-service", appName, serviceInstance)).Should(Exit(0))
-					Eventually(helpers.CF("delete-service", serviceInstance, "-f")).Should(Exit(0))
-				})
-
-				It("binds the service to the app, displays OK and TIP", func() {
-					session := helpers.CF("bind-service", appName, serviceInstance)
-					Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-					Eventually(session).Should(Exit(0))
-				})
-
-				When("the service is already bound to an app", func() {
-					BeforeEach(func() {
-						Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
-					})
-
-					It("displays OK and that the app is already bound to the service", func() {
-						session := helpers.CF("bind-service", appName, serviceInstance)
-
-						Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-						Eventually(session).Should(Say("App %s is already bound to %s.", appName, serviceInstance))
-						Eventually(session).Should(Say("OK"))
-
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("the --binding-name flag is provided and the value is a non-empty string", func() {
-					It("binds the service to the app, displays OK and TIP", func() {
-						session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "i-am-a-binding")
-						Eventually(session.Out).Should(Say("Binding service %s to app %s with binding name %s in org %s / space %s as %s...", serviceInstance, appName, "i-am-a-binding", org, space, username))
-
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("configuration parameters are provided in a file", func() {
-					var configurationFile *os.File
-
-					When("the file-path does not exist", func() {
-						It("displays FAILED and the invalid configuration error", func() {
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-do-not-exist")
-							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
-
-							Eventually(session).Should(Exit(1))
-						})
-					})
-
-					When("the file contians invalid json", func() {
-						BeforeEach(func() {
-							var err error
-							content := []byte("{i-am-very-bad-json")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
-							Expect(err).ToNot(HaveOccurred())
-
-							_, err = configurationFile.Write(content)
-							Expect(err).ToNot(HaveOccurred())
-
-							err = configurationFile.Close()
-							Expect(err).ToNot(HaveOccurred())
-						})
-
-						AfterEach(func() {
-							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
-						})
-
-						It("displays FAILED and the invalid configuration error", func() {
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", configurationFile.Name())
-							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
-
-							Eventually(session).Should(Exit(1))
-						})
-					})
-
-					When("the file-path is relative", func() {
-						BeforeEach(func() {
-							var err error
-							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
-							Expect(err).ToNot(HaveOccurred())
-
-							_, err = configurationFile.Write(content)
-							Expect(err).ToNot(HaveOccurred())
-
-							err = configurationFile.Close()
-							Expect(err).ToNot(HaveOccurred())
-						})
-
-						AfterEach(func() {
-							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
-						})
-
-						It("binds the service to the app, displays OK and TIP", func() {
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", configurationFile.Name())
-							Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-
-					When("the file-path is absolute", func() {
-						BeforeEach(func() {
-							var err error
-							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
-							Expect(err).ToNot(HaveOccurred())
-
-							_, err = configurationFile.Write(content)
-							Expect(err).ToNot(HaveOccurred())
-
-							err = configurationFile.Close()
-							Expect(err).ToNot(HaveOccurred())
-						})
-
-						AfterEach(func() {
-							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
-						})
-
-						It("binds the service to the app, displays OK and TIP", func() {
-							absolutePath, err := filepath.Abs(configurationFile.Name())
-							Expect(err).ToNot(HaveOccurred())
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", absolutePath)
-							Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
-
-				When("configuration paramters are provided as in-line JSON", func() {
-					When("the JSON is invalid", func() {
-						It("displays FAILED and the invalid configuration error", func() {
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-am-invalid-json")
-							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
-
-							Eventually(session).Should(Exit(1))
-						})
-					})
-
-					When("the JSON is valid", func() {
-						It("binds the service to the app, displays OK and TIP", func() {
-							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "{\"i-am-valid-json\":\"dope dude\"}")
-							Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
-			})
-
-			When("the service is provided by a broker", func() {
-				var broker *servicebrokerstub.ServiceBrokerStub
-
-				AfterEach(func() {
-					broker.Forget()
-				})
-
-				When("the service binding is blocking", func() {
-					BeforeEach(func() {
-						broker = servicebrokerstub.EnableServiceAccess()
-
-						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
-					})
-
-					It("binds the service to the app, displays OK and TIP", func() {
-						session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
-						Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("service", serviceInstance)
-						Eventually(session).Should(Say(appName))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("the service binding is asynchronous", func() {
-					BeforeEach(func() {
-						broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
-
-						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
-
-						Eventually(func() *Session {
-							session := helpers.CF("service", serviceInstance)
-							return session.Wait()
-						}, time.Minute*5, time.Second*5).Should(Say("create succeeded"))
-					})
-
-					It("binds the service to the app, displays OK and TIP", func() {
-						session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
-						Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("Binding in progress. Use 'cf service %s' to check operation status.", serviceInstance))
-						Eventually(session).Should(Say("TIP: Once this operation succeeds, use 'cf restage %s' to ensure your env variable changes take effect", appName))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("service", serviceInstance)
-						Eventually(session).Should(Say(appName))
-						Eventually(session).Should(Exit(0))
-					})
-				})
+			It("displays FAILED and service not found", func() {
+				session := helpers.CF(command, appName, "does-not-exist")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("Service instance 'does-not-exist' not found"))
 			})
 		})
 	})

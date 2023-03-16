@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -19,7 +19,7 @@ func (cmd FeatureFlagsCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (cmd FeatureFlagsCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd FeatureFlagsCommand) displayTable(featureFlags []v7action.FeatureFlag) {
+func (cmd FeatureFlagsCommand) displayTable(featureFlags []resources.FeatureFlag) {
 	if len(featureFlags) > 0 {
 		var keyValueTable = [][]string{
 			{"name", "state"},

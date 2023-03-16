@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . Repository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository
 
 type Repository interface {
 	CopyApplication(sourceAppGUID, targetAppGUID string) error

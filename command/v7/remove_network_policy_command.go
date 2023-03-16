@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . RemoveNetworkPolicyActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoveNetworkPolicyActor
 
 type RemoveNetworkPolicyActor interface {
 	RemoveNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
@@ -38,7 +38,7 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 
 	ccClient, uaaClient := cmd.BaseCommand.GetClients()
 
-	networkingClient, err := shared.NewNetworkingClient(ccClient.NetworkPolicyV1(), config, uaaClient, ui)
+	networkingClient, err := shared.NewNetworkingClient(config.NetworkPolicyV1Endpoint(), config, uaaClient, ui)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 		destSpaceGUID = destSpace.GUID
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

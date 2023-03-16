@@ -19,18 +19,3 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 
 	return responseBody, warnings, err
 }
-
-// ShareServiceInstanceToSpaces will create a sharing relationship between
-// the service instance and the shared-to space for each space provided.
-func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, Warnings, error) {
-	var responseBody resources.RelationshipList
-
-	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
-		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
-		RequestBody:  resources.RelationshipList{GUIDs: spaceGUIDs},
-		ResponseBody: &responseBody,
-	})
-
-	return responseBody, warnings, err
-}

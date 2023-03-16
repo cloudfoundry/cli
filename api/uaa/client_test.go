@@ -47,11 +47,11 @@ var _ = Describe("UAA Client", func() {
 				_, err := client.RefreshAccessToken("")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 
-		Describe("Conection", func() {
+		Describe("Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -65,7 +65,7 @@ var _ = Describe("UAA Client", func() {
 				_, err := client.RefreshAccessToken("")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 	})

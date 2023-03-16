@@ -72,7 +72,7 @@ var _ = Describe("service-brokers Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -92,7 +92,7 @@ var _ = Describe("service-brokers Command", func() {
 				GUID: "some-space-guid",
 			})
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
 		It("displays a message with the username", func() {

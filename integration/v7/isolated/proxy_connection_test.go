@@ -17,7 +17,7 @@ var _ = Describe("proxy", func() {
 
 	Context("V3", func() {
 		It("errors when proxy is not setup properly", func() {
-			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "orgs")
+			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "login")
 			Eventually(session.Err).Should(Say("%s.*proxy.*%s", apiURL, proxyURL))
 			Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 			Eventually(session).Should(Exit(1))

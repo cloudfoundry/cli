@@ -23,6 +23,9 @@ func (sq SpaceQuota) MarshalJSON() ([]byte, error) {
 	if sq.Apps.TotalAppInstances != nil {
 		appLimits["total_instances"] = sq.Apps.TotalAppInstances
 	}
+	if sq.Apps.TotalLogVolume != nil {
+		appLimits["log_rate_limit_in_bytes_per_second"] = sq.Apps.TotalLogVolume
+	}
 
 	serviceLimits := map[string]interface{}{}
 	if sq.Services.PaidServicePlans != nil {

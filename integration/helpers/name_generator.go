@@ -164,3 +164,7 @@ func RandomName() string {
 
 	return guid.String()
 }
+
+func RandomURL() string {
+	return fmt.Sprintf("https://%s.com", RandomName())
+}

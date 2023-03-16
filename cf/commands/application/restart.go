@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . Restarter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Restarter
 
 type Restarter interface {
 	commandregistry.Command

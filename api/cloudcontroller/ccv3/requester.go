@@ -5,29 +5,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"runtime"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-//go:generate counterfeiter . Requester
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester
 
 type RequestParams struct {
-	RequestName    string
-	URIParams      internal.Params
-	Query          []Query
-	RequestBody    interface{}
-	RequestHeaders [][]string
-	ResponseBody   interface{}
-	URL            string
-	AppendToList   func(item interface{}) error
+	RequestName  string
+	URIParams    internal.Params
+	Query        []Query
+	RequestBody  interface{}
+	ResponseBody interface{}
+	URL          string
+	AppendToList func(item interface{}) error
 }
 
 type Requester interface {
 	InitializeConnection(settings TargetSettings)
 
-	InitializeRouter(resources map[string]string)
+	InitializeRouter(baseURL string)
 
 	MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error)
 
@@ -46,6 +46,13 @@ type Requester interface {
 		requestBodyMimeType string,
 		responseBody interface{},
 	) (string, Warnings, error)
+
+	MakeRequestSendReceiveRaw(
+		Method string,
+		URL string,
+		headers http.Header,
+		requestBody []byte,
+	) ([]byte, *http.Response, error)
 
 	MakeRequestUploadAsync(
 		requestName string,
@@ -78,8 +85,8 @@ func (requester *RealRequester) InitializeConnection(settings TargetSettings) {
 	}
 }
 
-func (requester *RealRequester) InitializeRouter(resources map[string]string) {
-	requester.router = internal.NewRouter(internal.APIRoutes, resources)
+func (requester *RealRequester) InitializeRouter(baseURL string) {
+	requester.router = internal.NewRouter(internal.APIRoutes, baseURL)
 }
 
 func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
@@ -127,6 +134,29 @@ func (requester *RealRequester) MakeRequestReceiveRaw(
 	err = requester.connection.Make(request, &response)
 
 	return response.RawResponse, response.Warnings, err
+}
+
+func (requester *RealRequester) MakeRequestSendReceiveRaw(
+	Method string,
+	URL string,
+	headers http.Header,
+	requestBody []byte,
+) ([]byte, *http.Response, error) {
+	request, err := requester.newHTTPRequest(requestOptions{
+		URL:    URL,
+		Method: Method,
+		Body:   bytes.NewReader(requestBody),
+		Header: headers,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = requester.connection.Make(request, &response)
+
+	return response.RawResponse, response.HTTPResponse, err
 }
 
 func (requester *RealRequester) MakeRequestSendRaw(

@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServicePlanVisibilityRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServicePlanVisibilityRepository
 
 type ServicePlanVisibilityRepository interface {
 	Create(string, string) error

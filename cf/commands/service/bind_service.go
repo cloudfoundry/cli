@@ -16,7 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/util/json"
 )
 
-//go:generate counterfeiter . Binder
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Binder
 
 type Binder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error)

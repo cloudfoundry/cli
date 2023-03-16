@@ -61,7 +61,7 @@ var _ = Describe("delete Command", func() {
 			GUID: "some-space-guid",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -132,7 +132,7 @@ var _ = Describe("delete Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -227,7 +227,7 @@ var _ = Describe("delete Command", func() {
 					fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
 				})
 
-				It("displays all warnings, and returns the erorr", func() {
+				It("displays all warnings, and returns the error", func() {
 					Expect(testUI.Err).To(Say("some-warning"))
 					Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 					Expect(testUI.Out).ToNot(Say("OK"))

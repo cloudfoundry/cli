@@ -5,10 +5,10 @@ import (
 	"time"
 
 	logcache "code.cloudfoundry.org/go-log-cache"
-	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 )
 
-//go:generate counterfeiter . LogCacheClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LogCacheClient
 
 // LogCacheClient is a client for getting logs.
 type LogCacheClient interface {

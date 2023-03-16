@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . SecurityGroupSpaceBinder
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecurityGroupSpaceBinder
 
 type SecurityGroupSpaceBinder interface {
 	BindSpace(securityGroupGUID string, spaceGUID string) error

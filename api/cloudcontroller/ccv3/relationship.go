@@ -16,17 +16,6 @@ func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID st
 	return warnings, err
 }
 
-// DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
-// between the service instance and the shared-to space provided.
-func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
-	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
-		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID, "space_guid": spaceGUID},
-	})
-
-	return warnings, err
-}
-
 // GetOrganizationDefaultIsolationSegment returns the relationship between an
 // organization and it's default isolation segment.
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (resources.Relationship, Warnings, error) {

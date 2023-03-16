@@ -6,13 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . Config
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Config
 
 // Config a way of getting basic CF configuration
 type Config interface {
 	AccessToken() string
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(name string, url string)
+	AuthorizationEndpoint() string
 	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
@@ -30,8 +31,10 @@ type Config interface {
 	HasTargetedSpace() bool
 	IsTTY() bool
 	Locale() string
+	LogCacheEndpoint() string
 	MinCLIVersion() string
 	NOAARequestRetryCount() int
+	NetworkPolicyV1Endpoint() string
 	OverallPollingTimeout() time.Duration
 	PluginHome() string
 	PluginRepositories() []configv3.PluginRepository
@@ -67,6 +70,7 @@ type Config interface {
 	TargetedSpace() configv3.Space
 	TerminalWidth() int
 	UAADisableKeepAlives() bool
+	UAAEndpoint() string
 	UAAGrantType() string
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
@@ -76,4 +80,6 @@ type Config interface {
 	Verbose() (bool, []string)
 	WritePluginConfig() error
 	WriteConfig() error
+	IsCFOnK8s() bool
+	SetKubernetesAuthInfo(authInfo string)
 }

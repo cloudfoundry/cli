@@ -15,109 +15,12 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-//go:generate counterfeiter io.Reader
-
-// Package represents a Cloud Controller V3 Package.
-type Package struct {
-	// CreatedAt is the time with zone when the object was created.
-	CreatedAt string
-
-	// DockerImage is the registry address of the docker image.
-	DockerImage string
-
-	// DockerPassword is the password for the docker image's registry.
-	DockerPassword string
-
-	// DockerUsername is the username for the docker image's registry.
-	DockerUsername string
-
-	// GUID is the unique identifier of the package.
-	GUID string
-
-	// Links are links to related resources.
-	Links APILinks
-
-	// Relationships are a list of relationships to other resources.
-	Relationships resources.Relationships
-
-	// State is the state of the package.
-	State constant.PackageState
-
-	// Type is the package type.
-	Type constant.PackageType
-}
-
-// MarshalJSON converts a Package into a Cloud Controller Package.
-func (p Package) MarshalJSON() ([]byte, error) {
-	type ccPackageData struct {
-		Image    string `json:"image,omitempty"`
-		Username string `json:"username,omitempty"`
-		Password string `json:"password,omitempty"`
-	}
-	var ccPackage struct {
-		GUID          string                  `json:"guid,omitempty"`
-		CreatedAt     string                  `json:"created_at,omitempty"`
-		Links         APILinks                `json:"links,omitempty"`
-		Relationships resources.Relationships `json:"relationships,omitempty"`
-		State         constant.PackageState   `json:"state,omitempty"`
-		Type          constant.PackageType    `json:"type,omitempty"`
-		Data          *ccPackageData          `json:"data,omitempty"`
-	}
-
-	ccPackage.GUID = p.GUID
-	ccPackage.CreatedAt = p.CreatedAt
-	ccPackage.Links = p.Links
-	ccPackage.Relationships = p.Relationships
-	ccPackage.State = p.State
-	ccPackage.Type = p.Type
-	if p.DockerImage != "" {
-		ccPackage.Data = &ccPackageData{
-			Image:    p.DockerImage,
-			Username: p.DockerUsername,
-			Password: p.DockerPassword,
-		}
-	}
-
-	return json.Marshal(ccPackage)
-}
-
-// UnmarshalJSON helps unmarshal a Cloud Controller Package response.
-func (p *Package) UnmarshalJSON(data []byte) error {
-	var ccPackage struct {
-		GUID          string                  `json:"guid,omitempty"`
-		CreatedAt     string                  `json:"created_at,omitempty"`
-		Links         APILinks                `json:"links,omitempty"`
-		Relationships resources.Relationships `json:"relationships,omitempty"`
-		State         constant.PackageState   `json:"state,omitempty"`
-		Type          constant.PackageType    `json:"type,omitempty"`
-		Data          struct {
-			Image    string `json:"image"`
-			Username string `json:"username"`
-			Password string `json:"password"`
-		} `json:"data"`
-	}
-	err := cloudcontroller.DecodeJSON(data, &ccPackage)
-	if err != nil {
-		return err
-	}
-
-	p.GUID = ccPackage.GUID
-	p.CreatedAt = ccPackage.CreatedAt
-	p.Links = ccPackage.Links
-	p.Relationships = ccPackage.Relationships
-	p.State = ccPackage.State
-	p.Type = ccPackage.Type
-	p.DockerImage = ccPackage.Data.Image
-	p.DockerUsername = ccPackage.Data.Username
-	p.DockerPassword = ccPackage.Data.Password
-
-	return nil
-}
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 io.Reader
 
 // CreatePackage creates a package with the given settings, Type and the
 // ApplicationRelationship must be set.
-func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
-	var responseBody Package
+func (client *Client) CreatePackage(pkg resources.Package) (resources.Package, Warnings, error) {
+	var responseBody resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostPackageRequest,
@@ -129,8 +32,8 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 }
 
 // GetPackage returns the package with the given GUID.
-func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
-	var responseBody Package
+func (client *Client) GetPackage(packageGUID string) (resources.Package, Warnings, error) {
+	var responseBody resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetPackageRequest,
@@ -142,20 +45,20 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 }
 
 // GetPackages returns the list of packages.
-func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
-	var resources []Package
+func (client *Client) GetPackages(query ...Query) ([]resources.Package, Warnings, error) {
+	var packages []resources.Package
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetPackagesRequest,
 		Query:        query,
-		ResponseBody: Package{},
+		ResponseBody: resources.Package{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Package))
+			packages = append(packages, item.(resources.Package))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return packages, warnings, err
 }
 
 // UploadBitsPackage uploads the newResources and a list of existing resources
@@ -167,9 +70,9 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 //
 // Note: In order to determine if package creation is successful, poll the
 // Package's state field for more information.
-func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) UploadBitsPackage(pkg resources.Package, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (resources.Package, Warnings, error) {
 	if matchedResources == nil {
-		return Package{}, nil, ccerror.NilObjectError{Object: "matchedResources"}
+		return resources.Package{}, nil, ccerror.NilObjectError{Object: "matchedResources"}
 	}
 
 	if newResources == nil {
@@ -181,13 +84,13 @@ func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource
 
 // UploadPackage uploads a file to a given package's Upload resource. Note:
 // fileToUpload is read entirely into memory prior to sending data to CC.
-func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
+func (client *Client) UploadPackage(pkg resources.Package, fileToUpload string) (resources.Package, Warnings, error) {
 	body, contentType, err := client.createUploadBuffer(fileToUpload, "bits")
 	if err != nil {
-		return Package{}, nil, err
+		return resources.Package{}, nil, err
 	}
 
-	responsePackage := Package{}
+	responsePackage := resources.Package{}
 	_, warnings, err := client.MakeRequestSendRaw(
 		internal.PostPackageBitsRequest,
 		internal.Params{"package_guid": pkg.GUID},
@@ -201,8 +104,8 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 
 // CopyPackage copies a package from a source package to a destination package
 // Note: source app guid is in URL; dest app guid is in body
-func (client *Client) CopyPackage(sourcePkgGUID string, targetAppGUID string) (Package, Warnings, error) {
-	var targetPackage Package
+func (client *Client) CopyPackage(sourcePkgGUID string, targetAppGUID string) (resources.Package, Warnings, error) {
+	var targetPackage resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostPackageRequest,
@@ -310,25 +213,25 @@ func (*Client) createUploadBuffer(path string, paramName string) (bytes.Buffer, 
 	return body, writer.FormDataContentType(), err
 }
 
-func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedResources []Resource) (Package, Warnings, error) {
+func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedResources []Resource) (resources.Package, Warnings, error) {
 	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
-		return Package{}, nil, err
+		return resources.Package{}, nil, err
 	}
 
 	body := bytes.NewBuffer(nil)
 	form := multipart.NewWriter(body)
 	err = form.WriteField("resources", string(jsonResources))
 	if err != nil {
-		return Package{}, nil, err
+		return resources.Package{}, nil, err
 	}
 
 	err = form.Close()
 	if err != nil {
-		return Package{}, nil, err
+		return resources.Package{}, nil, err
 	}
 
-	responsePackage := Package{}
+	responsePackage := resources.Package{}
 
 	_, warnings, err := client.MakeRequestSendRaw(
 		internal.PostPackageBitsRequest,
@@ -341,15 +244,15 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 	return responsePackage, warnings, err
 }
 
-func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (resources.Package, Warnings, error) {
 	contentLength, err := client.calculateAppBitsRequestSize(matchedResources, newResourcesLength)
 	if err != nil {
-		return Package{}, nil, err
+		return resources.Package{}, nil, err
 	}
 
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
-	responseBody := Package{}
+	responseBody := resources.Package{}
 	_, warnings, err := client.MakeRequestUploadAsync(
 		internal.PostPackageBitsRequest,
 		internal.Params{"package_guid": packageGUID},

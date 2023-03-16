@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -171,6 +171,81 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(0))
 				})
+			})
+		})
+	})
+
+	Describe("GetApplicationMapForRoute", func() {
+		var (
+			appsByAppGuid map[string]resources.Application
+			app1          resources.Application
+			app2          resources.Application
+			route         resources.Route
+			warnings      Warnings
+			err           error
+		)
+
+		BeforeEach(func() {
+			app1 = resources.Application{
+				GUID: "app-guid-1",
+				Name: "app-name-1",
+			}
+			app2 = resources.Application{
+				GUID: "app-guid-2",
+				Name: "app-name-2",
+			}
+			route = resources.Route{
+				Destinations: []resources.RouteDestination{
+					{
+						App: resources.RouteDestinationApp{
+							GUID: "app-guid-1",
+						},
+					},
+					{
+						App: resources.RouteDestinationApp{
+							GUID: "app-guid-2",
+						},
+					},
+				},
+				SpaceGUID: "fake-space-1-guid",
+				URL:       "fake-url-1/fake-path-1:1",
+				Host:      "fake-host-1",
+				Path:      "fake-path-1",
+				Port:      1,
+			}
+		})
+
+		JustBeforeEach(func() {
+			appsByAppGuid, warnings, err = actor.GetApplicationMapForRoute(route)
+		})
+
+		When("CC successfully returns the response", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{app1, app2},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
+			})
+			It("returns a mapping from apps guids to apps", func() {
+				Expect(appsByAppGuid).To(Equal(map[string]resources.Application{"app-guid-1": app1, "app-guid-2": app2}))
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
+		When("CC errors", func() {
+			var cc_err = errors.New("failed to get route")
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{},
+					ccv3.Warnings{"get-apps-warning"},
+					cc_err,
+				)
+			})
+			It("returns an error", func() {
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+				Expect(err).To(Equal(cc_err))
 			})
 		})
 	})
@@ -602,8 +677,14 @@ var _ = Describe("Route Actions", func() {
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-1",
 							},
+							Protocol: "http1",
 						},
 					},
+					SpaceGUID: "fake-space-1-guid",
+					URL:       "fake-url-1/fake-path-1:1",
+					Host:      "fake-host-1",
+					Path:      "fake-path-1",
+					Port:      1,
 				},
 				{
 					GUID: "route-guid-2",
@@ -612,13 +693,20 @@ var _ = Describe("Route Actions", func() {
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-1",
 							},
+							Protocol: "http2",
 						},
 						{
 							App: resources.RouteDestinationApp{
 								GUID: "app-guid-2",
 							},
+							Protocol: "http1",
 						},
 					},
+					SpaceGUID: "fake-space-1-guid",
+					URL:       "fake-url-2/fake-path-2:2",
+					Host:      "fake-host-2",
+					Path:      "fake-path-2",
+					Port:      2,
 				},
 				{
 					GUID:         "route-guid-3",
@@ -626,8 +714,27 @@ var _ = Describe("Route Actions", func() {
 					DomainGUID:   "domain-guid-1",
 					Port:         1028,
 					URL:          "domain-1.com:1028",
+					SpaceGUID:    "fake-space-2-guid",
+					Host:         "domain-1.com",
+					Path:         "",
 				},
 			}
+
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{
+					{
+						GUID: "fake-space-1-guid",
+						Name: "fake-space-1",
+					},
+					{
+						GUID: "fake-space-2-guid",
+						Name: "fake-space-2",
+					},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"get-space-warning"},
+				nil,
+			)
 
 			fakeCloudControllerClient.GetApplicationsReturns(
 				[]resources.Application{
@@ -643,77 +750,300 @@ var _ = Describe("Route Actions", func() {
 				ccv3.Warnings{"get-apps-warning"},
 				nil,
 			)
+
+			fakeCloudControllerClient.GetRouteBindingsReturns(
+				[]resources.RouteBinding{
+					{RouteGUID: "route-guid-1", ServiceInstanceGUID: "si-guid-1"},
+					{RouteGUID: "route-guid-2", ServiceInstanceGUID: "si-guid-2"},
+				},
+				ccv3.IncludedResources{
+					ServiceInstances: []resources.ServiceInstance{
+						{GUID: "si-guid-1", Name: "foo"},
+						{GUID: "si-guid-2", Name: "bar"},
+					},
+				},
+				ccv3.Warnings{"get-route-bindings-warning"},
+				nil,
+			)
 		})
 
 		JustBeforeEach(func() {
 			routeSummaries, warnings, executeErr = actor.GetRouteSummaries(routes)
 		})
 
-		When("the API layer calls are successful", func() {
-			It("returns the routes and warnings", func() {
-				Expect(routeSummaries).To(Equal([]RouteSummary{
-					{
-						Route: resources.Route{
-							GUID: "route-guid-1",
-							Destinations: []resources.RouteDestination{
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-1"},
-								},
-							},
-						},
-						AppNames: []string{"app-name-1"},
-					},
-					{
-						Route: resources.Route{
-							GUID: "route-guid-2",
-							Destinations: []resources.RouteDestination{
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-1"},
-								},
-								{
-									App: resources.RouteDestinationApp{GUID: "app-guid-2"},
-								},
-							},
-						},
-						AppNames: []string{"app-name-1", "app-name-2"},
-					},
-					{
-						Route: resources.Route{
-							GUID:         "route-guid-3",
-							Destinations: []resources.RouteDestination{},
-							DomainGUID:   "domain-guid-1",
-							Port:         1028,
-							URL:          "domain-1.com:1028",
-						},
-						AppNames:   nil,
-						DomainName: "domain-1.com",
-					},
-				}))
-				Expect(warnings).To(ConsistOf("get-apps-warning"))
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				Expect(query).To(ConsistOf(
-					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"app-guid-1", "app-guid-2"}},
-				))
-			})
+		It("gets the spaces", func() {
+			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+				ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"fake-space-1-guid", "fake-space-2-guid"}},
+			))
 		})
 
-		When("getting apps fails", func() {
-			var err = errors.New("failed to get apps")
+		It("gets the apps", func() {
+			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+				ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"app-guid-1", "app-guid-2"}},
+			))
+		})
 
+		It("gets the route bindings", func() {
+			Expect(fakeCloudControllerClient.GetRouteBindingsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetRouteBindingsArgsForCall(0)).To(ConsistOf(
+				ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{"route-guid-1", "route-guid-2", "route-guid-3"}},
+				ccv3.Query{Key: ccv3.Include, Values: []string{"service_instance"}},
+			))
+		})
+
+		It("returns the routes summaries and warnings", func() {
+			Expect(routeSummaries).To(Equal([]RouteSummary{
+				{
+					Route: resources.Route{
+						GUID: "route-guid-1",
+						Destinations: []resources.RouteDestination{
+							{
+								App:      resources.RouteDestinationApp{GUID: "app-guid-1"},
+								Protocol: "http1",
+							},
+						},
+						SpaceGUID: "fake-space-1-guid",
+						URL:       "fake-url-1/fake-path-1:1",
+						Host:      "fake-host-1",
+						Path:      "fake-path-1",
+						Port:      1,
+					},
+					AppNames:            []string{"app-name-1"},
+					AppProtocols:        []string{"http1"},
+					DomainName:          "fake-url-1/fake-path-1",
+					SpaceName:           "fake-space-1",
+					ServiceInstanceName: "foo",
+				},
+				{
+					Route: resources.Route{
+						GUID: "route-guid-2",
+						Destinations: []resources.RouteDestination{
+							{
+								App:      resources.RouteDestinationApp{GUID: "app-guid-1"},
+								Protocol: "http2",
+							},
+							{
+								App:      resources.RouteDestinationApp{GUID: "app-guid-2"},
+								Protocol: "http1",
+							},
+						},
+						SpaceGUID: "fake-space-1-guid",
+						URL:       "fake-url-2/fake-path-2:2",
+						Host:      "fake-host-2",
+						Path:      "fake-path-2",
+						Port:      2,
+					},
+					AppNames:            []string{"app-name-1", "app-name-2"},
+					AppProtocols:        []string{"http1", "http2"},
+					DomainName:          "fake-url-2/fake-path-2",
+					SpaceName:           "fake-space-1",
+					ServiceInstanceName: "bar",
+				},
+				{
+					Route: resources.Route{
+						GUID:         "route-guid-3",
+						Destinations: []resources.RouteDestination{},
+						DomainGUID:   "domain-guid-1",
+						Port:         1028,
+						URL:          "domain-1.com:1028",
+						SpaceGUID:    "fake-space-2-guid",
+						Host:         "domain-1.com",
+						Path:         "",
+					},
+					AppNames:   nil,
+					DomainName: "domain-1.com",
+					SpaceName:  "fake-space-2",
+				},
+			}))
+			Expect(warnings).To(ConsistOf(
+				"get-apps-warning",
+				"get-space-warning",
+				"get-route-bindings-warning",
+			))
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+			query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+			Expect(query).To(ConsistOf(
+				ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"app-guid-1", "app-guid-2"}},
+			))
+		})
+
+		When("getting spaces fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns(
+				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
-					ccv3.Warnings{"get-apps-warning"},
-					err,
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-space-warning"},
+					errors.New("failed to get spaces"),
 				)
 			})
 
 			It("returns the error and any warnings", func() {
-				Expect(executeErr).To(Equal(err))
-				Expect(warnings).To(ConsistOf("get-apps-warning"))
+				Expect(executeErr).To(MatchError("failed to get spaces"))
+				Expect(warnings).To(ContainElement("get-space-warning"))
+			})
+		})
+
+		When("getting apps fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					nil,
+					ccv3.Warnings{"get-apps-warning"},
+					errors.New("failed to get apps"),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(MatchError("failed to get apps"))
+				Expect(warnings).To(ContainElement("get-apps-warning"))
+			})
+		})
+
+		When("getting route bindings fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteBindingsReturns(
+					nil,
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-route-bindings-warning"},
+					errors.New("failed to get route bindings"),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(MatchError("failed to get route bindings"))
+				Expect(warnings).To(ContainElement("get-route-bindings-warning"))
+			})
+		})
+
+		When("there are many routes", func() {
+			const batches = 10
+
+			var manyResults []RouteSummary
+
+			BeforeEach(func() {
+				var (
+					manySpaces           []resources.Space
+					manyApps             []resources.Application
+					manyRouteBindings    []resources.RouteBinding
+					manyServiceInstances []resources.ServiceInstance
+				)
+
+				routes = nil
+				manyResults = nil
+
+				for i := 0; i < batcher.BatchSize*batches; i++ {
+					port := i + 1000
+					appProtocol := "http1"
+					if i%2 == 0 {
+						appProtocol = "http2"
+					}
+					route := resources.Route{
+						GUID: fmt.Sprintf("route-guid-%d", i),
+						Destinations: []resources.RouteDestination{
+							{
+								App: resources.RouteDestinationApp{
+									GUID: fmt.Sprintf("fake-app-guid-%d", i),
+								},
+								Protocol: appProtocol,
+							},
+						},
+						SpaceGUID: fmt.Sprintf("fake-space-guid-%d", i),
+						URL:       fmt.Sprintf("fake-url-%d/fake-path-%d:%d", i, i, port),
+						Host:      fmt.Sprintf("fake-host-%d", i),
+						Path:      fmt.Sprintf("fake-path-%d", i),
+						Port:      port,
+					}
+
+					routes = append(routes, route)
+
+					manySpaces = append(manySpaces, resources.Space{
+						GUID: fmt.Sprintf("fake-space-guid-%d", i),
+						Name: fmt.Sprintf("fake-space-name-%d", i),
+					})
+
+					manyApps = append(manyApps, resources.Application{
+						GUID: fmt.Sprintf("fake-app-guid-%d", i),
+						Name: fmt.Sprintf("fake-app-name-%d", i),
+					})
+
+					manyRouteBindings = append(manyRouteBindings, resources.RouteBinding{
+						RouteGUID:           fmt.Sprintf("route-guid-%d", i),
+						ServiceInstanceGUID: fmt.Sprintf("service-instance-guid-%d", i),
+					})
+
+					manyServiceInstances = append(manyServiceInstances, resources.ServiceInstance{
+						Name: fmt.Sprintf("service-instance-name-%d", i),
+						GUID: fmt.Sprintf("service-instance-guid-%d", i),
+					})
+
+					manyResults = append(manyResults, RouteSummary{
+						Route:               route,
+						AppProtocols:        []string{appProtocol},
+						AppNames:            []string{fmt.Sprintf("fake-app-name-%d", i)},
+						DomainName:          fmt.Sprintf("fake-url-%d/fake-path-%d", i, i),
+						SpaceName:           fmt.Sprintf("fake-space-name-%d", i),
+						ServiceInstanceName: fmt.Sprintf("service-instance-name-%d", i),
+					})
+				}
+
+				for b := 0; b < batches; b++ {
+					fakeCloudControllerClient.GetSpacesReturnsOnCall(
+						b,
+						manySpaces[:batcher.BatchSize],
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"get-space-warning"},
+						nil,
+					)
+					manySpaces = manySpaces[batcher.BatchSize:]
+
+					fakeCloudControllerClient.GetApplicationsReturnsOnCall(
+						b,
+						manyApps[:batcher.BatchSize],
+						ccv3.Warnings{"get-apps-warning"},
+						nil,
+					)
+					manyApps = manyApps[batcher.BatchSize:]
+
+					fakeCloudControllerClient.GetRouteBindingsReturnsOnCall(
+						b,
+						manyRouteBindings[:batcher.BatchSize],
+						ccv3.IncludedResources{
+							ServiceInstances: manyServiceInstances[:batcher.BatchSize],
+						},
+						ccv3.Warnings{"get-route-binding-warning"},
+						nil,
+					)
+					manyRouteBindings = manyRouteBindings[batcher.BatchSize:]
+					manyServiceInstances = manyServiceInstances[batcher.BatchSize:]
+				}
+			})
+
+			It("constructs the correct result", func() {
+				Expect(routeSummaries).To(HaveLen(len(manyResults)))
+				for _, result := range manyResults {
+					Expect(routeSummaries).To(ContainElement(result))
+				}
+			})
+
+			It("makes multiple different calls to get spaces", func() {
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetSpacesArgsForCall(1)))
+			})
+
+			It("makes multiple different calls to get apps", func() {
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetApplicationsArgsForCall(1)))
+			})
+
+			It("makes multiple different calls to get route bindings", func() {
+				Expect(fakeCloudControllerClient.GetRouteBindingsCallCount()).To(Equal(batches))
+				Expect(fakeCloudControllerClient.GetRouteBindingsArgsForCall(0)).
+					NotTo(Equal(fakeCloudControllerClient.GetRouteBindingsArgsForCall(1)))
 			})
 		})
 	})
@@ -1040,7 +1370,6 @@ var _ = Describe("Route Actions", func() {
 					warnings, err := actor.DeleteRoute("domain.com", "hostname", "/path", 0)
 					Expect(err).To(Equal(actionerror.RouteNotFoundError{
 						DomainName: "domain.com",
-						DomainGUID: "domain-guid",
 						Host:       "hostname",
 						Path:       "/path",
 						Port:       0,
@@ -1137,7 +1466,6 @@ var _ = Describe("Route Actions", func() {
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
 						DomainName: domainName,
-						DomainGUID: domainGUID,
 						Host:       hostname,
 						Path:       path,
 					}))
@@ -1205,7 +1533,6 @@ var _ = Describe("Route Actions", func() {
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
 						DomainName: domainName,
-						DomainGUID: domainGUID,
 						Port:       port,
 					}))
 				})
@@ -1215,20 +1542,22 @@ var _ = Describe("Route Actions", func() {
 
 	Describe("MapRoute", func() {
 		var (
-			routeGUID string
-			appGUID   string
+			routeGUID           string
+			appGUID             string
+			destinationProtocol string
 
 			executeErr error
 			warnings   Warnings
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.MapRoute(routeGUID, appGUID)
+			warnings, executeErr = actor.MapRoute(routeGUID, appGUID, destinationProtocol)
 		})
 
 		BeforeEach(func() {
 			routeGUID = "route-guid"
 			appGUID = "app-guid"
+			destinationProtocol = "http2"
 		})
 
 		When("the cloud controller client errors", func() {
@@ -1247,6 +1576,13 @@ var _ = Describe("Route Actions", func() {
 				fakeCloudControllerClient.MapRouteReturns(ccv3.Warnings{"map-route-warning"}, nil)
 			})
 
+			It("calls the cloud controller client with the right arguments", func() {
+				actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeCloudControllerClient.MapRouteArgsForCall(0)
+				Expect(actualRouteGUID).To(Equal("route-guid"))
+				Expect(actualAppGUID).To(Equal("app-guid"))
+				Expect(actualDestinationProtocol).To(Equal("http2"))
+			})
+
 			It("returns the error and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("map-route-warning"))
@@ -1254,6 +1590,46 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("UnshareRoute", func() {
+		var (
+			routeGUID string
+			spaceGUID string
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UnshareRoute(routeGUID, spaceGUID)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+			spaceGUID = "space-guid"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnshareRouteReturns(ccv3.Warnings{"unshare-route-warning"}, errors.New("unshare-route-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("unshare-route-error")))
+				Expect(warnings).To(ConsistOf("unshare-route-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnshareRouteReturns(ccv3.Warnings{"unshare-route-warning"}, nil)
+			})
+
+			It("returns the warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("unshare-route-warning"))
+			})
+		})
+	})
 	Describe("UnmapRoute", func() {
 		var (
 			routeGUID       string
@@ -1286,6 +1662,49 @@ var _ = Describe("Route Actions", func() {
 		When("the cloud controller client succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UnmapRouteReturns(ccv3.Warnings{"unmap-route-warning"}, nil)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("unmap-route-warning"))
+			})
+		})
+	})
+
+	Describe("UpdateDestination", func() {
+		var (
+			routeGUID       string
+			destinationGUID string
+			protocol        string
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateDestination(routeGUID, destinationGUID, protocol)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+			destinationGUID = "destination-guid"
+			protocol = "http2"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateDestinationReturns(ccv3.Warnings{"unmap-route-warning"}, errors.New("unmap-route-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("unmap-route-error")))
+				Expect(warnings).To(ConsistOf("unmap-route-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateDestinationReturns(ccv3.Warnings{"unmap-route-warning"}, nil)
 			})
 
 			It("returns the error and warnings", func() {

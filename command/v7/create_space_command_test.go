@@ -55,7 +55,7 @@ var _ = Describe("create-space Command", func() {
 			Name: "some-org-name",
 			GUID: "some-org-guid",
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{
+		fakeActor.GetCurrentUserReturns(configv3.User{
 			Name:   userName,
 			Origin: "some-user-origin",
 		}, nil)

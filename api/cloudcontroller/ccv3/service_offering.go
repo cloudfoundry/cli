@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 // GetServiceOffering lists service offering with optional filters.
@@ -22,14 +23,27 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]resources.ServiceOf
 		},
 	})
 
-	brokerNameLookup := make(map[string]string)
-	for _, b := range included.ServiceBrokers {
-		brokerNameLookup[b.GUID] = b.Name
-	}
+	brokerNameLookup := lookuptable.NameFromGUID(included.ServiceBrokers)
 
 	for i, _ := range result {
 		result[i].ServiceBrokerName = brokerNameLookup[result[i].ServiceBrokerGUID]
 	}
+
+	return result, warnings, err
+}
+
+func (client *Client) GetServiceOfferingByGUID(guid string) (resources.ServiceOffering, Warnings, error) {
+	if guid == "" {
+		return resources.ServiceOffering{}, nil, ccerror.ServiceOfferingNotFoundError{}
+	}
+
+	var result resources.ServiceOffering
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceOfferingRequest,
+		URIParams:    internal.Params{"service_offering_guid": guid},
+		ResponseBody: &result,
+	})
 
 	return result, warnings, err
 }

@@ -281,7 +281,7 @@ var _ = Describe("SSH command", func() {
 
 			Context("Error when connecting", func() {
 				It("notifies users", func() {
-					fakeSecureShell.ConnectReturns(errors.New("dial errorrr"))
+					fakeSecureShell.ConnectReturns(errors.New("dial error"))
 
 					runCommand("my-app")
 

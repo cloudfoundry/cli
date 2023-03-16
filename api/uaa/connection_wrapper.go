@@ -1,6 +1,6 @@
 package uaa
 
-//go:generate counterfeiter . ConnectionWrapper
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConnectionWrapper
 
 // ConnectionWrapper can wrap a given connection allowing the wrapper to modify
 // all requests going in and out of the given connection.

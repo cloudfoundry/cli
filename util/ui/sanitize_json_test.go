@@ -81,4 +81,14 @@ var _ = Describe("SanitizeJSON", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(redacted).To(Equal([]byte(expected)))
 	})
+
+	It("represents empty arrays as []", func() {
+		original := `{"resources": []}`
+		expected := `{"resources": []}
+` // Extra new line is required due to encoder
+
+		redacted, err := SanitizeJSON([]byte(original))
+		Expect(err).ToNot(HaveOccurred())
+		Expect(string(redacted)).To(MatchJSON(expected))
+	})
 })

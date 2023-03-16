@@ -71,18 +71,36 @@ func setFlag(cmd interface{}, flag string, values ...interface{}) {
 
 		if tagValue, ok := field.Tag.Lookup(key); ok {
 			if tagValue == trimmedFlag {
-				if value.Type().ConvertibleTo(field.Type) {
+				switch {
+				case value.Type().ConvertibleTo(field.Type):
 					val.Field(i).Set(value.Convert(field.Type))
 					return
+				case reflect.PtrTo(field.Type).Implements(reflect.TypeOf((*interface{ UnmarshalFlag(string) error })(nil)).Elem()):
+					elem := reflect.New(field.Type)
+					e := elem.MethodByName("UnmarshalFlag").Call([]reflect.Value{value})
+					if !e[0].IsNil() {
+						Fail(fmt.Sprintf(
+							"Could not set field '%s' type '%s' to '%v' type '%s' for flag '%s' because %s",
+							field.Name,
+							field.Type,
+							value.Interface(),
+							value.Type(),
+							flag,
+							e[0].Interface(),
+						))
+					}
+					val.Field(i).Set(elem.Elem())
+					return
+				default:
+					Fail(fmt.Sprintf(
+						"Could not set field '%s' type '%s' to '%v' type '%s' for flag '%s'",
+						field.Name,
+						field.Type,
+						value.Interface(),
+						value.Type(),
+						flag,
+					))
 				}
-				Fail(fmt.Sprintf(
-					"Could not set field '%s' type '%s' to '%v' type '%s' for flag '%s'",
-					field.Name,
-					field.Type,
-					value.Interface(),
-					value.Type(),
-					flag,
-				))
 			}
 		}
 	}

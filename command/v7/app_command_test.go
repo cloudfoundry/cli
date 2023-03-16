@@ -60,7 +60,7 @@ var _ = Describe("app Command", func() {
 			GUID: "some-space-guid",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -87,7 +87,7 @@ var _ = Describe("app Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -189,13 +189,13 @@ var _ = Describe("app Command", func() {
 						},
 						ProcessSummaries: v7action.ProcessSummaries{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:    constant.ProcessTypeWeb,
 									Command: *types.NewFilteredString("some-command-1"),
 								},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type:    "console",
 									Command: *types.NewFilteredString("some-command-2"),
 								},

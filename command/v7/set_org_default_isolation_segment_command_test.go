@@ -50,7 +50,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		org = "some-org"
 		isolationSegment = "segment1"
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 		cmd.RequiredArgs.OrganizationName = org
 		cmd.RequiredArgs.IsolationSegmentName = isolationSegment
@@ -59,7 +59,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 			Name: org,
 			GUID: "some-org-guid",
 		}, v7action.Warnings{"org-warning-1", "org-warning-2"}, nil)
-		fakeActor.GetIsolationSegmentByNameReturns(v7action.IsolationSegment{GUID: "some-iso-guid"}, v7action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, nil)
+		fakeActor.GetIsolationSegmentByNameReturns(resources.IsolationSegment{GUID: "some-iso-guid"}, v7action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, nil)
 		fakeActor.SetOrganizationDefaultIsolationSegmentReturns(v7action.Warnings{"isolation-set-warning-1", "isolation-set-warning-2"}, nil)
 	})
 
@@ -84,7 +84,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("fetching the user fails", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
+			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("some-error"))
 		})
 
 		It("returns an error", func() {
@@ -115,7 +115,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("the isolation segment lookup is unsuccessful", func() {
 		BeforeEach(func() {
-			fakeActor.GetIsolationSegmentByNameReturns(v7action.IsolationSegment{}, v7action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
+			fakeActor.GetIsolationSegmentByNameReturns(resources.IsolationSegment{}, v7action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
 		})
 
 		It("returns the warnings and error", func() {

@@ -60,3 +60,14 @@ func (client *Client) GetUsers(query ...Query) ([]resources.User, Warnings, erro
 
 	return users, warnings, err
 }
+
+func (client *Client) WhoAmI() (resources.K8sUser, Warnings, error) {
+	var user resources.K8sUser
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.WhoAmI,
+		ResponseBody: &user,
+	})
+
+	return user, warnings, err
+}

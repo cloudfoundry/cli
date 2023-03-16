@@ -1,6 +1,6 @@
 package requirements
 
-//go:generate counterfeiter . Requirement
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requirement
 
 type Requirement interface {
 	Execute() error

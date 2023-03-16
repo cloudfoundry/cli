@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . ServiceAuthTokenRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceAuthTokenRepository
 
 type ServiceAuthTokenRepository interface {
 	FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr error)

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -40,6 +39,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
 			Eventually(session).Should(Say(`\s+service-broker`))
+			Eventually(session).Should(Say(`\s+service-instance`))
 			Eventually(session).Should(Say(`\s+service-offering`))
 			Eventually(session).Should(Say(`\s+service-plan`))
 			Eventually(session).Should(Say(`\s+space`))
@@ -139,9 +139,9 @@ var _ = Describe("unset-label command", func() {
 
 			When("the buildpack is unknown", func() {
 				It("displays an error", func() {
-					session := helpers.CF("unset-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
+					session := helpers.CF("unset-label", "buildpack", "nonexistent-buildpack", "some-key=some-value")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).Should(Say("Buildpack 'non-existent-buildpack' not found"))
+					Expect(session.Err).Should(Say("Buildpack 'nonexistent-buildpack' not found"))
 					Expect(session).Should(Say("FAILED"))
 				})
 			})
@@ -388,6 +388,36 @@ var _ = Describe("unset-label command", func() {
 
 				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
 					"pci": "true",
+				})
+			})
+		})
+
+		When("unsetting labels from a service-instance", func() {
+			var serviceInstanceName string
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				serviceInstanceName = helpers.NewServiceInstanceName()
+
+				helpers.SetupCF(orgName, spaceName)
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+
+				session := helpers.CF("set-label", "service-instance", serviceInstanceName, "some-key=some-value", "some-other-key=some-other-value", "some-third-key=other")
+				Eventually(session).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("unsets the specified labels on the service-instance", func() {
+				session := helpers.CF("unset-label", "service-instance", serviceInstanceName, "some-other-key", "some-third-key")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-instance %s in org %s / space %s as %s...`), serviceInstanceName, orgName, spaceName, username))
+				Expect(session).Should(Say("OK"))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances/%s", helpers.ServiceInstanceGUID(serviceInstanceName)), false, helpers.MetadataLabels{
+					"some-key": "some-value",
 				})
 			})
 		})

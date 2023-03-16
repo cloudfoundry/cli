@@ -206,7 +206,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "ftp://example.com/repo", "-k")
 
-				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from ftp://example\.com/repo: Get ftp://example\.com/repo/list: unsupported protocol scheme \"ftp\"`))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from ftp://example.com/repo: Get "ftp://example.com/repo/list": unsupported protocol scheme "ftp"`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -216,7 +216,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "cfpluginrepothatdoesnotexist.cf-app.com", "-k")
 
-				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\.cf-app\.com: Get https://cfpluginrepothatdoesnotexist\.cf-app\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\.cf-app\.com.*: no such host`))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist.cf-app.com: Get "https://cfpluginrepothatdoesnotexist.cf-app.com/list": dial tcp: lookup cfpluginrepothatdoesnotexist.cf-app.com.*: no such host`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

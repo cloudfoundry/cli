@@ -225,7 +225,7 @@ var _ = Describe("Broker Builder", func() {
 	})
 
 	Describe(".GetBrokerWithSpecifiedService", func() {
-		It("returns an error if a broker containeing the specific service cannot be found", func() {
+		It("returns an error if a broker containing the specific service cannot be found", func() {
 			serviceBuilder.GetServiceByNameWithPlansWithOrgNamesReturns(models.ServiceOffering{}, errors.New("Asplosions"))
 			_, err := brokerBuilder.GetBrokerWithSpecifiedService("totally-not-a-service")
 

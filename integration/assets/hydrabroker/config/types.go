@@ -18,13 +18,17 @@ type Plan struct {
 }
 
 type Service struct {
-	Name        string   `json:"name" validate:"printascii,min=5"`
-	ID          string   `json:"id,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Plans       []Plan   `json:"plans" validate:"min=1,dive"`
-	Shareable   bool     `json:"shareable"`
-	Bindable    bool     `json:"bindable"`
-	Requires    []string `json:"requires,omitempty"`
+	Name                 string   `json:"name" validate:"printascii,min=5"`
+	ID                   string   `json:"id,omitempty"`
+	Description          string   `json:"description,omitempty"`
+	DocumentationURL     string   `json:"documentation_url,omitempty" validate:"url"`
+	Tags                 []string `json:"tags"`
+	Plans                []Plan   `json:"plans" validate:"min=1,dive"`
+	Shareable            bool     `json:"shareable"`
+	Bindable             bool     `json:"bindable"`
+	PlanUpdatable        bool     `json:"plan_updateable"`
+	InstancesRetrievable bool     `json:"instances_retrievable"`
+	Requires             []string `json:"requires,omitempty"`
 }
 
 type BrokerConfiguration struct {

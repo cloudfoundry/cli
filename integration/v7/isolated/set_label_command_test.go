@@ -41,6 +41,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+route`))
 				Eventually(session).Should(Say(`\s+service-broker`))
+				Eventually(session).Should(Say(`\s+service-instance`))
 				Eventually(session).Should(Say(`\s+service-offering`))
 				Eventually(session).Should(Say(`\s+service-plan`))
 				Eventually(session).Should(Say(`\s+space`))
@@ -67,7 +68,7 @@ var _ = Describe("set-label command", func() {
 
 		testExpectedBehaviors := func(resourceType, resourceTypeFormatted, resourceName string) {
 			By("checking the behavior when the resource does not exist", func() {
-				unknownResourceName := "non-existent-" + resourceType
+				unknownResourceName := "nonexistent-" + resourceType
 				session := helpers.CF("set-label", resourceType, unknownResourceName, "some-key=some-value")
 				Eventually(session.Err).Should(Say("%s '%s' not found", resourceTypeFormatted, unknownResourceName))
 				Eventually(session).Should(Say("FAILED"))
@@ -330,10 +331,10 @@ var _ = Describe("set-label command", func() {
 
 			When("the route is unknown", func() {
 				It("displays an error", func() {
-					invalidRoute := "non-existent-host." + domainName
+					invalidRoute := "nonexistent-host." + domainName
 					session := helpers.CF("set-label", "route", invalidRoute, "some-key=some-value")
-					Eventually(session.Err).Should(Say(fmt.Sprintf("Route with host 'non-existent-host' and domain '%s' not found", domainName)))
-					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Route with host 'nonexistent-host', domain '%s', and path '/' not found\.`, domainName))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -509,7 +510,7 @@ var _ = Describe("set-label command", func() {
 						})
 					})
 
-					When("a non-existent stack is specified", func() {
+					When("a nonexistent stack is specified", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
@@ -574,7 +575,7 @@ var _ = Describe("set-label command", func() {
 						})
 					})
 
-					When("a non-existent stack is specified", func() {
+					When("a nonexistent stack is specified", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
@@ -667,6 +668,50 @@ var _ = Describe("set-label command", func() {
 					Eventually(session).Should(Exit(0))
 
 					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
+						"owner": "beth",
+					})
+				})
+			})
+		})
+
+		When("assigning label to service-instance", func() {
+			var serviceInstanceName string
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				serviceInstanceName = helpers.NewServiceInstanceName()
+				Eventually(helpers.CF("cups", serviceInstanceName)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("service-instance", "Service instance", serviceInstanceName)
+			})
+
+			It("sets the specified labels on the service-instance", func() {
+				session := helpers.CF("set-label", "service-instance", serviceInstanceName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-instance %s in org %s / space %s as %s...`), serviceInstanceName, orgName, spaceName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances?names=%s", serviceInstanceName), true, helpers.MetadataLabels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "service-instance", serviceInstanceName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_instances?names=%s", serviceInstanceName), true, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})

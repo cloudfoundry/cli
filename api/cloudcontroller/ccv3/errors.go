@@ -10,7 +10,10 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
-const taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
+const (
+	taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
+	operationInProgress    = "CF-AsyncServiceInstanceOperationInProgress"
+)
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
@@ -71,12 +74,16 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError, request *cloudcontr
 			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
 		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
-	default:
-		return ccerror.V3UnexpectedResponseError{
-			ResponseCode:    rawHTTPStatusErr.StatusCode,
-			RequestIDs:      rawHTTPStatusErr.RequestIDs,
-			V3ErrorResponse: errorResponse,
+	case http.StatusConflict:
+		if firstErr.Title == operationInProgress {
+			return ccerror.ServiceInstanceOperationInProgressError{Message: firstErr.Detail}
 		}
+	}
+
+	return ccerror.V3UnexpectedResponseError{
+		ResponseCode:    rawHTTPStatusErr.StatusCode,
+		RequestIDs:      rawHTTPStatusErr.RequestIDs,
+		V3ErrorResponse: errorResponse,
 	}
 }
 
@@ -108,9 +115,10 @@ func handleBadRequest(errorResponse ccerror.V3Error, _ *cloudcontroller.Request)
 	switch errorResponse.Detail {
 	case "Bad request: Cannot stage package whose state is not ready.":
 		return ccerror.InvalidStateError{}
+	case "This service does not support fetching service instance parameters.":
+		return ccerror.ServiceInstanceParametersFetchNotSupportedError{Message: errorResponse.Detail}
 	default:
 		return ccerror.BadRequestError{Message: errorResponse.Detail}
-
 	}
 }
 
@@ -163,6 +171,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Assign a droplet before starting this app."):
 		return ccerror.InvalidStartError{}
+	case strings.Contains(errorString,
+		"The service instance name is taken"):
+		return ccerror.ServiceInstanceNameTakenError{Message: err.Message}
 	case orgNameTakenRegexp.MatchString(errorString):
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	case roleExistsRegexp.MatchString(errorString):
@@ -174,6 +185,14 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Ensure the space is bound to this security group."):
 		return ccerror.SecurityGroupNotBound{Message: err.Message}
+	case errorResponse.Title == "CF-ServiceInstanceAlreadyBoundToSameRoute":
+		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
+	case strings.Contains(errorString,
+		"The app is already bound to the service instance"):
+		return ccerror.ResourceAlreadyExistsError{Message: err.Message}
+	case strings.Contains(errorString,
+		"Key binding names must be unique"):
+		return ccerror.ServiceKeyTakenError{Message: err.Message}
 	default:
 		return err
 	}

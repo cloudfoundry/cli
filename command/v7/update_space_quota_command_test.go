@@ -50,7 +50,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		}
 
 		currentUserName = "bob"
-		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUserName}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid"})
 		fakeConfig.TargetedOrganizationNameReturns(orgName)
 	})
@@ -94,11 +94,12 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 				cmd.NewName = "new-space-quota-name"
 				cmd.PaidServicePlans = true
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 10}
-				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 9}
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.PerProcessMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 9}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
+				cmd.TotalLogVolume = flag.BytesWithUnlimited{IsSet: true, Value: 512}
 				fakeActor.UpdateSpaceQuotaReturns(
 					v7action.Warnings{"warning"},
 					nil)
@@ -134,6 +135,9 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
 
+				Expect(quotaLimits.TotalLogVolume.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalLogVolume.Value).To(Equal(512))
+
 				Expect(testUI.Out).To(Say("Updating space quota %s for org %s as bob...", spaceQuotaName, orgName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -141,7 +145,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 
 		When("only some org quota limits are updated", func() {
 			BeforeEach(func() {
-				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.TotalMemory = flag.MegabytesWithUnlimited{IsSet: true, Value: 2048}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
 				fakeActor.UpdateSpaceQuotaReturns(
 					v7action.Warnings{"warning"},
@@ -173,6 +177,8 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 				Expect(quotaLimits.TotalRoutes).To(BeNil())
 
 				Expect(quotaLimits.TotalReservedPorts).To(BeNil())
+
+				Expect(quotaLimits.TotalLogVolume).To(BeNil())
 
 				Expect(testUI.Out).To(Say("Updating space quota %s for org %s as bob...", spaceQuotaName, orgName))
 				Expect(testUI.Out).To(Say("OK"))

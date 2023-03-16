@@ -10,6 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/util/unique"
 )
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
@@ -82,14 +84,16 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 }
 
 func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Application, Warnings, error) {
-	uniqueAppGUIDs := map[string]bool{}
-	for _, appGUID := range appGUIDs {
-		uniqueAppGUIDs[appGUID] = true
-	}
+	uniqueAppGUIDs := unique.StringSlice(appGUIDs)
 
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(
-		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},
-	)
+	var apps []resources.Application
+	warnings, err := batcher.RequestByGUID(appGUIDs, func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetApplications(
+			ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+		)
+		apps = append(apps, batch...)
+		return warnings, err
+	})
 
 	if err != nil {
 		return nil, Warnings(warnings), err
@@ -103,10 +107,7 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Applic
 }
 
 func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, Warnings, error) {
-	uniqueAppNames := map[string]bool{}
-	for _, appName := range appNames {
-		uniqueAppNames[appName] = true
-	}
+	uniqueAppNames := unique.StringSlice(appNames)
 
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.NameFilter, Values: appNames},
@@ -191,7 +192,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	setWarnings, err := actor.UpdateProcessByTypeAndApplication(
 		processType,
 		app.GUID,
-		Process{
+		resources.Process{
 			HealthCheckType:              healthCheckType,
 			HealthCheckEndpoint:          httpEndpoint,
 			HealthCheckInvocationTimeout: invocationTimeout,
@@ -264,7 +265,7 @@ func (actor Actor) PollStart(app resources.Application, noWait bool, handleInsta
 		return allWarnings, err
 	}
 
-	var filteredProcesses []ccv3.Process
+	var filteredProcesses []resources.Process
 	if noWait {
 		for _, process := range processes {
 			if process.Type == constant.ProcessTypeWeb {
@@ -299,8 +300,8 @@ func (actor Actor) PollStart(app resources.Application, noWait bool, handleInsta
 // they have failed or been canceled during polling.
 func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var (
-		deployment  ccv3.Deployment
-		processes   []ccv3.Process
+		deployment  resources.Deployment
+		processes   []resources.Process
 		allWarnings Warnings
 	)
 
@@ -311,6 +312,11 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 	for {
 		select {
 		case <-timeout:
+			warnings, err := actor.CancelDeployment(deploymentGUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return allWarnings, err
+			}
 			return allWarnings, actionerror.StartupTimeoutError{Name: app.Name}
 		case <-timer.C():
 			if !isDeployed(deployment) {
@@ -340,12 +346,12 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 	}
 }
 
-func isDeployed(d ccv3.Deployment) bool {
+func isDeployed(d resources.Deployment) bool {
 	return d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
 }
 
 // PollProcesses - return true if there's no need to keep polling
-func (actor Actor) PollProcesses(processes []ccv3.Process, handleInstanceDetails func(string)) (bool, Warnings, error) {
+func (actor Actor) PollProcesses(processes []resources.Process, handleInstanceDetails func(string)) (bool, Warnings, error) {
 	numProcesses := len(processes)
 	numStableProcesses := 0
 	var allWarnings Warnings
@@ -394,7 +400,18 @@ func (actor Actor) UpdateApplication(app resources.Application) (resources.Appli
 	return updatedApp, Warnings(warnings), nil
 }
 
-func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnings, error) {
+// UpdateApplicationName updates the name of an application
+func (actor Actor) UpdateApplicationName(newAppName string, appGUID string) (resources.Application, Warnings, error) {
+
+	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplicationName(newAppName, appGUID)
+	if err != nil {
+		return resources.Application{}, Warnings(warnings), err
+	}
+
+	return updatedApp, Warnings(warnings), nil
+}
+
+func (actor Actor) getDeployment(deploymentGUID string) (resources.Deployment, Warnings, error) {
 	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
 	if err != nil {
 		return deployment, Warnings(warnings), err
@@ -412,7 +429,7 @@ func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnin
 	return deployment, Warnings(warnings), err
 }
 
-func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWait bool) ([]ccv3.Process, Warnings, error) {
+func (actor Actor) getProcesses(deployment resources.Deployment, appGUID string, noWait bool) ([]resources.Process, Warnings, error) {
 	if noWait {
 		// these are only web processes for now so we can just use these
 		return deployment.NewProcesses, nil, nil
@@ -438,8 +455,8 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 	if err != nil {
 		return resources.Application{}, allWarnings, err
 	}
-	application.Name = newAppName
-	application, warnings, err = actor.UpdateApplication(application)
+	appGUID := application.GUID
+	application, warnings, err = actor.UpdateApplicationName(newAppName, appGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return resources.Application{}, allWarnings, err

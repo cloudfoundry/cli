@@ -74,6 +74,11 @@ func CreateSpace(space string) {
 	Eventually(CF("create-space", space)).Should(Exit(0))
 }
 
+// CreateSpaceInOrg creates a space with the given name using 'cf create-space'.
+func CreateSpaceInOrg(space string, org string) {
+	Eventually(CF("create-space", space, "-o", org)).Should(Exit(0))
+}
+
 // SetOrgRole sets the org role with `cf set-org-role`.
 func SetOrgRole(username, org, role string, isClient bool) {
 	if isClient {

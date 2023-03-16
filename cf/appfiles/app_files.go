@@ -16,7 +16,7 @@ import (
 
 const windowsPathPrefix = `\\?\`
 
-//go:generate counterfeiter . AppFiles
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AppFiles
 
 type AppFiles interface {
 	AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error)

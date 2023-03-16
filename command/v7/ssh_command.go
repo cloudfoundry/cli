@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh"
 )
 
-//go:generate counterfeiter . SharedSSHActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SharedSSHActor
 
 type SharedSSHActor interface {
 	ExecuteSecureShell(sshClient sharedaction.SecureShellClient, sshOptions sharedaction.SSHOptions) error

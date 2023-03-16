@@ -13,7 +13,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
-//go:generate counterfeiter . App
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . App
 
 type App interface {
 	BuildpackURL(string, string)

@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . SpaceQuotaRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SpaceQuotaRepository
 
 type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)

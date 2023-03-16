@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . SSHCodeGetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SSHCodeGetter
 
 type SSHCodeGetter interface {
 	commandregistry.Command

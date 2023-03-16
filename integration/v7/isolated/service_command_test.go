@@ -1,8 +1,10 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+	"fmt"
+	"strings"
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
@@ -12,40 +14,77 @@ import (
 )
 
 var _ = Describe("service command", func() {
-	var serviceInstanceName string
-
-	BeforeEach(func() {
-		serviceInstanceName = helpers.PrefixedRandomName("SI")
-	})
+	const serviceCommand = "service"
 
 	Describe("help", func() {
-		When("--help flag is set", func() {
-			It("displays command usage to output", func() {
-				session := helpers.CF("service", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+service - Show service instance info`))
-				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`\s+cf service SERVICE_INSTANCE`))
-				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`\s+\-\-guid\s+Retrieve and display the given service's guid\. All other output for the service is suppressed\.`))
-				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say(`\s+bind-service, rename-service, update-service`))
+		const serviceInstanceName = "fake-service-instance-name"
+
+		matchHelpMessage := SatisfyAll(
+			Say(`NAME:\n`),
+			Say(fmt.Sprintf(`\s+%s - Show service instance info\n`, serviceCommand)),
+			Say(`\n`),
+			Say(`USAGE:\n`),
+			Say(`\s+cf service SERVICE_INSTANCE\n`),
+			Say(`\n`),
+			Say(`OPTIONS:\n`),
+			Say(`\s+--guid\s+Retrieve and display the given service instances's guid. All other output is suppressed.\n`),
+			Say(`\s+--params\s+Retrieve and display the given service instances's parameters. All other output is suppressed.\n`),
+			Say(`\n`),
+			Say(`SEE ALSO:\n`),
+			Say(`\s+bind-service, rename-service, update-service\n`),
+			Say(`$`),
+		)
+
+		When("the -h flag is specified", func() {
+			It("succeeds and prints help", func() {
+				session := helpers.CF(serviceCommand, serviceInstanceName, "-h")
 				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("the service instance name is missing", func() {
+			It("fails with an error and prints help", func() {
+				session := helpers.CF(serviceCommand)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE_INSTANCE` was not provided"))
+				Expect(session.Out).To(matchHelpMessage)
+			})
+		})
+
+		When("an extra parameter is specified", func() {
+			It("fails with an error and prints help", func() {
+				session := helpers.CF(serviceCommand, serviceInstanceName, "anotherRandomParameter")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "anotherRandomParameter"`))
+				Expect(session.Out).To(SatisfyAll(
+					Say(`FAILED\n\n`),
+					matchHelpMessage,
+				))
+			})
+		})
+
+		When("an extra flag is specified", func() {
+			It("fails with an error and prints help", func() {
+				session := helpers.CF(serviceCommand, serviceInstanceName, "--anotherRandomFlag")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect Usage: unknown flag `anotherRandomFlag'"))
+				Expect(session.Out).To(matchHelpMessage)
 			})
 		})
 	})
 
-	When("the environment is not setup correctly", func() {
-		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "service", "some-service")
+	When("environment is not set up", func() {
+		It("displays an error and exits 1", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, serviceCommand, "serviceInstanceName")
 		})
 	})
 
-	When("an api is targeted, the user is logged in, and an org and space are targeted", func() {
+	When("user is logged in and targeting a space", func() {
 		var (
-			orgName   string
-			spaceName string
-			userName  string
+			serviceInstanceName string
+			orgName             string
+			spaceName           string
 		)
 
 		BeforeEach(func() {
@@ -53,514 +92,469 @@ var _ = Describe("service command", func() {
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
 
-			userName, _ = helpers.GetCredentials()
+			serviceInstanceName = helpers.NewServiceInstanceName()
 		})
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the service instance does not exist", func() {
-			It("returns an error and exits 1", func() {
-				session := helpers.CF("service", serviceInstanceName)
-				Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(""))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstanceName))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("the service instance belongs to this space", func() {
-			When("the service instance is a user provided service instance", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName)).Should(Exit(0))
-				})
-
-				AfterEach(func() {
-					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-				})
-
-				When("the --guid flag is provided", func() {
-					It("displays the service instance GUID", func() {
-						session := helpers.CF("service", serviceInstanceName, "--guid")
-						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(helpers.UserProvidedServiceInstanceGUID(serviceInstanceName)))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("no apps are bound to the service instance", func() {
-					It("displays service instance info", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-						Eventually(session).Should(Say(`service:\s+user-provided`))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("There are no bound apps for this service."))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("apps are bound to the service instance", func() {
-					var (
-						appName1 string
-						appName2 string
-					)
-
-					BeforeEach(func() {
-						appName1 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
-						appName2 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
-
-						helpers.WithHelloWorldApp(func(appDir string) {
-							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-						})
-					})
-
-					AfterEach(func() {
-						Eventually(helpers.CF("delete", appName1, "-f")).Should(Exit(0))
-						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
-					})
-
-					When("the service bindings do not have binding names", func() {
-						BeforeEach(func() {
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						AfterEach(func() {
-							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						It("displays service instance info", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Eventually(session).Should(Say(`service:\s+user-provided`))
-							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-							Eventually(session).Should(Say(appName1))
-							Eventually(session).Should(Say(appName2))
-
-							Eventually(session).Should(Exit(0))
-						})
-					})
-
-					When("the service bindings have binding names", func() {
-						var (
-							bindingName1 string
-							bindingName2 string
-						)
-
-						BeforeEach(func() {
-							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
-							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
-						})
-
-						AfterEach(func() {
-							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						It("displays service instance info", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Eventually(session).Should(Say(`service:\s+user-provided`))
-							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-							Eventually(session).Should(Say(`%s\s+%s`, appName1, bindingName1))
-							Eventually(session).Should(Say(`%s\s+%s`, appName2, bindingName2))
-							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
-
-				When("we update the user provided service instance with tags", func() {
-					BeforeEach(func() {
-						Eventually(helpers.CF("update-user-provided-service", serviceInstanceName,
-							"-t", "foo, bar")).Should(Exit(0))
-					})
-
-					It("displays service instance info", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`tags:\s+foo, bar`))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-			})
-
-			When("a user-provided service instance is created with tags", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName, "-t", "database, email")).Should(Exit(0))
-				})
-
-				It("displays tag info", func() {
-					session := helpers.CF("service", serviceInstanceName)
-					Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`tags:\s+database, email`))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-
-			When("the service instance is a managed service instance", func() {
-				var (
-					service     string
-					servicePlan string
-					broker      *servicebrokerstub.ServiceBrokerStub
-				)
-
-				BeforeEach(func() {
-					broker = servicebrokerstub.EnableServiceAccess()
-					service = broker.FirstServiceOfferingName()
-					servicePlan = broker.FirstServicePlanName()
-
-					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName, "-t", "database, email")).Should(Exit(0))
-				})
-
-				AfterEach(func() {
-					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-					broker.Forget()
-				})
-
-				When("the --guid flag is provided", func() {
-					It("displays the service instance GUID", func() {
-						session := helpers.CF("service", serviceInstanceName, "--guid")
-						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(helpers.ManagedServiceInstanceGUID(serviceInstanceName)))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("apps are bound to the service instance", func() {
-					var (
-						appName1 string
-						appName2 string
-					)
-
-					BeforeEach(func() {
-						appName1 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
-						appName2 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
-
-						helpers.WithHelloWorldApp(func(appDir string) {
-							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-						})
-					})
-
-					AfterEach(func() {
-						Eventually(helpers.CF("delete", appName1, "-f")).Should(Exit(0))
-						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
-					})
-
-					When("the service bindings do not have binding names", func() {
-						BeforeEach(func() {
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						AfterEach(func() {
-							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						It("displays service instance info", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say(`Showing info of service %s in org %s / space %s as %s\.\.\.`, serviceInstanceName, orgName, spaceName, userName))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Consistently(session).ShouldNot(Say("shared from:"))
-							Eventually(session).Should(Say(`service:\s+%s`, service))
-							Eventually(session).Should(Say(`tags:\s+database, email`))
-							Eventually(session).Should(Say(`plan:\s+%s`, servicePlan))
-							Eventually(session).Should(Say(`description:\s+%s`, broker.FirstServiceOfferingDescription()))
-							Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
-							Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
-							Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name))
-							Eventually(session).Should(Say("\n\n"))
-							Consistently(session).ShouldNot(Say("shared with spaces:"))
-							Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say(`status:\s+create succeeded`))
-							Eventually(session).Should(Say("message:"))
-							Eventually(session).Should(Say(`started:\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
-							Eventually(session).Should(Say(`updated:\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-							Eventually(session).Should(Say(appName1))
-							Eventually(session).Should(Say(appName2))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-
-					When("the service bindings have binding names", func() {
-						var (
-							bindingName1 string
-							bindingName2 string
-						)
-
-						BeforeEach(func() {
-							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
-							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
-						})
-
-						AfterEach(func() {
-							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						It("displays service instance info", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say(`Showing info of service %s in org %s / space %s as %s\.\.\.`, serviceInstanceName, orgName, spaceName, userName))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Consistently(session).ShouldNot(Say("shared from:"))
-							Eventually(session).Should(Say(`service:\s+%s`, service))
-							Eventually(session).Should(Say(`tags:\s+database, email`))
-							Eventually(session).Should(Say(`plan:\s+%s`, servicePlan))
-							Eventually(session).Should(Say(`description:\s+%s`, broker.FirstServiceOfferingDescription()))
-							Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
-							Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
-							Eventually(session).Should(Say("\n\n"))
-							Consistently(session).ShouldNot(Say("shared with spaces:"))
-							Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say(`status:\s+create succeeded`))
-							Eventually(session).Should(Say("message:"))
-							Eventually(session).Should(Say(`started:\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
-							Eventually(session).Should(Say(`updated:\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
-							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-							Eventually(session).Should(Say(`%s\s+%s`, appName1, bindingName1))
-							Eventually(session).Should(Say(`%s\s+%s`, appName2, bindingName2))
-
-							Eventually(session).Should(Exit(0))
-						})
-					})
-
-					When("the binding has a state", func() {
-						var (
-							bindingName1 string
-							bindingName2 string
-						)
-
-						BeforeEach(func() {
-							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
-							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
-						})
-
-						AfterEach(func() {
-							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-
-						It("displays it in the status field", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-							Eventually(session).Should(Say(`%s\s+%s\s+create succeeded`, appName1, bindingName1))
-							Eventually(session).Should(Say(`%s\s+%s\s+create succeeded`, appName2, bindingName2))
-
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
-
-				When("Upgrade available", func() {
-					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
-					})
-
-					When("maintenance_info is not configured", func() {
-						It("says that the broker does not support upgrades", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Eventually(session).Should(Say("Upgrades are not supported by this broker."))
-						})
-					})
-
-					When("maintenance_info is configured", func() {
-						BeforeEach(func() {
-							broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{
-								Version:     "3.0.0",
-								Description: "Stemcell update.\nExpect downtime.",
-							}
-							broker.Configure().Register()
-						})
-
-						It("says that an upgrade is available", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-							Eventually(session).Should(Say("Showing available upgrade details for this service..."))
-							Eventually(session).Should(Say("upgrade description: Stemcell update.\nExpect downtime."))
-							Eventually(session).Should(Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'`, serviceInstanceName))
-						})
-
-						It("says that a new service instance is already up to date", func() {
-							newServiceInstanceName := helpers.PrefixedRandomName("SI")
-							session := helpers.CF("create-service", service, servicePlan, newServiceInstanceName)
-							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("service", newServiceInstanceName)
-							Eventually(session).Should(Say(`name:\s+%s`, newServiceInstanceName))
-							Eventually(session).Should(Say("There is no upgrade available for this service."))
-							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("delete-service", "-f", newServiceInstanceName)
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
-			})
-		})
-	})
-
-	Context("service instance sharing when there are multiple spaces", func() {
-		var (
-			orgName         string
-			sourceSpaceName string
-
-			service     string
-			servicePlan string
-			broker      *servicebrokerstub.ServiceBrokerStub
-		)
-
-		BeforeEach(func() {
-			orgName = helpers.NewOrgName()
-			sourceSpaceName = helpers.NewSpaceName()
-			helpers.SetupCF(orgName, sourceSpaceName)
-
-			broker = servicebrokerstub.EnableServiceAccess()
-			service = broker.FirstServiceOfferingName()
-			servicePlan = broker.FirstServicePlanName()
-
-			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			broker.Forget()
-			helpers.QuickDeleteOrg(orgName)
-		})
-
-		Context("service has no type of shares", func() {
-			When("the service is shareable", func() {
-				It("should not display shared from or shared with information, but DOES display not currently shared info", func() {
-					session := helpers.CF("service", serviceInstanceName)
-					Eventually(session).Should(Say("This service is not currently shared."))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-		})
-
-		Context("service is shared between two spaces", func() {
-			var (
-				targetSpaceName string
+		When("the service instance is user-provided", func() {
+			const (
+				routeServiceURL = "https://route.com"
+				syslogURL       = "https://syslog.com"
+				tags            = "foo, bar"
 			)
 
 			BeforeEach(func() {
-				targetSpaceName = helpers.NewSpaceName()
-				helpers.CreateOrgAndSpace(orgName, targetSpaceName)
-				helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
-				Eventually(helpers.CF("share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
+				command := []string{
+					"create-user-provided-service", serviceInstanceName,
+					"-r", routeServiceURL,
+					"-l", syslogURL,
+					"-t", tags,
+				}
+				Eventually(helpers.CF(command...)).Should(Exit(0))
 			})
 
-			When("the user is targeted to the source space", func() {
-				When("there are externally bound apps to the service", func() {
-					BeforeEach(func() {
-						helpers.TargetOrgAndSpace(orgName, targetSpaceName)
-						helpers.WithHelloWorldApp(func(appDir string) {
-							appName1 := helpers.NewAppName()
-							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-
-							appName2 := helpers.NewAppName()
-							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
-						})
-						helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
-					})
-
-					It("should display the number of bound apps next to the target space name", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("shared with spaces:"))
-						Eventually(session).Should(Say(`org\s+space\s+bindings`))
-						Eventually(session).Should(Say(`%s\s+%s\s+2`, orgName, targetSpaceName))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("there are no externally bound apps to the service", func() {
-					It("should NOT display the number of bound apps next to the target space name", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("shared with spaces:"))
-						Eventually(session).Should(Say(`org\s+space\s+bindings`))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("the service is no longer shareable", func() {
-					Context("due to service broker settings", func() {
-						BeforeEach(func() {
-							broker.Services[0].Shareable = false
-							broker.Configure().Register()
-						})
-
-						It("should display that service instance sharing is disabled for this service", func() {
-							session := helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say("Service instance sharing is disabled for this service."))
-							Eventually(session).Should(Exit(0))
-						})
-					})
-				})
+			It("can show the GUID", func() {
+				session := helpers.CF(serviceCommand, serviceInstanceName, "--guid")
+				Eventually(session).Should(Exit(0))
+				Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
 			})
 
-			When("the user is targeted to the target space", func() {
-				var appName1, appName2 string
+			It("can show the service instance details", func() {
+				session := helpers.CF(serviceCommand, serviceInstanceName)
+				Eventually(session).Should(Exit(0))
+
+				username, _ := helpers.GetCredentials()
+				Expect(session).To(SatisfyAll(
+					Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+					Say(`\n`),
+					Say(`name:\s+%s\n`, serviceInstanceName),
+					Say(`guid:\s+\S{36}\n`),
+					Say(`type:\s+user-provided`),
+					Say(`tags:\s+%s\n`, tags),
+					Say(`route service url:\s+%s\n`, routeServiceURL),
+					Say(`syslog drain url:\s+%s\n`, syslogURL),
+					Say(`\n`),
+					Say(`Showing status of last operation:\n`),
+					Say(`status:\s+create succeeded\n`),
+					Say(`message:\s+Operation succeeded\n`),
+					Say(`started:\s+%s\n`, helpers.TimestampRegex),
+					Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+					Say(`\n`),
+					Say(`Showing bound apps:\n`),
+					Say(`There are no bound apps for this service instance\.\n`),
+				))
+			})
+
+			When("bound to apps", func() {
+				var (
+					appName1     string
+					appName2     string
+					bindingName1 string
+					bindingName2 string
+				)
 
 				BeforeEach(func() {
-					// We test that the app names are listed in alphanumeric sort order
-					appName1 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
-					appName2 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
-					helpers.TargetOrgAndSpace(orgName, targetSpaceName)
+					appName1 = helpers.PrefixedRandomName("APP1")
+					appName2 = helpers.PrefixedRandomName("APP2")
+					bindingName1 = helpers.RandomName()
+					bindingName2 = helpers.RandomName()
+
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-						Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-
 						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-						Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
+					})
+					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+				})
+
+				It("displays the bound apps", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Showing bound apps:\n`),
+						Say(`name\s+binding name\s+status\s+message\n`),
+						Say(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
+						Say(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
+					))
+				})
+			})
+
+			When("--params is requested", func() {
+				When("service instance parameters have been set", func() {
+					It("reports the service instance parameters JSON", func() {
+						session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
+						Eventually(session).Should(Exit(1))
+
+						Eventually(session.Err).Should(Say("This service does not support fetching service instance parameters."))
+					})
+				})
+			})
+
+		})
+
+		When("the service instance is managed by a broker", func() {
+			const (
+				testPollingInterval = time.Second
+				testTimeout         = time.Minute
+			)
+
+			var broker *servicebrokerstub.ServiceBrokerStub
+
+			AfterEach(func() {
+				broker.Forget()
+			})
+
+			When("created successfully", func() {
+				const tags = "foo, bar"
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Nanosecond).EnableServiceAccess()
+
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-t", tags,
+					)
+				})
+
+				It("can show the service instance details", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					username, _ := helpers.GetCredentials()
+					Expect(session).To(SatisfyAll(
+						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`name:\s+%s\n`, serviceInstanceName),
+						Say(`guid:\s+\S+\n`),
+						Say(`type:\s+managed`),
+						Say(`broker:\s+%s`, broker.Name),
+						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+						Say(`tags:\s+%s\n`, tags),
+						Say(`offering tags:\s+%s\n`, strings.Join(broker.Services[0].Tags, ", ")),
+						Say(`description:\s+%s\n`, broker.Services[0].Description),
+						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
+						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`\n`),
+						Say(`Showing status of last operation:\n`),
+						Say(`status:\s+create succeeded\n`),
+						Say(`message:\s+very happy service\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`Showing bound apps:\n`),
+						Say(`There are no bound apps for this service instance\.\n`),
+						Say(`\n`),
+						Say(`Showing sharing info:\n`),
+						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
+						Say(`Upgrades are not supported by this broker.\n`),
+					))
+				})
+			})
+
+			When("creation is in progress", func() {
+				const (
+					tags             = "foo, bar"
+					brokerAsyncDelay = time.Second
+				)
+
+				BeforeEach(func() {
+					broker = servicebrokerstub.New().WithAsyncDelay(brokerAsyncDelay).EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-t", tags,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+				})
+
+				It("can show the GUID immediately", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "--guid")
+					Eventually(session).Should(Exit(0))
+					Expect(strings.TrimSpace(string(session.Out.Contents()))).To(HaveLen(36), "GUID wrong length")
+				})
+
+				It("can show the service instance details", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					username, _ := helpers.GetCredentials()
+					Expect(session).To(SatisfyAll(
+						Say(`Showing info of service %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
+						Say(`\n`),
+						Say(`name:\s+%s\n`, serviceInstanceName),
+						Say(`guid:\s+\S+\n`),
+						Say(`type:\s+managed`),
+						Say(`broker:\s+%s`, broker.Name),
+						Say(`offering:\s+%s`, broker.FirstServiceOfferingName()),
+						Say(`plan:\s+%s`, broker.FirstServicePlanName()),
+						Say(`tags:\s+%s\n`, tags),
+						Say(`offering tags:\s+%s\n`, strings.Join(broker.Services[0].Tags, ", ")),
+						Say(`description:\s+%s\n`, broker.Services[0].Description),
+						Say(`documentation:\s+%s\n`, broker.Services[0].DocumentationURL),
+						Say(`dashboard url:\s+http://example.com\n`),
+						Say(`\n`),
+						Say(`Showing status of last operation:\n`),
+						Say(`status:\s+create in progress\n`),
+						Say(`message:\s+very happy service\n`),
+						Say(`started:\s+%s\n`, helpers.TimestampRegex),
+						Say(`updated:\s+%s\n`, helpers.TimestampRegex),
+						Say(`\n`),
+						Say(`Showing bound apps:\n`),
+						Say(`There are no bound apps for this service instance\.\n`),
+						Say(`\n`),
+						Say(`Showing sharing info:\n`),
+						Say(`This service instance is not currently being shared.`),
+						Say(`\n`),
+						Say(`Showing upgrade status:\n`),
+						Say(`Upgrades are not supported by this broker.\n`),
+					))
+				})
+			})
+
+			When("the instance is shared with another space", func() {
+				var sharedToSpaceName string
+
+				BeforeEach(func() {
+					sharedToSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(sharedToSpaceName)
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					output := func() *Buffer {
+						session := helpers.CF(serviceCommand, serviceInstanceName)
+						session.Wait()
+						return session.Out
+					}
+
+					Eventually(output, testTimeout, testPollingInterval).Should(Say(`status:\s+create succeeded\n`))
+
+					command = []string{
+						"share-service",
+						serviceInstanceName,
+						"-s",
+						sharedToSpaceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					command := []string{
+						"unshare-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+						"-f",
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.QuickDeleteSpace(sharedToSpaceName)
+				})
+
+				It("can show that the service is being shared", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Showing sharing info:\n`),
+						Say(`Shared with spaces:\n`),
+						Say(`org\s+space\s+bindings\n`),
+						Say(`%s\s+%s\s+0\s*\n`, orgName, sharedToSpaceName),
+					))
+				})
+			})
+
+			When("the instance is being accessed form shared to space", func() {
+				var sharedToSpaceName string
+
+				BeforeEach(func() {
+					sharedToSpaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(sharedToSpaceName)
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					command := []string{
+						"create-service",
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					output := func() *Buffer {
+						session := helpers.CF(serviceCommand, serviceInstanceName)
+						session.Wait()
+						return session.Out
+					}
+
+					Eventually(output, testTimeout, testPollingInterval).Should(Say(`status:\s+create succeeded\n`))
+
+					command = []string{
+						"share-service",
+						serviceInstanceName,
+						"-s",
+						sharedToSpaceName,
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.TargetOrgAndSpace(orgName, sharedToSpaceName)
+				})
+
+				AfterEach(func() {
+					helpers.TargetOrgAndSpace(orgName, spaceName)
+
+					command := []string{
+						"unshare-service",
+						serviceInstanceName,
+						"-s", sharedToSpaceName,
+						"-f",
+					}
+					Eventually(helpers.CF(command...)).Should(Exit(0))
+
+					helpers.QuickDeleteSpace(sharedToSpaceName)
+				})
+
+				It("can show that the service has been shared", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName)
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Showing sharing info:\n`),
+						Say(`This service instance is shared from space %s of org %s.\n`, spaceName, orgName),
+					))
+				})
+			})
+
+			When("the broker supports maintenance info", func() {
+				When("the service is up to date", func() {
+					var serviceInstanceName string
+
+					BeforeEach(func() {
+						serviceInstanceName = helpers.NewServiceInstanceName()
+						broker = servicebrokerstub.New().WithMaintenanceInfo("1.2.3").EnableServiceAccess()
+						helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+					})
+
+					It("says that the service has no upgrades available", func() {
+						session := helpers.CF(serviceCommand, serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(SatisfyAll(
+							Say(`Showing upgrade status:\n`),
+							Say(`There is no upgrade available for this service.\n`),
+						))
 					})
 				})
 
-				When("there are bound apps to the service with no binding names", func() {
-					It("should display the bound apps in alphanumeric sort order", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say(`shared from org/space:\s+%s / %s`, orgName, sourceSpaceName))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say("bound apps:"))
-						Eventually(session).Should(Say(`name\s+binding name\s+status\s+message`))
-						Eventually(session).Should(Say(appName2))
-						Eventually(session).Should(Say(appName1))
-						Eventually(session).Should(Exit(0))
+				When("an update is available", func() {
+					var serviceInstanceName string
+
+					BeforeEach(func() {
+						serviceInstanceName = helpers.NewServiceInstanceName()
+						broker = servicebrokerstub.New().WithMaintenanceInfo("1.2.3").EnableServiceAccess()
+						helpers.CreateManagedServiceInstance(broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)
+
+						broker.WithMaintenanceInfo("1.2.4", "really cool improvement").Configure().Register()
 					})
+
+					It("displays information about the upgrade", func() {
+						session := helpers.CF(serviceCommand, serviceInstanceName)
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(SatisfyAll(
+							Say(`Showing upgrade status:\n`),
+							Say(`There is an upgrade available for this service.\n`),
+							Say(`Upgrade description: really cool improvement\n`),
+							Say(`TIP: You can upgrade using 'cf upgrade-service %s'\n`, serviceInstanceName),
+						))
+					})
+				})
+			})
+
+			When("bound to apps", func() {
+				var (
+					appName1     string
+					appName2     string
+					bindingName1 string
+					bindingName2 string
+				)
+
+				BeforeEach(func() {
+					appName1 = helpers.PrefixedRandomName("APP1")
+					appName2 = helpers.PrefixedRandomName("APP2")
+					bindingName1 = helpers.RandomName()
+					bindingName2 = helpers.RandomName()
+
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
+
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+					)
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+					})
+
+					Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1, "--wait")).Should(Exit(0))
+					Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2, "--wait")).Should(Exit(0))
+				})
+
+				It("displays the bound apps", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`Showing bound apps:\n`),
+						Say(`name\s+binding name\s+status\s+message\n`),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName1, bindingName1),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName2, bindingName2),
+					))
+				})
+			})
+
+			When("--params is requested", func() {
+				var key string
+				var value string
+
+				BeforeEach(func() {
+					key = "foo"
+					value = helpers.RandomName()
+
+					broker = servicebrokerstub.New().EnableServiceAccess()
+					helpers.CreateManagedServiceInstance(
+						broker.FirstServiceOfferingName(),
+						broker.FirstServicePlanName(),
+						serviceInstanceName,
+						"-c", fmt.Sprintf(`{"%s":"%s"}`, key, value),
+					)
+				})
+
+				It("reports the service instance parameters JSON", func() {
+					session := helpers.CF(serviceCommand, serviceInstanceName, "--params")
+					Eventually(session).Should(Exit(0))
+
+					Expect(session).To(SatisfyAll(
+						Say(`\{\n`),
+						Say(`  %q: %q\n`, key, value),
+						Say(`\}\n`),
+					))
 				})
 			})
 		})

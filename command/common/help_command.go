@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . HelpActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . HelpActor
 
 // HelpActor handles the business logic of the help command
 type HelpActor interface {
@@ -238,7 +238,8 @@ func (cmd HelpCommand) displayCommand() error {
 	cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandUsage": cmd.UI.TranslateText(usageString),
-		})
+		},
+	)
 
 	if cmdInfo.Examples != "" {
 		examplesString := strings.Replace(cmdInfo.Examples, "CF_NAME", cmd.Config.BinaryName(), -1)
@@ -247,7 +248,18 @@ func (cmd HelpCommand) displayCommand() error {
 		cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.Examples}}",
 			map[string]interface{}{
 				"Examples": examplesString,
-			})
+			},
+		)
+	}
+
+	if cmdInfo.Resources != "" {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("RESOURCES:")
+		cmd.UI.DisplayText(sharedaction.CommandIndent+"{{.Resources}}",
+			map[string]interface{}{
+				"Resources": cmdInfo.Resources,
+			},
+		)
 	}
 
 	if cmdInfo.Alias != "" {

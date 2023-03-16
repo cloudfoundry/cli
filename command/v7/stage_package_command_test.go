@@ -81,7 +81,7 @@ var _ = Describe("stage-package Command", func() {
 			GUID: spaceGUID,
 			Name: "some-space",
 		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 
 		allLogsWritten = make(chan bool)
 		fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
@@ -169,7 +169,7 @@ var _ = Describe("stage-package Command", func() {
 				nil)
 
 			fakeActor.GetNewestReadyPackageForApplicationReturns(
-				v7action.Package{GUID: newestPackageGUID},
+				resources.Package{GUID: newestPackageGUID},
 				v7action.Warnings{"newest-pkg-warning"},
 				nil)
 		})

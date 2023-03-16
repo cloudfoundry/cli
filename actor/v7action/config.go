@@ -6,10 +6,12 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . Config
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Config
 
 type Config interface {
 	AccessToken() string
+	APIVersion() string
+	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
 	PollingInterval() time.Duration
 	RefreshToken() string
@@ -26,4 +28,6 @@ type Config interface {
 	Target() string
 	UAAGrantType() string
 	UnsetOrganizationAndSpaceInformation()
+	SetKubernetesAuthInfo(authInfo string)
+	IsCFOnK8s() bool
 }

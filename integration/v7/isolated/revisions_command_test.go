@@ -33,7 +33,7 @@ var _ = Describe("revisions command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("revisions", "APPS", "List revisions of an app"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("revisions", "EXPERIMENTAL COMMANDS", "List revisions of an app"))
 			})
 
 			It("Displays command usage to output", func() {
@@ -49,7 +49,7 @@ var _ = Describe("revisions command", func() {
 		})
 	})
 
-	When("targetting and org and space", func() {
+	When("targeting and org and space", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -105,8 +105,8 @@ var _ = Describe("revisions command", func() {
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(regexp.QuoteMeta(`Getting revisions for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 
-				Expect(session).Should(Say("New droplet deployed"))
-				Expect(session).Should(Say("Initial revision"))
+				Expect(session).Should(Say(`2\(deployed\)\s+New droplet deployed.\s+true`))
+				Expect(session).Should(Say(`1\s+Initial revision.\s+true`))
 			})
 
 			When("revisions are disabled for the app", func() {

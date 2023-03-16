@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -20,7 +21,7 @@ var _ = Describe("EnvironmentVariables", func() {
 
 	Describe("GetEnvironmentVariableGroup", func() {
 		var (
-			envVars    EnvironmentVariables
+			envVars    resources.EnvironmentVariables
 			warnings   Warnings
 			executeErr error
 		)
@@ -67,7 +68,7 @@ var _ = Describe("EnvironmentVariables", func() {
 			It("returns the error and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(envVars).To(Equal(EnvironmentVariables{
+				Expect(envVars).To(Equal(resources.EnvironmentVariables{
 					"DEBUG":  {Value: "false", IsSet: true},
 					"my-var": {Value: "my-val", IsSet: true},
 					"number": {Value: "6", IsSet: true},
@@ -79,8 +80,8 @@ var _ = Describe("EnvironmentVariables", func() {
 
 	Describe("UpdateApplicationEnvironmentVariables", func() {
 		var (
-			envVars        EnvironmentVariables
-			patchedEnvVars EnvironmentVariables
+			envVars        resources.EnvironmentVariables
+			patchedEnvVars resources.EnvironmentVariables
 
 			warnings   Warnings
 			executeErr error
@@ -92,7 +93,7 @@ var _ = Describe("EnvironmentVariables", func() {
 
 		When("the request errors", func() {
 			BeforeEach(func() {
-				envVars = EnvironmentVariables{"my-var": {Value: "my-val", IsSet: true}}
+				envVars = resources.EnvironmentVariables{"my-var": {Value: "my-val", IsSet: true}}
 
 				expectedBody := map[string]interface{}{
 					"var": map[string]string{
@@ -118,7 +119,7 @@ var _ = Describe("EnvironmentVariables", func() {
 		When("the request succeeds", func() {
 			When("env variable is being set", func() {
 				BeforeEach(func() {
-					envVars = EnvironmentVariables{
+					envVars = resources.EnvironmentVariables{
 						"my-var":    {Value: "my-val", IsSet: true},
 						"delete-me": {},
 					}
@@ -149,7 +150,7 @@ var _ = Describe("EnvironmentVariables", func() {
 				It("returns the error and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
-					Expect(patchedEnvVars).To(Equal(EnvironmentVariables{
+					Expect(patchedEnvVars).To(Equal(resources.EnvironmentVariables{
 						"DEBUG":  {Value: "false", IsSet: true},
 						"my-var": {Value: "my-val", IsSet: true},
 					}))
@@ -158,7 +159,7 @@ var _ = Describe("EnvironmentVariables", func() {
 
 			When("env variable is being unset", func() {
 				BeforeEach(func() {
-					envVars = EnvironmentVariables{
+					envVars = resources.EnvironmentVariables{
 						"my-var": {Value: "", IsSet: false},
 					}
 
@@ -186,7 +187,7 @@ var _ = Describe("EnvironmentVariables", func() {
 				It("returns the patchedEnvVars and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
-					Expect(patchedEnvVars).To(Equal(EnvironmentVariables{
+					Expect(patchedEnvVars).To(Equal(resources.EnvironmentVariables{
 						"DEBUG": {Value: "false", IsSet: true},
 					}))
 				})
@@ -198,8 +199,8 @@ var _ = Describe("EnvironmentVariables", func() {
 		var (
 			warnings       Warnings
 			executeErr     error
-			envVars        EnvironmentVariables
-			patchedEnvVars EnvironmentVariables
+			envVars        resources.EnvironmentVariables
+			patchedEnvVars resources.EnvironmentVariables
 		)
 
 		JustBeforeEach(func() {
@@ -208,7 +209,7 @@ var _ = Describe("EnvironmentVariables", func() {
 
 		When("the request errors", func() {
 			BeforeEach(func() {
-				envVars = EnvironmentVariables{"my-var": {Value: "my-val", IsSet: true}}
+				envVars = resources.EnvironmentVariables{"my-var": {Value: "my-val", IsSet: true}}
 
 				expectedBody := map[string]interface{}{
 					"var": map[string]string{
@@ -234,7 +235,7 @@ var _ = Describe("EnvironmentVariables", func() {
 		When("the request succeeds", func() {
 			When("env variable is being set", func() {
 				BeforeEach(func() {
-					envVars = EnvironmentVariables{
+					envVars = resources.EnvironmentVariables{
 						"my-var":    {Value: "my-val", IsSet: true},
 						"delete-me": {},
 					}
@@ -264,7 +265,7 @@ var _ = Describe("EnvironmentVariables", func() {
 				It("returns the patchedEnvVars and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
-					Expect(patchedEnvVars).To(Equal(EnvironmentVariables{
+					Expect(patchedEnvVars).To(Equal(resources.EnvironmentVariables{
 						"my-var": {Value: "my-val", IsSet: true},
 					}))
 				})

@@ -101,7 +101,6 @@ var _ = Describe("env command", func() {
 
 			AfterEach(func() {
 				Eventually(helpers.CF("unbind-service", appName, userProvidedServiceName)).Should(Exit(0))
-				Eventually(helpers.CF("delete-service", userProvidedServiceName)).Should(Exit(0))
 				Eventually(helpers.CF("set-running-environment-variable-group", `{}`)).Should(Exit(0))
 				Eventually(helpers.CF("set-staging-environment-variable-group", `{}`)).Should(Exit(0))
 			})

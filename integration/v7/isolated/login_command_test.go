@@ -223,7 +223,7 @@ var _ = Describe("login command", func() {
 		})
 
 		When("the API endpoint's scheme is https", func() {
-			// This test is somewhat redundant because the integration test setup will have alreayd logged in successfully with certificates at this point
+			// This test is somewhat redundant because the integration test setup will have already logged in successfully with certificates at this point
 			// In the interest of test coverage however, we have decided to keep it in.
 			When("the OS provides a valid SSL Certificate (Unix: SSL_CERT_FILE or SSL_CERT_DIR Environment variables) (Windows: Import-Certificate call)", func() {
 				BeforeEach(func() {
@@ -624,7 +624,7 @@ var _ = Describe("login command", func() {
 				Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 				Eventually(session).Should(Exit(1))
 
-				//And I am still logged in
+				// And I am still logged in
 				targetSession := helpers.CF("target")
 				Eventually(targetSession).Should(Exit(0))
 			})
@@ -753,7 +753,7 @@ var _ = Describe("login command", func() {
 				})
 
 				When("user does not select an organization", func() {
-					It("succesfully logs in but does not target any org", func() {
+					It("successfully logs in but does not target any org", func() {
 						input := NewBuffer()
 						_, err := input.Write([]byte("\n"))
 						Expect(err).ToNot(HaveOccurred())

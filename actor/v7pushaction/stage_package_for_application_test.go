@@ -51,7 +51,7 @@ var _ = Describe("StagePackageForApplication", func() {
 
 		When("staging is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.StageApplicationPackageReturns(v7action.Build{GUID: "some-build-guid"}, v7action.Warnings{"some-staging-warning"}, nil)
+				fakeV7Actor.StageApplicationPackageReturns(resources.Build{GUID: "some-build-guid"}, v7action.Warnings{"some-staging-warning"}, nil)
 			})
 
 			It("returns a polling build event and warnings", func() {
@@ -62,7 +62,7 @@ var _ = Describe("StagePackageForApplication", func() {
 
 		When("staging errors", func() {
 			BeforeEach(func() {
-				fakeV7Actor.StageApplicationPackageReturns(v7action.Build{}, v7action.Warnings{"some-staging-warning"}, errors.New("ahhh, i failed"))
+				fakeV7Actor.StageApplicationPackageReturns(resources.Build{}, v7action.Warnings{"some-staging-warning"}, errors.New("ahhh, i failed"))
 			})
 
 			It("returns errors and warnings", func() {

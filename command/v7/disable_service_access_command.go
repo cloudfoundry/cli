@@ -7,12 +7,12 @@ import (
 type DisableServiceAccessCommand struct {
 	BaseCommand
 
-	RequiredArgs    flag.Service `positional-args:"yes"`
-	ServiceBroker   string       `short:"b" description:"Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"`
-	Organization    string       `short:"o" description:"Disable access for a specified organization"`
-	ServicePlan     string       `short:"p" description:"Disable access to a specified service plan"`
-	usage           interface{}  `usage:"CF_NAME disable-service-access SERVICE [-b BROKER] [-p PLAN] [-o ORG]"`
-	relatedCommands interface{}  `related_commands:"enable-service-access, marketplace, service-access, service-brokers"`
+	RequiredArgs    flag.ServiceOffering `positional-args:"yes"`
+	ServiceBroker   string               `short:"b" description:"Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"`
+	Organization    string               `short:"o" description:"Disable access for a specified organization"`
+	ServicePlan     string               `short:"p" description:"Disable access to a specified service plan"`
+	usage           interface{}          `usage:"CF_NAME disable-service-access SERVICE_OFFERING [-b BROKER] [-p PLAN] [-o ORG]"`
+	relatedCommands interface{}          `related_commands:"enable-service-access, marketplace, service-access, service-brokers"`
 }
 
 func (cmd DisableServiceAccessCommand) Execute(args []string) error {
@@ -38,7 +38,7 @@ func (cmd DisableServiceAccessCommand) Execute(args []string) error {
 }
 
 func (cmd DisableServiceAccessCommand) displayMessage() error {
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}

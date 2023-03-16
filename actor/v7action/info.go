@@ -1,9 +1,13 @@
 package v7action
 
-func (actor Actor) GetLogCacheEndpoint() (string, Warnings, error) {
-	info, _, warnings, err := actor.CloudControllerClient.GetInfo()
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+
+type Info ccv3.Info
+
+func (actor Actor) GetRootResponse() (Info, Warnings, error) {
+	info, warnings, err := actor.CloudControllerClient.GetInfo()
 	if err != nil {
-		return "", Warnings(warnings), err
+		return Info{}, Warnings(warnings), err
 	}
-	return info.LogCache(), Warnings(warnings), nil
+	return Info(info), Warnings(warnings), nil
 }

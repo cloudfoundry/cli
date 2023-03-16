@@ -1,14 +1,14 @@
 package translatableerror
 
-type ManifestCreationError struct {
+type FileCreationError struct {
 	Err error
 }
 
-func (ManifestCreationError) Error() string {
-	return "Error creating manifest file: {{.Error}}"
+func (FileCreationError) Error() string {
+	return "Error creating file: {{.Error}}"
 }
 
-func (e ManifestCreationError) Translate(translate func(string, ...interface{}) string) string {
+func (e FileCreationError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Error": e.Err,
 	})

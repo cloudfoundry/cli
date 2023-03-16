@@ -1,64 +1,17 @@
 package store
 
 import (
-	"sync"
-
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-
-	uuid "github.com/nu7hatch/gouuid"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
 )
 
-type BrokerConfigurationStore struct {
-	data  map[string]config.BrokerConfiguration
-	mutex sync.Mutex
+type BrokerID database.ID
+type InstanceID database.ID
+type BindingID database.ID
+
+type Store struct {
+	db *database.Database
 }
 
-func New() *BrokerConfigurationStore {
-	return &BrokerConfigurationStore{
-		data: make(map[string]config.BrokerConfiguration),
-	}
-}
-
-func (c *BrokerConfigurationStore) CreateBroker(cfg config.BrokerConfiguration) string {
-	rawGUID, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
-	guid := rawGUID.String()
-
-	c.mutex.Lock()
-	c.data[guid] = cfg
-	c.mutex.Unlock()
-
-	return guid
-}
-
-func (c *BrokerConfigurationStore) UpdateBroker(guid string, cfg config.BrokerConfiguration) {
-	c.mutex.Lock()
-	c.data[guid] = cfg
-	c.mutex.Unlock()
-}
-
-func (c *BrokerConfigurationStore) DeleteBroker(guid string) {
-	c.mutex.Lock()
-	delete(c.data, guid)
-	c.mutex.Unlock()
-}
-
-func (c *BrokerConfigurationStore) GetBrokerConfiguration(guid string) (config.BrokerConfiguration, bool) {
-	c.mutex.Lock()
-	config, ok := c.data[guid]
-	c.mutex.Unlock()
-
-	return config, ok
-}
-
-func (c *BrokerConfigurationStore) ListBrokers() (result []string) {
-	c.mutex.Lock()
-	for k := range c.data {
-		result = append(result, k)
-	}
-	c.mutex.Unlock()
-
-	return
+func New() *Store {
+	return &Store{db: database.NewDatabase()}
 }

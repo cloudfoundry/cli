@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-//go:generate counterfeiter . SecureDialer
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SecureDialer
 
 type SecureDialer interface {
 	Dial(network, address string, config *ssh.ClientConfig) (SecureClient, error)

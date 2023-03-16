@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -21,9 +22,9 @@ var _ = Describe("Task", func() {
 
 	Describe("CreateApplicationTask", func() {
 		var (
-			submitTask Task
+			submitTask resources.Task
 
-			task       Task
+			task       resources.Task
 			warnings   Warnings
 			executeErr error
 		)
@@ -51,13 +52,13 @@ var _ = Describe("Task", func() {
 						),
 					)
 
-					submitTask = Task{Command: "some command"}
+					submitTask = resources.Task{Command: "some command"}
 				})
 
 				It("creates and returns the task and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(task).To(Equal(Task{SequenceID: 3}))
+					Expect(task).To(Equal(resources.Task{SequenceID: 3}))
 					Expect(warnings).To(ConsistOf("warning"))
 				})
 			})
@@ -72,13 +73,13 @@ var _ = Describe("Task", func() {
 						),
 					)
 
-					submitTask = Task{Command: "some command", Name: "some-task-name"}
+					submitTask = resources.Task{Command: "some command", Name: "some-task-name"}
 				})
 
 				It("creates and returns the task and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(task).To(Equal(Task{SequenceID: 3}))
+					Expect(task).To(Equal(resources.Task{SequenceID: 3}))
 					Expect(warnings).To(ConsistOf("warning"))
 				})
 			})
@@ -96,13 +97,13 @@ var _ = Describe("Task", func() {
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
-					submitTask = Task{Command: "some command", DiskInMB: uint64(123)}
+					submitTask = resources.Task{Command: "some command", DiskInMB: uint64(123)}
 				})
 
 				It("creates and returns the task and all warnings with the provided disk size", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(task).To(Equal(Task{DiskInMB: uint64(123), SequenceID: 3}))
+					Expect(task).To(Equal(resources.Task{DiskInMB: uint64(123), SequenceID: 3}))
 					Expect(warnings).To(ConsistOf("warning"))
 				})
 			})
@@ -121,13 +122,13 @@ var _ = Describe("Task", func() {
 						),
 					)
 
-					submitTask = Task{Command: "some command", MemoryInMB: uint64(123)}
+					submitTask = resources.Task{Command: "some command", MemoryInMB: uint64(123)}
 				})
 
 				It("creates and returns the task and all warnings with the provided memory", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(task).To(Equal(Task{MemoryInMB: uint64(123), SequenceID: 3}))
+					Expect(task).To(Equal(resources.Task{MemoryInMB: uint64(123), SequenceID: 3}))
 					Expect(warnings).To(ConsistOf("warning"))
 				})
 			})
@@ -157,7 +158,7 @@ var _ = Describe("Task", func() {
 					),
 				)
 
-				submitTask = Task{Command: "some command"}
+				submitTask = resources.Task{Command: "some command"}
 			})
 
 			It("returns the errors and all warnings", func() {
@@ -185,7 +186,7 @@ var _ = Describe("Task", func() {
 		var (
 			submitQuery Query
 
-			tasks      []Task
+			tasks      []resources.Task
 			warnings   Warnings
 			executeErr error
 		)
@@ -256,7 +257,7 @@ var _ = Describe("Task", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(tasks).To(ConsistOf(
-					Task{
+					resources.Task{
 						GUID:       "task-1-guid",
 						SequenceID: 1,
 						Name:       "task-1",
@@ -264,7 +265,7 @@ var _ = Describe("Task", func() {
 						CreatedAt:  "2016-11-07T05:59:01Z",
 						Command:    "some-command",
 					},
-					Task{
+					resources.Task{
 						GUID:       "task-2-guid",
 						SequenceID: 2,
 						Name:       "task-2",
@@ -272,7 +273,7 @@ var _ = Describe("Task", func() {
 						CreatedAt:  "2016-11-07T06:59:01Z",
 						Command:    "some-command",
 					},
-					Task{
+					resources.Task{
 						GUID:       "task-3-guid",
 						SequenceID: 3,
 						Name:       "task-3",
@@ -356,7 +357,7 @@ var _ = Describe("Task", func() {
 
 	Describe("UpdateTaskCancel", func() {
 		var (
-			task       Task
+			task       resources.Task
 			warnings   Warnings
 			executeErr error
 		)
@@ -386,7 +387,7 @@ var _ = Describe("Task", func() {
 			It("returns the task and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(task).To(Equal(Task{
+				Expect(task).To(Equal(resources.Task{
 					GUID:       "task-3-guid",
 					SequenceID: 3,
 					Name:       "task-3",

@@ -1,14 +1,15 @@
 Thank you for contributing to the CF CLI! Please read the following:
 
 
-* If you haven't yet, please review our contributing guidelines: https://github.com/cloudfoundry/cli/blob/master/.github/CONTRIBUTING.md
+* Please make sure you have implemented changes in line with the [contributing guidelines](https://github.com/cloudfoundry/cli/blob/main/.github/CONTRIBUTING.md)
 * We're not allowed to accept any PRs without a signed CLA, no matter how small.
 If your contribution falls under a company CLA but your membership is not public, expect delays while we confirm.
 * All new code requires tests to protect against regressions.
-* Contributions must confirm to our [style guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide). Please reach out to us if you have questions.
+* Contributions must be made against the appropriate branch. See the [contributing guidelines](https://github.com/cloudfoundry/cli/blob/main/.github/CONTRIBUTING.md)
+* Contributions must conform to our [style guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide). Please reach out to us if you have questions.
 
 
-## Does this PR modify CLI v6 or v7?
+## Does this PR modify CLI v6, CLI v7, or CLI v8?
 
 Please see the contribution doc above or review [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide).
 
@@ -30,7 +31,7 @@ Explain why this functionality should be in the cf CLI, as opposed to a plugin.
 
 ## Applicable Issues
 
-List any applicable Github Issues here
+List any applicable GitHub Issues here
 
 ## How Urgent Is The Change?
 

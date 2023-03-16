@@ -23,6 +23,7 @@ const (
 	Space           ResourceType = "space"
 	Stack           ResourceType = "stack"
 	ServiceBroker   ResourceType = "service-broker"
+	ServiceInstance ResourceType = "service-instance"
 	ServiceOffering ResourceType = "service-offering"
 	ServicePlan     ResourceType = "service-plan"
 )
@@ -32,7 +33,6 @@ type LabelsCommand struct {
 
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   service-plan\n   space\n   stack"`
 	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
 	ServiceBroker   string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
 	ServiceOffering string          `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
@@ -47,10 +47,12 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		err      error
 	)
 
-	cmd.username, err = cmd.Config.CurrentUserName()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
+
+	cmd.username = user.Name
 
 	if err := cmd.validateFlags(); err != nil {
 		return err
@@ -79,6 +81,9 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		labels, warnings, err = cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
+	case ServiceInstance:
+		cmd.displayMessageWithOrgAndSpace()
+		labels, warnings, err = cmd.Actor.GetServiceInstanceLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 	case ServiceOffering:
 		cmd.displayMessageForServiceCommands()
 		labels, warnings, err = cmd.Actor.GetServiceOfferingLabels(cmd.RequiredArgs.ResourceName, cmd.ServiceBroker)
@@ -103,11 +108,39 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	return nil
 }
 
+func (cmd LabelsCommand) Usage() string {
+	return `CF_NAME labels RESOURCE RESOURCE_NAME`
+}
+
+func (cmd LabelsCommand) Examples() string {
+	return `
+cf labels app dora
+cf labels org business
+cf labels buildpack go_buildpack --stack cflinuxfs3`
+}
+
+func (cmd LabelsCommand) Resources() string {
+	return `
+app
+buildpack
+domain
+org
+route
+service-broker
+service-instance
+service-offering
+service-plan
+space
+stack`
+}
+
 func (cmd LabelsCommand) canonicalResourceTypeForName() ResourceType {
 	return ResourceType(strings.ToLower(cmd.RequiredArgs.ResourceType))
 }
 
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
+	cmd.UI.DisplayNewline()
+
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
 		return
@@ -164,7 +197,7 @@ func (cmd LabelsCommand) validateFlags() error {
 
 func (cmd LabelsCommand) checkTarget() error {
 	switch ResourceType(cmd.RequiredArgs.ResourceType) {
-	case App, Route:
+	case App, Route, ServiceInstance:
 		return cmd.SharedActor.CheckTarget(true, true)
 	case Space:
 		return cmd.SharedActor.CheckTarget(true, false)
@@ -189,8 +222,6 @@ func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageWithOrg() {
@@ -199,8 +230,6 @@ func (cmd LabelsCommand) displayMessageWithOrg() {
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageWithStack() {
@@ -216,8 +245,6 @@ func (cmd LabelsCommand) displayMessageWithStack() {
 		"StackName":    cmd.BuildpackStack,
 		"User":         cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd LabelsCommand) displayMessageForServiceCommands() {
@@ -246,6 +273,4 @@ func (cmd LabelsCommand) displayMessageForServiceCommands() {
 		"ServiceOffering": cmd.ServiceOffering,
 		"User":            cmd.username,
 	})
-
-	cmd.UI.DisplayNewline()
 }

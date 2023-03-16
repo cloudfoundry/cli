@@ -18,10 +18,10 @@ type ManifestParser struct{}
 // For manifests with multiple applications, appName will filter the
 // applications and leave only a single application in the resulting parsed
 // manifest structure.
-func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (Manifest, error) {
+func (m ManifestParser) InterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error) {
 	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
-		return Manifest{}, err
+		return nil, err
 	}
 
 	tpl := template.NewTemplate(rawManifest)
@@ -30,14 +30,14 @@ func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFi
 	for _, path := range pathsToVarsFiles {
 		rawVarsFile, ioerr := ioutil.ReadFile(path)
 		if ioerr != nil {
-			return Manifest{}, ioerr
+			return nil, ioerr
 		}
 
 		var sv template.StaticVariables
 
 		err = yaml.Unmarshal(rawVarsFile, &sv)
 		if err != nil {
-			return Manifest{}, InvalidYAMLError{Err: err}
+			return nil, InvalidYAMLError{Err: err}
 		}
 
 		for k, v := range sv {
@@ -51,11 +51,15 @@ func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFi
 
 	rawManifest, err = tpl.Evaluate(fileVars, nil, template.EvaluateOpts{ExpectAllKeys: true})
 	if err != nil {
-		return Manifest{}, InterpolationError{Err: err}
+		return nil, InterpolationError{Err: err}
 	}
 
+	return rawManifest, nil
+}
+
+func (m ManifestParser) ParseManifest(pathToManifest string, rawManifest []byte) (Manifest, error) {
 	var parsedManifest Manifest
-	err = yaml.Unmarshal(rawManifest, &parsedManifest)
+	err := yaml.Unmarshal(rawManifest, &parsedManifest)
 	if err != nil {
 		return Manifest{}, &yaml.TypeError{}
 	}

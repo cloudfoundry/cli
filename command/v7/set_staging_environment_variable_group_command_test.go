@@ -3,8 +3,8 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -72,7 +72,7 @@ var _ = Describe("set-staging-environment-variable-group Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "apple"}, nil)
 		})
 
 		It("should print text indicating its running", func() {
@@ -118,7 +118,7 @@ var _ = Describe("set-staging-environment-variable-group Command", func() {
 				Expect(fakeActor.SetEnvironmentVariableGroupCallCount()).To(Equal(1))
 				group, envVars := fakeActor.SetEnvironmentVariableGroupArgsForCall(0)
 				Expect(group).To(Equal(constant.StagingEnvironmentVariableGroup))
-				Expect(envVars).To(Equal(ccv3.EnvironmentVariables{
+				Expect(envVars).To(Equal(resources.EnvironmentVariables{
 					"key1": {Value: "val1", IsSet: true},
 					"key2": {Value: "val2", IsSet: true},
 				}))

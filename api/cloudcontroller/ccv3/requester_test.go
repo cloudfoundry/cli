@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -88,7 +89,6 @@ var _ = Describe("shared request helpers", func() {
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
-
 			When("the cloud controller returns errors and warnings", func() {
 				BeforeEach(func() {
 					response := `{
@@ -442,6 +442,97 @@ var _ = Describe("shared request helpers", func() {
 		})
 	})
 
+	Describe("MakeRequestSendReceiveRaw", func() {
+		var (
+			method        string
+			url           string
+			headers       http.Header
+			requestBody   []byte
+			responseBytes []byte
+			httpResponse  *http.Response
+			executeErr    error
+		)
+		JustBeforeEach(func() {
+			responseBytes, httpResponse, executeErr = client.MakeRequestSendReceiveRaw(method, url, headers, requestBody)
+		})
+
+		Context("PATCH request with body", func() {
+			BeforeEach(func() {
+				method = "PATCH"
+				url = fmt.Sprintf("%s/v3/apps/%s", server.URL(), "some-app-guid")
+				headers = http.Header{}
+				headers.Set("Banana", "Plantain")
+
+				var err error
+				requestBody, err = json.Marshal(Application{
+					GUID:                "some-app-guid",
+					Name:                "some-app-name",
+					StackName:           "some-stack-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"some-buildpack"},
+					SpaceGUID:           "some-space-guid",
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"lifecycle": map[string]interface{}{
+						"type": "buildpack",
+						"data": map[string]interface{}{
+							"buildpacks": []string{"some-buildpack"},
+							"stack":      "some-stack-name",
+						},
+					},
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
+						VerifyHeader(http.Header{"Banana": {"Plantain"}}),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("successfully makes the request", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				actualResponse := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+				Expect(string(responseBytes)).To(Equal(actualResponse))
+				Expect(httpResponse.Header["X-Cf-Warnings"][0]).To(Equal("this is a warning"))
+			})
+		})
+	})
+
 	Describe("MakeListRequest", func() {
 		var (
 			requestParams RequestParams
@@ -558,6 +649,12 @@ var _ = Describe("shared request helpers", func() {
 							}
 						],
 						"included": {
+							"apps": [
+								{
+									"guid": "app-guid-1",
+									"name": "app-name-1"
+								}
+							],
 							"users": [
 								{
 									"guid": "user-guid-1",
@@ -576,6 +673,30 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "org-guid-1",
 									"name": "org-name-1"
 							  	}
+							],
+							"service_brokers": [
+								{
+									"guid": "broker-guid-1",
+									"name": "broker-name-1"
+								}
+							],
+							"service_instances": [
+								{
+									"guid": "service-instance-guid-1",
+									"name": "service-instance-name-1"
+								}
+							],
+							"service_offerings": [
+								{
+									"guid": "offering-guid-1",
+									"name": "offering-name-1"
+								}
+							],
+							"service_plans": [
+								{
+									"guid": "plan-guid-1",
+									"name": "plan-name-1"
+								}
 							]
 						}
 					}`, server.URL())
@@ -614,6 +735,30 @@ var _ = Describe("shared request helpers", func() {
 									"guid": "org-guid-2",
 									"name": "org-name-2"
 							  	}
+							],
+							"service_brokers": [
+								{
+									"guid": "broker-guid-2",
+									"name": "broker-name-2"
+								}
+							],
+							"service_instances": [
+								{
+									"guid": "service-instance-guid-2",
+									"name": "service-instance-name-2"
+								}
+							],
+							"service_offerings": [
+								{
+									"guid": "offering-guid-2",
+									"name": "offering-name-2"
+								}
+							],
+							"service_plans": [
+								{
+									"guid": "plan-guid-2",
+									"name": "plan-name-2"
+								}
 							]
 						  }
 						}`
@@ -647,6 +792,9 @@ var _ = Describe("shared request helpers", func() {
 					}}))
 
 					Expect(includedResources).To(Equal(IncludedResources{
+						Apps: []resources.Application{
+							{Name: "app-name-1", GUID: "app-guid-1"},
+						},
 						Users: []resources.User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
@@ -658,6 +806,22 @@ var _ = Describe("shared request helpers", func() {
 						Organizations: []Organization{
 							{GUID: "org-guid-1", Name: "org-name-1"},
 							{GUID: "org-guid-2", Name: "org-name-2"},
+						},
+						ServiceBrokers: []ServiceBroker{
+							{Name: "broker-name-1", GUID: "broker-guid-1"},
+							{Name: "broker-name-2", GUID: "broker-guid-2"},
+						},
+						ServiceInstances: []resources.ServiceInstance{
+							{Name: "service-instance-name-1", GUID: "service-instance-guid-1"},
+							{Name: "service-instance-name-2", GUID: "service-instance-guid-2"},
+						},
+						ServiceOfferings: []ServiceOffering{
+							{Name: "offering-name-1", GUID: "offering-guid-1"},
+							{Name: "offering-name-2", GUID: "offering-guid-2"},
+						},
+						ServicePlans: []ServicePlan{
+							{Name: "plan-name-1", GUID: "plan-guid-1"},
+							{Name: "plan-name-2", GUID: "plan-guid-2"},
 						},
 					}))
 				})

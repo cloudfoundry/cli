@@ -5,40 +5,42 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type InfoLinks struct {
 	// AppSSH is the link for application ssh info.
-	AppSSH APILink `json:"app_ssh"`
+	AppSSH resources.APILink `json:"app_ssh"`
 
 	// CCV3 is the link to the Cloud Controller V3 API.
-	CCV3 APILink `json:"cloud_controller_v3"`
+	CCV3 resources.APILink `json:"cloud_controller_v3"`
 
 	// Logging is the link to the Logging API.
-	Logging APILink `json:"logging"`
+	Logging resources.APILink `json:"logging"`
 
 	// Logging is the link to the Logging API.
-	LogCache APILink `json:"log_cache"`
+	LogCache resources.APILink `json:"log_cache"`
 
 	// NetworkPolicyV1 is the link to the Container to Container Networking
 	// API.
-	NetworkPolicyV1 APILink `json:"network_policy_v1"`
+	NetworkPolicyV1 resources.APILink `json:"network_policy_v1"`
 
 	// Routing is the link to the routing API
-	Routing APILink `json:"routing"`
+	Routing resources.APILink `json:"routing"`
 
 	// UAA is the link to the UAA API.
-	UAA APILink `json:"uaa"`
+	UAA resources.APILink `json:"uaa"`
 
 	// Login is the link to the Login API.
-	Login APILink `json:"login"`
+	Login resources.APILink `json:"login"`
 }
 
 // Info represents a GET response from the '/' endpoint of the cloud
 // controller API.
 type Info struct {
 	// Links is a list of top level Cloud Controller APIs.
-	Links InfoLinks `json:"links"`
+	Links   InfoLinks `json:"links"`
+	CFOnK8s bool      `json:"cf_on_k8s"`
 }
 
 // AppSSHEndpoint returns the HREF for SSHing into an app container.
@@ -93,18 +95,13 @@ func (info Info) Login() string {
 	return info.Links.Login.HREF
 }
 
-// ccv3Link returns the HREF of the CloudController v3 API.
-func (info Info) ccV3Link() string {
-	return info.Links.CCV3.HREF
-}
-
 // ResourceLinks represents the information returned back from /v3.
-type ResourceLinks map[string]APILink
+type ResourceLinks map[string]resources.APILink
 
 // UnmarshalJSON helps unmarshal a Cloud Controller /v3 response.
-func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
+func (links ResourceLinks) UnmarshalJSON(data []byte) error {
 	var ccResourceLinks struct {
-		Links map[string]APILink `json:"links"`
+		Links map[string]resources.APILink `json:"links"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccResourceLinks)
 	if err != nil {
@@ -112,28 +109,20 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 	}
 
 	for key, val := range ccResourceLinks.Links {
-		resources[key] = val
+		links[key] = val
 	}
 
 	return nil
 }
 
 // GetInfo returns endpoint and API information from /v3.
-func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
+func (client *Client) GetInfo() (Info, Warnings, error) {
 	rootResponse, warnings, err := client.RootResponse()
 	if err != nil {
-		return Info{}, ResourceLinks{}, warnings, err
+		return Info{}, warnings, err
 	}
 
-	info := ResourceLinks{}
-
-	_, v3Warnings, err := client.MakeRequest(RequestParams{
-		URL:          rootResponse.ccV3Link(),
-		ResponseBody: &info,
-	})
-	warnings = append(warnings, v3Warnings...)
-
-	return rootResponse, info, warnings, err
+	return rootResponse, warnings, err
 }
 
 // rootResponse returns the CC API root document.

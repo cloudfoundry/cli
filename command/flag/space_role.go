@@ -22,10 +22,12 @@ func (s *SpaceRole) UnmarshalFlag(val string) error {
 		s.Role = "SpaceDeveloper"
 	case "spacemanager":
 		s.Role = "SpaceManager"
+	case "spacesupporter":
+		s.Role = "SpaceSupporter"
 	default:
 		return &flags.Error{
 			Type:    flags.ErrRequired,
-			Message: `ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`,
+			Message: `ROLE must be "SpaceManager", "SpaceDeveloper", "SpaceAuditor" or "SpaceSupporter"`,
 		}
 	}
 

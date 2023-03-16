@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 )
 
-//go:generate counterfeiter . BuildpackRepository
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BuildpackRepository
 
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiErr error)

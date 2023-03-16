@@ -6,11 +6,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry/bosh-cli/director/template"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -20,12 +26,9 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"github.com/cloudfoundry/bosh-cli/director/template"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
-//go:generate counterfeiter . ProgressBar
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ProgressBar
 
 type ProgressBar interface {
 	v7pushaction.ProgressBar
@@ -33,7 +36,7 @@ type ProgressBar interface {
 	Ready()
 }
 
-//go:generate counterfeiter . PushActor
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PushActor
 
 type PushActor interface {
 	HandleFlagOverrides(baseManifest manifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
@@ -42,7 +45,7 @@ type PushActor interface {
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
 }
 
-//go:generate counterfeiter . V7ActorForPush
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V7ActorForPush
 
 type V7ActorForPush interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (resources.Application, v7action.Warnings, error)
@@ -52,17 +55,24 @@ type V7ActorForPush interface {
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
-//go:generate counterfeiter . ManifestParser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestParser
 
 type ManifestParser interface {
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (manifestparser.Manifest, error)
+	InterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error)
+	ParseManifest(pathToManifest string, rawManifest []byte) (manifestparser.Manifest, error)
 	MarshalManifest(manifest manifestparser.Manifest) ([]byte, error)
 }
 
-//go:generate counterfeiter . ManifestLocator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestLocator
 
 type ManifestLocator interface {
 	Path(filepathOrDirectory string) (string, bool, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DiffDisplayer
+
+type DiffDisplayer interface {
+	DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error
 }
 
 type PushCommand struct {
@@ -78,6 +88,7 @@ type PushCommand struct {
 	HealthCheckHTTPEndpoint string                              `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	HealthCheckType         flag.HealthCheckType                `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
+	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory                  string                              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
@@ -93,7 +104,7 @@ type PushCommand struct {
 	Vars                    []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	dockerPassword          interface{}                         `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
-	usage                   interface{}                         `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n \n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route ]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]..."`
+	usage                   interface{}                         `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n \n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route ]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]..."`
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
@@ -104,6 +115,7 @@ type PushCommand struct {
 	CWD             string
 	ManifestLocator ManifestLocator
 	ManifestParser  ManifestParser
+	DiffDisplayer   DiffDisplayer
 
 	stopStreamingFunc func()
 }
@@ -118,17 +130,17 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.VersionActor = cmd.Actor
 	cmd.PushActor = v7pushaction.NewActor(cmd.Actor, sharedaction.NewActor(config))
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
+	cmd.LogCacheClient, err = logcache.NewClient(config.LogCacheEndpoint(), config, ui, v7action.NewDefaultKubernetesConfigGetter())
 	if err != nil {
 		return err
 	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir
 
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
+	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
 
 	return err
 }
@@ -140,7 +152,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
 	}
@@ -179,10 +191,30 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	hasManifest := transformedManifest.PathToManifest != ""
 
+	spaceGUID := cmd.Config.TargetedSpace().GUID
 	if hasManifest {
 		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
 			"Path": transformedManifest.PathToManifest,
 		})
+
+		diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, transformedRawManifest)
+
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
+				cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
+			} else {
+				return err
+			}
+		} else {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayText("Updating with these attributes...")
+
+			err = cmd.DiffDisplayer.DisplayDiff(transformedRawManifest, diff)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	v7ActionWarnings, err := cmd.VersionActor.SetSpaceManifest(
@@ -264,12 +296,18 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
+	rawManifest, err := cmd.ManifestParser.InterpolateManifest(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
 		log.Errorln("reading manifest:", err)
 		if _, ok := err.(*yaml.TypeError); ok {
 			return manifestparser.Manifest{}, errors.New(fmt.Sprintf("Unable to push app because manifest %s is not valid yaml.", pathToManifest))
 		}
+		return manifestparser.Manifest{}, err
+	}
+
+	manifest, err := cmd.ManifestParser.ParseManifest(pathToManifest, rawManifest)
+	if err != nil {
+		log.Errorln("parsing manifest:", err)
 		return manifestparser.Manifest{}, err
 	}
 
@@ -321,6 +359,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		Vars:                cmd.Vars,
 		NoManifest:          cmd.NoManifest,
 		Task:                cmd.Task,
+		LogRateLimit:        cmd.LogRateLimit,
 	}, nil
 }
 

@@ -2,8 +2,6 @@ package configv3
 
 import (
 	"time"
-
-	"github.com/SermoDigital/jose/jws"
 )
 
 // JSONConfig represents .cf/config.json.
@@ -12,6 +10,7 @@ type JSONConfig struct {
 	APIVersion               string             `json:"APIVersion"`
 	AsyncTimeout             int                `json:"AsyncTimeout"`
 	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
+	CFOnK8s                  CFOnK8s            `json:"CFOnK8s"`
 	ColorEnabled             string             `json:"ColorEnabled"`
 	ConfigVersion            int                `json:"ConfigVersion"`
 	DopplerEndpoint          string             `json:"DopplerEndPoint"`
@@ -19,6 +18,7 @@ type JSONConfig struct {
 	LogCacheEndpoint         string             `json:"LogCacheEndPoint"`
 	MinCLIVersion            string             `json:"MinCLIVersion"`
 	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
+	NetworkPolicyV1Endpoint  string             `json:"NetworkPolicyV1Endpoint"`
 	TargetedOrganization     Organization       `json:"OrganizationFields"`
 	PluginRepositories       []PluginRepository `json:"PluginRepos"`
 	RefreshToken             string             `json:"RefreshToken"`
@@ -65,19 +65,9 @@ func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion
 }
 
-// CurrentUser returns user information decoded from the JWT access token in
-// .cf/config.json.
-func (config *Config) CurrentUser() (User, error) {
-	return decodeUserFromJWT(config.ConfigFile.AccessToken)
-}
-
-// CurrentUserName returns the name of a user as returned by CurrentUser()
-func (config *Config) CurrentUserName() (string, error) {
-	user, err := config.CurrentUser()
-	if err != nil {
-		return "", err
-	}
-	return user.Name, nil
+// AuthorizationEndpoint returns the authorization endpoint
+func (config *Config) AuthorizationEndpoint() string {
+	return config.ConfigFile.AuthorizationEndpoint
 }
 
 // HasTargetedOrganization returns true if the organization is set.
@@ -88,6 +78,11 @@ func (config *Config) HasTargetedOrganization() bool {
 // HasTargetedSpace returns true if the space is set.
 func (config *Config) HasTargetedSpace() bool {
 	return config.ConfigFile.TargetedSpace.GUID != ""
+}
+
+// LogCacheEndpoint returns the log cache endpoint.
+func (config *Config) LogCacheEndpoint() string {
+	return config.ConfigFile.LogCacheEndpoint
 }
 
 // MinCLIVersion returns the minimum CLI version required by the CC.
@@ -104,6 +99,11 @@ func (config *Config) OverallPollingTimeout() time.Duration {
 		return DefaultOverallPollingTimeout
 	}
 	return time.Duration(config.ConfigFile.AsyncTimeout) * time.Minute
+}
+
+// NetworkPolicyV1Endpoint returns the endpoint for V1 of the networking API
+func (config *Config) NetworkPolicyV1Endpoint() string {
+	return config.ConfigFile.NetworkPolicyV1Endpoint
 }
 
 // RefreshToken returns the refresh token for getting a new access token.
@@ -172,8 +172,11 @@ type TargetInformationArgs struct {
 	Doppler           string
 	LogCache          string
 	MinCLIVersion     string
+	NetworkPolicyV1   string
 	Routing           string
 	SkipSSLValidation bool
+	UAA               string
+	CFOnK8s           bool
 }
 
 // SetTargetInformation sets the currently targeted CC API and related other
@@ -186,10 +189,16 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.LogCacheEndpoint = args.LogCache
 	config.ConfigFile.RoutingEndpoint = args.Routing
 	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
+	config.ConfigFile.NetworkPolicyV1Endpoint = args.NetworkPolicyV1
+
+	config.ConfigFile.UAAEndpoint = args.UAA
+	config.ConfigFile.AuthorizationEndpoint = args.Auth
 
 	// NOTE: This gets written to the config file, but I do not believe it is currently
 	// ever read from there.
 	config.ConfigFile.AuthorizationEndpoint = args.Auth
+
+	config.ConfigFile.CFOnK8s.Enabled = args.CFOnK8s
 
 	config.UnsetOrganizationAndSpaceInformation()
 }
@@ -256,6 +265,11 @@ func (config *Config) TargetedSpace() Space {
 	return config.ConfigFile.TargetedSpace
 }
 
+// UAAEndpoint returns the UAA endpoint
+func (config *Config) UAAEndpoint() string {
+	return config.ConfigFile.UAAEndpoint
+}
+
 // UAAGrantType returns the grant type of the supplied UAA credentials.
 func (config *Config) UAAGrantType() string {
 	return config.ConfigFile.UAAGrantType
@@ -290,46 +304,13 @@ func (config *Config) UnsetUserInformation() {
 	config.SetRefreshToken("")
 	config.SetUAAGrantType("")
 	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
+	config.SetKubernetesAuthInfo("")
 
 	config.UnsetOrganizationAndSpaceInformation()
-
 }
 
 // V7SetSpaceInformation sets the currently targeted space.
 func (config *Config) V7SetSpaceInformation(guid string, name string) {
 	config.ConfigFile.TargetedSpace.GUID = guid
 	config.ConfigFile.TargetedSpace.Name = name
-}
-
-func decodeUserFromJWT(accessToken string) (User, error) {
-	if accessToken == "" {
-		return User{}, nil
-	}
-
-	token, err := jws.ParseJWT([]byte(accessToken[7:]))
-	if err != nil {
-		return User{}, err
-	}
-
-	claims := token.Claims()
-
-	var name, GUID, origin string
-	var isClient bool
-	if claims.Has("user_name") {
-		name = claims.Get("user_name").(string)
-		GUID = claims.Get("user_id").(string)
-		origin = claims.Get("origin").(string)
-		isClient = false
-	} else {
-		name = claims.Get("client_id").(string)
-		GUID = name
-		isClient = true
-	}
-
-	return User{
-		Name:     name,
-		GUID:     GUID,
-		Origin:   origin,
-		IsClient: isClient,
-	}, nil
 }

@@ -24,7 +24,8 @@ Running `make integration-tests` can be time-consuming, because it includes the 
 - `isolated` suite is for tests that are stand alone and do not affect each other. They are meant to run in their own organization and space, and will not affect system state. This is the most common type of integration tests.
 - `push` suite is for tests related to the `cf push` command only.
 - `experimental` suite is for tests that require the cf experimental flag to be set and/or an experimental feature for the CF CLI.
-- `plugin` suite is for tests that surround the CF CLI plugin framework. *These tests do not run in parallel.*
+- `plugin` suite is for tests that surround the CF CLI plugin framework. _These tests do not run in parallel._
+- `selfcontained` suite is for tests that talk to a fake CF API, hence they do not require a cf deployment
 
 ## How to run
 These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed.
@@ -60,6 +61,7 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/global in
 - `KEEP_FAKE_SERVICE_BROKERS` - If `true`, will not delete any deployed reusable fake service broker apps. Useful for local development: allows for faster test suite re-runs. Will default to `false` if not set.
 
 ### The test suite does not cleanup after itself!
-In order to focus on clean test code and performance of each test, we have decided to not cleanup after each test. However, in order to facilitate [clean up scripts](https://github.com/cloudfoundry/cli-ci/blob/master/bin/cleanup-integration), we are trying to keep consistent naming across organizations, spaces, etc.
+In order to focus on clean test code and performance of each test, we have decided to not cleanup after each test. However, in order to facilitate [clean up scripts](https://github.com/cloudfoundry/cli-ci/blob/main/bin/cleanup-integration), we are trying to keep consistent naming across organizations, spaces, etc.
 
 In addition, several router groups are created using a `INTEGRATION-TCP-NODE-[NUMBER]` format. These cannot be deleted without manual changes to the database.
+ 

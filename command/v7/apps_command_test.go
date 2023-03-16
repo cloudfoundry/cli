@@ -56,7 +56,7 @@ var _ = Describe("apps Command", func() {
 			GUID: "some-space-guid",
 		})
 
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -87,7 +87,7 @@ var _ = Describe("apps Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeActor.GetCurrentUserReturns(configv3.User{}, expectedErr)
 		})
 
 		It("return an error", func() {
@@ -125,7 +125,7 @@ var _ = Describe("apps Command", func() {
 						Name:  "some-app",
 						State: constant.ApplicationStarted,
 					},
-					ProcessSummaries: []v7action.ProcessSummary{{Process: v7action.Process{Type: "process-type"}}},
+					ProcessSummaries: []v7action.ProcessSummary{{Process: resources.Process{Type: "process-type"}}},
 					Routes:           []resources.Route{},
 				},
 			}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
@@ -153,13 +153,13 @@ var _ = Describe("apps Command", func() {
 						},
 						ProcessSummaries: []v7action.ProcessSummary{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: "console",
 								},
 								InstanceDetails: []v7action.ProcessInstance{},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: "worker",
 								},
 								InstanceDetails: []v7action.ProcessInstance{
@@ -170,7 +170,7 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
 								InstanceDetails: []v7action.ProcessInstance{
@@ -204,7 +204,7 @@ var _ = Describe("apps Command", func() {
 						},
 						ProcessSummaries: []v7action.ProcessSummary{
 							{
-								Process: v7action.Process{
+								Process: resources.Process{
 									Type: constant.ProcessTypeWeb,
 								},
 								InstanceDetails: []v7action.ProcessInstance{

@@ -29,6 +29,7 @@ func labelSubcommands(subcommandsToRemove ...string) []TableEntry {
 		"space",
 		"stack",
 		"service-broker",
+		"service-instance",
 		"service-offering",
 		"service-plan",
 	}
@@ -49,7 +50,6 @@ func labelSubcommands(subcommandsToRemove ...string) []TableEntry {
 }
 
 var _ = Describe("LabelUpdater", func() {
-
 	var (
 		cmd             LabelUpdater
 		fakeActor       *v7fakes.FakeActor
@@ -95,7 +95,7 @@ var _ = Describe("LabelUpdater", func() {
 					ResourceType: "anything",
 					ResourceName: resourceName,
 				}
-				fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+				fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, errors.New("boom"))
 			})
 
 			It("returns an error", func() {
@@ -207,7 +207,7 @@ var _ = Describe("LabelUpdater", func() {
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 
 				switch resourceType {
-				case "app", "route":
+				case "app", "route", "service-instance":
 					Expect(checkOrg).To(BeTrue())
 					Expect(checkSpace).To(BeTrue())
 				case "space":
@@ -238,11 +238,12 @@ var _ = Describe("LabelUpdater", func() {
 
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 		})
 
@@ -306,7 +307,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
-					//FIXME do we want to change the labels to all have nil values?
+					// FIXME do we want to change the labels to all have nil values?
 				})
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
@@ -316,7 +317,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
-					//FIXME do we want to change the labels to all have not nil values?
+					// FIXME do we want to change the labels to all have not nil values?
 				})
 
 				It("shows 'Setting' as action", func() {
@@ -339,18 +340,18 @@ var _ = Describe("LabelUpdater", func() {
 			}
 
 			fakeSharedActor.CheckTargetReturns(nil)
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 
 			fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
 				v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 				nil,
 			)
-
 		})
 
 		JustBeforeEach(func() {
@@ -404,7 +405,8 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				expectedMap = map[string]types.NullString{
 					"some-label":     types.NewNullString("some-value"),
-					"some-other-key": types.NewNullString()}
+					"some-other-key": types.NewNullString(),
+				}
 			})
 
 			It("calls the right actor", func() {
@@ -456,7 +458,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
-					//FIXME do we want to change the labels to all have not nil values?
+					// FIXME do we want to change the labels to all have not nil values?
 				})
 
 				When("stack is passed", func() {
@@ -492,10 +494,11 @@ var _ = Describe("LabelUpdater", func() {
 			}
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeActor.UpdateDomainLabelsByDomainNameReturns(
 				v7action.Warnings{"some-warning-1", "some-warning-2"},
 				nil,
@@ -587,11 +590,12 @@ var _ = Describe("LabelUpdater", func() {
 				ResourceName: orgName,
 			}
 			fakeSharedActor.CheckTargetReturns(nil)
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 
 			fakeActor.UpdateOrganizationLabelsByOrganizationNameReturns(
@@ -687,10 +691,11 @@ var _ = Describe("LabelUpdater", func() {
 
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "space-guid"})
 			fakeActor.UpdateRouteLabelsReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
@@ -782,7 +787,7 @@ var _ = Describe("LabelUpdater", func() {
 				ResourceName: expectedServiceBrokerName,
 			}
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
 				"some-other-key": types.NewNullString(),
@@ -871,10 +876,114 @@ var _ = Describe("LabelUpdater", func() {
 		})
 	})
 
-	When("updating labels on service-offering", func() {
+	When("updating labels on service-instance", func() {
+		const serviceInstanceName = "some-service-instance"
+
 		var (
-			executeErr error
+			executeErr  error
+			expectedMap map[string]types.NullString
 		)
+
+		BeforeEach(func() {
+			targetResource = TargetResource{
+				ResourceType: "service-instance",
+				ResourceName: serviceInstanceName,
+			}
+
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+
+			expectedMap = map[string]types.NullString{
+				"some-label":     types.NewNullString("some-value"),
+				"some-other-key": types.NewNullString(),
+			}
+			labels = expectedMap
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(targetResource, labels)
+		})
+
+		When("updating the service instance labels succeeds", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateServiceInstanceLabelsReturns(v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
+			})
+
+			It("prints all warnings and does not return an error ", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(fakeActor.UpdateServiceInstanceLabelsCallCount()).To(Equal(1))
+				actualServiceInstance, spaceGUID, labelsMap := fakeActor.UpdateServiceInstanceLabelsArgsForCall(0)
+				Expect(actualServiceInstance).To(Equal(serviceInstanceName))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(labelsMap).To(Equal(expectedMap))
+			})
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				targetResource.ResourceType = "serViCE-iNSTance"
+			})
+
+			It("calls the right actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.UpdateServiceInstanceLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays a message in the right case", func() {
+				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for service-instance (.*)"))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("updating the labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateServiceInstanceLabelsReturns(
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"),
+				)
+			})
+
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+			})
+		})
+
+		Context("shows the right update message with org and space", func() {
+			When("Unsetting labels", func() {
+				BeforeEach(func() {
+					cmd.Action = Unset
+				})
+
+				It("shows 'Removing' as action", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-instance %s in org fake-org / space fake-space as some-user...`), serviceInstanceName))
+				})
+			})
+
+			When("Setting labels", func() {
+				BeforeEach(func() {
+					cmd.Action = Set
+				})
+
+				It("shows 'Setting' as action", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-instance %s in org fake-org / space fake-space as some-user...`), serviceInstanceName))
+				})
+			})
+		})
+	})
+
+	When("updating labels on service-offering", func() {
+		var executeErr error
 
 		const serviceBrokerName = "brokerName"
 		const serviceOfferingName = "serviceOfferingName"
@@ -889,7 +998,7 @@ var _ = Describe("LabelUpdater", func() {
 				"some-other-key": types.NewNullString(),
 			}
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeActor.UpdateServiceOfferingLabelsReturns(
 				v7action.Warnings{"some-warning-1", "some-warning-2"},
 				nil,
@@ -1015,9 +1124,7 @@ var _ = Describe("LabelUpdater", func() {
 	})
 
 	When("updating labels on service-plan", func() {
-		var (
-			executeErr error
-		)
+		var executeErr error
 
 		const serviceBrokerName = "brokerName"
 		const serviceOfferingName = "serviceOfferingName"
@@ -1033,7 +1140,7 @@ var _ = Describe("LabelUpdater", func() {
 				"some-other-key": types.NewNullString(),
 			}
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeActor.UpdateServicePlanLabelsReturns(
 				v7action.Warnings{"some-warning-1", "some-warning-2"},
 				nil,
@@ -1225,7 +1332,6 @@ var _ = Describe("LabelUpdater", func() {
 					})
 				})
 			})
-
 		})
 	})
 
@@ -1244,10 +1350,11 @@ var _ = Describe("LabelUpdater", func() {
 			}
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
-				"some-other-key": types.NewNullString()}
+				"some-other-key": types.NewNullString(),
+			}
 			labels = expectedMap
 
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedOrganizationReturns(
 				configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
 
@@ -1345,7 +1452,7 @@ var _ = Describe("LabelUpdater", func() {
 				ResourceType: "stack",
 				ResourceName: stackName,
 			}
-			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeSharedActor.CheckTargetReturns(nil)
 			expectedMap = map[string]types.NullString{
 				"some-label":     types.NewNullString("some-value"),
@@ -1368,7 +1475,6 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
-
 			})
 
 			It("passes the correct parameters into the actor", func() {
