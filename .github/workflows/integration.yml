@@ -3,11 +3,11 @@ name: Integration Tests
 on:
   workflow_dispatch:
   pull_request_target:
-    branches:
-      - main
-      - v8
-      - v7
-      - .*
+    # branches:
+    #   - main
+    #   - v8
+    #   - v7
+    #   - .*
     paths-ignore:
       - 'doc/**'
       - '.gitpod.yml'
