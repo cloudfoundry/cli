@@ -47,8 +47,8 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
-          build-sha=$(git rev-parse --short HEAD)
-          echo "::set-output name=cf-build-sha::$build-sha"
+          build_sha=$(git rev-parse --short HEAD)
+          echo "::set-output name=cf-build-sha::$build_sha"
           # echo "cf-build-sha=${build-sha}" >> $GITHUB_OUTPUT
 
       - name: Setup tmate session
