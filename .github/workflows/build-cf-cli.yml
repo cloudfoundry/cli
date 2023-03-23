@@ -49,7 +49,13 @@ jobs:
         run: |
           build-sha=$(git rev-parse --short HEAD)
           echo "::set-output name=cf-build-sha::$build-sha"
-          # echo "cf-build-sha=${build-sha]}" >> $GITHUB_OUTPUT
+          # echo "cf-build-sha=${build-sha}" >> $GITHUB_OUTPUT
+
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+        with:
+          sudo: false           
 
   build-artifacts:
     name: Integration tests with EDGE CAPI
