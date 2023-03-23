@@ -16,11 +16,11 @@ on:
     #   - main
     #   - v8
     #   - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.github/**'
-      - '.gitpod.yml'
-      - 'README.md'
+    # paths-ignore:
+    #   - 'doc/**'
+    #   - '.github/**'
+    #   - '.gitpod.yml'
+    #   - 'README.md'
 
 permissions:
   contents: read
