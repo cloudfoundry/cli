@@ -44,16 +44,21 @@ jobs:
           echo "golang version: ${go_version[1]}"
           echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ steps.set-go-version.outputs.go-version }}
+
       - id: set-build-sha
         name: Get Build SHA
         run: |
           build_sha=$(git rev-parse --short HEAD)
-          echo "::set-output name=cf-build-sha::$build_sha"
-          # echo "cf-build-sha=${build-sha}" >> $GITHUB_OUTPUT
+          # echo "::set-output name=cf-build-sha::$build_sha"
+          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
 
-      - name: Setup tmate session
-        if: always()
-        uses: mxschmitt/action-tmate@v3 
+      # - name: Setup tmate session
+      #   if: always()
+      #   uses: mxschmitt/action-tmate@v3 
         # with:
         #   sudo: false           
 
@@ -96,6 +101,10 @@ jobs:
             tar -cvzf $cwd/cf-cli-binaries-${CF_BUILD_SHA}.tgz -C out .
             build-binaries=cf-cli-binaries-${CF_BUILD_SHA}.tgz
           popd
+
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
 
       - name: 'Upload Metadata'
         uses: actions/upload-artifact@v3
