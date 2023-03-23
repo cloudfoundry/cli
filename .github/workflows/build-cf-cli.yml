@@ -46,7 +46,10 @@ jobs:
 
       - id: set-build-sha
         name: Get Build SHA
-        run: cf-build-sha=($(git rev-parse --short HEAD))
+        run: |
+          build-sha=$(git rev-parse --short HEAD)
+          echo "::set-output name=cf-build-sha::$build-sha"
+          # echo "cf-build-sha=${build-sha]}" >> $GITHUB_OUTPUT
 
   build-artifacts:
     name: Integration tests with EDGE CAPI
