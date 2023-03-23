@@ -45,7 +45,7 @@ jobs:
           echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ steps.set-go-version.outputs.go-version }}
 
@@ -70,6 +70,9 @@ jobs:
     outputs:
       build-binaries: ${{ steps.build-artifacts.outputs.build-binaries }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: build
         run: >
           set -ex
