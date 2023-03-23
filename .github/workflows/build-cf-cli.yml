@@ -74,8 +74,9 @@ jobs:
           go-version: ${{ steps.set-go-version.outputs.go-version }}
 
       - name: Build Linux
-        run: >
+        run: |
           set -ex
+
           echo "PWD ============= $PWD"
           cwd=$PWD
           export GOPATH=$PWD/gopath
@@ -100,10 +101,12 @@ jobs:
             # echo "Building 64-bit Windows"
             # make out/cf-cli_winx64.exe
 
+            echo "PWD ============= $PWD"
             echo "cwd ============= $cwd"
+            
             echo "Creating tarball"
-            tar -cvzf $cwd/cf-cli-binaries-${CF_BUILD_SHA}.tgz -C out .
-            linux-binaries=cf-cli-binaries-${CF_BUILD_SHA}.tgz
+            tar -cvzf ${PWD}/cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz -C out .
+            linux-binaries=cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz
           # popd
 
       - name: 'Upload Linux Binaries'
