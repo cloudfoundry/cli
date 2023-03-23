@@ -76,7 +76,7 @@ jobs:
       - name: Build Linux
         run: >
           set -ex
-
+          echo "PWD ============= $PWD"
           cwd=$PWD
           export GOPATH=$PWD/gopath
           export PATH=$GOPATH/bin:$PATH
