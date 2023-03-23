@@ -44,11 +44,6 @@ jobs:
           echo "golang version: ${go_version[1]}"
           echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ steps.set-go-version.outputs.go-version }}
-
       - id: set-build-sha
         name: Get Build SHA
         run: |
@@ -73,6 +68,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ steps.set-go-version.outputs.go-version }}
+
       - name: build
         run: >
           set -ex
@@ -83,7 +83,7 @@ jobs:
 
           go version
 
-          pushd $GOPATH/src/code.cloudfoundry.org/cli
+          # pushd $GOPATH/src/code.cloudfoundry.org/cli
             export CF_BUILD_VERSION=$(cat BUILD_VERSION)
             export CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
             export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
@@ -103,14 +103,15 @@ jobs:
             echo "Creating tarball"
             tar -cvzf $cwd/cf-cli-binaries-${CF_BUILD_SHA}.tgz -C out .
             build-binaries=cf-cli-binaries-${CF_BUILD_SHA}.tgz
-          popd
-
-      - name: Setup tmate session
-        if: always()
-        uses: mxschmitt/action-tmate@v3 
+          # popd
 
       - name: 'Upload Metadata'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-artifacts.outputs.build-binaries }}
           path: ${{ steps.build-artifacts.outputs.build-binaries }}
+
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+
