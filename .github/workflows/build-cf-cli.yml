@@ -54,8 +54,8 @@ jobs:
       - name: Setup tmate session
         if: always()
         uses: mxschmitt/action-tmate@v3 
-        with:
-          sudo: false           
+        # with:
+        #   sudo: false           
 
   build-artifacts:
     name: Build binaries
