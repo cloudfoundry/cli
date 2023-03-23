@@ -22,8 +22,8 @@ on:
     #   - '.gitpod.yml'
     #   - 'README.md'
 
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
 jobs:
   shared-values:
@@ -58,7 +58,7 @@ jobs:
           sudo: false           
 
   build-artifacts:
-    name: Integration tests with EDGE CAPI
+    name: Build binaries
     runs-on: ubuntu-latest
     needs:
       - shared-values
