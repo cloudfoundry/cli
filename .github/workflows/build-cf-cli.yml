@@ -12,10 +12,10 @@ on:
       - '.gitpod.yml'
       - 'README.md'
   push:
-    branches:
-      - main
-      - v8
-      - v7
+    # branches:
+    #   - main
+    #   - v8
+    #   - v7
     paths-ignore:
       - 'doc/**'
       - '.github/**'
