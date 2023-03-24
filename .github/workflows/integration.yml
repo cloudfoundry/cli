@@ -13,7 +13,7 @@ jobs:
       runs-on: ubuntu-latest
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
       steps:
-          - run: echo 'SHA is ${{ github.event.workflow_run.referenced_workflows.sha}}. github sha is ${GITHUB_SHA}'
+          - run: echo 'SHA is ${{ github.event.workflow_run.referenced_workflows.sha}}. github sha is $GITHUB_SHA'
             # echo "The triggering workflow passed"
             
         
