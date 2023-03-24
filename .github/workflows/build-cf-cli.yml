@@ -122,7 +122,7 @@ jobs:
           Get-Command make
           Get-Item Makefile
 
-          CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
+          $CF_BUILD_SHA="${{ needs.shared-values.outputs.cf-build-sha }}"
 
           echo "Building 32-bit Windows"
           make out/cf-cli_win32.exe
@@ -131,7 +131,7 @@ jobs:
           make out/cf-cli_winx64.exe
 
           echo "Creating tarball"
-          tar -cvzf ${PWD}/cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
+          tar -cvzf cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
           windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
           echo "windows-binaries=${windows_binaries}" >> $GITHUB_OUTPUT
 
