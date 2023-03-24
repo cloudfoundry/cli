@@ -70,47 +70,43 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ steps.set-go-version.outputs.go-version }}
+          go-version: ${{ needs.shared-values.outputs.go-version }}
 
       - name: Build Linux
         run: |
           set -ex
 
-          echo "PWD ============= $PWD"
-          cwd=$PWD
           export GOPATH=$PWD/gopath
           export PATH=$GOPATH/bin:$PATH
 
           go version
 
-          # pushd $GOPATH/src/code.cloudfoundry.org/cli
-            export CF_BUILD_VERSION=$(cat BUILD_VERSION)
-            export CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
-            export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
+          export CF_BUILD_VERSION=$(cat BUILD_VERSION)
+          export CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
+          export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
 
-            echo "Building 32-bit Linux"
-            make out/cf-cli_linux_i686
+          echo "Building 32-bit Linux"
+          make out/cf-cli_linux_i686
 
-            echo "Building 64-bit Linux"
-            make out/cf-cli_linux_x86-64
+          echo "Building 64-bit Linux"
+          make out/cf-cli_linux_x86-64
 
-            # echo "Building 32-bit Windows"
-            # make out/cf-cli_win32.exe
+          # echo "Building 32-bit Windows"
+          # make out/cf-cli_win32.exe
 
-            # echo "Building 64-bit Windows"
-            # make out/cf-cli_winx64.exe
+          # echo "Building 64-bit Windows"
+          # make out/cf-cli_winx64.exe
 
-            echo "Creating tarball"
-            tar -cvzf ${PWD}/cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz -C out .
-            linux_binaries=cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz
-            echo "linux-binaries=${linux_binaries}" >> $GITHUB_OUTPUT
-          # popd
+          echo "Creating tarball"
+          tar -cvzf ${PWD}/cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz -C out .
+          linux_binaries=cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz
+          echo "linux-binaries=${linux_binaries}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-linux.outputs.linux-binaries }}
-          path: ${{ steps.build-linux.outputs.linux-binaries }}
+          path: $PWD
 
       - name: Setup tmate session
         if: always()
