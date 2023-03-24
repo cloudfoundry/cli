@@ -81,8 +81,8 @@ jobs:
           # echo "Building 32-bit Linux"
           # make out/cf-cli_linux_i686
 
-          echo "Building 64-bit Linux"
-          make out/cf-cli_linux_x86-64
+          # echo "Building 64-bit Linux"
+          # make out/cf-cli_linux_x86-64
 
           # echo "Building 32-bit Windows"
           # make out/cf-cli_win32.exe
