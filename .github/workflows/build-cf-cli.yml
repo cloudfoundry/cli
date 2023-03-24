@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-linux.outputs.linux-binaries }}
-          path: $PWD
+          path: $PWD/cf-cli-linux-binaries-*
 
       - name: Setup tmate session
         if: always()
