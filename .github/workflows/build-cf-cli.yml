@@ -82,9 +82,9 @@ jobs:
 
           go version
 
-          export CF_BUILD_VERSION=$(cat BUILD_VERSION)
+          # export CF_BUILD_VERSION=$(cat BUILD_VERSION)
           export CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
-          export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
+          # export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
 
           echo "Building 32-bit Linux"
           make out/cf-cli_linux_i686
@@ -101,7 +101,6 @@ jobs:
           echo "Creating tarball"
           tar -cvzf ${PWD}/cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz -C out .
           linux_binaries="cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz"
-          echo "linux_binaries =================== ${linux_binaries}"
           echo "linux-binaries=${linux_binaries}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Linux Binaries'
