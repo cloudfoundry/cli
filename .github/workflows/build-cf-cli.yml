@@ -108,7 +108,7 @@ jobs:
           name: ${{ steps.build-linux.outputs.linux-binaries }}
           path: ./cf-cli-linux-binaries-*
 
-      - name: Setup tmate session
-        if: always()
-        uses: mxschmitt/action-tmate@v3 
+      # - name: Setup tmate session
+      #   if: always()
+      #   uses: mxschmitt/action-tmate@v3 
 
