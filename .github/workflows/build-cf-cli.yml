@@ -1,4 +1,4 @@
-name: Build
+name: Build Binaries
 
 on:
   workflow_dispatch:
@@ -112,4 +112,13 @@ jobs:
       # - name: Setup tmate session
       #   if: always()
       #   uses: mxschmitt/action-tmate@v3 
+  # trigger-integration-tests:
+  #   name: Invoke Integration test workflow
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - build-linux
+  #   steps:
+  #     - name: Trigger workflow
+  #       run: |
+
 
