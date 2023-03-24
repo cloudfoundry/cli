@@ -2,30 +2,8 @@ name: Integration Tests
 
 on:
   workflow_run:
-    workflows: 
-      - Build Binaries
-    types:
-      - completed
-  # pull_request_target:
-    # branches:
-    #   - main
-    #   - v8
-    #   - v7
-    #   - .*
-    # paths-ignore:
-    #   - 'doc/**'
-    #   - '.gitpod.yml'
-    #   - 'README.md'
-  # push:
-  #   branches:
-  #     - main
-  #     - v8
-  #     - v7
-  #   paths-ignore:
-  #     - 'doc/**'
-  #     - '.github/**'
-  #     - '.gitpod.yml'
-  #     - 'README.md'
+    workflows: [Build]
+    types: [completed]
 
 permissions:
   contents: read

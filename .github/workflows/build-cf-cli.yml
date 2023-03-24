@@ -1,4 +1,4 @@
-name: Build Binaries
+name: Build
 
 on:
   workflow_dispatch:
@@ -50,12 +50,6 @@ jobs:
           build_sha=$(git rev-parse --short HEAD)
           echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
 
-      # - name: Setup tmate session
-      #   if: always()
-      #   uses: mxschmitt/action-tmate@v3 
-        # with:
-        #   sudo: false           
-
   build-linux:
     name: Build Linux binaries
     runs-on: ubuntu-latest
@@ -82,9 +76,7 @@ jobs:
 
           go version
 
-          # export CF_BUILD_VERSION=$(cat BUILD_VERSION)
           export CF_BUILD_SHA=${{ needs.shared-values.outputs.cf-build-sha }}
-          # export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
 
           echo "Building 32-bit Linux"
           make out/cf-cli_linux_i686
@@ -112,13 +104,3 @@ jobs:
       # - name: Setup tmate session
       #   if: always()
       #   uses: mxschmitt/action-tmate@v3 
-  # trigger-integration-tests:
-  #   name: Invoke Integration test workflow
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - build-linux
-  #   steps:
-  #     - name: Trigger workflow
-  #       run: |
-
-
