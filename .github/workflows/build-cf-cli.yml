@@ -99,7 +99,7 @@ jobs:
 
           echo "Creating tarball"
           tar -cvzf ${PWD}/cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz -C out .
-          linux_binaries=cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz
+          linux_binaries="cf-cli-linux-binaries-${CF_BUILD_SHA}.tgz"
           echo "linux-binaries=${linux_binaries}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Linux Binaries'
