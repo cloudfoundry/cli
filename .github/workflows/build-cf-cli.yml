@@ -57,13 +57,13 @@ jobs:
           name: ${{ steps.set-build-sha.outputs.cf-build-sha }}
           path: ./sha          
 
-  build-linux:
+  build-linux-binaries:
     name: Build Linux binaries
     runs-on: ubuntu-latest
     needs:
       - shared-values
     outputs:
-      linux-binaries: ${{ steps.build-linux.outputs.linux-binaries }}
+      linux-binaries: ${{ steps.build-linux-binaries.outputs.linux-binaries }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -74,7 +74,7 @@ jobs:
           go-version: ${{ needs.shared-values.outputs.go-version }}
 
       - name: Build Linux
-        id: build
+        id: build-linux
         run: |
           set -ex
 
@@ -99,16 +99,16 @@ jobs:
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.build.outputs.linux-binaries }}
+          name: ${{ steps.build-linux.outputs.linux-binaries }}
           path: ./cf-cli-linux-binaries-*
 
-  build-windows:
+  build-windows-binaries:
     name: Build Windows binaries
     runs-on: windows-latest
     needs:
       - shared-values
     outputs:
-      windows-binaries: ${{ steps.build-windows.outputs.windows-binaries }}
+      windows-binaries: ${{ steps.build-windows-binaries.outputs.windows-binaries }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -124,7 +124,7 @@ jobs:
           go install github.com/akavel/rsrc@v0.10.2
 
       - name: Build Windows
-        id: build
+        id: build-windows
         run: |
           Get-Command make
           Get-Item Makefile
@@ -145,7 +145,7 @@ jobs:
       - name: 'Upload Windows Binaries'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.build.outputs.windows-binaries }}
+          name: ${{ steps.build-windows.outputs.windows-binaries }}
           path: ./cf-cli-windows-binaries-*
 
       - name: Setup tmate session
