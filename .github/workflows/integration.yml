@@ -14,7 +14,13 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Print
-        run: echo "workflow stats =============== ${{ github.event.workflow_run }}"
+        run: |
+          echo "workflow stats: head_commit =============== ${{ github.event.workflow_run.head_commit }}"
+          echo "workflow stats: head_sha =============== ${{ github.event.workflow_run.head_sha }}"
+          echo "workflow stats: id =============== ${{ github.event.workflow_run.id }}"
+          echo "workflow stats: name =============== ${{ github.event.workflow_run.name }}"
+          echo "workflow stats: run_number =============== ${{ github.event.workflow_run.run_number }}"
+          echo "workflow stats: workflow_id =============== ${{ github.event.workflow_run.workflow_id }}"
 
       - name: 'Download SHA'
         uses: dawidd6/action-download-artifact@v2
