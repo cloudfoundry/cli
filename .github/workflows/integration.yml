@@ -9,29 +9,28 @@ permissions:
   contents: read
 
 jobs:
-  on-success:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    outputs:
-      go-version: ${{ steps.set-go-version.outputs.go-version }}
-      cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # on-success:
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  #   outputs:
+  #     go-version: ${{ steps.set-go-version.outputs.go-version }}
+  #     cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - id: set-go-version
-        name: Parse Golang Version
-        run: |
-          go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-          echo "golang version: ${go_version[1]}"
-          echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
+  #     - id: set-go-version
+  #       name: Parse Golang Version
+  #       run: |
+  #         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+  #         echo "golang version: ${go_version[1]}"
+  #         echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
-      - id: set-build-sha
-        name: Get Build SHA
-        run: |
-          build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
-          echo "sha ============ ${build_sha}"
-          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
+  #     - id: set-build-sha
+  #       name: Get Build SHA
+  #       run: |
+  #         build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
+  #         echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
 
       # - name: Print
       #   run: |
@@ -44,86 +43,52 @@ jobs:
       #     # echo "workflow stats: name =============== ${{ github.event.workflow_run.name }}"
       #     # echo "workflow stats: run_number =============== ${{ github.event.workflow_run.run_number }}"
       #     # echo "workflow stats: workflow_id =============== ${{ github.event.workflow_run.workflow_id }}"
-
-      # - name: 'Download SHA'
-      #   uses: dawidd6/action-download-artifact@v2
-      #   with:
-      #     run_id: ${{ github.event.workflow_run.id }}
-      #     name: sha
-      #     path: sha
            
       # - name: Setup tmate session
       #   if: always()
       #   uses: mxschmitt/action-tmate@v3 
-
-  # on-success:
-  #     runs-on: ubuntu-latest
-  #     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-  #     steps:
-  #       - name: 'Download artifact'
-  #         uses: actions/github-script@v6
-  #         with:
-  #           script: |
-  #             let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-  #               owner: context.repo.owner,
-  #               repo: context.repo.repo,
-  #               run_id: context.payload.workflow_run.id,
-  #             });
-  #             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-  #               return artifact.name == "sha"
-  #             })[0];
-  #             let download = await github.rest.actions.downloadArtifact({
-  #               owner: context.repo.owner,
-  #               repo: context.repo.repo,
-  #               artifact_id: matchArtifact.id,
-  #               archive_format: 'zip',
-  #             });
-  #             let fs = require('fs');
-  #             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/sha.zip`, Buffer.from(download.data));  
-
-  #       - name: 'Unzip artifact'
-  #         run: unzip sha.zip
-
-  #       - name: 'Comment on PR'
-  #         uses: actions/github-script@v6
-  #         with:
-  #           github-token: ${{ secrets.GITHUB_TOKEN }}
-  #           script: |
-  #             let fs = require('fs');
-  #             let sha = Number(fs.readFileSync('./sha'));
-  #             echo "sha is ${sha}"
         
-  # shared-values:
-  #   name: Shared Values
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-  #     go-version: ${{ steps.set-go-version.outputs.go-version }}
-  #     min-capi: ${{ steps.get-min-capi.outputs.min-capi }}
+  shared-values:
+    name: Shared Values
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+      min-capi: ${{ steps.get-min-capi.outputs.min-capi }}
+      cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+    steps:
+      - id: set-build-sha
+        name: Get Build SHA
+        run: |
+          build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
+          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
 
-  #     - id: set-secrets-environment
-  #       name: Set environment
-  #       run: echo "secrets-environment=PROD" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.set-build-sha.outputs.cf-build-sha }}
 
-  #     - id: set-go-version
-  #       name: Parse Golang Version
-  #       run: |
-  #         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-  #         echo "golang version: ${go_version[1]}"
-  #         echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
+      - id: set-secrets-environment
+        name: Set environment
+        run: echo "secrets-environment=PROD" >> $GITHUB_OUTPUT
 
-  #     - id: get-min-capi
-  #       name: Get Minimum CAPI Version
-  #       run: |
-  #         min_capi=($(yq .cf-d-capi-version-min build_data.yml))
-  #         echo "Minimum CAPI version: ${min_capi}"
-  #         echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
+      - id: set-go-version
+        name: Parse Golang Version
+        run: |
+          go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+          echo "golang version: ${go_version[1]}"
+          echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
-# ## START edge CAPI
+      - id: get-min-capi
+        name: Get Minimum CAPI Version
+        run: |
+          min_capi=($(yq .cf-d-capi-version-min build_data.yml))
+          echo "Minimum CAPI version: ${min_capi}"
+          echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
+
+## START edge CAPI
 
 #   get-cf-env-with-edge-capi:
 #     name: Setup CF env with EDGE CAPI
