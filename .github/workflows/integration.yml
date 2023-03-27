@@ -53,7 +53,8 @@ jobs:
       - name: Get Artifact Name
         id: get-artifact-name
         run: |
-          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          # build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
           echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}" >> $GITHUB_OUTPUT
 
       - name: Download binaries
