@@ -49,6 +49,13 @@ jobs:
         run: |
           build_sha=$(git rev-parse --short HEAD)
           echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
+          echo $build-sha > ./sha
+
+      - name: 'Export SHA'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.set-build-sha.outputs.cf-build-sha }}
+          path: ./sha          
 
   build-linux:
     name: Build Linux binaries
@@ -132,7 +139,7 @@ jobs:
 
           echo "Creating tarball"
           tar -cvzf cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
-          windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
+          $windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
           echo "windows-binaries=${windows_binaries}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Windows Binaries'
