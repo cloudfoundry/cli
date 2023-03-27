@@ -12,22 +12,45 @@ jobs:
   on-success:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      go-version: ${{ steps.set-go-version.outputs.go-version }}
+      cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
     steps:
-      - name: Print
-        run: |
-          echo "workflow stats: head_commit =============== ${{ github.event.workflow_run.head_commit }}"
-          echo "workflow stats: head_sha =============== ${{ github.event.workflow_run.head_sha }}"
-          echo "workflow stats: id =============== ${{ github.event.workflow_run.id }}"
-          echo "workflow stats: name =============== ${{ github.event.workflow_run.name }}"
-          echo "workflow stats: run_number =============== ${{ github.event.workflow_run.run_number }}"
-          echo "workflow stats: workflow_id =============== ${{ github.event.workflow_run.workflow_id }}"
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: 'Download SHA'
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          run_id: ${{ github.event.workflow_run.id }}
-          name: sha
-          path: sha
+      - id: set-go-version
+        name: Parse Golang Version
+        run: |
+          go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
+          echo "golang version: ${go_version[1]}"
+          echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
+
+      - id: set-build-sha
+        name: Get Build SHA
+        run: |
+          build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
+          echo "sha ============ ${build_sha}"
+          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
+
+      # - name: Print
+      #   run: |
+      #     build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
+      #     echo "sha ============ ${sha}"
+
+      #     # echo "workflow stats: head_commit =============== ${{ github.event.workflow_run.head_commit }}"
+      #     # echo "workflow stats: head_sha =============== ${{ github.event.workflow_run.head_sha }}"
+      #     # echo "workflow stats: id =============== ${{ github.event.workflow_run.id }}"
+      #     # echo "workflow stats: name =============== ${{ github.event.workflow_run.name }}"
+      #     # echo "workflow stats: run_number =============== ${{ github.event.workflow_run.run_number }}"
+      #     # echo "workflow stats: workflow_id =============== ${{ github.event.workflow_run.workflow_id }}"
+
+      # - name: 'Download SHA'
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: sha
+      #     path: sha
            
       # - name: Setup tmate session
       #   if: always()

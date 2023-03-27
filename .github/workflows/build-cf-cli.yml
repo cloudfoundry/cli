@@ -49,13 +49,13 @@ jobs:
         run: |
           build_sha=$(git rev-parse --short HEAD)
           echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
-          echo $build-sha > ./sha
+      #     echo $build-sha > ./sha
 
-      - name: 'Export SHA'
-        uses: actions/upload-artifact@v3
-        with:
-          name: sha
-          path: ./sha          
+      # - name: 'Export SHA'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: sha
+      #     path: ./sha          
 
   build-linux-binaries:
     name: Build Linux binaries
