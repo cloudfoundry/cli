@@ -131,8 +131,8 @@ jobs:
 
           $CF_BUILD_SHA="${{ needs.shared-values.outputs.cf-build-sha }}"
 
-          echo "Building 32-bit Windows"
-          make out/cf-cli_win32.exe
+          # echo "Building 32-bit Windows"
+          # make out/cf-cli_win32.exe
 
           echo "Building 64-bit Windows"
           make out/cf-cli_winx64.exe
@@ -140,13 +140,14 @@ jobs:
           echo "Creating tarball"
           tar -cvzf cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
           $windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
+          echo "windows-binaries ================ ${windows_binaries}"
           echo "windows-binaries=${windows_binaries}" >> $GITHUB_OUTPUT
 
       - name: 'Upload Windows Binaries'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-windows.outputs.windows-binaries }}
-          path: ./cf-cli-windows-binaries-*
+          path: cf-cli-windows-binaries-*
 
       - name: Setup tmate session
         if: always()
