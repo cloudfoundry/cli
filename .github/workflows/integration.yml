@@ -8,46 +8,7 @@ on:
 permissions:
   contents: read
 
-jobs:
-  # on-success:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.event.workflow_run.conclusion == 'success' }}
-  #   outputs:
-  #     go-version: ${{ steps.set-go-version.outputs.go-version }}
-  #     cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - id: set-go-version
-  #       name: Parse Golang Version
-  #       run: |
-  #         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-  #         echo "golang version: ${go_version[1]}"
-  #         echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
-
-  #     - id: set-build-sha
-  #       name: Get Build SHA
-  #       run: |
-  #         build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
-  #         echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
-
-      # - name: Print
-      #   run: |
-      #     build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
-      #     echo "sha ============ ${sha}"
-
-      #     # echo "workflow stats: head_commit =============== ${{ github.event.workflow_run.head_commit }}"
-      #     # echo "workflow stats: head_sha =============== ${{ github.event.workflow_run.head_sha }}"
-      #     # echo "workflow stats: id =============== ${{ github.event.workflow_run.id }}"
-      #     # echo "workflow stats: name =============== ${{ github.event.workflow_run.name }}"
-      #     # echo "workflow stats: run_number =============== ${{ github.event.workflow_run.run_number }}"
-      #     # echo "workflow stats: workflow_id =============== ${{ github.event.workflow_run.workflow_id }}"
-           
-      # - name: Setup tmate session
-      #   if: always()
-      #   uses: mxschmitt/action-tmate@v3 
-        
+jobs:      
   shared-values:
     name: Shared Values
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -62,8 +23,9 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
-          build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
-          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
+          # build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
+          # echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
+          echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -88,43 +50,60 @@ jobs:
           echo "Minimum CAPI version: ${min_capi}"
           echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
 
+      - name: Get Artifact Name
+        id: get-artifact-name
+        run: |
+          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}" >> $GITHUB_OUTPUT
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+          path: cf-cli-binaries
+        
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+
 ## START edge CAPI
 
-#   get-cf-env-with-edge-capi:
-#     name: Setup CF env with EDGE CAPI
-#     needs: shared-values
-#     uses: ./.github/workflows/cf-env-setup.yml
-#     with:
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       capi-version: edge
-#     secrets: inherit
+  # get-cf-env-with-edge-capi:
+  #   name: Setup CF env with EDGE CAPI
+  #   needs: shared-values
+  #   uses: ./.github/workflows/cf-env-setup.yml
+  #   with:
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     capi-version: edge
+  #   secrets: inherit
 
-#   run-integration-tests-cf-env-with-edge-capi:
-#     name: Integration tests with EDGE CAPI
-#     needs:
-#       - shared-values
-#       - get-cf-env-with-edge-capi
-#     uses: ./.github/workflows/run-integration-tests.yml
-#     with:
-#       go-version: ${{ needs.shared-values.outputs.go-version}}
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-#       run-with-client-creds: false
+  # run-integration-tests-cf-env-with-edge-capi:
+  #   name: Integration tests with EDGE CAPI
+  #   needs:
+  #     - shared-values
+  #     - get-cf-env-with-edge-capi
+  #   uses: ./.github/workflows/run-integration-tests.yml
+  #   with:
+  #     cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
+  #     go-version: ${{ needs.shared-values.outputs.go-version}}
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+  #     run-with-client-creds: false
 
-#   unclaim-cf-env-with-edge-capi:
-#     name: Unclaim CF env with EDGE CAPI
-#     needs:
-#       - shared-values
-#       - get-cf-env-with-edge-capi
-#       - run-integration-tests-cf-env-with-edge-capi
-#     if: always()
-#     uses: ./.github/workflows/cf-env-unclaim.yml
-#     with:
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-#     secrets: inherit
+  # unclaim-cf-env-with-edge-capi:
+  #   name: Unclaim CF env with EDGE CAPI
+  #   needs:
+  #     - shared-values
+  #     - get-cf-env-with-edge-capi
+  #     - run-integration-tests-cf-env-with-edge-capi
+  #   if: always()
+  #   uses: ./.github/workflows/cf-env-unclaim.yml
+  #   with:
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+  #   secrets: inherit
 
-# ## END edge CAPI
+## END edge CAPI
 
 # ## Start edge CAPI Client Creds
 #   get-cf-env-with-edge-capi-client-creds:
