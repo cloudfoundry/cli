@@ -54,7 +54,7 @@ jobs:
       - name: 'Export SHA'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.set-build-sha.outputs.cf-build-sha }}
+          name: sha
           path: ./sha          
 
   build-linux-binaries:
