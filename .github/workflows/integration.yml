@@ -60,6 +60,7 @@ jobs:
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
         with:
+          run_id: ${{ github.event.workflow_run.id }}
           name: ${{ steps.get-artifact-name.outputs.artifact-name }}
           path: cf-cli-binaries
         
