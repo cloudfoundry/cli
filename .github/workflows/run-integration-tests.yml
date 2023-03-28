@@ -15,6 +15,9 @@ on:
       run-with-client-creds:
         required: true
         type: boolean
+      cf-build-sha:
+        required: true
+        type: string
 jobs:
   run-integration-tests:
     name: Run Integration Tests
@@ -25,6 +28,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: cli
+          ref: ${{ inputs.cf-build-sha }}
       - name: Set Up Go
         uses: actions/setup-go@v3
         with:
@@ -51,6 +55,25 @@ jobs:
           chmod +x /usr/local/bin/credhub
           credhub --version
           rm ~/credhub-linux-2.9.4.tgz
+
+      - name: Get Artifact Name
+        id: get-artifact-name
+        run: |
+          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+          path: cf-cli-binaries
+
+      # - name: Setup tmate session
+      #   if: always()
+      #   uses: mxschmitt/action-tmate@v3 
+
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
@@ -69,16 +92,24 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
+          pushd cf-cli-binaries
+            tar xvzf ${{ steps.get-artifact-name.outputs.artifact-name }}
+            chmod +x cf-cli_linux_x86-64
+            mkdir -p $GOPATH/bin
+            mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+          popd
+
           cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          make build
-          export PATH="$(pwd)/out:$PATH"
+          # make build
+          # export PATH="$(pwd)/out:$PATH"
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
           cf auth
 
           make integration-tests-full-ci
+
       - name: Run Integration Tests with client credentials
         if: ${{ inputs.run-with-client-creds }}
         env:
@@ -103,8 +134,15 @@ jobs:
           cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          make build
-          export PATH="$(pwd)/out:$PATH"
+          pushd cf-cli-binaries
+            tar xvzf cf-cli-binaries.tgz
+            chmod +x cf-cli_linux_x86-64
+            mkdir -p $GOPATH/bin
+            mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+          popd
+
+          # make build
+          # export PATH="$(pwd)/out:$PATH"
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
           cf auth
