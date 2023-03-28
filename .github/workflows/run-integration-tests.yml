@@ -93,7 +93,7 @@ jobs:
           export PATH=$GOPATH/bin:$PATH
 
           pushd cf-cli-binaries
-            tar xvzf cf-cli-binaries.tgz
+            tar xvzf ${{ steps.get-artifact-name.outputs.artifact-name }}
             chmod +x cf-cli_linux_x86-64
             mkdir -p $GOPATH/bin
             mv cf-cli_linux_x86-64 $GOPATH/bin/cf
@@ -140,7 +140,7 @@ jobs:
             mkdir -p $GOPATH/bin
             mv cf-cli_linux_x86-64 $GOPATH/bin/cf
           popd
-          
+
           # make build
           # export PATH="$(pwd)/out:$PATH"
           export CF_PASSWORD=${CF_INT_PASSWORD}
