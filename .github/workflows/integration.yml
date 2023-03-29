@@ -23,8 +23,6 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
-          # build_sha=$(echo '${{ github.event.workflow_run.head_sha }}' | awk '{print substr($0,0,7)}')
-          # echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT
           echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
@@ -56,40 +54,40 @@ jobs:
 
 ## START edge CAPI
 
-  get-cf-env-with-edge-capi:
-    name: Setup CF env with EDGE CAPI
-    needs: shared-values
-    uses: ./.github/workflows/cf-env-setup.yml
-    with:
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      capi-version: edge
-    secrets: inherit
+  # get-cf-env-with-edge-capi:
+  #   name: Setup CF env with EDGE CAPI
+  #   needs: shared-values
+  #   uses: ./.github/workflows/cf-env-setup.yml
+  #   with:
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     capi-version: edge
+  #   secrets: inherit
 
-  run-integration-tests-cf-env-with-edge-capi:
-    name: Integration tests with EDGE CAPI
-    needs:
-      - shared-values
-      - get-cf-env-with-edge-capi
-    uses: ./.github/workflows/run-integration-tests.yml
-    with:
-      cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
-      go-version: ${{ needs.shared-values.outputs.go-version}}
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-      run-with-client-creds: false
+  # run-integration-tests-cf-env-with-edge-capi:
+  #   name: Integration tests with EDGE CAPI
+  #   needs:
+  #     - shared-values
+  #     - get-cf-env-with-edge-capi
+  #   uses: ./.github/workflows/run-integration-tests.yml
+  #   with:
+  #     cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
+  #     go-version: ${{ needs.shared-values.outputs.go-version}}
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+  #     run-with-client-creds: false
 
-  unclaim-cf-env-with-edge-capi:
-    name: Unclaim CF env with EDGE CAPI
-    needs:
-      - shared-values
-      - get-cf-env-with-edge-capi
-      - run-integration-tests-cf-env-with-edge-capi
-    if: always()
-    uses: ./.github/workflows/cf-env-unclaim.yml
-    with:
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-    secrets: inherit
+  # unclaim-cf-env-with-edge-capi:
+  #   name: Unclaim CF env with EDGE CAPI
+  #   needs:
+  #     - shared-values
+  #     - get-cf-env-with-edge-capi
+  #     - run-integration-tests-cf-env-with-edge-capi
+  #   if: always()
+  #   uses: ./.github/workflows/cf-env-unclaim.yml
+  #   with:
+  #     environment: ${{ needs.shared-values.outputs.secrets-environment }}
+  #     toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+  #   secrets: inherit
 
 ## END edge CAPI
 
@@ -110,6 +108,7 @@ jobs:
 #       - get-cf-env-with-edge-capi-client-creds
 #     uses: ./.github/workflows/run-integration-tests.yml
 #     with:
+#       cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
 #       go-version: ${{ needs.shared-values.outputs.go-version}}
 #       environment: ${{ needs.shared-values.outputs.secrets-environment }}
 #       environment-name: ${{ needs.get-cf-env-with-edge-capi-client-creds.outputs.environment-name }}
@@ -147,6 +146,7 @@ jobs:
 #       - get-cf-env-with-min-capi
 #     uses: ./.github/workflows/run-integration-tests.yml
 #     with:
+#       cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
 #       go-version: ${{ needs.shared-values.outputs.go-version}}
 #       environment: ${{ needs.shared-values.outputs.secrets-environment }}
 #       environment-name: ${{ needs.get-cf-env-with-min-capi.outputs.environment-name }}
@@ -167,71 +167,86 @@ jobs:
 
 # ## END min CAPI
 
-# ## START windows
-#   get-windows-cf-env-with-edge-capi:
-#     name: Setup CF env with EDGE CAPI for windows
-#     needs: shared-values
-#     uses: ./.github/workflows/cf-env-setup.yml
-#     with:
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       capi-version: edge
-#     secrets: inherit
+## START windows
+  get-windows-cf-env-with-edge-capi:
+    name: Setup CF env with EDGE CAPI for windows
+    needs: shared-values
+    uses: ./.github/workflows/cf-env-setup.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      capi-version: edge
+    secrets: inherit
 
-#   setup-windows-integration:
-#     name: Setup Integration Tests Windows
-#     needs:
-#      - shared-values
-#      - get-windows-cf-env-with-edge-capi
-#     uses: ./.github/workflows/windows-integration-setup.yml
-#     with:
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       environment-name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
+  setup-windows-integration:
+    name: Setup Integration Tests Windows
+    needs:
+     - shared-values
+     - get-windows-cf-env-with-edge-capi
+    uses: ./.github/workflows/windows-integration-setup.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      environment-name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
 
-#   run-windows-integration-tests:
-#     name: Run Integration tests Windows
-#     needs:
-#       - shared-values
-#       - get-windows-cf-env-with-edge-capi
-#       - setup-windows-integration
-#     runs-on: windows-latest
-#     defaults:
-#       run:
-#         shell: pwsh
-#     environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-#         with:
-#           path: cli
-#       - name: Set Up Go
-#         uses: actions/setup-go@v3
-#         with:
-#           go-version: ${{ needs.shared-values.outputs.go-version}}
-#           check-latest: true
-#       - name: Download metadata
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
+  run-windows-integration-tests:
+    name: Run Integration tests Windows
+    needs:
+      - shared-values
+      - get-windows-cf-env-with-edge-capi
+      - setup-windows-integration
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    environment: ${{ needs.shared-values.outputs.secrets-environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: cli
+      - name: Set Up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ needs.shared-values.outputs.go-version}}
+          check-latest: true
+      - name: Download metadata
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
 
-#       - name: Download CF data
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: cf-windows-data
-#       - name: Run Integration Tests
-#         run: cli/.github/win/integrations/integration-tests.ps1
+      - name: Download CF data
+        uses: actions/download-artifact@v3
+        with:
+          name: cf-windows-data
 
-#   unclaim-cf-windows-env-with-edge-capi:
-#     name: Unclaim CF windows env with edge CAPI
-#     needs:
-#       - shared-values
-#       - get-windows-cf-env-with-edge-capi
-#       - run-windows-integration-tests
-#     if: always()
-#     uses: ./.github/workflows/cf-env-unclaim.yml
-#     with:
-#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
-#       toolsmith-env-name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
-#     secrets: inherit
+      - name: Get Artifact Name
+        id: get-artifact-name
+        run: |
+          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+          path: cf-cli-binaries
+
+      - name: Run Integration Tests
+        run: cli/.github/win/integrations/integration-tests.ps1
+
+  unclaim-cf-windows-env-with-edge-capi:
+    name: Unclaim CF windows env with edge CAPI
+    needs:
+      - shared-values
+      - get-windows-cf-env-with-edge-capi
+      - run-windows-integration-tests
+    if: always()
+    uses: ./.github/workflows/cf-env-unclaim.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      toolsmith-env-name: ${{ needs.get-windows-cf-env-with-edge-capi.outputs.environment-name }}
+    secrets: inherit
 
 # ## START windows client credentials
 #   get-windows-cc-cf-env-with-edge-capi:
@@ -286,6 +301,21 @@ jobs:
 #         uses: actions/download-artifact@v3
 #         with:
 #           name: cf-windows-data
+
+      # - name: Get Artifact Name
+      #   id: get-artifact-name
+      #   run: |
+      #     build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+      #     # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+      #     echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
+
+      # - name: Download binaries
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+      #     path: cf-cli-binaries
+
 #       - name: Run Integration Tests
 #         run: cli/.github/win/integrations/integration-tests.ps1
 
