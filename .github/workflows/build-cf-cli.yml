@@ -137,11 +137,14 @@ jobs:
           echo "windows-binaries=${windows_binaries}" >> "$GITHUB_OUTPUT"
 
       - name: 'Upload Windows Binaries'
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.build-windows.outputs.windows-binaries }}
-          path: cf-cli-windows-binaries-*
+        run: |
+          Get-ChildItem
+          echo "name ================= ${{ steps.build-windows.outputs.windows-binaries }}"
+        # uses: actions/upload-artifact@v3
+        # with:
+        #   name: ${{ steps.build-windows.outputs.windows-binaries }}
+        #   path: cf-cli-windows-binaries-*
 
-  #     - name: Setup tmate session
-  #       if: always()
-  #       uses: mxschmitt/action-tmate@v3 
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
