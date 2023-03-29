@@ -137,9 +137,6 @@ jobs:
           echo "windows-binaries=${windows_binaries}" >> "$Env:GITHUB_OUTPUT"
 
       - name: 'Upload Windows Binaries'
-        # run: |
-        #   Get-ChildItem
-        #   echo "name ================= ${{ steps.build-windows.outputs.windows-binaries }}"
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-windows.outputs.windows-binaries }}
