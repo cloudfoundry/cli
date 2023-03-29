@@ -2,7 +2,7 @@ name: Integration Tests
 
 on:
   workflow_run:
-    workflows: [Build Binaries]
+    workflows: [Build Binaries1]
     types: [completed]
 
 permissions:
