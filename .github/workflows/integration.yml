@@ -221,9 +221,8 @@ jobs:
       - name: Get Artifact Name
         id: get-artifact-name
         run: |
-          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
+          $build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> "$Env:GITHUB_OUTPUT"
 
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
@@ -305,9 +304,8 @@ jobs:
       - name: Get Artifact Name
         id: get-artifact-name
         run: |
-          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
+          $build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
+          echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> "$Env:GITHUB_OUTPUT"
 
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2

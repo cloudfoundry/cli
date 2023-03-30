@@ -133,7 +133,6 @@ jobs:
           echo "Creating tarball"
           tar -cvzf cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
           $windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
-          echo "windows-binaries ================ ${windows_binaries}"
           echo "windows-binaries=${windows_binaries}" >> "$Env:GITHUB_OUTPUT"
 
       - name: 'Upload Windows Binaries'
