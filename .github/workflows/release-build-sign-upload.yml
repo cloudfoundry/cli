@@ -396,7 +396,7 @@ jobs:
             cp control_v8.template cf/DEBIAN/control
             echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
             echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
-            echo "Architecture: amd64" >> cf/DEBIAN/control
+            echo "Architecture: arm64" >> cf/DEBIAN/control
 
             cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
