@@ -190,6 +190,7 @@ jobs:
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
+        make out/cf-cli_linux_arm64
 
     - name: Store Linux Binaries
       uses: actions/upload-artifact@v2
@@ -241,6 +242,20 @@ jobs:
         	cat cf8-cli.spec.template >> cf-cli.spec
         	rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
         	mv build/RPMS/x86_64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_x86-64.rpm
+          popd
+        )
+
+        echo "Build aarch64 RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+        	cp $root/out/cf-cli_linux_arm64 cf8
+        	cp ../../license/NOTICE .
+        	cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+        	cp ../completion/cf8 cf8.bash
+        	echo "Version: ${RPM_VERSION}" > cf-cli.spec
+        	cat cf8-cli.spec.template >> cf-cli.spec
+        	rpmbuild --target aarch64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+        	mv build/RPMS/aarch64/cf8-cli*.rpm $root/packaged/cf8-cli-installer_${BUILD_VERSION}_aarch64.rpm
           popd
         )
 
@@ -358,6 +373,38 @@ jobs:
 
             fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
             mv cf8-cli-installer_${BUILD_VERSION}_x86-64.deb $root/packaged-deb
+          popd
+        )
+
+        echo "Build arm64 Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_arm64 | cut -f 1)"
+
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
+
+            cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
+
+            cp control_v8.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${BUILD_VERSION}" >> cf/DEBIAN/control
+            echo "Architecture: amd64" >> cf/DEBIAN/control
+
+            cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
+
+            cp $root/out/cf-cli_linux_arm64 cf/usr/bin/cf8
+            ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
+
+            fakeroot dpkg --build cf cf8-cli-installer_${BUILD_VERSION}_arm64.deb
+            mv cf8-cli-installer_${BUILD_VERSION}_arm64.deb $root/packaged-deb
           popd
         )
 
@@ -751,9 +798,11 @@ jobs:
         }
 
         pushd signed
-          mkdir linux_i686 linux_x86-64
+          mkdir linux_i686 linux_x86-64 linux_arm64
           mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf8
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf8
+          mv cf-cli-linux-binaries/cf-cli_linux_arm64 linux_arm64/cf8
+
           pushd linux_i686
             prepare_artifacts
             tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
@@ -761,6 +810,10 @@ jobs:
           pushd linux_x86-64
             prepare_artifacts
             tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
+          popd
+          pushd linux_arm64
+            prepare_artifacts
+            tar -cvzf cf8-cli_${INSTALLER_RELEASE_VERSION}_linux_arm64.tgz *
           popd
 
           mkdir osx
@@ -797,6 +850,7 @@ jobs:
           signed/cf-cli-windows-packages/cf*zip \
           signed/linux_i686/*tgz \
           signed/linux_x86-64/*tgz \
+          signed/linux_arm64/*tgz \
           signed/osx/*tgz \
           signed/win32/*zip \
           signed/winx64/*zip
