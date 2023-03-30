@@ -246,6 +246,7 @@ jobs:
         mkdir installers
         curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${BUILD_VERSION}&source=github-rel" > installers/cf8-cli-installer_${BUILD_VERSION}_i686.deb
         curl -L "https://cli.run.pivotal.io/stable?release=debian64&version=${BUILD_VERSION}&source=github-rel" > installers/cf8-cli-installer_${BUILD_VERSION}_x86-64.deb
+        curl -L "https://cli.run.pivotal.io/stable?release=debianarm64&version=${BUILD_VERSION}&source=github-rel" > installers/cf8-cli-installer_${BUILD_VERSION}_arm64.deb
 
     - name: Update Debian Repository
       env:
