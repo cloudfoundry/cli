@@ -48,13 +48,15 @@ jobs:
         name: Get Build SHA
         run: |
           build_sha=$(git rev-parse --short HEAD)
-          
+
           echo "run_id = ${{ github.event.workflow_run.id }}"
           echo "path = ${{ github.event.workflow_run.referenced_workflows.path }}"
           echo "ref = ${{ github.event.workflow_run.referenced_workflows.ref }}"
           echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
           echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
           echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
+          echo "github.sha = ${{ github.sha }}"
+          echo "github.run_id = ${{ github.run_id }}"
 
           echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT 
 

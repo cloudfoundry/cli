@@ -29,6 +29,8 @@ jobs:
           echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
           echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
           echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
+          echo "github.sha = ${{ github.sha }}"
+          echo "github.run_id = ${{ github.run_id }}"
 
           if [ '${{ github.event.workflow_run.event }}' == 'push' ]
           then
