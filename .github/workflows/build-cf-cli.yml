@@ -11,7 +11,7 @@ on:
       - 'doc/**'
       - '.gitpod.yml'
       - 'README.md'
-  push:
+  # push:
     # branches:
     #   - main
     #   - v8
