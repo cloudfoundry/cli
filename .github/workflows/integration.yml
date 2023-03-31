@@ -23,7 +23,7 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
-          if[${{ github.event.workflow_run.event }} == 'push']
+          if['${{ github.event.workflow_run.event }}' == 'push']
           then
             echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
           else
