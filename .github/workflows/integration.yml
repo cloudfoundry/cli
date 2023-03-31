@@ -39,11 +39,6 @@ jobs:
             echo "cf-build-sha=${{ github.event.workflow_run.pull_requests.head.sha }}" >> $GITHUB_OUTPUT
           fi
 
-      # - name: Download metadata
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: build-sha
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -89,7 +84,8 @@ jobs:
       - get-cf-env-with-edge-capi
     uses: ./.github/workflows/run-integration-tests.yml
     with:
-      cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
+      # cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
+      cf-build-sha: ${{ github.run_id }}
       go-version: ${{ needs.shared-values.outputs.go-version}}
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
