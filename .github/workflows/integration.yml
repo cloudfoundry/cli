@@ -55,12 +55,12 @@ jobs:
           echo "golang version: ${go_version[1]}"
           echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
 
-      - id: get-min-capi
-        name: Get Minimum CAPI Version
-        run: |
-          min_capi=($(yq .cf-d-capi-version-min build_data.yml))
-          echo "Minimum CAPI version: ${min_capi}"
-          echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
+      # - id: get-min-capi
+      #   name: Get Minimum CAPI Version
+      #   run: |
+      #     min_capi=($(yq .cf-d-capi-version-min build_data.yml))
+      #     echo "Minimum CAPI version: ${min_capi}"
+      #     echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
         
       # - name: Setup tmate session
       #   if: always()
