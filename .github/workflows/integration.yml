@@ -23,6 +23,9 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
+          echo "pr sha=${{ github.event.workflow_run.pull_requests.head.sha }}"
+          echo "artifacts url=${{ github.event.workflow_run.artifacts_url }}"
+          echo "event=${{ github.event.workflow_run.event }}"
           echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
