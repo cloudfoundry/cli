@@ -62,7 +62,7 @@ jobs:
           # build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
           # echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
           echo "artifact-name=cf-cli-linux-binaries.tgz" >> $GITHUB_OUTPUT
-          echo "run id ===================== ${{ github.event.run_id }}"
+          echo "run id ===================== ${{ inputs.cf-build-sha }}"
 
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
