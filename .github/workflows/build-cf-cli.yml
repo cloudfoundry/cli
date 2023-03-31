@@ -148,7 +148,7 @@ jobs:
           # tar -cvzf cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz -C out .
           # $windows_binaries="cf-cli-windows-binaries-${CF_BUILD_SHA}.tgz"
           # echo "windows-binaries=${windows_binaries}" >> "$Env:GITHUB_OUTPUT"
-          tar -cvzf ${windows_binaries}z -C out .
+          tar -cvzf ${windows_binaries} -C out .
           echo "windows-binaries=${windows_binaries}" >> "$Env:GITHUB_OUTPUT"
 
       - name: 'Upload Windows Binaries'

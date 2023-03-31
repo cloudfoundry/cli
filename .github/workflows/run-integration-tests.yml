@@ -67,7 +67,7 @@ jobs:
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
         with:
-          run_id: ${{ github.run_id }}
+          run_id: ${{ inputs.cf-build-sha }}.run_id }}
           name: ${{ steps.get-artifact-name.outputs.artifact-name }}
           path: cf-cli-binaries
 
