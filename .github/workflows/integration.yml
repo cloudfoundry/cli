@@ -23,12 +23,24 @@ jobs:
       - id: set-build-sha
         name: Get Build SHA
         run: |
+          echo "run_id = ${{ github.event.workflow_run.id }}"
+          echo "path = ${{ github.event.workflow_run.referenced_workflows.path }}"
+          echo "ref = ${{ github.event.workflow_run.referenced_workflows.ref }}"
+          echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
+          echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
+          echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
+
           if [ '${{ github.event.workflow_run.event }}' == 'push' ]
           then
             echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
           else
             echo "cf-build-sha=${{ github.event.workflow_run.pull_requests.head.sha }}" >> $GITHUB_OUTPUT
           fi
+
+      # - name: Download metadata
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: build-sha
 
       - name: Checkout
         uses: actions/checkout@v3

@@ -48,7 +48,21 @@ jobs:
         name: Get Build SHA
         run: |
           build_sha=$(git rev-parse --short HEAD)
-          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT        
+          
+          echo "run_id = ${{ github.event.workflow_run.id }}"
+          echo "path = ${{ github.event.workflow_run.referenced_workflows.path }}"
+          echo "ref = ${{ github.event.workflow_run.referenced_workflows.ref }}"
+          echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
+          echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
+          echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
+
+          echo "cf-build-sha=${build_sha}" >> $GITHUB_OUTPUT 
+
+      # - name: Upload sha
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ steps.set-build-sha.outputs.cf-build-sha }}
+      #     path: build-sha       
 
   build-linux-binaries:
     name: Build Linux binaries
