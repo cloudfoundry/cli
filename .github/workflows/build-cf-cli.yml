@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-linux.outputs.linux-binaries }}
-          path: \.
+          path: cf-cli-binaries
 
   build-windows-binaries:
     name: Build Windows binaries
@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-windows.outputs.windows-binaries }}
-          path: \.
+          path: cf-cli-binaries
 
       # - name: Setup tmate session
       #   if: always()
