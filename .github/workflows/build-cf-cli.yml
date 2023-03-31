@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build-windows.outputs.windows-binaries }}
-          path: ${{ steps.build-windows.outputs.windows-binaries }}
+          path: cf-cli-windows-binaries.tgz
 
       # - name: Setup tmate session
       #   if: always()
