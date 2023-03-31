@@ -63,12 +63,13 @@ jobs:
           # echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
           echo "artifact-name=cf-cli-linux-binaries.tgz" >> $GITHUB_OUTPUT
           echo "run id ===================== ${{ inputs.cf-build-sha }}"
+          echo "workflow_run.id ===================== ${{ github.event.workflow_run.id }}"
 
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ inputs.cf-build-sha }}
-          name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+          name: cf-cli-linux-binaries.tgz
           path: cf-cli-binaries
 
       # - name: Setup tmate session
