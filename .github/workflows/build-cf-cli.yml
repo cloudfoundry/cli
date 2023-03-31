@@ -3,14 +3,14 @@ name: Build Binaries
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - main
-      - v8
-      - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.gitpod.yml'
-      - 'README.md'
+    # branches:
+    #   - main
+    #   - v8
+    #   - v7
+    # paths-ignore:
+    #   - 'doc/**'
+    #   - '.gitpod.yml'
+    #   - 'README.md'
   # push:
     # branches:
     #   - main
