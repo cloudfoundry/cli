@@ -116,15 +116,15 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
-          cd $GOPATH/src/code.cloudfoundry.org/cli
-          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
-
           pushd cf-cli-binaries
             tar xvzf cf-cli-linux-binaries.tgz
             chmod +x cf-cli_linux_x86-64
             mkdir -p $GOPATH/bin
             mv cf-cli_linux_x86-64 $GOPATH/bin/cf
           popd
+
+          cd $GOPATH/src/code.cloudfoundry.org/cli
+          go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
