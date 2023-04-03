@@ -61,6 +61,10 @@ jobs:
           name: cf-cli-linux-binaries.tgz
           path: cf-cli-binaries
 
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3
+
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
@@ -80,7 +84,7 @@ jobs:
           export PATH=$GOPATH/bin:$PATH
 
           pushd cf-cli-binaries
-            tar xvzf cf-cli-binaries.tgz
+            tar xvzf cf-cli-linux-binaries.tgz
             chmod +x cf-cli_linux_x86-64
             mkdir -p $GOPATH/bin
             mv cf-cli_linux_x86-64 $GOPATH/bin/cf
