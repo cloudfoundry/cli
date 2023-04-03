@@ -54,25 +54,12 @@ jobs:
           credhub --version
           rm ~/credhub-linux-2.9.4.tgz
 
-      # - name: Get Artifact Name
-      #   id: get-artifact-name
-      #   run: |
-      #     # build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-      #     # echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
-      #     echo "artifact-name=cf-cli-linux-binaries.tgz" >> $GITHUB_OUTPUT
-      #     echo "run id ===================== ${{ inputs.cf-build-sha }}"
-      #     echo "workflow_run.id ===================== ${{ github.event.workflow_run.id }}"
-
       - name: Download binaries
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: cf-cli-linux-binaries.tgz
           path: cf-cli-binaries
-
-      # - name: Setup tmate session
-      #   if: always()
-      #   uses: mxschmitt/action-tmate@v3 
 
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
@@ -93,7 +80,7 @@ jobs:
           export PATH=$GOPATH/bin:$PATH
 
           pushd cf-cli-binaries
-            tar xvzf ${{ steps.get-artifact-name.outputs.artifact-name }}
+            tar xvzf cf-cli-linux-binaries.tgz
             chmod +x cf-cli_linux_x86-64
             mkdir -p $GOPATH/bin
             mv cf-cli_linux_x86-64 $GOPATH/bin/cf
