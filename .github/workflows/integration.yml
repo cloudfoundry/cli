@@ -17,27 +17,27 @@ jobs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
       go-version: ${{ steps.set-go-version.outputs.go-version }}
       min-capi: ${{ steps.get-min-capi.outputs.min-capi }}
-      cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
+      # cf-build-sha: ${{ steps.set-build-sha.outputs.cf-build-sha }}
 
     steps:
-      - id: set-build-sha
-        name: Get Build SHA
-        run: |
-          echo "run_id = ${{ github.event.workflow_run.id }}"
-          echo "path = ${{ github.event.workflow_run.referenced_workflows.path }}"
-          echo "ref = ${{ github.event.workflow_run.referenced_workflows.ref }}"
-          echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
-          echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
-          echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
-          echo "github.sha = ${{ github.sha }}"
-          echo "github.run_id = ${{ github.run_id }}"
+      # - id: set-build-sha
+      #   name: Get Build SHA
+      #   run: |
+      #     echo "run_id = ${{ github.event.workflow_run.id }}"
+      #     echo "path = ${{ github.event.workflow_run.referenced_workflows.path }}"
+      #     echo "ref = ${{ github.event.workflow_run.referenced_workflows.ref }}"
+      #     echo "sha = ${{ github.event.workflow_run.referenced_workflows.sha }}"
+      #     echo "workflow_id = ${{ github.event.workflow_run.workflow_id }}"
+      #     echo "artifacts_url = ${{ github.event.workflow_run.artifacts_url }}"
+      #     echo "github.sha = ${{ github.sha }}"
+      #     echo "github.run_id = ${{ github.run_id }}"
 
-          if [ '${{ github.event.workflow_run.event }}' == 'push' ]
-          then
-            echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
-          else
-            echo "cf-build-sha=${{ github.event.workflow_run.pull_requests.head.sha }}" >> $GITHUB_OUTPUT
-          fi
+      #     if [ '${{ github.event.workflow_run.event }}' == 'push' ]
+      #     then
+      #       echo "cf-build-sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "cf-build-sha=${{ github.event.workflow_run.pull_requests.head.sha }}" >> $GITHUB_OUTPUT
+      #     fi
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,7 +84,6 @@ jobs:
       - get-cf-env-with-edge-capi
     uses: ./.github/workflows/run-integration-tests.yml
     with:
-      cf-build-sha: ${{ github.event.workflow_run.id }}
       go-version: ${{ needs.shared-values.outputs.go-version}}
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
@@ -122,7 +121,6 @@ jobs:
 #       - get-cf-env-with-edge-capi-client-creds
 #     uses: ./.github/workflows/run-integration-tests.yml
 #     with:
-#       cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
 #       go-version: ${{ needs.shared-values.outputs.go-version}}
 #       environment: ${{ needs.shared-values.outputs.secrets-environment }}
 #       environment-name: ${{ needs.get-cf-env-with-edge-capi-client-creds.outputs.environment-name }}
@@ -160,7 +158,6 @@ jobs:
 #       - get-cf-env-with-min-capi
 #     uses: ./.github/workflows/run-integration-tests.yml
 #     with:
-#       cf-build-sha: ${{ needs.shared-values.outputs.cf-build-sha }}
 #       go-version: ${{ needs.shared-values.outputs.go-version}}
 #       environment: ${{ needs.shared-values.outputs.secrets-environment }}
 #       environment-name: ${{ needs.get-cf-env-with-min-capi.outputs.environment-name }}
@@ -232,17 +229,11 @@ jobs:
 #         with:
 #           name: cf-windows-data
 
-#       - name: Get Artifact Name
-#         id: get-artifact-name
-#         run: |
-#           $build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-#           echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> "$Env:GITHUB_OUTPUT"
-
 #       - name: Download binaries
 #         uses: dawidd6/action-download-artifact@v2
 #         with:
 #           run_id: ${{ github.event.workflow_run.id }}
-#           name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+#           name: cf-cli-windows-binaries.tgz
 #           path: cf-cli-binaries
 
 #       - name: Run Integration Tests
@@ -315,17 +306,11 @@ jobs:
 #         with:
 #           name: cf-windows-data
 
-#       - name: Get Artifact Name
-#         id: get-artifact-name
-#         run: |
-#           $build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-#           echo "artifact-name=cf-cli-windows-binaries-${build_short_sha}.tgz" >> "$Env:GITHUB_OUTPUT"
-
 #       - name: Download binaries
 #         uses: dawidd6/action-download-artifact@v2
 #         with:
 #           run_id: ${{ github.event.workflow_run.id }}
-#           name: ${{ steps.get-artifact-name.outputs.artifact-name }}
+#           name: cf-cli-windows-binaries.tgz
 #           path: cf-cli-binaries
 
 #       - name: Run Integration Tests
