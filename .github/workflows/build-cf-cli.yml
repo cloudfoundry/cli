@@ -22,8 +22,8 @@ on:
     #   - '.gitpod.yml'
     #   - 'README.md'
 
-# permissions:
-#   contents: read
+permissions:
+  contents: read
 
 jobs:
   shared-values:
