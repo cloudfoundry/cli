@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"errors"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -78,29 +77,6 @@ func (cmd AuthCommand) Execute(args []string) error {
 		grantType = constant.GrantTypeClientCredentials
 		credentials["client_id"] = username
 		credentials["client_secret"] = password
-	} else if cmd.Config.IsCFOnK8s() {
-		prompts, err := cmd.Actor.GetLoginPrompts()
-		if err != nil {
-			return err
-		}
-		prompt, ok := prompts["k8s-auth-info"]
-		if !ok {
-			return errors.New("kubernetes login context is missing")
-		}
-
-		userFound := false
-		for _, val := range prompt.Entries {
-			if val == username {
-				userFound = true
-				break
-			}
-		}
-		if !userFound {
-			return errors.New("kubernetes user not found in configuration: " + username)
-		}
-		credentials = map[string]string{
-			"k8s-auth-info": username,
-		}
 	} else {
 		credentials = map[string]string{
 			"username": username,
@@ -142,9 +118,16 @@ func (cmd AuthCommand) getUsernamePassword() (string, string, error) {
 	if password == "" {
 		if envPassword := cmd.Config.CFPassword(); envPassword != "" {
 			password = envPassword
-		} else if !cmd.Config.IsCFOnK8s() {
+		} else {
 			passwordMissing = true
 		}
+	}
+
+	if cmd.Config.IsCFOnK8s() {
+		if !passwordMissing {
+			cmd.UI.DisplayWarning("Warning: password is ignored when authenticating against Kubernetes.")
+		}
+		passwordMissing = false
 	}
 
 	if userMissing || passwordMissing {

@@ -1,7 +1,6 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -19,13 +18,12 @@ import (
 
 var _ = Describe("auth Command", func() {
 	var (
-		cmd             AuthCommand
-		testUI          *ui.UI
-		fakeActor       *v7fakes.FakeActor
-		fakeConfig      *commandfakes.FakeConfig
-		binaryName      string
-		err             error
-		k8sLoginPrompts map[string]coreconfig.AuthPrompt
+		cmd        AuthCommand
+		testUI     *ui.UI
+		fakeActor  *v7fakes.FakeActor
+		fakeConfig *commandfakes.FakeConfig
+		binaryName string
+		err        error
 	)
 
 	BeforeEach(func() {
@@ -45,11 +43,6 @@ var _ = Describe("auth Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.UAAOAuthClientReturns("cf")
 		fakeConfig.APIVersionReturns("3.99.0")
-		k8sLoginPrompts = map[string]coreconfig.AuthPrompt{
-			"k8s-auth-info": {
-				Entries: []string{"myuser"},
-			},
-		}
 	})
 
 	JustBeforeEach(func() {
@@ -124,11 +117,28 @@ var _ = Describe("auth Command", func() {
 			When("authenticating against Korifi", func() {
 				BeforeEach(func() {
 					fakeConfig.IsCFOnK8sReturns(true)
-					fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
 				})
 
 				It("succeeds", func() {
 					Expect(err).NotTo(HaveOccurred())
+				})
+			})
+		})
+
+		When("the password is given", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.Username = "myuser"
+				cmd.RequiredArgs.Password = "mypassword"
+			})
+
+			When("authenticating against korifi", func() {
+				BeforeEach(func() {
+					fakeConfig.IsCFOnK8sReturns(true)
+				})
+
+				It("succeeds but warns", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(testUI.Err).To(Say("Warning: password is ignored when authenticating against Kubernetes."))
 				})
 			})
 		})
@@ -321,33 +331,22 @@ var _ = Describe("auth Command", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.Username = "myuser"
 					fakeConfig.IsCFOnK8sReturns(true)
-					fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
 				})
 
-				When("the specified username doesn't match any k8s context", func() {
+				It("attempts to authenticate with the correct username", func() {
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials).To(HaveKeyWithValue("username", "myuser"))
+				})
+
+				When("there is an error authenticating with the given username", func() {
 					BeforeEach(func() {
-						cmd.RequiredArgs.Username = "some-unknown-user"
+						fakeActor.AuthenticateReturns(errors.New("stuff go boom"))
 					})
 
 					It("errors", func() {
-						Expect(err).To(MatchError(errors.New("kubernetes user not found in configuration: some-unknown-user")))
+						Expect(err).To(MatchError("stuff go boom"))
 					})
-				})
-
-				When("the prompts don't contain k8s authentication information", func() {
-					BeforeEach(func() {
-						k8sLoginPrompts = map[string]coreconfig.AuthPrompt{
-							"some-other-auth-info": {
-								Entries: []string{"myuser"},
-							},
-						}
-						fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
-					})
-
-					It("errors", func() {
-						Expect(err).To(MatchError(errors.New("kubernetes login context is missing")))
-					})
-
 				})
 
 			})

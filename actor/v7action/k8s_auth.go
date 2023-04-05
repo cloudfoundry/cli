@@ -52,11 +52,37 @@ func NewKubernetesAuthActor(config Config, k8sConfigGetter KubernetesConfigGette
 }
 
 func (actor kubernetesAuthActor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
-	actor.config.SetKubernetesAuthInfo(credentials["k8s-auth-info"])
-	return nil
+	username := credentials["username"]
+	availableUsernames, err := actor.getAvailableUsernames()
+	if err != nil {
+		return err
+	}
+
+	for _, u := range availableUsernames {
+		if u == username {
+			actor.config.SetKubernetesAuthInfo(username)
+			return nil
+		}
+	}
+
+	return errors.New("kubernetes user not found in configuration: " + username)
 }
 
 func (actor kubernetesAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, error) {
+	availableUsernames, err := actor.getAvailableUsernames()
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(availableUsernames)
+
+	return map[string]coreconfig.AuthPrompt{"username": {
+		Type:        coreconfig.AuthPromptTypeMenu,
+		Entries:     availableUsernames,
+		DisplayName: "Choose your Kubernetes authentication info",
+	}}, nil
+}
+
+func (actor kubernetesAuthActor) getAvailableUsernames() ([]string, error) {
 	conf, err := actor.k8sConfigGetter.Get()
 	if err != nil {
 		return nil, err
@@ -66,17 +92,11 @@ func (actor kubernetesAuthActor) GetLoginPrompts() (map[string]coreconfig.AuthPr
 		return nil, errors.New("no kubernetes authentication infos configured")
 	}
 
-	var prompts []string
+	var usernames []string
 	for authInfo := range conf.AuthInfos {
-		prompts = append(prompts, authInfo)
+		usernames = append(usernames, authInfo)
 	}
-	sort.Strings(prompts)
-
-	return map[string]coreconfig.AuthPrompt{"k8s-auth-info": {
-		Type:        coreconfig.AuthPromptTypeMenu,
-		Entries:     prompts,
-		DisplayName: "Choose your Kubernetes authentication info",
-	}}, nil
+	return usernames, nil
 }
 
 func (actor kubernetesAuthActor) GetCurrentUser() (configv3.User, error) {

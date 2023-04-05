@@ -130,17 +130,7 @@ var _ = Describe("login Command", func() {
 				fakeConfig.TargetReturns("https://foo.bar")
 			})
 
-			When("password flag is provider", func() {
-				BeforeEach(func() {
-					cmd.Password = "pass"
-				})
-
-				It("returns unsupported flag error", func() {
-					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-p"}))
-				})
-			})
-
-			When("sso flag is provider", func() {
+			When("sso flag is provided", func() {
 				BeforeEach(func() {
 					cmd.SSO = true
 				})
@@ -150,7 +140,7 @@ var _ = Describe("login Command", func() {
 				})
 			})
 
-			When("sso passcode flag is provider", func() {
+			When("sso passcode flag is provided", func() {
 				BeforeEach(func() {
 					cmd.SSOPasscode = "sso-pass"
 				})
@@ -160,17 +150,7 @@ var _ = Describe("login Command", func() {
 				})
 			})
 
-			When("username flag is provider", func() {
-				BeforeEach(func() {
-					cmd.Username = "my-user"
-				})
-
-				It("returns unsupported flag error", func() {
-					Expect(executeErr).To(Equal(translatableerror.NotSupportedOnKubernetesArgumentError{Arg: "-u"}))
-				})
-			})
-
-			When("origin flag is provider", func() {
+			When("origin flag is provided", func() {
 				BeforeEach(func() {
 					cmd.Origin = "my-origin"
 				})
@@ -680,6 +660,104 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say("Your Password:"))
 						Expect(testUI.Out).To(Say("MFA Code:"))
 						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+					})
+				})
+			})
+		})
+
+		When("authenticating against Korifi", func() {
+			BeforeEach(func() {
+				fakeConfig.IsCFOnK8sReturns(true)
+				k8sLoginPrompts := map[string]coreconfig.AuthPrompt{
+					"username": {
+						Type:        coreconfig.AuthPromptTypeMenu,
+						Entries:     []string{"myuser", "overly-powerful-admin"},
+						DisplayName: "Choose your Kubernetes authentication info",
+					},
+				}
+				fakeActor.GetLoginPromptsReturns(k8sLoginPrompts, nil)
+			})
+
+			When("the user selects a valid username", func() {
+				BeforeEach(func() {
+					_, err := input.Write([]byte("1\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("prompts the user with available k8s usernames", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("myuser"))
+					Expect(testUI.Out).To(Say("overly-powerful-admin"))
+					Expect(testUI.Out).To(Say("Choose your Kubernetes authentication info"))
+				})
+
+				It("authenticates with the chosen user", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials).To(Equal(map[string]string{
+						"username": "myuser",
+					}))
+				})
+			})
+
+			When("the user selects an invalid username", func() {
+				BeforeEach(func() {
+					_, err := input.Write([]byte("3\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("errors", func() {
+					Expect(executeErr).To(MatchError("Unable to authenticate."))
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(0))
+				})
+			})
+
+			When("the username flag is set", func() {
+				BeforeEach(func() {
+					cmd.Username = "myuser"
+				})
+
+				It("sets that username in the credentials", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials).To(Equal(map[string]string{
+						"username": "myuser",
+					}))
+
+					Expect(testUI.Out).NotTo(Say("Choose your Kubernetes authentication info"))
+				})
+
+				When("the password flag is also set", func() {
+					BeforeEach(func() {
+						cmd.Password = "should-be-ignored"
+					})
+
+					It("succeeds and sets only the username in the credentials", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(credentials).To(Equal(map[string]string{
+							"username": "myuser",
+						}))
+					})
+
+					It("displays a warning that password will be ignored", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Warning: password is ignored when authenticating against Kubernetes."))
+					})
+				})
+
+				When("authentication fails", func() {
+					BeforeEach(func() {
+						fakeActor.AuthenticateReturns(errors.New("boom"))
+					})
+
+					It("errors", func() {
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
 					})
 				})
 			})
