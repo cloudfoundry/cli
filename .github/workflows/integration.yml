@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 
-jobs:      
+jobs:
   shared-values:
     name: Shared Values
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -39,7 +39,7 @@ jobs:
           min_capi=($(yq .cf-d-capi-version-min build_data.yml))
           echo "Minimum CAPI version: ${min_capi}"
           echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
-        
+
 ## START edge CAPI
 
   get-cf-env-with-edge-capi:
