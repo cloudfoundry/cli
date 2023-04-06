@@ -63,15 +63,18 @@ $Env:CF_DIAL_TIMEOUT=15
 
 Import-Certificate -Filepath "$pwd\$CF_INT_NAME.router.ca" -CertStoreLocation "cert:\LocalMachine\root"
 
+pushd $pwd\cf-cli-binaries
+	7z e cf-cli-windows-binaries.tgz -y
+	7z x cf-cli-windows-binaries.tar -y
+	Move-Item -Path $pwd\cf-cli_winx64.exe  -Destination ..\cf.exe -Force
+popd
+
 New-Item "go/src/code.cloudfoundry.org" -Type Directory
 New-Item -ItemType SymbolicLink -Path "$pwd/go/src/code.cloudfoundry.org/cli" -Target "$pwd/cli"
 
 cd go/src/code.cloudfoundry.org/cli
 
 go install github.com/akavel/rsrc@v0.10.2
-
-make out/cf-cli_winx64.exe
-Move-Item -Path ./out/cf-cli_winx64.exe  -Destination ./out/cf.exe -Force
 
 cf.exe api $Env:CF_INT_API --skip-ssl-validation
 cf.exe auth admin $Env:CF_INT_PASSWORD

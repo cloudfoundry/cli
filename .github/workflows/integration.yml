@@ -1,26 +1,9 @@
 name: Integration Tests
 
 on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-      - v8
-      - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.gitpod.yml'
-      - 'README.md'
-  push:
-    branches:
-      - main
-      - v8
-      - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.github/**'
-      - '.gitpod.yml'
-      - 'README.md'
+  workflow_run:
+    workflows: [Build Binaries]
+    types: [completed]
 
 permissions:
   contents: read
@@ -28,6 +11,7 @@ permissions:
 jobs:
   shared-values:
     name: Shared Values
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
@@ -129,6 +113,7 @@ jobs:
       environment: ${{ needs.shared-values.outputs.secrets-environment }}
       toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi-client-creds.outputs.environment-name }}
     secrets: inherit
+    
 ## END edge CAPI Client Creds
 
 ## START min CAPI
@@ -218,6 +203,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cf-windows-data
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: cf-cli-windows-binaries.tgz
+          path: cf-cli-binaries
+
       - name: Run Integration Tests
         run: cli/.github/win/integrations/integration-tests.ps1
 
@@ -287,6 +280,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cf-windows-data
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: cf-cli-windows-binaries.tgz
+          path: cf-cli-binaries
+
       - name: Run Integration Tests
         run: cli/.github/win/integrations/integration-tests.ps1
 
