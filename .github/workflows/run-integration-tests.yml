@@ -59,16 +59,16 @@ jobs:
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: cf-cli.tgz
-          path: cf-cli-binaries
+          path: ${{ github.workspace }}
 
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
-          export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+          # export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
           export CF_INT_OIDC_USERNAME="admin-oidc"
-          export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+          # export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
           export CF_INT_API="https://api.${ENV}.cf-app.com"
           export CF_DIAL_TIMEOUT=15
           export CF_USERNAME=admin
@@ -77,8 +77,7 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
-          cd cf-cli-binaries
-          tar xvzf cf-cli-linux-binaries.tgz
+          tar xvzf cf-cli.tgz
             # chmod +x cf-cli_linux_x86-64
             # mkdir -p $GOPATH/bin
             # mv cf-cli_linux_x86-64 $GOPATH/bin/cf
@@ -89,6 +88,9 @@ jobs:
 
           cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
+          make build
+          export PATH="$(pwd)/out:$PATH"
 
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
