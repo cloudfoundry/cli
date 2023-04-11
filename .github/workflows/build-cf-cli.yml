@@ -76,15 +76,15 @@ jobs:
           echo "Creating tarball"
           tar -cvzf cf-cli.tgz cli
 
-      - name: Setup tmate session
-        if: always()
-        uses: mxschmitt/action-tmate@v3 
+      # - name: Setup tmate session
+      #   if: always()
+      #   uses: mxschmitt/action-tmate@v3 
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
         with:
           name: cf-cli.tgz
-          path: cf-cli.tgz
+          path: ../cf-cli.tgz
 
   # build-windows-binaries:
   #   name: Build Windows binaries

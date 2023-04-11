@@ -58,7 +58,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
-          name: cf-cli-linux-binaries.tgz
+          name: cf-cli.tgz
           path: cf-cli-binaries
 
       - name: Run Integration Tests
