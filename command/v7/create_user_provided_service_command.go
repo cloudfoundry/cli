@@ -24,7 +24,7 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := PromptUserForCredentialsIfRequired(&cmd.Credentials, cmd.UI); err != nil {
+	if err := promptUserForCredentialsIfRequired(&cmd.Credentials, cmd.UI); err != nil {
 		return err
 	}
 
@@ -69,7 +69,7 @@ func (cmd CreateUserProvidedServiceCommand) displayMessage() error {
 	return nil
 }
 
-func PromptUserForCredentialsIfRequired(flag *flag.CredentialsOrJSON, ui command.UI) error {
+func promptUserForCredentialsIfRequired(flag *flag.CredentialsOrJSON, ui command.UI) error {
 	if len(flag.UserPromptCredentials) > 0 {
 		flag.Value = make(map[string]interface{})
 

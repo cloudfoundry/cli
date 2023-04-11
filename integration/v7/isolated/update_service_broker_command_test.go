@@ -141,10 +141,10 @@ var _ = Describe("update-service-broker command", func() {
 	When("passing incorrect parameters", func() {
 		It("prints an error message", func() {
 			session := helpers.CF("update-service-broker", "b1")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `USERNAME`, `PASSWORD` and `URL` were not provided"))
-			eventuallyRendersUpdateServiceBrokerHelp(session)
 			Eventually(session).Should(Exit(1))
+
+			Expect(session.Err).To(Say("Incorrect Usage: the required arguments `USERNAME` and `URL` were not provided"))
+			expectToRenderUpdateServiceBrokerHelp(session)
 		})
 	})
 
@@ -157,18 +157,26 @@ var _ = Describe("update-service-broker command", func() {
 	When("passing --help", func() {
 		It("displays command usage to output", func() {
 			session := helpers.CF("update-service-broker", "--help")
-
-			eventuallyRendersUpdateServiceBrokerHelp(session)
 			Eventually(session).Should(Exit(0))
+
+			expectToRenderUpdateServiceBrokerHelp(session)
 		})
 	})
 })
 
-func eventuallyRendersUpdateServiceBrokerHelp(s *Session) {
-	Eventually(s).Should(Say("NAME:"))
-	Eventually(s).Should(Say("update-service-broker - Update a service broker"))
-	Eventually(s).Should(Say("USAGE:"))
-	Eventually(s).Should(Say("cf update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"))
-	Eventually(s).Should(Say("SEE ALSO:"))
-	Eventually(s).Should(Say("rename-service-broker, service-brokers"))
+func expectToRenderUpdateServiceBrokerHelp(s *Session) {
+	Expect(s).To(SatisfyAll(
+		Say("NAME:"),
+		Say("update-service-broker - Update a service broker"),
+		Say("USAGE:"),
+		Say("cf update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
+		Say("cf update-service-broker SERVICE_BROKER USERNAME URL"),
+		Say(`WARNING:`),
+		Say(`\s+Providing your password as a command line option is highly discouraged`),
+		Say(`\s+Your password may be visible to others and may be recorded in your shell history`),
+		Say(`ENVIRONMENT:`),
+		Say(`\s+CF_BROKER_PASSWORD=password\s+Password associated with user. Overridden if PASSWORD argument is provided`),
+		Say("SEE ALSO:"),
+		Say("rename-service-broker, service-brokers"),
+	))
 }

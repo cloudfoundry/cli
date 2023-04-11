@@ -25,7 +25,7 @@ func (cmd *UpdateUserProvidedServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	if err := PromptUserForCredentialsIfRequired(&cmd.Credentials, cmd.UI); err != nil {
+	if err := promptUserForCredentialsIfRequired(&cmd.Credentials, cmd.UI); err != nil {
 		return err
 	}
 
