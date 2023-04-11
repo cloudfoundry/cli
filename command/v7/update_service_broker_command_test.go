@@ -1,6 +1,9 @@
 package v7_test
 
 import (
+	"fmt"
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -29,13 +32,15 @@ var _ = Describe("update-service-broker command", func() {
 		fakeUpdateServiceBrokerActor *v7fakes.FakeActor
 		fakeSharedActor              *commandfakes.FakeSharedActor
 		fakeConfig                   *commandfakes.FakeConfig
+		input                        *Buffer
 		testUI                       *ui.UI
 	)
 
 	BeforeEach(func() {
 		fakeUpdateServiceBrokerActor = &v7fakes.FakeActor{}
 		fakeSharedActor = &commandfakes.FakeSharedActor{}
-		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		input = NewBuffer()
+		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
 		cmd = &v7.UpdateServiceBrokerCommand{
 			BaseCommand: v7.BaseCommand{
@@ -45,8 +50,6 @@ var _ = Describe("update-service-broker command", func() {
 				Config:      fakeConfig,
 			},
 		}
-
-		setPositionalFlags(cmd, serviceBrokerName, username, password, url)
 	})
 
 	When("logged in", func() {
@@ -60,6 +63,8 @@ var _ = Describe("update-service-broker command", func() {
 			)
 
 			fakeUpdateServiceBrokerActor.GetCurrentUserReturns(configv3.User{Name: "user"}, nil)
+
+			setPositionalFlags(cmd, serviceBrokerName, username, password, url)
 		})
 
 		It("succeeds", func() {
@@ -121,6 +126,64 @@ var _ = Describe("update-service-broker command", func() {
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(MatchError("no user found"))
+			})
+		})
+
+		When("password is provided as environment variable", func() {
+			const (
+				varName     = "CF_BROKER_PASSWORD"
+				varPassword = "var-password"
+			)
+
+			BeforeEach(func() {
+				setPositionalFlags(cmd, serviceBrokerName, username, url, "")
+				os.Setenv(varName, varPassword)
+
+				Expect(cmd.Execute(nil)).To(Succeed())
+			})
+
+			AfterEach(func() {
+				os.Unsetenv(varName)
+			})
+
+			It("passes the data to the actor layer", func() {
+				Expect(fakeUpdateServiceBrokerActor.UpdateServiceBrokerCallCount()).To(Equal(1))
+				serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
+				Expect(serviceBrokerGUID).To(Equal(guid))
+				Expect(model.Username).To(Equal(username))
+				Expect(model.Password).To(Equal(varPassword))
+				Expect(model.URL).To(Equal(url))
+			})
+		})
+
+		When("password is provided via prompt", func() {
+			const promptPassword = "prompt-password"
+
+			BeforeEach(func() {
+				setPositionalFlags(cmd, serviceBrokerName, username, url, "")
+
+				_, err := input.Write([]byte(fmt.Sprintf("%s\n", promptPassword)))
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(cmd.Execute(nil)).To(Succeed())
+			})
+
+			It("prompts the user for credentials", func() {
+				Expect(testUI.Out).To(Say("Service Broker Password: "))
+			})
+
+			It("does not echo the credentials", func() {
+				Expect(testUI.Out).NotTo(Say(promptPassword))
+				Expect(testUI.Err).NotTo(Say(promptPassword))
+			})
+
+			It("passes the data to the actor layer", func() {
+				Expect(fakeUpdateServiceBrokerActor.UpdateServiceBrokerCallCount()).To(Equal(1))
+				serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
+				Expect(serviceBrokerGUID).To(Equal(guid))
+				Expect(model.Username).To(Equal(username))
+				Expect(model.Password).To(Equal(promptPassword))
+				Expect(model.URL).To(Equal(url))
 			})
 		})
 	})

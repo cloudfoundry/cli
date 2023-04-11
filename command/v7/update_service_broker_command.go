@@ -8,9 +8,10 @@ import (
 type UpdateServiceBrokerCommand struct {
 	BaseCommand
 
-	RequiredArgs    flag.ServiceBrokerArgs `positional-args:"yes"`
-	usage           interface{}            `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`
-	relatedCommands interface{}            `related_commands:"rename-service-broker, service-brokers"`
+	PositionalArgs  flag.ServiceBrokerArgs `positional-args:"yes"`
+	usage           any                    `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL\n   CF_NAME update-service-broker SERVICE_BROKER USERNAME URL (omit password to specify interactively or via environment variable)\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"`
+	relatedCommands any                    `related_commands:"rename-service-broker, service-brokers"`
+	envPassword     any                    `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"`
 }
 
 func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
@@ -18,7 +19,12 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 		return err
 	}
 
-	serviceBroker, warnings, err := cmd.Actor.GetServiceBrokerByName(cmd.RequiredArgs.ServiceBroker)
+	brokerName, username, password, url, err := promptUserForBrokerPasswordIfRequired(cmd.PositionalArgs, cmd.UI)
+	if err != nil {
+		return err
+	}
+
+	serviceBroker, warnings, err := cmd.Actor.GetServiceBrokerByName(brokerName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -31,18 +37,18 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayTextWithFlavor(
 		"Updating service broker {{.ServiceBroker}} as {{.Username}}...",
-		map[string]interface{}{
+		map[string]any{
 			"Username":      user.Name,
-			"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
+			"ServiceBroker": brokerName,
 		},
 	)
 
 	warnings, err = cmd.Actor.UpdateServiceBroker(
 		serviceBroker.GUID,
 		resources.ServiceBroker{
-			Username: cmd.RequiredArgs.Username,
-			Password: cmd.RequiredArgs.Password,
-			URL:      cmd.RequiredArgs.URL,
+			Username: username,
+			Password: password,
+			URL:      url,
 		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
