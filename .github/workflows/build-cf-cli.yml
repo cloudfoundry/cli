@@ -72,9 +72,9 @@ jobs:
           # echo "Building 64-bit Linux"
           # make out/cf-cli_linux_x86-64
 
-          cd ..
+          # cd ..
           echo "Creating tarball"
-          tar -cvzf cf-cli.tgz cli
+          tar -cvzf ../cf-cli.tgz .
 
       # - name: Setup tmate session
       #   if: always()
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cf-cli.tgz
-          path: ../cf-cli.tgz
+          path: cf-cli.tgz
 
   # build-windows-binaries:
   #   name: Build Windows binaries
