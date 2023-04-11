@@ -71,16 +71,20 @@ jobs:
 
           # echo "Building 64-bit Linux"
           # make out/cf-cli_linux_x86-64
-          
+
           cd ..
           echo "Creating tarball"
-          tar -cvzf cf-cli-linux-binaries.tgz cli
+          tar -cvzf cf-cli.tgz cli
+
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
         with:
-          name: cf-cli-linux-binaries.tgz
-          path: cf-cli-linux-binaries.tgz
+          name: cf-cli.tgz
+          path: cf-cli.tgz
 
   # build-windows-binaries:
   #   name: Build Windows binaries
