@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cf-cli.tgz
-          path: cf-cli.tgz
+          path: ${{ github.workspace }}
 
   # build-windows-binaries:
   #   name: Build Windows binaries
