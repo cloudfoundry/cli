@@ -73,7 +73,7 @@ jobs:
           # make out/cf-cli_linux_x86-64
 
           echo "Creating tarball"
-          tar -cvzf cf-cli-linux-binaries.tgz -C $PWD .
+          tar -cvzf cf-cli-linux-binaries.tgz .
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
