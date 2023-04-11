@@ -61,6 +61,10 @@ jobs:
           name: cf-cli.tgz
           path: ${{ github.workspace }}
 
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
