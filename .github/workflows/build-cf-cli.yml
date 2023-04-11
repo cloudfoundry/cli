@@ -71,9 +71,10 @@ jobs:
 
           # echo "Building 64-bit Linux"
           # make out/cf-cli_linux_x86-64
-
+          
+          cd ..
           echo "Creating tarball"
-          tar -cvzf cf-cli-linux-binaries.tgz .
+          tar -cvzf cf-cli-linux-binaries.tgz cli
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
