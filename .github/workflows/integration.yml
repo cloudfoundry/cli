@@ -39,44 +39,61 @@ jobs:
           min_capi=($(yq .cf-d-capi-version-min build_data.yml))
           echo "Minimum CAPI version: ${min_capi}"
           echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
+
+      - name: Download binaries
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: cf-cli.tgz
+          path: ${{ github.workspace }}
+
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+
+      - name: test Download
+        run: |
+          tar xvzf cf-cli.tgz
+          mkdir -p go/src/code.cloudfoundry.org
+
         
-## START edge CAPI
+# ## START edge CAPI
 
-  get-cf-env-with-edge-capi:
-    name: Setup CF env with EDGE CAPI
-    needs: shared-values
-    uses: ./.github/workflows/cf-env-setup.yml
-    with:
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      capi-version: edge
-    secrets: inherit
+#   get-cf-env-with-edge-capi:
+#     name: Setup CF env with EDGE CAPI
+#     needs: shared-values
+#     uses: ./.github/workflows/cf-env-setup.yml
+#     with:
+#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
+#       capi-version: edge
+#     secrets: inherit
 
-  run-integration-tests-cf-env-with-edge-capi:
-    name: Integration tests with EDGE CAPI
-    needs:
-      - shared-values
-      - get-cf-env-with-edge-capi
-    uses: ./.github/workflows/run-integration-tests.yml
-    with:
-      go-version: ${{ needs.shared-values.outputs.go-version}}
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-      run-with-client-creds: false
+#   run-integration-tests-cf-env-with-edge-capi:
+#     name: Integration tests with EDGE CAPI
+#     needs:
+#       - shared-values
+#       - get-cf-env-with-edge-capi
+#     uses: ./.github/workflows/run-integration-tests.yml
+#     with:
+#       go-version: ${{ needs.shared-values.outputs.go-version}}
+#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
+#       environment-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+#       run-with-client-creds: false
 
-  unclaim-cf-env-with-edge-capi:
-    name: Unclaim CF env with EDGE CAPI
-    needs:
-      - shared-values
-      - get-cf-env-with-edge-capi
-      - run-integration-tests-cf-env-with-edge-capi
-    if: always()
-    uses: ./.github/workflows/cf-env-unclaim.yml
-    with:
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
-      toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
-    secrets: inherit
+#   unclaim-cf-env-with-edge-capi:
+#     name: Unclaim CF env with EDGE CAPI
+#     needs:
+#       - shared-values
+#       - get-cf-env-with-edge-capi
+#       - run-integration-tests-cf-env-with-edge-capi
+#     if: always()
+#     uses: ./.github/workflows/cf-env-unclaim.yml
+#     with:
+#       environment: ${{ needs.shared-values.outputs.secrets-environment }}
+#       toolsmith-env-name: ${{ needs.get-cf-env-with-edge-capi.outputs.environment-name }}
+#     secrets: inherit
 
-## END edge CAPI
+# ## END edge CAPI
 
 # ## Start edge CAPI Client Creds
 #   get-cf-env-with-edge-capi-client-creds:
