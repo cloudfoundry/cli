@@ -64,16 +64,16 @@ jobs:
         run: |
           set -ex
 
-          export GOPATH=$PWD/gopath
-          export PATH=$GOPATH/bin:$PATH
+          # export GOPATH=$PWD/gopath
+          # export PATH=$GOPATH/bin:$PATH
 
-          go version
+          # go version
 
-          echo "Building 64-bit Linux"
-          make out/cf-cli_linux_x86-64
+          # echo "Building 64-bit Linux"
+          # make out/cf-cli_linux_x86-64
 
           echo "Creating tarball"
-          tar -cvzf cf-cli-linux-binaries.tgz -C out .
+          tar -cvzf cf-cli-linux-binaries.tgz -C . .
 
       - name: 'Upload Linux Binaries'
         uses: actions/upload-artifact@v3
@@ -81,41 +81,41 @@ jobs:
           name: cf-cli-linux-binaries.tgz
           path: cf-cli-linux-binaries.tgz
 
-  build-windows-binaries:
-    name: Build Windows binaries
-    runs-on: windows-latest
-    needs:
-      - shared-values
-    outputs:
-      windows-binaries: ${{ steps.build-windows-binaries.outputs.windows-binaries }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # build-windows-binaries:
+  #   name: Build Windows binaries
+  #   runs-on: windows-latest
+  #   needs:
+  #     - shared-values
+  #   outputs:
+  #     windows-binaries: ${{ steps.build-windows-binaries.outputs.windows-binaries }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ needs.shared-values.outputs.go-version }}
+  #     - name: Set up Go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version: ${{ needs.shared-values.outputs.go-version }}
 
-      - name: Get build-time dependencies
-        run: |
-          choco install --no-progress --limit-output -y make
-          go install github.com/akavel/rsrc@v0.10.2
+  #     - name: Get build-time dependencies
+  #       run: |
+  #         choco install --no-progress --limit-output -y make
+  #         go install github.com/akavel/rsrc@v0.10.2
 
-      - name: Build Windows
-        id: build-windows
-        run: |
-          Get-Command make
-          Get-Item Makefile
+  #     - name: Build Windows
+  #       id: build-windows
+  #       run: |
+  #         Get-Command make
+  #         Get-Item Makefile
 
-          echo "Building 64-bit Windows"
-          make out/cf-cli_winx64.exe
+  #         echo "Building 64-bit Windows"
+  #         make out/cf-cli_winx64.exe
 
-          echo "Creating tarball"
-          tar -cvzf cf-cli-windows-binaries.tgz -C out .
+  #         echo "Creating tarball"
+  #         tar -cvzf cf-cli-windows-binaries.tgz -C out .
 
-      - name: 'Upload Windows Binaries'
-        uses: actions/upload-artifact@v3
-        with:
-          name: cf-cli-windows-binaries.tgz
-          path: cf-cli-windows-binaries.tgz
+  #     - name: 'Upload Windows Binaries'
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: cf-cli-windows-binaries.tgz
+  #         path: cf-cli-windows-binaries.tgz
