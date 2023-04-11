@@ -53,8 +53,8 @@ jobs:
 
       - name: test Download
         run: |
-          tar xvzf cf-cli.tgz
-          mkdir -p go/src/code.cloudfoundry.org
+          # tar xvzf cf-cli.tgz
+          ls
 
         
 # ## START edge CAPI

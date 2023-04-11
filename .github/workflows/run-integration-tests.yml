@@ -81,7 +81,7 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
-          tar xvzf cf-cli.tgz
+          # tar xvzf cf-cli.tgz
             # chmod +x cf-cli_linux_x86-64
             # mkdir -p $GOPATH/bin
             # mv cf-cli_linux_x86-64 $GOPATH/bin/cf
