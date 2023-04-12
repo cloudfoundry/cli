@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 type UpgradeServiceCommand struct {
@@ -11,6 +12,7 @@ type UpgradeServiceCommand struct {
 
 	RequiredArgs flag.ServiceInstance `positional-args:"yes"`
 	Force        bool                 `short:"f" long:"force" description:"Force upgrade without asking for confirmation"`
+	Wait         bool                 `short:"w" long:"wait" description:"Wait for the operation to complete"`
 
 	relatedCommands interface{} `related_commands:"services, update-service, update-user-provided-service"`
 }
@@ -38,7 +40,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 
 	serviceInstanceName := string(cmd.RequiredArgs.ServiceInstance)
 
-	warnings, actorError := cmd.Actor.UpgradeManagedServiceInstance(
+	stream, warnings, actorError := cmd.Actor.UpgradeManagedServiceInstance(
 		serviceInstanceName,
 		cmd.Config.TargetedSpace().GUID,
 	)
@@ -46,8 +48,6 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 
 	switch actorError.(type) {
 	case nil:
-		cmd.displayUpgradeInProgressMessage()
-		cmd.UI.DisplayOK()
 	case actionerror.ServiceInstanceUpgradeNotAvailableError:
 		cmd.UI.DisplayText(actorError.Error())
 		cmd.UI.DisplayOK()
@@ -57,6 +57,17 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		return actorError
 	}
 
+	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	switch {
+	case err != nil:
+		return err
+	case complete:
+		cmd.UI.DisplayTextWithFlavor("Upgrade of service instance {{.ServiceInstanceName}} complete.", cmd.serviceInstanceName())
+	default:
+		cmd.UI.DisplayTextWithFlavor("Upgrade in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+	}
+
+	cmd.UI.DisplayOK()
 	return nil
 }
 
@@ -79,6 +90,7 @@ func (cmd UpgradeServiceCommand) displayEvent() error {
 			"Username":            user.Name,
 		},
 	)
+	cmd.UI.DisplayNewline()
 
 	return nil
 }
@@ -101,15 +113,8 @@ func (cmd UpgradeServiceCommand) displayPrompt() (bool, error) {
 	return upgrade, nil
 }
 
-func (cmd UpgradeServiceCommand) displayUpgradeInProgressMessage() {
-	cmd.UI.DisplayTextWithFlavor("Upgrade in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
-		map[string]interface{}{
-			"ServiceInstance": cmd.RequiredArgs.ServiceInstance,
-		})
-}
-
-func (cmd UpgradeServiceCommand) serviceInstanceName() map[string]interface{} {
-	return map[string]interface{}{
+func (cmd UpgradeServiceCommand) serviceInstanceName() map[string]any {
+	return map[string]any{
 		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
 	}
 }
