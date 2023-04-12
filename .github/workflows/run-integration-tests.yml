@@ -87,9 +87,9 @@ jobs:
           export PATH="$(pwd)/out:$PATH"
 
           mkdir -p $GOPATH/bin
-          mv out/cf $GOPATH/bin/cf
+          mv out/cf-cli_linux_x86-64 $GOPATH/bin/cf
 
-          cd $GOPATH/src/code.cloudfoundry.org
+          cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           export CF_PASSWORD=${CF_INT_PASSWORD}
