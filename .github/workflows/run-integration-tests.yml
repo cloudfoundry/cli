@@ -64,11 +64,13 @@ jobs:
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
+          mkdir -p go/src/code.cloudfoundry.org
+          ln -s ${PWD} go/src/code.cloudfoundry.org
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
-          export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+          # export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
           export CF_INT_OIDC_USERNAME="admin-oidc"
-          export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+          # export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
           export CF_INT_API="https://api.${ENV}.cf-app.com"
           export CF_DIAL_TIMEOUT=15
           export CF_USERNAME=admin
@@ -77,13 +79,10 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
-          mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD} go/src/code.cloudfoundry.org
-
           cd $GOPATH/src/code.cloudfoundry.org
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          make build
+          make out/cf-cli_linux_x86-64
           export PATH="$(pwd)/out:$PATH"
 
           export CF_PASSWORD=${CF_INT_PASSWORD}
@@ -99,7 +98,7 @@ jobs:
           CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: |
           mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+          ln -s ${PWD} go/src/code.cloudfoundry.org
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -120,10 +119,10 @@ jobs:
           #   mv cf-cli_linux_x86-64 $GOPATH/bin/cf
           # popd
 
-          cd $GOPATH/src/code.cloudfoundry.org/cli
+          cd $GOPATH/src/code.cloudfoundry.org/
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          make build
+          make out/cf-cli_linux_x86-64
           export PATH="$(pwd)/out:$PATH"
 
           export CF_PASSWORD=${CF_INT_PASSWORD}
