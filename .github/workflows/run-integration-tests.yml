@@ -61,6 +61,10 @@ jobs:
           name: cf-cli.tgz
           path: ${{ github.workspace }}
 
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3 
+
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
@@ -81,6 +85,9 @@ jobs:
 
           make out/cf-cli_linux_x86-64
           export PATH="$(pwd)/out:$PATH"
+
+          mkdir -p $GOPATH/bin
+          mv out/cf $GOPATH/bin/cf
 
           cd $GOPATH/src/code.cloudfoundry.org
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
