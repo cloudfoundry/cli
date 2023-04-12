@@ -78,9 +78,9 @@ jobs:
           export PATH=$GOPATH/bin:$PATH
 
           mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+          ln -s ${PWD} go/src/code.cloudfoundry.org
 
-          cd $GOPATH/src/code.cloudfoundry.org/cli
+          cd $GOPATH/src/code.cloudfoundry.org
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
           make build
