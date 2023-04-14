@@ -15,7 +15,7 @@ on:
       run-with-client-creds:
         required: true
         type: boolean
-     
+
 jobs:
   run-integration-tests:
     name: Run Integration Tests

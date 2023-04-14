@@ -25,6 +25,7 @@ on:
 permissions:
   contents: read
 
+
 jobs:
   shared-values:
     name: Shared Values
