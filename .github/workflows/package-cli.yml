@@ -1,0 +1,46 @@
+name: Package CLI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.gitpod.yml'
+      - 'README.md'
+  push:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+
+permissions:
+  contents: read
+
+jobs:
+  package-cli:
+    name: Package cli
+    runs-on: ubuntu-latest
+    outputs:
+      linux-binaries: ${{ steps.build-linux-binaries.outputs.linux-binaries }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 'Upload cli'
+        uses: actions/upload-artifact@v3
+        with:
+          name: cf-cli.tgz
+          path: ${{ github.workspace }}
