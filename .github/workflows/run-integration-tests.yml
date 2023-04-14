@@ -15,20 +15,14 @@ on:
       run-with-client-creds:
         required: true
         type: boolean
-      cf-build-sha:
-        required: true
-        type: string
+
 jobs:
   run-integration-tests:
     name: Run Integration Tests
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: cli
-          ref: ${{ inputs.cf-build-sha }}
+    
+    steps:          
       - name: Set Up Go
         uses: actions/setup-go@v3
         with:
@@ -56,29 +50,18 @@ jobs:
           credhub --version
           rm ~/credhub-linux-2.9.4.tgz
 
-      - name: Get Artifact Name
-        id: get-artifact-name
-        run: |
-          build_short_sha=$(echo '${{ inputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          # build_short_sha=$(echo '${{ steps.set-build-sha.outputs.cf-build-sha }}' | awk '{print substr($0,0,7)}')
-          echo "artifact-name=cf-cli-linux-binaries-${build_short_sha}.tgz" >> $GITHUB_OUTPUT
-
-      - name: Download binaries
+      - name: Download cli
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
-          name: ${{ steps.get-artifact-name.outputs.artifact-name }}
-          path: cf-cli-binaries
-
-      # - name: Setup tmate session
-      #   if: always()
-      #   uses: mxschmitt/action-tmate@v3 
+          name: cf-cli.tgz
+          path: ${{ github.workspace }}
 
       - name: Run Integration Tests
         if: ${{ !inputs.run-with-client-creds }}
         run: |
           mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+          ln -s ${PWD} go/src/code.cloudfoundry.org
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -92,18 +75,17 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
-          pushd cf-cli-binaries
-            tar xvzf ${{ steps.get-artifact-name.outputs.artifact-name }}
-            chmod +x cf-cli_linux_x86-64
-            mkdir -p $GOPATH/bin
-            mv cf-cli_linux_x86-64 $GOPATH/bin/cf
-          popd
+          make out/cf-cli_linux_x86-64
+          export PATH="$(pwd)/out:$PATH"
+
+          mkdir -p $GOPATH/bin
+          mv out/cf-cli_linux_x86-64 $GOPATH/bin/cf
+
+          chmod 755 -R $GOPATH/src/code.cloudfoundry.org/cli
 
           cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          # make build
-          # export PATH="$(pwd)/out:$PATH"
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
           cf auth
@@ -117,7 +99,7 @@ jobs:
           CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: |
           mkdir -p go/src/code.cloudfoundry.org
-          ln -s ${PWD}/cli go/src/code.cloudfoundry.org
+          ln -s ${PWD} go/src/code.cloudfoundry.org
           ENV=$(cat metadata.json | jq -r '.name')
           eval "$(bbl print-env --metadata-file ./metadata.json)"
           export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
@@ -131,18 +113,17 @@ jobs:
           export GOPATH=$PWD/go
           export PATH=$GOPATH/bin:$PATH
 
+          make out/cf-cli_linux_x86-64
+          export PATH="$(pwd)/out:$PATH"
+
+          mkdir -p $GOPATH/bin
+          mv out/cf-cli_linux_x86-64 $GOPATH/bin/cf
+
+          chmod 755 -R $GOPATH/src/code.cloudfoundry.org/cli
+
           cd $GOPATH/src/code.cloudfoundry.org/cli
           go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 
-          pushd cf-cli-binaries
-            tar xvzf cf-cli-binaries.tgz
-            chmod +x cf-cli_linux_x86-64
-            mkdir -p $GOPATH/bin
-            mv cf-cli_linux_x86-64 $GOPATH/bin/cf
-          popd
-
-          # make build
-          # export PATH="$(pwd)/out:$PATH"
           export CF_PASSWORD=${CF_INT_PASSWORD}
           cf api ${CF_INT_API} --skip-ssl-validation
           cf auth
