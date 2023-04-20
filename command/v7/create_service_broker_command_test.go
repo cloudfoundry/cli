@@ -2,6 +2,8 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -15,6 +17,15 @@ import (
 )
 
 var _ = Describe("create-service-broker Command", func() {
+	const (
+		binaryName        = "cf-command"
+		user              = "steve"
+		serviceBrokerName = "fake-service-broker-name"
+		username          = "fake-username"
+		password          = "fake-password"
+		url               = "fake-url"
+	)
+
 	var (
 		cmd             *v7.CreateServiceBrokerCommand
 		testUI          *ui.UI
@@ -22,7 +33,6 @@ var _ = Describe("create-service-broker Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
-		binaryName      string
 		executeErr      error
 	)
 
@@ -34,7 +44,6 @@ var _ = Describe("create-service-broker Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 		fakeActor.CreateServiceBrokerReturns(v7action.Warnings{"some default warning"}, nil)
 
-		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = &v7.CreateServiceBrokerCommand{
@@ -45,8 +54,6 @@ var _ = Describe("create-service-broker Command", func() {
 				Actor:       fakeActor,
 			},
 		}
-
-		setPositionalFlags(cmd, "service-broker-name", "username", "password", "https://example.org/super-broker")
 	})
 
 	JustBeforeEach(func() {
@@ -66,6 +73,7 @@ var _ = Describe("create-service-broker Command", func() {
 	When("fetching the current user fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("an error occurred"))
+			setPositionalFlags(cmd, serviceBrokerName, username, password, url)
 		})
 
 		It("return an error", func() {
@@ -75,7 +83,8 @@ var _ = Describe("create-service-broker Command", func() {
 
 	When("fetching the current user succeeds", func() {
 		BeforeEach(func() {
-			fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: user}, nil)
+			setPositionalFlags(cmd, serviceBrokerName, username, password, url)
 		})
 
 		It("checks that there is a valid target", func() {
@@ -86,7 +95,7 @@ var _ = Describe("create-service-broker Command", func() {
 		})
 
 		It("displays a message with the username", func() {
-			Expect(testUI.Out).To(Say(`Creating service broker %s as %s\.\.\.`, "service-broker-name", "steve"))
+			Expect(testUI.Out).To(Say(`Creating service broker %s as %s\.\.\.`, serviceBrokerName, user))
 		})
 
 		It("passes the data to the actor layer", func() {
@@ -94,10 +103,10 @@ var _ = Describe("create-service-broker Command", func() {
 
 			model := fakeActor.CreateServiceBrokerArgsForCall(0)
 
-			Expect(model.Name).To(Equal("service-broker-name"))
-			Expect(model.Username).To(Equal("username"))
-			Expect(model.Password).To(Equal("password"))
-			Expect(model.URL).To(Equal("https://example.org/super-broker"))
+			Expect(model.Name).To(Equal(serviceBrokerName))
+			Expect(model.Username).To(Equal(username))
+			Expect(model.Password).To(Equal(password))
+			Expect(model.URL).To(Equal(url))
 			Expect(model.SpaceGUID).To(Equal(""))
 		})
 
@@ -122,13 +131,19 @@ var _ = Describe("create-service-broker Command", func() {
 		})
 
 		When("creating a space scoped broker", func() {
+			const (
+				orgName   = "fake-org-name"
+				spaceName = "fake-space-name"
+				spaceGUID = "fake-space-guid"
+			)
+
 			BeforeEach(func() {
 				cmd.SpaceScoped = true
 				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					Name: "fake-space-name",
-					GUID: "fake-space-guid",
+					Name: spaceName,
+					GUID: spaceGUID,
 				})
-				fakeConfig.TargetedOrganizationNameReturns("fake-org-name")
+				fakeConfig.TargetedOrganizationNameReturns(orgName)
 			})
 
 			It("checks that a space is targeted", func() {
@@ -139,15 +154,75 @@ var _ = Describe("create-service-broker Command", func() {
 			})
 
 			It("displays the space name in the message", func() {
-				Expect(testUI.Out).To(Say(`Creating service broker %s in org %s / space %s as %s\.\.\.`, "service-broker-name", "fake-org-name", "fake-space-name", "steve"))
+				Expect(testUI.Out).To(Say(`Creating service broker %s in org %s / space %s as %s\.\.\.`, serviceBrokerName, orgName, spaceName, user))
 			})
 
 			It("looks up the space guid and passes it to the actor", func() {
 				Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
 
 				model := fakeActor.CreateServiceBrokerArgsForCall(0)
-				Expect(model.SpaceGUID).To(Equal("fake-space-guid"))
+				Expect(model.SpaceGUID).To(Equal(spaceGUID))
 			})
+		})
+	})
+
+	When("password is provided as environment variable", func() {
+		const (
+			varName     = "CF_BROKER_PASSWORD"
+			varPassword = "var-password"
+		)
+
+		BeforeEach(func() {
+			setPositionalFlags(cmd, serviceBrokerName, username, url, "")
+			os.Setenv(varName, varPassword)
+		})
+
+		AfterEach(func() {
+			os.Unsetenv(varName)
+		})
+
+		It("passes the data to the actor layer", func() {
+			Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
+
+			model := fakeActor.CreateServiceBrokerArgsForCall(0)
+
+			Expect(model.Name).To(Equal(serviceBrokerName))
+			Expect(model.Username).To(Equal(username))
+			Expect(model.Password).To(Equal(varPassword))
+			Expect(model.URL).To(Equal(url))
+			Expect(model.SpaceGUID).To(Equal(""))
+		})
+	})
+
+	When("password is provided via prompt", func() {
+		const promptPassword = "prompt-password"
+
+		BeforeEach(func() {
+			setPositionalFlags(cmd, serviceBrokerName, username, url, "")
+
+			_, err := input.Write([]byte(fmt.Sprintf("%s\n", promptPassword)))
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("prompts the user for credentials", func() {
+			Expect(testUI.Out).To(Say("Service Broker Password: "))
+		})
+
+		It("does not echo the credentials", func() {
+			Expect(testUI.Out).NotTo(Say(promptPassword))
+			Expect(testUI.Err).NotTo(Say(promptPassword))
+		})
+
+		It("passes the data to the actor layer", func() {
+			Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
+
+			model := fakeActor.CreateServiceBrokerArgsForCall(0)
+
+			Expect(model.Name).To(Equal(serviceBrokerName))
+			Expect(model.Username).To(Equal(username))
+			Expect(model.Password).To(Equal(promptPassword))
+			Expect(model.URL).To(Equal(url))
+			Expect(model.SpaceGUID).To(Equal(""))
 		})
 	})
 })

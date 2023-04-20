@@ -324,8 +324,8 @@ type ServiceBroker struct {
 type ServiceBrokerArgs struct {
 	ServiceBroker string `positional-arg-name:"SERVICE_BROKER" required:"true" description:"The service broker name"`
 	Username      string `positional-arg-name:"USERNAME" required:"true" description:"The username"`
-	Password      string `positional-arg-name:"PASSWORD" required:"true" description:"The password"`
-	URL           string `positional-arg-name:"URL" required:"true" description:"The URL of the service broker"`
+	PasswordOrURL string `positional-arg-name:"URL" required:"true" description:"The URL of the service broker"`
+	URL           string `positional-arg-name:"URL" description:"The URL of the service broker"`
 }
 
 type RenameServiceBrokerArgs struct {

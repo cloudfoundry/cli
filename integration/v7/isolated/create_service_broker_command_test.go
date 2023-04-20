@@ -28,22 +28,9 @@ var _ = Describe("create-service-broker command", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("create-service-broker", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("\\s+create-service-broker - Create a service broker"))
-
-				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("\\s+cf create-service-broker SERVICE_BROKER USERNAME PASSWORD URL \\[--space-scoped\\]"))
-
-				Eventually(session).Should(Say("ALIAS:"))
-				Eventually(session).Should(Say("\\s+csb"))
-
-				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("\\s+--space-scoped      Make the broker's service plans only visible within the targeted space"))
-
-				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("\\s+enable-service-access, service-brokers, target"))
-
 				Eventually(session).Should(Exit(0))
+
+				expectToRenderCreateServiceBrokerHelp(session)
 			})
 		})
 	})
@@ -185,24 +172,36 @@ var _ = Describe("create-service-broker command", func() {
 	When("no arguments are provided", func() {
 		It("displays an error, naming each of the missing args and the help text", func() {
 			session := helpers.CF("create-service-broker")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SERVICE_BROKER`, `USERNAME`, `PASSWORD` and `URL` were not provided"))
-
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("\\s+create-service-broker - Create a service broker"))
-
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("\\s+cf create-service-broker SERVICE_BROKER USERNAME PASSWORD URL \\[--space-scoped\\]"))
-
-			Eventually(session).Should(Say("ALIAS:"))
-			Eventually(session).Should(Say("\\s+csb"))
-
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+--space-scoped      Make the broker's service plans only visible within the targeted space"))
-
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("\\s+enable-service-access, service-brokers, target"))
-
 			Eventually(session).Should(Exit(1))
+
+			expectToRenderCreateServiceBrokerHelp(session)
 		})
 	})
 })
+
+func expectToRenderCreateServiceBrokerHelp(s *Session) {
+	Expect(s).To(SatisfyAll(
+		Say(`NAME:`),
+		Say(`\s+create-service-broker - Create a service broker`),
+
+		Say(`USAGE:`),
+		Say(`\s+cf create-service-broker SERVICE_BROKER USERNAME PASSWORD URL \[--space-scoped\]`),
+		Say(`\s+cf create-service-broker SERVICE_BROKER USERNAME URL \[--space-scoped\]`),
+
+		Say(`WARNING:`),
+		Say(`\s+Providing your password as a command line option is highly discouraged`),
+		Say(`\s+Your password may be visible to others and may be recorded in your shell history`),
+
+		Say(`ALIAS:`),
+		Say(`\s+csb`),
+
+		Say(`OPTIONS:`),
+		Say(`\s+--space-scoped      Make the broker's service plans only visible within the targeted space`),
+
+		Say(`ENVIRONMENT:`),
+		Say(`\s+CF_BROKER_PASSWORD=password\s+Password associated with user. Overridden if PASSWORD argument is provided`),
+
+		Say(`SEE ALSO:`),
+		Say(`\s+enable-service-access, service-brokers, target`),
+	))
+}
