@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
 )
@@ -35,28 +36,32 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor(
+	return updateServiceBroker(cmd.UI, cmd.Actor, user.Name, serviceBroker.GUID, brokerName, username, password, url)
+}
+
+func updateServiceBroker(ui command.UI, actor Actor, user, brokerGUID, brokerName, username, password, url string) error {
+	ui.DisplayTextWithFlavor(
 		"Updating service broker {{.ServiceBroker}} as {{.Username}}...",
 		map[string]any{
-			"Username":      user.Name,
+			"Username":      user,
 			"ServiceBroker": brokerName,
 		},
 	)
 
-	warnings, err = cmd.Actor.UpdateServiceBroker(
-		serviceBroker.GUID,
+	warnings, err := actor.UpdateServiceBroker(
+		brokerGUID,
 		resources.ServiceBroker{
 			Username: username,
 			Password: password,
 			URL:      url,
 		},
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	ui.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayOK()
+	ui.DisplayOK()
 
 	return nil
 }

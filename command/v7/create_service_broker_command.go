@@ -3,6 +3,7 @@ package v7
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
@@ -14,6 +15,7 @@ type CreateServiceBrokerCommand struct {
 
 	PositionalArgs  flag.ServiceBrokerArgs `positional-args:"yes"`
 	SpaceScoped     bool                   `long:"space-scoped" description:"Make the broker's service plans only visible within the targeted space"`
+	UpdateIfExists  bool                   `long:"update-if-exists" description:"If the broker already exists, update it rather than failing. Ignores --space-scoped."`
 	usage           any                    `usage:"CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]\n   CF_NAME create-service-broker SERVICE_BROKER USERNAME URL [--space-scoped] (omit password to specify interactively or via environment variable)\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"`
 	relatedCommands any                    `related_commands:"enable-service-access, service-brokers, target"`
 	envPassword     any                    `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"`
@@ -33,6 +35,18 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
+	}
+
+	if cmd.UpdateIfExists {
+		serviceBroker, warnings, err := cmd.Actor.GetServiceBrokerByName(brokerName)
+		cmd.UI.DisplayWarnings(warnings)
+		switch err.(type) {
+		case nil:
+			return updateServiceBroker(cmd.UI, cmd.Actor, user.Name, serviceBroker.GUID, brokerName, username, password, url)
+		case actionerror.ServiceBrokerNotFoundError: // do nothing
+		default:
+			return err
+		}
 	}
 
 	var space configv3.Space
