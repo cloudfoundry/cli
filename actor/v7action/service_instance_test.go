@@ -493,7 +493,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				It("returns warnings and an error", func() {
-					//Expect(warnings).To(ContainElement("warning from get"))
+					Expect(warnings).To(ContainElement("warning from get"))
 					Expect(executeErr).To(MatchError("bang"))
 				})
 			})
@@ -1282,12 +1282,13 @@ var _ = Describe("Service Instance Actions", func() {
 		)
 
 		var (
-			err      error
-			warnings Warnings
+			executeErr error
+			warnings   Warnings
+			stream     chan PollJobEvent
 		)
 
 		JustBeforeEach(func() {
-			warnings, err = actor.UpgradeManagedServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
+			stream, warnings, executeErr = actor.UpgradeManagedServiceInstance(fakeServiceInstanceName, fakeSpaceGUID)
 		})
 
 		It("makes a request to get the service instance", func() {
@@ -1313,8 +1314,9 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the appropriate error", func() {
+				Expect(stream).To(BeNil())
 				Expect(warnings).To(ConsistOf("get SI warning"))
-				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{
+				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{
 					Name: fakeServiceInstanceName,
 				}))
 			})
@@ -1342,8 +1344,9 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the appropriate error", func() {
+				Expect(stream).To(BeNil())
 				Expect(warnings).To(ConsistOf("get SI warning"))
-				Expect(err).To(MatchError(actionerror.ServiceInstanceUpgradeNotAvailableError{}))
+				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceUpgradeNotAvailableError{}))
 			})
 		})
 
@@ -1380,10 +1383,15 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv3.Warnings{"warning from update"},
 					nil,
 				)
-				fakeCloudControllerClient.PollJobForStateReturns(
-					ccv3.Warnings{"warning from poll"},
-					nil,
-				)
+
+				fakeStream := make(chan ccv3.PollJobEvent)
+				go func() {
+					fakeStream <- ccv3.PollJobEvent{
+						State:    constant.JobProcessing,
+						Warnings: ccv3.Warnings{"stream warning"},
+					}
+				}()
+				fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
 			})
 
 			It("makes the right calls and returns all warnings", func() {
@@ -1403,15 +1411,18 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				By("polling the job", func() {
-					Expect(fakeCloudControllerClient.PollJobForStateCallCount()).To(Equal(1))
-					actualURL, actualState := fakeCloudControllerClient.PollJobForStateArgsForCall(0)
-					Expect(actualURL).To(Equal(jobURL))
-					Expect(actualState).To(Equal(constant.JobPolling))
+					Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)).To(Equal(jobURL))
 				})
 
-				By("returning warnings and no error", func() {
-					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning from get", "warning from plan", "warning from update", "warning from poll"))
+				By("returning a stream, warnings and no error", func() {
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:    JobProcessing,
+						Warnings: Warnings{"stream warning"},
+					})))
+
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning from get", "warning from plan", "warning from update"))
 				})
 			})
 		})

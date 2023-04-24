@@ -3550,19 +3550,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpgradeManagedServiceInstanceStub        func(string, string) (v7action.Warnings, error)
+	UpgradeManagedServiceInstanceStub        func(string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	upgradeManagedServiceInstanceMutex       sync.RWMutex
 	upgradeManagedServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	upgradeManagedServiceInstanceReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	upgradeManagedServiceInstanceReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	UploadBitsPackageStub        func(resources.Package, []sharedaction.V3Resource, io.Reader, int64) (resources.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
@@ -18883,7 +18885,7 @@ func (fake *FakeActor) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.upgradeManagedServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.upgradeManagedServiceInstanceReturnsOnCall[len(fake.upgradeManagedServiceInstanceArgsForCall)]
 	fake.upgradeManagedServiceInstanceArgsForCall = append(fake.upgradeManagedServiceInstanceArgsForCall, struct {
@@ -18896,10 +18898,10 @@ func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (
 		return fake.UpgradeManagedServiceInstanceStub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.upgradeManagedServiceInstanceReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeActor) UpgradeManagedServiceInstanceCallCount() int {
@@ -18908,7 +18910,7 @@ func (fake *FakeActor) UpgradeManagedServiceInstanceCallCount() int {
 	return len(fake.upgradeManagedServiceInstanceArgsForCall)
 }
 
-func (fake *FakeActor) UpgradeManagedServiceInstanceCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) UpgradeManagedServiceInstanceCalls(stub func(string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.upgradeManagedServiceInstanceMutex.Lock()
 	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
 	fake.UpgradeManagedServiceInstanceStub = stub
@@ -18921,30 +18923,33 @@ func (fake *FakeActor) UpgradeManagedServiceInstanceArgsForCall(i int) (string, 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) UpgradeManagedServiceInstanceReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) UpgradeManagedServiceInstanceReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.upgradeManagedServiceInstanceMutex.Lock()
 	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
 	fake.UpgradeManagedServiceInstanceStub = nil
 	fake.upgradeManagedServiceInstanceReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) UpgradeManagedServiceInstanceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) UpgradeManagedServiceInstanceReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.upgradeManagedServiceInstanceMutex.Lock()
 	defer fake.upgradeManagedServiceInstanceMutex.Unlock()
 	fake.UpgradeManagedServiceInstanceStub = nil
 	if fake.upgradeManagedServiceInstanceReturnsOnCall == nil {
 		fake.upgradeManagedServiceInstanceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.upgradeManagedServiceInstanceReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) UploadBitsPackage(arg1 resources.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (resources.Package, v7action.Warnings, error) {
