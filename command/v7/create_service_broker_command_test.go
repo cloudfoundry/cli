@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -223,6 +225,61 @@ var _ = Describe("create-service-broker Command", func() {
 			Expect(model.Password).To(Equal(promptPassword))
 			Expect(model.URL).To(Equal(url))
 			Expect(model.SpaceGUID).To(Equal(""))
+		})
+	})
+
+	When("the --update-if-exists flag is used", func() {
+		BeforeEach(func() {
+			setPositionalFlags(cmd, serviceBrokerName, username, password, url)
+			setFlag(cmd, "--update-if-exists")
+		})
+
+		Context("and the broker does not exist", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceBrokerByNameReturns(resources.ServiceBroker{}, v7action.Warnings{}, actionerror.ServiceBrokerNotFoundError{})
+			})
+
+			It("checks to see whether the broker exists", func() {
+				Expect(fakeActor.GetServiceBrokerByNameCallCount()).To(Equal(1))
+				Expect(fakeActor.GetServiceBrokerByNameArgsForCall(0)).To(Equal(serviceBrokerName))
+			})
+
+			It("creates a new service broker", func() {
+				Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
+
+				model := fakeActor.CreateServiceBrokerArgsForCall(0)
+
+				Expect(model.Name).To(Equal(serviceBrokerName))
+				Expect(model.Username).To(Equal(username))
+				Expect(model.Password).To(Equal(password))
+				Expect(model.URL).To(Equal(url))
+				Expect(model.SpaceGUID).To(Equal(""))
+			})
+		})
+
+		Context("and the broker already exists", func() {
+			const brokerGUID = "fake-broker-guid"
+
+			BeforeEach(func() {
+				fakeActor.GetServiceBrokerByNameReturns(resources.ServiceBroker{GUID: brokerGUID}, v7action.Warnings{}, nil)
+			})
+
+			It("checks to see whether the broker exists", func() {
+				Expect(fakeActor.GetServiceBrokerByNameCallCount()).To(Equal(1))
+				Expect(fakeActor.GetServiceBrokerByNameArgsForCall(0)).To(Equal(serviceBrokerName))
+			})
+
+			It("updates an existing service broker", func() {
+				Expect(fakeActor.UpdateServiceBrokerCallCount()).To(Equal(1))
+
+				guid, model := fakeActor.UpdateServiceBrokerArgsForCall(0)
+
+				Expect(guid).To(Equal(brokerGUID))
+				Expect(model.Username).To(Equal(username))
+				Expect(model.Password).To(Equal(password))
+				Expect(model.URL).To(Equal(url))
+				Expect(model.SpaceGUID).To(Equal(""))
+			})
 		})
 	})
 })
