@@ -67,6 +67,7 @@ type stagingAndStartActor interface {
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
+	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
 func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Config, logCache sharedaction.LogCacheClient) AppStager {
@@ -188,6 +189,16 @@ func (stager *Stager) StartApp(
 			},
 		)
 		stager.UI.DisplayNewline()
+
+		if appAction == constant.ApplicationRestarting {
+			stager.UI.DisplayText("Restarting app...")
+			warnings, err := stager.Actor.RestartApplication(app.GUID, false)
+			stager.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
 
 		if app.Started() {
 			if appAction == constant.ApplicationStarting {
