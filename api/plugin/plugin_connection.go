@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+	"errors"
 
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/util"
@@ -101,18 +102,21 @@ func (connection *PluginConnection) populateResponse(response *http.Response, pa
 func (connection *PluginConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
-		switch urlErr := e.Err.(type) {
-		case x509.UnknownAuthorityError:
+		if errors.As(err, &x509.UnknownAuthorityError{}) {
 			return pluginerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
-		case x509.HostnameError:
-			return pluginerror.SSLValidationHostnameError{
-				Message: urlErr.Error(),
-			}
-		default:
-			return pluginerror.RequestError{Err: e}
 		}
+
+		hostnameError := x509.HostnameError{}
+		if errors.As(err, &hostnameError) {
+			return pluginerror.SSLValidationHostnameError{
+				Message: hostnameError.Error(),
+			}
+		}
+
+		return pluginerror.RequestError{Err: e}
+
 	default:
 		return err
 	}

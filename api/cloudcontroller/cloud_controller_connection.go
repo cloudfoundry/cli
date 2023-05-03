@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"errors"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/util"
 )
@@ -133,18 +134,21 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 func (*CloudControllerConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
-		switch urlErr := e.Err.(type) {
-		case x509.UnknownAuthorityError:
+		if errors.As(err, &x509.UnknownAuthorityError{}) {
 			return ccerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
-		case x509.HostnameError:
-			return ccerror.SSLValidationHostnameError{
-				Message: urlErr.Error(),
-			}
-		default:
-			return ccerror.RequestError{Err: e}
 		}
+
+		hostnameError := x509.HostnameError{}
+	        if errors.As(err, &hostnameError) {
+			return ccerror.SSLValidationHostnameError{
+				Message: hostnameError.Error(),
+			}
+		}
+
+		return ccerror.RequestError{Err: e}
+
 	default:
 		return err
 	}
