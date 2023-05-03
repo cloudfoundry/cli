@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	asErrors "errors"
 
 	"code.cloudfoundry.org/cli/cf/errors"
 	. "code.cloudfoundry.org/cli/cf/i18n"
@@ -83,14 +84,17 @@ func WrapNetworkErrors(host string, err error) error {
 	}
 
 	if innerErr != nil {
-		switch typedInnerErr := innerErr.(type) {
-		case x509.UnknownAuthorityError:
+		if asErrors.As(innerErr, &x509.UnknownAuthorityError{}){
 			return errors.NewInvalidSSLCert(host, T("unknown authority"))
-		case x509.HostnameError:
+		}
+		if asErrors.As(innerErr, &x509.HostnameError{}){
 			return errors.NewInvalidSSLCert(host, T("not valid for the requested host"))
-		case x509.CertificateInvalidError:
+		}
+		if asErrors.As(innerErr, &x509.CertificateInvalidError{}){
 			return errors.NewInvalidSSLCert(host, "")
-		case *net.OpError:
+		}
+		typedInnerErr := new(net.OpError)
+		if asErrors.As(innerErr, &typedInnerErr) {
 			if typedInnerErr.Op == "dial" {
 				return fmt.Errorf("%s: %s\n%s", T("Error performing request"), err.Error(), T("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 			}
