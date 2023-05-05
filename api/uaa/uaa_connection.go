@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+	"errors"
 
 	"code.cloudfoundry.org/cli/util"
 )
@@ -100,7 +101,7 @@ func (connection *UAAConnection) populateResponse(response *http.Response, passe
 func (connection *UAAConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
-		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
+		if errors.As(err, &x509.UnknownAuthorityError{}) {
 			return UnverifiedServerError{
 				URL: request.URL.String(),
 			}
