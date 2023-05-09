@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli
 
-go 1.19
+go 1.20
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20170428003108-f4415fafc561
@@ -41,7 +41,7 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.4.0
+	golang.org/x/crypto v0.8.0
 	golang.org/x/net v0.9.0
 	golang.org/x/text v0.9.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.27
