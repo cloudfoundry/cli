@@ -27,7 +27,7 @@ jobs:
         env:
           api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
           hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
-          notes:     GHA CF CLI Integration Tests run_id: ${{ github.event.workflow_run.id }}
+          notes:     GHA CF CLI Integration Tests run_id ${{ github.event.workflow_run.id }}
           pool_name: devex_cfd
         run: |
           while true; do
