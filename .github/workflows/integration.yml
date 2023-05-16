@@ -27,6 +27,14 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: cf-cli.tgz
           path: ${{ github.workspace }}
+    
+    # This is for debugging. It's equivalent to fly intercept
+      - name: Setup upterm session
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        if: always()
+        uses: lhotari/action-upterm@v1
+        timeout-minutes: 60
 
       - id: set-secrets-environment
         name: Set environment
