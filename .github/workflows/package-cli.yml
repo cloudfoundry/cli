@@ -2,28 +2,28 @@ name: Package CLI
 
 on:
   workflow_dispatch:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - ready_for_review
-    branches:
-      - main
-      - v8
-      - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.gitpod.yml'
-      - 'README.md'
-  push:
-    branches:
-      - main
-      - v8
-      - v7
-    paths-ignore:
-      - 'doc/**'
-      - '.gitpod.yml'
-      - 'README.md'
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - reopened
+  #     - ready_for_review
+  #   branches:
+  #     - main
+  #     - v8
+  #     - v7
+  #   paths-ignore:
+  #     - 'doc/**'
+  #     - '.gitpod.yml'
+  #     - 'README.md'
+  # push:
+  #   branches:
+  #     - main
+  #     - v8
+  #     - v7
+  #   paths-ignore:
+  #     - 'doc/**'
+  #     - '.gitpod.yml'
+  #     - 'README.md'
 
 permissions:
   contents: read
