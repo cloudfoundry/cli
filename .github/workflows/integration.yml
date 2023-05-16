@@ -61,7 +61,7 @@ jobs:
 ## START edge CAPI
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
-    runs-on: linux
+    runs-on: ubuntu-latest
     needs:
       - shared-values
     steps:
