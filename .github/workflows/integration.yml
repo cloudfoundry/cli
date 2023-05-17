@@ -61,17 +61,14 @@ jobs:
 ## START edge CAPI
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/cf-env-setup.yml
+    with:
+      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      capi-version: edge
+      go-version: ${{ needs.shared-values.outputs.go-version}}
+      run-with-client-creds: false
     needs:
       - shared-values
-    steps:
-    - uses: ./.github/workflows/cf-env-setup.yml
-      id: get-cf-env-with-edge-capi
-      with:
-        environment: ${{ needs.shared-values.outputs.secrets-environment }}
-        capi-version: edge
-        go-version: ${{ needs.shared-values.outputs.go-version}}
-        run-with-client-creds: false
 
 ## END edge CAPI
 
