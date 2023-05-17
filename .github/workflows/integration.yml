@@ -15,7 +15,7 @@ jobs:
 ## START edge CAPI
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
-    uses: ./.github/workflows/cf-env-setup.yml
+    uses: ./.github/workflows/integration-tests-new.yml
     with:
       environment: PROD
       capi-version: edge
