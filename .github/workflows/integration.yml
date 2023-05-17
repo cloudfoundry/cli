@@ -11,7 +11,14 @@ on:
 permissions:
   contents: read
 
-jobs:      
+jobs: 
+  test-curl:
+    name: testing curl
+    runs-on: windows-latest
+    steps:
+    - name: test-curl
+      shell: bash
+      run: curl example.com
   shared-values:
     name: Shared Values
     # if: ${{ github.event.workflow_run.conclusion == 'success' }}
