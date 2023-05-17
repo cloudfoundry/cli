@@ -312,6 +312,29 @@ var _ = Describe("logs command", func() {
 				When("there is an error refreshing a token sometime later", func() {
 					BeforeEach(func() {
 						cmd.Recent = false
+						fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub =
+							func(_ string, _ string, _ sharedaction.LogCacheClient) (
+								<-chan sharedaction.LogMessage,
+								<-chan error, context.CancelFunc,
+								v7action.Warnings,
+								error) {
+
+								logStream := make(chan sharedaction.LogMessage)
+								errorStream := make(chan error)
+
+								go func() {
+									for {
+										logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance") //TODO: is it ok to leave staging logs here?
+										logStream <- *sharedaction.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
+										time.Sleep(100 * time.Millisecond)
+										close(logStream)
+										close(errorStream)
+										return
+									}
+								}()
+
+								return logStream, errorStream, func() {}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil
+							}
 						fakeActor.ScheduleTokenRefreshStub = func(
 							after func(time.Duration) <-chan time.Time,
 							stop chan struct{}, stoppedRefreshing chan struct{}) (<-chan error, error) {
