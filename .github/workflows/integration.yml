@@ -12,63 +12,15 @@ permissions:
   contents: read
 
 jobs: 
-  shared-values:
-    name: Shared Values
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    outputs:
-      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-      go-version: ${{ steps.set-go-version.outputs.go-version }}
-      min-capi: ${{ steps.get-min-capi.outputs.min-capi }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      # - name: Download cli
-      #   uses: dawidd6/action-download-artifact@v2
-      #   with:
-      #     run_id: ${{ github.event.workflow_run.id }}
-      #     name: cf-cli.tgz
-      #     path: ${{ github.workspace }}
-    
-    # # This is for debugging. It's equivalent to fly intercept
-    #   - name: Setup upterm session
-    #     env:
-    #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     if: always()
-    #     uses: lhotari/action-upterm@v1
-    #     timeout-minutes: 60
-
-      - id: set-secrets-environment
-        name: Set environment
-        run: echo "secrets-environment=PROD" >> $GITHUB_OUTPUT
-
-      - id: set-go-version
-        name: Parse Golang Version
-        run: |
-          go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-          echo "golang version: ${go_version[1]}"
-          echo "go-version=${go_version[1]}" >> $GITHUB_OUTPUT
-
-      - id: get-min-capi
-        name: Get Minimum CAPI Version
-        run: |
-          min_capi=($(yq .cf-d-capi-version-min build_data.yml))
-          echo "Minimum CAPI version: ${min_capi}"
-          echo "min-capi=${min_capi}" >> $GITHUB_OUTPUT
-
 ## START edge CAPI
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
     uses: ./.github/workflows/cf-env-setup.yml
     with:
-      environment: ${{ needs.shared-values.outputs.secrets-environment }}
+      environment: PROD
       capi-version: edge
-      go-version: ${{ needs.shared-values.outputs.go-version}}
+      go-version: 1.20
       run-with-client-creds: false
-    needs:
-      - shared-values
 
 ## END edge CAPI
 
