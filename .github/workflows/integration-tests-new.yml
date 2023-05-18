@@ -57,7 +57,7 @@ jobs:
       env:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
         hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
-        notes:     GHA CF CLI Integration Tests run_id ${{ github.run_id }}
+        notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         pool_name: cf-deployment
       run: |
         while true; do
