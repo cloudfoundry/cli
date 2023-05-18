@@ -192,11 +192,11 @@ jobs:
         rm ~/credhub-linux-2.9.4.tgz
 
 
-    # This is for debugging. It's equivalent to fly intercept
-    - name: Setup upterm session
-      if: always()
-      uses: lhotari/action-upterm@v1
-      timeout-minutes: 60
+    # # This is for debugging. It's equivalent to fly intercept
+    # - name: Setup upterm session
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
 
 
     - name: Run Integration Tests
