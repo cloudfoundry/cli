@@ -92,7 +92,7 @@ jobs:
     - name: Install Tools
       run: |
         if [ ${{ inputs.os }} == "ubuntu-latest" ]
-        than
+        then
           bbl_artifact=bbl-v8.4.110_linux_x86-64
         else
           bbl_artifact=bbl-v9.0.1_windows.exe
