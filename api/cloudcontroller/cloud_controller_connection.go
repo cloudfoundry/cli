@@ -55,6 +55,7 @@ func (connection *CloudControllerConnection) Make(request *Request, passedRespon
 	if err != nil {
 		return connection.processRequestErrors(request.Request, err)
 	}
+	defer response.Body.Close()
 
 	return connection.populateResponse(response, passedResponse)
 }
@@ -64,7 +65,6 @@ func (*CloudControllerConnection) handleStatusCodes(response *http.Response, pas
 		passedResponse.RawResponse = []byte("{}")
 	} else {
 		rawBytes, err := ioutil.ReadAll(response.Body)
-		defer response.Body.Close()
 		if err != nil {
 			return err
 		}
