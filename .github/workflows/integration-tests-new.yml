@@ -98,8 +98,8 @@ jobs:
           bbl_artifact=bbl-v9.0.1_windows.exe
         fi
         curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --output /usr/local/bin/bbl --location
-        chmod +x /usr/local/bin/bbl
-        bbl --version
+        # chmod +x /usr/local/bin/bbl
+        # bbl --version
 
         # curl https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --silent --output /usr/local/bin/bosh --location
         # chmod +x /usr/local/bin/bosh
