@@ -97,7 +97,7 @@ jobs:
         bbl --version
 
         curl https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 \
-          --silent --output="/usr/local/bin/bosh"
+          --silent --output /usr/local/bin/bosh
         chmod +x /usr/local/bin/bosh
         bosh --version
 
