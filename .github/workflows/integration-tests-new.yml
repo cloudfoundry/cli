@@ -92,17 +92,23 @@ jobs:
     - name: Install Tools
       run: |
         curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/bbl-v8.4.110_linux_x86-64 \
-          --silent --output /usr/local/bin/bbl
+          --silent \
+          --output /usr/local/bin/bbl \
+          --location
         chmod +x /usr/local/bin/bbl
         bbl --version
 
         curl https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 \
-          --silent --output /usr/local/bin/bosh
+          --silent \
+          --output /usr/local/bin/bosh \
+          --location
         chmod +x /usr/local/bin/bosh
         bosh --version
 
         curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz \
-          --silent --output /tmp/credhub-linux-2.9.4.tgz
+          --silent \
+          --output /tmp/credhub-linux-2.9.4.tgz \
+          --location
         tar xzvf /tmp/credhub-linux-2.9.4.tgz
         mv credhub /usr/local/bin/credhub
         chmod +x /usr/local/bin/credhub
