@@ -57,7 +57,7 @@ jobs:
       env:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
         hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
-        notes:     GHA CF CLI Integration Tests run_id ${{ github.event.workflow_run.id }}
+        notes:     GHA CF CLI Integration Tests run_id ${{ github.run_id }}
         pool_name: cf-deployment
       run: |
         while true; do
@@ -190,6 +190,14 @@ jobs:
         chmod +x /usr/local/bin/credhub
         credhub --version
         rm ~/credhub-linux-2.9.4.tgz
+
+
+    # This is for debugging. It's equivalent to fly intercept
+    - name: Setup upterm session
+      if: always()
+      uses: lhotari/action-upterm@v1
+      timeout-minutes: 60
+
 
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds }}
