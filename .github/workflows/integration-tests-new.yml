@@ -52,6 +52,8 @@ jobs:
           sleep 30
         done
 
+    - name: Checkout cli
+      uses: actions/checkout@v3
 
     - name: Checkout cli-ci
       uses: actions/checkout@v3
@@ -187,13 +189,6 @@ jobs:
         chmod +x /usr/local/bin/credhub
         credhub --version
         rm ~/credhub-linux-2.9.4.tgz
-
-    - name: Download cli
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        run_id: ${{ github.event.workflow_run.id }}
-        name: cf-cli.tgz
-        path: ${{ github.workspace }}
 
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds }}
