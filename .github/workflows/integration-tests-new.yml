@@ -274,6 +274,7 @@ jobs:
 
 
     - name: Unclaim environment
+      if: always()
       env:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
         hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
