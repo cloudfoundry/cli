@@ -97,7 +97,7 @@ jobs:
         else
           bbl_artifact=bbl-v8.4.110_windows.exe
         fi
-        echo https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --output /usr/local/bin/bbl --location
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --output /usr/local/bin/bbl --location
         # chmod +x /usr/local/bin/bbl
         # bbl --version
 
