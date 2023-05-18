@@ -24,7 +24,7 @@ jobs:
     secrets: inherit
 
   run-integration-tests-cf-env-with-edge-capi-with-client-creds:
-    name: Integration tests with EDGE CAPI
+    name: EDGE CAPI and client creds
     uses: ./.github/workflows/integration-tests-new.yml
     with:
       environment: PROD
@@ -35,7 +35,7 @@ jobs:
     secrets: inherit
 
   run-integration-tests-cf-env-with-min-capi:
-    name: Integration tests with EDGE CAPI
+    name: MIN CAPI
     uses: ./.github/workflows/integration-tests-new.yml
     with:
       environment: PROD
@@ -46,7 +46,7 @@ jobs:
     secrets: inherit
 
   run-integration-windows:
-    name: Integration tests with EDGE CAPI
+    name: Windows
     uses: ./.github/workflows/integration-tests-new.yml
     with:
       environment: PROD
@@ -57,7 +57,7 @@ jobs:
     secrets: inherit
 
   run-integration-windows-client-credentials:
-    name: Integration tests with EDGE CAPI
+    name: Windows with client credentials
     uses: ./.github/workflows/integration-tests-new.yml
     with:
       environment: PROD
