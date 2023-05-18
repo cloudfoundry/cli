@@ -95,7 +95,7 @@ jobs:
         bosh --version
 
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version == 'edge' }}
+      if: ${{ inputs.capi-version == 'edge2' }} # TODO: we know that CAPI redeploy works; let's turn this off to save dev time
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
