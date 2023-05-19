@@ -40,7 +40,7 @@ jobs:
         ls / || true
         ls /* || true
         echo ::endgroup::
-        mv /tmp/bbl /usr/local/bin/bbl
-        chmod +x /usr/local/bin/bbl
+        mv /tmp/bbl /usr/bin/bbl
+        chmod +x /usr/bin/bbl
         bbl --version
 
