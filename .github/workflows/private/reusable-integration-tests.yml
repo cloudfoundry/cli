@@ -1,3 +1,5 @@
+name: Run Integration Tests
+
 on:
   workflow_call:
     inputs:
