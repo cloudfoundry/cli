@@ -46,8 +46,9 @@ jobs:
         chmod +x $install_location/bosh
         bosh --version
 
-        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/credhub-linux-2.9.4.tgz --location
-        tar xzvf /tmp/$credhub_artifact
+        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output credhub-linux-2.9.4.tgz --location
+        tar xzvf $credhub_artifact
+        rm $credhub_artifact
         mv credhub $install_location/credhub
         chmod +x $install_location/credhub
         credhub --version
