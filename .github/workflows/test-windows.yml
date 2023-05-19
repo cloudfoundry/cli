@@ -8,13 +8,10 @@ permissions:
 
 jobs: 
   test-install:
-    name: install-linux
+    name: install-${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        foo:
-          - bar
-          - baz
         os:
           - ubuntu-latest
           - ubuntu-18.04
@@ -39,9 +36,10 @@ jobs:
         echo ::group::Env
         env
         echo ::endgroup::Env
-        echo ::group:: tree
-        tree -d /
-        echo ::endgroup:: tree
+        echo ::group::file system
+        ls / || true
+        ls /* || true
+        echo ::endgroup::
         mv /tmp/bbl /usr/local/bin/bbl
         chmod +x /usr/local/bin/bbl
         bbl --version
