@@ -1,0 +1,51 @@
+name: test-windows-install
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs: 
+  test-install:
+    name: install-${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-20.04
+          - windows-latest
+          - windows-2019
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: install
+      shell: bash
+      run: |
+        echo ${{ matrix.foo }}
+        if [[ ${{ matrix.os }} =~ "windows" ]]
+        then
+          install_location=/usr/bin
+          bbl_artifact=bbl-v8.4.110_windows.exe
+          bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
+          credhub_artifact=credhub-windows-2.9.4.tgz
+        else
+          install_location=/usr/local/bin
+          bbl_artifact=bbl-v8.4.110_linux_x86-64
+          bosh_cli_artifact=bosh-cli-7.0.1-linux-amd64
+          credhub_artifact=credhub-linux-2.9.4.tgz
+        fi
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
+        echo "download worked"
+        chmod +x $install_location/bbl
+        bbl --version
+
+        curl https://s3.amazonaws.com/bosh-cli-artifacts/$bosh_cli_artifact --silent --output $install_location/bosh --location
+        chmod +x $install_location/bosh
+        bosh --version
+
+        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/$credhub_artifact --location
+        tar xzvf /tmp/$credhub_artifact
+        mv credhub $install_location/credhub
+        chmod +x $install_location/credhub
+        credhub --version
