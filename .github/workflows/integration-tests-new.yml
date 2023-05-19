@@ -91,24 +91,31 @@ jobs:
 
     - name: Install Tools
       run: |
-        if [ ${{ inputs.os }} == "ubuntu-latest" ]
+        if [[ ${{ inputs.os }} =~ "windows" ]]
         then
-          bbl_artifact=bbl-v8.4.110_linux_x86-64
-        else
+          install_location=/usr/bin
           bbl_artifact=bbl-v8.4.110_windows.exe
+          bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
+          credhub_artifact=credhub-windows-2.9.4.tgz
+        else
+          install_location=/usr/local/bin
+          bbl_artifact=bbl-v8.4.110_linux_x86-64
+          bosh_cli_artifact=bosh-cli-7.0.1-linux-amd64
+          credhub_artifact=credhub-linux-2.9.4.tgz
         fi
-        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output /usr/local/bin/bbl
-        chmod +x /usr/local/bin/bbl
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
+        echo "download worked"
+        chmod +x $install_location/bbl
         bbl --version
 
-        curl https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.0.1-linux-amd64 --silent --output /usr/local/bin/bosh --location
-        chmod +x /usr/local/bin/bosh
+        curl https://s3.amazonaws.com/bosh-cli-artifacts/$bosh_cli_artifact --silent --output $install_location/bosh --location
+        chmod +x $install_location/bosh
         bosh --version
 
-        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/credhub-linux-2.9.4.tgz --silent --output /tmp/credhub-linux-2.9.4.tgz --location
-        tar xzvf /tmp/credhub-linux-2.9.4.tgz
-        mv credhub /usr/local/bin/credhub
-        chmod +x /usr/local/bin/credhub
+        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/$credhub_artifact --location
+        tar xzvf /tmp/$credhub_artifact
+        mv credhub $install_location/credhub
+        chmod +x $install_location/credhub
         credhub --version
 
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
