@@ -1,0 +1,48 @@
+name: test-windows-install
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs: 
+  test-install:
+    name: install-linux
+    strategy:
+      fail-fast: false
+      matrix:
+        foo:
+          - bar
+          - baz
+        os:
+          - ubuntu-latest
+          - ubuntu-18.04
+          - windows-latest
+          - windows-2019
+          - macos-10.15
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: install
+      shell: bash
+      run: |
+        echo ${{ matrix.foo }}
+        if [ ${{ inputs.os }} == "ubuntu-latest" ]
+        then
+          bbl_artifact=bbl-v8.4.110_linux_x86-64
+        else
+          bbl_artifact=bbl-v8.4.110_windows.exe
+        fi
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output /tmp/bbl
+        echo "download worked"
+        echo ::group::Env
+        env
+        echo ::endgroup::Env
+        echo ::group:: tree
+        tree -d /
+        echo ::endgroup:: tree
+        mv /tmp/bbl /usr/local/bin/bbl
+        chmod +x /usr/local/bin/bbl
+        bbl --version
+
