@@ -46,7 +46,6 @@ jobs:
 
         curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/$credhub_artifact --location
         tar xzvf /tmp/$credhub_artifact
-        rm $credhub_artifact
         mv credhub $install_location/credhub
         chmod +x $install_location/credhub
         credhub --version
