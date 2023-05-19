@@ -1,4 +1,4 @@
-name: Units Tests
+name: "Tests: Lint and Units"
 
 on:
   workflow_dispatch:
