@@ -25,22 +25,16 @@ jobs:
       shell: bash
       run: |
         echo ${{ matrix.foo }}
-        if [ ${{ matrix.os }} == "ubuntu-latest" ]
+        if [[ ${{ matrix.os }} =~ "windows" ]]
         then
-          bbl_artifact=bbl-v8.4.110_linux_x86-64
-        else
+          install_location=/usr/bin
           bbl_artifact=bbl-v8.4.110_windows.exe
+        else
+          install_location=/usr/local/bin
+          bbl_artifact=bbl-v8.4.110_linux_x86-64
         fi
-        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output /tmp/bbl
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
         echo "download worked"
-        echo ::group::Env
-        env
-        echo ::endgroup::Env
-        echo ::group::file system
-        ls / || true
-        ls /* || true
-        echo ::endgroup::
-        mv /tmp/bbl /usr/bin/bbl
-        chmod +x /usr/bin/bbl
+        chmod +x $install_location/bbl
         bbl --version
 
