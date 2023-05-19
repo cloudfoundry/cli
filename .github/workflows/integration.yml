@@ -14,7 +14,7 @@ permissions:
 jobs: 
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
-    uses: ./.github/workflows/private/reusable-integration-tests.yml
+    uses: ./.github/reusable-integration-tests.yml
     with:
       environment: PROD
       capi-version: edge
@@ -25,7 +25,7 @@ jobs:
 
   run-integration-tests-cf-env-with-edge-capi-with-client-creds:
     name: EDGE CAPI and client creds
-    uses: ./.github/workflows/private/reusable-integration-tests.yml
+    uses: ./.github/reusable-integration-tests.yml
     with:
       environment: PROD
       capi-version: edge
@@ -36,7 +36,7 @@ jobs:
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
-    uses: ./.github/workflows/private/reusable-integration-tests.yml
+    uses: ./.github/reusable-integration-tests.yml
     with:
       environment: PROD
       capi-version: v16.11.0
@@ -47,7 +47,7 @@ jobs:
 
   run-integration-windows:
     name: Windows
-    uses: ./.github/workflows/private/reusable-integration-tests.yml
+    uses: ./.github/reusable-integration-tests.yml
     with:
       environment: PROD
       capi-version: edge
@@ -58,7 +58,7 @@ jobs:
 
   run-integration-windows-client-credentials:
     name: Windows with client credentials
-    uses: ./.github/workflows/private/reusable-integration-tests.yml
+    uses: ./.github/reusable-integration-tests.yml
     with:
       environment: PROD
       capi-version: edge
