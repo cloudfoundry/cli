@@ -1,0 +1,31 @@
+name: testbed
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs: 
+  test-claim-ts:
+    name: claim-${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - id: claim-toolsmiths-env
+      name: Claim Toolsmiths Environment
+      env:
+        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+        hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
+      run: |
+          echo hostname - ${hostname}
+          curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
+          -X GET "https://environments.toolsmiths.cf-app.com/v1/custom_gcp/cf-deployment/versions?api_token=${api_token}"
