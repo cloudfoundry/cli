@@ -26,6 +26,9 @@ jobs:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
         hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
       run: |
+          set -x
+
           echo hostname - ${hostname}
-          curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
+
+          curl -s --show-error -H 'Accept: application/json' \
           -X GET "https://environments.toolsmiths.cf-app.com/v1/custom_gcp/cf-deployment/versions?api_token=${api_token}"
