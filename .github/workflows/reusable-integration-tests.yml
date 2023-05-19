@@ -264,10 +264,12 @@ jobs:
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
         while true; do
-          output=$(curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
+          output=$(curl -s --show-error -D headers.txt -H 'Accept: application/json' \
           -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
           --data-urlencode "api_token=${api_token}" \
           --data-urlencode "name=${ENV}")
+
+          cat headers.txt
 
           ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
 
