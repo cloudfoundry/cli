@@ -1,7 +1,7 @@
 name: test-windows-install
 
 on:
-  workflow_dispatch:
+  push:
 
 permissions:
   contents: read
@@ -25,7 +25,7 @@ jobs:
       shell: bash
       run: |
         echo ${{ matrix.foo }}
-        if [ ${{ inputs.os }} == "ubuntu-latest" ]
+        if [ ${{ matrix.os }} == "ubuntu-latest" ]
         then
           bbl_artifact=bbl-v8.4.110_linux_x86-64
         else
