@@ -64,7 +64,7 @@ jobs:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
         hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
         notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        pool_name: cf-deployment
+        pool_name: ${{ vars.TS_POOL_NAME }}
       run: |
         while true; do
           curl -s --show-error -D >(tee headers.txt >&2) -H 'Accept: application/json' \
