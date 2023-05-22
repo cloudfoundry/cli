@@ -48,6 +48,7 @@ jobs:
         Add-WindowsCapability -Online -Name $componentName
         Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
         New-NetFirewallRule -Name "openssh sshd rule" -DisplayName "allow sshd" -Enabled True -EdgeTraversalPolicy Allow -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+        netsh advfirewall firewall add rule name="Open SSH Port 22" dir=in action=allow protocol=TCP localport=22 remoteip=any
         #Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
 
     - name: ssh session
