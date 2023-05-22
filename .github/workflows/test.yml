@@ -59,6 +59,7 @@ jobs:
         Get-NetIPAddress | Select-Object -Property IPAddress
         whoami
         Get-Service -Name *ssh*
+        Get-Service -Name ssh-agent | Set-Service -StartupType Manual
         Start-Service 'ssh-agent'
 
     - name: stop session
