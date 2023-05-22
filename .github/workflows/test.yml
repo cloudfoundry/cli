@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+#           - ubuntu-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -32,3 +32,21 @@ jobs:
 
           curl -s --show-error -H 'Accept: application/json' \
           -X GET "https://environments.toolsmiths.cf-app.com/v1/custom_gcp/cf-deployment/versions?api_token=${api_token}"
+
+    # This is for debugging windows
+    - name: enable ssh
+      if: always()
+      run: |
+        Get-WindowsCapability -Online
+        $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
+        Add-WindowsCapability -Online -Name $componentName
+        Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
+
+    - name: ssh session
+      if: always()
+      run: |
+        Start-Service sshd
+        echo "IP address below:"
+        Get-NetIPAddress | Select-Object -Property IPAddress
+        sleep 3600
+        Stop-Service sshd
