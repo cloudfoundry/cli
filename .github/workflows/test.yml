@@ -57,6 +57,9 @@ jobs:
         Start-Service sshd
         echo "IP address below:"
         Get-NetIPAddress | Select-Object -Property IPAddress
+        choco install ngrok
+        ngrok tcp 22
+
     - name: stop session
       if: always()
       shell: pwsh
