@@ -36,6 +36,7 @@ jobs:
     # This is for debugging windows
     - name: enable ssh
       if: always()
+      shell: pwsh
       run: |
         Get-WindowsCapability -Online
         $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
@@ -44,6 +45,7 @@ jobs:
 
     - name: ssh session
       if: always()
+      shell: pwsh
       run: |
         Start-Service sshd
         echo "IP address below:"
