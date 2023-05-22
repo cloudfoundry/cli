@@ -58,6 +58,7 @@ jobs:
         echo "IP address below:"
         Get-NetIPAddress | Select-Object -Property IPAddress
         whoami
+        Get-Service -Name *ssh*
         Start-Service 'ssh-agent'
 
     - name: stop session
