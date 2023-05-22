@@ -58,8 +58,7 @@ jobs:
         echo "IP address below:"
         Get-NetIPAddress | Select-Object -Property IPAddress
         whoami
-        choco install ngrok
-        ngrok tcp 22
+        Start-Service 'ssh-agent'
 
     - name: stop session
       if: always()
