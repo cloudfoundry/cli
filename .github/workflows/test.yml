@@ -47,7 +47,7 @@ jobs:
         Get-WindowsCapability -Online
         $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
         Add-WindowsCapability -Online -Name $componentName
-        New-NetFirewallRule -Name "openssh sshd rule" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+        New-NetFirewallRule -Name "openssh sshd rule" -DisplayName "allow sshd" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
         #Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
 
     - name: ssh session
