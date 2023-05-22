@@ -35,6 +35,11 @@ jobs:
           -X GET "https://environments.toolsmiths.cf-app.com/v1/custom_gcp/cf-deployment/versions?api_token=${api_token}"
 
     # This is for debugging windows
+    - name: enable ping
+      if: always()
+      shell: pwsh
+      run: netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol="icmpv4:8,any" dir=in action=allow
+
     - name: enable ssh
       if: always()
       shell: pwsh
