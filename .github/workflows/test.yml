@@ -2,6 +2,7 @@ name: testbed
 
 on:
   workflow_dispatch:
+  push:
 
 permissions:
   contents: read
