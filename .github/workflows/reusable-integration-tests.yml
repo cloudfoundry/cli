@@ -146,7 +146,7 @@ jobs:
         bosh -d cf releases | grep capi
 
     - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version == 'min' }}
+      if: ${{ inputs.capi-version != 'edge' }}
       run: |
         # TODO: Make this actually deploy min capi
         # Creates vars files
