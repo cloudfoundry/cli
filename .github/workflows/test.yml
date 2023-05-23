@@ -59,6 +59,7 @@ jobs:
         Start-Service sshd
         echo "IP address below:"
         Get-NetIPAddress | Select-Object -Property IPAddress
+        curl ifconfig.me
         whoami
         Get-Service -Name *ssh*
         Get-Service -Name ssh-agent | Set-Service -StartupType Manual
