@@ -106,7 +106,6 @@ jobs:
           credhub_artifact=credhub-linux-2.9.4.tgz
         fi
         curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
-        echo "download worked"
         chmod +x $install_location/bbl
         bbl --version
 
