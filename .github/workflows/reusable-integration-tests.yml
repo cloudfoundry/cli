@@ -120,7 +120,7 @@ jobs:
         credhub --version
 
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version == 'edge' }} # TODO: we know that CAPI redeploy works; let's turn this off to save dev time
+      if: ${{ inputs.capi-version == 'edge' }}
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
