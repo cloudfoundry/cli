@@ -96,6 +96,7 @@ jobs:
 
         touch "/tmp/$(cat metadata.json | jq -r '.name').priv"
         chmod 0600 "/tmp/$(cat metadata.json | jq -r '.name').priv"
+        echo "adfadsfasdfasdfasdfasdfasdfasdfasdfasdfa" > "/tmp/$(cat metadata.json | jq -r '.name').priv"
         cat "/tmp/$(cat metadata.json | jq -r '.name').priv"
         ls -l /tmp
         echo bbl print-env --metadata-file metadata.json
