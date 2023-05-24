@@ -84,7 +84,7 @@ jobs:
     - name: test powershell
       shell: pwsh
       run: |
-        bbl print-env --metadata-file metadata.json
+        bbl print-env --metadata-file metadata.json --shell-type powershell
 
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
       env:
