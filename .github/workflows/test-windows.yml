@@ -67,9 +67,10 @@ jobs:
         bbl_artifact=bbl-v8.4.110_windows.exe
         bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
         credhub_artifact=credhub-windows-2.9.4.tgz
-        curl https://github.com/Benjamintf1/bosh-bootloader/releases/download/test/bbl.exe --silent --location --output  $install_location/bbl
+        curl https://github.com/Benjamintf1/bosh-bootloader/releases/download/test2/bbl.exe --silent --location --output  $install_location/bbl
         chmod +x $install_location/bbl
         bbl --version
+
 
         curl https://s3.amazonaws.com/bosh-cli-artifacts/$bosh_cli_artifact --silent --output $install_location/bosh --location
         chmod +x $install_location/bosh
@@ -95,6 +96,7 @@ jobs:
         cat "/tmp/$(cat metadata.json | jq -r '.name').priv"
         ls -l /tmp
         echo bbl print-env --metadata-file metadata.json  --shell-type posix
+        bbl print-env --metadata-file metadata.json --shell-type posix
         eval "$(bbl print-env --metadata-file metadata.json --shell-type posix)"
         bosh upload-release --sha2 "$FILENAME"
         rm $FILENAME
