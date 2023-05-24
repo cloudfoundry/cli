@@ -27,8 +27,7 @@ jobs:
           curl -s --show-error -D headers.txt -H 'Accept: application/json' \
           -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
           --data-urlencode "api_token=${api_token}" \
-          --data-urlencode "pool_name=${pool_name}" \
-          --data-urlencode "notes=${notes}" > metadata.json \
+          --data-urlencode "environment_name=palecopper" > metadata.json \
           || echo "Unable to reach server, trying again in 30 seconds..."
 
           cat headers.txt
