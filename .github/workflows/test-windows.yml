@@ -91,7 +91,7 @@ jobs:
 
         touch "/tmp/$(cat metadata.json | jq -r '.name').priv"
         ls -l /tmp
-        eval "$(sudo bbl print-env --metadata-file metadata.json)"
+        eval "$(bbl print-env --metadata-file metadata.json)"
         bosh upload-release --sha2 "$FILENAME"
         rm $FILENAME
 
