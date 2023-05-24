@@ -13,6 +13,7 @@ jobs:
       run:
         shell: bash
     runs-on: windows-latest
+    environment: PROD
     steps:
     - id: claim-toolsmiths-env
       name: Claim Toolsmiths Environment
