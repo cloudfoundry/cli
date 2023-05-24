@@ -1,0 +1,48 @@
+name: testbed
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs: 
+  test-claim-ts:
+    name: claim-${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    runs-on: windows-latest
+    steps:
+    - id: claim-toolsmiths-env
+      name: Claim Toolsmiths Environment
+      env:
+        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+        hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
+        notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        pool_name: ${{ vars.TS_POOL_NAME }}
+      run: |
+        while true; do
+          curl -s --show-error -D headers.txt -H 'Accept: application/json' \
+          -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
+          --data-urlencode "api_token=${api_token}" \
+          --data-urlencode "pool_name=${pool_name}" \
+          --data-urlencode "notes=${notes}" > metadata.json \
+          || echo "Unable to reach server, trying again in 30 seconds..."
+
+          cat headers.txt
+
+          ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
+          ERR_429="Sorry, Toolsmiths are out of environments in your requested pool. New environments are on their way but you can stop by the Toolsmiths slack channel for more help."
+          ERR_409="Sorry, was not able to claim an environment. Trying again in 30 seconds..."
+
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && exit 1
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && exit 2
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500"
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 200" headers.txt && break
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 429" && echo "$ERR_429"
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 409" && echo "$ERR_409"
+
+          sleep 30
+        done
+        cat metadata.json | jq -r '.name'
