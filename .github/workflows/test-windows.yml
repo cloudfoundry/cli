@@ -81,6 +81,11 @@ jobs:
         chmod +x $install_location/credhub
         credhub --version
 
+    - name: test powershell
+      shell: pwsh
+      run: |
+        eval "$(bbl print-env --metadata-file metadata.json)"
+
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
