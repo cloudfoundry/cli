@@ -87,7 +87,9 @@ jobs:
       run: |
         # find latest capi
         FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
-        aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1
+        aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1 --no-progress
+
+        touch "/tmp/$(cat metadata.json | jq -r '.name').priv"
         ls -l /
         ls -l /tmp
         bbl print-env --metadata-file metadata.json
