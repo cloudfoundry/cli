@@ -1,4 +1,4 @@
-name: testbed
+name: iterate-windows
 
 on:
   workflow_dispatch:
@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 jobs: 
-  test-claim-ts:
-    name: claim-${{ matrix.os }}
+  iterate-windows:
+    name: iterate-windows
     defaults:
       run:
         shell: bash
