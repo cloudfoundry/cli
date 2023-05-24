@@ -63,18 +63,10 @@ jobs:
         cat metadata.json | jq -r '.name'
     - name: Install Tools
       run: |
-        if [[ ${{ inputs.os }} =~ "windows" ]]
-        then
-          install_location=/usr/bin
-          bbl_artifact=bbl-v8.4.110_windows.exe
-          bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
-          credhub_artifact=credhub-windows-2.9.4.tgz
-        else
-          install_location=/usr/local/bin
-          bbl_artifact=bbl-v8.4.110_linux_x86-64
-          bosh_cli_artifact=bosh-cli-7.0.1-linux-amd64
-          credhub_artifact=credhub-linux-2.9.4.tgz
-        fi
+        install_location=/usr/bin
+        bbl_artifact=bbl-v8.4.110_windows.exe
+        bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
+        credhub_artifact=credhub-windows-2.9.4.tgz
         curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
         chmod +x $install_location/bbl
         bbl --version
