@@ -94,6 +94,7 @@ jobs:
         echo "adfadsfasdfasdfasdfasdfasdfasdfasdfasdfa" > "/tmp/$(cat metadata.json | jq -r '.name').priv"
         cat "/tmp/$(cat metadata.json | jq -r '.name').priv"
         ls -l /tmp
+        cat metadata.json
         echo bbl print-env --metadata-file metadata.json  --shell-type posix
         bbl print-env --metadata-file metadata.json --shell-type posix
         bosh upload-release --sha2 "$FILENAME"
