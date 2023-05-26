@@ -65,10 +65,9 @@ jobs:
         notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         pool_name: ${{ vars.TOOLSMITHS_POOL_NAME }}
       run: |
-        set -x
         while true; do
           curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/v1/pooled_gcp_engineering_environments/claim" \
+          -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
           --data-urlencode "api_token=${api_token}" \
           --data-urlencode "pool_name=${pool_name}" \
           --data-urlencode "notes=${notes}" > metadata.json \
@@ -266,7 +265,7 @@ jobs:
         ENV=$(cat metadata.json | jq -r '.name')
         while true; do
           output=$(curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/v1/pooled_gcp_engineering_environments/unclaim" \
+          -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
           --data-urlencode "api_token=${api_token}" \
           --data-urlencode "name=${ENV}")
 
