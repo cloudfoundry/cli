@@ -2,11 +2,11 @@ name: "Tests: Integration"
 
 on:
   workflow_dispatch:
-  # workflow_run:
-  #   workflows: 
-  #     - Package CLI
-  #   types: 
-  #     - completed
+  workflow_run:
+    workflows:
+      - "Tests: Lint and Units"
+    types:
+      - completed
 
 permissions:
   contents: read
