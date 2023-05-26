@@ -16,9 +16,7 @@ jobs:
     name: Integration tests with EDGE CAPI
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
-      environment: PROD
       capi-version: edge
-      go-version: "1.20"
       run-with-client-creds: false
       os: ubuntu-latest
     secrets: inherit
@@ -27,9 +25,7 @@ jobs:
     name: EDGE CAPI and client creds
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
-      environment: PROD
       capi-version: edge
-      go-version: "1.20"
       run-with-client-creds: true
       os: ubuntu-latest
     secrets: inherit
@@ -38,9 +34,7 @@ jobs:
     name: MIN CAPI
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
-      environment: PROD
-      capi-version: v16.11.0
-      go-version: "1.20"
+      capi-version: min
       run-with-client-creds: false
       os: ubuntu-latest
     secrets: inherit
@@ -49,9 +43,7 @@ jobs:
   #  name: Windows
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
-  #    environment: PROD
   #    capi-version: edge
-  #    go-version: "1.20"
   #    run-with-client-creds: false
   #    os: windows-latest
   #  secrets: inherit
@@ -60,9 +52,7 @@ jobs:
   #  name: Windows with client credentials
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
-  #    environment: PROD
   #    capi-version: edge
-  #    go-version: "1.20"
   #    run-with-client-creds: true
   #    os: windows-latest
   #  secrets: inherit

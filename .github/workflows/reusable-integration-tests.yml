@@ -3,13 +3,7 @@ name: "pvt: run integration tests"
 on:
   workflow_call:
     inputs:
-      environment:
-        required: true
-        type: string
       capi-version:
-        required: true
-        type: string
-      go-version:
         required: true
         type: string
       run-with-client-creds:
@@ -25,7 +19,6 @@ jobs:
       run:
         shell: bash
     runs-on: ${{ inputs.os }} 
-    environment: ${{ inputs.environment }}
 
     steps:
     - name: Checkout cli
@@ -37,13 +30,19 @@ jobs:
         repository: cloudfoundry/cli-ci
         path: cli-ci
 
+    - id: read-min-capi
+      name: Read MIN CAPI
+      run: |
+        version=$(yq '.cf-d-capi-version-min' build_data.yml)
+        echo "::set-output name=version::$version"
+
     - name: Checkout cf-deployment Min CAPI
       if: ${{ inputs.capi-version != 'edge' }}
       uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cf-deployment
         path: cf-deployment
-        ref: ${{ inputs.capi-version }}
+        ref: ${{ steps.read-min-capi.outputs.version }}
 
     - name: Checkout cf-deployment
       uses: actions/checkout@v3
@@ -62,13 +61,13 @@ jobs:
       name: Claim Toolsmiths Environment
       env:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-        hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
+        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
         notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        pool_name: ${{ vars.TS_POOL_NAME }}
+        pool_name: ${{ vars.TOOLSMITHS_POOL_NAME }}
       run: |
         while true; do
           curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
+          -X POST "https://${hostname}/v1/pooled_gcp_engineering_environments/claim" \
           --data-urlencode "api_token=${api_token}" \
           --data-urlencode "pool_name=${pool_name}" \
           --data-urlencode "notes=${notes}" > metadata.json \
@@ -194,9 +193,9 @@ jobs:
         ./cf-deployment-concourse-tasks/bosh-deploy/task
 
     - name: Set Up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ inputs.go-version }}
+        go-version-file: go.mod
         check-latest: true
 
     - name: Run Integration Tests
@@ -261,12 +260,12 @@ jobs:
       if: always()
       env:
         api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-        hostname:  ${{ secrets.TOOLSMITHS_HOSTNAME }}
+        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
         while true; do
           output=$(curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
+          -X POST "https://${hostname}/v1/pooled_gcp_engineering_environments/unclaim" \
           --data-urlencode "api_token=${api_token}" \
           --data-urlencode "name=${ENV}")
 
