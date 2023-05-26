@@ -34,7 +34,7 @@ jobs:
       name: Read MIN CAPI
       run: |
         version=$(yq '.cf-d-capi-version-min' build_data.yml)
-        echo "::set-output name=version::$version"
+        echo "version=$version" >> $GITHUB_OUTPUT
 
     - name: Checkout cf-deployment Min CAPI
       if: ${{ inputs.capi-version != 'edge' }}
@@ -65,6 +65,7 @@ jobs:
         notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         pool_name: ${{ vars.TOOLSMITHS_POOL_NAME }}
       run: |
+        set -x
         while true; do
           curl -s --show-error -D headers.txt -H 'Accept: application/json' \
           -X POST "https://${hostname}/v1/pooled_gcp_engineering_environments/claim" \
