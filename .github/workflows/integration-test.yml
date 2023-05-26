@@ -28,5 +28,5 @@ jobs:
         if [ test_secret == $test_secret ]; then
           echo "I SEE SECERET"
         fi
-        echo  $test-var
+        echo  $test_var
 
