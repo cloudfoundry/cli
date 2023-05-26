@@ -1,0 +1,32 @@
+name: "TEST Integration"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: 
+      - TEST Unit
+    types: 
+      - completed
+
+permissions:
+  contents: read
+
+jobs: 
+  test-integration:
+    runs-on: ubuntu-latest
+    name: test-integration
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - id: test-secret
+      name: test secret
+      env:
+        test_secret: ${{ secrets.TEST_SECRET }}
+        test_var: ${{ vars.TEST_VAR }}
+      run: |
+        if [ test_secret == $test_secret ]; then
+          echo "I SEE SECERET"
+        fi
+        echo  $test-var
+

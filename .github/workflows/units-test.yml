@@ -1,0 +1,42 @@
+name: "TEST Unit"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.gitpod.yml'
+      - 'README.md'
+  push:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.github/**'
+      - '.gitpod.yml'
+      - 'README.md'
+
+permissions:
+  contents: read
+
+jobs: 
+  test-unit:
+    runs-on: ubuntu-latest
+    name: test-unit
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - id: test-exit
+      name: test-exit
+      env:
+        exit_code: ${{ vars.EXIT_CODE }}
+      run: |
+        exit $exit_code
+
