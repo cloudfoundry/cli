@@ -14,45 +14,56 @@ permissions:
 jobs: 
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
+      sha:  ${{github.event.workflow_run.head_sha}}
       capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
+      name: edge-capi
     secrets: inherit
 
   run-integration-tests-cf-env-with-edge-capi-with-client-creds:
     name: EDGE CAPI and client creds
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
       capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
+      name: edge-capi-client-creds
     secrets: inherit
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
       capi-version: min
       run-with-client-creds: false
       os: ubuntu-latest
+      name: min-capi
     secrets: inherit
 
   #run-integration-windows:
   #  name: Windows
+  #  if: ${{ github.event.workflow_run.conclusion == 'success' }}
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
   #    capi-version: edge
   #    run-with-client-creds: false
   #    os: windows-latest
+  #    name: windows
   #  secrets: inherit
 
   #run-integration-windows-client-credentials:
   #  name: Windows with client credentials
+  #  if: ${{ github.event.workflow_run.conclusion == 'success' }}
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
   #    capi-version: edge
   #    run-with-client-creds: true
   #    os: windows-latest
+  #    name: windows-client-credentials
   #  secrets: inherit
