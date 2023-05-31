@@ -31,7 +31,7 @@ jobs:
       run: echo "::set-output name=secrets-environment::PROD"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
       run: |
@@ -168,10 +168,10 @@ jobs:
       run: echo "BUILD_VERSION $BUILD_VERSION"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
@@ -409,17 +409,17 @@ jobs:
       run: echo "BUILD_VERSION $BUILD_VERSION"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
         ref: main
 
     - name: Checkout bomutils
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: hogliux/bomutils.git
         ref: 0.2
@@ -593,7 +593,7 @@ jobs:
         shell: pwsh
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up Go
@@ -732,7 +732,7 @@ jobs:
       contents: read
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: get semver version
       # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
