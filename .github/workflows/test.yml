@@ -24,3 +24,21 @@ jobs:
       env:
         First_Name: Monay
       run: echo "2= $Greeting $First_Name. Today is $DAY_OF_WEEK!"
+
+  reading_env_job:
+    runs-on: ubuntu-latest
+    needs: [greeting_job]
+
+    steps:
+    - name: "Say Hello Mona it's TUESDAY"
+      env:
+        First_Name: Monay
+      run: echo "No $Greeting $First_Name. Today is $DAY_OF_WEEK!"
+
+    - name: "set global var"
+      run: echo "DAY_OF_WEEK=Friday" >> $GITHUB_ENV
+
+    - name: "Say Hello Mona it's FRIDAY"
+      env:
+        First_Name: Monay
+      run: echo "2= $Greeting $First_Name. Today is $DAY_OF_WEEK!"
