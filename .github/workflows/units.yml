@@ -2,15 +2,15 @@ name: "Tests: Lint and Units"
 
 on:
   workflow_dispatch:
-   pull_request:
-     branches:
-       - main
-       - v8
-       - v7
-     paths-ignore:
-       - 'doc/**'
-       - '.gitpod.yml'
-       - 'README.md'
+  pull_request:
+    branches:
+      - main
+      - v8
+      - v7
+    paths-ignore:
+      - 'doc/**'
+      - '.gitpod.yml'
+      - 'README.md'
 
 permissions:
   contents: read
