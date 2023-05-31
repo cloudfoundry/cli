@@ -29,7 +29,7 @@ jobs:
       id: check
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: "test-integration-fail-${{ github.run_number }}"
+        name: "${{ inputs.name }}"
         status: in_progress
         sha:  ${{github.event.workflow_run.head_sha}}
         output: |
