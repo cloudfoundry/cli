@@ -20,43 +20,25 @@ defaults:
     shell: bash
 
 jobs:
-  shared-values:
-    name: Shared Values
-    runs-on: ubuntu-latest
-    outputs:
-      go-version: ${{ steps.set-go-version.outputs.go-version }}
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - id: set-go-version
-      name: Parse Golang Version
-      run: |
-        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-        echo "golang version: ${go_version[1]}"
-        echo "::set-output name=go-version::${go_version[1]}"
-
   lint:
     name: Lint code
     runs-on: ubuntu-latest
-    needs: shared-values
     steps:
 
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - name: Set Up Go
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ needs.shared-values.outputs.go-version }}
+        go-version-file: go.mod
+        check-latest: true
 
     - name: Run go fmt
       run: go fmt && git diff --exit-code
 
   units:
     name: Units
-    needs: shared-values
     strategy:
       fail-fast: false
       matrix:
@@ -71,10 +53,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - name: Set Up Go
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ needs.shared-values.outputs.go-version }}
+        go-version-file: go.mod
+        check-latest: true
 
     - name: Set up Test
       run: |
@@ -94,7 +77,6 @@ jobs:
           - windows-latest
           - windows-2019
     runs-on: ${{ matrix.os }}
-    needs: shared-values
     defaults:
       run:
         shell: pwsh
@@ -103,10 +85,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - name: Set Up Go
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ needs.shared-values.outputs.go-version }}
+        go-version-file: go.mod
+        check-latest: true
 
     - name: Set up Test
       run: |
@@ -130,3 +113,5 @@ jobs:
         -randomizeSuites
         -skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
         -flakeAttempts=2
+
+# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
