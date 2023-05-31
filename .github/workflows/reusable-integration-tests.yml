@@ -152,6 +152,7 @@ jobs:
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
+          -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
           -v client-secret="${CF_INT_CLIENT_SECRET}" \
           > ./director.yml
 
@@ -175,6 +176,7 @@ jobs:
         cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
+        cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
 
         # Deletes CF-D
         eval "$(bbl print-env --metadata-file metadata.json)"
@@ -203,8 +205,9 @@ jobs:
         export BOSH_LITE=false
         export BBL_JSON_CONFIG=""
         export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
-        add-uaa-client-credentials.yml \
-        add-oidc-provider.yml"
+                          add-uaa-client-credentials.yml \
+                          diego-cell-instances.yml \
+                          add-oidc-provider.yml"
         ./cf-deployment-concourse-tasks/bosh-deploy/task
 
     - name: Set Up Go
