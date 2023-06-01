@@ -59,7 +59,7 @@ jobs:
         go-version-file: go.mod
         check-latest: true
 
-    - name: Set up Test
+    - name: Set Up Test
       run: |
         go install github.com/onsi/ginkgo/ginkgo@v1.16.4
         go install github.com/onsi/gomega/matchers
@@ -72,6 +72,7 @@ jobs:
   units-windows:
     name: Units Windows
     strategy:
+      fail-fast: false
       matrix:
         os:
           - windows-latest
