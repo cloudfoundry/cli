@@ -104,9 +104,9 @@ jobs:
       env:
         ACK_GINKGO_RC: true
       run: >
-        # Get-Command make
-        # Get-Item Makefile
-        # make units-non-plugin
+        Get-Command make
+        Get-Item Makefile
+        make units #-non-plugin
 
         echo ginkgo -r -p
         -randomizeAllSpecs
