@@ -11,7 +11,7 @@ on:
 jobs: 
   run-integration-tests-cf-env-with-edge-capi:
     name: Integration tests with EDGE CAPI
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
       capi-version: edge
@@ -22,7 +22,7 @@ jobs:
 
   run-integration-tests-cf-env-with-edge-capi-with-client-creds:
     name: EDGE CAPI and client creds
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
       capi-version: edge
@@ -33,7 +33,7 @@ jobs:
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/reusable-integration-tests.yml
     with:
       capi-version: min
@@ -44,7 +44,7 @@ jobs:
 
   #run-integration-windows:
   #  name: Windows
-  #  if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  #  if: github.event.workflow_run.conclusion == 'success'
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
   #    capi-version: edge
@@ -55,7 +55,7 @@ jobs:
 
   #run-integration-windows-client-credentials:
   #  name: Windows with client credentials
-  #  if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  #  if: github.event.workflow_run.conclusion == 'success'
   #  uses: ./.github/workflows/reusable-integration-tests.yml
   #  with:
   #    capi-version: edge
