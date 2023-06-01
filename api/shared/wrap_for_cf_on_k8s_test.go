@@ -340,6 +340,8 @@ var _ = Describe("WrapForCFOnK8sAuth", func() {
 			})
 
 			It("uses the exec command to generate the Bearer token", func() {
+				helpers.SkipIfWindows() // We're getting "plugin returned version client.authentication.k8s.io/__internal" on Windows. This issue is unresolved in upstream library.
+
 				Expect(wrapErr).NotTo(HaveOccurred())
 				Expect(wrappedRoundTripper.RoundTripCallCount()).To(Equal(1))
 
