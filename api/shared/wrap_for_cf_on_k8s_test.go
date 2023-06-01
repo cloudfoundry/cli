@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/api/shared"
 	"code.cloudfoundry.org/cli/api/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/integration/helpers"
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
