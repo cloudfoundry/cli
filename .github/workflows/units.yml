@@ -37,37 +37,37 @@ jobs:
     - name: Run go fmt
       run: go fmt && git diff --exit-code
 
-  # units:
-    # name: Units
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     os:
-    #       - ubuntu-latest
-    #       - ubuntu-20.04
-    #       - macos-latest
-    #       - macos-11
-    # runs-on: ${{ matrix.os }}
-    # steps:
+  units:
+    name: Units
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-20.04
+          - macos-latest
+          - macos-11
+    runs-on: ${{ matrix.os }}
+    steps:
 
-    # - name: Checkout
-    #   uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-    # - name: Set Up Go
-    #   uses: actions/setup-go@v4
-    #   with:
-    #     go-version-file: go.mod
-    #     check-latest: true
+    - name: Set Up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: go.mod
+        check-latest: true
 
-    # - name: Set Up Test
-    #   run: |
-    #     go install github.com/onsi/ginkgo/ginkgo@v1.16.4
-    #     go install github.com/onsi/gomega/matchers
+    - name: Set Up Test
+      run: |
+        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+        go install github.com/onsi/gomega/matchers
 
-    # - name: Run Units
-    #   run: echo make units
-    #   env:
-    #     ACK_GINKGO_RC: true
+    - name: Run Units
+      run: make units
+      env:
+        ACK_GINKGO_RC: true
 
   units-windows:
     name: Units Windows
@@ -81,6 +81,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
+        # working-directory: 
     steps:
 
     - name: Checkout
