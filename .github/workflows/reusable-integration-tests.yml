@@ -1,0 +1,307 @@
+name: "pvt: run integration tests"
+
+on:
+  workflow_call:
+    inputs:
+      capi-version:
+        required: true
+        type: string
+      run-with-client-creds:
+        required: true
+        type: boolean
+      os:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+
+jobs:
+  run-integration-tests:
+    defaults:
+      run:
+        shell: bash
+    runs-on: ${{ inputs.os }} 
+
+    steps:
+    - uses: LouisBrunner/checks-action@v1.6.0
+      if: always()
+      id: check
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: "${{ inputs.name }}"
+        status: in_progress
+        sha:  ${{github.event.workflow_run.head_sha}}
+        output: |
+          {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+    - name: Checkout cli
+      uses: actions/checkout@v3
+      with:
+        ref: ${{github.event.workflow_run.head_sha}}
+
+    - name: Checkout cli-ci
+      uses: actions/checkout@v3
+      with:
+        repository: cloudfoundry/cli-ci
+        path: cli-ci
+
+    - id: read-min-capi
+      name: Read MIN CAPI
+      run: |
+        version=$(yq '.cf-d-capi-version-min' build_data.yml)
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: Checkout cf-deployment Min CAPI
+      if: ${{ inputs.capi-version != 'edge' }}
+      uses: actions/checkout@v3
+      with:
+        repository: cloudfoundry/cf-deployment
+        path: cf-deployment
+        ref: ${{ steps.read-min-capi.outputs.version }}
+
+    - name: Checkout cf-deployment
+      uses: actions/checkout@v3
+      if: ${{ inputs.capi-version == 'edge' }}
+      with:
+        repository: cloudfoundry/cf-deployment
+        path: cf-deployment
+
+    - name: Checkout CF deployment tasks
+      uses: actions/checkout@v3
+      with:
+        repository: cloudfoundry/cf-deployment-concourse-tasks
+        path: cf-deployment-concourse-tasks
+
+    - id: claim-toolsmiths-env
+      name: Claim Toolsmiths Environment
+      env:
+        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
+        notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        pool_name: ${{ vars.TOOLSMITHS_POOL_NAME }}
+      run: |
+        while true; do
+          curl -s --show-error -D headers.txt -H 'Accept: application/json' \
+          -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
+          --data-urlencode "api_token=${api_token}" \
+          --data-urlencode "pool_name=${pool_name}" \
+          --data-urlencode "notes=${notes}" > metadata.json \
+          || echo "Unable to reach server, trying again in 30 seconds..."
+
+          cat headers.txt
+
+          ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
+          ERR_429="Sorry, Toolsmiths are out of environments in your requested pool. New environments are on their way but you can stop by the Toolsmiths slack channel for more help."
+          ERR_409="Sorry, was not able to claim an environment. Trying again in 30 seconds..."
+
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && exit 1
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && exit 2
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500"
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 200" headers.txt && break
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 429" && echo "$ERR_429"
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 409" && echo "$ERR_409"
+
+          sleep 30
+        done
+        cat metadata.json | jq -r '.name'
+
+    - name: Install Tools
+      run: |
+        if [[ ${{ inputs.os }} =~ "windows" ]]
+        then
+          install_location=/usr/bin
+          bbl_artifact=bbl-v8.4.110_windows.exe
+          bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
+          credhub_artifact=credhub-windows-2.9.4.tgz
+        else
+          install_location=/usr/local/bin
+          bbl_artifact=bbl-v8.4.110_linux_x86-64
+          bosh_cli_artifact=bosh-cli-7.0.1-linux-amd64
+          credhub_artifact=credhub-linux-2.9.4.tgz
+        fi
+        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
+        chmod +x $install_location/bbl
+        bbl --version
+
+        curl https://s3.amazonaws.com/bosh-cli-artifacts/$bosh_cli_artifact --silent --output $install_location/bosh --location
+        chmod +x $install_location/bosh
+        bosh --version
+
+        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/$credhub_artifact --location
+        tar xzvf /tmp/$credhub_artifact
+        mv credhub $install_location/credhub
+        chmod +x $install_location/credhub
+        credhub --version
+
+    - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
+      if: ${{ inputs.capi-version == 'edge' }}
+      env:
+        CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      run: |
+        # find latest capi
+        FILENAME="$(aws s3 ls capi-releases --no-sign-request --recursive --region us-east-1 | sort | tail -n 1 | awk '{print $4}')"
+        aws s3 cp s3://capi-releases/$FILENAME $FILENAME --no-sign-request --region us-east-1 --no-progress
+        eval "$(bbl print-env --metadata-file metadata.json)"
+        bosh upload-release --sha2 "$FILENAME"
+        rm $FILENAME
+
+        # deploy
+        bosh -d cf manifest > /tmp/manifest.yml
+        bosh interpolate /tmp/manifest.yml \
+          -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
+          -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
+          -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
+          -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
+          -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
+          -v client-secret="${CF_INT_CLIENT_SECRET}" \
+          > ./director.yml
+
+        bosh -d cf deploy director.yml -n
+        echo "Deployed CAPI version:"
+        bosh -d cf releases | grep capi
+
+    - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
+      if: ${{ inputs.capi-version != 'edge' }}
+      run: |
+        # TODO: Make this actually deploy min capi
+        # Creates vars files
+        mkdir vars-files
+        echo "cs = ${{ secrets.CLIENT_SECRET }}"
+        cat << EOF > vars-files/vars.yml
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+        EOF
+
+        # Copy Ops files
+        mkdir ops-files
+        cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
+        cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
+        cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
+        cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
+
+        # Deletes CF-D
+        eval "$(bbl print-env --metadata-file metadata.json)"
+        bosh -d cf delete-deployment -n
+
+        # Deploy CF-D
+        mkdir toolsmiths-env
+        cp metadata.json toolsmiths-env/metadata
+        cat metadata.json | jq -r .name > toolsmiths-env/name
+        export VARS_FILES="vars.yml"
+        export MANIFEST_FILE="cf-deployment.yml"
+        export SYSTEM_DOMAIN=""
+        export REGENERATE_CREDENTIALS=false
+        export DEPLOY_WITH_UPTIME_MEASUREMENTS=false
+        export MEASURE_SYSLOG_AVAILABILITY=false
+        export TCP_DOMAIN=""
+        export AVAILABLE_PORT=""
+        export FAIL_ON_DOWNTIME=false
+        export APP_PUSHABILITY_THRESHOLD=0
+        export HTTP_AVAILABILITY_THRESHOLD=0
+        export RECENT_LOGS_THRESHOLD=0
+        export STREAMING_LOGS_THRESHOLD=0
+        export APP_SYSLOG_AVAILABILITY_THRESHOLD=0
+        export USE_SINGLE_APP_INSTANCE=false
+        export BOSH_DEPLOY_ARGS=""
+        export BOSH_LITE=false
+        export BBL_JSON_CONFIG=""
+        export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
+                          add-uaa-client-credentials.yml \
+                          diego-cell-instances.yml \
+                          add-oidc-provider.yml"
+        ./cf-deployment-concourse-tasks/bosh-deploy/task
+
+    - name: Set Up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: go.mod
+        check-latest: true
+
+    - name: Run Integration Tests
+      if: ${{ !inputs.run-with-client-creds }}
+      run: |
+        ENV=$(cat metadata.json | jq -r '.name')
+        eval "$(bbl print-env --metadata-file ./metadata.json)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_OIDC_USERNAME="admin-oidc"
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_API="https://api.${ENV}.cf-app.com"
+        export CF_DIAL_TIMEOUT=15
+        export CF_USERNAME=admin
+        export FLAKE_ATTEMPTS=2
+        export NODES=16
+        export GOPATH=$PWD/go
+        export PATH="$GOPATH/bin:$PATH"
+        export PATH="$PWD/out:$PATH"
+
+        make build
+
+        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
+        export CF_PASSWORD=${CF_INT_PASSWORD}
+        cf api ${CF_INT_API} --skip-ssl-validation
+        cf auth
+
+        make integration-tests-full-ci
+
+    - name: Run Integration Tests with client credentials
+      if: ${{ inputs.run-with-client-creds }}
+      env:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      run: |
+        ENV=$(cat metadata.json | jq -r '.name')
+        eval "$(bbl print-env --metadata-file ./metadata.json)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_OIDC_USERNAME="admin-oidc"
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_API="https://api.${ENV}.cf-app.com"
+        export CF_DIAL_TIMEOUT=15
+        export CF_USERNAME=admin
+        export FLAKE_ATTEMPTS=2
+        export NODES=16
+        export GOPATH=$PWD/go
+        export PATH="$GOPATH/bin:$PATH"
+        export PATH="$PWD/out:$PATH"
+
+        make build
+
+        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+
+        export CF_PASSWORD=${CF_INT_PASSWORD}
+        cf api ${CF_INT_API} --skip-ssl-validation
+        cf auth
+
+        make integration-tests-full-ci
+
+
+    - name: Unclaim environment
+      if: always()
+      env:
+        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
+        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
+      run: |
+        ENV=$(cat metadata.json | jq -r '.name')
+        while true; do
+          output=$(curl -s --show-error -D headers.txt -H 'Accept: application/json' \
+          -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
+          --data-urlencode "api_token=${api_token}" \
+          --data-urlencode "name=${ENV}")
+
+          cat headers.txt
+
+          ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
+
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500" && sleep 30 && continue
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 1
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 2
+          grep -q -E "HTTP/[[:digit:]\.]{1,3} 202" headers.txt && break
+        done
+    - uses: LouisBrunner/checks-action@v1.6.0
+      if: always()
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        check_id: ${{ steps.check.outputs.check_id }}
+        conclusion: ${{ job.status }}
+        sha:  ${{github.event.workflow_run.head_sha}}
+        output: |
+          {"title": "${{ inputs.name }}", "summary":"finished ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}

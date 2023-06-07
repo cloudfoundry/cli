@@ -72,7 +72,7 @@ format: ## Run go fmt
 	go fmt ./...
 
 integration-cleanup:
-	$(PWD)/bin/cleanup-integration
+	$(CURDIR)/bin/cleanup-integration
 
 ie: integration-experimental
 integration-experimental: build integration-cleanup integration-shared-experimental integration-experimental-versioned ## Run all experimental integration tests, both versioned and shared across versions
@@ -200,14 +200,14 @@ test: units ## (synonym for units)
 units: units-full ## (synonym for units-full)
 
 units-plugin:
-	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
 
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
+	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
-	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
 
 units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"

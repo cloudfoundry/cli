@@ -1,5 +1,4 @@
-
-name: Build-Sign-Upload
+name: 'Release: Build-Sign-Upload'
 
 on:
   push:
@@ -22,8 +21,6 @@ jobs:
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-      build-version: ${{ steps.set-build-version.outputs.build-version }}
-      go-version: ${{ steps.set-go-version.outputs.go-version }}
     steps:
     # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
 
@@ -32,7 +29,7 @@ jobs:
       run: echo "::set-output name=secrets-environment::PROD"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Check if BUILD_VERSION matches tag ${{ github.ref }}
       run: |
@@ -40,19 +37,6 @@ jobs:
         echo "BUILD_VERSION: $(cat BUILD_VERSION)"
 
         exit 0
-
-    - name: Parse Build Version
-      id: set-build-version
-      run: |
-        version=$(cat BUILD_VERSION)
-        echo "::set-output name=build-version::$version"
-
-    - name: Parse Golang Version
-      id: set-go-version
-      run: |
-        go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
-        echo "golang version: ${go_version[1]}"
-        echo "::set-output name=go-version::${go_version[1]}"
 
     # This is for debugging. It's equivalent to fly intercept
     # - name: Setup upterm session
@@ -159,20 +143,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.secrets-environment }}
 
-    env:
-      BUILD_VERSION: ${{ needs.setup.outputs.build-version }}
-
     steps:
+
+    - name: Setup
+      run: echo "BUILD_VERSION=$(cat BUILD_VERSION)" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
       run: echo "BUILD_VERSION $BUILD_VERSION"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
@@ -180,10 +164,12 @@ jobs:
 
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
-    - name: Set up Go
-      uses: actions/setup-go@v2
+
+    - name: Set Up Go
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ needs.setup.outputs.go-version }}
+        go-version-file: go.mod
+        check-latest: true
 
     - name: Print go environment
       id: go-cache-paths
@@ -402,25 +388,24 @@ jobs:
     steps:
 
     - name: Setup
-      run: |
-        echo "BUILD_VERSION=${{ needs.setup.outputs.build-version }}" >> $GITHUB_ENV
+      run: echo "BUILD_VERSION=$(cat BUILD_VERSION)" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
       run: echo "BUILD_VERSION $BUILD_VERSION"
 
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
         ref: main
 
     - name: Checkout bomutils
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: hogliux/bomutils.git
         ref: 0.2
@@ -430,10 +415,11 @@ jobs:
       working-directory: bomutils
       run: make
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - name: Set Up Go
+      uses: actions/setup-go@v4
       with:
-        go-version: ${{ needs.setup.outputs.go-version }}
+        go-version-file: go.mod
+        check-latest: true
 
     - name: Update Homebrew
       run: |
@@ -594,13 +580,15 @@ jobs:
         shell: pwsh
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up Go
-        uses: actions/setup-go@v2
+
+      - name: Set Up Go
+        uses: actions/setup-go@v4
         with:
-          go-version: ${{ needs.setup.outputs.go-version }}
+          go-version-file: go.mod
+          check-latest: true
 
       - name: Get build-time dependencies
         run: |
@@ -733,7 +721,7 @@ jobs:
       contents: read
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: get semver version
       # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |

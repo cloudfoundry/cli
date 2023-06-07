@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/api/shared"
 	"code.cloudfoundry.org/cli/api/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/integration/helpers"
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
@@ -340,6 +341,8 @@ var _ = Describe("WrapForCFOnK8sAuth", func() {
 			})
 
 			It("uses the exec command to generate the Bearer token", func() {
+				helpers.SkipIfWindows() // We're getting "plugin returned version client.authentication.k8s.io/__internal" on Windows. This issue is unresolved in upstream library.
+
 				Expect(wrapErr).NotTo(HaveOccurred())
 				Expect(wrappedRoundTripper.RoundTripCallCount()).To(Equal(1))
 
