@@ -216,7 +216,7 @@ func (Generator) RandomTwoLetters() string {
 	var asciiLetterA = 97
 	letterOne := string(rand.Intn(26) + asciiLetterA)
 	letterTwo := string(rand.Intn(26) + asciiLetterA)
-	return letterOne + letterTwo
+	return fmt.Sprint(letterOne + letterTwo)
 }
 
 func randomElement(fullList string) string {
