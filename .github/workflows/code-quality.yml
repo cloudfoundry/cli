@@ -1,10 +1,12 @@
 name: "Code Quality"
 
 on:
-  push:
-    branches: [ main, '*' ]
+  workflow_dispatch:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - v8
+      - v7
   schedule:
     - cron: '45 5 * * *'
 
