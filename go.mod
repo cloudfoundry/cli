@@ -19,7 +19,7 @@ require (
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/bosh-cli v5.5.1+incompatible
-	github.com/cyphar/filepath-securejoin v0.2.1
+	github.com/cyphar/filepath-securejoin v0.2.3
 	github.com/docker/distribution v2.8.0+incompatible
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
