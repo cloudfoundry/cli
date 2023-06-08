@@ -12,7 +12,7 @@ require (
 	code.cloudfoundry.org/go-log-cache v1.0.1-0.20211011162012-ede82a99d3cc
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
-	code.cloudfoundry.org/jsonry v1.1.3
+	code.cloudfoundry.org/jsonry v1.1.4
 	code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be
 	code.cloudfoundry.org/tlsconfig v0.0.0-20210615191307-5d92ef3894a7
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
@@ -32,7 +32,7 @@ require (
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.13.0
+	github.com/onsi/gomega v1.20.0
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
