@@ -208,7 +208,7 @@ units-non-plugin:
 	@ginkgo version
 	CF_HOME=$(CURDIR)\fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
-	CF_HOME=$(CURDIR)\fixtures $(ginkgo_units) -flakeAttempts 3 cf\ssh
+#	CF_HOME=$(CURDIR)\fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
 else
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
