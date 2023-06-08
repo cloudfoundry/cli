@@ -28,11 +28,11 @@ require (
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.13.0
+	github.com/onsi/gomega v1.26.0
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
@@ -65,7 +65,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
