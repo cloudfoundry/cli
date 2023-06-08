@@ -27,7 +27,7 @@ require (
 	github.com/kr/pty v1.1.1
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.0
-	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
+	github.com/mattn/go-runewidth v0.0.14
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -79,6 +79,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.9.0 // indirect
