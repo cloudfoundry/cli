@@ -20,7 +20,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/bosh-cli v5.5.1+incompatible
 	github.com/cyphar/filepath-securejoin v0.2.1
-	github.com/docker/distribution v2.8.0+incompatible
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
