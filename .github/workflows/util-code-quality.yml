@@ -1,10 +1,12 @@
 name: "Code Quality"
 
 on:
-  push:
-    branches: [ main, '*' ]
+  workflow_dispatch:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - v8
+      - v7
   schedule:
     - cron: '45 5 * * *'
 
@@ -21,7 +23,7 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1

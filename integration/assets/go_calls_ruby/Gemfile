@@ -1,2 +1,4 @@
 source 'https://rubygems.org'
-ruby '~> 2.7.0' #TODO: Remove the ruby version once bundler issue(https://github.com/rubygems/rubygems/issues/6280) is solved
+ruby '~> 3.0'
+
+gem 'webrick'

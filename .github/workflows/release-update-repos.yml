@@ -1,4 +1,4 @@
-name: Update Repositories
+name: "Release: Update Repositories"
 
 on:
   push:

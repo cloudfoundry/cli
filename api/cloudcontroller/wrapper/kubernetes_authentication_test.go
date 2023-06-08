@@ -16,7 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-
+	"code.cloudfoundry.org/cli/integration/helpers"
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
@@ -339,6 +339,8 @@ var _ = Describe("KubernetesAuthentication", func() {
 			})
 
 			It("uses the exec command to generate the Bearer token", func() {
+ 				helpers.SkipIfWindows()
+
 				Expect(makeErr).NotTo(HaveOccurred())
 				Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
 

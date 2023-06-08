@@ -1,0 +1,65 @@
+name: "Tests: Integration"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Tests"
+    types:
+      - completed
+
+jobs: 
+  run-integration-tests-cf-env-with-edge-capi:
+    name: Integration tests with EDGE CAPI
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: edge
+      run-with-client-creds: false
+      os: ubuntu-latest
+      name: Integration EDGE CAPI
+    secrets: inherit
+
+  run-integration-tests-cf-env-with-edge-capi-with-client-creds:
+    name: EDGE CAPI and client creds
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: edge
+      run-with-client-creds: true
+      os: ubuntu-latest
+      name: Integration EDGE CAPI client creds
+    secrets: inherit
+
+  run-integration-tests-cf-env-with-min-capi:
+    name: MIN CAPI
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: min
+      run-with-client-creds: false
+      os: ubuntu-latest
+      name: Integration MIN CAPI
+    secrets: inherit
+
+  #run-integration-windows:
+  #  name: Windows
+  #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+  #  uses: ./.github/workflows/tests-integration-reusable.yml
+  #  with:
+  #    capi-version: edge
+  #    run-with-client-creds: false
+  #    os: windows-latest
+  #    name: Integration windows
+  #  secrets: inherit
+
+  #run-integration-windows-client-credentials:
+  #  name: Windows with client credentials
+  #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+  #  uses: ./.github/workflows/tests-integration-reusable.yml
+  #  with:
+  #    capi-version: edge
+  #    run-with-client-creds: true
+  #    os: windows-latest
+  #    name: Integration windows client credentials
+  #  secrets: inherit

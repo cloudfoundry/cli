@@ -1,4 +1,4 @@
-name: Build-Sign-Upload
+name: "Release: Build Sign Upload"
 
 # List of env variables
 
