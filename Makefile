@@ -202,21 +202,21 @@ units: units-full ## (synonym for units-full)
 units-plugin:
 	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
 
-ifeq ($(OS),Windows_NT)
-units-non-plugin:
-	@rm -f $(wildcard fixtures\plugins\*.exe)
-	@ginkgo version
-	CF_HOME=$(CURDIR)\fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
-#	CF_HOME=$(CURDIR)\fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
-else
+# ifeq ($(OS),Windows_NT)
+# units-non-plugin:
+# 	@rm -f $(wildcard fixtures\plugins\*.exe)
+# 	@ginkgo version
+# 	CF_HOME=$(CURDIR)\fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
+# 		-skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
+# #	CF_HOME=$(CURDIR)\fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+# else
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
 	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
-endif
+# endif
 
 units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
