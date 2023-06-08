@@ -24,7 +24,7 @@ require (
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
-	github.com/kr/pty v1.1.1
+	github.com/kr/pty v1.1.8
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
@@ -62,6 +62,7 @@ require (
 	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
 	github.com/cloudfoundry/bosh-utils v0.0.0-20180315210917-c6a922e299b8 // indirect
 	github.com/cppforlife/go-patch v0.1.0 // indirect
+	github.com/creack/pty v1.1.11 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
