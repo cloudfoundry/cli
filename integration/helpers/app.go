@@ -145,28 +145,30 @@ console: bundle exec irb`,
 	//TODO: Remove the ruby version once bundler issue(https://github.com/rubygems/rubygems/issues/6280)
 	// is solved
 	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), []byte(`source 'http://rubygems.org'
-ruby '~> 2.7.0'
-gem 'irb'`,
+ruby '~> 3.0'
+gem 'irb'
+gem 'webrick'`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`GEM
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
+GEM
   remote: http://rubygems.org/
   specs:
-    io-console (0.5.6)
-    irb (1.2.4)
-      reline (>= 0.0.1)
-    reline (0.1.4)
+    io-console (0.6.0)
+    irb (1.6.4)
+      reline (>= 0.3.0)
+    reline (0.3.3)
       io-console (~> 0.5)
+    webrick (1.8.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   irb
-
-BUNDLED WITH
-   2.1.4`,
+  webrick
+`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 

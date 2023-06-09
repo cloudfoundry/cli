@@ -72,7 +72,7 @@ format: ## Run go fmt
 	go fmt ./...
 
 integration-cleanup:
-	$(PWD)/bin/cleanup-integration
+	$(CURDIR)/bin/cleanup-integration
 
 ie: integration-experimental
 integration-experimental: build integration-cleanup integration-shared-experimental integration-experimental-versioned ## Run all experimental integration tests, both versioned and shared across versions
@@ -127,11 +127,15 @@ ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/v7/push
 
-integration-tests: build integration-cleanup integration-isolated integration-push integration-global ## Run all isolated, push, and global integration tests
+integration-selfcontained: build
+	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
+
+integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
+
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
-integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
+integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global integration-selfcontained ## Run all isolated, push, experimental, plugin, selfcontained, and global integration tests
 
 integration-tests-full-ci: integration-cleanup
 	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
@@ -166,14 +170,19 @@ out/cf-cli_linux_x86-64: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
 							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
+							
+out/cf-cli_linux_arm64: $(GOSRC)
+	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_arm64 .
 
 out/cf-cli_osx: $(GOSRC)
 	GOARCH=amd64 GOOS=darwin go build \
 				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx .
 
-out/cf-cli_macosarm: $(GOSRC)
+out/cf-cli_osx_arm: $(GOSRC)
 	GOARCH=arm64 GOOS=darwin go build \
-				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_macosarm .
+				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx_arm .
 
 out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
 	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
@@ -184,7 +193,6 @@ out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
 	rm rsrc.syso
 
 rsrc.syso:
-	@# Generates icon file
 	rsrc -ico cf.ico -o rsrc.syso
 
 test: units ## (synonym for units)
@@ -192,14 +200,23 @@ test: units ## (synonym for units)
 units: units-full ## (synonym for units-full)
 
 units-plugin:
-	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
 
+ifeq ($(OS),Windows_NT)
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
-	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
+		-skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+else
+units-non-plugin:
+	@rm -f $(wildcard fixtures/plugins/*.exe)
+	@ginkgo version
+	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
+		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+endif
 
 units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"

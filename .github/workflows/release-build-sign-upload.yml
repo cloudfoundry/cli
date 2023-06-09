@@ -1,4 +1,4 @@
-name: Build-Sign-Upload
+name: "Release: Build Sign Upload"
 
 # List of env variables
 
@@ -12,6 +12,7 @@ name: Build-Sign-Upload
 #
 #    AWS_ACCESS_KEY_ID
 #    AWS_REGION
+#    AWS_S3_BUCKET
 #    AWS_SECRET_ACCESS_KEY
 #
 # GitHub details
@@ -40,6 +41,9 @@ on:
   push:
     tags:
     - 'v7.*'
+    - 'v8.*'
+    branches:
+    - "gh-actions-*"
 
 permissions:
   contents: read
@@ -60,6 +64,7 @@ jobs:
     #   env:
     #     AWS_ACCESS_KEY_ID:              ${{ secrets.AWS_ACCESS_KEY_ID }}
     #     AWS_REGION:                     ${{ secrets.AWS_REGION }}
+    #     AWS_S3_BUCKET:                  ${{ secrets.AWS_S3_BUCKET }}
     #     AWS_SECRET_ACCESS_KEY:          ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     #     GIT_RELEASE_TARGET_REPO:        ${{ secrets.GIT_RELEASE_TARGET_REPO }}
     #     GIT_REPO_ACCESS_TOKEN:          ${{ secrets.GIT_REPO_ACCESS_TOKEN }}
@@ -82,23 +87,20 @@ jobs:
     # needs: test
     runs-on: ubuntu-latest
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
-
     outputs:
-      secrets-environment:   ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-      go-version:            ${{ steps.set-go-version.outputs.go-version }}
-      #TODO: DEV SHIM
-      # aws-s3-bucket:         cf-cli-dev
-      aws-s3-bucket:         "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      go-version:          ${{ steps.set-go-version.outputs.go-version }}
 
-      version-build:         ${{ steps.parse-semver.outputs.version-build }}
-      version-major:         ${{ steps.parse-semver.outputs.version-major }}
-      version-minor:         ${{ steps.parse-semver.outputs.version-minor }}
-      version-patch:         ${{ steps.parse-semver.outputs.version-patch }}
+      version-build: ${{ steps.parse-semver.outputs.version-build }}
+      version-major: ${{ steps.parse-semver.outputs.version-major }}
+      version-minor: ${{ steps.parse-semver.outputs.version-minor }}
+      version-patch: ${{ steps.parse-semver.outputs.version-patch }}
 
     steps:
-    - id: set-secrets-environment
-      #TODO: DEV SHIM
-      # run: echo "::set-output name=secrets-environment::DEV"
+    # note the key must be 'id' and not 'name' here, to be accessed via the steps.<step> syntax above
+
+    - name: Set environment
+      id: set-secrets-environment
       run: echo "::set-output name=secrets-environment::PROD"
 
     - name: Checkout cli
@@ -131,6 +133,14 @@ jobs:
         go_version=($(grep -E '^go 1\.[[:digit:]]{1,2}' go.mod))
         echo "golang version: ${go_version[1]}"
         echo "::set-output name=go-version::${go_version[1]}"
+
+    # This is for debugging. It's equivalent to fly intercept
+    # - name: Setup upterm session
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
 
   build-linux:
     name: Build Linux
@@ -317,7 +327,7 @@ jobs:
             cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
             cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
 
-            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
             echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
             echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
             echo "Architecture: i386" >> cf/DEBIAN/control
@@ -350,7 +360,7 @@ jobs:
             cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
             cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
 
-            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+            cp control_v8.template cf/DEBIAN/control
             echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
             echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
             echo "Architecture: amd64" >> cf/DEBIAN/control
@@ -391,6 +401,10 @@ jobs:
     runs-on: macos-latest
     environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
+
+    # - name: Setup
+    #   run: |
+    #     echo "VERSION_BUILD=${{ needs.setup.outputs.version-build }}" >> $GITHUB_ENV
 
     - name: Get Build Version
       id: get_build_version
@@ -483,7 +497,7 @@ jobs:
         (
         SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_osx | cut -f 1)"
 
-        pushd cli-ci/ci/installers/osx_v${VERSION_MAJOR}
+        pushd cli-ci/ci/installers/osx_v8
           sed -i -e "s/VERSION/${VERSION_BUILD}/g" Distribution
           sed -i -e "s/SIZE/${SIZE}/g" Distribution
           mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf${VERSION_MAJOR}-cli
@@ -518,7 +532,7 @@ jobs:
         (
         SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_macosarm | cut -f 1)"
 
-        pushd cli-ci/ci/installers/osx_v${VERSION_MAJOR}
+        pushd cli-ci/ci/installers/osx_v8
           sed -i -e "s/VERSION/${VERSION_BUILD}/g" Distribution
           sed -i -e "s/SIZE/${SIZE}/g" Distribution
           mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf${VERSION_MAJOR}-cli
@@ -621,7 +635,6 @@ jobs:
       run:
         shell: pwsh
     env:
-      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
       - name: Checkout
@@ -702,9 +715,9 @@ jobs:
       - name: Run innosetup
         run: |
           mkdir "${env:RUNNER_TEMP}\winx64"
-          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:VERSION_MAJOR}-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x64.iss" -CfBinary "out\cf-cli_winx64.exe" -InstallerOutput "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
           mkdir "${env:RUNNER_TEMP}\win32"
-          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:VERSION_MAJOR}-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
+          .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v8-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
 
       - name: Sign windows installer
         env:
@@ -766,22 +779,18 @@ jobs:
       actions: read
       contents: read
     env:
-      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_REGION:            ${{ secrets.AWS_REGION }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_S3_BUCKET:         ${{ needs.setup.outputs.aws-s3-bucket }}
-      VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
-      VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
 
     - name: Checkout cli
       uses: actions/checkout@v2
 
-    # - name: get semver version
-    #   # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-    #   run: |
-    #     VERSION_BUILD=$(cat BUILD_VERSION | tr -d v)
-    #     echo "VERSION_BUILD=${VERSION_BUILD}" >> $GITHUB_ENV
+    - name: get semver version
+      # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      run: |
+        INSTALLER_RELEASE_VERSION=$(cat BUILD_VERSION | tr -d v)
+        echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
 
     - name: Download signed artifacts
       uses: actions/download-artifact@v2
@@ -789,6 +798,8 @@ jobs:
         path: signed # download all artifacts to 'signed/'
 
     - name: Archive nix binaries for upload
+      env:
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
       run: |
 
         prepare_legal() {
@@ -813,25 +824,25 @@ jobs:
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf${VERSION_MAJOR}
           pushd linux_i686
             prepare_artifacts
-            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_i686.tgz *
+            tar -cvzf cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_linux_i686.tgz *
           popd
           pushd linux_x86-64
             prepare_artifacts
-            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_x86-64.tgz *
+            tar -cvzf cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
           popd
 
           mkdir osx
           mv cf-cli-macos-binaries/cf-cli_osx osx/cf${VERSION_MAJOR}
           pushd osx
             prepare_artifacts
-            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_osx.tgz *
+            tar -cvzf cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_osx.tgz *
           popd
 
           mkdir macosarm
           mv cf-cli-macos-binaries/cf-cli_macosarm macosarm/cf${VERSION_MAJOR}
           pushd macosarm
             prepare_artifacts
-            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_macosarm.tgz *
+            tar -cvzf cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_macosarm.tgz *
           popd
 
           mkdir win32 winx64
@@ -840,12 +851,12 @@ jobs:
           pushd win32
             prepare_win_artifacts
             # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
-            zip -y cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_win32.zip *
+            zip -y cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_win32.zip *
           popd
           pushd winx64
             prepare_win_artifacts
             # -y flag avoids the default behavior of dereferencing the link, so we archive the symlink as-is
-            zip -y cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_winx64.zip *
+            zip -y cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_winx64.zip *
           popd
         popd
 
@@ -868,19 +879,51 @@ jobs:
       # forked for security considerations
       uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
       env:
-        DEST_DIR:              "releases/v${{ env.VERSION_BUILD }}"
+        AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_REGION:            ${{ secrets.AWS_REGION }}
+        AWS_S3_BUCKET:         ${{ secrets.AWS_S3_BUCKET }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        DEST_DIR:              "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
         SOURCE_DIR:            upload
 
     - name: list S3 for human verification
       uses: docker://amazon/aws-cli:latest
       with:
-        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.VERSION_BUILD }}/"
+        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+      env:
+        AWS_ACCESS_KEY_ID:         ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_REGION:                ${{ secrets.AWS_REGION }}
+        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
+        AWS_SECRET_ACCESS_KEY:     ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+
+    # - name: SETUP UPTERM SESSION
+    #   if: always()
+    #   uses: lhotari/action-upterm@v1
+    #   timeout-minutes: 60
+    #   env:
+    #     AWS_ACCESS_KEY_ID:              ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_REGION:                     ${{ secrets.AWS_REGION }}
+    #     AWS_S3_BUCKET:                  ${{ secrets.AWS_S3_BUCKET }}
+    #     AWS_SECRET_ACCESS_KEY:          ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     GIT_RELEASE_TARGET_REPO:        ${{ secrets.GIT_RELEASE_TARGET_REPO }}
+    #     GIT_REPO_ACCESS_TOKEN:          ${{ secrets.GIT_REPO_ACCESS_TOKEN }}
+    #     SIGNING_KEY_GPG:                ${{ secrets.SIGNING_KEY_GPG }}
+    #     SIGNING_KEY_GPG_ID:             ${{ secrets.SIGNING_KEY_GPG_ID }}
+    #     SIGNING_KEY_GPG_PASSPHRASE:     ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_ID:             ${{ secrets.SIGNING_KEY_MAC_ID }}
+    #     SIGNING_KEY_MAC_PASSPHRASE:     ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
+    #     SIGNING_KEY_MAC_PFX:            ${{ secrets.SIGNING_KEY_MAC_PFX }}
+    #     SIGNING_KEY_WINDOWS_ID:         ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
+    #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+    #     SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+    #     SIGNING_TEST_CA_MAC:            ${{ secrets.SIGNING_TEST_CA_MAC }}
 
     - name: Instruct human to update CLAW
       run: |
         echo "Please go to https://github.com/cloudfoundry/CLAW/blob/develop/claw-variables.yml and add the following line to the file:"
         echo
-        echo "- ${VERSION_BUILD}"
+        echo "- ${INSTALLER_RELEASE_VERSION}"
 
   github-release-draft:
     name: Create GitHub Release Draft
@@ -905,25 +948,26 @@ jobs:
       uses: pivotalsoftware/action-gh-release@v1
       with:
         draft:                   true
-        name:                    "DRAFT v${{ env.VERSION_BUILD }}"
-        # tag_name:                "v${{ env.VERSION_BUILD }}"
+        name:                    "DRAFT v${{ env.INSTALLER_RELEASE_VERSION }}"
+        # tag_name:                "v${{ env.INSTALLER_RELEASE_VERSION }}"
         repository:              ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
         token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
         fail_on_unmatched_files: true
-        # files: |
-        #   signed/cf-cli-linux-binaries/cf-cli*
-        #   signed/cf-cli-linux-deb-packages/cf*deb
-        #   signed/cf-cli-linux-rpm-packages/cf*rpm
-        #   signed/cf-cli-macos-binaries/cf-cli*
-        #   signed/cf-cli-macos-packages/cf*pkg
-        #   signed/cf-cli-windows-binaries/cf-cli*.exe
-        #   signed/cf-cli-windows-packages/*.zip
+        files: |
+          signed/cf-cli-linux-binaries/cf-cli*
+          signed/cf-cli-linux-deb-packages/cf*deb
+          signed/cf-cli-linux-rpm-packages/cf*rpm
+          signed/cf-cli-macos-binaries/cf-cli*
+          signed/cf-cli-macos-packages/cf*pkg
+          signed/cf-cli-windows-binaries/cf-cli*.exe
+          signed/cf-cli-windows-packages/*.zip
 
   test-rpm-package:
     name: Test RPM Artifacts
     needs:
     - setup
     - build-linux
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     runs-on: ubuntu-latest
     container:
       image: fedora
@@ -967,6 +1011,7 @@ jobs:
     needs:
     - setup
     - build-macos
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     runs-on: macos-latest
     steps:
 
@@ -986,6 +1031,7 @@ jobs:
     needs:
     - setup
     - build-windows
+    environment: ${{ needs.setup.outputs.secrets-environment }}
     runs-on: windows-latest
     defaults:
       run:
