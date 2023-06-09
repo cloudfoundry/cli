@@ -52,7 +52,7 @@ jobs:
         echo "version=$version" >> $GITHUB_OUTPUT
 
     - name: Checkout cf-deployment Min CAPI
-      if: ${{ inputs.capi-version != 'edge' }}
+      if: inputs.capi-version != 'edge'
       uses: actions/checkout@v3
       with:
         repository: cloudfoundry/cf-deployment
@@ -61,7 +61,7 @@ jobs:
 
     - name: Checkout cf-deployment
       uses: actions/checkout@v3
-      if: ${{ inputs.capi-version == 'edge' }}
+      if: inputs.capi-version == 'edge'
       with:
         repository: cloudfoundry/cf-deployment
         path: cf-deployment
@@ -134,7 +134,7 @@ jobs:
         credhub --version
 
     - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version == 'edge' }}
+      if: inputs.capi-version == 'edge'
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
@@ -161,7 +161,7 @@ jobs:
         bosh -d cf releases | grep capi
 
     - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version != 'edge' }}
+      if: inputs.capi-version != 'edge'
       run: |
         # TODO: Make this actually deploy min capi
         # Creates vars files
@@ -217,7 +217,7 @@ jobs:
         check-latest: true
 
     - name: Run Integration Tests
-      if: ${{ !inputs.run-with-client-creds }}
+      if: !inputs.run-with-client-creds
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
         eval "$(bbl print-env --metadata-file ./metadata.json)"
@@ -244,7 +244,7 @@ jobs:
         make integration-tests-full-ci
 
     - name: Run Integration Tests with client credentials
-      if: ${{ inputs.run-with-client-creds }}
+      if: inputs.run-with-client-creds
       env:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
