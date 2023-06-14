@@ -640,6 +640,46 @@ var _ = Describe("install actions", func() {
 				})
 
 			})
+
+			Describe("CLI v 9", func() {
+				BeforeEach(func() {
+					fakeConfig.BinaryVersionReturns("9.0.0")
+					pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+						Major: 1,
+						Minor: 0,
+						Build: 0,
+					}
+					fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+				})
+
+				When("the plugin is valid", func() {
+					BeforeEach(func() {
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
+
+					It("returns the plugin and no errors", func() {
+						Expect(validateErr).ToNot(HaveOccurred())
+						Expect(plugin).To(Equal(pluginToBeInstalled))
+
+						Expect(fakePluginMetadata.GetMetadataCallCount()).To(Equal(1))
+						Expect(fakePluginMetadata.GetMetadataArgsForCall(0)).To(Equal("some-plugin-path"))
+
+						Expect(fakeCommandList.HasCommandCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasCommandArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasCommandArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeCommandList.HasAliasCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasAliasArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasAliasArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeConfig.PluginsCallCount()).To(Equal(1))
+					})
+				})
+			})
 		})
 	})
 
