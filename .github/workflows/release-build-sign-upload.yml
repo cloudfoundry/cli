@@ -1,9 +1,7 @@
 name: 'Release: Build-Sign-Upload'
 
 on:
-  push:
-    tags:
-    - 'v8.*'
+  workflow_dispatch:
 
 permissions:
   contents: read
