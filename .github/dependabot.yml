@@ -7,4 +7,3 @@ updates:
     time: '11:00'
   open-pull-requests-limit: 10
   target-branch: "v7"
-  vendor: true
