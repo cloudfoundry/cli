@@ -1,9 +1,6 @@
 name: "Release: Update Repositories"
 
 on:
-  push:
-    branches: "v*"
-
   workflow_dispatch:
     inputs:
       build_version:

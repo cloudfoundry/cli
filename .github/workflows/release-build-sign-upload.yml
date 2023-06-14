@@ -38,12 +38,7 @@ name: "Release: Build Sign Upload"
 
 
 on:
-  push:
-    tags:
-    - 'v7.*'
-    - 'v8.*'
-    branches:
-    - "gh-actions-*"
+  workflow_dispatch:
 
 permissions:
   contents: read
