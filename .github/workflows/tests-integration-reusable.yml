@@ -1,3 +1,11 @@
+# GitHub repo level Secrets and Variables
+
+# secrets.CLIENT_SECRET
+# secrets.GITHUB_TOKEN
+# secrets.TOOLSMITHS_API_TOKEN
+# vars.TOOLSMITHS_HOSTNAME
+# vars.TOOLSMITHS_POOL_NAME
+
 name: "pvt: run integration tests"
 
 on:
