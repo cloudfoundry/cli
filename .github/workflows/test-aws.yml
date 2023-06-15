@@ -1,0 +1,27 @@
+name: Test AWS
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+jobs:
+    test-aws:
+        # name: test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+                # SOURCE_DIR: upload
+                # DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+                role-to-assume: ${{ secrets.AWS_S3_ROLE_ARN }}
+            
+            - name: Copy files to the test website with the AWS CLI
+              run: |
+                  touch test.txt
+                  aws s3 sync . s3://cf-cli-dev
