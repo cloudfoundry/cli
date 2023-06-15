@@ -56,7 +56,7 @@ jobs:
     - id: read-min-capi
       name: Read MIN CAPI
       run: |
-        version=$(yq '.cf-d-capi-version-min' build_data.yml)
+        version=$(yq '.capi-version-min' build_data.yml)
         echo "version=$version" >> $GITHUB_OUTPUT
 
     - name: Checkout cf-deployment Min CAPI
