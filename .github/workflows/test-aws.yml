@@ -22,6 +22,7 @@ jobs:
                 # DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
                 role-to-assume: ${{ secrets.AWS_S3_ROLE_ARN }}
                 role-skip-session-tagging: true
+                role-duration-seconds: 1200
             
             - name: Copy files to the test website with the AWS CLI
               run: |
