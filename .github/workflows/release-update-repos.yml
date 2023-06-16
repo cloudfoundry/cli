@@ -340,6 +340,7 @@ jobs:
   update-rpm:
     name: Update RPM Repository
     runs-on: ubuntu-20.04
+    container: ubuntu:18.04
     environment: ${{ needs.setup.outputs.secrets-environment }}
     needs: setup
     env:
@@ -386,8 +387,8 @@ jobs:
 
     - name: Install Linux Packages
       run: >
-        sudo apt update &&
-        sudo apt install -y --no-install-recommends
+        apt update &&
+        apt install -y --no-install-recommends
         gnupg createrepo
 
     - name: Download V8 RPMs
