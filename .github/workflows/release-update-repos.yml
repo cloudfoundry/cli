@@ -33,11 +33,11 @@ jobs:
     steps:
     - name: Set environment
       id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::PROD"
+      run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
 
     - name: Set CLAW URL
       id: set-claw-url
-      run: echo "::set-output name=claw-url::https://packages.cloudfoundry.org"
+      run: echo "claw-url=https://packages.cloudfoundry.org" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
       uses: actions/checkout@v3
@@ -51,12 +51,12 @@ jobs:
         VERSION_MINOR="${VERSION#*.}"
         VERSION_MINOR="${VERSION_MINOR%.*}"
 
-        echo "::set-output name=version-build::${VERSION}"
-        echo "::set-output name=version-major::${VERSION%%\.*}"
-        echo "::set-output name=version-minor::${VERSION_MINOR}"
-        echo "::set-output name=version-patch::${VERSION##*.}"
+        echo "version-build=${VERSION}"       >> "${GITHUB_OUTPUT}"
+        echo "version-major=${VERSION%%\.*}"  >> "${GITHUB_OUTPUT}"
+        echo "version-minor=${VERSION_MINOR}" >> "${GITHUB_OUTPUT}"
+        echo "version-patch=${VERSION##*.}"   >> "${GITHUB_OUTPUT}"
 
-        echo "VERSION_BUILD=${VERSION}" >> ${GITHUB_ENV}
+        echo "VERSION_BUILD=${VERSION}"       >> "${GITHUB_ENV}"
 
     - name: Test if CLAW serve this version
       env:
@@ -130,9 +130,9 @@ jobs:
           CLI_LINUX_64_SHA256=$(shasum -a 256 cf-cli_linux64.tgz | cut -d ' ' -f 1)
         popd
 
-        echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}" >> ${GITHUB_ENV}
-        echo "CLI_MACOSARM_SHA256=${CLI_MACOSARM_SHA256}" >> ${GITHUB_ENV}
-        echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> ${GITHUB_ENV}
+        echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}"           >> "${GITHUB_ENV}"
+        echo "CLI_MACOSARM_SHA256=${CLI_MACOSARM_SHA256}" >> "${GITHUB_ENV}"
+        echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> "${GITHUB_ENV}"
 
     - name: Generate Homebrew formula file
       run: |

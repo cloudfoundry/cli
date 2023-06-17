@@ -95,9 +95,8 @@ jobs:
 
     steps:
     - id: set-secrets-environment
-      #TODO: DEV SHIM
-      # run: echo "::set-output name=secrets-environment::DEV"
-      run: echo "::set-output name=secrets-environment::PROD"
+      # run: echo "secrets-environment=DEV" >> "${GITHUB_OUTPUT}"
+      run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
       uses: actions/checkout@v3
@@ -118,10 +117,10 @@ jobs:
         VERSION_MINOR="${VERSION#*.}"
         VERSION_MINOR="${VERSION_MINOR%.*}"
 
-        echo "::set-output name=version-build::${VERSION}"
-        echo "::set-output name=version-major::${VERSION%%\.*}"
-        echo "::set-output name=version-minor::${VERSION_MINOR}"
-        echo "::set-output name=version-patch::${VERSION##*.}"
+        echo "version-build=${VERSION}"       >> "${GITHUB_OUTPUT}"
+        echo "version-major=${VERSION%%\.*}"  >> "${GITHUB_OUTPUT}"
+        echo "version-minor=${VERSION_MINOR}" >> "${GITHUB_OUTPUT}"
+        echo "version-patch=${VERSION##*.}"   >> "${GITHUB_OUTPUT}"
 
   build-linux:
     name: Build Linux
@@ -160,8 +159,8 @@ jobs:
     - name: Print go environment
       id: go-cache-paths
       run: |
-        echo "::set-output name=go-build::$(go env GOCACHE)"
-        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        echo "go-build=$(go env GOCACHE)"  >> "${GITHUB_OUTPUT}"
+        echo "go-mod=$(go env GOMODCACHE)" >> "${GITHUB_OUTPUT}"
         go env
 
     - name: Go Assets Cache
@@ -435,8 +434,8 @@ jobs:
     - name: Print go environment
       id: go-cache-paths
       run: |
-        echo "::set-output name=go-build::$(go env GOCACHE)"
-        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        echo "go-build=$(go env GOCACHE)" >> "${GITHUB_OUTPUT}"
+        echo "go-mod=$(go env GOMODCACHE)" >> "${GITHUB_OUTPUT}"
         go env
 
     - name: Go Assets Cache
