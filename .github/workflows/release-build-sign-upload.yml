@@ -207,7 +207,7 @@ jobs:
           echo "Build ${arch_array[$arch]} RedHat package"
           (
             pushd cli-ci/ci/installers/rpm
-            cp $root/out/cf-cli_linux_i686 cf${VERSION_MAJOR}
+            cp $root/out/cf-cli_linux_${arch} cf${VERSION_MAJOR}
             cp ../../license/NOTICE .
             cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
             cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
@@ -756,7 +756,7 @@ jobs:
         }
 
         pushd signed
-          mkdir linux_i686 linux_x86-64
+          mkdir linux_i686 linux_x86-64 linux_arm64
           mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf${VERSION_MAJOR}
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf${VERSION_MAJOR}
           mv cf-cli-linux-binaries/cf-cli_linux_arm64 linux_arm64/cf${VERSION_MAJOR}
