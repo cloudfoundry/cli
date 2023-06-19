@@ -113,10 +113,14 @@ jobs:
         curl -L "${CLAW_URL}/stable?release=linux64-binary&version=${VERSION_BUILD}&source=github-rel" \
           > cf-cli-linux-tarball/cf-cli_linux64.tgz
 
+        curl -L "${CLAW_URL}/stable?release=linuxarm64-binary&version=${VERSION_BUILD}&source=github-rel" \
+          > cf-cli-linux-tarball/cf-cli_linuxarm64.tgz
+
         # Because CLAW always returns 200 we have to check if we got archive
         file cf-cli-osx-tarball/cf-cli_osx.tgz | grep -q gzip || exit 1
         file cf-cli-macosarm-tarball/cf-cli_macosarm.tgz | grep -q gzip || exit 1
         file cf-cli-linux-tarball/cf-cli_linux64.tgz | grep -q gzip || exit 1
+        file cf-cli-linux-tarball/cf-cli_linuxarm64.tgz | grep -q gzip || exit 1
 
         pushd cf-cli-osx-tarball
           CLI_OSX_SHA256=$(shasum -a 256 cf-cli_osx.tgz | cut -d ' ' -f 1)
@@ -130,9 +134,14 @@ jobs:
           CLI_LINUX_64_SHA256=$(shasum -a 256 cf-cli_linux64.tgz | cut -d ' ' -f 1)
         popd
 
+        pushd cf-cli-linux-tarball
+          CLI_LINUX_ARM64_SHA256=$(shasum -a 256 cf-cli_linuxarm64.tgz | cut -d ' ' -f 1)
+        popd
+
         echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}"           >> "${GITHUB_ENV}"
         echo "CLI_MACOSARM_SHA256=${CLI_MACOSARM_SHA256}" >> "${GITHUB_ENV}"
         echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> "${GITHUB_ENV}"
+        echo "CLI_LINUX_ARM64_SHA256=${CLI_LINUX_ARM64_SHA256}" >> "${GITHUB_ENV}"
 
     - name: Generate Homebrew formula file
       run: |
@@ -291,6 +300,7 @@ jobs:
         mkdir installers
         curl -L "${CLAW_URL}/stable?release=debian32&version=${VERSION_BUILD}&source=github-rel" > installers/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
         curl -L "${CLAW_URL}/stable?release=debian64&version=${VERSION_BUILD}&source=github-rel" > installers/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
+        curl -L "${CLAW_URL}/stable?release=debianarm64&version=${VERSION_BUILD}&source=github-rel" > installers/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
 
     - name: Update Debian Repository
       env:

@@ -177,6 +177,7 @@ jobs:
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
+        make out/cf-cli_linux_arm64
 
     - name: Store Linux Binaries
       uses: actions/upload-artifact@v3
@@ -192,6 +193,7 @@ jobs:
         set -ex
         set -o pipefail
 
+        declare -A arch_array=([i686]="32-bit" [x86_64]="64-bit" [aarch64]='aarch/arm-64bit')
         root=$PWD
 
         cat<< EOF >~/.rpmmacros
@@ -201,35 +203,21 @@ jobs:
         RPM_VERSION=${VERSION_BUILD//-/_}
 
         mkdir -pv $root/packaged
-
-        echo "Build 32-bit RedHat package"
-        (
-          pushd cli-ci/ci/installers/rpm
-          cp $root/out/cf-cli_linux_i686 cf${VERSION_MAJOR}
-          cp ../../license/NOTICE .
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
-          echo "Version: ${RPM_VERSION}" > cf-cli.spec
-          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
-          rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-          mv build/RPMS/i386/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.rpm
-          popd
-        )
-
-
-        echo "Build 64-bit RedHat package"
-        (
-          pushd cli-ci/ci/installers/rpm
-          cp $root/out/cf-cli_linux_x86-64 cf${VERSION_MAJOR}
-          cp ../../license/NOTICE .
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
-          echo "Version: ${RPM_VERSION}" > cf-cli.spec
-          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
-          rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-          mv build/RPMS/x86_64/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.rpm
-          popd
-        )
+        for arch in "${!arch_array[@]}"; do
+          echo "Build ${arch_array[$arch]} RedHat package"
+          (
+            pushd cli-ci/ci/installers/rpm
+            cp $root/out/cf-cli_linux_i686 cf${VERSION_MAJOR}
+            cp ../../license/NOTICE .
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+            cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+            echo "Version: ${RPM_VERSION}" > cf-cli.spec
+            cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+            rpmbuild --target $arch --define "_topdir $(pwd)/build" -bb cf-cli.spec
+            mv build/RPMS/$arch/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.rpm
+            popd
+          )
+        done
 
     - name: Load GPG key
       env:
@@ -285,75 +273,45 @@ jobs:
       run: |
         set -ex
         set -o pipefail
-
+        
+        declare -A arch_array=([i686]="32-bit" [x86_64]="64-bit" [arm64]='arm-64bit')
         root=$PWD
 
         mkdir -pv $root/packaged-deb
+        for arch in "${!arch_array[@]}"; do
+          echo "Build ${arch_array[$arch]} Debian package"
+          (
+            SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_${arch} | cut -f 1)"
 
-        echo "Build 32-bit Debian package"
-        (
-          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
+            pushd cli-ci/ci/installers/deb
+              mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
-          pushd cli-ci/ci/installers/deb
-            mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+              cp copyright_preamble cf/DEBIAN/copyright
+              sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+              cat copyright_comment_header >> cf/DEBIAN/copyright
+              sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-            cp copyright_preamble cf/DEBIAN/copyright
-            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-            cat copyright_comment_header >> cf/DEBIAN/copyright
-            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+              cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
 
-            cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
+              cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
+              cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
 
-            cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
-            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
+              cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+              echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+              echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
+              echo "Architecture: $arch" >> cf/DEBIAN/control
 
-            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
-            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-            echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
-            echo "Architecture: i386" >> cf/DEBIAN/control
+              cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
 
-            cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
+              cp $root/out/cf-cli_linux_${arch} cf/usr/bin/cf${VERSION_MAJOR}
+              ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
 
-            cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf${VERSION_MAJOR}
-            ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
-            mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb $root/packaged-deb
-            rm -rf cf
-          popd
-        )
-
-        echo "Build 64-bit Debian package"
-        (
-          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
-
-          pushd cli-ci/ci/installers/deb
-            mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
-
-            cp copyright_preamble cf/DEBIAN/copyright
-            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
-            cat copyright_comment_header >> cf/DEBIAN/copyright
-            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
-
-            cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
-
-            cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
-            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
-
-            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
-            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
-            echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
-            echo "Architecture: amd64" >> cf/DEBIAN/control
-
-            cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
-
-            cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf${VERSION_MAJOR}
-            ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
-            mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb $root/packaged-deb
-          popd
-        )
+              fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.deb
+              mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.deb $root/packaged-deb
+              rm -rf cf
+            popd
+          )
+        done
 
     - name: Print DEB Packages Info
       run: |
@@ -801,6 +759,7 @@ jobs:
           mkdir linux_i686 linux_x86-64
           mv cf-cli-linux-binaries/cf-cli_linux_i686 linux_i686/cf${VERSION_MAJOR}
           mv cf-cli-linux-binaries/cf-cli_linux_x86-64 linux_x86-64/cf${VERSION_MAJOR}
+          mv cf-cli-linux-binaries/cf-cli_linux_arm64 linux_arm64/cf${VERSION_MAJOR}
           pushd linux_i686
             prepare_artifacts
             tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_i686.tgz *
@@ -808,6 +767,10 @@ jobs:
           pushd linux_x86-64
             prepare_artifacts
             tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_x86-64.tgz *
+          popd
+          pushd linux_arm64
+            prepare_artifacts
+            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_arm64.tgz *
           popd
 
           mkdir osx
@@ -849,6 +812,7 @@ jobs:
           signed/cf-cli-windows-packages/cf*zip \
           signed/linux_i686/*tgz \
           signed/linux_x86-64/*tgz \
+          signed/linux_arm64/*tgz \
           signed/osx/*tgz \
           signed/macosarm/*tgz \
           signed/win32/*zip \
