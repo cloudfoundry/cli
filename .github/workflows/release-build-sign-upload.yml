@@ -288,33 +288,33 @@ jobs:
         for arch in "${!arch_array[@]}"; do
           echo "Build ${arch_array[$arch]} Debian package"
           (
-            SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_$arch | cut -f 1)"
+            SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_${arch} | cut -f 1)"
 
             pushd cli-ci/ci/installers/deb
-              mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+              mkdir -p cf/usr/bin cf/usr/share/doc/cf8-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
               cp copyright_preamble cf/DEBIAN/copyright
               sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
               cat copyright_comment_header >> cf/DEBIAN/copyright
               sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-              cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
+              cp cf/DEBIAN/copyright cf/usr/share/doc/cf8-cli/copyright
 
-              cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
-              cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
+              cp ../../license/NOTICE cf/usr/share/doc/cf8-cli
+              cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf8-cli/LICENSE
 
-              cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+              cp control_v8.template cf/DEBIAN/control
               echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
               echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
               echo "Architecture: $arch" >> cf/DEBIAN/control
 
-              cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
+              cp ../completion/cf8 cf/usr/share/bash-completion/completions/cf8
 
-              cp $root/out/cf-cli_linux_$arch cf/usr/bin/cf${VERSION_MAJOR}
-              ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
+              cp $root/out/cf-cli_linux_$arch cf/usr/bin/cf8
+              ln -frs cf/usr/bin/cf8 cf/usr/bin/cf
 
-              fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.deb
-              mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.deb $root/packaged-deb
+              fakeroot dpkg --build cf cf8-cli-installer_${VERSION_BUILD}_${arch}.deb
+              mv cf8-cli-installer_${VERSION_BUILD}_${arch}.deb $root/packaged-deb
               rm -rf cf
             popd
           )
