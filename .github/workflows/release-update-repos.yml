@@ -83,6 +83,12 @@ jobs:
         # Because CLAW always returns 200 we have to check if we got archive
         file cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linux64.tgz | grep -q gzip || exit 1
 
+        curl -L "https://packages.cloudfoundry.org/stable?release=linuxarm64-binary&version=${BUILD_VERSION}&source=github-rel" \
+          > cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linuxarm64.tgz
+
+        # Because CLAW always returns 200 we have to check if we got archive
+        file cf8-cli-linux-tarball/cf8-cli_${BUILD_VERSION}_linuxarm64.tgz | grep -q gzip || exit 1
+
         pushd cf8-cli-osx-tarball
           CLI_OSX_SHA256=$(shasum -a 256 cf8-cli_*_osx.tgz | cut -d ' ' -f 1)
         popd
@@ -91,8 +97,13 @@ jobs:
           CLI_LINUX_64_SHA256=$(shasum -a 256 cf8-cli_*_linux64.tgz | cut -d ' ' -f 1)
         popd
 
+        pushd cf8-cli-linux-tarball
+          CLI_LINUX_ARM64_SHA256=$(shasum -a 256 cf8-cli_*_linuxarm64.tgz | cut -d ' ' -f 1)
+        popd
+
         echo "CLI_OSX_SHA256=${CLI_OSX_SHA256}" >> $GITHUB_ENV
         echo "CLI_LINUX_64_SHA256=${CLI_LINUX_64_SHA256}" >> $GITHUB_ENV
+        echo "CLI_LINUX_ARM64_SHA256=${CLI_LINUX_ARM64_SHA256}" >> $GITHUB_ENV
 
     - name: Generate Homebrew formula file
       run: |
