@@ -28,3 +28,4 @@ jobs:
               run: |
                   touch test.txt
                   aws s3 sync . s3://cf-cli-dev
+                  aws s3 ls s3://cf-cli-dev
