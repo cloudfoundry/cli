@@ -870,27 +870,31 @@ jobs:
           signed/win32/*zip \
           signed/winx64/*zip
 
-    - name: Upload installers to CLAW S3 bucket
-      # forked for security considerations
-      uses: pivotalsoftware/s3-sync-action@v0.5.2 #pinned to no-default-region change
+    - name: Setup aws to upload installers to CLAW S3 bucket
+      if: ${{ github.ref_type == 'tag' }}
+      uses: aws-actions/configure-aws-credentials@v2
       env:
         AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_REGION:            ${{ secrets.AWS_REGION }}
         AWS_S3_BUCKET:         ${{ secrets.AWS_S3_BUCKET }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        DEST_DIR:              "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
-        SOURCE_DIR:            upload
+        AWS_S3_ROLE_ARN:       ${{ secrets.AWS_S3_ROLE_ARN }}
+        SOURCE_DIR: upload
+        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1
+        role-to-assume: ${{ env.AWS_S3_ROLE_ARN }}
+        role-skip-session-tagging: true
+        role-duration-seconds: 1200
+
+    - name: Upload installers to CLAW S3 bucket
+      run: |
+          aws s3 sync upload "s3://${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
 
     - name: list S3 for human verification
-      uses: docker://amazon/aws-cli:latest
-      with:
-        args: s3 ls "${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
-      env:
-        AWS_ACCESS_KEY_ID:         ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_REGION:                ${{ secrets.AWS_REGION }}
-        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
-        AWS_SECRET_ACCESS_KEY:     ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
+      run: |
+          aws s3 ls "s3://${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
 
     # - name: SETUP UPTERM SESSION
     #   if: always()
