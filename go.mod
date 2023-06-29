@@ -20,7 +20,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/bosh-cli v5.5.1+incompatible
 	github.com/cyphar/filepath-securejoin v0.2.1
-	github.com/docker/distribution v2.8.0+incompatible
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
 	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
@@ -70,7 +70,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.10.0 // indirect
