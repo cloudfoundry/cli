@@ -22,21 +22,21 @@ require (
 	github.com/cyphar/filepath-securejoin v0.2.1
 	github.com/docker/distribution v2.8.0+incompatible
 	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
-	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
-	github.com/kr/pty v1.1.1
+	github.com/kr/pty v1.1.8
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
-	github.com/sirupsen/logrus v1.2.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.8.0
@@ -62,6 +62,7 @@ require (
 	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
 	github.com/cloudfoundry/bosh-utils v0.0.0-20180315210917-c6a922e299b8 // indirect
 	github.com/cppforlife/go-patch v0.1.0 // indirect
+	github.com/creack/pty v1.1.11 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -73,7 +74,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0 // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect

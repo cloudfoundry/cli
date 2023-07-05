@@ -2,15 +2,21 @@ name: "Tests"
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "v9.*"
+      - "v8.*"
+      - "v7.*"
   pull_request:
     branches:
       - main
+      - v9
       - v8
       - v7
     paths-ignore:
-      - 'doc/**'
-      - '.gitpod.yml'
-      - 'README.md'
+      - "doc/**"
+      - ".gitpod.yml"
+      - "README.md"
 
 permissions:
   contents: read
