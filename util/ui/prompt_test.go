@@ -1,6 +1,7 @@
 package ui_test
 
 import (
+	"io"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"github.com/vito/go-interact/interact"
 )
 
 var _ = Describe("Prompts", func() {
@@ -379,7 +379,7 @@ var _ = Describe("Prompts", func() {
 
 			BeforeEach(func() {
 				fakeResolver = new(uifakes.FakeResolver)
-				fakeResolver.ResolveReturns(interact.ErrKeyboardInterrupt)
+				fakeResolver.ResolveReturns(io.EOF)
 				fakeExiter = new(uifakes.FakeExiter)
 				fakeInteractor = new(uifakes.FakeInteractor)
 				fakeInteractor.NewInteractionReturns(fakeResolver)
@@ -400,7 +400,7 @@ var _ = Describe("Prompts", func() {
 				_, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError("EOF"))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
