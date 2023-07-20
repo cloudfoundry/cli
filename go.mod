@@ -83,7 +83,11 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.9.0 // indirect
+<<<<<<< HEAD
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
+=======
+	golang.org/x/oauth2 v0.7.0 // indirect
+>>>>>>> 8d6495c0f (Bump go dependencies for security vulnerability)
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/term v0.10.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
