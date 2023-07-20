@@ -32,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	p, err := command_parser.NewCommandParser()
+	p, err := command_parser.NewCommandParser(config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
