@@ -43,13 +43,8 @@ type CommandParser struct {
 	UI     *ui.UI
 }
 
-func NewCommandParser() (CommandParser, error) {
-	cfConfig, err := configv3.GetCFConfig()
-	if err != nil {
-		return CommandParser{}, err
-	}
-
-	return CommandParser{Config: cfConfig}, nil
+func NewCommandParser(config *configv3.Config) (CommandParser, error) {
+	return CommandParser{Config: config}, nil
 }
 
 func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) (int, error) {
