@@ -11,7 +11,7 @@ If your contribution falls under a company CLA but your membership is not public
 
 ## Where this PR should be backported?
 
-- [ ] [main](https://github.com/cloudfoundry/cli/tree/main)
+- [ ] [main](https://github.com/cloudfoundry/cli/tree/main) - all changes should by default start here
 - [ ] [v8](https://github.com/cloudfoundry/cli/tree/v8)
 - [ ] [v7](https://github.com/cloudfoundry/cli/tree/v7)
 
