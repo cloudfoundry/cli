@@ -65,8 +65,8 @@ github.com/cyphar/filepath-securejoin v0.2.1/go.mod h1:FpkQEhXnPnOthhzymB7CGsFk2
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/docker/distribution v2.8.1+incompatible h1:Q50tZOPR6T/hjNsyc9g8/syEs6bk8XXApsHjKukMl68=
-github.com/docker/distribution v2.8.1+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
+github.com/docker/distribution v2.8.2+incompatible h1:T3de5rq0dB1j30rp0sA2rER+m322EBzniBPB6ZIzuh8=
+github.com/docker/distribution v2.8.2+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/drewolson/testflight v1.0.0/go.mod h1:t9oKuuEohRGLb80SWX+uxJHuhX98B7HnojqtW+Ryq30=
 github.com/elazarl/goproxy v0.0.0-20220417044921-416226498f94 h1:VIy7cdK7ufs7ctpTFkXJHm1uP3dJSnCGSPysEICB1so=
 github.com/elazarl/goproxy/ext v0.0.0-20220417044921-416226498f94 h1:lTlYurl4RYJaQPm6t0fvJ2v95xGff9mcs0O70iQRFfo=

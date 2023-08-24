@@ -22,7 +22,7 @@ require (
 	github.com/cloudfoundry/noaa/v2 v2.2.0
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 	github.com/cyphar/filepath-securejoin v0.2.1
-	github.com/docker/distribution v2.8.1+incompatible
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/fatih/color v1.15.0
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
