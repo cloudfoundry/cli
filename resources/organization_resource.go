@@ -12,7 +12,8 @@ type Organization struct {
 	Name string `json:"name"`
 	// QuotaGUID is the GUID of the organization Quota applied to this Organization
 	QuotaGUID string `json:"-"`
-
+	//  Suspended is the status of the organization applied to this Organization
+	Suspended bool `json:"suspended"`
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
