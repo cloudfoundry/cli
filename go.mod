@@ -23,12 +23,12 @@ require (
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435
 	github.com/cyphar/filepath-securejoin v0.2.1
 	github.com/docker/distribution v2.8.1+incompatible
-	github.com/fatih/color v1.5.1-0.20170926111411-5df930a27be2
+	github.com/fatih/color v1.15.0
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
 	github.com/kr/pty v1.1.8
 	github.com/lunixbochs/vtclean v1.0.0
-	github.com/mattn/go-colorable v0.1.0
+	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-runewidth v0.0.5-0.20181218000649-703b5e6b11ae
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
@@ -66,7 +66,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-isatty v0.0.3 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
