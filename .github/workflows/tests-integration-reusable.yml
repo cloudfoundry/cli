@@ -185,6 +185,7 @@ jobs:
         cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
+        cp cli-ci/ci/infrastructure/operations/use-latest-ruby-buildpack.yml ops-files/
 
         # Deletes CF-D
         eval "$(bbl print-env --metadata-file metadata.json)"
@@ -215,7 +216,8 @@ jobs:
         export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
                           add-uaa-client-credentials.yml \
                           diego-cell-instances.yml \
-                          add-oidc-provider.yml"
+                          add-oidc-provider.yml \
+                          use-latest-ruby-buildpack.yml"
         ./cf-deployment-concourse-tasks/bosh-deploy/task
 
     - name: Set Up Go
