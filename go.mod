@@ -28,7 +28,7 @@ require (
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-runewidth v0.0.15
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/moby/term v0.0.0-20221120202655-abb19827d345
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.5
@@ -86,7 +86,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230803162519-f966b187b2e5 // indirect
 	google.golang.org/grpc v1.57.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
