@@ -29,7 +29,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-runewidth v0.0.15
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
-	github.com/moby/term v0.0.0-20221120202655-abb19827d345
+	github.com/moby/term v0.5.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.10
@@ -55,7 +55,7 @@ require (
 	github.com/charlievieth/fs v0.0.3 // indirect
 	github.com/cloudfoundry/bosh-utils v0.0.385 // indirect
 	github.com/cppforlife/go-patch v0.1.0 // indirect
-	github.com/creack/pty v1.1.11 // indirect
+	github.com/creack/pty v1.1.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
