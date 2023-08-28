@@ -25,7 +25,7 @@ require (
 	github.com/docker/distribution v2.8.2+incompatible
 	github.com/fatih/color v1.15.0
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
-	github.com/jessevdk/go-flags v1.4.1-0.20181221193153-c0795c8afcf4
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/kr/pty v1.1.8
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.13
