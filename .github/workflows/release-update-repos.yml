@@ -245,10 +245,6 @@ jobs:
     needs: setup
     environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
-      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_BUCKET_NAME:       cf-cli-debian-repo
-      AWS_DEFAULT_REGION:    us-west-2
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
@@ -306,7 +302,13 @@ jobs:
       env:
         DEBIAN_FRONTEND:    noninteractive
         SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_BUCKET_NAME: cf-cli-debian-repo
+        AWS_DEFAULT_REGION: us-west-2
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_ROLE_ARN: ${{ secrets.AWS_S3_ROLE_ARN }}
       run: |
+        export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${AWS_S3_ROLE_ARN} --role-session-name foobar --output text --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]"))
         deb-s3 upload installers/*.deb \
           --preserve-versions \
           --bucket=${AWS_BUCKET_NAME} \
