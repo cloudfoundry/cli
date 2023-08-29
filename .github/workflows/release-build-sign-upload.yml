@@ -208,7 +208,6 @@ jobs:
         set -ex
         set -o pipefail
 
-        declare -A arch_array=([i686]="32-bit" [x86_64]="64-bit" [aarch64]='aarch/arm-64bit')
         root=$PWD
 
         cat<< EOF >~/.rpmmacros
@@ -218,21 +217,48 @@ jobs:
         RPM_VERSION=${VERSION_BUILD//-/_}
 
         mkdir -pv $root/packaged
-        for arch in "${!arch_array[@]}"; do
-          echo "Build ${arch_array[$arch]} RedHat package"
-          (
-            pushd cli-ci/ci/installers/rpm
-            cp $root/out/cf-cli_linux_${arch} cf${VERSION_MAJOR}
-            cp ../../license/NOTICE .
-            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-            cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
-            echo "Version: ${RPM_VERSION}" > cf-cli.spec
-            cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
-            rpmbuild --target $arch --define "_topdir $(pwd)/build" -bb cf-cli.spec
-            mv build/RPMS/$arch/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_${arch}.rpm
-            popd
-          )
-        done
+
+        echo "Build 32-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_i686 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/i386/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.rpm
+          popd
+        )
+
+        echo "Build 64-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_x86-64 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/x86_64/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.rpm
+          popd
+        )
+
+        echo "Build arm64 RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_arm64 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target aarch64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/aarch64/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_aarch64.rpm
+          popd
+        )
 
     - name: Load GPG key
       env:
@@ -289,7 +315,7 @@ jobs:
         set -ex
         set -o pipefail
         
-        declare -A arch_array=([i686]="32-bit" [x86_64]="64-bit" [arm64]='arm-64bit')
+        declare -A arch_array=([i686]="32-bit" [x86-64]="64-bit" [arm64]='arm-64bit')
         root=$PWD
 
         mkdir -pv $root/packaged-deb
@@ -783,10 +809,6 @@ jobs:
           pushd linux_x86-64
             prepare_artifacts
             tar -cvzf cf${VERSION_MAJOR}-cli_${INSTALLER_RELEASE_VERSION}_linux_x86-64.tgz *
-          popd
-          pushd linux_arm64
-            prepare_artifacts
-            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_arm64.tgz *
           popd
           pushd linux_arm64
             prepare_artifacts
