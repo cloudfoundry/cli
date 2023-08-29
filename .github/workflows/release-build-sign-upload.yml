@@ -860,11 +860,13 @@ jobs:
 
     - name: Upload installers to CLAW S3 bucket
       run: |
-          aws s3 sync upload "s3://${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+        export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${AWS_S3_ROLE_ARN} --role-session-name build-session --output text --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]"))
+        aws s3 sync upload "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
 
     - name: list S3 for human verification
       run: |
-          aws s3 ls "s3://${{ env.AWS_S3_BUCKET }}/releases/v${{ env.INSTALLER_RELEASE_VERSION }}/"
+        export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${AWS_S3_ROLE_ARN} --role-session-name test-session --output text --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]"))
+        aws s3 ls "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
 
     - name: Instruct human to update CLAW
       run: |
