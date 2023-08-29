@@ -841,15 +841,11 @@ jobs:
           signed/winx64/*zip
 
     - name: Setup aws to upload installers to CLAW S3 bucket
-      if: ${{ github.ref_type == 'tag' }}
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v3
       env:
         AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_S3_BUCKET:         ${{ secrets.AWS_S3_BUCKET }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_S3_ROLE_ARN:       ${{ secrets.AWS_S3_ROLE_ARN }}
-        SOURCE_DIR: upload
-        DEST_DIR: "releases/v${{ env.INSTALLER_RELEASE_VERSION }}"
       with:
         aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
@@ -859,13 +855,17 @@ jobs:
         role-duration-seconds: 1200
 
     - name: Upload installers to CLAW S3 bucket
+      env:
+        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
       run: |
-        export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${AWS_S3_ROLE_ARN} --role-session-name build-session --output text --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]"))
         aws s3 sync upload "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
 
     - name: list S3 for human verification
+      env:
+        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
+        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
       run: |
-        export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${AWS_S3_ROLE_ARN} --role-session-name test-session --output text --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]"))
         aws s3 ls "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
 
     - name: Instruct human to update CLAW
