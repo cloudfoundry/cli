@@ -356,10 +356,6 @@ jobs:
     environment: ${{ needs.setup.outputs.secrets-environment }}
     needs: setup
     env:
-      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_DEFAULT_REGION:    us-east-1
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      role-to-assume:        ${{ secrets.AWS_S3_ROLE_ARN }}
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
@@ -404,34 +400,31 @@ jobs:
         apt install -y --no-install-recommends
         gnupg createrepo
 
-        - name: Setup aws to upload installers to CLAW S3 bucket
-        uses: aws-actions/configure-aws-credentials@v3
-        env:
-          AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_ROLE_ARN:       ${{ secrets.AWS_S3_ROLE_ARN }}
-        with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-1
-          role-to-assume: ${{ env.AWS_S3_ROLE_ARN }}
-          role-skip-session-tagging: true
-          role-duration-seconds: 1200
+    - name: Setup aws to upload installers to CLAW S3 bucket
+      uses: aws-actions/configure-aws-credentials@v3
+      env:
+        AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_ROLE_ARN:       ${{ secrets.AWS_S3_ROLE_ARN }}
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1
+        role-to-assume: ${{ env.AWS_S3_ROLE_ARN }}
+        role-skip-session-tagging: true
+        role-duration-seconds: 1200
 
     - name: Download V8 RPMs
       run: |
-          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm"
-          aws s3://v8-cf-cli-releases .
+          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm" s3://v8-cf-cli-releases .
 
     - name: Download V7 RPMs
       run: |
-          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm"
-          aws s3://v7-cf-cli-releases .
+          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm" s3://v7-cf-cli-releases .
 
     - name: Download V6 RPMs
       run: |
-          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm"
-          aws s3://cf-cli-releases .
+          aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm" s3://cf-cli-releases .
 
     - name: Sign repo
       run: |
@@ -449,12 +442,8 @@ jobs:
         path: repodata
 
     - name: Upload RPM repodata
-      uses: docker://amazon/aws-cli:latest
-      with:
-        args: >
-          s3 sync --delete
-          repodata
-          s3://cf-cli-rpm-repo/repodata
+      run: |
+        s3 sync --delete repodata s3://cf-cli-rpm-repo/repodata
 
   test-rpm-repo:
     name: Test RPM Repository
