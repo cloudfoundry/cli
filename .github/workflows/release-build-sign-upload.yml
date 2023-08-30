@@ -832,6 +832,10 @@ jobs:
             prepare_artifacts
             tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_x86-64.tgz *
           popd
+          pushd linux_arm64
+            prepare_artifacts
+            tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_linux_arm64.tgz *
+          popd
 
           mkdir osx
           mv cf-cli-macos-binaries/cf-cli_osx osx/cf${VERSION_MAJOR}
@@ -839,7 +843,6 @@ jobs:
             prepare_artifacts
             tar -cvzf cf${VERSION_MAJOR}-cli_${VERSION_BUILD}_osx.tgz *
           popd
-
           mkdir macosarm
           mv cf-cli-macos-binaries/cf-cli_macosarm macosarm/cf${VERSION_MAJOR}
           pushd macosarm
