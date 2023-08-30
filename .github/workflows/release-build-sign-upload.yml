@@ -896,18 +896,10 @@ jobs:
         role-duration-seconds: 1200
 
     - name: Upload installers to CLAW S3 bucket
-      env:
-        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
-        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
-      run: |
-        aws s3 sync upload "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
+      run: aws s3 sync upload "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
 
     - name: list S3 for human verification
-      env:
-        AWS_S3_BUCKET:             ${{ secrets.AWS_S3_BUCKET }}
-        INSTALLER_RELEASE_VERSION: ${{ env.INSTALLER_RELEASE_VERSION }}
-      run: |
-        aws s3 ls "s3://${AWS_S3_BUCKET}/releases/v${INSTALLER_RELEASE_VERSION}/"
+      run: aws s3 ls "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
 
     - name: Instruct human to update CLAW
       run: |
