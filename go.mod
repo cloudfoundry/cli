@@ -24,7 +24,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.2.1
 	github.com/docker/distribution v2.8.2+incompatible
 	github.com/fatih/color v1.15.0
-	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/kr/pty v1.1.8
 	github.com/lunixbochs/vtclean v1.0.0
