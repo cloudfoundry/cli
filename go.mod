@@ -44,7 +44,7 @@ require (
 	golang.org/x/crypto v0.12.0
 	golang.org/x/net v0.14.0
 	golang.org/x/text v0.12.0
-	gopkg.in/cheggaaa/pb.v1 v1.0.27
+	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
 )
 
