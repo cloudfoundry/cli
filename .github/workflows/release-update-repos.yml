@@ -31,7 +31,7 @@ jobs:
       run: echo "::set-output name=secrets-environment::PROD"
 
     - name: Checkout cli
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set build version
       id: set-build-version
@@ -49,14 +49,14 @@ jobs:
     steps:
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: cloudfoundry/cli-ci.git
         ref: main
         path: cli-ci
 
     - name: Checkout homebrew-tap
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: cloudfoundry/homebrew-tap
         ref: master
@@ -217,9 +217,9 @@ jobs:
         echo "Environment: $ENVIRONMENT"
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.3
