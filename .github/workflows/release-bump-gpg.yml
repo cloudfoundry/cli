@@ -1,0 +1,136 @@
+#  # Manual steps to bump and save GPG key
+#
+#  ## Log in on GHA worker following upterm job instructions
+#
+#  GPG key should be loaded in this session by previous steps
+#
+#  ## Login to gh tool
+#
+#  This is required to save GHA secrets. Your GitHub user should have admin:repo
+#  permissions
+#
+#  - `gh auth login` - hit enter; it will open browser
+#  - `echo "All future steps will be applied to: ${GITHUB_REPOSITORY:?}"`
+#  - `gh secret list -R ${GITHUB_REPOSITORY:?} -e PROD`
+#
+#  ## Backup previous working GPG key
+#
+#    DO THIS STEP ONLY WHEN YOU KNOW THAT SIGNING_KEY_GPG KEY IS WORKING
+#
+#  - `gh secret set BACKUP_SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?} -e PROD -b"${SIGNING_KEY_GPG:?}"`
+#
+#  ## Update GPG key expiration date
+#
+#  - `gpg --list-keys`
+#  - `echo "GPG ID: ${SIGNING_KEY_GPG_ID:?}"`
+#  - `echo "GPG Passphrase: ${SIGNING_KEY_GPG_PASSPHRASE:?}"`
+#
+#  - `gpg --edit-key "${SIGNING_KEY_GPG_ID}"`
+#    - Inside the gpg tool
+#    - `list`
+#    - `key 0` - to select private key
+#    - `expire`
+#      - `1y` - to set to 1 year from now
+#    - `key 1` - to select private key
+#    - `expire`
+#      - `1y` - to set to 1 year from now
+#    - `list` check expiration dates
+#    - `save` - this will save updated keys to GPG keyring
+#
+#  - `gpg --list-keys` - check new expiration dates on both public and private keys
+#
+#  ## Export keys from the keyring and save them to GigHub Actions secrets
+#
+#  - `echo "GPG Passphrase: ${SIGNING_KEY_GPG_PASSPHRASE:?}"`
+#
+#  - `gpg --armor --export "${SIGNING_KEY_GPG_ID:?}"` - we need this public key to update CLAW
+#
+#  - `gpg --export-secret-key "${SIGNING_KEY_GPG_ID:?}" | base64 | gh secret set SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?} -e PROD`
+#
+#  to keep GPG Passphrase UI without distortion use snippet below instead of the top one
+#  ```
+#  key_pvt="$(gpg --export-secret-key "${SIGNING_KEY_GPG_ID:?}" | base64)"
+#  gh secret set SIGNING_KEY_GPG2 -R ${GITHUB_REPOSITORY:?} -e PROD  -b"${key_pvt}"
+#  ```
+#
+# List of GHA secrets:
+#   SIGNING_KEY_GPG
+#   SIGNING_KEY_GPG_ID
+#   SIGNING_KEY_GPG_PASSPHRASE
+
+name: 'Release: Bump GPG'
+
+on:
+  workflow_dispatch:
+    inputs:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
+    outputs:
+      build-version: ${{ steps.set-build-version.outputs.build-version }}
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+    steps:
+
+      - name: Set environment
+        id: set-secrets-environment
+        run: echo "::set-output name=secrets-environment::PROD"
+
+  bump-gpg:
+    name: Bump GPG
+    needs:
+      - setup
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+
+    steps:
+
+      - name: Load GPG key
+        env:
+          SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+        run: echo -n "${SIGNING_KEY_GPG:?}" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+      - name: View GPG keys
+        run: gpg --list-keys
+
+      - name: Setup upterm session
+        env:
+          BACKUP_SIGNING_KEY_GPG:     ${{ secrets.BACKUP_SIGNING_KEY_GPG }}
+          SIGNING_KEY_GPG:            ${{ secrets.SIGNING_KEY_GPG }}
+          SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
+          SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+        if: always()
+        uses: lhotari/action-upterm@v1
+        timeout-minutes: 60
+
+      - name: Print public key to update CLAW
+        env:
+          SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
+        run: gpg --armor --export "${SIGNING_KEY_GPG_ID:?}"
+
+  verify-gpg:
+    name: Verify GPG
+    needs:
+      - setup
+      - bump-gpg
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+
+    steps:
+
+      - name: Load GPG key
+        env:
+          SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+        run: echo -n "${SIGNING_KEY_GPG:?}" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+      - name: View GPG keys
+        run: gpg --list-keys
