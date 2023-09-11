@@ -12,6 +12,11 @@
 #  - `gh auth login` - hit enter; it will open browser
 #  - `gh secret list -R pivotal-cf/cli -e PROD`
 #
+#  ## Backup previous working GPG key
+#
+#    DO THIS STEP ONLY WHEN YOU KNOW THAT SIGNING_KEY_GPG KEY IS WORKING
+#
+#  - `gh secret set BACKUP_SIGNING_KEY_GPG -R pivotal-cf/cli -e PROD -b"${SIGNING_KEY_GPG:?}"`
 #
 #  ## Update GPG key expiration date
 #
@@ -36,7 +41,6 @@
 #  ## Export keys from the keyring and save them to GigHub Actions secrets
 #
 #  - `echo "GPG Passphrase: ${SIGNING_KEY_GPG_PASSPHRASE:?}"`
-#
 #
 #  - `gpg --armor --export "${SIGNING_KEY_GPG_ID:?}"` - we need this public key to update CLAW
 #
@@ -92,7 +96,7 @@ jobs:
       - name: Load GPG key
         env:
           SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
-        run: echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+        run: echo -n "${SIGNING_KEY_GPG:?}" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
 
       - name: View GPG keys
         run: gpg --list-keys
@@ -108,5 +112,24 @@ jobs:
         timeout-minutes: 60
 
       - name: Print public key to update CLAW
+        env:
+          SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
         run: gpg --armor --export "${SIGNING_KEY_GPG_ID:?}"
 
+  verify-gpg:
+    name: Verify GPG
+    needs:
+      - setup
+      - bump-gpg
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+
+    steps:
+
+      - name: Load GPG key
+        env:
+          SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+        run: echo -n "${SIGNING_KEY_GPG:?}" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+      - name: View GPG keys
+        run: gpg --list-keys
