@@ -769,7 +769,7 @@ jobs:
 
     - name: Setup aws to upload installers to CLAW S3 bucket
       if: ${{ github.ref_type == 'tag' }}
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
