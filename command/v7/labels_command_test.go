@@ -82,7 +82,7 @@ var _ = Describe("labels command", func() {
 				}
 				Expect(executeErr).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("buildpack")...,
+			labelSubcommands("buildpack"),
 		)
 
 		DescribeTable(
@@ -98,7 +98,7 @@ var _ = Describe("labels command", func() {
 				}
 				Expect(executeErr).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-offering", "service-plan")...,
+			labelSubcommands("service-offering", "service-plan"),
 		)
 
 		DescribeTable(
@@ -114,7 +114,7 @@ var _ = Describe("labels command", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-plan")...,
+			labelSubcommands("service-plan"),
 		)
 
 		DescribeTable(
@@ -125,7 +125,7 @@ var _ = Describe("labels command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			labelSubcommands()...,
+			labelSubcommands(),
 		)
 
 		DescribeTable(
@@ -150,7 +150,7 @@ var _ = Describe("labels command", func() {
 					Expect(checkSpace).To(BeFalse())
 				}
 			},
-			labelSubcommands()...,
+			labelSubcommands(),
 		)
 
 		type MethodCallCountType func() int

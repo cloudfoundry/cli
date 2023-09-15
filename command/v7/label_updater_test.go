@@ -141,7 +141,7 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("buildpack")...,
+			labelSubcommands("buildpack"),
 		)
 
 		DescribeTable(
@@ -159,7 +159,7 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-offering", "service-plan")...,
+			labelSubcommands("service-offering", "service-plan"),
 		)
 
 		DescribeTable(
@@ -177,7 +177,7 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-plan")...,
+			labelSubcommands("service-plan"),
 		)
 
 		DescribeTable(
@@ -191,7 +191,7 @@ var _ = Describe("LabelUpdater", func() {
 				err := cmd.Execute(targetResource, nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			labelSubcommands()...,
+			labelSubcommands(),
 		)
 
 		DescribeTable(
@@ -218,7 +218,7 @@ var _ = Describe("LabelUpdater", func() {
 					Expect(checkSpace).To(BeFalse())
 				}
 			},
-			labelSubcommands()...,
+			labelSubcommands(),
 		)
 	})
 
