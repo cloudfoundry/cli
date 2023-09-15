@@ -11,9 +11,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
-	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginMetadata

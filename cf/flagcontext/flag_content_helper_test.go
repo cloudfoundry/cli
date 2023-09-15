@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/flagcontext"
 
-	"code.cloudfoundry.org/gofileutils/fileutils"
+	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
