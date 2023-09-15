@@ -4,7 +4,7 @@ package cfnetworkingactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 )
 
