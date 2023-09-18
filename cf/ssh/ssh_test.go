@@ -28,7 +28,7 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_io"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_net"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
-	"code.cloudfoundry.org/lager/lagertest"
+	"code.cloudfoundry.org/lager/v3/lagertest"
 	"github.com/kr/pty"
 	"github.com/moby/term"
 	"golang.org/x/crypto/ssh"
@@ -889,7 +889,7 @@ var _ = Describe("SSH", func() {
 			fakeLocalListener = &fake_net.FakeListener{}
 			fakeLocalListener.AcceptReturns(nil, errors.New("Not Accepting Connections"))
 
-			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler)
+			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler, 500*time.Millisecond)
 			echoServer.SetListener(echoListener)
 			go echoServer.Serve()
 
