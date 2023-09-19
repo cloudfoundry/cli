@@ -245,7 +245,7 @@ jobs:
 
         make build
 
-        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+        go install github.com/onsi/ginkgo/v2/ginkgo
 
         export CF_PASSWORD=${CF_INT_PASSWORD}
         cf api ${CF_INT_API} --skip-ssl-validation
@@ -275,7 +275,7 @@ jobs:
 
         make build
 
-        go install github.com/onsi/ginkgo/ginkgo@v1.16.4
+        go install github.com/onsi/ginkgo/v2/ginkgo
 
         export CF_PASSWORD=${CF_INT_PASSWORD}
         cf api ${CF_INT_API} --skip-ssl-validation
