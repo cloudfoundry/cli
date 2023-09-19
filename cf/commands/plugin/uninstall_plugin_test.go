@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"

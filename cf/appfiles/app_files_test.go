@@ -10,8 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	uuid "github.com/nu7hatch/gouuid"
 
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

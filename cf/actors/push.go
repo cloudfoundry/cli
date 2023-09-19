@@ -10,9 +10,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/applicationbits"
 	"code.cloudfoundry.org/cli/cf/api/resources"
 	"code.cloudfoundry.org/cli/cf/appfiles"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 const windowsPathPrefix = `\\?\`
