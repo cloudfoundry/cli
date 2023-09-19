@@ -72,8 +72,6 @@ jobs:
 
     - name: Run Units
       run: make units
-      env:
-        ACK_GINKGO_RC: true
 
   units-windows:
     name: Units Windows
@@ -108,8 +106,6 @@ jobs:
         choco install --no-progress --limit-output -y make
 
     - name: Run Windows Units
-      env:
-        ACK_GINKGO_RC: true
       run: |
         Get-Command make
         Get-Item Makefile
