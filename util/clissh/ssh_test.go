@@ -94,17 +94,23 @@ var _ = Describe("CLI SSH", func() {
 		stdinPipe.WriteStub = func(p []byte) (int, error) {
 			return len(p), nil
 		}
+		PauseOutputInterception()
 		fakeSecureSession.StdinPipeReturns(stdinPipe, nil)
+		ResumeOutputInterception()
 
 		stdoutPipe.ReadStub = func(p []byte) (int, error) {
 			return 0, io.EOF
 		}
+		PauseOutputInterception()
 		fakeSecureSession.StdoutPipeReturns(stdoutPipe, nil)
+		ResumeOutputInterception()
 
 		stderrPipe.ReadStub = func(p []byte) (int, error) {
 			return 0, io.EOF
 		}
+		PauseOutputInterception()
 		fakeSecureSession.StderrPipeReturns(stderrPipe, nil)
+		ResumeOutputInterception()
 
 		username = "some-user"
 		passcode = "some-passcode"
@@ -590,7 +596,9 @@ var _ = Describe("CLI SSH", func() {
 
 			When("the command fails to start", func() {
 				BeforeEach(func() {
+					PauseOutputInterception()
 					fakeSecureSession.StartReturns(errors.New("oh well"))
+					ResumeOutputInterception()
 				})
 
 				It("returns the error", func() {
@@ -631,11 +639,13 @@ var _ = Describe("CLI SSH", func() {
 					return 1, nil
 				}
 
+				PauseOutputInterception()
 				fakeSecureSession.StdinPipeReturns(stdinPipe, nil)
 				fakeSecureSession.StdoutPipeReturns(stdoutPipe, nil)
 				fakeSecureSession.StderrPipeReturns(stderrPipe, nil)
 
 				fakeSecureSession.WaitReturns(errors.New("error result"))
+				ResumeOutputInterception()
 			})
 
 			It("copies data from the stdin stream to the session stdin pipe", func() {
