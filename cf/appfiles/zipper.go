@@ -10,7 +10,7 @@ import (
 	"runtime"
 
 	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 	securejoin "github.com/cyphar/filepath-securejoin"
 )
 

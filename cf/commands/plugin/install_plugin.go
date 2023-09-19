@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/requirements"
@@ -21,6 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/util/downloader"
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	pluginRPCService "code.cloudfoundry.org/cli/plugin/rpc"
 )

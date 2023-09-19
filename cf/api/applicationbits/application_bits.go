@@ -2,7 +2,6 @@ package applicationbits
 
 import (
 	"bytes"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 const (

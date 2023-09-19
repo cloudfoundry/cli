@@ -19,11 +19,11 @@ import (
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/fileutils/fileutils"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . BuildpackBitsRepository
