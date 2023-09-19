@@ -18,11 +18,11 @@ UNAME_S := $(shell uname -s)
 
 SLOW_SPEC_THRESHOLD=120
 
-GINKGO_FLAGS ?= -r -randomizeAllSpecs -requireSuite
+GINKGO_FLAGS ?= -r -randomize-all -require-suite
 GINKGO_INT_FLAGS = $(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
-GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomizeSuites -p
+GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomize-suites -p
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
 GOFLAGS := -mod=mod
 
@@ -138,9 +138,9 @@ integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global integration-selfcontained ## Run all isolated, push, experimental, plugin, selfcontained, and global integration tests
 
 integration-tests-full-ci: integration-cleanup
-	$(ginkgo_int) -nodes $(NODES)  -flakeAttempts $(FLAKE_ATTEMPTS) \
+	$(ginkgo_int) -nodes $(NODES)  -flake-attempts $(FLAKE_ATTEMPTS) \
 		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
-	$(ginkgo_int) -flakeAttempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
+	$(ginkgo_int) -flake-attempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
 lint: custom-lint ## Runs all linters and formatters
 	@echo "Running linters..."
@@ -200,22 +200,22 @@ test: units ## (synonym for units)
 units: units-full ## (synonym for units-full)
 
 units-plugin:
-	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flake-attempts 2 -skip-package integration ./**/plugin* ./plugin
 
 ifeq ($(OS),Windows_NT)
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
-	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+		-skip-package integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flake-attempts 3 cf/ssh
 else
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
-	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
+		-skip-package integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
+	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flake-attempts 3 cf/ssh
 endif
 
 units-full: build units-plugin units-non-plugin
