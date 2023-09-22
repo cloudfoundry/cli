@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.0.0
+	code.cloudfoundry.org/clock v1.1.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f
 	code.cloudfoundry.org/go-log-cache v1.0.1-0.20211011162012-ede82a99d3cc
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
@@ -73,7 +73,6 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect

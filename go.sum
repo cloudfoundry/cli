@@ -38,8 +38,8 @@ code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85 h1:jaHW
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85/go.mod h1:R1EiyOAr7lW0l/YkZNqItUNZ01Q/dYUfbTn4X4Z+82M=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4 h1:O+j8afQWaDuxzKGcculsjgHGK+biBTn6iMjgFpBf54c=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4/go.mod h1:dVTgo9kQbYns/QM4A1C2GtxqUnFSvJTk2Qhw+M0/uzk=
-code.cloudfoundry.org/clock v1.0.0 h1:kFXWQM4bxYvdBw2X8BbBeXwQNgfoWv1vqAk2ZZyBN2o=
-code.cloudfoundry.org/clock v1.0.0/go.mod h1:QD9Lzhd/ux6eNQVUDVRJX/RKTigpewimNYBi7ivZKY8=
+code.cloudfoundry.org/clock v1.1.0 h1:XLzC6W3Ah/Y7ht1rmZ6+QfPdt1iGWEAAtIZXgiaj57c=
+code.cloudfoundry.org/clock v1.1.0/go.mod h1:yA3fxddT9RINQL2XHS7PS+OXxKCGhfrZmlNUCIM6AKo=
 code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f h1:xDSTgaS6b/AkaBqvyEYfu6i1Z+y8JSCHAd/e1HGqyF4=
 code.cloudfoundry.org/diego-ssh v0.0.0-20170109142818-18cdb3586e7f/go.mod h1:L2/glHnSK+wKnsG8oZZqdV2sgYY9NDo/I1aDJGhcWaM=
 code.cloudfoundry.org/go-diodes v0.0.0-20180905200951-72629b5276e3/go.mod h1:Jzi+ccHgo/V/PLQUaQ6hnZcC1c4BS790gx21LRRui4g=
@@ -333,8 +333,7 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ8=
-github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 h1:mujcChM89zOHwgZBBNr5WZ77mBXP1yR+gLThGCYZgAg=
-github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00/go.mod h1:eyZnKCc955uh98WQvzOm0dgAeLnf2O0Rz0LPoC5ze+0=
+github.com/tedsuo/ifrit v0.0.0-20230330192023-5cba443a66c4 h1:MGZzzxBuPuK4J0XQo+0uy0NnXQGKzHXhYp5oG1Wy860=
 github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958 h1:mueRRuRjR35dEOkHdhpoRcruNgBz0ohG659HxxmcAwA=
 github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958/go.mod h1:X47ELzhOoLbfFIY0Cql9P6yo3Cdwf2CMX3FVZxRzJPc=
 github.com/unrolled/secure v0.0.0-20180416205222-a1cf62cc2159/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
