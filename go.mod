@@ -20,7 +20,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 	github.com/cyphar/filepath-securejoin v0.2.4
-	github.com/docker/distribution v2.8.2+incompatible
+	github.com/docker/distribution v2.8.3+incompatible
 	github.com/fatih/color v1.15.0
 	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.5.0
@@ -57,6 +57,7 @@ require (
 	github.com/cppforlife/go-patch v0.1.0 // indirect
 	github.com/creack/pty v1.1.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/distribution/reference v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
