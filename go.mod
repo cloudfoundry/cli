@@ -22,7 +22,7 @@ require (
 	github.com/cloudfoundry/noaa/v2 v2.3.0
 	github.com/cloudfoundry/sonde-go v0.0.0-20230710164515-a0a43d1dbbf8
 	github.com/cyphar/filepath-securejoin v0.2.4
-	github.com/docker/distribution v2.8.2+incompatible
+	github.com/docker/distribution v2.8.3+incompatible
 	github.com/fatih/color v1.15.0
 	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.5.0
@@ -56,6 +56,7 @@ require (
 	github.com/cloudfoundry/bosh-utils v0.0.390 // indirect
 	github.com/cppforlife/go-patch v0.1.0 // indirect
 	github.com/creack/pty v1.1.18 // indirect
+	github.com/distribution/reference v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -66,7 +67,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
