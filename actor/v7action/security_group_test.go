@@ -324,6 +324,8 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"security-group-name"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(0))
@@ -403,6 +405,8 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"security-group-name"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
@@ -1016,6 +1020,8 @@ var _ = Describe("Security Group Actions", func() {
 				orgsQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
 				Expect(orgsQuery).To(Equal([]ccv3.Query{
 					{Key: ccv3.NameFilter, Values: []string{orgName}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
@@ -1023,12 +1029,16 @@ var _ = Describe("Security Group Actions", func() {
 				Expect(spacesQuery).To(Equal([]ccv3.Query{
 					{Key: ccv3.NameFilter, Values: []string{spaceName}},
 					{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 
 				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 				securityGroupsQuery := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 				Expect(securityGroupsQuery).To(Equal([]ccv3.Query{
 					{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 
 				Expect(fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceCallCount()).To(Equal(1))
@@ -1171,6 +1181,8 @@ var _ = Describe("Security Group Actions", func() {
 			givenQuery := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 			Expect(givenQuery).To(ConsistOf(
 				ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			))
 
 			givenSecurityGroup := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
@@ -1282,6 +1294,8 @@ var _ = Describe("Security Group Actions", func() {
 					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 					Expect(query).To(Equal([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
@@ -1307,6 +1321,8 @@ var _ = Describe("Security Group Actions", func() {
 					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 					Expect(query).To(Equal([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
@@ -1332,6 +1348,8 @@ var _ = Describe("Security Group Actions", func() {
 					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 					Expect(query).To(Equal([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
@@ -1357,6 +1375,8 @@ var _ = Describe("Security Group Actions", func() {
 					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 					Expect(query).To(Equal([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))

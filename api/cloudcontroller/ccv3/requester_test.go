@@ -938,6 +938,100 @@ var _ = Describe("shared request helpers", func() {
 				})
 			})
 		})
+
+		Context("with 'per_page' and 'page' query params", func() {
+			var (
+				resourceList []resources.Stack
+				query        []Query
+			)
+
+			BeforeEach(func() {
+				resourceList = []resources.Stack{}
+				query = []Query{
+					{
+						Key:    PerPage,
+						Values: []string{"1"},
+					},
+				}
+				requestParams = RequestParams{
+					RequestName:  internal.GetStacksRequest,
+					Query:        query,
+					ResponseBody: resources.Stack{},
+					AppendToList: func(item interface{}) error {
+						resourceList = append(resourceList, item.(resources.Stack))
+						return nil
+					},
+				}
+			})
+
+			When("requesting page=1", func() {
+				BeforeEach(func() {
+					requestParams.Query = append(requestParams.Query, Query{
+						Key: Page, Values: []string{"1"},
+					})
+
+					response1 := fmt.Sprintf(`{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/stacks?per_page=1&page=2"
+							}
+						},
+						"resources": [
+							{
+								"guid": "stack-guid-1"
+							}
+						]
+					}`, server.URL())
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/stacks", "per_page=1&page=1"),
+							RespondWith(http.StatusOK, response1),
+						),
+					)
+				})
+
+				It("returns only the resources from the specified page", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(resourceList).To(Equal([]resources.Stack{{
+						GUID: "stack-guid-1",
+					}}))
+				})
+			})
+
+			When("requesting page=2", func() {
+				BeforeEach(func() {
+					requestParams.Query = append(requestParams.Query, Query{
+						Key: Page, Values: []string{"2"},
+					})
+
+					response2 := `{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"guid": "stack-guid-2"
+							}
+						]
+					}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/stacks", "per_page=1&page=2"),
+							RespondWith(http.StatusOK, response2),
+						),
+					)
+				})
+
+				It("returns only the resources from the specified page", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(resourceList).To(Equal([]resources.Stack{{
+						GUID: "stack-guid-2",
+					}}))
+				})
+			})
+		})
 	})
 
 	Describe("MakeRequestReceiveRaw", func() {

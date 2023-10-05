@@ -104,7 +104,7 @@ var _ = Describe("Build Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]resources.Package{{GUID: "some-other-package-guid"}},
+					[]resources.Package{},
 					ccv3.Warnings{"get-packages-warning"},
 					nil,
 				)
@@ -180,7 +180,10 @@ var _ = Describe("Build Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(Equal([]ccv3.Query{
+						{Key: ccv3.GUIDFilter, Values: []string{packageGUID}},
 						{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))

@@ -142,6 +142,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -221,6 +223,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -311,6 +315,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"sub.example.com"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -321,6 +327,8 @@ var _ = Describe("labels", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -413,6 +421,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
 					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -494,6 +504,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -938,6 +950,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -1022,6 +1036,8 @@ var _ = Describe("labels", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -1102,6 +1118,8 @@ var _ = Describe("labels", func() {
 				Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 

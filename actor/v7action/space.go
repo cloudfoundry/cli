@@ -81,6 +81,8 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 	ccv3Spaces, _, warnings, err := actor.CloudControllerClient.GetSpaces(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	if err != nil {

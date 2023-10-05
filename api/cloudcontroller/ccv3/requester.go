@@ -95,7 +95,15 @@ func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (In
 		return IncludedResources{}, nil, err
 	}
 
-	return requester.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
+	specificPage := false
+	for _, query := range requestParams.Query {
+		if query.Key == Page {
+			specificPage = true
+			break
+		}
+	}
+
+	return requester.paginate(request, requestParams.ResponseBody, requestParams.AppendToList, specificPage)
 }
 
 func (requester *RealRequester) MakeRequest(requestParams RequestParams) (JobURL, Warnings, error) {

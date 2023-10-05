@@ -417,18 +417,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{userNameOrGUID},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.SpaceDeveloperRole)},
-							},
-							{
-								Key:    ccv3.SpaceGUIDFilter,
-								Values: []string{spaceGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{userNameOrGUID}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.SpaceDeveloperRole)}},
+							{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 					passedRoleGUID := fakeCloudControllerClient.DeleteRoleArgsForCall(0)
@@ -468,18 +461,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{"user-guid"},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.SpaceDeveloperRole)},
-							},
-							{
-								Key:    ccv3.SpaceGUIDFilter,
-								Values: []string{spaceGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{"user-guid"}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.SpaceDeveloperRole)}},
+							{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 
@@ -691,18 +677,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{userGUID},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.SpaceDeveloperRole)},
-							},
-							{
-								Key:    ccv3.SpaceGUIDFilter,
-								Values: []string{orgOrSpaceGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.SpaceDeveloperRole)}},
+							{Key: ccv3.SpaceGUIDFilter, Values: []string{orgOrSpaceGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 					Expect(warnings).To(ConsistOf("get-roles-warning"))
@@ -732,18 +711,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{userGUID},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.SpaceDeveloperRole)},
-							},
-							{
-								Key:    ccv3.OrganizationGUIDFilter,
-								Values: []string{orgOrSpaceGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.SpaceDeveloperRole)}},
+							{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgOrSpaceGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 					Expect(warnings).To(ConsistOf("get-roles-warning"))
@@ -766,18 +738,11 @@ var _ = Describe("Role Actions", func() {
 				passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 				Expect(passedRolesQuery).To(Equal(
 					[]ccv3.Query{
-						{
-							Key:    ccv3.UserGUIDFilter,
-							Values: []string{"user-guid"},
-						},
-						{
-							Key:    ccv3.RoleTypesFilter,
-							Values: []string{string(constant.SpaceDeveloperRole)},
-						},
-						{
-							Key:    ccv3.SpaceGUIDFilter,
-							Values: []string{orgOrSpaceGUID},
-						},
+						{Key: ccv3.UserGUIDFilter, Values: []string{"user-guid"}},
+						{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.SpaceDeveloperRole)}},
+						{Key: ccv3.SpaceGUIDFilter, Values: []string{orgOrSpaceGUID}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					},
 				))
 				Expect(warnings).To(ConsistOf("get-roles-warning"))
@@ -883,18 +848,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{userNameOrGUID},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.OrgBillingManagerRole)},
-							},
-							{
-								Key:    ccv3.OrganizationGUIDFilter,
-								Values: []string{orgGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{userNameOrGUID}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.OrgBillingManagerRole)}},
+							{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 					passedRoleGUID := fakeCloudControllerClient.DeleteRoleArgsForCall(0)
@@ -934,18 +892,11 @@ var _ = Describe("Role Actions", func() {
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.UserGUIDFilter,
-								Values: []string{"user-guid"},
-							},
-							{
-								Key:    ccv3.RoleTypesFilter,
-								Values: []string{string(constant.OrgBillingManagerRole)},
-							},
-							{
-								Key:    ccv3.OrganizationGUIDFilter,
-								Values: []string{orgGUID},
-							},
+							{Key: ccv3.UserGUIDFilter, Values: []string{"user-guid"}},
+							{Key: ccv3.RoleTypesFilter, Values: []string{string(constant.OrgBillingManagerRole)}},
+							{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						},
 					))
 

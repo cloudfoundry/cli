@@ -144,10 +144,9 @@ func (actor Actor) parseRoutePath(routePath string) (string, string, string, res
 
 func (actor Actor) GetRoute(routePath string, spaceGUID string) (resources.Route, Warnings, error) {
 	filters := []ccv3.Query{
-		{
-			Key:    ccv3.SpaceGUIDFilter,
-			Values: []string{spaceGUID},
-		},
+		{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+		{Key: ccv3.PerPage, Values: []string{"1"}},
+		{Key: ccv3.Page, Values: []string{"1"}},
 	}
 
 	host, path, port, domain, allWarnings, err := actor.parseRoutePath(routePath)
@@ -370,6 +369,8 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
 		{Key: ccv3.HostsFilter, Values: []string{hostname}},
 		{Key: ccv3.PathsFilter, Values: []string{path}},
+		{Key: ccv3.PerPage, Values: []string{"1"}},
+		{Key: ccv3.Page, Values: []string{"1"}},
 	}
 
 	if domain.IsTCP() {

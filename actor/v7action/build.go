@@ -33,16 +33,19 @@ func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan 
 		}
 		app := apps[0]
 
-		pkgs, allWarnings, err := actor.CloudControllerClient.GetPackages(ccv3.Query{
-			Key: ccv3.AppGUIDFilter, Values: []string{app.GUID},
-		})
+		pkgs, allWarnings, err := actor.CloudControllerClient.GetPackages(
+			ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{packageGUID}},
+			ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+			ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+			ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+		)
 		warningsStream <- Warnings(allWarnings)
 		if err != nil {
 			errorStream <- err
 			return
 		}
 
-		if !packageInPackages(packageGUID, pkgs) {
+		if len(pkgs) == 0 {
 			err = actionerror.PackageNotFoundInAppError{GUID: packageGUID, AppName: appName}
 			errorStream <- err
 			return
@@ -165,13 +168,4 @@ func (actor Actor) PollBuild(buildGUID string, appName string) (resources.Drople
 			return resources.Droplet{}, allWarnings, actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 		}
 	}
-}
-
-func packageInPackages(targetPkgGUID string, pkgs []resources.Package) bool {
-	for i := range pkgs {
-		if pkgs[i].GUID == targetPkgGUID {
-			return true
-		}
-	}
-	return false
 }
