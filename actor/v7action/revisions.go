@@ -43,11 +43,12 @@ func (actor *Actor) GetRevisionsByApplicationNameAndSpace(appName string, spaceG
 }
 
 func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVersion int) (resources.Revision, Warnings, error) {
-	query := ccv3.Query{
-		Key:    ccv3.VersionsFilter,
-		Values: []string{strconv.Itoa(revisionVersion)},
+	query := []ccv3.Query{
+		{Key: ccv3.VersionsFilter, Values: []string{strconv.Itoa(revisionVersion)}},
+		{Key: ccv3.PerPage, Values: []string{"2"}},
+		{Key: ccv3.Page, Values: []string{"1"}},
 	}
-	revisions, warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(appGUID, query)
+	revisions, warnings, apiErr := actor.CloudControllerClient.GetApplicationRevisions(appGUID, query...)
 	if apiErr != nil {
 		return resources.Revision{}, Warnings(warnings), apiErr
 	}

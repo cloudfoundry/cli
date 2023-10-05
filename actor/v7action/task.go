@@ -54,6 +54,8 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(
 		appGUID,
 		ccv3.Query{Key: ccv3.SequenceIDFilter, Values: []string{strconv.Itoa(sequenceID)}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	if err != nil {
 		return resources.Task{}, Warnings(warnings), err

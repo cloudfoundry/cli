@@ -212,14 +212,15 @@ var _ = Describe("Revisions Actions", func() {
 			})
 
 			It("returns the revision", func() {
-				expectedQuery := ccv3.Query{
-					Key:    ccv3.VersionsFilter,
-					Values: []string{strconv.Itoa(revisionVersion)},
+				expectedQuery := []ccv3.Query{
+					{Key: ccv3.VersionsFilter, Values: []string{strconv.Itoa(revisionVersion)}},
+					{Key: ccv3.PerPage, Values: []string{"2"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}
 				Expect(fakeCloudControllerClient.GetApplicationRevisionsCallCount()).To(Equal(1), "GetApplicationRevisions call count")
 				appGuid, query := fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)
 				Expect(appGuid).To(Equal("some-app-guid"))
-				Expect(query).To(ContainElement(expectedQuery))
+				Expect(query).To(ConsistOf(expectedQuery))
 
 				Expect(fakeConfig.APIVersionCallCount()).To(Equal(1), "APIVersion call count")
 				Expect(fakeCloudControllerClient.GetDropletsCallCount()).To(Equal(0), "GetDroplets call count")
@@ -252,14 +253,15 @@ var _ = Describe("Revisions Actions", func() {
 				})
 
 				It("fills in deployable based on droplet status", func() {
-					expectedQuery := ccv3.Query{
-						Key:    ccv3.VersionsFilter,
-						Values: []string{strconv.Itoa(revisionVersion)},
+					expectedQuery := []ccv3.Query{
+						{Key: ccv3.VersionsFilter, Values: []string{strconv.Itoa(revisionVersion)}},
+						{Key: ccv3.PerPage, Values: []string{"2"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}
 					Expect(fakeCloudControllerClient.GetApplicationRevisionsCallCount()).To(Equal(1), "GetApplicationRevisions call count")
 					appGuid, query := fakeCloudControllerClient.GetApplicationRevisionsArgsForCall(0)
 					Expect(appGuid).To(Equal("some-app-guid"))
-					Expect(query).To(ContainElement(expectedQuery))
+					Expect(query).To(ConsistOf(expectedQuery))
 
 					Expect(fakeConfig.APIVersionCallCount()).To(Equal(1), "APIVersion call count")
 					Expect(fakeCloudControllerClient.GetDropletsCallCount()).To(Equal(1), "GetDroplets call count")

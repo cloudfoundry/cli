@@ -169,6 +169,8 @@ var _ = Describe("Route Binding Action", func() {
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -210,6 +212,8 @@ var _ = Describe("Route Binding Action", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -458,6 +462,8 @@ var _ = Describe("Route Binding Action", func() {
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -499,6 +505,8 @@ var _ = Describe("Route Binding Action", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -546,6 +554,8 @@ var _ = Describe("Route Binding Action", func() {
 				Expect(fakeCloudControllerClient.GetRouteBindingsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{routeGUID}},
 					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 

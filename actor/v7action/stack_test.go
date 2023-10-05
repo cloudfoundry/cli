@@ -76,7 +76,11 @@ var _ = Describe("Stack", func() {
 					Description: "Some stack desc",
 				}
 
-				expectedParams := []ccv3.Query{{Key: ccv3.NameFilter, Values: []string{"some-stack-name"}}}
+				expectedParams := []ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{"some-stack-name"}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
+				}
 
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(

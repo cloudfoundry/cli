@@ -156,18 +156,11 @@ var _ = Describe("Service Instance", func() {
 			actualParams := requester.MakeListRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.GetServiceInstancesRequest))
 			Expect(actualParams.Query).To(ConsistOf(
-				Query{
-					Key:    NameFilter,
-					Values: []string{name},
-				},
-				Query{
-					Key:    SpaceGUIDFilter,
-					Values: []string{spaceGUID},
-				},
-				Query{
-					Key:    Include,
-					Values: []string{"unicorns"},
-				},
+				Query{Key: NameFilter, Values: []string{name}},
+				Query{Key: SpaceGUIDFilter, Values: []string{spaceGUID}},
+				Query{Key: PerPage, Values: []string{"1"}},
+				Query{Key: Page, Values: []string{"1"}},
+				Query{Key: Include, Values: []string{"unicorns"}},
 			))
 			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceInstance{}))
 		})

@@ -113,10 +113,11 @@ var _ = Describe("Service Broker Actions", func() {
 
 			It("returns the service broker and warnings", func() {
 				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(ConsistOf(ccv3.Query{
-					Key:    ccv3.NameFilter,
-					Values: []string{serviceBroker1Name},
-				}))
+				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceBroker1Name}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+				))
 
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-service-broker-warning"))

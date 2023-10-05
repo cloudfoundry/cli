@@ -34,14 +34,10 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 
 func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...Query) (resources.ServiceInstance, IncludedResources, Warnings, error) {
 	query = append(query,
-		Query{
-			Key:    NameFilter,
-			Values: []string{name},
-		},
-		Query{
-			Key:    SpaceGUIDFilter,
-			Values: []string{spaceGUID},
-		},
+		Query{Key: NameFilter, Values: []string{name}},
+		Query{Key: SpaceGUIDFilter, Values: []string{spaceGUID}},
+		Query{Key: PerPage, Values: []string{"1"}},
+		Query{Key: Page, Values: []string{"1"}},
 	)
 
 	instances, included, warnings, err := client.GetServiceInstances(query...)

@@ -172,6 +172,8 @@ func (actor Actor) GetDomainAndOrgGUIDsByName(domainName string, orgName string)
 func (actor Actor) getDomainByName(domainName string) (resources.Domain, ccv3.Warnings, error) {
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	switch {
 	case err != nil:

@@ -191,6 +191,8 @@ var _ = Describe("Package Actions", func() {
 						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 						ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"READY"}},
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(err).ToNot(HaveOccurred())
@@ -1093,18 +1095,11 @@ var _ = Describe("Package Actions", func() {
 
 				queries := fakeCloudControllerClient.GetPackagesArgsForCall(0)
 				Expect(queries).To(Equal([]ccv3.Query{
-					ccv3.Query{
-						Key:    ccv3.AppGUIDFilter,
-						Values: []string{sourceApp.GUID},
-					},
-					ccv3.Query{
-						Key:    ccv3.StatesFilter,
-						Values: []string{string(constant.PackageReady)},
-					},
-					ccv3.Query{
-						Key:    ccv3.OrderBy,
-						Values: []string{ccv3.CreatedAtDescendingOrder},
-					},
+					{Key: ccv3.AppGUIDFilter, Values: []string{sourceApp.GUID}},
+					{Key: ccv3.StatesFilter, Values: []string{string(constant.PackageReady)}},
+					{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 			})
 		})

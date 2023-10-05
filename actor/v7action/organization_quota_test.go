@@ -102,10 +102,9 @@ var _ = Describe("Organization Quota Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
 				passedQuotaQuery := fakeCloudControllerClient.GetOrganizationQuotasArgsForCall(0)
 				Expect(passedQuotaQuery).To(Equal([]ccv3.Query{
-					{
-						Key:    "names",
-						Values: []string{quotaName},
-					},
+					{Key: ccv3.NameFilter, Values: []string{quotaName}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 				Expect(fakeCloudControllerClient.ApplyOrganizationQuotaCallCount()).To(Equal(1))
 				passedQuotaGUID, passedOrgGUID := fakeCloudControllerClient.ApplyOrganizationQuotaArgsForCall(0)
@@ -158,6 +157,8 @@ var _ = Describe("Organization Quota Actions", func() {
 				query := fakeCloudControllerClient.GetOrganizationQuotasArgsForCall(0)
 				Expect(query).To(Equal([]ccv3.Query{
 					{Key: ccv3.NameFilter, Values: []string{quotaName}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
 				}))
 
 				Expect(fakeCloudControllerClient.DeleteOrganizationQuotaCallCount()).To(Equal(1))
@@ -368,6 +369,8 @@ var _ = Describe("Organization Quota Actions", func() {
 				query := fakeCloudControllerClient.GetOrganizationQuotasArgsForCall(0)
 				Expect(query).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{quotaName}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))

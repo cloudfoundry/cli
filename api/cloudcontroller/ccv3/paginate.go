@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
+func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error, specificPage bool) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
 	var includes IncludedResources
 
@@ -26,7 +26,7 @@ func (requester RealRequester) paginate(request *cloudcontroller.Request, obj in
 		includes.ServiceOfferings = append(includes.ServiceOfferings, wrapper.IncludedResources.ServiceOfferings...)
 		includes.ServicePlans = append(includes.ServicePlans, wrapper.IncludedResources.ServicePlans...)
 
-		if wrapper.NextPage() == "" {
+		if specificPage || wrapper.NextPage() == "" {
 			break
 		}
 

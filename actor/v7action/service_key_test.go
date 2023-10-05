@@ -367,6 +367,8 @@ var _ = Describe("Service Key Action", func() {
 				ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
 				ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"key"}},
 				ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceKeyName}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			))
 		})
 
@@ -508,6 +510,8 @@ var _ = Describe("Service Key Action", func() {
 				ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
 				ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"key"}},
 				ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceKeyName}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			))
 		})
 
@@ -724,6 +728,8 @@ var _ = Describe("Service Key Action", func() {
 					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"key"}},
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceKeyName}},
 					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 

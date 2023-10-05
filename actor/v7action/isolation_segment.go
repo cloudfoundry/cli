@@ -101,6 +101,8 @@ func (actor Actor) AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentN
 func (actor Actor) GetIsolationSegmentByName(name string) (resources.IsolationSegment, Warnings, error) {
 	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	if err != nil {
 		return resources.IsolationSegment{}, Warnings(warnings), err
