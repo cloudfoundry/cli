@@ -70,6 +70,8 @@ var _ = Describe("space features", func() {
 			Expect(query).To(ConsistOf(
 				ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 				ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			))
 
 			Expect(fakeCloudControllerClient.GetSpaceFeatureCallCount()).To(Equal(1))
@@ -200,6 +202,8 @@ var _ = Describe("space features", func() {
 					Expect(query).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.UpdateSpaceFeatureCallCount()).To(Equal(1))
@@ -245,6 +249,8 @@ var _ = Describe("space features", func() {
 					Expect(query).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.UpdateSpaceFeatureCallCount()).To(Equal(1))
@@ -280,6 +286,8 @@ var _ = Describe("space features", func() {
 			Expect(query).To(ConsistOf(
 				ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 				ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			))
 
 			Expect(fakeCloudControllerClient.UpdateSpaceFeatureCallCount()).To(Equal(1))

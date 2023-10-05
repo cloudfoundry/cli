@@ -75,10 +75,9 @@ var _ = Describe("Service Instance Sharing", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal(
 					[]ccv3.Query{
-						{
-							Key:    ccv3.NameFilter,
-							Values: []string{shareToOrgName},
-						},
+						{Key: ccv3.NameFilter, Values: []string{shareToOrgName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(0))
 			})
@@ -112,14 +111,10 @@ var _ = Describe("Service Instance Sharing", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.NameFilter,
-								Values: []string{shareToSpaceName},
-							},
-							{
-								Key:    ccv3.OrganizationGUIDFilter,
-								Values: []string{targetedOrgGUID},
-							},
+							{Key: ccv3.NameFilter, Values: []string{shareToSpaceName}},
+							{Key: ccv3.OrganizationGUIDFilter, Values: []string{targetedOrgGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						}))
 				})
 
@@ -147,14 +142,10 @@ var _ = Describe("Service Instance Sharing", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
 						[]ccv3.Query{
-							{
-								Key:    ccv3.NameFilter,
-								Values: []string{shareToSpaceName},
-							},
-							{
-								Key:    ccv3.OrganizationGUIDFilter,
-								Values: []string{shareToOrgGUID},
-							},
+							{Key: ccv3.NameFilter, Values: []string{shareToSpaceName}},
+							{Key: ccv3.OrganizationGUIDFilter, Values: []string{shareToOrgGUID}},
+							{Key: ccv3.PerPage, Values: []string{"1"}},
+							{Key: ccv3.Page, Values: []string{"1"}},
 						}))
 				})
 

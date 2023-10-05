@@ -25,6 +25,7 @@ func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (resources.De
 		ccv3.Query{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueActive)}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	if err != nil {

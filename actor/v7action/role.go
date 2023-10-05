@@ -167,18 +167,11 @@ func (actor Actor) getUserGuidForDeleteRole(isClient bool, userNameOrGUID string
 
 func (actor Actor) GetRoleGUID(queryKey ccv3.QueryKey, orgOrSpaceGUID string, userGUID string, roleType constant.RoleType) (string, Warnings, error) {
 	ccv3Roles, _, warnings, err := actor.CloudControllerClient.GetRoles(
-		ccv3.Query{
-			Key:    ccv3.UserGUIDFilter,
-			Values: []string{userGUID},
-		},
-		ccv3.Query{
-			Key:    ccv3.RoleTypesFilter,
-			Values: []string{string(roleType)},
-		},
-		ccv3.Query{
-			Key:    queryKey,
-			Values: []string{orgOrSpaceGUID},
-		},
+		ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+		ccv3.Query{Key: ccv3.RoleTypesFilter, Values: []string{string(roleType)}},
+		ccv3.Query{Key: queryKey, Values: []string{orgOrSpaceGUID}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	if err != nil {

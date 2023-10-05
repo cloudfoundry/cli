@@ -397,15 +397,14 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query).To(HaveLen(4))
-				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
-				Expect(query[0].Values).To(ConsistOf("space-guid"))
-				Expect(query[1].Key).To(Equal(ccv3.DomainGUIDFilter))
-				Expect(query[1].Values).To(ConsistOf("domain-guid"))
-				Expect(query[2].Key).To(Equal(ccv3.HostsFilter))
-				Expect(query[2].Values).To(ConsistOf("hostname"))
-				Expect(query[3].Key).To(Equal(ccv3.PathsFilter))
-				Expect(query[3].Values).To(ConsistOf("/the-path"))
+				Expect(query).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{"hostname"}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/the-path"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+				))
 			})
 		})
 
@@ -438,8 +437,14 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query[2].Key).To(Equal(ccv3.HostsFilter))
-				Expect(query[2].Values).To(ConsistOf(""))
+				Expect(query).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+				))
 			})
 		})
 
@@ -481,8 +486,15 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query[4].Key).To(Equal(ccv3.PortsFilter))
-				Expect(query[4].Values).To(ConsistOf("8080"))
+				Expect(query).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PortsFilter, Values: []string{"8080"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+				))
 			})
 		})
 
@@ -1216,6 +1228,8 @@ var _ = Describe("Route Actions", func() {
 					query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
 					Expect(query).To(ConsistOf([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{"domain.com"}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					// Get the route based on the domain GUID
@@ -1225,6 +1239,8 @@ var _ = Describe("Route Actions", func() {
 						{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 						{Key: ccv3.HostsFilter, Values: []string{"hostname"}},
 						{Key: ccv3.PathsFilter, Values: []string{"/path"}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					// Delete the route asynchronously
@@ -1265,6 +1281,8 @@ var _ = Describe("Route Actions", func() {
 					query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
 					Expect(query).To(ConsistOf([]ccv3.Query{
 						{Key: ccv3.NameFilter, Values: []string{"domain.com"}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					// Get the route based on the domain GUID
@@ -1275,6 +1293,8 @@ var _ = Describe("Route Actions", func() {
 						{Key: ccv3.HostsFilter, Values: []string{""}},
 						{Key: ccv3.PathsFilter, Values: []string{""}},
 						{Key: ccv3.PortsFilter, Values: []string{"1026"}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
 					}))
 
 					// Delete the route asynchronously
@@ -1443,6 +1463,8 @@ var _ = Describe("Route Actions", func() {
 						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -1512,6 +1534,8 @@ var _ = Describe("Route Actions", func() {
 						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
 						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
 						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{""}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))

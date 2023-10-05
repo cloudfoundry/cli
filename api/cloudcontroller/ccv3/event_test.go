@@ -31,7 +31,8 @@ var _ = Describe("Event", func() {
 			events, warnings, executeErr = client.GetEvents(
 				Query{Key: TargetGUIDFilter, Values: []string{"some-target-guid"}},
 				Query{Key: OrderBy, Values: []string{"-created_at"}},
-				Query{Key: PerPage, Values: []string{"1"}})
+				Query{Key: PerPage, Values: []string{"1"}},
+				Query{Key: Page, Values: []string{"1"}})
 		})
 
 		var response string
@@ -86,7 +87,7 @@ var _ = Describe("Event", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/audit_events", "target_guids=some-target-guid&order_by=-created_at&per_page=1"),
+						VerifyRequest(http.MethodGet, "/v3/audit_events", "target_guids=some-target-guid&order_by=-created_at&per_page=1&page=1"),
 						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 					),
 				)
@@ -132,7 +133,7 @@ var _ = Describe("Event", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/audit_events", "target_guids=some-target-guid&order_by=-created_at&per_page=1"),
+						VerifyRequest(http.MethodGet, "/v3/audit_events", "target_guids=some-target-guid&order_by=-created_at&per_page=1&page=1"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 					),
 				)

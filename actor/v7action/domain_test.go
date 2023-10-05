@@ -63,6 +63,8 @@ var _ = Describe("Domain Actions", func() {
 			givenQuery := fakeCloudControllerClient.GetDomainsArgsForCall(0)
 			Expect(givenQuery).To(Equal([]ccv3.Query{
 				{Key: ccv3.NameFilter, Values: []string{domainName}},
+				{Key: ccv3.PerPage, Values: []string{"1"}},
+				{Key: ccv3.Page, Values: []string{"1"}},
 			}))
 
 			Expect(fakeCloudControllerClient.CheckRouteCallCount()).To(Equal(1))
@@ -438,7 +440,11 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		When("the API layer call is successful", func() {
-			expectedQuery := []ccv3.Query{{Key: ccv3.NameFilter, Values: []string{domain1Name}}}
+			expectedQuery := []ccv3.Query{
+				{Key: ccv3.NameFilter, Values: []string{domain1Name}},
+				{Key: ccv3.PerPage, Values: []string{"1"}},
+				{Key: ccv3.Page, Values: []string{"1"}},
+			}
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
 					ccv3Domains,
@@ -512,7 +518,11 @@ var _ = Describe("Domain Actions", func() {
 
 			Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 			actualQuery := fakeCloudControllerClient.GetDomainsArgsForCall(0)
-			Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{"private-domain.com"}}}))
+			Expect(actualQuery).To(Equal([]ccv3.Query{
+				{Key: ccv3.NameFilter, Values: []string{"private-domain.com"}},
+				{Key: ccv3.PerPage, Values: []string{"1"}},
+				{Key: ccv3.Page, Values: []string{"1"}},
+			}))
 
 			Expect(fakeCloudControllerClient.SharePrivateDomainToOrgsCallCount()).To(Equal(1))
 			domainGuid, sharedOrgs := fakeCloudControllerClient.SharePrivateDomainToOrgsArgsForCall(0)
@@ -634,7 +644,11 @@ var _ = Describe("Domain Actions", func() {
 			It("returns the error and doesnt get the domain", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-				Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{orgName}}}))
+				Expect(actualQuery).To(Equal([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{orgName}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
+				}))
 
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(0))
 
@@ -665,11 +679,19 @@ var _ = Describe("Domain Actions", func() {
 				It("returns the error and doesnt get the domain", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 					actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-					Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{orgName}}}))
+					Expect(actualQuery).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{orgName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
+					}))
 
 					Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 					actualQuery = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-					Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{domainName}}}))
+					Expect(actualQuery).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{domainName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
+					}))
 
 					Expect(executeErr).To(MatchError(errors.New("get-domains-error")))
 					Expect(warnings).To(ConsistOf("get-orgs-warning", "get-domains-warning"))
@@ -690,11 +712,19 @@ var _ = Describe("Domain Actions", func() {
 				It("returns the GUIDs", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 					actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-					Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{orgName}}}))
+					Expect(actualQuery).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{orgName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
+					}))
 
 					Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 					actualQuery = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-					Expect(actualQuery).To(Equal([]ccv3.Query{{Key: ccv3.NameFilter, Values: []string{domainName}}}))
+					Expect(actualQuery).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{domainName}},
+						{Key: ccv3.PerPage, Values: []string{"1"}},
+						{Key: ccv3.Page, Values: []string{"1"}},
+					}))
 
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-orgs-warning", "get-domains-warning"))

@@ -76,10 +76,9 @@ func (actor Actor) GetOrganizationQuotas() ([]resources.OrganizationQuota, Warni
 
 func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (resources.OrganizationQuota, Warnings, error) {
 	ccv3OrgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas(
-		ccv3.Query{
-			Key:    ccv3.NameFilter,
-			Values: []string{orgQuotaName},
-		},
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{orgQuotaName}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	if err != nil {
 		return resources.OrganizationQuota{}, Warnings(warnings), err

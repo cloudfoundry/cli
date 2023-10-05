@@ -331,6 +331,8 @@ var _ = Describe("Service Offering", func() {
 					"RequestName": Equal(internal.GetServiceOfferingsRequest),
 					"Query": Equal([]Query{
 						{Key: NameFilter, Values: []string{serviceOfferingName}},
+						{Key: PerPage, Values: []string{"2"}},
+						{Key: Page, Values: []string{"1"}},
 						{Key: FieldsServiceBroker, Values: []string{"name", "guid"}},
 					}),
 					"ResponseBody": Equal(resources.ServiceOffering{}),
@@ -406,6 +408,8 @@ var _ = Describe("Service Offering", func() {
 				Expect(requester.MakeListRequestArgsForCall(0).Query).To(ConsistOf(
 					Query{Key: NameFilter, Values: []string{serviceOfferingName}},
 					Query{Key: ServiceBrokerNamesFilter, Values: []string{"myServiceBroker"}},
+					Query{Key: PerPage, Values: []string{"2"}},
+					Query{Key: Page, Values: []string{"1"}},
 					Query{Key: FieldsServiceBroker, Values: []string{"name", "guid"}},
 				))
 			})

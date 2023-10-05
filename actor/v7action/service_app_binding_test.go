@@ -425,6 +425,8 @@ var _ = Describe("Service App Binding Action", func() {
 					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
 					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 

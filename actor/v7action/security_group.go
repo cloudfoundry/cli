@@ -75,7 +75,11 @@ func (actor Actor) CreateSecurityGroup(name, filePath string) (Warnings, error) 
 func (actor Actor) GetSecurityGroup(securityGroupName string) (resources.SecurityGroup, Warnings, error) {
 	allWarnings := Warnings{}
 
-	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}})
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+	)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
@@ -92,7 +96,11 @@ func (actor Actor) GetSecurityGroup(securityGroupName string) (resources.Securit
 func (actor Actor) GetSecurityGroupSummary(securityGroupName string) (SecurityGroupSummary, Warnings, error) {
 	allWarnings := Warnings{}
 	securityGroupSummary := SecurityGroupSummary{}
-	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}})
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+	)
 
 	allWarnings = append(allWarnings, warnings...)
 
@@ -247,7 +255,11 @@ func (actor Actor) UpdateSecurityGroup(name, filePath string) (Warnings, error) 
 	}
 
 	// fetch security group from API
-	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}})
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
+	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err

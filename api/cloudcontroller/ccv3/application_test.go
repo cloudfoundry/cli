@@ -358,6 +358,8 @@ var _ = Describe("Application", func() {
 				Expect(actualParams.Query).To(Equal([]Query{
 					{Key: NameFilter, Values: []string{"some-app-name"}},
 					{Key: SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					{Key: PerPage, Values: []string{"1"}},
+					{Key: Page, Values: []string{"1"}},
 				}))
 				_, ok := actualParams.ResponseBody.(resources.Application)
 				Expect(ok).To(BeTrue())
