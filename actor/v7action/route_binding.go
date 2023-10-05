@@ -128,6 +128,8 @@ func (actor Actor) getRouteBinding(serviceInstanceGUID, routeGUID string) (resou
 	bindings, _, warnings, err := actor.CloudControllerClient.GetRouteBindings(
 		ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{routeGUID}},
 		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	switch {
@@ -156,6 +158,8 @@ func (actor Actor) getRouteForBinding(params getRouteForBindingParams) (resource
 				ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
 				ccv3.Query{Key: ccv3.HostsFilter, Values: []string{params.Hostname}},
 				ccv3.Query{Key: ccv3.PathsFilter, Values: []string{params.Path}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+				ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 			)
 			return
 		},

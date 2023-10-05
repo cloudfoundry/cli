@@ -156,6 +156,8 @@ func (actor Actor) DownloadDropletByGUIDAndAppName(dropletGUID string, appName s
 	droplets, getDropletWarnings, err := actor.CloudControllerClient.GetDroplets(
 		ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{dropletGUID}},
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	allWarnings = append(allWarnings, getDropletWarnings...)
 	if err != nil {

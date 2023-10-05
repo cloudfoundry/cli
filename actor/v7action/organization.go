@@ -35,6 +35,8 @@ func (actor Actor) GetOrganizationByGUID(orgGUID string) (resources.Organization
 func (actor Actor) GetOrganizationByName(name string) (resources.Organization, Warnings, error) {
 	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 	if err != nil {
 		return resources.Organization{}, Warnings(warnings), err

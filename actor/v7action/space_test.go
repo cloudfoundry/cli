@@ -258,6 +258,8 @@ var _ = Describe("Space", func() {
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 				})
 			})
@@ -281,6 +283,8 @@ var _ = Describe("Space", func() {
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 					Expect(space).To(Equal(resources.Space{
 						GUID: "some-space-guid",
@@ -524,20 +528,18 @@ var _ = Describe("Space", func() {
 							Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
 
 							Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{{
-								Key:    ccv3.NameFilter,
-								Values: []string{"some-org"},
-							}}))
+							Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{
+								{Key: ccv3.NameFilter, Values: []string{"some-org"}},
+								{Key: ccv3.PerPage, Values: []string{"1"}},
+								{Key: ccv3.Page, Values: []string{"1"}},
+							}))
 
 							Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{{
-								Key:    ccv3.NameFilter,
-								Values: []string{"some-space"},
-							},
-								{
-									Key:    ccv3.OrganizationGUIDFilter,
-									Values: []string{"some-org-guid"},
-								},
+							Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{
+								{Key: ccv3.NameFilter, Values: []string{"some-space"}},
+								{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+								{Key: ccv3.PerPage, Values: []string{"1"}},
+								{Key: ccv3.Page, Values: []string{"1"}},
 							}))
 
 							Expect(fakeCloudControllerClient.DeleteSpaceCallCount()).To(Equal(1))

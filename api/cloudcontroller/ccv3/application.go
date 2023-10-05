@@ -23,6 +23,8 @@ func (client *Client) GetApplicationByNameAndSpace(appName string, spaceGUID str
 	apps, warnings, err := client.GetApplications(
 		Query{Key: NameFilter, Values: []string{appName}},
 		Query{Key: SpaceGUIDFilter, Values: []string{spaceGUID}},
+		Query{Key: PerPage, Values: []string{"1"}},
+		Query{Key: Page, Values: []string{"1"}},
 	)
 	if err != nil {
 		return resources.Application{}, warnings, err

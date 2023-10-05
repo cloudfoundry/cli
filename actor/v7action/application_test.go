@@ -1959,6 +1959,7 @@ var _ = Describe("Application Actions", func() {
 						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 				})
 
@@ -1998,8 +1999,9 @@ var _ = Describe("Application Actions", func() {
 				packageGuid, queries := fakeCloudControllerClient.GetPackageDropletsArgsForCall(0)
 				Expect(packageGuid).To(Equal("package-guid"))
 				Expect(queries).To(ConsistOf(
-					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
 					ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"STAGED"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 

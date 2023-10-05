@@ -49,7 +49,11 @@ func (client *Client) GetServiceOfferingByGUID(guid string) (resources.ServiceOf
 }
 
 func (client *Client) GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (resources.ServiceOffering, Warnings, error) {
-	query := []Query{{Key: NameFilter, Values: []string{serviceOfferingName}}}
+	query := []Query{
+		{Key: NameFilter, Values: []string{serviceOfferingName}},
+		{Key: PerPage, Values: []string{"2"}},
+		{Key: Page, Values: []string{"1"}},
+	}
 	if serviceBrokerName != "" {
 		query = append(query, Query{Key: ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}})
 	}

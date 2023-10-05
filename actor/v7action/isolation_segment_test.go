@@ -110,6 +110,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.DeleteIsolationSegmentCallCount()).To(Equal(1))
@@ -266,6 +268,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+						ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 					))
 
 					Expect(fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipCallCount()).To(Equal(1))
@@ -438,6 +442,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 				Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 		})

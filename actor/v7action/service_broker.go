@@ -18,10 +18,9 @@ func (actor Actor) GetServiceBrokers() ([]resources.ServiceBroker, Warnings, err
 
 func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (resources.ServiceBroker, Warnings, error) {
 	query := []ccv3.Query{
-		{
-			Key:    ccv3.NameFilter,
-			Values: []string{serviceBrokerName},
-		},
+		{Key: ccv3.NameFilter, Values: []string{serviceBrokerName}},
+		{Key: ccv3.PerPage, Values: []string{"1"}},
+		{Key: ccv3.Page, Values: []string{"1"}},
 	}
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(query...)
 	if err != nil {

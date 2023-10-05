@@ -131,18 +131,11 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 
 func (actor Actor) GetNewestReadyPackageForApplication(app resources.Application) (resources.Package, Warnings, error) {
 	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
-		ccv3.Query{
-			Key:    ccv3.AppGUIDFilter,
-			Values: []string{app.GUID},
-		},
-		ccv3.Query{
-			Key:    ccv3.StatesFilter,
-			Values: []string{string(constant.PackageReady)},
-		},
-		ccv3.Query{
-			Key:    ccv3.OrderBy,
-			Values: []string{ccv3.CreatedAtDescendingOrder},
-		},
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+		ccv3.Query{Key: ccv3.StatesFilter, Values: []string{string(constant.PackageReady)}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	if err != nil {

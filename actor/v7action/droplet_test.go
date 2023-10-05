@@ -783,6 +783,8 @@ var _ = Describe("Droplet Actions", func() {
 				Expect(fakeCloudControllerClient.GetDropletsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"some-droplet-guid"}},
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 
 				Expect(fakeCloudControllerClient.DownloadDropletCallCount()).To(Equal(1))

@@ -9,6 +9,8 @@ import (
 func (actor *Actor) GetStackByName(stackName string) (resources.Stack, Warnings, error) {
 	stacks, warnings, err := actor.CloudControllerClient.GetStacks(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{stackName}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	if err != nil {
