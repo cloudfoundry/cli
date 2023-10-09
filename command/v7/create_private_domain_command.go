@@ -1,6 +1,9 @@
 package v7
 
 import (
+	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -34,8 +37,17 @@ func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.CreatePrivateDomain(domain, orgName)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
+		if e, ok := err.(ccerror.UnprocessableEntityError); ok {
+			inUse := fmt.Sprintf("The domain name \"%s\" is already in use", domain)
+			if e.Message == inUse {
+				cmd.UI.DisplayWarning(err.Error())
+				cmd.UI.DisplayOK()
+				return nil
+			}
+		}
 		return err
 	}
 
