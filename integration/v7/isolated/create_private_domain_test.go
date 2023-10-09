@@ -106,12 +106,12 @@ var _ = Describe("create-private-domain command", func() {
 						privateDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName())
 						privateDomain1.Create()
 					})
-					It("should fail and return an error", func() {
+					It("succeeds", func() {
 						session := helpers.CF("create-private-domain", orgName, privateDomain1.Name)
 
 						Eventually(session.Err).Should(Say("The domain name \"%s\" is already in use", privateDomain1.Name))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
