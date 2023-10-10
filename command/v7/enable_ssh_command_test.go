@@ -160,6 +160,7 @@ var _ = Describe("enable-ssh Command", func() {
 			It("shows the app ssh is already enabled", func() {
 				Expect(testUI.Out).To(Say("ssh support for app 'some-app' is already enabled."))
 				Expect(testUI.Out).To(Say("OK"))
+				Expect(testUI.Out).To(Say("TIP: An app restart may be required for the change to take effect."))
 			})
 		})
 
