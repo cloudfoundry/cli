@@ -17,6 +17,7 @@ type RunTaskCommand struct {
 	Memory          flag.Megabytes          `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	Name            string                  `long:"name" description:"Name to give the task (generated if omitted)"`
 	Process         string                  `long:"process" description:"Process type to use as a template for command, memory, and disk for the created task."`
+	Wait            bool                    `long:"wait" short:"w" description:"Wait for the task to complete before exiting"`
 	usage           interface{}             `usage:"CF_NAME run-task APP_NAME [--command COMMAND] [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [--name TASK_NAME] [--process PROCESS_TYPE]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app --command \"bundle exec rake db:migrate\" --name migrate\n\n   CF_NAME run-task my-app --process batch_job\n\n   CF_NAME run-task my-app"`
 	relatedCommands interface{}             `related_commands:"logs, tasks, terminate-task"`
 }
@@ -93,6 +94,22 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("task name:"), task.Name},
 		{cmd.UI.TranslateText("task id:"), fmt.Sprint(task.SequenceID)},
 	}, 3)
+
+	if cmd.Wait {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for task to complete execution...")
+
+		_, pollWarnings, err := cmd.Actor.PollTask(task)
+		cmd.UI.DisplayWarnings(pollWarnings)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Task has completed successfully.")
+	}
+
+	cmd.UI.DisplayOK()
 
 	return nil
 }

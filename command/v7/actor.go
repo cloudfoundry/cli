@@ -189,6 +189,7 @@ type Actor interface {
 	PollPackage(pkg resources.Package) (resources.Package, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
+	PollTask(task resources.Task) (resources.Task, v7action.Warnings, error)
 	PollUploadBuildpackJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
 	PurgeServiceInstance(serviceInstanceName, spaceGUID string) (v7action.Warnings, error)

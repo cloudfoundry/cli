@@ -145,6 +145,7 @@ var _ = Describe("run-task Command", func() {
 
 						Expect(testUI.Out).To(Say(`task name:\s+31337ddd`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
+						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))
@@ -190,6 +191,7 @@ var _ = Describe("run-task Command", func() {
 
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
+						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))
@@ -280,6 +282,7 @@ var _ = Describe("run-task Command", func() {
 
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
+						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))
@@ -331,11 +334,55 @@ var _ = Describe("run-task Command", func() {
 
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
+						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))
 						Expect(testUI.Err).To(Say("get-process-warning"))
 						Expect(testUI.Err).To(Say("get-application-warning-3"))
+					})
+				})
+
+				When("wait is provided", func() {
+					BeforeEach(func() {
+						cmd.Name = "some-task-name"
+						cmd.Command = "echo hello"
+						cmd.Wait = true
+						fakeActor.RunTaskReturns(
+							resources.Task{
+								Name:       "some-task-name",
+								SequenceID: 3,
+							},
+							v7action.Warnings{"get-application-warning-3"},
+							nil)
+						fakeActor.PollTaskReturns(
+							resources.Task{
+								Name:       "some-task-name",
+								SequenceID: 3,
+							},
+							v7action.Warnings{"poll-warnings"},
+							nil)
+					})
+
+					It("waits for the task to complete before exiting", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
+						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
+						Expect(testUI.Out).To(Say(`task id:\s+3`))
+
+						Expect(testUI.Out).To(Say(`Waiting for task to complete execution...`))
+
+						Expect(testUI.Out).To(Say(`Task has completed successfully.`))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(testUI.Err).To(Say("get-application-warning-1"))
+						Expect(testUI.Err).To(Say("get-application-warning-2"))
+						Expect(testUI.Err).To(Say("get-application-warning-3"))
+						Expect(testUI.Err).To(Say("poll-warnings"))
+
 					})
 				})
 			})
@@ -372,6 +419,31 @@ var _ = Describe("run-task Command", func() {
 								nil,
 								nil)
 							fakeActor.RunTaskReturns(
+								resources.Task{},
+								nil,
+								returnedErr)
+						})
+
+						It("returns a translatable error", func() {
+							Expect(executeErr).To(MatchError(returnedErr))
+						})
+					})
+
+					When("polling the task returns the error", func() {
+						var returnedErr error
+
+						BeforeEach(func() {
+							cmd.Wait = true
+							returnedErr = ccerror.UnverifiedServerError{URL: "some-url"}
+							fakeActor.GetApplicationByNameAndSpaceReturns(
+								resources.Application{GUID: "some-app-guid"},
+								nil,
+								nil)
+							fakeActor.RunTaskReturns(
+								resources.Task{},
+								nil,
+								nil)
+							fakeActor.PollTaskReturns(
 								resources.Task{},
 								nil,
 								returnedErr)

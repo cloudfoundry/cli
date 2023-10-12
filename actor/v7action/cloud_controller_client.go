@@ -136,6 +136,7 @@ type CloudControllerClient interface {
 	GetAppFeature(appGUID string, featureName string) (resources.ApplicationFeature, ccv3.Warnings, error)
 	GetStacks(query ...ccv3.Query) ([]resources.Stack, ccv3.Warnings, error)
 	GetStagingSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
+	GetTask(guid string) (resources.Task, ccv3.Warnings, error)
 	GetUser(userGUID string) (resources.User, ccv3.Warnings, error)
 	GetUsers(query ...ccv3.Query) ([]resources.User, ccv3.Warnings, error)
 	MakeRequestSendReceiveRaw(Method string, URL string, headers http.Header, requestBody []byte) ([]byte, *http.Response, error)
