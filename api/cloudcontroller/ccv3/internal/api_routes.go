@@ -103,6 +103,7 @@ const (
 	GetSpaceStagingSecurityGroupsRequest                        = "GetSpaceStagingSecurityGroups"
 	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetStacksRequest                                            = "GetStacks"
+	GetTaskRequest                                              = "GetTask"
 	GetUserRequest                                              = "GetUser"
 	GetUsersRequest                                             = "GetUsers"
 	MapRouteRequest                                             = "MapRoute"
@@ -343,6 +344,7 @@ var APIRoutes = map[string]Route{
 	DeleteSpaceQuotaFromSpaceRequest:                            {Path: "/v3/space_quotas/:quota_guid/relationships/spaces/:space_guid", Method: http.MethodDelete},
 	GetStacksRequest:                                            {Path: "/v3/stacks", Method: http.MethodGet},
 	PatchStackRequest:                                           {Path: "/v3/stacks/:stack_guid", Method: http.MethodPatch},
+	GetTaskRequest:                                              {Path: "/v3/tasks/:task_guid", Method: http.MethodGet},
 	PutTaskCancelRequest:                                        {Path: "/v3/tasks/:task_guid/cancel", Method: http.MethodPut},
 	GetUsersRequest:                                             {Path: "/v3/users", Method: http.MethodGet},
 	GetUserRequest:                                              {Path: "/v3/users/:user_guid", Method: http.MethodGet},
