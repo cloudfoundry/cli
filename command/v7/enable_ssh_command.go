@@ -65,5 +65,14 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("TIP: Ensure ssh is also enabled on the space and global level.")
 	}
 
+	if sshEnabled.Enabled && !appFeature.Enabled {
+		cmd.UI.DisplayText("TIP: An app restart is required for the change to take effect.")
+	}
+
+	if appFeature.Enabled {
+		cmd.UI.DisplayText("TIP: An app restart may be required for the change to take effect.")
+	}
+
 	return nil
 }
+
