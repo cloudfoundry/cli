@@ -18,11 +18,13 @@ var _ = Describe("Task Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		fakeConfig                *v7actionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
+		fakeConfig = new(v7actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, nil)
 	})
 
 	Describe("RunTask", func() {
@@ -303,6 +305,65 @@ var _ = Describe("Task Actions", func() {
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("update-task-warning"))
 			})
+		})
+	})
+
+	Describe("PollTask", func() {
+
+		It("polls for SUCCEDED state", func() {
+			firstTaskResponse := resources.Task{State: constant.TaskRunning}
+			secondTaskResponse := resources.Task{State: constant.TaskSucceeded}
+
+			fakeCloudControllerClient.GetTaskReturnsOnCall(0, firstTaskResponse, nil, nil)
+			fakeCloudControllerClient.GetTaskReturnsOnCall(1, secondTaskResponse, nil, nil)
+
+			task, _, _ := actor.PollTask(resources.Task{})
+
+			Expect(task.State).To(Equal(constant.TaskSucceeded))
+		})
+
+		It("polls for FAILED state", func() {
+			firstTaskResponse := resources.Task{State: constant.TaskRunning}
+			secondTaskResponse := resources.Task{State: constant.TaskFailed}
+
+			fakeCloudControllerClient.GetTaskReturnsOnCall(0, firstTaskResponse, nil, nil)
+			fakeCloudControllerClient.GetTaskReturnsOnCall(1, secondTaskResponse, nil, nil)
+
+			task, _, _ := actor.PollTask(resources.Task{})
+
+			Expect(task.State).To(Equal(constant.TaskFailed))
+		})
+
+		It("aggregates warnings from all requests made while polling", func() {
+			firstTaskResponse := resources.Task{State: constant.TaskRunning}
+			secondTaskResponse := resources.Task{State: constant.TaskSucceeded}
+
+			fakeCloudControllerClient.GetTaskReturnsOnCall(0, firstTaskResponse, ccv3.Warnings{"warning-1"}, nil)
+			fakeCloudControllerClient.GetTaskReturnsOnCall(1, secondTaskResponse, ccv3.Warnings{"warning-2"}, nil)
+
+			_, warnings, _ := actor.PollTask(resources.Task{})
+
+			Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+		})
+
+		It("handles errors from requests to cc", func() {
+			firstTaskResponse := resources.Task{State: constant.TaskSucceeded}
+
+			fakeCloudControllerClient.GetTaskReturnsOnCall(0, firstTaskResponse, nil, errors.New("request-error"))
+
+			_, _, err := actor.PollTask(resources.Task{})
+
+			Expect(err).To(MatchError("request-error"))
+		})
+
+		It("returns an error if the task failed", func() {
+			firstTaskResponse := resources.Task{State: constant.TaskFailed}
+
+			fakeCloudControllerClient.GetTaskReturnsOnCall(0, firstTaskResponse, nil, nil)
+
+			_, _, err := actor.PollTask(resources.Task{})
+
+			Expect(err).To(MatchError("Task failed to complete successfully"))
 		})
 	})
 })
