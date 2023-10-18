@@ -1,5 +1,3 @@
-
-
 <img src="https://raw.githubusercontent.com/cloudfoundry/logos/master/CF_Icon_4-colour.png" alt="CF logo" height="100" align="left"/>
 
 # Cloud Foundry CLI
