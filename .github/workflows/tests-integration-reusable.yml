@@ -43,12 +43,12 @@ jobs:
         output: |
           {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
     - name: Checkout cli
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{github.event.workflow_run.head_sha}}
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: cloudfoundry/cli-ci
         path: cli-ci
@@ -61,21 +61,21 @@ jobs:
 
     - name: Checkout cf-deployment Min CAPI
       if: ${{ inputs.capi-version != 'edge' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: cloudfoundry/cf-deployment
         path: cf-deployment
         ref: ${{ steps.read-min-capi.outputs.version }}
 
     - name: Checkout cf-deployment
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       if: ${{ inputs.capi-version == 'edge' }}
       with:
         repository: cloudfoundry/cf-deployment
         path: cf-deployment
 
     - name: Checkout CF deployment tasks
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
