@@ -179,7 +179,7 @@ jobs:
         go env
 
     - name: Go Assets Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ${{ steps.go-cache-paths.outputs.go-mod }}
@@ -460,7 +460,7 @@ jobs:
         cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
 
     - name: Configure Homebrew cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/Library/Caches/Homebrew/gon--*
@@ -480,7 +480,7 @@ jobs:
         go env
 
     - name: Go Assets Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ${{ steps.go-cache-paths.outputs.go-mod }}
