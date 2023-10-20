@@ -398,8 +398,8 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: >
-        apt update &&
-        apt install --yes --no-install-recommends
+        sudo apt update &&
+        sudo apt install --yes --no-install-recommends
         gnupg
         createrepo
         awscli
