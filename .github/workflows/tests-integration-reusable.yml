@@ -156,7 +156,7 @@ jobs:
         # deploy
         bosh -d cf manifest > /tmp/manifest.yml
         bosh interpolate /tmp/manifest.yml \
-          -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
+          -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
@@ -181,7 +181,7 @@ jobs:
 
         # Copy Ops files
         mkdir ops-files
-        cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
+        cp cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
