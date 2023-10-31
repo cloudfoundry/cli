@@ -181,7 +181,7 @@ jobs:
 
         # Copy Ops files
         mkdir ops-files
-        cp cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml ops-files/
+        cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
         cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
