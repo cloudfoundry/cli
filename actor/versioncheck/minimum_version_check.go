@@ -1,7 +1,7 @@
 package versioncheck
 
 import (
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 func IsMinimumAPIVersionMet(current string, minimum string) (bool, error) {

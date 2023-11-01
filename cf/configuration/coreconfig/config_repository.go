@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/version"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 type ConfigRepository struct {
