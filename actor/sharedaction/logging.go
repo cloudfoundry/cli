@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	logcache "code.cloudfoundry.org/go-log-cache"
-	"code.cloudfoundry.org/go-log-cache/rpc/logcache_v1"
-	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
+	logcache "code.cloudfoundry.org/go-log-cache/v2"
+	"code.cloudfoundry.org/go-log-cache/v2/rpc/logcache_v1"
+	"code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2"
 	"github.com/sirupsen/logrus"
 )
 
