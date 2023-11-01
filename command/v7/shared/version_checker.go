@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 func CheckCCAPIVersion(currentAPIVersion string) (string, error) {

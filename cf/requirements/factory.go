@@ -3,7 +3,7 @@ package requirements
 import (
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Factory

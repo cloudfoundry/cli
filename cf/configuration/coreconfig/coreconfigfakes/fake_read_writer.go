@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 type FakeReadWriter struct {
