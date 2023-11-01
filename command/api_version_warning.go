@@ -3,7 +3,7 @@ package command
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/version"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 type APIVersionTooHighError struct{}

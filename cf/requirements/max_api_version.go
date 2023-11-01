@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 )
