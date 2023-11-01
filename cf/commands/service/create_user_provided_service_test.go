@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"

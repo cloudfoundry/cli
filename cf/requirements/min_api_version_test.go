@@ -3,7 +3,7 @@ package requirements_test
 import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/requirements"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 

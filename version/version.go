@@ -1,6 +1,6 @@
 package version
 
-import "github.com/blang/semver"
+import "github.com/blang/semver/v4"
 
 const DefaultVersion = "0.0.0-unknown-version"
 
