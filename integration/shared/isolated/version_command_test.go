@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"

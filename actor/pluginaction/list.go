@@ -2,7 +2,7 @@ package pluginaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 type OutdatedPlugin struct {

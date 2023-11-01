@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/plugin"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 var (

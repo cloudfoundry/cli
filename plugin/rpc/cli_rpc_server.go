@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 	"code.cloudfoundry.org/cli/version"
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 
 	"fmt"
 	"net"

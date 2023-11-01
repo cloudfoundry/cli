@@ -3,7 +3,7 @@ package shared
 import (
 	"fmt"
 
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 const minimumCCAPIVersionForV7 = "3.85.0"
