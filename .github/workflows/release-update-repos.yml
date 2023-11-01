@@ -351,8 +351,7 @@ jobs:
 
   update-rpm:
     name: Update RPM Repository
-    runs-on: ubuntu-20.04
-    container: ubuntu:18.04
+    runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.secrets-environment }}
     needs: setup
     env:
@@ -398,10 +397,10 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: >
-        apt update &&
-        apt install --yes --no-install-recommends
+        sudo apt update &&
+        sudo apt install --yes --no-install-recommends
         gnupg
-        createrepo
+        createrepo-c
         awscli
 
     - name: Setup aws to upload installers to CLAW S3 bucket
@@ -428,7 +427,7 @@ jobs:
       run: aws s3 sync --exclude "*" --include "releases/*/*installer*.rpm" s3://cf-cli-releases .
 
     - name: Sign repo
-      run: createrepo --checksum=sha .
+      run: createrepo_c --checksum=sha .
 
     - name: List assets
       run: ls -R
