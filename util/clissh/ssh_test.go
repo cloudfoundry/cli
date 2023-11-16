@@ -27,7 +27,7 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_net"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
 	"code.cloudfoundry.org/lager/v3/lagertest"
-	"github.com/kr/pty"
+	"github.com/creack/pty"
 	"github.com/moby/term"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -50,7 +50,7 @@ func BlockAcceptOnClose(fake *fake_net.FakeListener) {
 	}
 }
 
-var _ = Describe("CLI SSH", func() {
+var _ = Describe("CLI SSH", Serial, func() {
 	var (
 		fakeSecureDialer    *clisshfakes.FakeSecureDialer
 		fakeSecureClient    *clisshfakes.FakeSecureClient

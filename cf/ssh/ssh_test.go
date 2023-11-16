@@ -29,7 +29,7 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_net"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
 	"code.cloudfoundry.org/lager/v3/lagertest"
-	"github.com/kr/pty"
+	"github.com/creack/pty"
 	"github.com/moby/term"
 	"golang.org/x/crypto/ssh"
 
