@@ -125,6 +125,7 @@ var _ = Describe("app stager", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, app.Name, organization.Name, space.Name, user.Name))
 			Expect(testUI.Out).To(Say("Waiting for app to start..."))
+
 		})
 
 		When("staging fails", func() {
@@ -168,6 +169,32 @@ var _ = Describe("app stager", func() {
 
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError("start-app-error"))
+			})
+		})
+
+		When("The deployment strategy is rolling with nowait", func() {
+			BeforeEach(func() {
+				strategy = constant.DeploymentStrategyRolling
+				noWait = true
+				appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
+				executeErr = appStager.StageAndStart(
+					app,
+					space,
+					organization,
+					pkgGUID,
+					strategy,
+					noWait,
+					appAction,
+				)
+			})
+
+			It("Restages and starts the app", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("Creating deployment for app %s...", app.Name))
+				Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
+
+				Expect(testUI.Out).To(Say("First instance restaged correctly, restaging remaining in the background"))
 			})
 		})
 	})
@@ -609,4 +636,5 @@ var _ = Describe("app stager", func() {
 			Expect(executeErr).To(Not(HaveOccurred()))
 		})
 	})
+
 })
