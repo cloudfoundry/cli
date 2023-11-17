@@ -125,7 +125,7 @@ var _ = Describe("CLI SSH", Serial, func() {
 		)
 	})
 
-	Describe("Connect", func() {
+	Describe("Connect", Serial, func() {
 		var connectErr error
 
 		JustBeforeEach(func() {
@@ -175,7 +175,7 @@ var _ = Describe("CLI SSH", Serial, func() {
 		})
 	})
 
-	Describe("InteractiveSession", func() {
+	Describe("InteractiveSession", Serial, func() {
 		var (
 			stdin          *fake_io.FakeReadCloser
 			stdout, stderr *fake_io.FakeWriter
@@ -820,7 +820,7 @@ var _ = Describe("CLI SSH", Serial, func() {
 		})
 	})
 
-	Describe("LocalPortForward", func() {
+	Describe("LocalPortForward", Serial, func() {
 		var (
 			forwardErr error
 
@@ -1149,7 +1149,7 @@ var _ = Describe("CLI SSH", Serial, func() {
 		})
 	})
 
-	Describe("Wait", func() {
+	Describe("Wait", Serial, func() {
 		var waitErr error
 
 		JustBeforeEach(func() {
@@ -1203,7 +1203,7 @@ var _ = Describe("CLI SSH", Serial, func() {
 		})
 	})
 
-	Describe("Close", func() {
+	Describe("Close", Serial, func() {
 		JustBeforeEach(func() {
 			connectErr := secureShell.Connect(username, passcode, sshEndpoint, sshEndpointFingerprint, skipHostValidation)
 			Expect(connectErr).NotTo(HaveOccurred())
