@@ -171,6 +171,10 @@ func (stager *Stager) StartApp(
 		if err != nil {
 			return err
 		}
+		if noWait == true {
+			stager.UI.DisplayText("First instance restaged correctly, restaging remaining in the background")
+			return nil
+		}
 	} else {
 		user, err := stager.Config.CurrentUser()
 		if err != nil {
