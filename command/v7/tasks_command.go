@@ -62,6 +62,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("state"),
 			cmd.UI.TranslateText("start time"),
 			cmd.UI.TranslateText("command"),
+			cmd.UI.TranslateText("result"),
 		},
 	}
 	for _, task := range tasks {
@@ -74,12 +75,18 @@ func (cmd TasksCommand) Execute(args []string) error {
 			task.Command = "[hidden]"
 		}
 
+		result := ""
+		if task.Result != nil {
+			result = task.Result.FailureReason
+		}
+
 		table = append(table, []string{
 			strconv.FormatInt(task.SequenceID, 10),
 			task.Name,
 			cmd.UI.TranslateText(string(task.State)),
 			t.Format(time.RFC1123),
 			task.Command,
+			result,
 		})
 	}
 
