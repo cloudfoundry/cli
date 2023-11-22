@@ -30,6 +30,8 @@ type Task struct {
 	// Using a pointer so that it can be set to nil to prevent
 	// json serialization when no template is used
 	Template *TaskTemplate `json:"template,omitempty"`
+
+	Result *TaskResult `json:"result,omitempty"`
 }
 
 type TaskTemplate struct {
@@ -38,4 +40,8 @@ type TaskTemplate struct {
 
 type TaskProcessTemplate struct {
 	Guid string `json:"guid,omitempty"`
+}
+
+type TaskResult struct {
+	FailureReason string `json:"failure_reason,omitempty"`
 }
