@@ -213,6 +213,7 @@ jobs:
         export BOSH_DEPLOY_ARGS=""
         export BOSH_LITE=false
         export BBL_JSON_CONFIG=""
+        export SKIP_STEMCELL_UPLOAD=false
         export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
                           add-uaa-client-credentials.yml \
                           diego-cell-instances.yml \
