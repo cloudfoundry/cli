@@ -164,7 +164,7 @@ jobs:
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
 
     - name: Set Up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
         check-latest: true
@@ -373,7 +373,7 @@ jobs:
       run: make
 
     - name: Set Up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
         check-latest: true
@@ -542,7 +542,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set Up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           check-latest: true
