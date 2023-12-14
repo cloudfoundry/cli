@@ -167,7 +167,7 @@ jobs:
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ needs.setup.outputs.go-version }}
 
@@ -449,7 +449,7 @@ jobs:
       run: make
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ needs.setup.outputs.go-version }}
 
@@ -659,7 +659,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ needs.setup.outputs.go-version }}
 
