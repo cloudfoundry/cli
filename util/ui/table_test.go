@@ -75,9 +75,9 @@ var _ = Describe("Table", func() {
 					{"#0", "data1", "data2", "data3"},
 				},
 				2)
-			Expect(out).To(Say("    \x1b\\[1mheader1\x1b\\[0m")) // Makes sure empty values are not bolded
-			Expect(out).To(Say("\x1b\\[1mheader2\x1b\\[0m"))
-			Expect(out).To(Say("\x1b\\[1mheader3\x1b\\[0m"))
+			Expect(out).To(Say("    \u001B\\[1mheader1\u001B\\[22m")) // Makes sure empty values are not bolded
+			Expect(out).To(Say("\u001B\\[1mheader2\u001B\\[22m"))
+			Expect(out).To(Say("\u001B\\[1mheader3\u001B\\[22m"))
 			Expect(out).To(Say("#0  data1    data2    data3"))
 		})
 	})
