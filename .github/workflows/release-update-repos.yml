@@ -340,7 +340,7 @@ jobs:
     #     ls -R
     #
     # - name: Backup current Linux RPM repodata
-    #   uses: actions/upload-artifact@v3
+    #   uses: actions/upload-artifact@v4
     #   with:
     #     if-no-files-found: error
     #     name: cf-cli-linux-rpm-repodata-backup
@@ -382,7 +382,7 @@ jobs:
         ls -R
 
     - name: Store Linux RPM repodata
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-repodata
