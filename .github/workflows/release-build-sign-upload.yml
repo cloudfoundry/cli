@@ -180,7 +180,7 @@ jobs:
         make out/cf-cli_linux_arm64
 
     - name: Store Linux Binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-linux-binaries
@@ -285,7 +285,7 @@ jobs:
       working-directory: signed-redhat-installer
 
     - name: Store Signed Linux RPM Packages
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-packages
@@ -387,7 +387,7 @@ jobs:
       working-directory: packaged-deb
 
     - name: Store Debian Packages
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-linux-deb-packages
@@ -476,7 +476,7 @@ jobs:
         make out/cf-cli_macosarm
 
     - name: Store macOS Binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-macos-binaries
@@ -616,7 +616,7 @@ jobs:
           "signed-macos-installer/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_macosarm.pkg"
 
     - name: Store macOS Signed Packages
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
         name: cf-cli-macos-packages
@@ -702,7 +702,7 @@ jobs:
       #     Stop-Service sshd
 
       - name: Save signed binaries as a GitHub Action Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cf-cli-windows-binaries
           if-no-files-found: error
@@ -754,7 +754,7 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
 
       - name: Save installer and dist files as a GitHub Action Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cf-cli-windows-packages
           if-no-files-found: error
