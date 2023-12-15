@@ -810,7 +810,7 @@ jobs:
         echo "INSTALLER_RELEASE_VERSION=${INSTALLER_RELEASE_VERSION}" >> $GITHUB_ENV
 
     - name: Download signed artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: signed # download all artifacts to 'signed/'
 
@@ -969,7 +969,7 @@ jobs:
     environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
     - name: Download signed artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: signed # download all artifacts to 'signed/'
 
@@ -1003,7 +1003,7 @@ jobs:
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cf-cli-linux-rpm-packages
 
@@ -1026,7 +1026,7 @@ jobs:
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cf-cli-linux-deb-packages
 
@@ -1045,7 +1045,7 @@ jobs:
     steps:
 
     - name: Download Signed macOS Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cf-cli-macos-packages
 
@@ -1070,7 +1070,7 @@ jobs:
     steps:
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cf-cli-windows-binaries
 
@@ -1080,7 +1080,7 @@ jobs:
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cf-cli-windows-packages
 
