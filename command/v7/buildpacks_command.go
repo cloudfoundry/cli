@@ -48,7 +48,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 func (cmd BuildpacksCommand) displayTable(buildpacks []resources.Buildpack) {
 	if len(buildpacks) > 0 {
 		var keyValueTable = [][]string{
-			{"position", "name", "stack", "enabled", "locked", "filename"},
+			{"position", "name", "stack", "enabled", "locked", "state", "filename"},
 		}
 		for _, buildpack := range buildpacks {
 			keyValueTable = append(keyValueTable, []string{
@@ -57,6 +57,7 @@ func (cmd BuildpacksCommand) displayTable(buildpacks []resources.Buildpack) {
 				buildpack.Stack,
 				strconv.FormatBool(buildpack.Enabled.Value),
 				strconv.FormatBool(buildpack.Locked.Value),
+				buildpack.State,
 				buildpack.Filename,
 			})
 		}

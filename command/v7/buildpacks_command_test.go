@@ -8,6 +8,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -114,6 +115,7 @@ var _ = Describe("buildpacks Command", func() {
 							Position: types.NullInt{Value: 1, IsSet: true},
 							Enabled:  types.NullBool{Value: true, IsSet: true},
 							Locked:   types.NullBool{Value: false, IsSet: true},
+							State:    constant.BuildpackReady,
 							Filename: "buildpack-1.file",
 							Stack:    "buildpack-1-stack",
 						},
@@ -123,6 +125,7 @@ var _ = Describe("buildpacks Command", func() {
 							Position: types.NullInt{Value: 2, IsSet: true},
 							Enabled:  types.NullBool{Value: false, IsSet: true},
 							Locked:   types.NullBool{Value: true, IsSet: true},
+							State:    constant.BuildpackAwaitingUpload,
 							Filename: "buildpack-2.file",
 							Stack:    "",
 						},
@@ -133,9 +136,9 @@ var _ = Describe("buildpacks Command", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
-					Expect(testUI.Out).To(Say(`position\s+name\s+stack\s+enabled\s+locked\s+filename`))
-					Expect(testUI.Out).To(Say(`1\s+buildpack-1\s+buildpack-1-stack\s+true\s+false\s+buildpack-1.file`))
-					Expect(testUI.Out).To(Say(`2\s+buildpack-2\s+false\s+true\s+buildpack-2.file`))
+					Expect(testUI.Out).To(Say(`position\s+name\s+stack\s+enabled\s+locked\s+state\s+filename`))
+					Expect(testUI.Out).To(Say(`1\s+buildpack-1\s+buildpack-1-stack\s+true\s+false\s+READY\s+buildpack-1.file`))
+					Expect(testUI.Out).To(Say(`2\s+buildpack-2\s+false\s+true\s+AWAITING_UPLOAD\s+buildpack-2.file`))
 				})
 			})
 			When("there are no buildpacks", func() {

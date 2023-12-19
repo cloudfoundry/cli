@@ -53,33 +53,36 @@ var _ = Describe("buildpacks command", func() {
 
 			username, _ := helpers.GetCredentials()
 			Eventually(session).Should(Say("Getting buildpacks as %s...", username))
-			Eventually(session).Should(Say(`position\s+name\s+stack\s+enabled\s+locked\s+filename`))
+			Eventually(session).Should(Say(`position\s+name\s+stack\s+enabled\s+locked\s+state\s+filename`))
 
 			positionRegex := `\d+`
 			enabledRegex := `true`
 			lockedRegex := `false`
 			stackRegex := `(cflinuxfs[23]|windows.+)`
+			stateRegex := `READY`
 
 			staticfileNameRegex := `staticfile_buildpack`
 			// staticfileFileRegex := `staticfile[-_]buildpack-\S+`
 			staticfileFileRegex := ""
-			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
 				positionRegex,
 				staticfileNameRegex,
 				stackRegex,
 				enabledRegex,
 				lockedRegex,
+				stateRegex,
 				staticfileFileRegex))
 
 			binaryNameRegex := `binary_buildpack`
 			// binaryFileRegex := `binary[-_]buildpack-\S+`
 			binaryFileRegex := ""
-			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
 				positionRegex,
 				binaryNameRegex,
 				stackRegex,
 				enabledRegex,
 				lockedRegex,
+				stateRegex,
 				binaryFileRegex))
 			Eventually(session).Should(Exit(0))
 		})
@@ -118,7 +121,7 @@ var _ = Describe("buildpacks command", func() {
 
 					username, _ := helpers.GetCredentials()
 					Expect(session).Should(Say("Getting buildpacks as %s...", username))
-					Expect(session).Should(Say(`position\s+name\s+stack\s+enabled\s+locked\s+filename`))
+					Expect(session).Should(Say(`position\s+name\s+stack\s+enabled\s+locked\s+state\s+filename`))
 
 					re := regexp.MustCompile(`(?:\n|\r)\d+\s+\w{8}`)
 					buildpackMatches := re.FindAll(session.Out.Contents(), -1)
@@ -128,13 +131,15 @@ var _ = Describe("buildpacks command", func() {
 					enabledRegex := `true`
 					lockedRegex := `false`
 					stackRegex := ``
+					stateRegex := `READY`
 
-					Expect(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+					Expect(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
 						positionRegex,
 						buildpack2,
 						stackRegex,
 						enabledRegex,
 						lockedRegex,
+						stateRegex,
 						""))
 				})
 			})
