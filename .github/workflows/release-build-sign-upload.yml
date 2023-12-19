@@ -83,19 +83,16 @@ jobs:
     if: ${{ github.action_repository != 'cloudfoundry/cli' }}
 
     outputs:
-      secrets-environment:   ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-      #TODO: DEV SHIM
-      # aws-s3-bucket:         cf-cli-dev
-      aws-s3-bucket:         "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
+      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
+      aws-s3-bucket:       "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
 
-      version-build:         ${{ steps.parse-semver.outputs.version-build }}
-      version-major:         ${{ steps.parse-semver.outputs.version-major }}
-      version-minor:         ${{ steps.parse-semver.outputs.version-minor }}
-      version-patch:         ${{ steps.parse-semver.outputs.version-patch }}
+      version-build: ${{ steps.parse-semver.outputs.version-build }}
+      version-major: ${{ steps.parse-semver.outputs.version-major }}
+      version-minor: ${{ steps.parse-semver.outputs.version-minor }}
+      version-patch: ${{ steps.parse-semver.outputs.version-patch }}
 
     steps:
     - id: set-secrets-environment
-      # run: echo "secrets-environment=DEV" >> "${GITHUB_OUTPUT}"
       run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
@@ -789,12 +786,6 @@ jobs:
     - name: Checkout cli
       uses: actions/checkout@v4
 
-    # - name: get semver version
-    #   # set environment var for subsequent steps. see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-    #   run: |
-    #     VERSION_BUILD=$(cat BUILD_VERSION | tr -d v)
-    #     echo "VERSION_BUILD=${VERSION_BUILD}" >> $GITHUB_ENV
-
     - name: Download signed artifacts
       uses: actions/download-artifact@v4
       with:
@@ -935,14 +926,6 @@ jobs:
         repository:              ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
         token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
         fail_on_unmatched_files: true
-        # files: |
-        #   signed/cf-cli-linux-binaries/cf-cli*
-        #   signed/cf-cli-linux-deb-packages/cf*deb
-        #   signed/cf-cli-linux-rpm-packages/cf*rpm
-        #   signed/cf-cli-macos-binaries/cf-cli*
-        #   signed/cf-cli-macos-packages/cf*pkg
-        #   signed/cf-cli-windows-binaries/cf-cli*.exe
-        #   signed/cf-cli-windows-packages/*.zip
 
   test-rpm-package:
     name: Test RPM Artifacts
