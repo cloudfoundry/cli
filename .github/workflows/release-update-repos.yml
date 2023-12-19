@@ -1,4 +1,5 @@
-name: "Release: Update Repositories"
+name:     "Release: Update Repositories"
+run-name: "Release: Update Repositories [${{ github.ref_name }}]"
 
 on:
   workflow_dispatch:
@@ -32,11 +33,11 @@ jobs:
     steps:
     - name: Set environment
       id: set-secrets-environment
-      run: echo "::set-output name=secrets-environment::PROD"
+      run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
 
     - name: Set CLAW URL
       id: set-claw-url
-      run: echo "::set-output name=claw-url::https://packages.cloudfoundry.org"
+      run: echo "claw-url=https://packages.cloudfoundry.org" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
       uses: actions/checkout@v4
@@ -50,12 +51,12 @@ jobs:
         VERSION_MINOR="${VERSION#*.}"
         VERSION_MINOR="${VERSION_MINOR%.*}"
 
-        echo "::set-output name=version-build::${VERSION}"
-        echo "::set-output name=version-major::${VERSION%%\.*}"
-        echo "::set-output name=version-minor::${VERSION_MINOR}"
-        echo "::set-output name=version-patch::${VERSION##*.}"
+        echo "version-build=${VERSION}"       >> "${GITHUB_OUTPUT}"
+        echo "version-major=${VERSION%%\.*}"  >> "${GITHUB_OUTPUT}"
+        echo "version-minor=${VERSION_MINOR}" >> "${GITHUB_OUTPUT}"
+        echo "version-patch=${VERSION##*.}"   >> "${GITHUB_OUTPUT}"
 
-        echo "VERSION_BUILD=${VERSION}" >> ${GITHUB_ENV}
+        echo "VERSION_BUILD=${VERSION}"       >> "${GITHUB_ENV}"
 
     - name: Test if CLAW serve this version
       env:
@@ -258,7 +259,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7
@@ -358,8 +358,8 @@ jobs:
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
-
     steps:
+
     - name: Setup
       env:
         ENVIRONMENT:   ${{ github.event.inputs.environment }}
@@ -402,7 +402,7 @@ jobs:
         gnupg
         createrepo-c
         awscli
-  
+
     - name: Setup aws to upload installers to CLAW S3 bucket
       uses: aws-actions/configure-aws-credentials@v4
       env:
