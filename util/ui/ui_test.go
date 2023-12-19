@@ -95,7 +95,7 @@ var _ = Describe("UI", func() {
 
 			It("displays the error to ui.Err and displays FAILED in bold red to ui.Out", func() {
 				Expect(ui.Err).To(Say("I am an error\n"))
-				Expect(out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
+				Expect(out).To(Say("\u001B\\[31;1mFAILED\u001B\\[0;22m\n"))
 			})
 
 			When("the locale is not set to english", func() {
@@ -110,7 +110,7 @@ var _ = Describe("UI", func() {
 			It("displays the error text to ui.Err and displays FAILED in bold red to ui.Out", func() {
 				ui.DisplayError(errors.New("I am a BANANA!"))
 				Expect(ui.Err).To(Say("I am a BANANA!\n"))
-				Expect(out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
+				Expect(out).To(Say("\u001B\\[31;1mFAILED\u001B\\[0;22m\n"))
 			})
 		})
 	})
@@ -118,7 +118,7 @@ var _ = Describe("UI", func() {
 	Describe("DisplayHeader", func() {
 		It("displays the header colorized and bolded to ui.Out", func() {
 			ui.DisplayHeader("some-header")
-			Expect(out).To(Say("\x1b\\[1msome-header\x1b\\[0m"))
+			Expect(out).To(Say("\u001B\\[1msome-header\u001B\\[22m"))
 		})
 
 		When("the locale is not set to English", func() {
@@ -134,7 +134,7 @@ var _ = Describe("UI", func() {
 
 			It("displays the translated header colorized and bolded to ui.Out", func() {
 				ui.DisplayHeader("FEATURE FLAGS")
-				Expect(out).To(Say("\x1b\\[1mINDICATEURS DE FONCTION\x1b\\[0m"))
+				Expect(out).To(Say("\u001B\\[1mINDICATEURS DE FONCTION\u001B\\[22m"))
 			})
 		})
 	})
@@ -149,7 +149,7 @@ var _ = Describe("UI", func() {
 	Describe("DisplayOK", func() {
 		It("displays 'OK' in green and bold", func() {
 			ui.DisplayOK()
-			Expect(out).To(Say("\x1b\\[32;1mOK\x1b\\[0m"))
+			Expect(out).To(Say("\u001B\\[32;1mOK\u001B\\[0;22m"))
 		})
 	})
 
@@ -269,7 +269,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"SomeMapValue": "map-value",
 					})
-				Expect(out).To(Say("template with \x1b\\[1mmap-value\x1b\\[0m"))
+				Expect(out).To(Say("template with \u001B\\[1mmap-value\u001B\\[22m"))
 			})
 		})
 
@@ -283,7 +283,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"SomeOtherMapValue": "other-map-value",
 					})
-				Expect(out).To(Say("template with \x1b\\[1mmap-value\x1b\\[0m and <no value>"))
+				Expect(out).To(Say("template with \u001B\\[1mmap-value\u001B\\[22m and <no value>"))
 			})
 		})
 
@@ -304,7 +304,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"AppName": "some-app-name",
 					})
-				Expect(out).To(Say("L'application \x1b\\[1msome-app-name\x1b\\[0m n'existe pas.\n"))
+				Expect(out).To(Say("L'application \u001B\\[1msome-app-name\u001B\\[22m n'existe pas.\n"))
 			})
 		})
 	})
@@ -322,7 +322,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"SomeMapValue": "map-value",
 					})
-				Expect(out).To(Say("template with \x1b\\[36;1mmap-value\x1b\\[0m"))
+				Expect(out).To(Say("template with \u001B\\[36;1mmap-value\u001B\\[0;22m"))
 			})
 		})
 
@@ -336,7 +336,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"SomeOtherMapValue": "other-map-value",
 					})
-				Expect(out).To(Say("template with \x1b\\[36;1mmap-value\x1b\\[0m and <no value>"))
+				Expect(out).To(Say("template with \u001B\\[36;1mmap-value\u001B\\[0;22m and <no value>"))
 			})
 		})
 
@@ -357,7 +357,7 @@ var _ = Describe("UI", func() {
 					map[string]interface{}{
 						"AppName": "some-app-name",
 					})
-				Expect(out).To(Say("L'application \x1b\\[36;1msome-app-name\x1b\\[0m n'existe pas.\n"))
+				Expect(out).To(Say("L'application \u001B\\[36;1msome-app-name\u001B\\[0;22m n'existe pas.\n"))
 			})
 		})
 	})
@@ -365,11 +365,11 @@ var _ = Describe("UI", func() {
 	Describe("DisplayDiffAddition", func() {
 		It("displays a green indented line with a +", func() {
 			ui.DisplayDiffAddition("added", 3, false)
-			Expect(out).To(Say(`\x1b\[32m\+       added\x1b\[0m`))
+			Expect(out).To(Say("\u001B\\[32m\\+\\s+added\u001B\\[0m"))
 		})
 		It("displays a hyphen when the addHyphen is true", func() {
 			ui.DisplayDiffAddition("added", 3, true)
-			Expect(out).To(Say(`\x1b\[32m\+     - added\x1b\[0m`))
+			Expect(out).To(Say("\u001B\\[32m\\+\\s+\\- added\u001B\\[0m"))
 		})
 
 	})
@@ -377,11 +377,11 @@ var _ = Describe("UI", func() {
 	Describe("DisplayDiffRemoval", func() {
 		It("displays a red indented line with a -", func() {
 			ui.DisplayDiffRemoval("removed", 3, false)
-			Expect(out).To(Say(`\x1b\[31m\-       removed\x1b\[0m`))
+			Expect(out).To(Say("\u001B\\[31m\\-\\s+removed\u001B\\[0m"))
 		})
 		It("displays a a hyphen when addHyphen is true", func() {
 			ui.DisplayDiffRemoval("removed", 3, true)
-			Expect(out).To(Say(`\x1b\[31m\-     - removed\x1b\[0m`))
+			Expect(out).To(Say("\u001B\\[31m\\-\\s+\\- removed\u001B\\[0m"))
 		})
 	})
 

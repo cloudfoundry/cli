@@ -39,10 +39,10 @@ var _ = Describe("UI", func() {
 					{"#2", "crashed", "val1", "val2"},
 				})
 
-				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
+				Expect(ui.Out).To(Say("\u001B\\[1mheader1\u001B\\[22m\\s+\u001B\\[1mheader2\u001B\\[22m\\s+\u001B\\[1mheader3\u001B\\[22m")) // Makes sure empty values are not bolded
 				Expect(ui.Out).To(Say(`#0\s+starting\s+val1\s+val2`))
-				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1mdown\x1b\\[0m\\s+val1\\s+val2"))
-				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1mcrashed\x1b\\[0m\\s+val1\\s+val2"))
+				Expect(ui.Out).To(Say("#1\\s+\u001B\\[31;1mdown\u001B\\[0;22m\\s+val1\\s+val2"))
+				Expect(ui.Out).To(Say("#2\\s+\u001B\\[31;1mcrashed\u001B\\[0;22m\\s+val1\\s+val2"))
 			})
 		})
 
@@ -65,10 +65,10 @@ var _ = Describe("UI", func() {
 					{"#2", ui.TranslateText("crashed"), "val1", "val2"},
 				})
 
-				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
+				Expect(ui.Out).To(Say("\u001B\\[1mheader1\u001B\\[22m\\s+\u001B\\[1mheader2\u001B\\[22m\\s+\u001B\\[1mheader3\u001B\\[22m")) // Makes sure empty values are not bolded
 				Expect(ui.Out).To(Say(`#0\s+%s\s+val1\s+val2`, ui.TranslateText("starting")))
-				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("down")))
-				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("crashed")))
+				Expect(ui.Out).To(Say("#1\\s+\u001B\\[31;1m%s\u001B\\[0;22m\\s+val1\\s+val2", ui.TranslateText("down")))
+				Expect(ui.Out).To(Say("#2\\s+\u001B\\[31;1m%s\u001B\\[0;22m\\s+val1\\s+val2", ui.TranslateText("crashed")))
 			})
 		})
 	})
@@ -144,8 +144,8 @@ var _ = Describe("UI", func() {
 
 				It("displays a table with requested state and instances in red", func() {
 					Expect(ui.Out).To(Say("name:              dora\n"))
-					Expect(ui.Out).To(Say("requested state:   \x1b\\[31;1mrunning\x1b\\[0m\n"))
-					Expect(ui.Out).To(Say("instances:         \x1b\\[31;1m0/1\x1b\\[0m\n"))
+					Expect(ui.Out).To(Say("requested state:   \u001B\\[31;1mrunning\u001B\\[0;22m\n"))
+					Expect(ui.Out).To(Say("instances:         \u001B\\[31;1m0/1\u001B\\[0;22m\n"))
 				})
 			})
 
@@ -168,8 +168,8 @@ var _ = Describe("UI", func() {
 
 				It("displays a table with requested state and instances in red", func() {
 					Expect(ui.Out).To(Say("name:              dora\n"))
-					Expect(ui.Out).To(Say("requested state:   \x1b\\[31;1m%s\x1b\\[0m\n", ui.TranslateText("running")))
-					Expect(ui.Out).To(Say("instances:         \x1b\\[31;1m0/1\x1b\\[0m\n"))
+					Expect(ui.Out).To(Say("requested state:   \u001B\\[31;1m%s\u001B\\[0;22m\n", ui.TranslateText("running")))
+					Expect(ui.Out).To(Say("instances:         \u001B\\[31;1m0/1\u001B\\[0;22m\n"))
 				})
 			})
 		})
