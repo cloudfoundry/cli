@@ -91,7 +91,7 @@ var _ = Describe("tasks command", func() {
 					session := helpers.CF("tasks", appName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Eventually(session).Should(Say(`id\s+name\s+state\s+start time\s+command
+					Eventually(session).Should(Say(`id\s+name\s+state\s+start time\s+command\s+result
 2\s+[a-zA-Z-0-9 ,:]+echo foo bar
 1\s+[a-zA-Z-0-9 ,:]+echo hello world`))
 					Eventually(session).Should(Exit(0))
