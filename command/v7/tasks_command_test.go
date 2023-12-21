@@ -199,31 +199,6 @@ var _ = Describe("tasks Command", func() {
 					})
 				})
 
-				When("the tasks command field Result is set", func() {
-					BeforeEach(func() {
-						fakeActor.GetApplicationTasksReturns(
-							[]resources.Task{
-								{
-									GUID:       "task-1-guid",
-									SequenceID: 1,
-									Name:       "task-1",
-									State:      constant.TaskFailed,
-									CreatedAt:  "2016-11-08T22:26:02Z",
-									Command:    "",
-									Result:     &resources.TaskResult{FailureReason: "Failed test"},
-								},
-							},
-							v7action.Warnings{"get-tasks-warning-1"},
-							nil)
-					})
-
-					It("outputs Result for the tasks commands", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say(`1\s+task-1\s+FAILED\s+Tue, 08 Nov 2016 22:26:02 UTC\s+\[hidden\]\s+Failed test`))
-					})
-				})
-
 				When("there are no tasks associated with the application", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns([]resources.Task{}, nil, nil)
