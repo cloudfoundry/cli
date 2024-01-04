@@ -1,10 +1,14 @@
 package pluginrepo
 
 import (
+	"code.cloudfoundry.org/cli/version"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
@@ -37,8 +41,14 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 			repoError = append(repoError, fmt.Sprintf(T("Error creating a request")+" '%s' - %s", repo.Name, err.Error()))
 			continue
 		}
-
-		req.Header.Set("User-Agent", "golang_user_agent/1.0")
+		userAgent := fmt.Sprintf("%s/%s (%s; %s %s)",
+			filepath.Base(os.Args[0]),
+			version.VersionString(),
+			runtime.Version(),
+			runtime.GOARCH,
+			runtime.GOOS,
+		)
+		req.Header.Set("User-Agent", userAgent)
 		resp, err := client.Do(req)
 		if err != nil {
 			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
