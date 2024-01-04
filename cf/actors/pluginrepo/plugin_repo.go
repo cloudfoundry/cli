@@ -31,7 +31,16 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 	repoPlugins := make(map[string][]clipr.Plugin)
 
 	for _, repo := range repos {
-		resp, err := http.Get(getListEndpoint(repo.URL))
+		// resp, err := http.Get(getListEndpoint(repo.URL))
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", getListEndpoint(repo.URL), nil)
+		if err != nil {
+			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
+			continue
+		}
+
+		req.Header.Set("User-Agent", "golang_user_agent/1.0")
+		resp, err := client.Do(req)
 		if err != nil {
 			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
 			continue
