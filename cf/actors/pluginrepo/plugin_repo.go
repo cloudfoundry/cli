@@ -31,7 +31,6 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 	repoPlugins := make(map[string][]clipr.Plugin)
 
 	for _, repo := range repos {
-		// resp, err := http.Get(getListEndpoint(repo.URL))
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", getListEndpoint(repo.URL), nil)
 		if err != nil {
