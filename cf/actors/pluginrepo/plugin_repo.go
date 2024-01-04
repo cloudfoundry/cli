@@ -34,7 +34,7 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", getListEndpoint(repo.URL), nil)
 		if err != nil {
-			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
+			repoError = append(repoError, fmt.Sprintf(T("Error creating a request")+" '%s' - %s", repo.Name, err.Error()))
 			continue
 		}
 
