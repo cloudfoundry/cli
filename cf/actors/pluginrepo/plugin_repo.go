@@ -4,7 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/version"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,7 +31,7 @@ func NewPluginRepo() PluginRepo {
 
 func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Plugin, []string) {
 	var pluginList clipr.PluginsJson
-	repoError := []string{}
+	var repoError []string
 	repoPlugins := make(map[string][]clipr.Plugin)
 
 	for _, repo := range repos {
@@ -54,9 +54,14 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
 			continue
 		} else {
-			defer resp.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					repoError = append(repoError, fmt.Sprintf(T("Error closing body")+" '%s' - %s", repo.Name, err.Error()))
+				}
+			}(resp.Body)
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				repoError = append(repoError, fmt.Sprintf(T("Error reading response from")+" '%s' - %s ", repo.Name, err.Error()))
 				continue
