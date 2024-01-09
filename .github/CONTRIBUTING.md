@@ -79,8 +79,8 @@ export PATH=<path-to-cli-directory>/out:$PATH # Puts the built CLI first in your
 
 ### Compiling for Other Operating Systems and Architectures
 
-The supported platforms for the CF CLI are Linux (32-bit and 64-bit), Windows
-(32-bit and 64-bit) and OSX (aka Darwin). The commands that build the binaries
+The supported platforms for the CF CLI are Linux (x86, x86-64 and arm64) , Windows
+(x86 and x86-64) and OSX (aka Darwin x86-64 and arm64). The commands that build the binaries
 can be seen in the [Makefile](/Makefile) where the target begins with the
 `out/cf-cli`.
 
