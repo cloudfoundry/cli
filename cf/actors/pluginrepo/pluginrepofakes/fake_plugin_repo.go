@@ -38,15 +38,16 @@ func (fake *FakePluginRepo) GetPlugins(arg1 []models.PluginRepo) (map[string][]w
 	fake.getPluginsArgsForCall = append(fake.getPluginsArgsForCall, struct {
 		arg1 []models.PluginRepo
 	}{arg1Copy})
+	stub := fake.GetPluginsStub
+	fakeReturns := fake.getPluginsReturns
 	fake.recordInvocation("GetPlugins", []interface{}{arg1Copy})
 	fake.getPluginsMutex.Unlock()
-	if fake.GetPluginsStub != nil {
-		return fake.GetPluginsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPluginsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

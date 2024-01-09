@@ -30,15 +30,19 @@ var _ = Describe("PluginRepo", func() {
 		BeforeEach(func() {
 			testServer1CallCount = 0
 			h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				defer GinkgoRecover()
 				testServer1CallCount++
 				fmt.Fprintln(w, `{"plugins":[]}`)
+				Expect(r.Header.Get("User-Agent")).NotTo(Equal("Go-http-client/1.1"))
 			})
 			testServer1 = httptest.NewServer(h1)
 
 			testServer2CallCount = 0
 			h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				defer GinkgoRecover()
 				testServer2CallCount++
 				fmt.Fprintln(w, `{"plugins":[]}`)
+				Expect(r.Header.Get("User-Agent")).NotTo(Equal("Go-http-client/1.1"))
 			})
 			testServer2 = httptest.NewServer(h2)
 
@@ -87,6 +91,7 @@ var _ = Describe("PluginRepo", func() {
 		Context("When data is valid", func() {
 			BeforeEach(func() {
 				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					defer GinkgoRecover()
 					fmt.Fprintln(w, `{"plugins":[
 						{
 							"name":"plugin1",
@@ -111,6 +116,7 @@ var _ = Describe("PluginRepo", func() {
 							]
 						}]
 					}`)
+					Expect(r.Header.Get("User-Agent")).NotTo(Equal("Go-http-client/1.1"))
 				})
 				testServer1 = httptest.NewServer(h1)
 
@@ -146,7 +152,9 @@ var _ = Describe("PluginRepo", func() {
 		Context("json is invalid", func() {
 			BeforeEach(func() {
 				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					defer GinkgoRecover()
 					fmt.Fprintln(w, `"plugins":[]}`)
+					Expect(r.Header.Get("User-Agent")).NotTo(Equal("Go-http-client/1.1"))
 				})
 				testServer1 = httptest.NewServer(h1)
 			})
@@ -174,7 +182,9 @@ var _ = Describe("PluginRepo", func() {
 		Context("when data is valid json, but not valid plugin repo data", func() {
 			BeforeEach(func() {
 				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					defer GinkgoRecover()
 					fmt.Fprintln(w, `{"bad_plugin_tag":[]}`)
+					Expect(r.Header.Get("User-Agent")).NotTo(Equal("Go-http-client/1.1"))
 				})
 				testServer1 = httptest.NewServer(h1)
 			})
