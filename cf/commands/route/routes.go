@@ -53,7 +53,11 @@ func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc
 	reqs := []requirements.Requirement{
 		usageReq,
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedSpaceRequirement(),
+	}
+
+	orglevel := fc.Bool("orglevel")
+	if !orglevel {
+		reqs = append(reqs, requirementsFactory.NewTargetedSpaceRequirement())
 	}
 
 	return reqs, nil
