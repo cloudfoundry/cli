@@ -450,6 +450,7 @@ var _ = Describe("Organizations", func() {
 
 				expectedBody := map[string]interface{}{
 					"name": "some-org-name",
+					"suspended": false,
 				}
 
 				server.AppendHandlers(
@@ -485,6 +486,7 @@ var _ = Describe("Organizations", func() {
 
 				expectedBody := map[string]interface{}{
 					"name": "some-org-name",
+					"suspended": false,
 				}
 
 				server.AppendHandlers(
@@ -525,6 +527,7 @@ var _ = Describe("Organizations", func() {
 
 				expectedBody := map[string]interface{}{
 					"name": "some-org-name",
+					"suspended": false,
 				}
 
 				server.AppendHandlers(
@@ -584,6 +587,7 @@ var _ = Describe("Organizations", func() {
 
 				expectedBody := map[string]interface{}{
 					"name": "some-org-name",
+					"suspended": false,
 					"metadata": map[string]interface{}{
 						"labels": map[string]string{
 							"k1": "v1",
