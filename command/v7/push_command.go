@@ -97,6 +97,7 @@ type PushCommand struct {
 	NoWait                  bool                                `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app (except when no-route is specified in the manifest)"`
+	RedactEnv               bool                                `long:"redact-env" description:"Do not print values for environment vars set in the application manifest"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy, either rolling or null."`
@@ -140,7 +141,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
-	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
+	cmd.DiffDisplayer = &shared.ManifestDiffDisplayer{UI: ui, RedactEnv: cmd.RedactEnv}
 
 	return err
 }
