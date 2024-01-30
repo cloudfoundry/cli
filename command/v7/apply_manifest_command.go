@@ -20,6 +20,7 @@ type ApplyManifestCommand struct {
 	PathToManifest   flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
 	Vars             []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
+	RedactEnv        bool                                `long:"redact-env" description:"Do not print values for environment vars set in the application manifest"`
 	usage            interface{}                         `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
 	relatedCommands  interface{}                         `related_commands:"create-app, create-app-manifest, push"`
 
@@ -33,7 +34,10 @@ type ApplyManifestCommand struct {
 func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
-	cmd.DiffDisplayer = shared.NewManifestDiffDisplayer(ui)
+	cmd.DiffDisplayer = &shared.ManifestDiffDisplayer{
+		UI:        ui,
+		RedactEnv: cmd.RedactEnv,
+	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
