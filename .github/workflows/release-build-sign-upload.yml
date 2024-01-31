@@ -296,7 +296,7 @@ jobs:
       run: |
         set -ex
         set -o pipefail
-        
+
         root=$PWD
 
         mkdir -pv $root/packaged-deb
@@ -654,31 +654,32 @@ jobs:
           make out/cf-cli_win32.exe
           make out/cf-cli_winx64.exe
 
-      - name: write windows cert
-        env:
-          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
-          SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
+      - name: Set up certificate
         run: |
-          $pass = convertto-securestring -string "${env:SIGNING_KEY_WINDOWS_PASSPHRASE}" -asplaintext
-          [convert]::frombase64string(${env:SIGNING_KEY_WINDOWS_PFX}) | set-content -path $env:runner_temp\cert.pfx -asbytestream
+          echo "${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CLIENT_CERT_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+        shell: bash
 
-
-      - name: Sign windows binaries
-        env:
-          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+      - name: Set variables
+        id: variables
         run: |
-          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_win32.exe
-          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath out\cf-cli_winx64.exe
+          echo "SM_HOST=${{ vars.SIGNING_KEY_WINDOWS_DIGICERT_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CLIENT_CERT_INSTALLATION_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
+          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
+        shell: bash
 
-      - name: View binary signatures
+      - name: Setup Keylocker KSP on Windows
         run: |
-          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_win32.exe
-          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_winx64.exe
-
-      - name: Make symlinks
-        run: |
-          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_win32.exe -Path .\out\cf-cli_win32-link.exe
-          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
+          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o Keylockertools-windows-x64.msi
+          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
+          smksp_registrar.exe list
+          smctl.exe keypair ls
+          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
+          smctl windows certsync
+        shell: cmd
 
       # This is for debugging windows
       # - name: enable ssh
@@ -698,6 +699,22 @@ jobs:
       #     sleep 3600
       #     Stop-Service sshd
 
+      - name: Sign Windows binaries
+        run: |
+          smctl healthcheck --all
+          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_win32.exe
+          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_winx64.exe
+
+      - name: View binary signatures
+        run: |
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_win32.exe
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\out\cf-cli_winx64.exe
+
+      - name: Make symlinks
+        run: |
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_win32.exe -Path .\out\cf-cli_win32-link.exe
+          New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
+
       - name: Save signed binaries as a GitHub Action Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -715,34 +732,32 @@ jobs:
           mkdir "${env:RUNNER_TEMP}\win32"
           .\.github\win\run-innosetup.ps1 -InnoSetupConfig ".github\win\windows-installer-v${env:VERSION_MAJOR}-x86.iss" -CfBinary "out\cf-cli_win32.exe" -InstallerOutput "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
 
-      - name: Sign windows installer
-        env:
-          SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
+      - name: Sign Windows installers
         run: |
-          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
-          .\.github\win\sign-windows-binary.ps1 -BinaryFilePath "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
+          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
+          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
 
       - name: View installer signature
         run: |
-          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
           Get-AuthenticodeSignature -Verbose -ErrorAction Stop "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
+          Get-AuthenticodeSignature -Verbose -ErrorAction Stop "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
 
       - name: Arrange files for upload
         # note the -Path flag takes comma-delimited args
         run: |
-          Copy-Item -Destination "${env:RUNNER_TEMP}\winx64" -Path .github\win\LICENSE,.github\win\NOTICE
           Copy-Item -Destination "${env:RUNNER_TEMP}\win32" -Path .github\win\LICENSE,.github\win\NOTICE
+          Copy-Item -Destination "${env:RUNNER_TEMP}\winx64" -Path .github\win\LICENSE,.github\win\NOTICE
 
-      - name: Zip windows artifact
+      - name: Zip Windows artifact
         run: |
           # strip leading v to go from tag -> semver
           $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
-          pushd "${env:RUNNER_TEMP}\winx64"
-            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${installer_release_version}_winx64.zip"
-            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
-          popd
           pushd "${env:RUNNER_TEMP}\win32"
             $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${installer_release_version}_win32.zip"
+            Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
+          popd
+          pushd "${env:RUNNER_TEMP}\winx64"
+            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${installer_release_version}_winx64.zip"
             Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
           popd
           Get-ChildItem "${env:RUNNER_TEMP}"
