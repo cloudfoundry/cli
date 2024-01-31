@@ -473,4 +473,102 @@ jobs:
     - name: Test Version Match
       run: cf -v | grep -q "${VERSION_BUILD}"
 
+  update-windows:
+    name: Update Windows Chocolatey Package
+    runs-on: windows-2019
+    needs: setup
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    env:
+      CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR:         ${{ needs.setup.outputs.version-major }}
+    steps:
+
+      - name: Setup
+        run: |
+          echo "VERSION_BUILD: ${VERSION_BUILD}"
+          echo "Environment: ${ENVIRONMENT}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Chocolatey
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          choco setapikey -k $env:CHOCO_API_KEY -s https://push.chocolatey.org/
+
+      - name: Calculate Checksums
+        run: |
+          foreach ($bit in @('32', '64')) {
+            $file="cf-cli_win${bit}.zip"
+            Invoke-WebRequest "${env:CLAW_URL}/stable?release=windows${bit}-exe&version=${env:VERSION_BUILD}&source=github-rel" `
+              -OutFile $file
+            
+            if (-not (Test-Path -Path $file)) {
+              Write-Error "Failed to download $file" -ErrorAction Stop
+            }
+          
+            $hash = (Get-FileHash $file).Hash
+            Add-Content -Path "$env:GITHUB_ENV" -Value "CLI_WIN${bit}_SHA256=$hash"
+          }
+
+      - name: Render Chocolatey Templates
+        run: |
+          # Ensure current directory is accurate for WriteAllLines
+          [System.Environment]::CurrentDirectory = (Get-Location).Path
+
+          # Use WriteAllLines because it uses UTF8 without a BOM
+          $nuspec = (Get-Content -Encoding utf8 -Raw ./cli/.github/win/choco/cloudfoundry-cli.nuspec.tmpl).
+            Replace('${version}', $env:VERSION_BUILD)
+          [System.IO.File]::WriteAllLines('./cloudfoundry-cli.nuspec', $nuspec)
+
+          New-Item -Path ./tools -ItemType Directory -Force | Out-Null
+          (Get-Content -Encoding utf8 -Raw ./cli/.github/win/choco/chocolateyinstall.ps1.tmpl).
+            Replace('${version}', $env:VERSION_BUILD). `
+            Replace('${checksum}', $env:CLI_WIN32_SHA256). `
+            Replace('${checksum64}', $env:CLI_WIN64_SHA256). `
+            Replace('${claw_url}', $env:CLAW_URL) | `
+            Set-Content ./tools/chocolateyinstall.ps1 -Encoding utf8
+
+      - name: Create Chocolatey Package
+        run: |         
+          choco pack ./cloudfoundry-cli.nuspec
+
+      - name: Push Chocolatey Package
+        run: |
+          choco push "cloudfoundry-cli.$env:VERSION_BUILD.nupkg"
+
+  test-windows:
+    name: Test Windows Chocolatey Package
+    runs-on: windows-2019
+    needs:
+      - setup
+      - update-windows
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    env:
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
+    steps:
+
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Install cf cli package
+        run: choco install cloudfoundry-cli --version $env:VERSION_MAJOR
+        
+      - name: Print CF CLI Versions
+        run: |
+          cf -v
+          Invoke-Expression "cf$env:VERSION_MAJOR -v"
+  
+      - name: Test Version Match
+        run: |
+          $found = (cf -v | Select-String "$env:VERSION_BUILD")
+          if ($null -eq $found) {
+            Write-Error "CF CLI version $env:VERSION_BUILD was not found" -ErrorAction Stop
+          }
+
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

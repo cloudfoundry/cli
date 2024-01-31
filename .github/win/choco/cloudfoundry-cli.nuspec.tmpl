@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Do not remove this test for UTF-8: if “Ω” does not appear as greek uppercase omega letter enclosed in quotation
+  marks, you should use an editor that supports UTF-8, not this one.
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>cloudfoundry-cli</id>
+        <title>Cloud Foundry CLI</title>
+        <version>${version}</version>
+        <authors>Cloud Foundry Foundation</authors>
+        <owners>Cloud Foundry Foundation</owners>
+        <summary>Install official command line client for Cloud Foundry.</summary>
+        <description>Cloud Foundry CLI is the official command line client for Cloud Foundry
+        </description>
+        <projectUrl>https://github.com/cloudfoundry/cli</projectUrl>
+        <tags>cf cli cloudfoundry</tags>
+        <copyright>Cloud Foundry Foundation</copyright>
+        <licenseUrl>https://raw.githubusercontent.com/cloudfoundry/cli/master/LICENSE</licenseUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <iconUrl>https://raw.githubusercontent.com/cloudfoundry/cli/main/.github/win/cf.ico</iconUrl>
+        <packageSourceUrl>https://github.com/cloudfoundry/cli</packageSourceUrl>
+        <docsUrl>https://docs.cloudfoundry.org/cf-cli/</docsUrl>
+        <bugTrackerUrl>https://github.com/cloudfoundry/cli/issues</bugTrackerUrl>
+        <releaseNotes>https://github.com/cloudfoundry/cli/releases</releaseNotes>
+    </metadata>
+    <files>
+        <file src="tools\*.*" target="tools"/>
+    </files>
+</package>
