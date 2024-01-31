@@ -1,0 +1,21 @@
+# stop on all errors
+$ErrorActionPreference = 'Stop';
+
+$packageName = 'cloudfoundry-cli'
+$registryUninstallerKeyName = 'cloudfoundry-cli'
+$version = '${version}'
+$url = '${claw_url}/stable?release=windows32-exe&version=${version}&source=github-rel'
+$url64 = '${claw_url}/stable?release=windows64-exe&version=${version}&source=github-rel'
+$checksum = '${checksum}'
+$checksum64 = '${checksum64}'
+$installDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$validExitCodes = @(0)
+
+Install-ChocolateyZipPackage -PackageName "$packageName" `
+  -Url "$url" `
+  -ChecksumType sha256 `
+  -Checksum "$checksum" `
+  -Url64bit "$url64" `
+  -ChecksumType64 sha256 `
+  -Checksum64 "$checksum64" `
+  -UnzipLocation "$installDir"
