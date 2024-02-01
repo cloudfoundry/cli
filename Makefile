@@ -22,7 +22,7 @@ GINKGO_FLAGS ?= -r -randomize-all -require-suite
 GINKGO_INT_FLAGS = $(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
-GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomize-suites -p
+GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomize-suites
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
 GOFLAGS := -mod=mod
 
