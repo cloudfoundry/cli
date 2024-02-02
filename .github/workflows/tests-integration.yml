@@ -11,26 +11,26 @@ on:
       - completed
 
 jobs: 
-  run-integration-tests-cf-env-with-edge-capi:
-    name: Integration tests with EDGE CAPI
+  run-integration-tests-cf-env:
+    name: Integration tests
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
-      name: Integration EDGE CAPI
+      name: Integration
     secrets: inherit
 
-  run-integration-tests-cf-env-with-edge-capi-with-client-creds:
-    name: EDGE CAPI and client creds
+  run-integration-tests-cf-env-with-client-creds:
+    name: client creds
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
-      name: Integration EDGE CAPI client creds
+      name: Integration client creds
     secrets: inherit
 
   run-integration-tests-cf-env-with-min-capi:
