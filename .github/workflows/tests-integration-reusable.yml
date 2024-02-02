@@ -141,7 +141,7 @@ jobs:
         chmod +x $install_location/credhub
         credhub --version
 
-    - name: Deploy edge CAPI with Isolation Segment and OIDC Provider
+    - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
