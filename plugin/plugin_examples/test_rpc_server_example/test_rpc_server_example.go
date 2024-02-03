@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/plugin"
@@ -95,7 +96,7 @@ func getAllApps(cliConnection plugin.CliConnection) (AppsModel, error) {
 		}
 
 		apps := AppsModel{}
-		err = json.Unmarshal([]byte(output[0]), &apps)
+		err = json.Unmarshal([]byte(strings.Join(output, " ")), &apps)
 		if err != nil {
 			return AppsModel{}, err
 		}
