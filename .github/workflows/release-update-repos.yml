@@ -520,6 +520,8 @@ jobs:
             Replace('${version}', $env:VERSION_BUILD)
           [System.IO.File]::WriteAllLines('./cloudfoundry-cli.nuspec', $nuspec)
 
+          Get-Content ./cloudfoundry-cli.nuspec
+
           New-Item -Path ./tools -ItemType Directory -Force | Out-Null
           (Get-Content -Encoding utf8 -Raw ./.github/win/choco/chocolateyinstall.ps1.tmpl).
             Replace('${version}', $env:VERSION_BUILD). `
@@ -527,6 +529,8 @@ jobs:
             Replace('${checksum64}', $env:CLI_WIN64_SHA256). `
             Replace('${claw_url}', $env:CLAW_URL) | `
             Set-Content ./tools/chocolateyinstall.ps1 -Encoding utf8
+
+          Get-Content ./tools/chocolateyinstall.ps1
 
       - name: Create Chocolatey Package
         run: |         
