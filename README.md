@@ -49,8 +49,6 @@ If you have any questions, ask away on the #cli channel in [our Slack
 community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
 mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  
-You can follow our development progress
-on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
 
 ## Contributing & Build Instructions
 Please read the [contributors' guide](.github/CONTRIBUTING.md)
