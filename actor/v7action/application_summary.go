@@ -39,6 +39,7 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	keys := []ccv3.Query{
 		{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 		{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+		{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 	}
 	if len(labelSelector) > 0 {
 		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
