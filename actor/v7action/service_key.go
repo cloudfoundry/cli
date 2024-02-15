@@ -62,6 +62,7 @@ func (actor Actor) GetServiceKeysByServiceInstance(serviceInstanceName, spaceGUI
 			keys, warnings, err = actor.CloudControllerClient.GetServiceCredentialBindings(
 				ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstance.GUID}},
 				ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"key"}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 			)
 			return
 		},
