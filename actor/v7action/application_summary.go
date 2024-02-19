@@ -32,7 +32,7 @@ func (a ApplicationSummary) hasIsolationSegment() bool {
 		len(a.ProcessSummaries[0].InstanceDetails[0].IsolationSegment) > 0
 }
 
-func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector string) ([]ApplicationSummary, Warnings, error) {
+func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector string, omitStats bool) ([]ApplicationSummary, Warnings, error) {
 	var allWarnings Warnings
 	var allSummaries []ApplicationSummary
 
@@ -43,56 +43,33 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	if len(labelSelector) > 0 {
 		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
 	}
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(keys...)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-	var processes []resources.Process
-
-	warnings, err = batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
-		batch, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
-			Key: ccv3.AppGUIDFilter, Values: guids,
-		})
-		processes = append(processes, batch...)
-		return warnings, err
-	})
-	allWarnings = append(allWarnings, warnings...)
+	apps, ccv3Warnings, err := actor.CloudControllerClient.GetApplications(keys...)
+	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
-	processSummariesByAppGUID := make(map[string]ProcessSummaries, len(apps))
-	for _, process := range processes {
-		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
-		allWarnings = append(allWarnings, Warnings(warnings)...)
+	var processSummariesByAppGUID map[string]ProcessSummaries
+	var warnings Warnings
+
+	if !omitStats {
+		processSummariesByAppGUID, warnings, err = actor.getProcessSummariesForApps(apps)
+		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err
 		}
-
-		var instanceDetails []ProcessInstance
-		for _, instance := range instances {
-			instanceDetails = append(instanceDetails, ProcessInstance(instance))
-		}
-
-		processSummary := ProcessSummary{
-			Process:         resources.Process(process),
-			InstanceDetails: instanceDetails,
-		}
-
-		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
 	}
 
 	var routes []resources.Route
 
-	warnings, err = batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
+	ccv3Warnings, err = batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
 		batch, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
 			Key: ccv3.AppGUIDFilter, Values: guids,
 		})
 		routes = append(routes, batch...)
 		return warnings, err
 	})
-	allWarnings = append(allWarnings, warnings...)
+	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
@@ -142,6 +119,46 @@ func (actor Actor) GetDetailedAppSummary(appName, spaceGUID string, withObfuscat
 	}
 
 	return detailedSummary, allWarnings, err
+}
+
+func (actor Actor) getProcessSummariesForApps(apps []resources.Application) (map[string]ProcessSummaries, Warnings, error) {
+	processSummariesByAppGUID := make(map[string]ProcessSummaries)
+	var allWarnings Warnings
+	var processes []resources.Process
+
+	warnings, err := batcher.RequestByGUID(toAppGUIDs(apps), func(guids []string) (ccv3.Warnings, error) {
+		batch, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
+			Key: ccv3.AppGUIDFilter, Values: guids,
+		})
+		processes = append(processes, batch...)
+		return warnings, err
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, process := range processes {
+		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+		allWarnings = append(allWarnings, Warnings(warnings)...)
+
+		if err != nil {
+			return nil, allWarnings, err
+		}
+
+		var instanceDetails []ProcessInstance
+		for _, instance := range instances {
+			instanceDetails = append(instanceDetails, ProcessInstance(instance))
+		}
+
+		processSummary := ProcessSummary{
+			Process:         resources.Process(process),
+			InstanceDetails: instanceDetails,
+		}
+
+		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
+	}
+	return processSummariesByAppGUID, allWarnings, nil
 }
 
 func (actor Actor) createSummary(app resources.Application, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {

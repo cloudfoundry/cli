@@ -1007,11 +1007,12 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetAppSummariesForSpaceStub        func(string, string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
+	GetAppSummariesForSpaceStub        func(string, string, bool) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 	getAppSummariesForSpaceMutex       sync.RWMutex
 	getAppSummariesForSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
 	}
 	getAppSummariesForSpaceReturns struct {
 		result1 []v7action.ApplicationSummary
@@ -3643,15 +3644,16 @@ func (fake *FakeActor) ApplyOrganizationQuotaByName(arg1 string, arg2 string) (v
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ApplyOrganizationQuotaByNameStub
+	fakeReturns := fake.applyOrganizationQuotaByNameReturns
 	fake.recordInvocation("ApplyOrganizationQuotaByName", []interface{}{arg1, arg2})
 	fake.applyOrganizationQuotaByNameMutex.Unlock()
-	if fake.ApplyOrganizationQuotaByNameStub != nil {
-		return fake.ApplyOrganizationQuotaByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.applyOrganizationQuotaByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -3708,15 +3710,16 @@ func (fake *FakeActor) ApplySpaceQuotaByName(arg1 string, arg2 string, arg3 stri
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ApplySpaceQuotaByNameStub
+	fakeReturns := fake.applySpaceQuotaByNameReturns
 	fake.recordInvocation("ApplySpaceQuotaByName", []interface{}{arg1, arg2, arg3})
 	fake.applySpaceQuotaByNameMutex.Unlock()
-	if fake.ApplySpaceQuotaByNameStub != nil {
-		return fake.ApplySpaceQuotaByNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.applySpaceQuotaByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -3772,15 +3775,16 @@ func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpace(arg1 string, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub
+	fakeReturns := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns
 	fake.recordInvocation("AssignIsolationSegmentToSpaceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
-	if fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub != nil {
-		return fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -3837,15 +3841,16 @@ func (fake *FakeActor) Authenticate(arg1 map[string]string, arg2 string, arg3 co
 		arg2 string
 		arg3 constant.GrantType
 	}{arg1, arg2, arg3})
+	stub := fake.AuthenticateStub
+	fakeReturns := fake.authenticateReturns
 	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3})
 	fake.authenticateMutex.Unlock()
-	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.authenticateReturns
 	return fakeReturns.result1
 }
 
@@ -3904,15 +3909,16 @@ func (fake *FakeActor) BindSecurityGroupToSpaces(arg1 string, arg2 []resources.S
 		arg2 []resources.Space
 		arg3 constanta.SecurityGroupLifecycle
 	}{arg1, arg2Copy, arg3})
+	stub := fake.BindSecurityGroupToSpacesStub
+	fakeReturns := fake.bindSecurityGroupToSpacesReturns
 	fake.recordInvocation("BindSecurityGroupToSpaces", []interface{}{arg1, arg2Copy, arg3})
 	fake.bindSecurityGroupToSpacesMutex.Unlock()
-	if fake.BindSecurityGroupToSpacesStub != nil {
-		return fake.BindSecurityGroupToSpacesStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.bindSecurityGroupToSpacesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -3967,15 +3973,16 @@ func (fake *FakeActor) CancelDeployment(arg1 string) (v7action.Warnings, error) 
 	fake.cancelDeploymentArgsForCall = append(fake.cancelDeploymentArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CancelDeploymentStub
+	fakeReturns := fake.cancelDeploymentReturns
 	fake.recordInvocation("CancelDeployment", []interface{}{arg1})
 	fake.cancelDeploymentMutex.Unlock()
-	if fake.CancelDeploymentStub != nil {
-		return fake.CancelDeploymentStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.cancelDeploymentReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -4033,15 +4040,16 @@ func (fake *FakeActor) CheckRoute(arg1 string, arg2 string, arg3 string, arg4 in
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.CheckRouteStub
+	fakeReturns := fake.checkRouteReturns
 	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.checkRouteMutex.Unlock()
-	if fake.CheckRouteStub != nil {
-		return fake.CheckRouteStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.checkRouteReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4097,9 +4105,10 @@ func (fake *FakeActor) ClearTarget() {
 	fake.clearTargetMutex.Lock()
 	fake.clearTargetArgsForCall = append(fake.clearTargetArgsForCall, struct {
 	}{})
+	stub := fake.ClearTargetStub
 	fake.recordInvocation("ClearTarget", []interface{}{})
 	fake.clearTargetMutex.Unlock()
-	if fake.ClearTargetStub != nil {
+	if stub != nil {
 		fake.ClearTargetStub()
 	}
 }
@@ -4123,15 +4132,16 @@ func (fake *FakeActor) CopyPackage(arg1 resources.Application, arg2 resources.Ap
 		arg1 resources.Application
 		arg2 resources.Application
 	}{arg1, arg2})
+	stub := fake.CopyPackageStub
+	fakeReturns := fake.copyPackageReturns
 	fake.recordInvocation("CopyPackage", []interface{}{arg1, arg2})
 	fake.copyPackageMutex.Unlock()
-	if fake.CopyPackageStub != nil {
-		return fake.CopyPackageStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.copyPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4191,15 +4201,16 @@ func (fake *FakeActor) CreateAndUploadBitsPackageByApplicationNameAndSpace(arg1 
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub
+	fakeReturns := fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns
 	fake.recordInvocation("CreateAndUploadBitsPackageByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.Unlock()
-	if fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub != nil {
-		return fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4257,15 +4268,16 @@ func (fake *FakeActor) CreateApplicationDroplet(arg1 string) (resources.Droplet,
 	fake.createApplicationDropletArgsForCall = append(fake.createApplicationDropletArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateApplicationDropletStub
+	fakeReturns := fake.createApplicationDropletReturns
 	fake.recordInvocation("CreateApplicationDroplet", []interface{}{arg1})
 	fake.createApplicationDropletMutex.Unlock()
-	if fake.CreateApplicationDropletStub != nil {
-		return fake.CreateApplicationDropletStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createApplicationDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4324,15 +4336,16 @@ func (fake *FakeActor) CreateApplicationInSpace(arg1 resources.Application, arg2
 		arg1 resources.Application
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateApplicationInSpaceStub
+	fakeReturns := fake.createApplicationInSpaceReturns
 	fake.recordInvocation("CreateApplicationInSpace", []interface{}{arg1, arg2})
 	fake.createApplicationInSpaceMutex.Unlock()
-	if fake.CreateApplicationInSpaceStub != nil {
-		return fake.CreateApplicationInSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createApplicationInSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4390,15 +4403,16 @@ func (fake *FakeActor) CreateBitsPackageByApplication(arg1 string) (resources.Pa
 	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateBitsPackageByApplicationStub
+	fakeReturns := fake.createBitsPackageByApplicationReturns
 	fake.recordInvocation("CreateBitsPackageByApplication", []interface{}{arg1})
 	fake.createBitsPackageByApplicationMutex.Unlock()
-	if fake.CreateBitsPackageByApplicationStub != nil {
-		return fake.CreateBitsPackageByApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createBitsPackageByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4456,15 +4470,16 @@ func (fake *FakeActor) CreateBuildpack(arg1 resources.Buildpack) (resources.Buil
 	fake.createBuildpackArgsForCall = append(fake.createBuildpackArgsForCall, struct {
 		arg1 resources.Buildpack
 	}{arg1})
+	stub := fake.CreateBuildpackStub
+	fakeReturns := fake.createBuildpackReturns
 	fake.recordInvocation("CreateBuildpack", []interface{}{arg1})
 	fake.createBuildpackMutex.Unlock()
-	if fake.CreateBuildpackStub != nil {
-		return fake.CreateBuildpackStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createBuildpackReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4523,15 +4538,16 @@ func (fake *FakeActor) CreateDeploymentByApplicationAndDroplet(arg1 string, arg2
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateDeploymentByApplicationAndDropletStub
+	fakeReturns := fake.createDeploymentByApplicationAndDropletReturns
 	fake.recordInvocation("CreateDeploymentByApplicationAndDroplet", []interface{}{arg1, arg2})
 	fake.createDeploymentByApplicationAndDropletMutex.Unlock()
-	if fake.CreateDeploymentByApplicationAndDropletStub != nil {
-		return fake.CreateDeploymentByApplicationAndDropletStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentByApplicationAndDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4590,15 +4606,16 @@ func (fake *FakeActor) CreateDeploymentByApplicationAndRevision(arg1 string, arg
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateDeploymentByApplicationAndRevisionStub
+	fakeReturns := fake.createDeploymentByApplicationAndRevisionReturns
 	fake.recordInvocation("CreateDeploymentByApplicationAndRevision", []interface{}{arg1, arg2})
 	fake.createDeploymentByApplicationAndRevisionMutex.Unlock()
-	if fake.CreateDeploymentByApplicationAndRevisionStub != nil {
-		return fake.CreateDeploymentByApplicationAndRevisionStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentByApplicationAndRevisionReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4657,15 +4674,16 @@ func (fake *FakeActor) CreateDockerPackageByApplication(arg1 string, arg2 v7acti
 		arg1 string
 		arg2 v7action.DockerImageCredentials
 	}{arg1, arg2})
+	stub := fake.CreateDockerPackageByApplicationStub
+	fakeReturns := fake.createDockerPackageByApplicationReturns
 	fake.recordInvocation("CreateDockerPackageByApplication", []interface{}{arg1, arg2})
 	fake.createDockerPackageByApplicationMutex.Unlock()
-	if fake.CreateDockerPackageByApplicationStub != nil {
-		return fake.CreateDockerPackageByApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDockerPackageByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4725,15 +4743,16 @@ func (fake *FakeActor) CreateDockerPackageByApplicationNameAndSpace(arg1 string,
 		arg2 string
 		arg3 v7action.DockerImageCredentials
 	}{arg1, arg2, arg3})
+	stub := fake.CreateDockerPackageByApplicationNameAndSpaceStub
+	fakeReturns := fake.createDockerPackageByApplicationNameAndSpaceReturns
 	fake.recordInvocation("CreateDockerPackageByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.createDockerPackageByApplicationNameAndSpaceMutex.Unlock()
-	if fake.CreateDockerPackageByApplicationNameAndSpaceStub != nil {
-		return fake.CreateDockerPackageByApplicationNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDockerPackageByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4791,15 +4810,16 @@ func (fake *FakeActor) CreateIsolationSegmentByName(arg1 resources.IsolationSegm
 	fake.createIsolationSegmentByNameArgsForCall = append(fake.createIsolationSegmentByNameArgsForCall, struct {
 		arg1 resources.IsolationSegment
 	}{arg1})
+	stub := fake.CreateIsolationSegmentByNameStub
+	fakeReturns := fake.createIsolationSegmentByNameReturns
 	fake.recordInvocation("CreateIsolationSegmentByName", []interface{}{arg1})
 	fake.createIsolationSegmentByNameMutex.Unlock()
-	if fake.CreateIsolationSegmentByNameStub != nil {
-		return fake.CreateIsolationSegmentByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createIsolationSegmentByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -4854,15 +4874,16 @@ func (fake *FakeActor) CreateManagedServiceInstance(arg1 v7action.CreateManagedS
 	fake.createManagedServiceInstanceArgsForCall = append(fake.createManagedServiceInstanceArgsForCall, struct {
 		arg1 v7action.CreateManagedServiceInstanceParams
 	}{arg1})
+	stub := fake.CreateManagedServiceInstanceStub
+	fakeReturns := fake.createManagedServiceInstanceReturns
 	fake.recordInvocation("CreateManagedServiceInstance", []interface{}{arg1})
 	fake.createManagedServiceInstanceMutex.Unlock()
-	if fake.CreateManagedServiceInstanceStub != nil {
-		return fake.CreateManagedServiceInstanceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createManagedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -4924,15 +4945,16 @@ func (fake *FakeActor) CreateOrgRole(arg1 constanta.RoleType, arg2 string, arg3 
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.CreateOrgRoleStub
+	fakeReturns := fake.createOrgRoleReturns
 	fake.recordInvocation("CreateOrgRole", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createOrgRoleMutex.Unlock()
-	if fake.CreateOrgRoleStub != nil {
-		return fake.CreateOrgRoleStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createOrgRoleReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -4987,15 +5009,16 @@ func (fake *FakeActor) CreateOrganization(arg1 string) (resources.Organization, 
 	fake.createOrganizationArgsForCall = append(fake.createOrganizationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateOrganizationStub
+	fakeReturns := fake.createOrganizationReturns
 	fake.recordInvocation("CreateOrganization", []interface{}{arg1})
 	fake.createOrganizationMutex.Unlock()
-	if fake.CreateOrganizationStub != nil {
-		return fake.CreateOrganizationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5054,15 +5077,16 @@ func (fake *FakeActor) CreateOrganizationQuota(arg1 string, arg2 v7action.QuotaL
 		arg1 string
 		arg2 v7action.QuotaLimits
 	}{arg1, arg2})
+	stub := fake.CreateOrganizationQuotaStub
+	fakeReturns := fake.createOrganizationQuotaReturns
 	fake.recordInvocation("CreateOrganizationQuota", []interface{}{arg1, arg2})
 	fake.createOrganizationQuotaMutex.Unlock()
-	if fake.CreateOrganizationQuotaStub != nil {
-		return fake.CreateOrganizationQuotaStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createOrganizationQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5118,15 +5142,16 @@ func (fake *FakeActor) CreatePrivateDomain(arg1 string, arg2 string) (v7action.W
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreatePrivateDomainStub
+	fakeReturns := fake.createPrivateDomainReturns
 	fake.recordInvocation("CreatePrivateDomain", []interface{}{arg1, arg2})
 	fake.createPrivateDomainMutex.Unlock()
-	if fake.CreatePrivateDomainStub != nil {
-		return fake.CreatePrivateDomainStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createPrivateDomainReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5185,15 +5210,16 @@ func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 s
 		arg4 string
 		arg5 int
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.CreateRouteStub
+	fakeReturns := fake.createRouteReturns
 	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createRouteMutex.Unlock()
-	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createRouteReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5251,15 +5277,16 @@ func (fake *FakeActor) CreateRouteBinding(arg1 v7action.CreateRouteBindingParams
 	fake.createRouteBindingArgsForCall = append(fake.createRouteBindingArgsForCall, struct {
 		arg1 v7action.CreateRouteBindingParams
 	}{arg1})
+	stub := fake.CreateRouteBindingStub
+	fakeReturns := fake.createRouteBindingReturns
 	fake.recordInvocation("CreateRouteBinding", []interface{}{arg1})
 	fake.createRouteBindingMutex.Unlock()
-	if fake.CreateRouteBindingStub != nil {
-		return fake.CreateRouteBindingStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createRouteBindingReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5318,15 +5345,16 @@ func (fake *FakeActor) CreateSecurityGroup(arg1 string, arg2 string) (v7action.W
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateSecurityGroupStub
+	fakeReturns := fake.createSecurityGroupReturns
 	fake.recordInvocation("CreateSecurityGroup", []interface{}{arg1, arg2})
 	fake.createSecurityGroupMutex.Unlock()
-	if fake.CreateSecurityGroupStub != nil {
-		return fake.CreateSecurityGroupStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createSecurityGroupReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5381,15 +5409,16 @@ func (fake *FakeActor) CreateServiceAppBinding(arg1 v7action.CreateServiceAppBin
 	fake.createServiceAppBindingArgsForCall = append(fake.createServiceAppBindingArgsForCall, struct {
 		arg1 v7action.CreateServiceAppBindingParams
 	}{arg1})
+	stub := fake.CreateServiceAppBindingStub
+	fakeReturns := fake.createServiceAppBindingReturns
 	fake.recordInvocation("CreateServiceAppBinding", []interface{}{arg1})
 	fake.createServiceAppBindingMutex.Unlock()
-	if fake.CreateServiceAppBindingStub != nil {
-		return fake.CreateServiceAppBindingStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createServiceAppBindingReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5447,15 +5476,16 @@ func (fake *FakeActor) CreateServiceBroker(arg1 resources.ServiceBroker) (v7acti
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
 		arg1 resources.ServiceBroker
 	}{arg1})
+	stub := fake.CreateServiceBrokerStub
+	fakeReturns := fake.createServiceBrokerReturns
 	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
 	fake.createServiceBrokerMutex.Unlock()
-	if fake.CreateServiceBrokerStub != nil {
-		return fake.CreateServiceBrokerStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createServiceBrokerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5510,15 +5540,16 @@ func (fake *FakeActor) CreateServiceKey(arg1 v7action.CreateServiceKeyParams) (c
 	fake.createServiceKeyArgsForCall = append(fake.createServiceKeyArgsForCall, struct {
 		arg1 v7action.CreateServiceKeyParams
 	}{arg1})
+	stub := fake.CreateServiceKeyStub
+	fakeReturns := fake.createServiceKeyReturns
 	fake.recordInvocation("CreateServiceKey", []interface{}{arg1})
 	fake.createServiceKeyMutex.Unlock()
-	if fake.CreateServiceKeyStub != nil {
-		return fake.CreateServiceKeyStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createServiceKeyReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5578,15 +5609,16 @@ func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string) (
 		arg2 bool
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.CreateSharedDomainStub
+	fakeReturns := fake.createSharedDomainReturns
 	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3})
 	fake.createSharedDomainMutex.Unlock()
-	if fake.CreateSharedDomainStub != nil {
-		return fake.CreateSharedDomainStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createSharedDomainReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5642,15 +5674,16 @@ func (fake *FakeActor) CreateSpace(arg1 string, arg2 string) (resources.Space, v
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateSpaceStub
+	fakeReturns := fake.createSpaceReturns
 	fake.recordInvocation("CreateSpace", []interface{}{arg1, arg2})
 	fake.createSpaceMutex.Unlock()
-	if fake.CreateSpaceStub != nil {
-		return fake.CreateSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5710,15 +5743,16 @@ func (fake *FakeActor) CreateSpaceQuota(arg1 string, arg2 string, arg3 v7action.
 		arg2 string
 		arg3 v7action.QuotaLimits
 	}{arg1, arg2, arg3})
+	stub := fake.CreateSpaceQuotaStub
+	fakeReturns := fake.createSpaceQuotaReturns
 	fake.recordInvocation("CreateSpaceQuota", []interface{}{arg1, arg2, arg3})
 	fake.createSpaceQuotaMutex.Unlock()
-	if fake.CreateSpaceQuotaStub != nil {
-		return fake.CreateSpaceQuotaStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createSpaceQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5778,15 +5812,16 @@ func (fake *FakeActor) CreateSpaceRole(arg1 constanta.RoleType, arg2 string, arg
 		arg5 string
 		arg6 bool
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	stub := fake.CreateSpaceRoleStub
+	fakeReturns := fake.createSpaceRoleReturns
 	fake.recordInvocation("CreateSpaceRole", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createSpaceRoleMutex.Unlock()
-	if fake.CreateSpaceRoleStub != nil {
-		return fake.CreateSpaceRoleStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createSpaceRoleReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5843,15 +5878,16 @@ func (fake *FakeActor) CreateUser(arg1 string, arg2 string, arg3 string) (resour
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.CreateUserStub
+	fakeReturns := fake.createUserReturns
 	fake.recordInvocation("CreateUser", []interface{}{arg1, arg2, arg3})
 	fake.createUserMutex.Unlock()
-	if fake.CreateUserStub != nil {
-		return fake.CreateUserStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createUserReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -5909,15 +5945,16 @@ func (fake *FakeActor) CreateUserProvidedServiceInstance(arg1 resources.ServiceI
 	fake.createUserProvidedServiceInstanceArgsForCall = append(fake.createUserProvidedServiceInstanceArgsForCall, struct {
 		arg1 resources.ServiceInstance
 	}{arg1})
+	stub := fake.CreateUserProvidedServiceInstanceStub
+	fakeReturns := fake.createUserProvidedServiceInstanceReturns
 	fake.recordInvocation("CreateUserProvidedServiceInstance", []interface{}{arg1})
 	fake.createUserProvidedServiceInstanceMutex.Unlock()
-	if fake.CreateUserProvidedServiceInstanceStub != nil {
-		return fake.CreateUserProvidedServiceInstanceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createUserProvidedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -5974,15 +6011,16 @@ func (fake *FakeActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string,
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.DeleteApplicationByNameAndSpaceStub
+	fakeReturns := fake.deleteApplicationByNameAndSpaceReturns
 	fake.recordInvocation("DeleteApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.deleteApplicationByNameAndSpaceMutex.Unlock()
-	if fake.DeleteApplicationByNameAndSpaceStub != nil {
-		return fake.DeleteApplicationByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6038,15 +6076,16 @@ func (fake *FakeActor) DeleteBuildpackByNameAndStack(arg1 string, arg2 string) (
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteBuildpackByNameAndStackStub
+	fakeReturns := fake.deleteBuildpackByNameAndStackReturns
 	fake.recordInvocation("DeleteBuildpackByNameAndStack", []interface{}{arg1, arg2})
 	fake.deleteBuildpackByNameAndStackMutex.Unlock()
-	if fake.DeleteBuildpackByNameAndStackStub != nil {
-		return fake.DeleteBuildpackByNameAndStackStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteBuildpackByNameAndStackReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6101,15 +6140,16 @@ func (fake *FakeActor) DeleteDomain(arg1 resources.Domain) (v7action.Warnings, e
 	fake.deleteDomainArgsForCall = append(fake.deleteDomainArgsForCall, struct {
 		arg1 resources.Domain
 	}{arg1})
+	stub := fake.DeleteDomainStub
+	fakeReturns := fake.deleteDomainReturns
 	fake.recordInvocation("DeleteDomain", []interface{}{arg1})
 	fake.deleteDomainMutex.Unlock()
-	if fake.DeleteDomainStub != nil {
-		return fake.DeleteDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteDomainReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6167,15 +6207,16 @@ func (fake *FakeActor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(a
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexStub
+	fakeReturns := fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexReturns
 	fake.recordInvocation("DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex", []interface{}{arg1, arg2, arg3, arg4})
 	fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexMutex.Unlock()
-	if fake.DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexStub != nil {
-		return fake.DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6230,15 +6271,16 @@ func (fake *FakeActor) DeleteIsolationSegmentByName(arg1 string) (v7action.Warni
 	fake.deleteIsolationSegmentByNameArgsForCall = append(fake.deleteIsolationSegmentByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteIsolationSegmentByNameStub
+	fakeReturns := fake.deleteIsolationSegmentByNameReturns
 	fake.recordInvocation("DeleteIsolationSegmentByName", []interface{}{arg1})
 	fake.deleteIsolationSegmentByNameMutex.Unlock()
-	if fake.DeleteIsolationSegmentByNameStub != nil {
-		return fake.DeleteIsolationSegmentByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteIsolationSegmentByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6294,15 +6336,16 @@ func (fake *FakeActor) DeleteIsolationSegmentOrganizationByName(arg1 string, arg
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteIsolationSegmentOrganizationByNameStub
+	fakeReturns := fake.deleteIsolationSegmentOrganizationByNameReturns
 	fake.recordInvocation("DeleteIsolationSegmentOrganizationByName", []interface{}{arg1, arg2})
 	fake.deleteIsolationSegmentOrganizationByNameMutex.Unlock()
-	if fake.DeleteIsolationSegmentOrganizationByNameStub != nil {
-		return fake.DeleteIsolationSegmentOrganizationByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteIsolationSegmentOrganizationByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6361,15 +6404,16 @@ func (fake *FakeActor) DeleteOrgRole(arg1 constanta.RoleType, arg2 string, arg3 
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.DeleteOrgRoleStub
+	fakeReturns := fake.deleteOrgRoleReturns
 	fake.recordInvocation("DeleteOrgRole", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.deleteOrgRoleMutex.Unlock()
-	if fake.DeleteOrgRoleStub != nil {
-		return fake.DeleteOrgRoleStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteOrgRoleReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6424,15 +6468,16 @@ func (fake *FakeActor) DeleteOrganization(arg1 string) (v7action.Warnings, error
 	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteOrganizationStub
+	fakeReturns := fake.deleteOrganizationReturns
 	fake.recordInvocation("DeleteOrganization", []interface{}{arg1})
 	fake.deleteOrganizationMutex.Unlock()
-	if fake.DeleteOrganizationStub != nil {
-		return fake.DeleteOrganizationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6487,15 +6532,16 @@ func (fake *FakeActor) DeleteOrganizationQuota(arg1 string) (v7action.Warnings, 
 	fake.deleteOrganizationQuotaArgsForCall = append(fake.deleteOrganizationQuotaArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteOrganizationQuotaStub
+	fakeReturns := fake.deleteOrganizationQuotaReturns
 	fake.recordInvocation("DeleteOrganizationQuota", []interface{}{arg1})
 	fake.deleteOrganizationQuotaMutex.Unlock()
-	if fake.DeleteOrganizationQuotaStub != nil {
-		return fake.DeleteOrganizationQuotaStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteOrganizationQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6550,15 +6596,16 @@ func (fake *FakeActor) DeleteOrphanedRoutes(arg1 string) (v7action.Warnings, err
 	fake.deleteOrphanedRoutesArgsForCall = append(fake.deleteOrphanedRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteOrphanedRoutesStub
+	fakeReturns := fake.deleteOrphanedRoutesReturns
 	fake.recordInvocation("DeleteOrphanedRoutes", []interface{}{arg1})
 	fake.deleteOrphanedRoutesMutex.Unlock()
-	if fake.DeleteOrphanedRoutesStub != nil {
-		return fake.DeleteOrphanedRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteOrphanedRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6616,15 +6663,16 @@ func (fake *FakeActor) DeleteRoute(arg1 string, arg2 string, arg3 string, arg4 i
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.DeleteRouteStub
+	fakeReturns := fake.deleteRouteReturns
 	fake.recordInvocation("DeleteRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.deleteRouteMutex.Unlock()
-	if fake.DeleteRouteStub != nil {
-		return fake.DeleteRouteStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6679,15 +6727,16 @@ func (fake *FakeActor) DeleteRouteBinding(arg1 v7action.DeleteRouteBindingParams
 	fake.deleteRouteBindingArgsForCall = append(fake.deleteRouteBindingArgsForCall, struct {
 		arg1 v7action.DeleteRouteBindingParams
 	}{arg1})
+	stub := fake.DeleteRouteBindingStub
+	fakeReturns := fake.deleteRouteBindingReturns
 	fake.recordInvocation("DeleteRouteBinding", []interface{}{arg1})
 	fake.deleteRouteBindingMutex.Unlock()
-	if fake.DeleteRouteBindingStub != nil {
-		return fake.DeleteRouteBindingStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.deleteRouteBindingReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -6745,15 +6794,16 @@ func (fake *FakeActor) DeleteSecurityGroup(arg1 string) (v7action.Warnings, erro
 	fake.deleteSecurityGroupArgsForCall = append(fake.deleteSecurityGroupArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteSecurityGroupStub
+	fakeReturns := fake.deleteSecurityGroupReturns
 	fake.recordInvocation("DeleteSecurityGroup", []interface{}{arg1})
 	fake.deleteSecurityGroupMutex.Unlock()
-	if fake.DeleteSecurityGroupStub != nil {
-		return fake.DeleteSecurityGroupStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteSecurityGroupReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6808,15 +6858,16 @@ func (fake *FakeActor) DeleteServiceAppBinding(arg1 v7action.DeleteServiceAppBin
 	fake.deleteServiceAppBindingArgsForCall = append(fake.deleteServiceAppBindingArgsForCall, struct {
 		arg1 v7action.DeleteServiceAppBindingParams
 	}{arg1})
+	stub := fake.DeleteServiceAppBindingStub
+	fakeReturns := fake.deleteServiceAppBindingReturns
 	fake.recordInvocation("DeleteServiceAppBinding", []interface{}{arg1})
 	fake.deleteServiceAppBindingMutex.Unlock()
-	if fake.DeleteServiceAppBindingStub != nil {
-		return fake.DeleteServiceAppBindingStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.deleteServiceAppBindingReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -6874,15 +6925,16 @@ func (fake *FakeActor) DeleteServiceBroker(arg1 string) (v7action.Warnings, erro
 	fake.deleteServiceBrokerArgsForCall = append(fake.deleteServiceBrokerArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteServiceBrokerStub
+	fakeReturns := fake.deleteServiceBrokerReturns
 	fake.recordInvocation("DeleteServiceBroker", []interface{}{arg1})
 	fake.deleteServiceBrokerMutex.Unlock()
-	if fake.DeleteServiceBrokerStub != nil {
-		return fake.DeleteServiceBrokerStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteServiceBrokerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -6938,15 +6990,16 @@ func (fake *FakeActor) DeleteServiceInstance(arg1 string, arg2 string) (chan v7a
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteServiceInstanceStub
+	fakeReturns := fake.deleteServiceInstanceReturns
 	fake.recordInvocation("DeleteServiceInstance", []interface{}{arg1, arg2})
 	fake.deleteServiceInstanceMutex.Unlock()
-	if fake.DeleteServiceInstanceStub != nil {
-		return fake.DeleteServiceInstanceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.deleteServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7006,15 +7059,16 @@ func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndName(arg1 string, arg
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.DeleteServiceKeyByServiceInstanceAndNameStub
+	fakeReturns := fake.deleteServiceKeyByServiceInstanceAndNameReturns
 	fake.recordInvocation("DeleteServiceKeyByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
 	fake.deleteServiceKeyByServiceInstanceAndNameMutex.Unlock()
-	if fake.DeleteServiceKeyByServiceInstanceAndNameStub != nil {
-		return fake.DeleteServiceKeyByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.deleteServiceKeyByServiceInstanceAndNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7073,15 +7127,16 @@ func (fake *FakeActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 st
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteSpaceByNameAndOrganizationNameStub
+	fakeReturns := fake.deleteSpaceByNameAndOrganizationNameReturns
 	fake.recordInvocation("DeleteSpaceByNameAndOrganizationName", []interface{}{arg1, arg2})
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
-	if fake.DeleteSpaceByNameAndOrganizationNameStub != nil {
-		return fake.DeleteSpaceByNameAndOrganizationNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteSpaceByNameAndOrganizationNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7137,15 +7192,16 @@ func (fake *FakeActor) DeleteSpaceQuotaByName(arg1 string, arg2 string) (v7actio
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteSpaceQuotaByNameStub
+	fakeReturns := fake.deleteSpaceQuotaByNameReturns
 	fake.recordInvocation("DeleteSpaceQuotaByName", []interface{}{arg1, arg2})
 	fake.deleteSpaceQuotaByNameMutex.Unlock()
-	if fake.DeleteSpaceQuotaByNameStub != nil {
-		return fake.DeleteSpaceQuotaByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteSpaceQuotaByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7204,15 +7260,16 @@ func (fake *FakeActor) DeleteSpaceRole(arg1 constanta.RoleType, arg2 string, arg
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.DeleteSpaceRoleStub
+	fakeReturns := fake.deleteSpaceRoleReturns
 	fake.recordInvocation("DeleteSpaceRole", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.deleteSpaceRoleMutex.Unlock()
-	if fake.DeleteSpaceRoleStub != nil {
-		return fake.DeleteSpaceRoleStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteSpaceRoleReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7267,15 +7324,16 @@ func (fake *FakeActor) DeleteUser(arg1 string) (v7action.Warnings, error) {
 	fake.deleteUserArgsForCall = append(fake.deleteUserArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteUserStub
+	fakeReturns := fake.deleteUserReturns
 	fake.recordInvocation("DeleteUser", []interface{}{arg1})
 	fake.deleteUserMutex.Unlock()
-	if fake.DeleteUserStub != nil {
-		return fake.DeleteUserStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7336,15 +7394,16 @@ func (fake *FakeActor) DiffSpaceManifest(arg1 string, arg2 []byte) (resources.Ma
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.DiffSpaceManifestStub
+	fakeReturns := fake.diffSpaceManifestReturns
 	fake.recordInvocation("DiffSpaceManifest", []interface{}{arg1, arg2Copy})
 	fake.diffSpaceManifestMutex.Unlock()
-	if fake.DiffSpaceManifestStub != nil {
-		return fake.DiffSpaceManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.diffSpaceManifestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7402,15 +7461,16 @@ func (fake *FakeActor) DisableFeatureFlag(arg1 string) (v7action.Warnings, error
 	fake.disableFeatureFlagArgsForCall = append(fake.disableFeatureFlagArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DisableFeatureFlagStub
+	fakeReturns := fake.disableFeatureFlagReturns
 	fake.recordInvocation("DisableFeatureFlag", []interface{}{arg1})
 	fake.disableFeatureFlagMutex.Unlock()
-	if fake.DisableFeatureFlagStub != nil {
-		return fake.DisableFeatureFlagStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.disableFeatureFlagReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7468,15 +7528,16 @@ func (fake *FakeActor) DisableServiceAccess(arg1 string, arg2 string, arg3 strin
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.DisableServiceAccessStub
+	fakeReturns := fake.disableServiceAccessReturns
 	fake.recordInvocation("DisableServiceAccess", []interface{}{arg1, arg2, arg3, arg4})
 	fake.disableServiceAccessMutex.Unlock()
-	if fake.DisableServiceAccessStub != nil {
-		return fake.DisableServiceAccessStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.disableServiceAccessReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7535,15 +7596,16 @@ func (fake *FakeActor) DownloadCurrentDropletByAppName(arg1 string, arg2 string)
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DownloadCurrentDropletByAppNameStub
+	fakeReturns := fake.downloadCurrentDropletByAppNameReturns
 	fake.recordInvocation("DownloadCurrentDropletByAppName", []interface{}{arg1, arg2})
 	fake.downloadCurrentDropletByAppNameMutex.Unlock()
-	if fake.DownloadCurrentDropletByAppNameStub != nil {
-		return fake.DownloadCurrentDropletByAppNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
 	}
-	fakeReturns := fake.downloadCurrentDropletByAppNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
 }
 
@@ -7606,15 +7668,16 @@ func (fake *FakeActor) DownloadDropletByGUIDAndAppName(arg1 string, arg2 string,
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.DownloadDropletByGUIDAndAppNameStub
+	fakeReturns := fake.downloadDropletByGUIDAndAppNameReturns
 	fake.recordInvocation("DownloadDropletByGUIDAndAppName", []interface{}{arg1, arg2, arg3})
 	fake.downloadDropletByGUIDAndAppNameMutex.Unlock()
-	if fake.DownloadDropletByGUIDAndAppNameStub != nil {
-		return fake.DownloadDropletByGUIDAndAppNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.downloadDropletByGUIDAndAppNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7672,15 +7735,16 @@ func (fake *FakeActor) EnableFeatureFlag(arg1 string) (v7action.Warnings, error)
 	fake.enableFeatureFlagArgsForCall = append(fake.enableFeatureFlagArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.EnableFeatureFlagStub
+	fakeReturns := fake.enableFeatureFlagReturns
 	fake.recordInvocation("EnableFeatureFlag", []interface{}{arg1})
 	fake.enableFeatureFlagMutex.Unlock()
-	if fake.EnableFeatureFlagStub != nil {
-		return fake.EnableFeatureFlagStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.enableFeatureFlagReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7738,15 +7802,16 @@ func (fake *FakeActor) EnableServiceAccess(arg1 string, arg2 string, arg3 string
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.EnableServiceAccessStub
+	fakeReturns := fake.enableServiceAccessReturns
 	fake.recordInvocation("EnableServiceAccess", []interface{}{arg1, arg2, arg3, arg4})
 	fake.enableServiceAccessMutex.Unlock()
-	if fake.EnableServiceAccessStub != nil {
-		return fake.EnableServiceAccessStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.enableServiceAccessReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7805,15 +7870,16 @@ func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByName(arg1 string, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.EntitleIsolationSegmentToOrganizationByNameStub
+	fakeReturns := fake.entitleIsolationSegmentToOrganizationByNameReturns
 	fake.recordInvocation("EntitleIsolationSegmentToOrganizationByName", []interface{}{arg1, arg2})
 	fake.entitleIsolationSegmentToOrganizationByNameMutex.Unlock()
-	if fake.EntitleIsolationSegmentToOrganizationByNameStub != nil {
-		return fake.EntitleIsolationSegmentToOrganizationByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.entitleIsolationSegmentToOrganizationByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -7869,15 +7935,16 @@ func (fake *FakeActor) GetAppFeature(arg1 string, arg2 string) (resources.Applic
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetAppFeatureStub
+	fakeReturns := fake.getAppFeatureReturns
 	fake.recordInvocation("GetAppFeature", []interface{}{arg1, arg2})
 	fake.getAppFeatureMutex.Unlock()
-	if fake.GetAppFeatureStub != nil {
-		return fake.GetAppFeatureStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getAppFeatureReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7929,22 +7996,24 @@ func (fake *FakeActor) GetAppFeatureReturnsOnCall(i int, result1 resources.Appli
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetAppSummariesForSpace(arg1 string, arg2 string) ([]v7action.ApplicationSummary, v7action.Warnings, error) {
+func (fake *FakeActor) GetAppSummariesForSpace(arg1 string, arg2 string, arg3 bool) ([]v7action.ApplicationSummary, v7action.Warnings, error) {
 	fake.getAppSummariesForSpaceMutex.Lock()
 	ret, specificReturn := fake.getAppSummariesForSpaceReturnsOnCall[len(fake.getAppSummariesForSpaceArgsForCall)]
 	fake.getAppSummariesForSpaceArgsForCall = append(fake.getAppSummariesForSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("GetAppSummariesForSpace", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	stub := fake.GetAppSummariesForSpaceStub
+	fakeReturns := fake.getAppSummariesForSpaceReturns
+	fake.recordInvocation("GetAppSummariesForSpace", []interface{}{arg1, arg2, arg3})
 	fake.getAppSummariesForSpaceMutex.Unlock()
-	if fake.GetAppSummariesForSpaceStub != nil {
-		return fake.GetAppSummariesForSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getAppSummariesForSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7954,17 +8023,17 @@ func (fake *FakeActor) GetAppSummariesForSpaceCallCount() int {
 	return len(fake.getAppSummariesForSpaceArgsForCall)
 }
 
-func (fake *FakeActor) GetAppSummariesForSpaceCalls(stub func(string, string) ([]v7action.ApplicationSummary, v7action.Warnings, error)) {
+func (fake *FakeActor) GetAppSummariesForSpaceCalls(stub func(string, string, bool) ([]v7action.ApplicationSummary, v7action.Warnings, error)) {
 	fake.getAppSummariesForSpaceMutex.Lock()
 	defer fake.getAppSummariesForSpaceMutex.Unlock()
 	fake.GetAppSummariesForSpaceStub = stub
 }
 
-func (fake *FakeActor) GetAppSummariesForSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeActor) GetAppSummariesForSpaceArgsForCall(i int) (string, string, bool) {
 	fake.getAppSummariesForSpaceMutex.RLock()
 	defer fake.getAppSummariesForSpaceMutex.RUnlock()
 	argsForCall := fake.getAppSummariesForSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeActor) GetAppSummariesForSpaceReturns(result1 []v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
@@ -8003,15 +8072,16 @@ func (fake *FakeActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (r
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8070,15 +8140,16 @@ func (fake *FakeActor) GetApplicationDroplets(arg1 string, arg2 string) ([]resou
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationDropletsStub
+	fakeReturns := fake.getApplicationDropletsReturns
 	fake.recordInvocation("GetApplicationDroplets", []interface{}{arg1, arg2})
 	fake.getApplicationDropletsMutex.Unlock()
-	if fake.GetApplicationDropletsStub != nil {
-		return fake.GetApplicationDropletsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationDropletsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8137,15 +8208,16 @@ func (fake *FakeActor) GetApplicationLabels(arg1 string, arg2 string) (map[strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationLabelsStub
+	fakeReturns := fake.getApplicationLabelsReturns
 	fake.recordInvocation("GetApplicationLabels", []interface{}{arg1, arg2})
 	fake.getApplicationLabelsMutex.Unlock()
-	if fake.GetApplicationLabelsStub != nil {
-		return fake.GetApplicationLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8203,15 +8275,16 @@ func (fake *FakeActor) GetApplicationMapForRoute(arg1 resources.Route) (map[stri
 	fake.getApplicationMapForRouteArgsForCall = append(fake.getApplicationMapForRouteArgsForCall, struct {
 		arg1 resources.Route
 	}{arg1})
+	stub := fake.GetApplicationMapForRouteStub
+	fakeReturns := fake.getApplicationMapForRouteReturns
 	fake.recordInvocation("GetApplicationMapForRoute", []interface{}{arg1})
 	fake.getApplicationMapForRouteMutex.Unlock()
-	if fake.GetApplicationMapForRouteStub != nil {
-		return fake.GetApplicationMapForRouteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationMapForRouteReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8270,15 +8343,16 @@ func (fake *FakeActor) GetApplicationPackages(arg1 string, arg2 string) ([]resou
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationPackagesStub
+	fakeReturns := fake.getApplicationPackagesReturns
 	fake.recordInvocation("GetApplicationPackages", []interface{}{arg1, arg2})
 	fake.getApplicationPackagesMutex.Unlock()
-	if fake.GetApplicationPackagesStub != nil {
-		return fake.GetApplicationPackagesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationPackagesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8337,15 +8411,16 @@ func (fake *FakeActor) GetApplicationProcessHealthChecksByNameAndSpace(arg1 stri
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationProcessHealthChecksByNameAndSpaceStub
+	fakeReturns := fake.getApplicationProcessHealthChecksByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationProcessHealthChecksByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationProcessHealthChecksByNameAndSpaceStub != nil {
-		return fake.GetApplicationProcessHealthChecksByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationProcessHealthChecksByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8403,15 +8478,16 @@ func (fake *FakeActor) GetApplicationRevisionsDeployed(arg1 string) ([]resources
 	fake.getApplicationRevisionsDeployedArgsForCall = append(fake.getApplicationRevisionsDeployedArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationRevisionsDeployedStub
+	fakeReturns := fake.getApplicationRevisionsDeployedReturns
 	fake.recordInvocation("GetApplicationRevisionsDeployed", []interface{}{arg1})
 	fake.getApplicationRevisionsDeployedMutex.Unlock()
-	if fake.GetApplicationRevisionsDeployedStub != nil {
-		return fake.GetApplicationRevisionsDeployedStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationRevisionsDeployedReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8469,15 +8545,16 @@ func (fake *FakeActor) GetApplicationRoutes(arg1 string) ([]resources.Route, v7a
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationRoutesStub
+	fakeReturns := fake.getApplicationRoutesReturns
 	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
 	fake.getApplicationRoutesMutex.Unlock()
-	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8536,15 +8613,16 @@ func (fake *FakeActor) GetApplicationTasks(arg1 string, arg2 v7action.SortOrder)
 		arg1 string
 		arg2 v7action.SortOrder
 	}{arg1, arg2})
+	stub := fake.GetApplicationTasksStub
+	fakeReturns := fake.getApplicationTasksReturns
 	fake.recordInvocation("GetApplicationTasks", []interface{}{arg1, arg2})
 	fake.getApplicationTasksMutex.Unlock()
-	if fake.GetApplicationTasksStub != nil {
-		return fake.GetApplicationTasksStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationTasksReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8608,15 +8686,16 @@ func (fake *FakeActor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 string
 		arg1 []string
 		arg2 string
 	}{arg1Copy, arg2})
+	stub := fake.GetApplicationsByNamesAndSpaceStub
+	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
 	fake.recordInvocation("GetApplicationsByNamesAndSpace", []interface{}{arg1Copy, arg2})
 	fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	if fake.GetApplicationsByNamesAndSpaceStub != nil {
-		return fake.GetApplicationsByNamesAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8675,15 +8754,16 @@ func (fake *FakeActor) GetBuildpackLabels(arg1 string, arg2 string) (map[string]
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetBuildpackLabelsStub
+	fakeReturns := fake.getBuildpackLabelsReturns
 	fake.recordInvocation("GetBuildpackLabels", []interface{}{arg1, arg2})
 	fake.getBuildpackLabelsMutex.Unlock()
-	if fake.GetBuildpackLabelsStub != nil {
-		return fake.GetBuildpackLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getBuildpackLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8741,15 +8821,16 @@ func (fake *FakeActor) GetBuildpacks(arg1 string) ([]resources.Buildpack, v7acti
 	fake.getBuildpacksArgsForCall = append(fake.getBuildpacksArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetBuildpacksStub
+	fakeReturns := fake.getBuildpacksReturns
 	fake.recordInvocation("GetBuildpacks", []interface{}{arg1})
 	fake.getBuildpacksMutex.Unlock()
-	if fake.GetBuildpacksStub != nil {
-		return fake.GetBuildpacksStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getBuildpacksReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8806,15 +8887,16 @@ func (fake *FakeActor) GetCurrentUser() (configv3.User, error) {
 	ret, specificReturn := fake.getCurrentUserReturnsOnCall[len(fake.getCurrentUserArgsForCall)]
 	fake.getCurrentUserArgsForCall = append(fake.getCurrentUserArgsForCall, struct {
 	}{})
+	stub := fake.GetCurrentUserStub
+	fakeReturns := fake.getCurrentUserReturns
 	fake.recordInvocation("GetCurrentUser", []interface{}{})
 	fake.getCurrentUserMutex.Unlock()
-	if fake.GetCurrentUserStub != nil {
-		return fake.GetCurrentUserStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getCurrentUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -8862,15 +8944,16 @@ func (fake *FakeActor) GetDefaultDomain(arg1 string) (resources.Domain, v7action
 	fake.getDefaultDomainArgsForCall = append(fake.getDefaultDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDefaultDomainStub
+	fakeReturns := fake.getDefaultDomainReturns
 	fake.recordInvocation("GetDefaultDomain", []interface{}{arg1})
 	fake.getDefaultDomainMutex.Unlock()
-	if fake.GetDefaultDomainStub != nil {
-		return fake.GetDefaultDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDefaultDomainReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8930,15 +9013,16 @@ func (fake *FakeActor) GetDetailedAppSummary(arg1 string, arg2 string, arg3 bool
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetDetailedAppSummaryStub
+	fakeReturns := fake.getDetailedAppSummaryReturns
 	fake.recordInvocation("GetDetailedAppSummary", []interface{}{arg1, arg2, arg3})
 	fake.getDetailedAppSummaryMutex.Unlock()
-	if fake.GetDetailedAppSummaryStub != nil {
-		return fake.GetDetailedAppSummaryStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDetailedAppSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -8996,15 +9080,16 @@ func (fake *FakeActor) GetDomain(arg1 string) (resources.Domain, v7action.Warnin
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDomainStub
+	fakeReturns := fake.getDomainReturns
 	fake.recordInvocation("GetDomain", []interface{}{arg1})
 	fake.getDomainMutex.Unlock()
-	if fake.GetDomainStub != nil {
-		return fake.GetDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDomainReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9062,15 +9147,16 @@ func (fake *FakeActor) GetDomainByName(arg1 string) (resources.Domain, v7action.
 	fake.getDomainByNameArgsForCall = append(fake.getDomainByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDomainByNameStub
+	fakeReturns := fake.getDomainByNameReturns
 	fake.recordInvocation("GetDomainByName", []interface{}{arg1})
 	fake.getDomainByNameMutex.Unlock()
-	if fake.GetDomainByNameStub != nil {
-		return fake.GetDomainByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDomainByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9128,15 +9214,16 @@ func (fake *FakeActor) GetDomainLabels(arg1 string) (map[string]types.NullString
 	fake.getDomainLabelsArgsForCall = append(fake.getDomainLabelsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDomainLabelsStub
+	fakeReturns := fake.getDomainLabelsReturns
 	fake.recordInvocation("GetDomainLabels", []interface{}{arg1})
 	fake.getDomainLabelsMutex.Unlock()
-	if fake.GetDomainLabelsStub != nil {
-		return fake.GetDomainLabelsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDomainLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9195,15 +9282,16 @@ func (fake *FakeActor) GetEffectiveIsolationSegmentBySpace(arg1 string, arg2 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetEffectiveIsolationSegmentBySpaceStub
+	fakeReturns := fake.getEffectiveIsolationSegmentBySpaceReturns
 	fake.recordInvocation("GetEffectiveIsolationSegmentBySpace", []interface{}{arg1, arg2})
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
-	if fake.GetEffectiveIsolationSegmentBySpaceStub != nil {
-		return fake.GetEffectiveIsolationSegmentBySpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getEffectiveIsolationSegmentBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9261,15 +9349,16 @@ func (fake *FakeActor) GetEnvironmentVariableGroup(arg1 constanta.EnvironmentVar
 	fake.getEnvironmentVariableGroupArgsForCall = append(fake.getEnvironmentVariableGroupArgsForCall, struct {
 		arg1 constanta.EnvironmentVariableGroupName
 	}{arg1})
+	stub := fake.GetEnvironmentVariableGroupStub
+	fakeReturns := fake.getEnvironmentVariableGroupReturns
 	fake.recordInvocation("GetEnvironmentVariableGroup", []interface{}{arg1})
 	fake.getEnvironmentVariableGroupMutex.Unlock()
-	if fake.GetEnvironmentVariableGroupStub != nil {
-		return fake.GetEnvironmentVariableGroupStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getEnvironmentVariableGroupReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9328,15 +9417,16 @@ func (fake *FakeActor) GetEnvironmentVariablesByApplicationNameAndSpace(arg1 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub
+	fakeReturns := fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns
 	fake.recordInvocation("GetEnvironmentVariablesByApplicationNameAndSpace", []interface{}{arg1, arg2})
 	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.Unlock()
-	if fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub != nil {
-		return fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9394,15 +9484,16 @@ func (fake *FakeActor) GetFeatureFlagByName(arg1 string) (resources.FeatureFlag,
 	fake.getFeatureFlagByNameArgsForCall = append(fake.getFeatureFlagByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetFeatureFlagByNameStub
+	fakeReturns := fake.getFeatureFlagByNameReturns
 	fake.recordInvocation("GetFeatureFlagByName", []interface{}{arg1})
 	fake.getFeatureFlagByNameMutex.Unlock()
-	if fake.GetFeatureFlagByNameStub != nil {
-		return fake.GetFeatureFlagByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getFeatureFlagByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9459,15 +9550,16 @@ func (fake *FakeActor) GetFeatureFlags() ([]resources.FeatureFlag, v7action.Warn
 	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
 	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
 	}{})
+	stub := fake.GetFeatureFlagsStub
+	fakeReturns := fake.getFeatureFlagsReturns
 	fake.recordInvocation("GetFeatureFlags", []interface{}{})
 	fake.getFeatureFlagsMutex.Unlock()
-	if fake.GetFeatureFlagsStub != nil {
-		return fake.GetFeatureFlagsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getFeatureFlagsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9517,15 +9609,16 @@ func (fake *FakeActor) GetGlobalRunningSecurityGroups() ([]resources.SecurityGro
 	ret, specificReturn := fake.getGlobalRunningSecurityGroupsReturnsOnCall[len(fake.getGlobalRunningSecurityGroupsArgsForCall)]
 	fake.getGlobalRunningSecurityGroupsArgsForCall = append(fake.getGlobalRunningSecurityGroupsArgsForCall, struct {
 	}{})
+	stub := fake.GetGlobalRunningSecurityGroupsStub
+	fakeReturns := fake.getGlobalRunningSecurityGroupsReturns
 	fake.recordInvocation("GetGlobalRunningSecurityGroups", []interface{}{})
 	fake.getGlobalRunningSecurityGroupsMutex.Unlock()
-	if fake.GetGlobalRunningSecurityGroupsStub != nil {
-		return fake.GetGlobalRunningSecurityGroupsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getGlobalRunningSecurityGroupsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9575,15 +9668,16 @@ func (fake *FakeActor) GetGlobalStagingSecurityGroups() ([]resources.SecurityGro
 	ret, specificReturn := fake.getGlobalStagingSecurityGroupsReturnsOnCall[len(fake.getGlobalStagingSecurityGroupsArgsForCall)]
 	fake.getGlobalStagingSecurityGroupsArgsForCall = append(fake.getGlobalStagingSecurityGroupsArgsForCall, struct {
 	}{})
+	stub := fake.GetGlobalStagingSecurityGroupsStub
+	fakeReturns := fake.getGlobalStagingSecurityGroupsReturns
 	fake.recordInvocation("GetGlobalStagingSecurityGroups", []interface{}{})
 	fake.getGlobalStagingSecurityGroupsMutex.Unlock()
-	if fake.GetGlobalStagingSecurityGroupsStub != nil {
-		return fake.GetGlobalStagingSecurityGroupsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getGlobalStagingSecurityGroupsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9634,15 +9728,16 @@ func (fake *FakeActor) GetIsolationSegmentByName(arg1 string) (resources.Isolati
 	fake.getIsolationSegmentByNameArgsForCall = append(fake.getIsolationSegmentByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetIsolationSegmentByNameStub
+	fakeReturns := fake.getIsolationSegmentByNameReturns
 	fake.recordInvocation("GetIsolationSegmentByName", []interface{}{arg1})
 	fake.getIsolationSegmentByNameMutex.Unlock()
-	if fake.GetIsolationSegmentByNameStub != nil {
-		return fake.GetIsolationSegmentByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getIsolationSegmentByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9699,15 +9794,16 @@ func (fake *FakeActor) GetIsolationSegmentSummaries() ([]v7action.IsolationSegme
 	ret, specificReturn := fake.getIsolationSegmentSummariesReturnsOnCall[len(fake.getIsolationSegmentSummariesArgsForCall)]
 	fake.getIsolationSegmentSummariesArgsForCall = append(fake.getIsolationSegmentSummariesArgsForCall, struct {
 	}{})
+	stub := fake.GetIsolationSegmentSummariesStub
+	fakeReturns := fake.getIsolationSegmentSummariesReturns
 	fake.recordInvocation("GetIsolationSegmentSummaries", []interface{}{})
 	fake.getIsolationSegmentSummariesMutex.Unlock()
-	if fake.GetIsolationSegmentSummariesStub != nil {
-		return fake.GetIsolationSegmentSummariesStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getIsolationSegmentSummariesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9758,15 +9854,16 @@ func (fake *FakeActor) GetIsolationSegmentsByOrganization(arg1 string) ([]resour
 	fake.getIsolationSegmentsByOrganizationArgsForCall = append(fake.getIsolationSegmentsByOrganizationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetIsolationSegmentsByOrganizationStub
+	fakeReturns := fake.getIsolationSegmentsByOrganizationReturns
 	fake.recordInvocation("GetIsolationSegmentsByOrganization", []interface{}{arg1})
 	fake.getIsolationSegmentsByOrganizationMutex.Unlock()
-	if fake.GetIsolationSegmentsByOrganizationStub != nil {
-		return fake.GetIsolationSegmentsByOrganizationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getIsolationSegmentsByOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9824,15 +9921,16 @@ func (fake *FakeActor) GetLatestActiveDeploymentForApp(arg1 string) (resources.D
 	fake.getLatestActiveDeploymentForAppArgsForCall = append(fake.getLatestActiveDeploymentForAppArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetLatestActiveDeploymentForAppStub
+	fakeReturns := fake.getLatestActiveDeploymentForAppReturns
 	fake.recordInvocation("GetLatestActiveDeploymentForApp", []interface{}{arg1})
 	fake.getLatestActiveDeploymentForAppMutex.Unlock()
-	if fake.GetLatestActiveDeploymentForAppStub != nil {
-		return fake.GetLatestActiveDeploymentForAppStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getLatestActiveDeploymentForAppReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -9889,15 +9987,16 @@ func (fake *FakeActor) GetLoginPrompts() (map[string]coreconfig.AuthPrompt, erro
 	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
 	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
 	}{})
+	stub := fake.GetLoginPromptsStub
+	fakeReturns := fake.getLoginPromptsReturns
 	fake.recordInvocation("GetLoginPrompts", []interface{}{})
 	fake.getLoginPromptsMutex.Unlock()
-	if fake.GetLoginPromptsStub != nil {
-		return fake.GetLoginPromptsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getLoginPromptsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -9945,15 +10044,16 @@ func (fake *FakeActor) GetNewestReadyPackageForApplication(arg1 resources.Applic
 	fake.getNewestReadyPackageForApplicationArgsForCall = append(fake.getNewestReadyPackageForApplicationArgsForCall, struct {
 		arg1 resources.Application
 	}{arg1})
+	stub := fake.GetNewestReadyPackageForApplicationStub
+	fakeReturns := fake.getNewestReadyPackageForApplicationReturns
 	fake.recordInvocation("GetNewestReadyPackageForApplication", []interface{}{arg1})
 	fake.getNewestReadyPackageForApplicationMutex.Unlock()
-	if fake.GetNewestReadyPackageForApplicationStub != nil {
-		return fake.GetNewestReadyPackageForApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getNewestReadyPackageForApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10011,15 +10111,16 @@ func (fake *FakeActor) GetOrgUsersByRoleType(arg1 string) (map[constanta.RoleTyp
 	fake.getOrgUsersByRoleTypeArgsForCall = append(fake.getOrgUsersByRoleTypeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrgUsersByRoleTypeStub
+	fakeReturns := fake.getOrgUsersByRoleTypeReturns
 	fake.recordInvocation("GetOrgUsersByRoleType", []interface{}{arg1})
 	fake.getOrgUsersByRoleTypeMutex.Unlock()
-	if fake.GetOrgUsersByRoleTypeStub != nil {
-		return fake.GetOrgUsersByRoleTypeStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrgUsersByRoleTypeReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10077,15 +10178,16 @@ func (fake *FakeActor) GetOrganizationByName(arg1 string) (resources.Organizatio
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationByNameStub
+	fakeReturns := fake.getOrganizationByNameReturns
 	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
 	fake.getOrganizationByNameMutex.Unlock()
-	if fake.GetOrganizationByNameStub != nil {
-		return fake.GetOrganizationByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10144,15 +10246,16 @@ func (fake *FakeActor) GetOrganizationDomains(arg1 string, arg2 string) ([]resou
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetOrganizationDomainsStub
+	fakeReturns := fake.getOrganizationDomainsReturns
 	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1, arg2})
 	fake.getOrganizationDomainsMutex.Unlock()
-	if fake.GetOrganizationDomainsStub != nil {
-		return fake.GetOrganizationDomainsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationDomainsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10210,15 +10313,16 @@ func (fake *FakeActor) GetOrganizationLabels(arg1 string) (map[string]types.Null
 	fake.getOrganizationLabelsArgsForCall = append(fake.getOrganizationLabelsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationLabelsStub
+	fakeReturns := fake.getOrganizationLabelsReturns
 	fake.recordInvocation("GetOrganizationLabels", []interface{}{arg1})
 	fake.getOrganizationLabelsMutex.Unlock()
-	if fake.GetOrganizationLabelsStub != nil {
-		return fake.GetOrganizationLabelsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10276,15 +10380,16 @@ func (fake *FakeActor) GetOrganizationQuotaByName(arg1 string) (resources.Organi
 	fake.getOrganizationQuotaByNameArgsForCall = append(fake.getOrganizationQuotaByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationQuotaByNameStub
+	fakeReturns := fake.getOrganizationQuotaByNameReturns
 	fake.recordInvocation("GetOrganizationQuotaByName", []interface{}{arg1})
 	fake.getOrganizationQuotaByNameMutex.Unlock()
-	if fake.GetOrganizationQuotaByNameStub != nil {
-		return fake.GetOrganizationQuotaByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationQuotaByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10341,15 +10446,16 @@ func (fake *FakeActor) GetOrganizationQuotas() ([]resources.OrganizationQuota, v
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
 	fake.getOrganizationQuotasArgsForCall = append(fake.getOrganizationQuotasArgsForCall, struct {
 	}{})
+	stub := fake.GetOrganizationQuotasStub
+	fakeReturns := fake.getOrganizationQuotasReturns
 	fake.recordInvocation("GetOrganizationQuotas", []interface{}{})
 	fake.getOrganizationQuotasMutex.Unlock()
-	if fake.GetOrganizationQuotasStub != nil {
-		return fake.GetOrganizationQuotasStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationQuotasReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10400,15 +10506,16 @@ func (fake *FakeActor) GetOrganizationSpaces(arg1 string) ([]resources.Space, v7
 	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationSpacesStub
+	fakeReturns := fake.getOrganizationSpacesReturns
 	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
 	fake.getOrganizationSpacesMutex.Unlock()
-	if fake.GetOrganizationSpacesStub != nil {
-		return fake.GetOrganizationSpacesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationSpacesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10467,15 +10574,16 @@ func (fake *FakeActor) GetOrganizationSpacesWithLabelSelector(arg1 string, arg2 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetOrganizationSpacesWithLabelSelectorStub
+	fakeReturns := fake.getOrganizationSpacesWithLabelSelectorReturns
 	fake.recordInvocation("GetOrganizationSpacesWithLabelSelector", []interface{}{arg1, arg2})
 	fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
-	if fake.GetOrganizationSpacesWithLabelSelectorStub != nil {
-		return fake.GetOrganizationSpacesWithLabelSelectorStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationSpacesWithLabelSelectorReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10533,15 +10641,16 @@ func (fake *FakeActor) GetOrganizationSummaryByName(arg1 string) (v7action.Organ
 	fake.getOrganizationSummaryByNameArgsForCall = append(fake.getOrganizationSummaryByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationSummaryByNameStub
+	fakeReturns := fake.getOrganizationSummaryByNameReturns
 	fake.recordInvocation("GetOrganizationSummaryByName", []interface{}{arg1})
 	fake.getOrganizationSummaryByNameMutex.Unlock()
-	if fake.GetOrganizationSummaryByNameStub != nil {
-		return fake.GetOrganizationSummaryByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationSummaryByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10599,15 +10708,16 @@ func (fake *FakeActor) GetOrganizations(arg1 string) ([]resources.Organization, 
 	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationsStub
+	fakeReturns := fake.getOrganizationsReturns
 	fake.recordInvocation("GetOrganizations", []interface{}{arg1})
 	fake.getOrganizationsMutex.Unlock()
-	if fake.GetOrganizationsStub != nil {
-		return fake.GetOrganizationsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10666,15 +10776,16 @@ func (fake *FakeActor) GetProcessByTypeAndApplication(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetProcessByTypeAndApplicationStub
+	fakeReturns := fake.getProcessByTypeAndApplicationReturns
 	fake.recordInvocation("GetProcessByTypeAndApplication", []interface{}{arg1, arg2})
 	fake.getProcessByTypeAndApplicationMutex.Unlock()
-	if fake.GetProcessByTypeAndApplicationStub != nil {
-		return fake.GetProcessByTypeAndApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getProcessByTypeAndApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10733,15 +10844,16 @@ func (fake *FakeActor) GetRawApplicationManifestByNameAndSpace(arg1 string, arg2
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRawApplicationManifestByNameAndSpaceStub
+	fakeReturns := fake.getRawApplicationManifestByNameAndSpaceReturns
 	fake.recordInvocation("GetRawApplicationManifestByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getRawApplicationManifestByNameAndSpaceMutex.Unlock()
-	if fake.GetRawApplicationManifestByNameAndSpaceStub != nil {
-		return fake.GetRawApplicationManifestByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRawApplicationManifestByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10800,15 +10912,16 @@ func (fake *FakeActor) GetRecentEventsByApplicationNameAndSpace(arg1 string, arg
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRecentEventsByApplicationNameAndSpaceStub
+	fakeReturns := fake.getRecentEventsByApplicationNameAndSpaceReturns
 	fake.recordInvocation("GetRecentEventsByApplicationNameAndSpace", []interface{}{arg1, arg2})
 	fake.getRecentEventsByApplicationNameAndSpaceMutex.Unlock()
-	if fake.GetRecentEventsByApplicationNameAndSpaceStub != nil {
-		return fake.GetRecentEventsByApplicationNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRecentEventsByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10868,15 +10981,16 @@ func (fake *FakeActor) GetRecentLogsForApplicationByNameAndSpace(arg1 string, ar
 		arg2 string
 		arg3 sharedaction.LogCacheClient
 	}{arg1, arg2, arg3})
+	stub := fake.GetRecentLogsForApplicationByNameAndSpaceStub
+	fakeReturns := fake.getRecentLogsForApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetRecentLogsForApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetRecentLogsForApplicationByNameAndSpaceStub != nil {
-		return fake.GetRecentLogsForApplicationByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRecentLogsForApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -10935,15 +11049,16 @@ func (fake *FakeActor) GetRevisionByApplicationAndVersion(arg1 string, arg2 int)
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	stub := fake.GetRevisionByApplicationAndVersionStub
+	fakeReturns := fake.getRevisionByApplicationAndVersionReturns
 	fake.recordInvocation("GetRevisionByApplicationAndVersion", []interface{}{arg1, arg2})
 	fake.getRevisionByApplicationAndVersionMutex.Unlock()
-	if fake.GetRevisionByApplicationAndVersionStub != nil {
-		return fake.GetRevisionByApplicationAndVersionStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRevisionByApplicationAndVersionReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11002,15 +11117,16 @@ func (fake *FakeActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRevisionsByApplicationNameAndSpaceStub
+	fakeReturns := fake.getRevisionsByApplicationNameAndSpaceReturns
 	fake.recordInvocation("GetRevisionsByApplicationNameAndSpace", []interface{}{arg1, arg2})
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
-	if fake.GetRevisionsByApplicationNameAndSpaceStub != nil {
-		return fake.GetRevisionsByApplicationNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRevisionsByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11067,15 +11183,16 @@ func (fake *FakeActor) GetRootResponse() (v7action.Info, v7action.Warnings, erro
 	ret, specificReturn := fake.getRootResponseReturnsOnCall[len(fake.getRootResponseArgsForCall)]
 	fake.getRootResponseArgsForCall = append(fake.getRootResponseArgsForCall, struct {
 	}{})
+	stub := fake.GetRootResponseStub
+	fakeReturns := fake.getRootResponseReturns
 	fake.recordInvocation("GetRootResponse", []interface{}{})
 	fake.getRootResponseMutex.Unlock()
-	if fake.GetRootResponseStub != nil {
-		return fake.GetRootResponseStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRootResponseReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11129,15 +11246,16 @@ func (fake *FakeActor) GetRouteByAttributes(arg1 resources.Domain, arg2 string, 
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetRouteByAttributesStub
+	fakeReturns := fake.getRouteByAttributesReturns
 	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getRouteByAttributesMutex.Unlock()
-	if fake.GetRouteByAttributesStub != nil {
-		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRouteByAttributesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11196,15 +11314,16 @@ func (fake *FakeActor) GetRouteDestinationByAppGUID(arg1 resources.Route, arg2 s
 		arg1 resources.Route
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRouteDestinationByAppGUIDStub
+	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
 	fake.recordInvocation("GetRouteDestinationByAppGUID", []interface{}{arg1, arg2})
 	fake.getRouteDestinationByAppGUIDMutex.Unlock()
-	if fake.GetRouteDestinationByAppGUIDStub != nil {
-		return fake.GetRouteDestinationByAppGUIDStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -11260,15 +11379,16 @@ func (fake *FakeActor) GetRouteLabels(arg1 string, arg2 string) (map[string]type
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRouteLabelsStub
+	fakeReturns := fake.getRouteLabelsReturns
 	fake.recordInvocation("GetRouteLabels", []interface{}{arg1, arg2})
 	fake.getRouteLabelsMutex.Unlock()
-	if fake.GetRouteLabelsStub != nil {
-		return fake.GetRouteLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRouteLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11331,15 +11451,16 @@ func (fake *FakeActor) GetRouteSummaries(arg1 []resources.Route) ([]v7action.Rou
 	fake.getRouteSummariesArgsForCall = append(fake.getRouteSummariesArgsForCall, struct {
 		arg1 []resources.Route
 	}{arg1Copy})
+	stub := fake.GetRouteSummariesStub
+	fakeReturns := fake.getRouteSummariesReturns
 	fake.recordInvocation("GetRouteSummaries", []interface{}{arg1Copy})
 	fake.getRouteSummariesMutex.Unlock()
-	if fake.GetRouteSummariesStub != nil {
-		return fake.GetRouteSummariesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRouteSummariesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11396,15 +11517,16 @@ func (fake *FakeActor) GetRouterGroups() ([]v7action.RouterGroup, error) {
 	ret, specificReturn := fake.getRouterGroupsReturnsOnCall[len(fake.getRouterGroupsArgsForCall)]
 	fake.getRouterGroupsArgsForCall = append(fake.getRouterGroupsArgsForCall, struct {
 	}{})
+	stub := fake.GetRouterGroupsStub
+	fakeReturns := fake.getRouterGroupsReturns
 	fake.recordInvocation("GetRouterGroups", []interface{}{})
 	fake.getRouterGroupsMutex.Unlock()
-	if fake.GetRouterGroupsStub != nil {
-		return fake.GetRouterGroupsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getRouterGroupsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -11453,15 +11575,16 @@ func (fake *FakeActor) GetRoutesByOrg(arg1 string, arg2 string) ([]resources.Rou
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRoutesByOrgStub
+	fakeReturns := fake.getRoutesByOrgReturns
 	fake.recordInvocation("GetRoutesByOrg", []interface{}{arg1, arg2})
 	fake.getRoutesByOrgMutex.Unlock()
-	if fake.GetRoutesByOrgStub != nil {
-		return fake.GetRoutesByOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRoutesByOrgReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11520,15 +11643,16 @@ func (fake *FakeActor) GetRoutesBySpace(arg1 string, arg2 string) ([]resources.R
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRoutesBySpaceStub
+	fakeReturns := fake.getRoutesBySpaceReturns
 	fake.recordInvocation("GetRoutesBySpace", []interface{}{arg1, arg2})
 	fake.getRoutesBySpaceMutex.Unlock()
-	if fake.GetRoutesBySpaceStub != nil {
-		return fake.GetRoutesBySpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRoutesBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11586,15 +11710,16 @@ func (fake *FakeActor) GetSSHEnabled(arg1 string) (ccv3.SSHEnabled, v7action.War
 	fake.getSSHEnabledArgsForCall = append(fake.getSSHEnabledArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSSHEnabledStub
+	fakeReturns := fake.getSSHEnabledReturns
 	fake.recordInvocation("GetSSHEnabled", []interface{}{arg1})
 	fake.getSSHEnabledMutex.Unlock()
-	if fake.GetSSHEnabledStub != nil {
-		return fake.GetSSHEnabledStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSSHEnabledReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11653,15 +11778,16 @@ func (fake *FakeActor) GetSSHEnabledByAppName(arg1 string, arg2 string) (ccv3.SS
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSSHEnabledByAppNameStub
+	fakeReturns := fake.getSSHEnabledByAppNameReturns
 	fake.recordInvocation("GetSSHEnabledByAppName", []interface{}{arg1, arg2})
 	fake.getSSHEnabledByAppNameMutex.Unlock()
-	if fake.GetSSHEnabledByAppNameStub != nil {
-		return fake.GetSSHEnabledByAppNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSSHEnabledByAppNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11718,15 +11844,16 @@ func (fake *FakeActor) GetSSHPasscode() (string, error) {
 	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
 	fake.getSSHPasscodeArgsForCall = append(fake.getSSHPasscodeArgsForCall, struct {
 	}{})
+	stub := fake.GetSSHPasscodeStub
+	fakeReturns := fake.getSSHPasscodeReturns
 	fake.recordInvocation("GetSSHPasscode", []interface{}{})
 	fake.getSSHPasscodeMutex.Unlock()
-	if fake.GetSSHPasscodeStub != nil {
-		return fake.GetSSHPasscodeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSSHPasscodeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -11777,15 +11904,16 @@ func (fake *FakeActor) GetSecureShellConfigurationByApplicationNameSpaceProcessT
 		arg3 string
 		arg4 uint
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub
+	fakeReturns := fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns
 	fake.recordInvocation("GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.Unlock()
-	if fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub != nil {
-		return fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11843,15 +11971,16 @@ func (fake *FakeActor) GetSecurityGroup(arg1 string) (resources.SecurityGroup, v
 	fake.getSecurityGroupArgsForCall = append(fake.getSecurityGroupArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSecurityGroupStub
+	fakeReturns := fake.getSecurityGroupReturns
 	fake.recordInvocation("GetSecurityGroup", []interface{}{arg1})
 	fake.getSecurityGroupMutex.Unlock()
-	if fake.GetSecurityGroupStub != nil {
-		return fake.GetSecurityGroupStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSecurityGroupReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11909,15 +12038,16 @@ func (fake *FakeActor) GetSecurityGroupSummary(arg1 string) (v7action.SecurityGr
 	fake.getSecurityGroupSummaryArgsForCall = append(fake.getSecurityGroupSummaryArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSecurityGroupSummaryStub
+	fakeReturns := fake.getSecurityGroupSummaryReturns
 	fake.recordInvocation("GetSecurityGroupSummary", []interface{}{arg1})
 	fake.getSecurityGroupSummaryMutex.Unlock()
-	if fake.GetSecurityGroupSummaryStub != nil {
-		return fake.GetSecurityGroupSummaryStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSecurityGroupSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -11974,15 +12104,16 @@ func (fake *FakeActor) GetSecurityGroups() ([]v7action.SecurityGroupSummary, v7a
 	ret, specificReturn := fake.getSecurityGroupsReturnsOnCall[len(fake.getSecurityGroupsArgsForCall)]
 	fake.getSecurityGroupsArgsForCall = append(fake.getSecurityGroupsArgsForCall, struct {
 	}{})
+	stub := fake.GetSecurityGroupsStub
+	fakeReturns := fake.getSecurityGroupsReturns
 	fake.recordInvocation("GetSecurityGroups", []interface{}{})
 	fake.getSecurityGroupsMutex.Unlock()
-	if fake.GetSecurityGroupsStub != nil {
-		return fake.GetSecurityGroupsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSecurityGroupsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12035,15 +12166,16 @@ func (fake *FakeActor) GetServiceAccess(arg1 string, arg2 string, arg3 string) (
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetServiceAccessStub
+	fakeReturns := fake.getServiceAccessReturns
 	fake.recordInvocation("GetServiceAccess", []interface{}{arg1, arg2, arg3})
 	fake.getServiceAccessMutex.Unlock()
-	if fake.GetServiceAccessStub != nil {
-		return fake.GetServiceAccessStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceAccessReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12101,15 +12233,16 @@ func (fake *FakeActor) GetServiceBrokerByName(arg1 string) (resources.ServiceBro
 	fake.getServiceBrokerByNameArgsForCall = append(fake.getServiceBrokerByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServiceBrokerByNameStub
+	fakeReturns := fake.getServiceBrokerByNameReturns
 	fake.recordInvocation("GetServiceBrokerByName", []interface{}{arg1})
 	fake.getServiceBrokerByNameMutex.Unlock()
-	if fake.GetServiceBrokerByNameStub != nil {
-		return fake.GetServiceBrokerByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceBrokerByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12167,15 +12300,16 @@ func (fake *FakeActor) GetServiceBrokerLabels(arg1 string) (map[string]types.Nul
 	fake.getServiceBrokerLabelsArgsForCall = append(fake.getServiceBrokerLabelsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServiceBrokerLabelsStub
+	fakeReturns := fake.getServiceBrokerLabelsReturns
 	fake.recordInvocation("GetServiceBrokerLabels", []interface{}{arg1})
 	fake.getServiceBrokerLabelsMutex.Unlock()
-	if fake.GetServiceBrokerLabelsStub != nil {
-		return fake.GetServiceBrokerLabelsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceBrokerLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12232,15 +12366,16 @@ func (fake *FakeActor) GetServiceBrokers() ([]resources.ServiceBroker, v7action.
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
 	fake.getServiceBrokersArgsForCall = append(fake.getServiceBrokersArgsForCall, struct {
 	}{})
+	stub := fake.GetServiceBrokersStub
+	fakeReturns := fake.getServiceBrokersReturns
 	fake.recordInvocation("GetServiceBrokers", []interface{}{})
 	fake.getServiceBrokersMutex.Unlock()
-	if fake.GetServiceBrokersStub != nil {
-		return fake.GetServiceBrokersStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceBrokersReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12292,15 +12427,16 @@ func (fake *FakeActor) GetServiceInstanceByNameAndSpace(arg1 string, arg2 string
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceByNameAndSpaceStub
+	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
-	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12360,15 +12496,16 @@ func (fake *FakeActor) GetServiceInstanceDetails(arg1 string, arg2 string, arg3 
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetServiceInstanceDetailsStub
+	fakeReturns := fake.getServiceInstanceDetailsReturns
 	fake.recordInvocation("GetServiceInstanceDetails", []interface{}{arg1, arg2, arg3})
 	fake.getServiceInstanceDetailsMutex.Unlock()
-	if fake.GetServiceInstanceDetailsStub != nil {
-		return fake.GetServiceInstanceDetailsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceDetailsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12427,15 +12564,16 @@ func (fake *FakeActor) GetServiceInstanceLabels(arg1 string, arg2 string) (map[s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceLabelsStub
+	fakeReturns := fake.getServiceInstanceLabelsReturns
 	fake.recordInvocation("GetServiceInstanceLabels", []interface{}{arg1, arg2})
 	fake.getServiceInstanceLabelsMutex.Unlock()
-	if fake.GetServiceInstanceLabelsStub != nil {
-		return fake.GetServiceInstanceLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12494,15 +12632,16 @@ func (fake *FakeActor) GetServiceInstanceParameters(arg1 string, arg2 string) (v
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceParametersStub
+	fakeReturns := fake.getServiceInstanceParametersReturns
 	fake.recordInvocation("GetServiceInstanceParameters", []interface{}{arg1, arg2})
 	fake.getServiceInstanceParametersMutex.Unlock()
-	if fake.GetServiceInstanceParametersStub != nil {
-		return fake.GetServiceInstanceParametersStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceParametersReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12561,15 +12700,16 @@ func (fake *FakeActor) GetServiceInstancesForSpace(arg1 string, arg2 bool) ([]v7
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.GetServiceInstancesForSpaceStub
+	fakeReturns := fake.getServiceInstancesForSpaceReturns
 	fake.recordInvocation("GetServiceInstancesForSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstancesForSpaceMutex.Unlock()
-	if fake.GetServiceInstancesForSpaceStub != nil {
-		return fake.GetServiceInstancesForSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstancesForSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12629,15 +12769,16 @@ func (fake *FakeActor) GetServiceKeyByServiceInstanceAndName(arg1 string, arg2 s
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetServiceKeyByServiceInstanceAndNameStub
+	fakeReturns := fake.getServiceKeyByServiceInstanceAndNameReturns
 	fake.recordInvocation("GetServiceKeyByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
 	fake.getServiceKeyByServiceInstanceAndNameMutex.Unlock()
-	if fake.GetServiceKeyByServiceInstanceAndNameStub != nil {
-		return fake.GetServiceKeyByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceKeyByServiceInstanceAndNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12697,15 +12838,16 @@ func (fake *FakeActor) GetServiceKeyDetailsByServiceInstanceAndName(arg1 string,
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetServiceKeyDetailsByServiceInstanceAndNameStub
+	fakeReturns := fake.getServiceKeyDetailsByServiceInstanceAndNameReturns
 	fake.recordInvocation("GetServiceKeyDetailsByServiceInstanceAndName", []interface{}{arg1, arg2, arg3})
 	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.Unlock()
-	if fake.GetServiceKeyDetailsByServiceInstanceAndNameStub != nil {
-		return fake.GetServiceKeyDetailsByServiceInstanceAndNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceKeyDetailsByServiceInstanceAndNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12764,15 +12906,16 @@ func (fake *FakeActor) GetServiceKeysByServiceInstance(arg1 string, arg2 string)
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceKeysByServiceInstanceStub
+	fakeReturns := fake.getServiceKeysByServiceInstanceReturns
 	fake.recordInvocation("GetServiceKeysByServiceInstance", []interface{}{arg1, arg2})
 	fake.getServiceKeysByServiceInstanceMutex.Unlock()
-	if fake.GetServiceKeysByServiceInstanceStub != nil {
-		return fake.GetServiceKeysByServiceInstanceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceKeysByServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12831,15 +12974,16 @@ func (fake *FakeActor) GetServiceOfferingLabels(arg1 string, arg2 string) (map[s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceOfferingLabelsStub
+	fakeReturns := fake.getServiceOfferingLabelsReturns
 	fake.recordInvocation("GetServiceOfferingLabels", []interface{}{arg1, arg2})
 	fake.getServiceOfferingLabelsMutex.Unlock()
-	if fake.GetServiceOfferingLabelsStub != nil {
-		return fake.GetServiceOfferingLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceOfferingLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12899,15 +13043,16 @@ func (fake *FakeActor) GetServicePlanByNameOfferingAndBroker(arg1 string, arg2 s
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetServicePlanByNameOfferingAndBrokerStub
+	fakeReturns := fake.getServicePlanByNameOfferingAndBrokerReturns
 	fake.recordInvocation("GetServicePlanByNameOfferingAndBroker", []interface{}{arg1, arg2, arg3})
 	fake.getServicePlanByNameOfferingAndBrokerMutex.Unlock()
-	if fake.GetServicePlanByNameOfferingAndBrokerStub != nil {
-		return fake.GetServicePlanByNameOfferingAndBrokerStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicePlanByNameOfferingAndBrokerReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -12967,15 +13112,16 @@ func (fake *FakeActor) GetServicePlanLabels(arg1 string, arg2 string, arg3 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetServicePlanLabelsStub
+	fakeReturns := fake.getServicePlanLabelsReturns
 	fake.recordInvocation("GetServicePlanLabels", []interface{}{arg1, arg2, arg3})
 	fake.getServicePlanLabelsMutex.Unlock()
-	if fake.GetServicePlanLabelsStub != nil {
-		return fake.GetServicePlanLabelsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicePlanLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13034,15 +13180,16 @@ func (fake *FakeActor) GetSpaceByNameAndOrganization(arg1 string, arg2 string) (
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSpaceByNameAndOrganizationStub
+	fakeReturns := fake.getSpaceByNameAndOrganizationReturns
 	fake.recordInvocation("GetSpaceByNameAndOrganization", []interface{}{arg1, arg2})
 	fake.getSpaceByNameAndOrganizationMutex.Unlock()
-	if fake.GetSpaceByNameAndOrganizationStub != nil {
-		return fake.GetSpaceByNameAndOrganizationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceByNameAndOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13102,15 +13249,16 @@ func (fake *FakeActor) GetSpaceFeature(arg1 string, arg2 string, arg3 string) (b
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetSpaceFeatureStub
+	fakeReturns := fake.getSpaceFeatureReturns
 	fake.recordInvocation("GetSpaceFeature", []interface{}{arg1, arg2, arg3})
 	fake.getSpaceFeatureMutex.Unlock()
-	if fake.GetSpaceFeatureStub != nil {
-		return fake.GetSpaceFeatureStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceFeatureReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13169,15 +13317,16 @@ func (fake *FakeActor) GetSpaceLabels(arg1 string, arg2 string) (map[string]type
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSpaceLabelsStub
+	fakeReturns := fake.getSpaceLabelsReturns
 	fake.recordInvocation("GetSpaceLabels", []interface{}{arg1, arg2})
 	fake.getSpaceLabelsMutex.Unlock()
-	if fake.GetSpaceLabelsStub != nil {
-		return fake.GetSpaceLabelsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13236,15 +13385,16 @@ func (fake *FakeActor) GetSpaceQuotaByName(arg1 string, arg2 string) (resources.
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSpaceQuotaByNameStub
+	fakeReturns := fake.getSpaceQuotaByNameReturns
 	fake.recordInvocation("GetSpaceQuotaByName", []interface{}{arg1, arg2})
 	fake.getSpaceQuotaByNameMutex.Unlock()
-	if fake.GetSpaceQuotaByNameStub != nil {
-		return fake.GetSpaceQuotaByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceQuotaByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13302,15 +13452,16 @@ func (fake *FakeActor) GetSpaceQuotasByOrgGUID(arg1 string) ([]resources.SpaceQu
 	fake.getSpaceQuotasByOrgGUIDArgsForCall = append(fake.getSpaceQuotasByOrgGUIDArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSpaceQuotasByOrgGUIDStub
+	fakeReturns := fake.getSpaceQuotasByOrgGUIDReturns
 	fake.recordInvocation("GetSpaceQuotasByOrgGUID", []interface{}{arg1})
 	fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
-	if fake.GetSpaceQuotasByOrgGUIDStub != nil {
-		return fake.GetSpaceQuotasByOrgGUIDStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceQuotasByOrgGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13369,15 +13520,16 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganization(arg1 string, arg2 st
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSpaceSummaryByNameAndOrganizationStub
+	fakeReturns := fake.getSpaceSummaryByNameAndOrganizationReturns
 	fake.recordInvocation("GetSpaceSummaryByNameAndOrganization", []interface{}{arg1, arg2})
 	fake.getSpaceSummaryByNameAndOrganizationMutex.Unlock()
-	if fake.GetSpaceSummaryByNameAndOrganizationStub != nil {
-		return fake.GetSpaceSummaryByNameAndOrganizationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceSummaryByNameAndOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13435,15 +13587,16 @@ func (fake *FakeActor) GetSpaceUsersByRoleType(arg1 string) (map[constanta.RoleT
 	fake.getSpaceUsersByRoleTypeArgsForCall = append(fake.getSpaceUsersByRoleTypeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSpaceUsersByRoleTypeStub
+	fakeReturns := fake.getSpaceUsersByRoleTypeReturns
 	fake.recordInvocation("GetSpaceUsersByRoleType", []interface{}{arg1})
 	fake.getSpaceUsersByRoleTypeMutex.Unlock()
-	if fake.GetSpaceUsersByRoleTypeStub != nil {
-		return fake.GetSpaceUsersByRoleTypeStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSpaceUsersByRoleTypeReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13501,15 +13654,16 @@ func (fake *FakeActor) GetStackByName(arg1 string) (resources.Stack, v7action.Wa
 	fake.getStackByNameArgsForCall = append(fake.getStackByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetStackByNameStub
+	fakeReturns := fake.getStackByNameReturns
 	fake.recordInvocation("GetStackByName", []interface{}{arg1})
 	fake.getStackByNameMutex.Unlock()
-	if fake.GetStackByNameStub != nil {
-		return fake.GetStackByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getStackByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13567,15 +13721,16 @@ func (fake *FakeActor) GetStackLabels(arg1 string) (map[string]types.NullString,
 	fake.getStackLabelsArgsForCall = append(fake.getStackLabelsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetStackLabelsStub
+	fakeReturns := fake.getStackLabelsReturns
 	fake.recordInvocation("GetStackLabels", []interface{}{arg1})
 	fake.getStackLabelsMutex.Unlock()
-	if fake.GetStackLabelsStub != nil {
-		return fake.GetStackLabelsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getStackLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13633,15 +13788,16 @@ func (fake *FakeActor) GetStacks(arg1 string) ([]resources.Stack, v7action.Warni
 	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetStacksStub
+	fakeReturns := fake.getStacksReturns
 	fake.recordInvocation("GetStacks", []interface{}{arg1})
 	fake.getStacksMutex.Unlock()
-	if fake.GetStacksStub != nil {
-		return fake.GetStacksStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getStacksReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13701,15 +13857,16 @@ func (fake *FakeActor) GetStreamingLogsForApplicationByNameAndSpace(arg1 string,
 		arg2 string
 		arg3 sharedaction.LogCacheClient
 	}{arg1, arg2, arg3})
+	stub := fake.GetStreamingLogsForApplicationByNameAndSpaceStub
+	fakeReturns := fake.getStreamingLogsForApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetStreamingLogsForApplicationByNameAndSpaceStub != nil {
-		return fake.GetStreamingLogsForApplicationByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4, ret.result5
 	}
-	fakeReturns := fake.getStreamingLogsForApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4, fakeReturns.result5
 }
 
@@ -13774,15 +13931,16 @@ func (fake *FakeActor) GetTaskBySequenceIDAndApplication(arg1 int, arg2 string) 
 		arg1 int
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetTaskBySequenceIDAndApplicationStub
+	fakeReturns := fake.getTaskBySequenceIDAndApplicationReturns
 	fake.recordInvocation("GetTaskBySequenceIDAndApplication", []interface{}{arg1, arg2})
 	fake.getTaskBySequenceIDAndApplicationMutex.Unlock()
-	if fake.GetTaskBySequenceIDAndApplicationStub != nil {
-		return fake.GetTaskBySequenceIDAndApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getTaskBySequenceIDAndApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13839,15 +13997,16 @@ func (fake *FakeActor) GetUAAAPIVersion() (string, error) {
 	ret, specificReturn := fake.getUAAAPIVersionReturnsOnCall[len(fake.getUAAAPIVersionArgsForCall)]
 	fake.getUAAAPIVersionArgsForCall = append(fake.getUAAAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.GetUAAAPIVersionStub
+	fakeReturns := fake.getUAAAPIVersionReturns
 	fake.recordInvocation("GetUAAAPIVersion", []interface{}{})
 	fake.getUAAAPIVersionMutex.Unlock()
-	if fake.GetUAAAPIVersionStub != nil {
-		return fake.GetUAAAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getUAAAPIVersionReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -13895,15 +14054,16 @@ func (fake *FakeActor) GetUnstagedNewestPackageGUID(arg1 string) (string, v7acti
 	fake.getUnstagedNewestPackageGUIDArgsForCall = append(fake.getUnstagedNewestPackageGUIDArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetUnstagedNewestPackageGUIDStub
+	fakeReturns := fake.getUnstagedNewestPackageGUIDReturns
 	fake.recordInvocation("GetUnstagedNewestPackageGUID", []interface{}{arg1})
 	fake.getUnstagedNewestPackageGUIDMutex.Unlock()
-	if fake.GetUnstagedNewestPackageGUIDStub != nil {
-		return fake.GetUnstagedNewestPackageGUIDStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getUnstagedNewestPackageGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -13962,15 +14122,16 @@ func (fake *FakeActor) GetUser(arg1 string, arg2 string) (resources.User, error)
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetUserStub
+	fakeReturns := fake.getUserReturns
 	fake.recordInvocation("GetUser", []interface{}{arg1, arg2})
 	fake.getUserMutex.Unlock()
-	if fake.GetUserStub != nil {
-		return fake.GetUserStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14034,15 +14195,16 @@ func (fake *FakeActor) MakeCurlRequest(arg1 string, arg2 string, arg3 []string, 
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3Copy, arg4, arg5})
+	stub := fake.MakeCurlRequestStub
+	fakeReturns := fake.makeCurlRequestReturns
 	fake.recordInvocation("MakeCurlRequest", []interface{}{arg1, arg2, arg3Copy, arg4, arg5})
 	fake.makeCurlRequestMutex.Unlock()
-	if fake.MakeCurlRequestStub != nil {
-		return fake.MakeCurlRequestStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.makeCurlRequestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -14102,15 +14264,16 @@ func (fake *FakeActor) MapRoute(arg1 string, arg2 string, arg3 string) (v7action
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.MapRouteStub
+	fakeReturns := fake.mapRouteReturns
 	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
 	fake.mapRouteMutex.Unlock()
-	if fake.MapRouteStub != nil {
-		return fake.MapRouteStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.mapRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14165,15 +14328,16 @@ func (fake *FakeActor) Marketplace(arg1 v7action.MarketplaceFilter) ([]v7action.
 	fake.marketplaceArgsForCall = append(fake.marketplaceArgsForCall, struct {
 		arg1 v7action.MarketplaceFilter
 	}{arg1})
+	stub := fake.MarketplaceStub
+	fakeReturns := fake.marketplaceReturns
 	fake.recordInvocation("Marketplace", []interface{}{arg1})
 	fake.marketplaceMutex.Unlock()
-	if fake.MarketplaceStub != nil {
-		return fake.MarketplaceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.marketplaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -14232,15 +14396,16 @@ func (fake *FakeActor) MoveRoute(arg1 string, arg2 string) (v7action.Warnings, e
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.MoveRouteStub
+	fakeReturns := fake.moveRouteReturns
 	fake.recordInvocation("MoveRoute", []interface{}{arg1, arg2})
 	fake.moveRouteMutex.Unlock()
-	if fake.MoveRouteStub != nil {
-		return fake.MoveRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.moveRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14295,15 +14460,16 @@ func (fake *FakeActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
 	fake.parseAccessTokenArgsForCall = append(fake.parseAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ParseAccessTokenStub
+	fakeReturns := fake.parseAccessTokenReturns
 	fake.recordInvocation("ParseAccessToken", []interface{}{arg1})
 	fake.parseAccessTokenMutex.Unlock()
-	if fake.ParseAccessTokenStub != nil {
-		return fake.ParseAccessTokenStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.parseAccessTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14359,15 +14525,16 @@ func (fake *FakeActor) PollBuild(arg1 string, arg2 string) (resources.Droplet, v
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PollBuildStub
+	fakeReturns := fake.pollBuildReturns
 	fake.recordInvocation("PollBuild", []interface{}{arg1, arg2})
 	fake.pollBuildMutex.Unlock()
-	if fake.PollBuildStub != nil {
-		return fake.PollBuildStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollBuildReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -14425,15 +14592,16 @@ func (fake *FakeActor) PollPackage(arg1 resources.Package) (resources.Package, v
 	fake.pollPackageArgsForCall = append(fake.pollPackageArgsForCall, struct {
 		arg1 resources.Package
 	}{arg1})
+	stub := fake.PollPackageStub
+	fakeReturns := fake.pollPackageReturns
 	fake.recordInvocation("PollPackage", []interface{}{arg1})
 	fake.pollPackageMutex.Unlock()
-	if fake.PollPackageStub != nil {
-		return fake.PollPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -14493,15 +14661,16 @@ func (fake *FakeActor) PollStart(arg1 resources.Application, arg2 bool, arg3 fun
 		arg2 bool
 		arg3 func(string)
 	}{arg1, arg2, arg3})
+	stub := fake.PollStartStub
+	fakeReturns := fake.pollStartReturns
 	fake.recordInvocation("PollStart", []interface{}{arg1, arg2, arg3})
 	fake.pollStartMutex.Unlock()
-	if fake.PollStartStub != nil {
-		return fake.PollStartStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollStartReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14559,15 +14728,16 @@ func (fake *FakeActor) PollStartForRolling(arg1 resources.Application, arg2 stri
 		arg3 bool
 		arg4 func(string)
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.PollStartForRollingStub
+	fakeReturns := fake.pollStartForRollingReturns
 	fake.recordInvocation("PollStartForRolling", []interface{}{arg1, arg2, arg3, arg4})
 	fake.pollStartForRollingMutex.Unlock()
-	if fake.PollStartForRollingStub != nil {
-		return fake.PollStartForRollingStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollStartForRollingReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14622,15 +14792,16 @@ func (fake *FakeActor) PollTask(arg1 resources.Task) (resources.Task, v7action.W
 	fake.pollTaskArgsForCall = append(fake.pollTaskArgsForCall, struct {
 		arg1 resources.Task
 	}{arg1})
+	stub := fake.PollTaskStub
+	fakeReturns := fake.pollTaskReturns
 	fake.recordInvocation("PollTask", []interface{}{arg1})
 	fake.pollTaskMutex.Unlock()
-	if fake.PollTaskStub != nil {
-		return fake.PollTaskStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollTaskReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -14688,15 +14859,16 @@ func (fake *FakeActor) PollUploadBuildpackJob(arg1 ccv3.JobURL) (v7action.Warnin
 	fake.pollUploadBuildpackJobArgsForCall = append(fake.pollUploadBuildpackJobArgsForCall, struct {
 		arg1 ccv3.JobURL
 	}{arg1})
+	stub := fake.PollUploadBuildpackJobStub
+	fakeReturns := fake.pollUploadBuildpackJobReturns
 	fake.recordInvocation("PollUploadBuildpackJob", []interface{}{arg1})
 	fake.pollUploadBuildpackJobMutex.Unlock()
-	if fake.PollUploadBuildpackJobStub != nil {
-		return fake.PollUploadBuildpackJobStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollUploadBuildpackJobReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14753,15 +14925,16 @@ func (fake *FakeActor) PrepareBuildpackBits(arg1 string, arg2 string, arg3 v7act
 		arg2 string
 		arg3 v7action.Downloader
 	}{arg1, arg2, arg3})
+	stub := fake.PrepareBuildpackBitsStub
+	fakeReturns := fake.prepareBuildpackBitsReturns
 	fake.recordInvocation("PrepareBuildpackBits", []interface{}{arg1, arg2, arg3})
 	fake.prepareBuildpackBitsMutex.Unlock()
-	if fake.PrepareBuildpackBitsStub != nil {
-		return fake.PrepareBuildpackBitsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.prepareBuildpackBitsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14817,15 +14990,16 @@ func (fake *FakeActor) PurgeServiceInstance(arg1 string, arg2 string) (v7action.
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PurgeServiceInstanceStub
+	fakeReturns := fake.purgeServiceInstanceReturns
 	fake.recordInvocation("PurgeServiceInstance", []interface{}{arg1, arg2})
 	fake.purgeServiceInstanceMutex.Unlock()
-	if fake.PurgeServiceInstanceStub != nil {
-		return fake.PurgeServiceInstanceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.purgeServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14881,15 +15055,16 @@ func (fake *FakeActor) PurgeServiceOfferingByNameAndBroker(arg1 string, arg2 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PurgeServiceOfferingByNameAndBrokerStub
+	fakeReturns := fake.purgeServiceOfferingByNameAndBrokerReturns
 	fake.recordInvocation("PurgeServiceOfferingByNameAndBroker", []interface{}{arg1, arg2})
 	fake.purgeServiceOfferingByNameAndBrokerMutex.Unlock()
-	if fake.PurgeServiceOfferingByNameAndBrokerStub != nil {
-		return fake.PurgeServiceOfferingByNameAndBrokerStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.purgeServiceOfferingByNameAndBrokerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -14943,15 +15118,16 @@ func (fake *FakeActor) RefreshAccessToken() (string, error) {
 	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
 	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
 	}{})
+	stub := fake.RefreshAccessTokenStub
+	fakeReturns := fake.refreshAccessTokenReturns
 	fake.recordInvocation("RefreshAccessToken", []interface{}{})
 	fake.refreshAccessTokenMutex.Unlock()
-	if fake.RefreshAccessTokenStub != nil {
-		return fake.RefreshAccessTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshAccessTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15001,15 +15177,16 @@ func (fake *FakeActor) RenameApplicationByNameAndSpaceGUID(arg1 string, arg2 str
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.RenameApplicationByNameAndSpaceGUIDStub
+	fakeReturns := fake.renameApplicationByNameAndSpaceGUIDReturns
 	fake.recordInvocation("RenameApplicationByNameAndSpaceGUID", []interface{}{arg1, arg2, arg3})
 	fake.renameApplicationByNameAndSpaceGUIDMutex.Unlock()
-	if fake.RenameApplicationByNameAndSpaceGUIDStub != nil {
-		return fake.RenameApplicationByNameAndSpaceGUIDStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.renameApplicationByNameAndSpaceGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15068,15 +15245,16 @@ func (fake *FakeActor) RenameOrganization(arg1 string, arg2 string) (resources.O
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.RenameOrganizationStub
+	fakeReturns := fake.renameOrganizationReturns
 	fake.recordInvocation("RenameOrganization", []interface{}{arg1, arg2})
 	fake.renameOrganizationMutex.Unlock()
-	if fake.RenameOrganizationStub != nil {
-		return fake.RenameOrganizationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.renameOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15136,15 +15314,16 @@ func (fake *FakeActor) RenameServiceInstance(arg1 string, arg2 string, arg3 stri
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.RenameServiceInstanceStub
+	fakeReturns := fake.renameServiceInstanceReturns
 	fake.recordInvocation("RenameServiceInstance", []interface{}{arg1, arg2, arg3})
 	fake.renameServiceInstanceMutex.Unlock()
-	if fake.RenameServiceInstanceStub != nil {
-		return fake.RenameServiceInstanceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.renameServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15201,15 +15380,16 @@ func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUID(arg1 string, arg2 st
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.RenameSpaceByNameAndOrganizationGUIDStub
+	fakeReturns := fake.renameSpaceByNameAndOrganizationGUIDReturns
 	fake.recordInvocation("RenameSpaceByNameAndOrganizationGUID", []interface{}{arg1, arg2, arg3})
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.Unlock()
-	if fake.RenameSpaceByNameAndOrganizationGUIDStub != nil {
-		return fake.RenameSpaceByNameAndOrganizationGUIDStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.renameSpaceByNameAndOrganizationGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15267,15 +15447,16 @@ func (fake *FakeActor) ResetOrganizationDefaultIsolationSegment(arg1 string) (v7
 	fake.resetOrganizationDefaultIsolationSegmentArgsForCall = append(fake.resetOrganizationDefaultIsolationSegmentArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ResetOrganizationDefaultIsolationSegmentStub
+	fakeReturns := fake.resetOrganizationDefaultIsolationSegmentReturns
 	fake.recordInvocation("ResetOrganizationDefaultIsolationSegment", []interface{}{arg1})
 	fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
-	if fake.ResetOrganizationDefaultIsolationSegmentStub != nil {
-		return fake.ResetOrganizationDefaultIsolationSegmentStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.resetOrganizationDefaultIsolationSegmentReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15331,15 +15512,16 @@ func (fake *FakeActor) ResetSpaceIsolationSegment(arg1 string, arg2 string) (str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ResetSpaceIsolationSegmentStub
+	fakeReturns := fake.resetSpaceIsolationSegmentReturns
 	fake.recordInvocation("ResetSpaceIsolationSegment", []interface{}{arg1, arg2})
 	fake.resetSpaceIsolationSegmentMutex.Unlock()
-	if fake.ResetSpaceIsolationSegmentStub != nil {
-		return fake.ResetSpaceIsolationSegmentStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.resetSpaceIsolationSegmentReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15402,15 +15584,16 @@ func (fake *FakeActor) ResourceMatch(arg1 []sharedaction.V3Resource) ([]sharedac
 	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
 		arg1 []sharedaction.V3Resource
 	}{arg1Copy})
+	stub := fake.ResourceMatchStub
+	fakeReturns := fake.resourceMatchReturns
 	fake.recordInvocation("ResourceMatch", []interface{}{arg1Copy})
 	fake.resourceMatchMutex.Unlock()
-	if fake.ResourceMatchStub != nil {
-		return fake.ResourceMatchStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.resourceMatchReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15469,15 +15652,16 @@ func (fake *FakeActor) RestartApplication(arg1 string, arg2 bool) (v7action.Warn
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.RestartApplicationStub
+	fakeReturns := fake.restartApplicationReturns
 	fake.recordInvocation("RestartApplication", []interface{}{arg1, arg2})
 	fake.restartApplicationMutex.Unlock()
-	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.restartApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15531,15 +15715,16 @@ func (fake *FakeActor) RevokeAccessAndRefreshTokens() error {
 	ret, specificReturn := fake.revokeAccessAndRefreshTokensReturnsOnCall[len(fake.revokeAccessAndRefreshTokensArgsForCall)]
 	fake.revokeAccessAndRefreshTokensArgsForCall = append(fake.revokeAccessAndRefreshTokensArgsForCall, struct {
 	}{})
+	stub := fake.RevokeAccessAndRefreshTokensStub
+	fakeReturns := fake.revokeAccessAndRefreshTokensReturns
 	fake.recordInvocation("RevokeAccessAndRefreshTokens", []interface{}{})
 	fake.revokeAccessAndRefreshTokensMutex.Unlock()
-	if fake.RevokeAccessAndRefreshTokensStub != nil {
-		return fake.RevokeAccessAndRefreshTokensStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.revokeAccessAndRefreshTokensReturns
 	return fakeReturns.result1
 }
 
@@ -15585,15 +15770,16 @@ func (fake *FakeActor) RunTask(arg1 string, arg2 resources.Task) (resources.Task
 		arg1 string
 		arg2 resources.Task
 	}{arg1, arg2})
+	stub := fake.RunTaskStub
+	fakeReturns := fake.runTaskReturns
 	fake.recordInvocation("RunTask", []interface{}{arg1, arg2})
 	fake.runTaskMutex.Unlock()
-	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.runTaskReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -15652,15 +15838,16 @@ func (fake *FakeActor) ScaleProcessByApplication(arg1 string, arg2 resources.Pro
 		arg1 string
 		arg2 resources.Process
 	}{arg1, arg2})
+	stub := fake.ScaleProcessByApplicationStub
+	fakeReturns := fake.scaleProcessByApplicationReturns
 	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
 	fake.scaleProcessByApplicationMutex.Unlock()
-	if fake.ScaleProcessByApplicationStub != nil {
-		return fake.ScaleProcessByApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.scaleProcessByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15717,15 +15904,16 @@ func (fake *FakeActor) ScheduleTokenRefresh(arg1 func(time.Duration) <-chan time
 		arg2 chan struct{}
 		arg3 chan struct{}
 	}{arg1, arg2, arg3})
+	stub := fake.ScheduleTokenRefreshStub
+	fakeReturns := fake.scheduleTokenRefreshReturns
 	fake.recordInvocation("ScheduleTokenRefresh", []interface{}{arg1, arg2, arg3})
 	fake.scheduleTokenRefreshMutex.Unlock()
-	if fake.ScheduleTokenRefreshStub != nil {
-		return fake.ScheduleTokenRefreshStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.scheduleTokenRefreshReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15781,15 +15969,16 @@ func (fake *FakeActor) SetApplicationDroplet(arg1 string, arg2 string) (v7action
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SetApplicationDropletStub
+	fakeReturns := fake.setApplicationDropletReturns
 	fake.recordInvocation("SetApplicationDroplet", []interface{}{arg1, arg2})
 	fake.setApplicationDropletMutex.Unlock()
-	if fake.SetApplicationDropletStub != nil {
-		return fake.SetApplicationDropletStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationDropletReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15846,15 +16035,16 @@ func (fake *FakeActor) SetApplicationDropletByApplicationNameAndSpace(arg1 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.SetApplicationDropletByApplicationNameAndSpaceStub
+	fakeReturns := fake.setApplicationDropletByApplicationNameAndSpaceReturns
 	fake.recordInvocation("SetApplicationDropletByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
-	if fake.SetApplicationDropletByApplicationNameAndSpaceStub != nil {
-		return fake.SetApplicationDropletByApplicationNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationDropletByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15915,15 +16105,16 @@ func (fake *FakeActor) SetApplicationManifest(arg1 string, arg2 []byte) (v7actio
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.SetApplicationManifestStub
+	fakeReturns := fake.setApplicationManifestReturns
 	fake.recordInvocation("SetApplicationManifest", []interface{}{arg1, arg2Copy})
 	fake.setApplicationManifestMutex.Unlock()
-	if fake.SetApplicationManifestStub != nil {
-		return fake.SetApplicationManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -15983,15 +16174,16 @@ func (fake *FakeActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(arg1 s
 		arg5 string
 		arg6 int64
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	stub := fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub
+	fakeReturns := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceReturns
 	fake.recordInvocation("SetApplicationProcessHealthCheckTypeByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Unlock()
-	if fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub != nil {
-		return fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -16051,15 +16243,16 @@ func (fake *FakeActor) SetEnvironmentVariableByApplicationNameAndSpace(arg1 stri
 		arg2 string
 		arg3 v7action.EnvironmentVariablePair
 	}{arg1, arg2, arg3})
+	stub := fake.SetEnvironmentVariableByApplicationNameAndSpaceStub
+	fakeReturns := fake.setEnvironmentVariableByApplicationNameAndSpaceReturns
 	fake.recordInvocation("SetEnvironmentVariableByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.setEnvironmentVariableByApplicationNameAndSpaceMutex.Unlock()
-	if fake.SetEnvironmentVariableByApplicationNameAndSpaceStub != nil {
-		return fake.SetEnvironmentVariableByApplicationNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setEnvironmentVariableByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16115,15 +16308,16 @@ func (fake *FakeActor) SetEnvironmentVariableGroup(arg1 constanta.EnvironmentVar
 		arg1 constanta.EnvironmentVariableGroupName
 		arg2 resources.EnvironmentVariables
 	}{arg1, arg2})
+	stub := fake.SetEnvironmentVariableGroupStub
+	fakeReturns := fake.setEnvironmentVariableGroupReturns
 	fake.recordInvocation("SetEnvironmentVariableGroup", []interface{}{arg1, arg2})
 	fake.setEnvironmentVariableGroupMutex.Unlock()
-	if fake.SetEnvironmentVariableGroupStub != nil {
-		return fake.SetEnvironmentVariableGroupStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setEnvironmentVariableGroupReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16179,15 +16373,16 @@ func (fake *FakeActor) SetOrganizationDefaultIsolationSegment(arg1 string, arg2 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SetOrganizationDefaultIsolationSegmentStub
+	fakeReturns := fake.setOrganizationDefaultIsolationSegmentReturns
 	fake.recordInvocation("SetOrganizationDefaultIsolationSegment", []interface{}{arg1, arg2})
 	fake.setOrganizationDefaultIsolationSegmentMutex.Unlock()
-	if fake.SetOrganizationDefaultIsolationSegmentStub != nil {
-		return fake.SetOrganizationDefaultIsolationSegmentStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setOrganizationDefaultIsolationSegmentReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16248,15 +16443,16 @@ func (fake *FakeActor) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Warn
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.SetSpaceManifestStub
+	fakeReturns := fake.setSpaceManifestReturns
 	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
 	fake.setSpaceManifestMutex.Unlock()
-	if fake.SetSpaceManifestStub != nil {
-		return fake.SetSpaceManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setSpaceManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16311,15 +16507,16 @@ func (fake *FakeActor) SetTarget(arg1 v7action.TargetSettings) (v7action.Warning
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
 		arg1 v7action.TargetSettings
 	}{arg1})
+	stub := fake.SetTargetStub
+	fakeReturns := fake.setTargetReturns
 	fake.recordInvocation("SetTarget", []interface{}{arg1})
 	fake.setTargetMutex.Unlock()
-	if fake.SetTargetStub != nil {
-		return fake.SetTargetStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setTargetReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16375,15 +16572,16 @@ func (fake *FakeActor) SharePrivateDomain(arg1 string, arg2 string) (v7action.Wa
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SharePrivateDomainStub
+	fakeReturns := fake.sharePrivateDomainReturns
 	fake.recordInvocation("SharePrivateDomain", []interface{}{arg1, arg2})
 	fake.sharePrivateDomainMutex.Unlock()
-	if fake.SharePrivateDomainStub != nil {
-		return fake.SharePrivateDomainStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.sharePrivateDomainReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16439,15 +16637,16 @@ func (fake *FakeActor) ShareRoute(arg1 string, arg2 string) (v7action.Warnings, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ShareRouteStub
+	fakeReturns := fake.shareRouteReturns
 	fake.recordInvocation("ShareRoute", []interface{}{arg1, arg2})
 	fake.shareRouteMutex.Unlock()
-	if fake.ShareRouteStub != nil {
-		return fake.ShareRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.shareRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16505,15 +16704,16 @@ func (fake *FakeActor) ShareServiceInstanceToSpaceAndOrg(arg1 string, arg2 strin
 		arg3 string
 		arg4 v7action.ServiceInstanceSharingParams
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.ShareServiceInstanceToSpaceAndOrgStub
+	fakeReturns := fake.shareServiceInstanceToSpaceAndOrgReturns
 	fake.recordInvocation("ShareServiceInstanceToSpaceAndOrg", []interface{}{arg1, arg2, arg3, arg4})
 	fake.shareServiceInstanceToSpaceAndOrgMutex.Unlock()
-	if fake.ShareServiceInstanceToSpaceAndOrgStub != nil {
-		return fake.ShareServiceInstanceToSpaceAndOrgStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.shareServiceInstanceToSpaceAndOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16568,15 +16768,16 @@ func (fake *FakeActor) StageApplicationPackage(arg1 string) (resources.Build, v7
 	fake.stageApplicationPackageArgsForCall = append(fake.stageApplicationPackageArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StageApplicationPackageStub
+	fakeReturns := fake.stageApplicationPackageReturns
 	fake.recordInvocation("StageApplicationPackage", []interface{}{arg1})
 	fake.stageApplicationPackageMutex.Unlock()
-	if fake.StageApplicationPackageStub != nil {
-		return fake.StageApplicationPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.stageApplicationPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -16636,15 +16837,16 @@ func (fake *FakeActor) StagePackage(arg1 string, arg2 string, arg3 string) (<-ch
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.StagePackageStub
+	fakeReturns := fake.stagePackageReturns
 	fake.recordInvocation("StagePackage", []interface{}{arg1, arg2, arg3})
 	fake.stagePackageMutex.Unlock()
-	if fake.StagePackageStub != nil {
-		return fake.StagePackageStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.stagePackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -16702,15 +16904,16 @@ func (fake *FakeActor) StartApplication(arg1 string) (v7action.Warnings, error) 
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StartApplicationStub
+	fakeReturns := fake.startApplicationReturns
 	fake.recordInvocation("StartApplication", []interface{}{arg1})
 	fake.startApplicationMutex.Unlock()
-	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.startApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16765,15 +16968,16 @@ func (fake *FakeActor) StopApplication(arg1 string) (v7action.Warnings, error) {
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StopApplicationStub
+	fakeReturns := fake.stopApplicationReturns
 	fake.recordInvocation("StopApplication", []interface{}{arg1})
 	fake.stopApplicationMutex.Unlock()
-	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stopApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16828,15 +17032,16 @@ func (fake *FakeActor) TerminateTask(arg1 string) (resources.Task, v7action.Warn
 	fake.terminateTaskArgsForCall = append(fake.terminateTaskArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.TerminateTaskStub
+	fakeReturns := fake.terminateTaskReturns
 	fake.recordInvocation("TerminateTask", []interface{}{arg1})
 	fake.terminateTaskMutex.Unlock()
-	if fake.TerminateTaskStub != nil {
-		return fake.TerminateTaskStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.terminateTaskReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -16897,15 +17102,16 @@ func (fake *FakeActor) UnbindSecurityGroup(arg1 string, arg2 string, arg3 string
 		arg3 string
 		arg4 constanta.SecurityGroupLifecycle
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UnbindSecurityGroupStub
+	fakeReturns := fake.unbindSecurityGroupReturns
 	fake.recordInvocation("UnbindSecurityGroup", []interface{}{arg1, arg2, arg3, arg4})
 	fake.unbindSecurityGroupMutex.Unlock()
-	if fake.UnbindSecurityGroupStub != nil {
-		return fake.UnbindSecurityGroupStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unbindSecurityGroupReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -16961,15 +17167,16 @@ func (fake *FakeActor) UnmapRoute(arg1 string, arg2 string) (v7action.Warnings, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnmapRouteStub
+	fakeReturns := fake.unmapRouteReturns
 	fake.recordInvocation("UnmapRoute", []interface{}{arg1, arg2})
 	fake.unmapRouteMutex.Unlock()
-	if fake.UnmapRouteStub != nil {
-		return fake.UnmapRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unmapRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17026,15 +17233,16 @@ func (fake *FakeActor) UnsetEnvironmentVariableByApplicationNameAndSpace(arg1 st
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetEnvironmentVariableByApplicationNameAndSpaceStub
+	fakeReturns := fake.unsetEnvironmentVariableByApplicationNameAndSpaceReturns
 	fake.recordInvocation("UnsetEnvironmentVariableByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.unsetEnvironmentVariableByApplicationNameAndSpaceMutex.Unlock()
-	if fake.UnsetEnvironmentVariableByApplicationNameAndSpaceStub != nil {
-		return fake.UnsetEnvironmentVariableByApplicationNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unsetEnvironmentVariableByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17091,15 +17299,16 @@ func (fake *FakeActor) UnsetSpaceQuota(arg1 string, arg2 string, arg3 string) (v
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetSpaceQuotaStub
+	fakeReturns := fake.unsetSpaceQuotaReturns
 	fake.recordInvocation("UnsetSpaceQuota", []interface{}{arg1, arg2, arg3})
 	fake.unsetSpaceQuotaMutex.Unlock()
-	if fake.UnsetSpaceQuotaStub != nil {
-		return fake.UnsetSpaceQuotaStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unsetSpaceQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17155,15 +17364,16 @@ func (fake *FakeActor) UnsharePrivateDomain(arg1 string, arg2 string) (v7action.
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnsharePrivateDomainStub
+	fakeReturns := fake.unsharePrivateDomainReturns
 	fake.recordInvocation("UnsharePrivateDomain", []interface{}{arg1, arg2})
 	fake.unsharePrivateDomainMutex.Unlock()
-	if fake.UnsharePrivateDomainStub != nil {
-		return fake.UnsharePrivateDomainStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unsharePrivateDomainReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17219,15 +17429,16 @@ func (fake *FakeActor) UnshareRoute(arg1 string, arg2 string) (v7action.Warnings
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnshareRouteStub
+	fakeReturns := fake.unshareRouteReturns
 	fake.recordInvocation("UnshareRoute", []interface{}{arg1, arg2})
 	fake.unshareRouteMutex.Unlock()
-	if fake.UnshareRouteStub != nil {
-		return fake.UnshareRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unshareRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17285,15 +17496,16 @@ func (fake *FakeActor) UnshareServiceInstanceFromSpaceAndOrg(arg1 string, arg2 s
 		arg3 string
 		arg4 v7action.ServiceInstanceSharingParams
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UnshareServiceInstanceFromSpaceAndOrgStub
+	fakeReturns := fake.unshareServiceInstanceFromSpaceAndOrgReturns
 	fake.recordInvocation("UnshareServiceInstanceFromSpaceAndOrg", []interface{}{arg1, arg2, arg3, arg4})
 	fake.unshareServiceInstanceFromSpaceAndOrgMutex.Unlock()
-	if fake.UnshareServiceInstanceFromSpaceAndOrgStub != nil {
-		return fake.UnshareServiceInstanceFromSpaceAndOrgStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unshareServiceInstanceFromSpaceAndOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17350,15 +17562,16 @@ func (fake *FakeActor) UpdateAppFeature(arg1 resources.Application, arg2 bool, a
 		arg2 bool
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateAppFeatureStub
+	fakeReturns := fake.updateAppFeatureReturns
 	fake.recordInvocation("UpdateAppFeature", []interface{}{arg1, arg2, arg3})
 	fake.updateAppFeatureMutex.Unlock()
-	if fake.UpdateAppFeatureStub != nil {
-		return fake.UpdateAppFeatureStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateAppFeatureReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17413,15 +17626,16 @@ func (fake *FakeActor) UpdateApplication(arg1 resources.Application) (resources.
 	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
 		arg1 resources.Application
 	}{arg1})
+	stub := fake.UpdateApplicationStub
+	fakeReturns := fake.updateApplicationReturns
 	fake.recordInvocation("UpdateApplication", []interface{}{arg1})
 	fake.updateApplicationMutex.Unlock()
-	if fake.UpdateApplicationStub != nil {
-		return fake.UpdateApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.updateApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -17481,15 +17695,16 @@ func (fake *FakeActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateApplicationLabelsByApplicationNameStub
+	fakeReturns := fake.updateApplicationLabelsByApplicationNameReturns
 	fake.recordInvocation("UpdateApplicationLabelsByApplicationName", []interface{}{arg1, arg2, arg3})
 	fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
-	if fake.UpdateApplicationLabelsByApplicationNameStub != nil {
-		return fake.UpdateApplicationLabelsByApplicationNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateApplicationLabelsByApplicationNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17546,15 +17761,16 @@ func (fake *FakeActor) UpdateBuildpackByNameAndStack(arg1 string, arg2 string, a
 		arg2 string
 		arg3 resources.Buildpack
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateBuildpackByNameAndStackStub
+	fakeReturns := fake.updateBuildpackByNameAndStackReturns
 	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{arg1, arg2, arg3})
 	fake.updateBuildpackByNameAndStackMutex.Unlock()
-	if fake.UpdateBuildpackByNameAndStackStub != nil {
-		return fake.UpdateBuildpackByNameAndStackStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.updateBuildpackByNameAndStackReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -17614,15 +17830,16 @@ func (fake *FakeActor) UpdateBuildpackLabelsByBuildpackNameAndStack(arg1 string,
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub
+	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackReturns
 	fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStack", []interface{}{arg1, arg2, arg3})
 	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	if fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub != nil {
-		return fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17679,15 +17896,16 @@ func (fake *FakeActor) UpdateDestination(arg1 string, arg2 string, arg3 string) 
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateDestinationStub
+	fakeReturns := fake.updateDestinationReturns
 	fake.recordInvocation("UpdateDestination", []interface{}{arg1, arg2, arg3})
 	fake.updateDestinationMutex.Unlock()
-	if fake.UpdateDestinationStub != nil {
-		return fake.UpdateDestinationStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateDestinationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17743,15 +17961,16 @@ func (fake *FakeActor) UpdateDomainLabelsByDomainName(arg1 string, arg2 map[stri
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.UpdateDomainLabelsByDomainNameStub
+	fakeReturns := fake.updateDomainLabelsByDomainNameReturns
 	fake.recordInvocation("UpdateDomainLabelsByDomainName", []interface{}{arg1, arg2})
 	fake.updateDomainLabelsByDomainNameMutex.Unlock()
-	if fake.UpdateDomainLabelsByDomainNameStub != nil {
-		return fake.UpdateDomainLabelsByDomainNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateDomainLabelsByDomainNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17806,15 +18025,16 @@ func (fake *FakeActor) UpdateManagedServiceInstance(arg1 v7action.UpdateManagedS
 	fake.updateManagedServiceInstanceArgsForCall = append(fake.updateManagedServiceInstanceArgsForCall, struct {
 		arg1 v7action.UpdateManagedServiceInstanceParams
 	}{arg1})
+	stub := fake.UpdateManagedServiceInstanceStub
+	fakeReturns := fake.updateManagedServiceInstanceReturns
 	fake.recordInvocation("UpdateManagedServiceInstance", []interface{}{arg1})
 	fake.updateManagedServiceInstanceMutex.Unlock()
-	if fake.UpdateManagedServiceInstanceStub != nil {
-		return fake.UpdateManagedServiceInstanceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.updateManagedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -17873,15 +18093,16 @@ func (fake *FakeActor) UpdateOrganizationLabelsByOrganizationName(arg1 string, a
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.UpdateOrganizationLabelsByOrganizationNameStub
+	fakeReturns := fake.updateOrganizationLabelsByOrganizationNameReturns
 	fake.recordInvocation("UpdateOrganizationLabelsByOrganizationName", []interface{}{arg1, arg2})
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
-	if fake.UpdateOrganizationLabelsByOrganizationNameStub != nil {
-		return fake.UpdateOrganizationLabelsByOrganizationNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateOrganizationLabelsByOrganizationNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -17938,15 +18159,16 @@ func (fake *FakeActor) UpdateOrganizationQuota(arg1 string, arg2 string, arg3 v7
 		arg2 string
 		arg3 v7action.QuotaLimits
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateOrganizationQuotaStub
+	fakeReturns := fake.updateOrganizationQuotaReturns
 	fake.recordInvocation("UpdateOrganizationQuota", []interface{}{arg1, arg2, arg3})
 	fake.updateOrganizationQuotaMutex.Unlock()
-	if fake.UpdateOrganizationQuotaStub != nil {
-		return fake.UpdateOrganizationQuotaStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateOrganizationQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18003,15 +18225,16 @@ func (fake *FakeActor) UpdateProcessByTypeAndApplication(arg1 string, arg2 strin
 		arg2 string
 		arg3 resources.Process
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateProcessByTypeAndApplicationStub
+	fakeReturns := fake.updateProcessByTypeAndApplicationReturns
 	fake.recordInvocation("UpdateProcessByTypeAndApplication", []interface{}{arg1, arg2, arg3})
 	fake.updateProcessByTypeAndApplicationMutex.Unlock()
-	if fake.UpdateProcessByTypeAndApplicationStub != nil {
-		return fake.UpdateProcessByTypeAndApplicationStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateProcessByTypeAndApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18068,15 +18291,16 @@ func (fake *FakeActor) UpdateRouteLabels(arg1 string, arg2 string, arg3 map[stri
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateRouteLabelsStub
+	fakeReturns := fake.updateRouteLabelsReturns
 	fake.recordInvocation("UpdateRouteLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateRouteLabelsMutex.Unlock()
-	if fake.UpdateRouteLabelsStub != nil {
-		return fake.UpdateRouteLabelsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateRouteLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18132,15 +18356,16 @@ func (fake *FakeActor) UpdateSecurityGroup(arg1 string, arg2 string) (v7action.W
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UpdateSecurityGroupStub
+	fakeReturns := fake.updateSecurityGroupReturns
 	fake.recordInvocation("UpdateSecurityGroup", []interface{}{arg1, arg2})
 	fake.updateSecurityGroupMutex.Unlock()
-	if fake.UpdateSecurityGroupStub != nil {
-		return fake.UpdateSecurityGroupStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateSecurityGroupReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18197,15 +18422,16 @@ func (fake *FakeActor) UpdateSecurityGroupGloballyEnabled(arg1 string, arg2 cons
 		arg2 constanta.SecurityGroupLifecycle
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateSecurityGroupGloballyEnabledStub
+	fakeReturns := fake.updateSecurityGroupGloballyEnabledReturns
 	fake.recordInvocation("UpdateSecurityGroupGloballyEnabled", []interface{}{arg1, arg2, arg3})
 	fake.updateSecurityGroupGloballyEnabledMutex.Unlock()
-	if fake.UpdateSecurityGroupGloballyEnabledStub != nil {
-		return fake.UpdateSecurityGroupGloballyEnabledStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateSecurityGroupGloballyEnabledReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18261,15 +18487,16 @@ func (fake *FakeActor) UpdateServiceBroker(arg1 string, arg2 resources.ServiceBr
 		arg1 string
 		arg2 resources.ServiceBroker
 	}{arg1, arg2})
+	stub := fake.UpdateServiceBrokerStub
+	fakeReturns := fake.updateServiceBrokerReturns
 	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerMutex.Unlock()
-	if fake.UpdateServiceBrokerStub != nil {
-		return fake.UpdateServiceBrokerStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServiceBrokerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18325,15 +18552,16 @@ func (fake *FakeActor) UpdateServiceBrokerLabelsByServiceBrokerName(arg1 string,
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub
+	fakeReturns := fake.updateServiceBrokerLabelsByServiceBrokerNameReturns
 	fake.recordInvocation("UpdateServiceBrokerLabelsByServiceBrokerName", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.Unlock()
-	if fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub != nil {
-		return fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServiceBrokerLabelsByServiceBrokerNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18390,15 +18618,16 @@ func (fake *FakeActor) UpdateServiceInstanceLabels(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateServiceInstanceLabelsStub
+	fakeReturns := fake.updateServiceInstanceLabelsReturns
 	fake.recordInvocation("UpdateServiceInstanceLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateServiceInstanceLabelsMutex.Unlock()
-	if fake.UpdateServiceInstanceLabelsStub != nil {
-		return fake.UpdateServiceInstanceLabelsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServiceInstanceLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18455,15 +18684,16 @@ func (fake *FakeActor) UpdateServiceOfferingLabels(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateServiceOfferingLabelsStub
+	fakeReturns := fake.updateServiceOfferingLabelsReturns
 	fake.recordInvocation("UpdateServiceOfferingLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateServiceOfferingLabelsMutex.Unlock()
-	if fake.UpdateServiceOfferingLabelsStub != nil {
-		return fake.UpdateServiceOfferingLabelsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServiceOfferingLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18521,15 +18751,16 @@ func (fake *FakeActor) UpdateServicePlanLabels(arg1 string, arg2 string, arg3 st
 		arg3 string
 		arg4 map[string]types.NullString
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UpdateServicePlanLabelsStub
+	fakeReturns := fake.updateServicePlanLabelsReturns
 	fake.recordInvocation("UpdateServicePlanLabels", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updateServicePlanLabelsMutex.Unlock()
-	if fake.UpdateServicePlanLabelsStub != nil {
-		return fake.UpdateServicePlanLabelsStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServicePlanLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18587,15 +18818,16 @@ func (fake *FakeActor) UpdateSpaceFeature(arg1 string, arg2 string, arg3 bool, a
 		arg3 bool
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UpdateSpaceFeatureStub
+	fakeReturns := fake.updateSpaceFeatureReturns
 	fake.recordInvocation("UpdateSpaceFeature", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updateSpaceFeatureMutex.Unlock()
-	if fake.UpdateSpaceFeatureStub != nil {
-		return fake.UpdateSpaceFeatureStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateSpaceFeatureReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18652,15 +18884,16 @@ func (fake *FakeActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 string, ar
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateSpaceLabelsBySpaceNameStub
+	fakeReturns := fake.updateSpaceLabelsBySpaceNameReturns
 	fake.recordInvocation("UpdateSpaceLabelsBySpaceName", []interface{}{arg1, arg2, arg3})
 	fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
-	if fake.UpdateSpaceLabelsBySpaceNameStub != nil {
-		return fake.UpdateSpaceLabelsBySpaceNameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateSpaceLabelsBySpaceNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18718,15 +18951,16 @@ func (fake *FakeActor) UpdateSpaceQuota(arg1 string, arg2 string, arg3 string, a
 		arg3 string
 		arg4 v7action.QuotaLimits
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UpdateSpaceQuotaStub
+	fakeReturns := fake.updateSpaceQuotaReturns
 	fake.recordInvocation("UpdateSpaceQuota", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updateSpaceQuotaMutex.Unlock()
-	if fake.UpdateSpaceQuotaStub != nil {
-		return fake.UpdateSpaceQuotaStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateSpaceQuotaReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18782,15 +19016,16 @@ func (fake *FakeActor) UpdateStackLabelsByStackName(arg1 string, arg2 map[string
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.UpdateStackLabelsByStackNameStub
+	fakeReturns := fake.updateStackLabelsByStackNameReturns
 	fake.recordInvocation("UpdateStackLabelsByStackName", []interface{}{arg1, arg2})
 	fake.updateStackLabelsByStackNameMutex.Unlock()
-	if fake.UpdateStackLabelsByStackNameStub != nil {
-		return fake.UpdateStackLabelsByStackNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateStackLabelsByStackNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18847,15 +19082,16 @@ func (fake *FakeActor) UpdateUserPassword(arg1 string, arg2 string, arg3 string)
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateUserPasswordStub
+	fakeReturns := fake.updateUserPasswordReturns
 	fake.recordInvocation("UpdateUserPassword", []interface{}{arg1, arg2, arg3})
 	fake.updateUserPasswordMutex.Unlock()
-	if fake.UpdateUserPasswordStub != nil {
-		return fake.UpdateUserPasswordStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateUserPasswordReturns
 	return fakeReturns.result1
 }
 
@@ -18909,15 +19145,16 @@ func (fake *FakeActor) UpdateUserProvidedServiceInstance(arg1 string, arg2 strin
 		arg2 string
 		arg3 resources.ServiceInstance
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateUserProvidedServiceInstanceStub
+	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
 	fake.recordInvocation("UpdateUserProvidedServiceInstance", []interface{}{arg1, arg2, arg3})
 	fake.updateUserProvidedServiceInstanceMutex.Unlock()
-	if fake.UpdateUserProvidedServiceInstanceStub != nil {
-		return fake.UpdateUserProvidedServiceInstanceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -18973,15 +19210,16 @@ func (fake *FakeActor) UpgradeManagedServiceInstance(arg1 string, arg2 string) (
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UpgradeManagedServiceInstanceStub
+	fakeReturns := fake.upgradeManagedServiceInstanceReturns
 	fake.recordInvocation("UpgradeManagedServiceInstance", []interface{}{arg1, arg2})
 	fake.upgradeManagedServiceInstanceMutex.Unlock()
-	if fake.UpgradeManagedServiceInstanceStub != nil {
-		return fake.UpgradeManagedServiceInstanceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.upgradeManagedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -19047,15 +19285,16 @@ func (fake *FakeActor) UploadBitsPackage(arg1 resources.Package, arg2 []sharedac
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2Copy, arg3, arg4})
+	stub := fake.UploadBitsPackageStub
+	fakeReturns := fake.uploadBitsPackageReturns
 	fake.recordInvocation("UploadBitsPackage", []interface{}{arg1, arg2Copy, arg3, arg4})
 	fake.uploadBitsPackageMutex.Unlock()
-	if fake.UploadBitsPackageStub != nil {
-		return fake.UploadBitsPackageStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.uploadBitsPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -19115,15 +19354,16 @@ func (fake *FakeActor) UploadBuildpack(arg1 string, arg2 string, arg3 v7action.S
 		arg2 string
 		arg3 v7action.SimpleProgressBar
 	}{arg1, arg2, arg3})
+	stub := fake.UploadBuildpackStub
+	fakeReturns := fake.uploadBuildpackReturns
 	fake.recordInvocation("UploadBuildpack", []interface{}{arg1, arg2, arg3})
 	fake.uploadBuildpackMutex.Unlock()
-	if fake.UploadBuildpackStub != nil {
-		return fake.UploadBuildpackStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.uploadBuildpackReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -19184,15 +19424,16 @@ func (fake *FakeActor) UploadDroplet(arg1 string, arg2 string, arg3 io.Reader, a
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UploadDropletStub
+	fakeReturns := fake.uploadDropletReturns
 	fake.recordInvocation("UploadDroplet", []interface{}{arg1, arg2, arg3, arg4})
 	fake.uploadDropletMutex.Unlock()
-	if fake.UploadDropletStub != nil {
-		return fake.UploadDropletStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.uploadDropletReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

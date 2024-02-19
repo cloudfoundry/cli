@@ -87,7 +87,7 @@ type Actor interface {
 	EnableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (resources.ApplicationFeature, v7action.Warnings, error)
-	GetAppSummariesForSpace(spaceGUID string, labels string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
+	GetAppSummariesForSpace(spaceGUID string, labels string, omitStats bool) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	GetApplicationMapForRoute(route resources.Route) (map[string]resources.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, v7action.Warnings, error)
