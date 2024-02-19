@@ -72,6 +72,7 @@ var _ = Describe("Application Summary Actions", func() {
 		var (
 			spaceGUID     string
 			labelSelector string
+			omitStats     bool
 
 			summaries  []ApplicationSummary
 			warnings   Warnings
@@ -81,10 +82,11 @@ var _ = Describe("Application Summary Actions", func() {
 		BeforeEach(func() {
 			spaceGUID = "some-space-guid"
 			labelSelector = "some-key=some-value"
+			omitStats = false
 		})
 
 		JustBeforeEach(func() {
-			summaries, warnings, executeErr = actor.GetAppSummariesForSpace(spaceGUID, labelSelector)
+			summaries, warnings, executeErr = actor.GetAppSummariesForSpace(spaceGUID, labelSelector, omitStats)
 		})
 
 		When("getting the application is successful", func() {
@@ -359,6 +361,43 @@ var _ = Describe("Application Summary Actions", func() {
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(MatchError("failed to get app"))
 				Expect(warnings).To(ConsistOf("get-apps-warning"))
+			})
+		})
+
+		When("omitStats flag is provided", func() {
+			BeforeEach(func() {
+				omitStats = true
+
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{
+						{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+					},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
+
+				listedProcesses := []resources.Process{
+					{
+						GUID:       "some-process-web-guid",
+						Type:       "web",
+						Command:    *types.NewFilteredString("[Redacted Value]"),
+						MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+						AppGUID:    "some-app-guid",
+					},
+				}
+
+				fakeCloudControllerClient.GetProcessesReturns(
+					listedProcesses,
+					ccv3.Warnings{"get-app-processes-warning"},
+					nil,
+				)
+			})
+			It("doesn't call the stats endpoint", func() {
+				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(0))
 			})
 		})
 	})
