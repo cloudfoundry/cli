@@ -400,6 +400,56 @@ var _ = Describe("Application Summary Actions", func() {
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(0))
 			})
 		})
+
+		When("an application is deleted in between", func() {
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{
+						{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+					},
+					nil,
+					nil,
+				)
+
+				fakeCloudControllerClient.GetProcessesReturns(
+					[]resources.Process{
+						{
+							GUID:       "some-process-web-guid",
+							Type:       "web",
+							Command:    *types.NewFilteredString("[Redacted Value]"),
+							MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+							AppGUID:    "some-app-guid",
+						},
+					},
+					nil,
+					nil,
+				)
+
+				fakeCloudControllerClient.GetProcessInstancesReturns(nil, nil, ccerror.ProcessNotFoundError{})
+			})
+
+			It("does not fail and has empty ProcessSummaries & Routes", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(summaries).To(Equal([]ApplicationSummary{
+					{
+						Application: resources.Application{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+						ProcessSummaries: nil,
+						Routes:           nil,
+					},
+				}))
+
+			})
+		})
 	})
 
 	Describe("GetDetailedAppSummary", func() {

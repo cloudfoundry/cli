@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/batcher"
@@ -143,7 +144,12 @@ func (actor Actor) getProcessSummariesForApps(apps []resources.Application) (map
 		allWarnings = append(allWarnings, Warnings(warnings)...)
 
 		if err != nil {
-			return nil, allWarnings, err
+			switch err.(type) {
+			case ccerror.ProcessNotFoundError, ccerror.InstanceNotFoundError:
+				continue
+			default:
+				return nil, allWarnings, err
+			}
 		}
 
 		var instanceDetails []ProcessInstance
