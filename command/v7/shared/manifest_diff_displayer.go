@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"errors"
 	"path"
 	"reflect"
 	"strconv"
@@ -8,22 +9,56 @@ import (
 
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/resources"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
+var redacted = "<redacted>"
+
 type ManifestDiffDisplayer struct {
-	UI command.UI
+	UI        command.UI
+	RedactEnv bool
 }
 
-func NewManifestDiffDisplayer(ui command.UI) *ManifestDiffDisplayer {
-	return &ManifestDiffDisplayer{
-		UI: ui,
+func redactEnvVarsInRawManifest(rawManifest []byte) ([]byte, error) {
+	var manifestDataStructure struct {
+		Version      int             `yaml:"version,omitempty"`
+		Applications []yaml.MapSlice `yaml:"applications"`
 	}
-}
 
+	if err := yaml.Unmarshal(rawManifest, &manifestDataStructure); err != nil {
+		return []byte{}, err
+	}
+	for appListIndex, application := range manifestDataStructure.Applications {
+		for appDataIndex, appDataKV := range application {
+			if appDataKV.Key == "env" {
+				envMapSlice := appDataKV.Value.(yaml.MapSlice)
+				for envKeyIndex := range envMapSlice {
+					envMapSlice[envKeyIndex].Value = redacted
+				}
+				appDataKV.Value = envMapSlice
+				application[appDataIndex] = appDataKV
+				manifestDataStructure.Applications[appListIndex] = application
+			}
+		}
+	}
+	return yaml.Marshal(manifestDataStructure)
+}
 func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resources.ManifestDiff) error {
-	// If there are no diffs, just print the manifest
+
+	// Redact RAW manifest envVarValues in all apps
+	// The below could probably be achieved easier if we stop trying to avoid changing map element ordering..
+	if display.RedactEnv {
+		var err error
+		rawManifest, err = redactEnvVarsInRawManifest(rawManifest)
+		if err != nil {
+			return errors.New("unable to process manifest diff because its format is invalid")
+		}
+	}
+
+	// Always display the yaml header line
+	display.UI.DisplayDiffUnchanged("---", 0, false)
+
+	// If there are no diffs, just print the (redacted) manifest
 	if len(diff.Diffs) == 0 {
 		display.UI.DisplayDiffUnchanged(string(rawManifest), 0, false)
 		return nil
@@ -33,7 +68,7 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 	var yamlManifest yaml.MapSlice
 	err := yaml.Unmarshal(rawManifest, &yamlManifest)
 	if err != nil {
-		return errors.New("Unable to process manifest diff because its format is invalid.")
+		return errors.New("unable to process manifest diff because its format is invalid")
 	}
 
 	// Distinguish between add/remove and replace diffs
@@ -41,6 +76,7 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 	// Add/Remove diffs will not, so we need to know their parent's path to insert the diff as a child
 	pathAddReplaceMap := make(map[string]resources.Diff)
 	pathRemoveMap := make(map[string]resources.Diff)
+
 	for _, diff := range diff.Diffs {
 		switch diff.Op {
 		case resources.AddOperation, resources.ReplaceOperation:
@@ -49,9 +85,6 @@ func (display *ManifestDiffDisplayer) DisplayDiff(rawManifest []byte, diff resou
 			pathRemoveMap[path.Dir(diff.Path)] = diff
 		}
 	}
-
-	// Always display the yaml header line
-	display.UI.DisplayDiffUnchanged("---", 0, false)
 
 	// For each entry in the provided manifest, process any diffs at or below that entry
 	for _, entry := range yamlManifest {
@@ -119,14 +152,48 @@ func (display *ManifestDiffDisplayer) processDiffsRecursively(
 	// Otherwise, print the unchanged field and value
 	display.UI.DisplayDiffUnchanged(formatKeyValue(field, value), depth, addHyphen)
 }
+func redactDiff(diff resources.Diff) resources.Diff {
+	// there are 3 possible ways that a diff can contain env data
+	// - the diff applies to a path /applications/0/env/key that identifies a changed KV pair in the env object
+	//   in that case we want to change the diff.Value && diff.Was to ensure that no env item is printed
+	// - the diff applies to a path /applications/0/env that identifies `env` itself, all subvalues must be replaced
+	//   in that case we want to change the diff.Value && diff.Was to ensure that no env item is printed
+	// - the diff applies to a path /applications/0 that identifies the parent element that contains `env` itself, all subvalues in `env` must be replaced
+
+	isEnvKV := strings.HasSuffix(path.Dir(diff.Path), "env")
+	isEnvMap := strings.HasSuffix(diff.Path, "env")
+	fullMap, containsMap := diff.Value.(map[string]interface{})
+	if isEnvKV {
+		diff.Value = redacted
+		diff.Was = redacted
+	}
+	if isEnvMap {
+		cleanMap := diff.Value.(map[string]interface{})
+		for index := range cleanMap {
+			cleanMap[index] = redacted
+		}
+		diff.Value = cleanMap
+	} else if envMap, containsEnvInMap := fullMap["env"].(map[string]interface{}); containsMap && containsEnvInMap {
+		for index := range envMap {
+			envMap[index] = redacted
+		}
+		fullMap["env"] = envMap
+		diff.Value = fullMap
+	}
+	return diff
+}
 
 func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int, addHyphen bool) {
+	if display.RedactEnv {
+		diff = redactDiff(diff)
+	}
 	addHyphen = isInt(field) || addHyphen
 	switch diff.Op {
 	case resources.AddOperation:
 		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth, addHyphen)
 
 	case resources.ReplaceOperation:
+
 		display.UI.DisplayDiffRemoval(formatKeyValue(field, diff.Was), depth, addHyphen)
 		display.UI.DisplayDiffAddition(formatKeyValue(field, diff.Value), depth, addHyphen)
 
