@@ -243,9 +243,10 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Err).To(Say("warning-2"))
 
 				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-				spaceGUID, labels := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+				spaceGUID, labels, omitStats := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(labels).To(Equal(""))
+				Expect(omitStats).To(Equal(false))
 			})
 		})
 
@@ -274,9 +275,10 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Err).To(Say("warning"))
 
 				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-				spaceGUID, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+				spaceGUID, labelSelector, omitStats := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(labelSelector).To(Equal(""))
+				Expect(omitStats).To(Equal(false))
 			})
 		})
 
@@ -301,8 +303,45 @@ var _ = Describe("apps Command", func() {
 
 		It("passes the flag to the API", func() {
 			Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-			_, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+			_, labelSelector, _ := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 			Expect(labelSelector).To(Equal("fish=moose"))
+		})
+	})
+
+	Context("when '--skip-stats' flag is set", func() {
+		BeforeEach(func() {
+			cmd.OmitStats = true
+
+			appSummaries := []v7action.ApplicationSummary{
+				{
+					Application: resources.Application{
+						GUID:  "app-guid-1",
+						Name:  "some-app-1",
+						State: constant.ApplicationStarted,
+					},
+					ProcessSummaries: []v7action.ProcessSummary{},
+					Routes: []resources.Route{
+						{
+							Host: "some-app-1",
+							URL:  "some-app-1.some-domain",
+						},
+					},
+				},
+			}
+			fakeActor.GetAppSummariesForSpaceReturns(appSummaries, v7action.Warnings{}, nil)
+
+		})
+
+		It("prints the application summary without process information", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
+
+			Expect(testUI.Out).To(Say(`name\s+requested state\s+routes`))
+			Expect(testUI.Out).To(Say(`some-app-1\s+started\s+some-app-1.some-domain`))
+			Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
+			_, _, omitStats := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+			Expect(omitStats).To(Equal(true))
 		})
 	})
 
