@@ -276,6 +276,7 @@ var _ = Describe("Application Summary Actions", func() {
 					ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
 					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
 					ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{"some-key=some-value"}},
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 				))
 
 				Expect(fakeCloudControllerClient.GetProcessesCallCount()).To(Equal(1))
@@ -296,6 +297,7 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
 						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 					))
 				})
 			})

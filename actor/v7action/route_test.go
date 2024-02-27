@@ -296,9 +296,11 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query).To(HaveLen(1))
+				Expect(query).To(HaveLen(2))
 				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space-guid"))
+				Expect(query[1].Key).To(Equal(ccv3.PerPage))
+				Expect(query[1].Values).To(ConsistOf(ccv3.MaxPerPage))
 			})
 
 			When("a label selector is provided", func() {
@@ -312,6 +314,7 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					expectedQuery := []ccv3.Query{
 						{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+						{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 						{Key: ccv3.LabelSelectorFilter, Values: []string{"ink=blink"}},
 					}
 					actualQuery := fakeCloudControllerClient.GetRoutesArgsForCall(0)
@@ -631,9 +634,11 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query).To(HaveLen(1))
+				Expect(query).To(HaveLen(2))
 				Expect(query[0].Key).To(Equal(ccv3.OrganizationGUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("org-guid"))
+				Expect(query[1].Key).To(Equal(ccv3.PerPage))
+				Expect(query[1].Values).To(ConsistOf(ccv3.MaxPerPage))
 			})
 
 			When("a label selector is provided", func() {
@@ -647,6 +652,7 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					expectedQuery := []ccv3.Query{
 						{Key: ccv3.OrganizationGUIDFilter, Values: []string{"org-guid"}},
+						{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 						{Key: ccv3.LabelSelectorFilter, Values: []string{"env=prod"}},
 					}
 					actualQuery := fakeCloudControllerClient.GetRoutesArgsForCall(0)
