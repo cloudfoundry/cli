@@ -248,6 +248,7 @@ var _ = Describe("Service Key Action", func() {
 			Expect(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(0)).To(ConsistOf(
 				ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
 				ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"key"}},
+				ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
 			))
 		})
 
