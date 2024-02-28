@@ -168,6 +168,18 @@ var _ = Describe("create-app Command", func() {
 					Expect(testUI.Err).To(Say("I am also a warning"))
 				})
 			})
+
+			Context("due to missing buildpacks when AppType is cnb", func() {
+				BeforeEach(func() {
+					cmd.AppType = "cnb"
+				})
+
+				It("displays the header and error", func() {
+					Expect(executeErr).To(MatchError("buildpack(s) must be provided when using --app-type cnb"))
+
+					Expect(testUI.Out).To(Say("Creating app some-app in org some-org / space some-space as banana..."))
+				})
+			})
 		})
 	})
 })

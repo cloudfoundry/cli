@@ -48,7 +48,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
 		ccApp.setDockerLifecycle()
-	} else if a.LifecycleType == constant.AppLifecycleTypeBuildpack {
+	} else if a.LifecycleType == constant.AppLifecycleTypeBuildpack || a.LifecycleType == constant.AppLifecycleTypeCNB {
 		if len(a.LifecycleBuildpacks) > 0 || a.StackName != "" {
 			if a.hasAutodetectedBuildpack() {
 				ccApp.setAutodetectedBuildpackLifecycle(a)

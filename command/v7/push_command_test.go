@@ -1079,6 +1079,7 @@ var _ = Describe("push Command", func() {
 			cmd.Vars = []template.VarKV{{Name: "key", Value: "val"}}
 			cmd.Task = true
 			cmd.LogRateLimit = "512M"
+			cmd.Lifecycle = constant.AppLifecycleTypeBuildpack
 		})
 
 		JustBeforeEach(func() {
@@ -1108,6 +1109,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
 			Expect(overrides.Task).To(BeTrue())
 			Expect(overrides.LogRateLimit).To(Equal("512M"))
+			Expect(overrides.Lifecycle).To(BeEquivalentTo("buildpack"))
 		})
 
 		When("a docker image is provided", func() {
@@ -1266,6 +1268,90 @@ var _ = Describe("push Command", func() {
 			translatableerror.ArgumentCombinationError{
 				Args: []string{
 					"--task", "--strategy=rolling",
+				},
+			}),
+
+		Entry("lifecycle buildpack and docker-image flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeBuildpack
+				cmd.DockerImage = flag.DockerImage{Path: "foo"}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle buildpack",
+					"--docker-image, -o",
+				},
+			}),
+
+		Entry("lifecycle buildpack and docker-username flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeBuildpack
+				cmd.DockerUsername = "user"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle buildpack",
+					"--docker-username",
+				},
+			}),
+
+		Entry("lifecycle docker and buildpacks flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeDocker
+				cmd.Buildpacks = []string{"nodejs"}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle docker",
+					"--buildpack, -b",
+				},
+			}),
+
+		Entry("lifecycle docker and stck flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeDocker
+				cmd.Stack = "stack"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle docker",
+					"--stack, -s",
+				},
+			}),
+
+		Entry("lifecycle docker and droplet flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeDocker
+				cmd.DropletPath = flag.PathWithExistenceCheck("path")
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle docker",
+					"--droplet",
+				},
+			}),
+
+		Entry("lifecycle cnb and docker-image flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeCNB
+				cmd.DockerImage = flag.DockerImage{Path: "foo"}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle cnb",
+					"--docker-image, -o",
+				},
+			}),
+
+		Entry("lifecycle cnb and docker-username flags are passed",
+			func() {
+				cmd.Lifecycle = constant.AppLifecycleTypeCNB
+				cmd.DockerUsername = "user"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--lifecycle cnb",
+					"--docker-username",
 				},
 			}),
 	)

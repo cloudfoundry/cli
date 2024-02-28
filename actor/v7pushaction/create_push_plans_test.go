@@ -41,7 +41,7 @@ var _ = Describe("CreatePushPlans", func() {
 
 		manifest = manifestparser.Manifest{
 			Applications: []manifestparser.Application{
-				{Name: "name-1", Path: "path1"},
+				{Name: "name-1", Path: "path1", Lifecycle: "cnb"},
 				{Name: "name-2", Path: "path2", Docker: &manifestparser.Docker{Image: "image", Username: "uname"}},
 			},
 		}
@@ -120,6 +120,7 @@ var _ = Describe("CreatePushPlans", func() {
 			Expect(pushPlans[0].DockerImageCredentials.Username).To(Equal(""))
 			Expect(pushPlans[0].DockerImageCredentials.Password).To(Equal(""))
 			Expect(pushPlans[0].BitsPath).To(Equal("path1"))
+			Expect(pushPlans[0].Application.LifecycleType).To(BeEquivalentTo("cnb"))
 			Expect(pushPlans[1].Application.Name).To(Equal("name-2"))
 			Expect(pushPlans[1].Application.GUID).To(Equal("app-guid-2"))
 			Expect(pushPlans[1].SpaceGUID).To(Equal(spaceGUID))
@@ -128,7 +129,20 @@ var _ = Describe("CreatePushPlans", func() {
 			Expect(pushPlans[1].DockerImageCredentials.Username).To(Equal("uname"))
 			Expect(pushPlans[1].DockerImageCredentials.Password).To(Equal("passwd"))
 			Expect(pushPlans[1].BitsPath).To(Equal("path2"))
+			Expect(pushPlans[1].Application.LifecycleType).To(BeEquivalentTo(""))
+		})
+	})
+
+	When("lifecycle is overwritten", func() {
+		BeforeEach(func() {
+			flagOverrides = FlagOverrides{
+				Lifecycle: "buildpack",
+			}
 		})
 
+		It("uses the lifecycle from the command line", func() {
+			Expect(pushPlans[0].Application.LifecycleType).To(BeEquivalentTo("buildpack"))
+		})
 	})
+
 })
