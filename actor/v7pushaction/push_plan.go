@@ -62,6 +62,7 @@ type FlagOverrides struct {
 	NoManifest          bool
 	Task                bool
 	LogRateLimit        string
+	Lifecycle           constant.AppLifecycleType
 }
 
 func (state PushPlan) String() string {
