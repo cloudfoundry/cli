@@ -14,7 +14,7 @@ import (
 	. "code.cloudfoundry.org/cli/api/plugin/wrapper"
 	"code.cloudfoundry.org/cli/api/plugin/wrapper/wrapperfakes"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

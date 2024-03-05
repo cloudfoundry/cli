@@ -3,7 +3,7 @@ package helpers
 import (
 	"runtime"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 func IsWindows() bool {

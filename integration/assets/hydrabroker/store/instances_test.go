@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 var _ = Describe("Instances", func() {

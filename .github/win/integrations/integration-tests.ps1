@@ -49,7 +49,7 @@ $Env:RUN_ID=(openssl rand -hex 16)
 $Env:GOFLAGS = "-mod=mod"
 
 if ((Get-Command "ginkgo" -ErrorAction SilentlyContinue) -eq $null) {
-	go install -v github.com/onsi/ginkgo/ginkgo@v1.16.4
+  go install -v github.com/onsi/ginkgo/v2/ginkgo@latest
 }
 
 $CF_INT_NAME=(Get-Content $pwd\metadata.json -Raw| Out-String | ConvertFrom-Json).name.trim()

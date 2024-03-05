@@ -358,7 +358,7 @@ func WaitForAppMemoryToTakeEffect(appName string, processIndex int, instanceInde
 		Eventually(session).Should(Exit(0))
 		appTable := ParseV3AppProcessTable(session.Out.Contents())
 		return appTable.Processes[processIndex].Instances[instanceIndex].Memory
-	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, expectedMemory)))
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[BKMG]? of %s`, expectedMemory)))
 }
 
 func WaitForAppDiskToTakeEffect(appName string, processIndex int, instanceIndex int, shouldRestartFirst bool, expectedDisk string) {
@@ -386,5 +386,5 @@ func WaitForLogRateLimitToTakeEffect(appName string, processIndex int, instanceI
 		Eventually(session).Should(Exit(0))
 		appTable := ParseV3AppProcessTable(session.Out.Contents())
 		return appTable.Processes[processIndex].Instances[instanceIndex].LogRate
-	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]?/s of %s/s`, expectedLogRateLimit)))
+	}).Should(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[BKMG]?/s of %s/s`, expectedLogRateLimit)))
 }

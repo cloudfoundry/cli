@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/gomega"
@@ -28,7 +28,7 @@ var mutex sync.Mutex
 func ensureAppIsDeployed() {
 	if !appResponds() {
 		ensureAppIsPushed()
-		Eventually(appResponds).Should(BeTrue())
+		Eventually(appResponds()).Should(BeTrue())
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
 	"code.cloudfoundry.org/cli/plugin/models"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"code.cloudfoundry.org/cli/cf/api"

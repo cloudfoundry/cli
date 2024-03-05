@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/appfiles/appfilesfakes"
 	"code.cloudfoundry.org/cli/cf/models"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
