@@ -4,10 +4,10 @@ name: "Tests: Integration"
 
 on:
   workflow_dispatch:
+  workflow_run:
   push:
     branches: 
       - v8
-  workflow_run:
   #   workflows:
   #     - "Tests"
   #   types:
