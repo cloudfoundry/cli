@@ -1,22 +1,19 @@
 name: "Tests: Integration"
 
-# run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
+run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
 
 on:
   workflow_dispatch:
-  push:
-    branches: 
-      - v8
-  # workflow_run:
-  #   workflows:
-  #     - "Tests"
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows:
+      - "Tests"
+    types:
+      - completed
 
 jobs: 
   run-integration-tests-cf-env:
     name: Integration tests
-    # if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
@@ -27,7 +24,7 @@ jobs:
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
-    # if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
@@ -38,7 +35,7 @@ jobs:
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
-    # if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: min
