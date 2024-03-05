@@ -32,7 +32,7 @@ require (
 	github.com/moby/term v0.5.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo/v2 v2.15.0
-	github.com/onsi/gomega v1.32.0
+	github.com/onsi/gomega v1.31.1
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
