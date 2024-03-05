@@ -32,16 +32,16 @@ jobs:
     runs-on: ${{ inputs.os }} 
 
     steps:
-    - uses: LouisBrunner/checks-action@v1.6.2
-      if: always()
-      id: check
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: "${{ inputs.name }}"
-        status: in_progress
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+    # - uses: LouisBrunner/checks-action@v1.6.2
+    #   if: always()
+    #   id: check
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     name: "${{ inputs.name }}"
+    #     status: in_progress
+    #     sha:  ${{github.event.workflow_run.head_sha}}
+    #     output: |
+    #       {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
@@ -301,12 +301,12 @@ jobs:
           grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 2
           grep -q -E "HTTP/[[:digit:]\.]{1,3} 202" headers.txt && break
         done
-    - uses: LouisBrunner/checks-action@v1.6.2
-      if: always()
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        check_id: ${{ steps.check.outputs.check_id }}
-        conclusion: ${{ job.status }}
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"finished ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+    # - uses: LouisBrunner/checks-action@v1.6.2
+    #   if: always()
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     check_id: ${{ steps.check.outputs.check_id }}
+    #     conclusion: ${{ job.status }}
+    #     sha:  ${{github.event.workflow_run.head_sha}}
+    #     output: |
+    #       {"title": "${{ inputs.name }}", "summary":"finished ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
