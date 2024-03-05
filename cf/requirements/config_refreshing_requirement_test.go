@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -48,7 +48,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	return nil
 }, func(_ []byte) {
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized Before Each==============================", GinkgoParallelProcess())))
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
@@ -69,18 +69,18 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	var err error
 	realDir, err = ioutil.TempDir("", "push-real-dir")
 	Expect(err).ToNot(HaveOccurred())
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelProcess())))
 })
 
 var _ = SynchronizedAfterSuite(func() {
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelProcess())))
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()
 	helpers.QuickDeleteOrg(organization)
 	Expect(os.RemoveAll(realDir)).ToNot(HaveOccurred())
 	helpers.DestroyHomeDir(homeDir)
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelProcess())))
 }, func() {
 })
 

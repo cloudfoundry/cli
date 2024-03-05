@@ -26,10 +26,10 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_io"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_net"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
-	"code.cloudfoundry.org/lager/lagertest"
-	"github.com/kr/pty"
+	"code.cloudfoundry.org/lager/v3/lagertest"
+	"github.com/creack/pty"
 	"github.com/moby/term"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"golang.org/x/crypto/ssh"
 )
@@ -50,7 +50,7 @@ func BlockAcceptOnClose(fake *fake_net.FakeListener) {
 	}
 }
 
-var _ = Describe("CLI SSH", func() {
+var _ = Describe("CLI SSH", Serial, func() {
 	var (
 		fakeSecureDialer    *clisshfakes.FakeSecureDialer
 		fakeSecureClient    *clisshfakes.FakeSecureClient
@@ -125,7 +125,7 @@ var _ = Describe("CLI SSH", func() {
 		)
 	})
 
-	Describe("Connect", func() {
+	Describe("Connect", Serial, func() {
 		var connectErr error
 
 		JustBeforeEach(func() {
@@ -175,7 +175,7 @@ var _ = Describe("CLI SSH", func() {
 		})
 	})
 
-	Describe("InteractiveSession", func() {
+	Describe("InteractiveSession", Serial, func() {
 		var (
 			stdin          *fake_io.FakeReadCloser
 			stdout, stderr *fake_io.FakeWriter
@@ -820,7 +820,7 @@ var _ = Describe("CLI SSH", func() {
 		})
 	})
 
-	Describe("LocalPortForward", func() {
+	Describe("LocalPortForward", Serial, func() {
 		var (
 			forwardErr error
 
@@ -865,7 +865,7 @@ var _ = Describe("CLI SSH", func() {
 			fakeLocalListener = new(fake_net.FakeListener)
 			fakeLocalListener.AcceptReturns(nil, errors.New("Not Accepting Connections"))
 
-			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler)
+			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler, 500*time.Millisecond)
 			err = echoServer.SetListener(echoListener)
 			Expect(err).NotTo(HaveOccurred())
 			go echoServer.Serve()
@@ -1149,7 +1149,7 @@ var _ = Describe("CLI SSH", func() {
 		})
 	})
 
-	Describe("Wait", func() {
+	Describe("Wait", Serial, func() {
 		var waitErr error
 
 		JustBeforeEach(func() {
@@ -1203,7 +1203,7 @@ var _ = Describe("CLI SSH", func() {
 		})
 	})
 
-	Describe("Close", func() {
+	Describe("Close", Serial, func() {
 		JustBeforeEach(func() {
 			connectErr := secureShell.Connect(username, passcode, sshEndpoint, sshEndpointFingerprint, skipHostValidation)
 			Expect(connectErr).NotTo(HaveOccurred())

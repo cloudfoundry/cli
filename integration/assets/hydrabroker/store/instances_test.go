@@ -5,11 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
-	uuid "github.com/nu7hatch/gouuid"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 var _ = Describe("Instances", func() {

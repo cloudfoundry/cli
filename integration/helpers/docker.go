@@ -3,7 +3,7 @@ package helpers
 import (
 	"os"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 // SkipIfPrivateDockerInfoNotSet skips the test if CF_INT_DOCKER_IMAGE,

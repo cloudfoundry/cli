@@ -17,7 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
 	apiv1 "k8s.io/client-go/tools/clientcmd/api/v1"

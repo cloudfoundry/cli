@@ -6,7 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/api/router"
 	"code.cloudfoundry.org/cli/api/router/routererror"
 	"code.cloudfoundry.org/cli/api/router/wrapper"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
 )

@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 
 	"code.cloudfoundry.org/cli/cf/configuration/configurationfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
