@@ -20,7 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
 	"code.cloudfoundry.org/cli/api/uaa/wrapper/util"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

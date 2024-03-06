@@ -2,7 +2,7 @@ package push
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("targeting the correct environment", func() {

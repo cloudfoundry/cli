@@ -4,12 +4,10 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 
-	. "github.com/onsi/ginkgo"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"

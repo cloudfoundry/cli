@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 
 	"code.cloudfoundry.org/cli/command/v6/shared"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

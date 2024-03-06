@@ -9,8 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -220,7 +219,7 @@ var _ = Describe("GetApplicationChanges", func() {
 				}))
 			},
 			Entry("new app with disk_quota specified", 0, 200, "", "200M"),
-			Entry("existing disk_quota with no disk_quota specified", 100, 0, "100M", "0"),
+			Entry("existing disk_quota with no disk_quota specified", 100, 0, "100M", "0B"),
 			Entry("existing disk_quota with new disk_quota specified", 100, 200, "100M", "200M"),
 		)
 	})
@@ -359,7 +358,7 @@ var _ = Describe("GetApplicationChanges", func() {
 				}))
 			},
 			Entry("new app with memory specified", 0, 200, "", "200M"),
-			Entry("existing memory with no memory specified", 100, 0, "100M", "0"),
+			Entry("existing memory with no memory specified", 100, 0, "100M", "0B"),
 			Entry("existing memory with new memory specified", 100, 200, "100M", "200M"),
 		)
 	})
