@@ -32,7 +32,7 @@ jobs:
     runs-on: ${{ inputs.os }} 
 
     steps:
-    - uses: LouisBrunner/checks-action@v2.0.0
+    - uses: LouisBrunner/checks-action@v1.6.2
       if: always()
       id: check
       with:
@@ -301,7 +301,7 @@ jobs:
           grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 2
           grep -q -E "HTTP/[[:digit:]\.]{1,3} 202" headers.txt && break
         done
-    - uses: LouisBrunner/checks-action@v2.0.0
+    - uses: LouisBrunner/checks-action@v1.6.2
       if: always()
       with:
         token: ${{ secrets.GITHUB_TOKEN }}

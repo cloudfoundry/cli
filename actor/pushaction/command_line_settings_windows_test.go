@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/util/manifest"
 
 	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/ginkgo/v2/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
