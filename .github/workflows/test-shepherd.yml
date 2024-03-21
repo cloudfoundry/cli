@@ -16,3 +16,6 @@ jobs:
             echo "Testing shepherd"
             echo "$PATH"
             shepherd version
+
+            shepherd login service-account ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+            shepherd list
