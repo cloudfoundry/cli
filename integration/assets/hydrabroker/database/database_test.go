@@ -5,8 +5,6 @@ import (
 	"sync"
 
 	. "code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Database", func() {

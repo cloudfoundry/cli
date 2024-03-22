@@ -2,8 +2,7 @@ package generic_test
 
 import (
 	. "code.cloudfoundry.org/cli/util/generic"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

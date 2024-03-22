@@ -4,7 +4,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
 	flags "github.com/jessevdk/go-flags"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

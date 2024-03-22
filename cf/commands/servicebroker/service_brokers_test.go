@@ -13,7 +13,7 @@ import (
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"strings"

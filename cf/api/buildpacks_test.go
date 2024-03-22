@@ -16,7 +16,7 @@ import (
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	testnet "code.cloudfoundry.org/cli/cf/util/testhelpers/net"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
