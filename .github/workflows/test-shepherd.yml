@@ -19,3 +19,4 @@ jobs:
 
             shepherd login service-account ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
             shepherd list
+            smith
