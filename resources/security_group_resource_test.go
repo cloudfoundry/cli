@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	. "code.cloudfoundry.org/cli/resources"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

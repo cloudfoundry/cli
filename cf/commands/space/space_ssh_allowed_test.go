@@ -10,7 +10,7 @@ import (
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

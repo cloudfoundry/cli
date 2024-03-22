@@ -2,7 +2,7 @@ package flag_test
 
 import (
 	flags "github.com/jessevdk/go-flags"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	. "code.cloudfoundry.org/cli/command/flag"
