@@ -1,6 +1,6 @@
 name: "Tests: Integration"
 
-# run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
+run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
 
 on:
   workflow_dispatch:
