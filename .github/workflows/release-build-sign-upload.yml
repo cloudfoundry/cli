@@ -78,7 +78,7 @@ jobs:
 
   setup:
     name: Setup
-    # needs: test
+    if: github.triggering_actor.role == 'Write'
     runs-on: ubuntu-latest
 
     outputs:
