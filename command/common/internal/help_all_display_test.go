@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/internal"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

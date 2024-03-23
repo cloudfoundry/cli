@@ -8,7 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -283,7 +283,7 @@ var _ = Describe("ssh command", func() {
 				var port int
 
 				BeforeEach(func() {
-					port = 55500 + GinkgoParallelNode()
+					port = 55500 + GinkgoParallelProcess()
 				})
 
 				It("configures local port to connect to the app port", func() {

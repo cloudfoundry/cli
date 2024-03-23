@@ -27,7 +27,7 @@ Running `make integration-tests` can be time-consuming, because it includes the 
 - `plugin` suite is for tests that surround the CF CLI plugin framework. *These tests do not run in parallel.*
 
 ## How to run
-These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed.
+These tests rely on [ginkgo](https://github.com/onsi/ginkgo/v2) to be installed.
 
 Run command for the `isolated`, `push` and `experimental` suite:
 ```
