@@ -39,7 +39,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	return nil
 }, func(_ []byte) {
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized Before Each==============================", GinkgoParallelProcess())))
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
@@ -48,17 +48,17 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.TurnOffColors()
 	perfOrg, perfSpace = helpers.SetupReadOnlyOrgAndSpace()
 
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelProcess())))
 })
 
 var _ = SynchronizedAfterSuite(func() {
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelProcess())))
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()
 	helpers.QuickDeleteOrg(perfOrg)
 	helpers.DestroyHomeDir(homeDir)
-	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelProcess())))
 }, func() {})
 
 var _ = BeforeEach(func() {
