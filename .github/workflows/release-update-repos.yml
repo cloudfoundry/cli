@@ -473,4 +473,85 @@ jobs:
     - name: Test Version Match
       run: cf -v | grep -q "${VERSION_BUILD}"
 
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: setup
+    environment: ${{ needs.setup.outputs.secrets-environment }}
+    env:
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
+    steps:
+
+    - name: Setup
+      env:
+        ENVIRONMENT:   ${{ github.event.inputs.environment }}
+        VERSION_BUILD: ${{ github.event.inputs.build_version }}
+      run: |
+        echo "VERSION_BUILD: ${VERSION_BUILD}"
+        echo "Environment: ${ENVIRONMENT}"
+    
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: cloudfoundry/cli
+        ref: ${{ github.ref_name }}
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and export to Docker locally
+      uses: docker/build-push-action@v5
+      with:
+        context: docker
+        load: true
+        tags: ${{ env.VERSION_BUILD }}
+
+    - name: Test docker container
+      run: |
+        cat <<\EOF > test.sh
+        set -eux
+
+        # Test if CLI inside container is correct
+
+        if ! [ -x "$(command -v cf)" ]; then
+          echo 'Error: cf is not installed.' >&2
+          exit 1
+        fi
+
+        CF_VERSION="$(cf -v)"
+        VERSION=${{ env.VERSION_BUILD }}
+
+        if [[ ! "${CF_VERSION}" == *"cf version $VERSION"* ]]; then
+          echo "Error: cf -v did not match expected version"
+          echo "Expected: $VERSION"
+          echo "Got ${CF_VERSION}"
+          exit 1
+        fi
+        EOF
+
+        chmod 700 test.sh
+
+        docker run -v $(pwd):/clidir -w /clidir \
+          --rm ${{ env.VERSION_BUILD }} sh test.sh
+
+        # If bash reaches this point, it means that tests passed, setting latest
+        if [[ ( ${{ github.ref_name }} == "v8" ) || ( ${{ github.ref_name }} == "v7" ) ]]; then
+          echo "LATEST_DOCKER=true" >> "$GITHUB_ENV"
+        fi
+        
+        rm test.sh
+
+    - name: Push image if comes from v8 or v7
+      if: ${{ env.LATEST_DOCKER }}
+      uses: docker/build-push-action@v5
+      with:
+        context: docker
+        push: true
+        tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}, cloudfoundry/cli:latest  
+
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
