@@ -348,7 +348,7 @@ applications:
 
 					BeforeEach(func() {
 						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("tcp"))
-						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
+						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelProcess()))
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`
 ---
