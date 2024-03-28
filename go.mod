@@ -13,7 +13,7 @@ require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.0
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.0.2
+	code.cloudfoundry.org/lager/v3 v3.0.3
 	code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
@@ -74,7 +74,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/openzipkin/zipkin-go v0.4.1 // indirect
+	github.com/openzipkin/zipkin-go v0.4.2 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/mod v0.14.0 // indirect
