@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -92,6 +93,7 @@ var _ = Describe("ProcessInstance", func() {
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.01,
+								"cpu_entitlement": 0.02,
 								"mem": 1000000,
 								"disk": 2000000,
 								"log_rate": 5000
@@ -109,6 +111,7 @@ var _ = Describe("ProcessInstance", func() {
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.02,
+								"cpu_entitlement": 0.04,
 								"mem": 8000000,
 								"disk": 16000000,
 								"log_rate": 32000
@@ -136,6 +139,7 @@ var _ = Describe("ProcessInstance", func() {
 				Expect(processes).To(ConsistOf(
 					ProcessInstance{
 						CPU:              0.01,
+						CPUEntitlement:   types.NullFloat64{IsSet: true, Value: 0.02},
 						Details:          "some details",
 						DiskQuota:        4000000,
 						DiskUsage:        2000000,
@@ -151,6 +155,7 @@ var _ = Describe("ProcessInstance", func() {
 					},
 					ProcessInstance{
 						CPU:              0.02,
+						CPUEntitlement:   types.NullFloat64{IsSet: true, Value: 0.04},
 						DiskQuota:        32000000,
 						DiskUsage:        16000000,
 						Index:            1,

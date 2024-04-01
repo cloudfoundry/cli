@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/sirupsen/logrus"
 )
@@ -80,6 +81,13 @@ func formatLogRateLimit(limit int64) string {
 	}
 }
 
+func formatCPUEntitlement(cpuEntitlement types.NullFloat64) string {
+	if !cpuEntitlement.IsSet {
+		return ""
+	}
+	return fmt.Sprintf("%.1f%%", cpuEntitlement.Value*100)
+}
+
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
@@ -90,6 +98,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			display.UI.TranslateText("memory"),
 			display.UI.TranslateText("disk"),
 			display.UI.TranslateText("logging"),
+			display.UI.TranslateText("cpu entitlement"),
 			display.UI.TranslateText("details"),
 		},
 	}
@@ -112,6 +121,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 				"LogRate":      bytefmt.ByteSize(instance.LogRate),
 				"LogRateLimit": formatLogRateLimit(instance.LogRateLimit),
 			}),
+			formatCPUEntitlement(instance.CPUEntitlement),
 			instance.Details,
 		})
 	}
