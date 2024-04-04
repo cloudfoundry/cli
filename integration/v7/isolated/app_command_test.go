@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"path"
@@ -105,7 +105,7 @@ applications:
   - route: %s.%s
 `, appName, appName, domainName))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							err := os.WriteFile(manifestPath, manifestContents, 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							// Create manifest
@@ -131,7 +131,7 @@ applications:
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+\d/2`))
 						Eventually(session).Should(Say(`memory usage:\s+128M`))
-						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`))
+						Eventually(session).Should(Say(`\s+state\s+since\s+cpu entitlement\s+memory\s+disk\s+logging\s+details`))
 						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 						Eventually(session).Should(Exit(0))
@@ -358,7 +358,7 @@ applications:
   - route: %s:1024
 `, appName, tcpDomain.Name))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							err := os.WriteFile(manifestPath, manifestContents, 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							// Create manifest

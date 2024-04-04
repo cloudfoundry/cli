@@ -8,14 +8,14 @@ import (
 // AppInstanceRow represents an instance of a V3 app's process,
 // as displayed in the 'cf app' output.
 type AppInstanceRow struct {
-	Index   string
-	State   string
-	Since   string
-	CPU     string
-	Memory  string
-	Disk    string
-	LogRate string
-	Details string
+	Index          string
+	State          string
+	Since          string
+	CPUEntitlement string
+	Memory         string
+	Disk           string
+	LogRate        string
+	Details        string
 }
 
 // AppProcessTable represents a process of a V3 app, as displayed in the 'cf
@@ -62,18 +62,18 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 			columns := splitColumns(row)
 			details := ""
 			if len(columns) >= columnCount {
-				details = columns[7]
+				details = columns[columnCount-1]
 			}
 
 			instanceRow := AppInstanceRow{
-				Index:   columns[0],
-				State:   columns[1],
-				Since:   columns[2],
-				CPU:     columns[3],
-				Memory:  columns[4],
-				Disk:    columns[5],
-				LogRate: columns[6],
-				Details: details,
+				Index:          columns[0],
+				State:          columns[1],
+				Since:          columns[2],
+				CPUEntitlement: columns[3],
+				Memory:         columns[4],
+				Disk:           columns[5],
+				LogRate:        columns[6],
+				Details:        details,
 			}
 			lastProcessIndex := len(appTable.Processes) - 1
 			appTable.Processes[lastProcessIndex].Instances = append(
@@ -107,6 +107,13 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 }
 
 func splitColumns(row string) []string {
+	s := strings.TrimSpace(row)
 	// uses 3 spaces between columns
-	return regexp.MustCompile(`\s{3,}`).Split(strings.TrimSpace(row), -1)
+	result := regexp.MustCompile(`\s{3,}`).Split(s, -1)
+	// 21 spaces should only occur if cpu entitlement is empty but details is filled in
+	if regexp.MustCompile(`\s{21}`).MatchString(s) {
+		result = append(result[:4], result[3:]...)
+		result[3] = ""
+	}
+	return result
 }

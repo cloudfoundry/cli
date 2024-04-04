@@ -16,20 +16,16 @@ import (
 )
 
 var _ = Describe("app summary displayer", func() {
-
-	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`
+	const instanceStatsTitles = `state\s+since\s+cpu entitlement\s+memory\s+disk\s+logging\s+details`
 
 	var (
-		appSummaryDisplayer *AppSummaryDisplayer
-		output              *Buffer
-		testUI              *ui.UI
+		output *Buffer
+		testUI *ui.UI
 	)
 
 	BeforeEach(func() {
 		output = NewBuffer()
 		testUI = ui.NewTestUI(nil, output, NewBuffer())
-
-		appSummaryDisplayer = NewAppSummaryDisplayer(testUI)
 	})
 
 	Describe("AppDisplay", func() {
@@ -39,6 +35,7 @@ var _ = Describe("app summary displayer", func() {
 		)
 
 		JustBeforeEach(func() {
+			appSummaryDisplayer := NewAppSummaryDisplayer(testUI)
 			appSummaryDisplayer.AppDisplay(summary, displayStartCommand)
 		})
 
@@ -65,39 +62,42 @@ var _ = Describe("app summary displayer", func() {
 									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
-											Index:        0,
-											State:        constant.ProcessInstanceRunning,
-											MemoryUsage:  1000000,
-											DiskUsage:    1000000,
-											LogRate:      1024,
-											MemoryQuota:  33554432,
-											DiskQuota:    2000000,
-											LogRateLimit: 1024 * 5,
-											Uptime:       uptime,
-											Details:      "Some Details 1",
+											Index:          0,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+											MemoryUsage:    1000000,
+											DiskUsage:      1000000,
+											LogRate:        1024,
+											MemoryQuota:    33554432,
+											DiskQuota:      2000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         uptime,
+											Details:        "Some Details 1",
 										},
 										v7action.ProcessInstance{
-											Index:        1,
-											State:        constant.ProcessInstanceRunning,
-											MemoryUsage:  2000000,
-											DiskUsage:    2000000,
-											LogRate:      1024 * 2,
-											MemoryQuota:  33554432,
-											DiskQuota:    4000000,
-											LogRateLimit: 1024 * 5,
-											Uptime:       time.Since(time.Unix(330480000, 0)),
-											Details:      "Some Details 2",
+											Index:          1,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 1.0, IsSet: true},
+											MemoryUsage:    2000000,
+											DiskUsage:      2000000,
+											LogRate:        1024 * 2,
+											MemoryQuota:    33554432,
+											DiskQuota:      4000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         time.Since(time.Unix(330480000, 0)),
+											Details:        "Some Details 2",
 										},
 										v7action.ProcessInstance{
-											Index:        2,
-											State:        constant.ProcessInstanceRunning,
-											MemoryUsage:  3000000,
-											DiskUsage:    3000000,
-											LogRate:      1024 * 3,
-											MemoryQuota:  33554432,
-											DiskQuota:    6000000,
-											LogRateLimit: 1024 * 5,
-											Uptime:       time.Since(time.Unix(1277164800, 0)),
+											Index:          2,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.03, IsSet: true},
+											MemoryUsage:    3000000,
+											DiskUsage:      3000000,
+											LogRate:        1024 * 3,
+											MemoryQuota:    33554432,
+											DiskQuota:      6000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         time.Since(time.Unix(1277164800, 0)),
 										},
 									},
 								},
@@ -111,15 +111,16 @@ var _ = Describe("app summary displayer", func() {
 									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
-											Index:        0,
-											State:        constant.ProcessInstanceRunning,
-											MemoryUsage:  1000000,
-											DiskUsage:    1000000,
-											LogRate:      128,
-											MemoryQuota:  33554432,
-											DiskQuota:    8000000,
-											LogRateLimit: 256,
-											Uptime:       time.Since(time.Unix(167572800, 0)),
+											Index:          0,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+											MemoryUsage:    1000000,
+											DiskUsage:      1000000,
+											LogRate:        128,
+											MemoryQuota:    33554432,
+											DiskQuota:      8000000,
+											LogRateLimit:   256,
+											Uptime:         time.Since(time.Unix(167572800, 0)),
 										},
 									},
 								},
@@ -129,6 +130,8 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("lists information for each of the processes", func() {
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
+
 					processTable := helpers.ParseV3AppProcessTable(output.Contents())
 					Expect(len(processTable.Processes)).To(Equal(2))
 
@@ -142,19 +145,19 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.Instances[0].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
-					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[0].LogRate).To(Equal("1K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[0].Details).To(Equal("Some Details 1"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
-					Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[1].CPUEntitlement).To(Equal("100.0%"))
 					Expect(webProcessSummary.Instances[1].LogRate).To(Equal("2K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[1].Details).To(Equal("Some Details 2"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
-					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[2].CPUEntitlement).To(Equal("3.0%"))
 					Expect(webProcessSummary.Instances[2].LogRate).To(Equal("3K/s of 5K/s"))
 
 					consoleProcessSummary := processTable.Processes[1]
@@ -165,11 +168,53 @@ var _ = Describe("app summary displayer", func() {
 
 					Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
-					Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(consoleProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 					Expect(consoleProcessSummary.Instances[0].LogRate).To(Equal("128B/s of 256B/s"))
 				})
 			})
 
+			When("CPU entitlement is not available", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index: 0,
+											State: constant.ProcessInstanceRunning,
+										},
+										v7action.ProcessInstance{
+											Index: 1,
+											State: constant.ProcessInstanceRunning,
+										},
+										v7action.ProcessInstance{
+											Index: 2,
+											State: constant.ProcessInstanceRunning,
+										},
+									},
+								},
+							},
+						},
+					}
+				})
+
+				It("outputs an empty value for the CPU entitlement column", func() {
+					Expect(testUI.Out).To(Say(instanceStatsTitles))
+
+					processTable := helpers.ParseV3AppProcessTable(output.Contents())
+					Expect(len(processTable.Processes)).To(Equal(1))
+
+					webProcessSummary := processTable.Processes[0]
+					Expect(webProcessSummary.Instances[0].CPUEntitlement).To(BeEmpty())
+					Expect(webProcessSummary.Instances[1].CPUEntitlement).To(BeEmpty())
+					Expect(webProcessSummary.Instances[2].CPUEntitlement).To(BeEmpty())
+				})
+			})
 			When("the log rate is unlimited", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
@@ -226,13 +271,14 @@ var _ = Describe("app summary displayer", func() {
 									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
-											Index:       0,
-											State:       constant.ProcessInstanceRunning,
-											MemoryUsage: 1000000,
-											DiskUsage:   1000000,
-											MemoryQuota: 33554432,
-											DiskQuota:   2000000,
-											Uptime:      time.Since(time.Unix(267321600, 0)),
+											Index:          0,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.50, IsSet: true},
+											MemoryUsage:    1000000,
+											DiskUsage:      1000000,
+											MemoryQuota:    33554432,
+											DiskQuota:      2000000,
+											Uptime:         time.Since(time.Unix(267321600, 0)),
 										},
 									},
 								},

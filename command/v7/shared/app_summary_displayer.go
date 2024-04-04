@@ -80,13 +80,20 @@ func formatLogRateLimit(limit int64) string {
 	}
 }
 
+func formatCPU(instance v7action.ProcessInstance) string {
+	if !instance.CPUEntitlement.IsSet {
+		return ""
+	}
+	return fmt.Sprintf("%.1f%%", instance.CPUEntitlement.Value*100)
+}
+
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
 			"",
 			display.UI.TranslateText("state"),
 			display.UI.TranslateText("since"),
-			display.UI.TranslateText("cpu"),
+			display.UI.TranslateText("cpu entitlement"),
 			display.UI.TranslateText("memory"),
 			display.UI.TranslateText("disk"),
 			display.UI.TranslateText("logging"),
@@ -99,7 +106,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			fmt.Sprintf("#%d", instance.Index),
 			display.UI.TranslateText(strings.ToLower(string(instance.State))),
 			display.appInstanceDate(instance.StartTime()),
-			fmt.Sprintf("%.1f%%", instance.CPU*100),
+			formatCPU(instance),
 			display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
 				"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
 				"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
