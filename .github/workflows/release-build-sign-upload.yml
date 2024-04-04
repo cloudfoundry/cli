@@ -80,10 +80,8 @@ jobs:
     name: Setup
     # needs: test
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
 
     outputs:
-      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
       aws-s3-bucket:       "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
 
       version-build: ${{ steps.parse-semver.outputs.version-build }}
@@ -92,9 +90,6 @@ jobs:
       version-patch: ${{ steps.parse-semver.outputs.version-patch }}
 
     steps:
-    - id: set-secrets-environment
-      run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
-
     - name: Checkout cli
       uses: actions/checkout@v4
 
@@ -124,7 +119,6 @@ jobs:
     needs:
     - setup
     runs-on: ubuntu-20.04
-    environment: ${{ needs.setup.outputs.secrets-environment }}
 
     env:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -398,7 +392,6 @@ jobs:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     runs-on: macos-latest
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
 
     - name: Get Build Version
@@ -625,7 +618,6 @@ jobs:
     needs:
     - setup
     runs-on: windows-2019
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     defaults:
       run:
         shell: pwsh
@@ -785,7 +777,6 @@ jobs:
     - test-deb-package
     - test-macos
     - test-windows
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     permissions:
       actions: read
       contents: read
@@ -925,7 +916,6 @@ jobs:
     - test-deb-package
     - test-macos
     - test-windows
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     steps:
     - name: Download signed artifacts
       uses: actions/download-artifact@v4
@@ -969,7 +959,6 @@ jobs:
     needs:
     - setup
     - build-linux
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     runs-on: ubuntu-20.04
     container:
       image: ubuntu:20.04

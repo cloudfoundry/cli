@@ -20,10 +20,7 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
-      secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
-
       version-build: ${{ steps.parse-semver.outputs.version-build }}
       version-major: ${{ steps.parse-semver.outputs.version-major }}
       version-minor: ${{ steps.parse-semver.outputs.version-minor }}
@@ -31,10 +28,6 @@ jobs:
       claw-url: ${{ steps.set-claw-url.outputs.claw-url }}
 
     steps:
-    - name: Set environment
-      id: set-secrets-environment
-      run: echo "secrets-environment=PROD" >> "${GITHUB_OUTPUT}"
-
     - name: Set CLAW URL
       id: set-claw-url
       run: echo "claw-url=https://packages.cloudfoundry.org" >> "${GITHUB_OUTPUT}"
@@ -71,7 +64,6 @@ jobs:
     name: Update Homebrew Repository
     runs-on: ubuntu-latest
     needs: setup
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -216,7 +208,6 @@ jobs:
     needs:
     - setup
     - update-homebrew
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -244,7 +235,6 @@ jobs:
     name: Update Debian Repository
     runs-on: ubuntu-20.04
     needs: setup
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
@@ -320,7 +310,6 @@ jobs:
     needs:
     - setup
     - update-deb
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -352,7 +341,6 @@ jobs:
   update-rpm:
     name: Update RPM Repository
     runs-on: ubuntu-latest
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     needs: setup
     env:
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
@@ -450,7 +438,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: fedora
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -477,7 +464,6 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: setup
-    environment: ${{ needs.setup.outputs.secrets-environment }}
     env:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
