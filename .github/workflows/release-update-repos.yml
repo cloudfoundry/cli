@@ -292,7 +292,7 @@ jobs:
     - name: Update Debian Repository
       env:
         DEBIAN_FRONTEND:       noninteractive
-        SIGNING_KEY_GPG_ID:    ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_ID:    ${{ vars.SIGNING_KEY_GPG_ID }}
         AWS_ACCESS_KEY_ID:     ${{ vars.AWS_ACCESS_KEY_ID }}
         AWS_BUCKET_NAME:       cf-cli-debian-repo
         AWS_DEFAULT_REGION:    us-west-2
