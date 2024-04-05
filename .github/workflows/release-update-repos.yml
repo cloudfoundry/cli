@@ -628,18 +628,30 @@ jobs:
           --rm ${{ env.VERSION_BUILD }} sh test.sh
 
         # If bash reaches this point, it means that tests passed, setting latest
-        if [[ ( ${{ github.ref_name }} == "v8" ) || ( ${{ github.ref_name }} == "v7" ) ]]; then
-          echo "LATEST_DOCKER=true" >> "$GITHUB_ENV"
+        if [[ ( ${{ github.ref_name }} == "v8" ) ]]; then
+          echo "LATEST_DOCKER=v8" >> "$GITHUB_ENV"
+        fi
+
+        if [[ ( ${{ github.ref_name }} == "v7" ) ]]; then
+          echo "LATEST_DOCKER=v7" >> "$GITHUB_ENV"
         fi
         
         rm test.sh
 
-    - name: Push image if comes from v8 or v7
-      if: ${{ env.LATEST_DOCKER }}
+    - name: Push image if its from v8
+      if: ${{ env.LATEST_DOCKER }} == v8
       uses: docker/build-push-action@v5
       with:
         context: docker
         push: true
-        tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}, cloudfoundry/cli:latest  
+        tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}, cloudfoundry/cli:latest
+    
+    - name: Push image if its from v7
+      if: ${{ env.LATEST_DOCKER }} == v7
+      uses: docker/build-push-action@v5
+      with:
+        context: docker
+        push: true
+        tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}
 
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
