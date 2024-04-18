@@ -570,8 +570,8 @@ jobs:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
-    steps:
 
+    steps:
     - name: Setup
       env:
         ENVIRONMENT:   ${{ github.event.inputs.environment }}
@@ -653,5 +653,59 @@ jobs:
         context: docker
         push: true
         tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}
+
+  bosh-release:
+    name: Create a bosh release
+    runs-on: ubuntu-latest
+    needs: setup
+    env:
+      CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
+
+    steps:
+    - name: Setup
+      env:
+        ENVIRONMENT:   ${{ github.event.inputs.environment }}
+        VERSION_BUILD: ${{ github.event.inputs.build_version }}
+      run: |
+        echo "VERSION_BUILD: ${VERSION_BUILD}"
+        echo "Environment: ${ENVIRONMENT}"
+    
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: cloudfoundry/cli
+        ref: ${{ github.ref_name }}
+        path: ${{ env.GITHUB_WORKSPACE }}
+    
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: bosh-packages/cf-cli-release
+        private_key: ${{secrets.repo_key}} ## ((release-repo-github-key))
+        ref: main
+        path: ${{ env.GITHUB_WORKSPACE }}
+    
+    - name: Install dependencies
+      run : |
+        cd $GITHUB_WORKSPACE
+        echo "Installing AWS CLI"
+
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+
+        echo "Installed AWS CLI"
+
+    - name: Pull CLI binaries from S3
+      run: |
+        aws s3api get-object --bucket v7-cf-cli-releases --region us-west-1 --key releases/v7/cf-cli_7_linux_x86-64.tgz | tar zxvf cf-cli_7_linux_x86-64.tgz | mv cf-cli_7_linux_x86-64 v7-cli-binary
+        aws s3api get-object --bucket v8-cf-cli-releases --region us-west-1 --key releases/v8/cf-cli_8_linux_x86-64.tgz | tar zxvf cf-cli_8_linux_x86-64.tgz | mv cf-cli_8_linux_x86-64 v8-cli-binary   
+
+        LATEST_V7_CLI_VERSION = $(cat v7-cli-binary/version)
+        LATEST_V8_CLI_VERSION=$(cat v8-cli-binary/version)
+
+        chmod 700 test.sh
 
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
