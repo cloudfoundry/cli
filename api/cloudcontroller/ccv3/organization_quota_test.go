@@ -163,6 +163,7 @@ var _ = Describe("Organization Quotas", func() {
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
 								PaidServicePlans:      &trueValue,
+								TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 20},
 							},
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
@@ -183,6 +184,7 @@ var _ = Describe("Organization Quotas", func() {
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
+								TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 20},
 							},
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
@@ -267,6 +269,7 @@ var _ = Describe("Organization Quotas", func() {
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
+								TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 20},
 							},
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
@@ -396,6 +399,7 @@ var _ = Describe("Organization Quotas", func() {
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
 								PaidServicePlans:      &trueValue,
+								TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 20},
 							},
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
