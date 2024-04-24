@@ -17,6 +17,8 @@ type Quota struct {
 	Services ServiceLimit `json:"services"`
 	// Routes contain the various limits that are associated with routes
 	Routes RouteLimit `json:"routes"`
+	// Domains contain the various limits that are associated with domains
+	Domains DomainLimit `json:"domains"`
 }
 
 type AppLimit struct {
@@ -111,6 +113,31 @@ func (sl *RouteLimit) UnmarshalJSON(rawJSON []byte) error {
 
 	if sl.TotalReservedPorts == nil {
 		sl.TotalReservedPorts = &types.NullInt{
+			IsSet: false,
+			Value: 0,
+		}
+	}
+
+	return nil
+}
+
+type DomainLimit struct {
+	TotalDomains *types.NullInt `json:"total_domains,omitempty"`
+}
+
+func (sl *DomainLimit) UnmarshalJSON(rawJSON []byte) error {
+	type Alias DomainLimit
+
+	var aux Alias
+	err := json.Unmarshal(rawJSON, &aux)
+	if err != nil {
+		return err
+	}
+
+	*sl = DomainLimit(aux)
+
+	if sl.TotalDomains == nil {
+		sl.TotalDomains = &types.NullInt{
 			IsSet: false,
 			Value: 0,
 		}
