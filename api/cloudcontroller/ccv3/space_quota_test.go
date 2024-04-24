@@ -246,6 +246,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 								TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 								TotalLogVolume:    &types.NullInt{IsSet: true, Value: 8},
+								PerAppTasks:       &types.NullInt{IsSet: true, Value: 900},
 							},
 							Services: resources.ServiceLimit{
 								PaidServicePlans:      &trueValue,
@@ -380,6 +381,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 								TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 								TotalLogVolume:    &types.NullInt{IsSet: true, Value: 8},
+								PerAppTasks:       &types.NullInt{IsSet: true, Value: 5},
 							},
 							Services: resources.ServiceLimit{
 								PaidServicePlans:      &trueValue,
@@ -576,6 +578,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 								TotalLogVolume:    &types.NullInt{Value: 8, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
@@ -769,6 +772,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
 								TotalLogVolume:    &types.NullInt{Value: 8, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
@@ -790,6 +794,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 								TotalLogVolume:    &types.NullInt{Value: 16, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
@@ -874,6 +879,7 @@ var _ = Describe("Space Quotas", func() {
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 								TotalLogVolume:    &types.NullInt{Value: 8, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
