@@ -23,6 +23,7 @@ type AppLimit struct {
 	TotalMemory       *types.NullInt `json:"total_memory_in_mb,omitempty"`
 	InstanceMemory    *types.NullInt `json:"per_process_memory_in_mb,omitempty"`
 	TotalAppInstances *types.NullInt `json:"total_instances,omitempty"`
+	PerAppTasks       *types.NullInt `json:"per_app_tasks,omitempty"`
 }
 
 func (al *AppLimit) UnmarshalJSON(rawJSON []byte) error {

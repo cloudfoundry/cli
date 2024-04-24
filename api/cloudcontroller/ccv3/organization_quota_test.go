@@ -156,6 +156,7 @@ var _ = Describe("Organization Quotas", func() {
 								TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
@@ -175,6 +176,7 @@ var _ = Describe("Organization Quotas", func() {
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
@@ -257,6 +259,7 @@ var _ = Describe("Organization Quotas", func() {
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
@@ -384,6 +387,7 @@ var _ = Describe("Organization Quotas", func() {
 								TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
+								PerAppTasks:       &types.NullInt{Value: 5, IsSet: true},
 							},
 							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
