@@ -63,6 +63,7 @@ func (al *AppLimit) UnmarshalJSON(rawJSON []byte) error {
 type ServiceLimit struct {
 	TotalServiceInstances *types.NullInt `json:"total_service_instances,omitempty"`
 	PaidServicePlans      *bool          `json:"paid_services_allowed,omitempty"`
+	TotalServiceKeys      *types.NullInt `json:"total_service_keys,omitempty"`
 }
 
 func (sl *ServiceLimit) UnmarshalJSON(rawJSON []byte) error {
