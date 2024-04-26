@@ -507,6 +507,27 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the service instance has already been shared", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "A service instance called foo has already been shared with foo-space.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns an ServiceInstanceAlreadySharedError", func() {
+							Expect(makeError).To(MatchError(ccerror.ServiceInstanceAlreadySharedError{
+								Message: "A service instance called foo has already been shared with foo-space.",
+							}))
+						})
+					})					
+
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `
