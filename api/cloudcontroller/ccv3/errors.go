@@ -154,6 +154,7 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	roleExistsRegexp := regexp.MustCompile(`User '.*' already has '.*' role.*`)
 	quotaExistsRegexp := regexp.MustCompile(`.* Quota '.*' already exists\.`)
 	securityGroupExistsRegexp := regexp.MustCompile(`Security group with name '.*' already exists\.`)
+	serviceInstanceSharedRegexp := regexp.MustCompile(`A service instance called .* has already been shared with .*\.`)
 
 	// boolean switch case with partial/regex string matchers
 	switch {
@@ -174,6 +175,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"The service instance name is taken"):
 		return ccerror.ServiceInstanceNameTakenError{Message: err.Message}
+	case serviceInstanceSharedRegexp.MatchString(errorString):
+		return ccerror.ServiceInstanceAlreadySharedError{Message: err.Message}
 	case orgNameTakenRegexp.MatchString(errorString):
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	case roleExistsRegexp.MatchString(errorString):
