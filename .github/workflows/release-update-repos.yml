@@ -662,7 +662,10 @@ jobs:
       CLAW_URL:      ${{ needs.setup.outputs.claw-url }}
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
-
+    container:
+      image: cfcli/cli-release-base:latest
+      env:
+        FOO: BAR
     steps:
     - name: Setup
       env:
@@ -677,7 +680,7 @@ jobs:
       with:
         repository: cloudfoundry/cli
         ref: ${{ github.ref_name }}
-        path: ${{ env.GITHUB_WORKSPACE }}
+        path: /
     
     - name: Checkout
       uses: actions/checkout@v4
@@ -685,11 +688,12 @@ jobs:
         repository: bosh-packages/cf-cli-release
         private_key: ${{secrets.repo_key}} ## ((release-repo-github-key))
         ref: main
-        path: ${{ env.GITHUB_WORKSPACE }}
+        path: /
     
     - name: Install dependencies
       run : |
-        cd $GITHUB_WORKSPACE
+        cd /
+
         echo "Installing AWS CLI"
 
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -700,12 +704,147 @@ jobs:
 
     - name: Pull CLI binaries from S3
       run: |
+        cd /
+
+        #Change the following steps to a simple wget from the cloudfoundry endpoint, there is an example in docker/Dockerfile. Delete "Install dependencies" step after
         aws s3api get-object --bucket v7-cf-cli-releases --region us-west-1 --key releases/v7/cf-cli_7_linux_x86-64.tgz | tar zxvf cf-cli_7_linux_x86-64.tgz | mv cf-cli_7_linux_x86-64 v7-cli-binary
         aws s3api get-object --bucket v8-cf-cli-releases --region us-west-1 --key releases/v8/cf-cli_8_linux_x86-64.tgz | tar zxvf cf-cli_8_linux_x86-64.tgz | mv cf-cli_8_linux_x86-64 v8-cli-binary   
 
-        LATEST_V7_CLI_VERSION = $(cat v7-cli-binary/version)
+        LATEST_V7_CLI_VERSION=$(cat v7-cli-binary/version)
         LATEST_V8_CLI_VERSION=$(cat v8-cli-binary/version)
 
-        chmod 700 test.sh
+        cp -r cf-cli-release/. cf-cli-release-output
+
+        cd cf-cli-release-output
+
+        echo "Checking if V7 CLI has been upgraded..."
+        (
+          OLD_V7_BLOB_PATH=$(bosh blobs --column=path | grep "cf7-")
+          OLD_V7_CLI_VERSION=$(echo ${OLD_BLOB_PATH} | cut -d_ -f2)
+
+          if [[ "${OLD_V7_CLI_VERSION}" != "${LATEST_V7_CLI_VERSION}" ]]; then
+            git config --global user.email cf-cli-eng@pivotal.io
+            git config --global user.name "CI Bot"
+
+            cat << EOF > config/private.yml
+          blobstore:
+            options:
+              access_key_id: "$ACCESS_KEY_ID"
+              secret_access_key: "$SECRET_KEY"
+              assume_role_arn: "$AWS_ROLE_ARN"
+        EOF
+
+            bosh remove-blob $OLD_V7_BLOB_PATH
+
+            bosh add-blob ../v7-cli-binary/cf7-cli_${LATEST_V7_CLI_VERSION}_linux_x86-64.tgz cf7-cli_${LATEST_V7_CLI_VERSION}_linux_x86-64.tgz
+            bosh upload-blobs
+
+            git add config/blobs.yml
+            git status
+            git commit -m "bump v7 cli to ${LATEST_V7_CLI_VERSION}"
+          else
+            echo "Release has latest v7 CLI version, skipping bump."
+          fi
+        )
+
+        echo "Checking if V8 CLI has been upgraded..."
+        (
+          OLD_V8_BLOB_PATH=$(bosh blobs --column=path | grep "cf8-")
+          OLD_V8_CLI_VERSION=$(echo ${OLD_BLOB_PATH} | cut -d_ -f2)
+
+          if [[ "${OLD_V8_CLI_VERSION}" != "${LATEST_V8_CLI_VERSION}" ]]; then
+            git config --global user.email cf-cli-eng@pivotal.io
+            git config --global user.name "CI Bot"
+
+            cat << EOF > config/private.yml
+          blobstore:
+            options:
+              access_key_id: "$ACCESS_KEY_ID"
+              secret_access_key: "$SECRET_KEY"
+              assume_role_arn: "$AWS_ROLE_ARN"
+        EOF
+
+            bosh remove-blob $OLD_V8_BLOB_PATH
+
+            bosh add-blob ../v8-cli-binary/cf8-cli_${LATEST_V8_CLI_VERSION}_linux_x86-64.tgz cf8-cli_${LATEST_V8_CLI_VERSION}_linux_x86-64.tgz
+            bosh upload-blobs
+
+            git add config/blobs.yml
+            git status
+            git commit -m "bump v8 cli to ${LATEST_V8_CLI_VERSION}"
+          else
+            echo "Release has latest v8 CLI version, skipping bump."
+          fi
+        )
+
+        bosh create-release --timestamp-version --tarball=../candidate-release-output/cf-cli-dev-release.tgz
+
+    - name: Run CLI tests
+      run: |
+        cd /
+
+        # Here we have to execute bosh CLI tests with a created env
+        # TODO: Bellow's script was used for tests running in Toolsmith's envs, it needs to be adjusted to Shepherd's envs
+        # ENV=$(cat gcp-env/name)
+
+        # cat gcp-env/metadata > $ENV.json
+        # eval "$(bbl print-env --metadata-file $ENV.json)"
+
+        cd cf-cli-release-output
+        
+        export BOSH_DEPLOYMENT=cf-cli-test
+        export BOSH_NON_INTERACTIVE=true
+
+        echo "-----> `date`: Delete previous deployment"
+        bosh delete-deployment --force
+
+        echo "-----> `date`: Deploy"
+        bosh deploy ./manifests/test.yml
+
+        echo "-----> `date`: Run test errand for cf6"
+        bosh run-errand cf-cli-6-linux-test
+
+        echo "-----> `date`: Run test errand for cf7"
+        bosh run-errand cf-cli-7-linux-test
+
+        echo "-----> `date`: Run test errand for cf8"
+        bosh run-errand cf-cli-8-linux-test
+
+        echo "-----> `date`: Delete deployments"
+        bosh delete-deployment
+
+        echo "-----> `date`: Clean up"
+        bosh clean-up --all
+
+        echo "-----> `date`: Done"
+
+    - name: Finalize Bosh release
+      run: |
+        #Semver was used to bump the minor version of the product before releasing, there is the option of using semver here or bumping it manually
+        cd /
+        RELEASE_VERSION=$(cat release-version/version)
+
+        #use original copy of cli release after being tested, and create final release based on this version
+        cp -r cf-cli-release/. cf-cli-release-final
+
+        cd cf-cli-release-final
+
+        git config --global user.email cf-cli-eng@pivotal.io
+        git config --global user.name "CI Bot"
+
+        #TODO: Define these secret variables in Github Secrets
+        cat << EOF > config/private.yml
+        blobstore:
+          options:
+            access_key_id: "$ACCESS_KEY_ID"
+            secret_access_key: "$SECRET_KEY"
+            assume_role_arn: "$AWS_ROLE_ARN"
+        EOF
+
+        bosh create-release --final --version="${RELEASE_VERSION}" --tarball="./cf-cli-v${RELEASE_VERSION}.tgz"
+
+        git add --all
+        git status
+        git commit -m "create final release ${RELEASE_VERSION}"
 
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
