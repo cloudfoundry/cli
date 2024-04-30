@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -92,6 +93,7 @@ var _ = Describe("ProcessInstance", func() {
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.01,
+								"cpu_entitlement": 0.02,
 								"mem": 1000000,
 								"disk": 2000000,
 								"log_rate": 5000
@@ -109,6 +111,7 @@ var _ = Describe("ProcessInstance", func() {
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.02,
+								"cpu_entitlement": 0.04,
 								"mem": 8000000,
 								"disk": 16000000,
 								"log_rate": 32000
@@ -135,7 +138,7 @@ var _ = Describe("ProcessInstance", func() {
 
 				Expect(processes).To(ConsistOf(
 					ProcessInstance{
-						CPU:              0.01,
+						CPUEntitlement:   types.NullFloat64{Value: 0.02, IsSet: true},
 						Details:          "some details",
 						DiskQuota:        4000000,
 						DiskUsage:        2000000,
@@ -150,7 +153,7 @@ var _ = Describe("ProcessInstance", func() {
 						Uptime:           123 * time.Second,
 					},
 					ProcessInstance{
-						CPU:              0.02,
+						CPUEntitlement:   types.NullFloat64{Value: 0.04, IsSet: true},
 						DiskQuota:        32000000,
 						DiskUsage:        16000000,
 						Index:            1,
@@ -165,6 +168,51 @@ var _ = Describe("ProcessInstance", func() {
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("CPU entitlement is null", func() {
+			BeforeEach(func() {
+				response := `{
+					"resources": [
+						{
+						  "type": "web",
+							"usage": {
+								"cpu_entitlement": null
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid/stats"),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+			})
+
+			It("marks the cpu entitlement as not set", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(processes).To(HaveLen(1))
+				Expect(processes[0].CPUEntitlement.IsSet).To(BeFalse())
+			})
+		})
+
+		When("CPU entitlement is not present", func() {
+			BeforeEach(func() {
+				response := `{ "resources": [ { "type": "web", "usage": {} } ] }`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid/stats"),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+			})
+
+			It("marks the cpu entitlement as not set", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(processes).To(HaveLen(1))
+				Expect(processes[0].CPUEntitlement.IsSet).To(BeFalse())
 			})
 		})
 

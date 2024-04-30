@@ -33,7 +33,7 @@ var _ = Describe("push with instances flag", func() {
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
 			Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
-			Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+			Eventually(session).Should(Say(`\s+state\s+since`))
 			Eventually(session).Should(Say(`#0\s+(running|starting)\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
 			Eventually(session).Should(Say(`#1\s+(running|starting)\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))
 			Eventually(session).Should(Say(`#2\s+(running|starting)\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ`))

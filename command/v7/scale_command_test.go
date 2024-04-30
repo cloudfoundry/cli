@@ -161,37 +161,40 @@ var _ = Describe("scale Command", func() {
 								},
 								InstanceDetails: []v7action.ProcessInstance{
 									v7action.ProcessInstance{
-										Index:        0,
-										State:        constant.ProcessInstanceRunning,
-										MemoryUsage:  1000000,
-										DiskUsage:    1000000,
-										LogRate:      1024 * 5,
-										MemoryQuota:  33554432,
-										DiskQuota:    2000000,
-										LogRateLimit: 1024 * 10,
-										Uptime:       time.Since(time.Unix(267321600, 0)),
+										Index:          0,
+										State:          constant.ProcessInstanceRunning,
+										CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+										MemoryUsage:    1000000,
+										DiskUsage:      1000000,
+										LogRate:        1024 * 5,
+										MemoryQuota:    33554432,
+										DiskQuota:      2000000,
+										LogRateLimit:   1024 * 10,
+										Uptime:         time.Since(time.Unix(267321600, 0)),
 									},
 									v7action.ProcessInstance{
-										Index:        1,
-										State:        constant.ProcessInstanceRunning,
-										MemoryUsage:  2000000,
-										DiskUsage:    2000000,
-										LogRate:      1024 * 3,
-										MemoryQuota:  33554432,
-										DiskQuota:    4000000,
-										LogRateLimit: 1024 * 10,
-										Uptime:       time.Since(time.Unix(330480000, 0)),
+										Index:          1,
+										State:          constant.ProcessInstanceRunning,
+										CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+										MemoryUsage:    2000000,
+										DiskUsage:      2000000,
+										LogRate:        1024 * 3,
+										MemoryQuota:    33554432,
+										DiskQuota:      4000000,
+										LogRateLimit:   1024 * 10,
+										Uptime:         time.Since(time.Unix(330480000, 0)),
 									},
 									v7action.ProcessInstance{
-										Index:        2,
-										State:        constant.ProcessInstanceRunning,
-										MemoryUsage:  3000000,
-										DiskUsage:    3000000,
-										LogRate:      1024 * 4,
-										MemoryQuota:  33554432,
-										DiskQuota:    6000000,
-										LogRateLimit: 1024 * 10,
-										Uptime:       time.Since(time.Unix(1277164800, 0)),
+										Index:          2,
+										State:          constant.ProcessInstanceRunning,
+										CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+										MemoryUsage:    3000000,
+										DiskUsage:      3000000,
+										LogRate:        1024 * 4,
+										MemoryQuota:    33554432,
+										DiskQuota:      6000000,
+										LogRateLimit:   1024 * 10,
+										Uptime:         time.Since(time.Unix(1277164800, 0)),
 									},
 								},
 							},
@@ -204,15 +207,16 @@ var _ = Describe("scale Command", func() {
 								},
 								InstanceDetails: []v7action.ProcessInstance{
 									v7action.ProcessInstance{
-										Index:        0,
-										State:        constant.ProcessInstanceRunning,
-										MemoryUsage:  1000000,
-										DiskUsage:    1000000,
-										LogRate:      1024,
-										MemoryQuota:  33554432,
-										DiskQuota:    8000000,
-										LogRateLimit: 1024 * 5,
-										Uptime:       time.Since(time.Unix(167572800, 0)),
+										Index:          0,
+										State:          constant.ProcessInstanceRunning,
+										CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+										MemoryUsage:    1000000,
+										DiskUsage:      1000000,
+										LogRate:        1024,
+										MemoryQuota:    33554432,
+										DiskQuota:      8000000,
+										LogRateLimit:   1024 * 5,
+										Uptime:         time.Since(time.Unix(167572800, 0)),
 									},
 								},
 							},
@@ -250,17 +254,17 @@ var _ = Describe("scale Command", func() {
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
-					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[0].LogRate).To(Equal("5K/s of 10K/s"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
-					Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[1].CPUEntitlement).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[1].LogRate).To(Equal("3K/s of 10K/s"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
-					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[2].CPUEntitlement).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[2].LogRate).To(Equal("4K/s of 10K/s"))
 
 					consoleProcessSummary := firstAppTable.Processes[1]
@@ -270,7 +274,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
-					Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(consoleProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 					Expect(consoleProcessSummary.Instances[0].LogRate).To(Equal("1K/s of 5K/s"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
@@ -422,17 +426,17 @@ var _ = Describe("scale Command", func() {
 
 								Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 								Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
-								Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+								Expect(webProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 								Expect(webProcessSummary.Instances[0].LogRate).To(Equal("5K/s of 10K/s"))
 
 								Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 								Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
-								Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
+								Expect(webProcessSummary.Instances[1].CPUEntitlement).To(Equal("0.0%"))
 								Expect(webProcessSummary.Instances[1].LogRate).To(Equal("3K/s of 10K/s"))
 
 								Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 								Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
-								Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
+								Expect(webProcessSummary.Instances[2].CPUEntitlement).To(Equal("0.0%"))
 								Expect(webProcessSummary.Instances[2].LogRate).To(Equal("4K/s of 10K/s"))
 
 								consoleProcessSummary := firstAppTable.Processes[1]
@@ -442,7 +446,7 @@ var _ = Describe("scale Command", func() {
 
 								Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 								Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
-								Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+								Expect(consoleProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 								Expect(consoleProcessSummary.Instances[0].LogRate).To(Equal("1K/s of 5K/s"))
 
 								Expect(testUI.Err).To(Say("get-app-warning"))

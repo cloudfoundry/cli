@@ -14,7 +14,7 @@ import (
 var _ = Describe("restart command", func() {
 
 	const (
-		instanceStatsTitles = `\s+state\s+since\s+cpu\s+memory\s+disk\s+logging\s+details`
+		instanceStatsTitles = `\s+state\s+since\s+cpu entitlement\s+memory\s+disk\s+logging\s+details`
 		instanceStatsValues = `#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`
 	)
 

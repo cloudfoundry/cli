@@ -13,13 +13,13 @@ func CheckCCAPIVersion(currentAPIVersion string) (string, error) {
 		return "", err
 	}
 
-	minimumSemver, err := semver.Make(ccversion.MinSupportedClientVersionV8)
+	minimumSemver, err := semver.Make(ccversion.MinSupportedClientVersionV9)
 	if err != nil {
 		return "", err
 	}
 
 	if currentSemver.LT(minimumSemver) {
-		return fmt.Sprintf("\nWarning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, ccversion.MinSupportedClientVersionV8), nil
+		return fmt.Sprintf("\nWarning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, ccversion.MinSupportedClientVersionV9), nil
 	}
 
 	return "", nil

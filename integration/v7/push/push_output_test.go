@@ -61,7 +61,7 @@ var _ = Describe("Output", func() {
 		})
 	})
 
-	When("there is no a manifest", func() {
+	When("there is no manifest", func() {
 		It("does not display any manifest information", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
