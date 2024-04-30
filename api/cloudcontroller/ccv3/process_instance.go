@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // ProcessInstance represents a single process instance for a particular
@@ -15,6 +16,8 @@ import (
 type ProcessInstance struct {
 	// CPU is the current CPU usage of the instance.
 	CPU float64
+	// CPU Entitlement is the current CPU entitlement usage of the instance.
+	CPUEntitlement types.NullFloat64
 	// Details is information about errors placing the instance.
 	Details string
 	// DiskQuota is the maximum disk the instance is allowed to use.
@@ -56,10 +59,11 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 		Type             string `json:"type"`
 		Uptime           int64  `json:"uptime"`
 		Usage            struct {
-			CPU     float64 `json:"cpu"`
-			Mem     uint64  `json:"mem"`
-			Disk    uint64  `json:"disk"`
-			LogRate uint64  `json:"log_rate"`
+			CPU            float64           `json:"cpu"`
+			CPUEntitlement types.NullFloat64 `json:"cpu_entitlement"`
+			Mem            uint64            `json:"mem"`
+			Disk           uint64            `json:"disk"`
+			LogRate        uint64            `json:"log_rate"`
 		} `json:"usage"`
 	}
 
@@ -69,6 +73,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	}
 
 	instance.CPU = inputInstance.Usage.CPU
+	instance.CPUEntitlement = inputInstance.Usage.CPUEntitlement
 	instance.Details = inputInstance.Details
 	instance.DiskQuota = inputInstance.DiskQuota
 	instance.DiskUsage = inputInstance.Usage.Disk
