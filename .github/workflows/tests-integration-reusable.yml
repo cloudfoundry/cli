@@ -2,9 +2,8 @@
 
 # secrets.CLIENT_SECRET
 # secrets.GITHUB_TOKEN
-# secrets.TOOLSMITHS_API_TOKEN
-# vars.TOOLSMITHS_HOSTNAME
-# vars.TOOLSMITHS_POOL_NAME
+# secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
+# vars.SHEPHERD_POOL_NAME
 
 name: "pvt: run integration tests"
 
@@ -30,7 +29,7 @@ jobs:
       run:
         shell: bash
     runs-on: ${{ inputs.os }} 
-
+    container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     steps:
     - uses: LouisBrunner/checks-action@v2.0.0
       if: always()
@@ -42,6 +41,7 @@ jobs:
         sha:  ${{github.event.workflow_run.head_sha}}
         output: |
           {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+    
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
@@ -56,6 +56,8 @@ jobs:
     - id: read-min-capi
       name: Read MIN CAPI
       run: |
+        wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
+        chmod +x /usr/bin/yq
         version=$(yq '.capi-version-min' build_data.yml)
         echo "version=$version" >> $GITHUB_OUTPUT
 
@@ -80,38 +82,36 @@ jobs:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
 
-    - id: claim-toolsmiths-env
-      name: Claim Toolsmiths Environment
+    - id: claim-env
+      name: Claim Environment
       env:
-        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
-        notes:     "GHA CF CLI Integration Tests ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        pool_name: ${{ vars.TOOLSMITHS_POOL_NAME }}
+        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        pool_name: ${{ vars.SHEPHERD_POOL_NAME }}
       run: |
-        while true; do
-          curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/pooled_gcp_engineering_environments/claim" \
-          --data-urlencode "api_token=${api_token}" \
-          --data-urlencode "pool_name=${pool_name}" \
-          --data-urlencode "notes=${notes}" > metadata.json \
-          || echo "Unable to reach server, trying again in 30 seconds..."
+        shepherd login service-account ${account_token}
+        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace official --namespace tas-devex --json | jq -r .id) 
 
-          cat headers.txt
-
-          ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
-          ERR_429="Sorry, Toolsmiths are out of environments in your requested pool. New environments are on their way but you can stop by the Toolsmiths slack channel for more help."
-          ERR_409="Sorry, was not able to claim an environment. Trying again in 30 seconds..."
-
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && exit 1
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && exit 2
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500"
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 200" headers.txt && break
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 429" && echo "$ERR_429"
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 409" && echo "$ERR_409"
-
+        # Give somtime for the lease to complete. Shepherd may take upto an 3 hours to create an env
+        # if the pool is empty.
+        count=0
+        while [ $count -lt 360 ] ; do
           sleep 30
+          status=$(shepherd get lease ${lease_id} --namespace tas-devex --json | jq -r .status)
+          if [ $status == "LEASED" ] ; then
+            shepherd get lease ${lease_id} --namespace tas-devex --json | jq .output > metadata.json
+            break
+          elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
+            echo "There was an error obtaining the lease. Lease status is ${status}."
+            exit 1
+          else
+            echo "Waiting for environment to be ready. Lease status is ${status}."
+          fi
+          count=$(($count+1))
         done
+
+        env_name=$(jq -r .name metadata.json)
         cat metadata.json | jq -r '.name'
+        echo "lease-id=$lease_id" >> "${GITHUB_OUTPUT}"
     
     - name: Install Tools
       run: |
@@ -141,11 +141,16 @@ jobs:
         chmod +x $install_location/credhub
         credhub --version
 
+        apt-get update
+        apt-get install -y build-essential
+
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
       env:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
+        env_name=$(jq -r .name metadata.json)
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file metadata.json)"
 
         # deploy
@@ -182,6 +187,8 @@ jobs:
         cp cli-ci/ci/infrastructure/operations/use-latest-ruby-buildpack.yml ops-files/
 
         # Deletes CF-D
+        env_name=$(jq -r .name metadata.json)
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file metadata.json)"
         bosh -d cf delete-deployment -n
 
@@ -225,11 +232,13 @@ jobs:
       if: ${{ !inputs.run-with-client-creds }}
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
         export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
-        export CF_INT_API="https://api.${ENV}.cf-app.com"
+        API_URL="$(jq -r .cf.api_url metadata.json)"
+        export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
         export FLAKE_ATTEMPTS=2
@@ -255,11 +264,13 @@ jobs:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
         export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
-        export CF_INT_API="https://api.${ENV}.cf-app.com"
+        API_URL="$(jq -r .cf.api_url metadata.json)"
+        export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
         export FLAKE_ATTEMPTS=2
@@ -278,29 +289,15 @@ jobs:
 
         make integration-tests-full-ci
 
-
     - name: Unclaim environment
       if: always()
       env:
-        api_token: ${{ secrets.TOOLSMITHS_API_TOKEN }}
-        hostname:  ${{ vars.TOOLSMITHS_HOSTNAME }}
+        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        while true; do
-          output=$(curl -s --show-error -D headers.txt -H 'Accept: application/json' \
-          -X POST "https://${hostname}/pooled_gcp_engineering_environments/unclaim" \
-          --data-urlencode "api_token=${api_token}" \
-          --data-urlencode "name=${ENV}")
-
-          cat headers.txt
-
-          ERR_500="Sorry, the Toolsmiths Environments app is currently encountering issues. Trying again in 30 seconds..."
-
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 500" headers.txt && echo "$ERR_500" && sleep 30 && continue
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 401" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 1
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 404" headers.txt && echo $(echo "$output" | jq '.messages | join(", ")') && exit 2
-          grep -q -E "HTTP/[[:digit:]\.]{1,3} 202" headers.txt && break
-        done
+        shepherd login service-account ${account_token}
+        set -x
+        shepherd delete lease ${{ steps.claim-env.outputs.lease-id }} --namespace tas-devex
+        
     - uses: LouisBrunner/checks-action@v2.0.0
       if: always()
       with:
