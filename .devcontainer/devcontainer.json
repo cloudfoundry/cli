@@ -1,0 +1,23 @@
+{
+  "name": "Cloudfoundry CLI",
+  "image": "mcr.microsoft.com/devcontainers/go:1.22-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/go:latest": {
+      "version": "1.22.1"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "editorconfig.editorconfig",
+        "golang.go",
+        "DavidAnson.vscode-markdownlint",
+        "GitHub.vscode-pull-request-github",
+        "GitHub.copilot"
+      ]
+    }
+  },
+  "postCreateCommand": "make build"
+}
