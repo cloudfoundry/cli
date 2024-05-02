@@ -9,11 +9,7 @@ If your contribution falls under a company CLA but your membership is not public
 * Contributions must conform to our [style guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide). Please reach out to us if you have questions.
 
 
-## Where this PR should be backported?
-
-- [ ] [main](https://github.com/cloudfoundry/cli/tree/main) - all changes should by default start here
-- [ ] [v8](https://github.com/cloudfoundry/cli/tree/v8)
-- [ ] [v7](https://github.com/cloudfoundry/cli/tree/v7)
+#### Note: Please create separate PR for every branch (main, v8 and v7) as needed.
 
 ## Description of the Change
 
