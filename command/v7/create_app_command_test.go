@@ -124,6 +124,32 @@ var _ = Describe("create-app Command", func() {
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
 			})
+
+			When("app type is cnb", func() {
+				BeforeEach(func() {
+					cmd.AppType = "cnb"
+					cmd.Buildpacks = []string{"foo"}
+					fakeConfig.CNBCredentialsReturns(map[string]interface{}{
+						"foo": "bar",
+					}, nil)
+				})
+
+				It("creates an app with app type: cnb", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
+					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+					Expect(createApp).To(Equal(resources.Application{
+						Name:                app,
+						LifecycleType:       constant.AppLifecycleTypeCNB,
+						LifecycleBuildpacks: []string{"foo"},
+						Credentials: map[string]interface{}{
+							"foo": "bar",
+						},
+					}))
+					Expect(createSpaceGUID).To(Equal("some-space-guid"))
+				})
+			})
 		})
 
 		When("the create is unsuccessful", func() {

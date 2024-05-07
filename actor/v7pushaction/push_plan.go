@@ -43,6 +43,7 @@ type FlagOverrides struct {
 	DockerImage         string
 	DockerPassword      string
 	DockerUsername      string
+	CNBCredentials      map[string]interface{}
 	HealthCheckEndpoint string
 	HealthCheckTimeout  int64
 	HealthCheckType     constant.HealthCheckType

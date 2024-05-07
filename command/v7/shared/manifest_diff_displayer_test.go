@@ -572,6 +572,38 @@ applications:
 					})
 				})
 
+				When("adding cnb-credentials", func() {
+					BeforeEach(func() {
+						rawManifest = []byte(`---
+applications:
+- name: dora
+  lifecycle: cnb
+  cnb-credentials:
+   foo: bar`)
+						diff = resources.ManifestDiff{
+							Diffs: []resources.Diff{
+								{
+									Op:   resources.AddOperation,
+									Path: "/applications/0/cnb-credentials",
+									Value: []map[string]interface{}{
+										{
+											"foo": "Bar",
+										},
+									},
+								},
+							},
+						}
+					})
+
+					It("redacts output", func() {
+						Expect(testUI.Out).To(Say(`  ---
+  applications:
+  - name: dora
+    lifecycle: cnb
+\+   cnb-credentials: '\[PRIVATE DATA HIDDEN\]'`))
+					})
+				})
+
 				When("remove", func() {
 					BeforeEach(func() {
 						rawManifest = []byte(`---
