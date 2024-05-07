@@ -42,6 +42,7 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 
 		HandleInstancesOverride,
 		HandleStartCommandOverride,
+		HandleCNBCredentialsOverride,
 
 		HandleLifecycleOverride,
 

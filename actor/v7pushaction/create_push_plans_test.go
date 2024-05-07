@@ -49,6 +49,9 @@ var _ = Describe("CreatePushPlans", func() {
 		spaceGUID = "space"
 		flagOverrides = FlagOverrides{
 			DockerPassword: "passwd",
+			CNBCredentials: map[string]interface{}{
+				"foo": "bar",
+			},
 		}
 
 		testUpdatePlanCount = 0
@@ -121,6 +124,9 @@ var _ = Describe("CreatePushPlans", func() {
 			Expect(pushPlans[0].DockerImageCredentials.Password).To(Equal(""))
 			Expect(pushPlans[0].BitsPath).To(Equal("path1"))
 			Expect(pushPlans[0].Application.LifecycleType).To(BeEquivalentTo("cnb"))
+			Expect(pushPlans[0].Application.Credentials).To(Equal(map[string]interface{}{
+				"foo": "bar",
+			}))
 			Expect(pushPlans[1].Application.Name).To(Equal("name-2"))
 			Expect(pushPlans[1].Application.GUID).To(Equal("app-guid-2"))
 			Expect(pushPlans[1].SpaceGUID).To(Equal(spaceGUID))
