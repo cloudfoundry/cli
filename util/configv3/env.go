@@ -1,6 +1,7 @@
 package configv3
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +21,7 @@ type EnvOverride struct {
 	CFTrace          string
 	CFUsername       string
 	DockerPassword   string
+	CNBCredentials   string
 	Experimental     string
 	ForceTTY         string
 	HTTPSProxy       string
@@ -59,6 +61,21 @@ func (config *Config) DialTimeout() time.Duration {
 // DockerPassword returns the docker password from the environment.
 func (config *Config) DockerPassword() string {
 	return config.ENV.DockerPassword
+}
+
+// CNBCredentials retrurns CNB credentials from the environment
+func (config *Config) CNBCredentials() (map[string]interface{}, error) {
+	if config.ENV.CNBCredentials == "" {
+		return nil, nil
+	}
+
+	creds := map[string]interface{}{}
+
+	if err := json.Unmarshal([]byte(config.ENV.CNBCredentials), &creds); err != nil {
+		return nil, err
+	}
+
+	return creds, nil
 }
 
 // Experimental returns whether or not to run experimental CLI commands. This

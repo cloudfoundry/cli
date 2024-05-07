@@ -46,8 +46,17 @@ func (cmd CreateAppCommand) Execute(args []string) error {
 		LifecycleBuildpacks: cmd.Buildpacks,
 	}
 
-	if constant.AppLifecycleType(cmd.AppType) == constant.AppLifecycleTypeCNB && len(cmd.Buildpacks) == 0 {
-		return errors.New("buildpack(s) must be provided when using --app-type cnb")
+	if constant.AppLifecycleType(cmd.AppType) == constant.AppLifecycleTypeCNB {
+		if len(cmd.Buildpacks) == 0 {
+			return errors.New("buildpack(s) must be provided when using --app-type cnb")
+		}
+
+		creds, err := cmd.Config.CNBCredentials()
+		if err != nil {
+			return err
+		}
+
+		app.Credentials = creds
 	}
 
 	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
