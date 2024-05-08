@@ -44,45 +44,17 @@ permissions:
   contents: read
 
 defaults:
-  # top-level defaults subkeys apply to jobs
-  # run subkeys apply to all steps within all jobs
   run:
     shell: bash
 
 jobs:
-
-  # test:
-  #   environment: DEV
-  #   runs-on: ubuntu-latest
-  #   steps:
-    # - name: Setup upterm session
-    #   env:
-    #     AWS_ACCESS_KEY_ID:              ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_REGION:                     ${{ secrets.AWS_REGION }}
-    #     AWS_SECRET_ACCESS_KEY:          ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     GIT_RELEASE_TARGET_REPO:        ${{ secrets.GIT_RELEASE_TARGET_REPO }}
-    #     GIT_REPO_ACCESS_TOKEN:          ${{ secrets.GIT_REPO_ACCESS_TOKEN }}
-    #     SIGNING_KEY_GPG:                ${{ secrets.SIGNING_KEY_GPG }}
-    #     SIGNING_KEY_GPG_ID:             ${{ secrets.SIGNING_KEY_GPG_ID }}
-    #     SIGNING_KEY_GPG_PASSPHRASE:     ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
-    #     SIGNING_KEY_MAC_ID:             ${{ secrets.SIGNING_KEY_MAC_ID }}
-    #     SIGNING_KEY_MAC_PASSPHRASE:     ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
-    #     SIGNING_KEY_MAC_PFX:            ${{ secrets.SIGNING_KEY_MAC_PFX }}
-    #     SIGNING_KEY_WINDOWS_ID:         ${{ secrets.SIGNING_KEY_WINDOWS_ID }}
-    #     SIGNING_KEY_WINDOWS_PASSPHRASE: ${{ secrets.SIGNING_KEY_WINDOWS_PASSPHRASE }}
-    #     SIGNING_KEY_WINDOWS_PFX:        ${{ secrets.SIGNING_KEY_WINDOWS_PFX }}
-    #     SIGNING_TEST_CA_MAC:            ${{ secrets.SIGNING_TEST_CA_MAC }}
-    #   if: always()
-    #   uses: lhotari/action-upterm@v1
-    #   timeout-minutes: 60
-
   setup:
     name: Setup
     # needs: test
     runs-on: ubuntu-latest
 
     outputs:
-      aws-s3-bucket:       "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
+      aws-s3-bucket: "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
 
       version-build: ${{ steps.parse-semver.outputs.version-build }}
       version-major: ${{ steps.parse-semver.outputs.version-major }}
@@ -179,7 +151,7 @@ jobs:
 
     - name: Build RedHat Packages
       env:
-        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_ID: ${{ vars.SIGNING_KEY_GPG_ID }}
       run: |
         set -ex
         set -o pipefail
@@ -248,7 +220,7 @@ jobs:
 
     - name: Sign RedHat Packages
       env:
-        SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_ID:         ${{ vars.SIGNING_KEY_GPG_ID }}
         SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
       run: |
         set -ex
@@ -544,8 +516,7 @@ jobs:
 
     - name: Load macos key
       env:
-        # SIGNING_TEST_CA_MAC:      ${{ secrets.SIGNING_TEST_CA_MAC }}
-        SIGNING_KEY_MAC_ID:         ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_ID:         ${{ vars.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
         SIGNING_KEY_MAC_PFX:        ${{ secrets.SIGNING_KEY_MAC_PFX }}
 
@@ -583,7 +554,7 @@ jobs:
     - name: Sign macOS
       env:
         VERSION_MAJOR:              ${{ needs.setup.outputs.version-major }}
-        SIGNING_KEY_MAC_ID:         ${{ secrets.SIGNING_KEY_MAC_ID }}
+        SIGNING_KEY_MAC_ID:         ${{ vars.SIGNING_KEY_MAC_ID }}
         SIGNING_KEY_MAC_PASSPHRASE: ${{ secrets.SIGNING_KEY_MAC_PASSPHRASE }}
       run: |
 
@@ -694,8 +665,8 @@ jobs:
       - name: Sign Windows binaries
         run: |
           smctl healthcheck --all
-          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_win32.exe
-          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_winx64.exe
+          smctl sign --fingerprint ${{ vars.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_win32.exe
+          smctl sign --fingerprint ${{ vars.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input out\cf-cli_winx64.exe
 
       - name: View binary signatures
         run: |
@@ -726,8 +697,8 @@ jobs:
 
       - name: Sign Windows installers
         run: |
-          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
-          smctl sign --fingerprint ${{ secrets.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
+          smctl sign --fingerprint ${{ vars.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\win32\cf${env:VERSION_MAJOR}_installer.exe"
+          smctl sign --fingerprint ${{ vars.SIGNING_KEY_WINDOWS_DIGICERT_CERT_FINGERPRINT }} --tool signtool --input "${env:RUNNER_TEMP}\winx64\cf${env:VERSION_MAJOR}_installer.exe"
 
       - name: View installer signature
         run: |
@@ -781,8 +752,8 @@ jobs:
       actions: read
       contents: read
     env:
-      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_REGION:            ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID:     ${{ vars.AWS_ACCESS_KEY_ID }}
+      AWS_REGION:            ${{ vars.AWS_REGION }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_S3_BUCKET:         ${{ needs.setup.outputs.aws-s3-bucket }}
       VERSION_BUILD:         ${{ needs.setup.outputs.version-build }}
@@ -880,17 +851,13 @@ jobs:
 
     - name: Setup aws to upload installers to CLAW S3 bucket
       uses: aws-actions/configure-aws-credentials@v4
-      env:
-        AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_S3_ROLE_ARN:       ${{ secrets.AWS_S3_ROLE_ARN }}
       with:
-        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-1
-        role-to-assume: ${{ env.AWS_S3_ROLE_ARN }}
+        aws-access-key-id:     ${{ vars.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY  }}
+        aws-region:            ${{ vars.AWS_REGION }}
+        role-to-assume:        ${{ vars.AWS_S3_ROLE_ARN }}
         role-skip-session-tagging: true
-        role-duration-seconds: 1200
+        role-duration-seconds:     1200
 
     - name: Upload installers to CLAW S3 bucket
       run: aws s3 sync upload "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
@@ -928,7 +895,7 @@ jobs:
         draft:                   true
         name:                    "DRAFT v${{ env.VERSION_BUILD }}"
         # tag_name:                "v${{ env.VERSION_BUILD }}"
-        repository:              ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
+        repository:              ${{ vars.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
         token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
         fail_on_unmatched_files: true
 
