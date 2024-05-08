@@ -2,6 +2,7 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -38,7 +39,14 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		})
 
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceAlreadySharedError:
+		cmd.UI.DisplayOK()
+		cmd.UI.DisplayTextWithFlavor("A service instance called {{.ServiceInstanceName}} has already been shared", map[string]interface{}{"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance})
+		return nil
+	default:
 		return err
 	}
 
