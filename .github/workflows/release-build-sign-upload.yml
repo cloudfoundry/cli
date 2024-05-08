@@ -878,6 +878,13 @@ jobs:
           signed/win32/*zip \
           signed/winx64/*zip
 
+    - name: Store Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: final-artifacts
+        path: signed/*
+
     - name: Setup aws to upload installers to CLAW S3 bucket
       uses: aws-actions/configure-aws-credentials@v4
       env:
@@ -897,40 +904,6 @@ jobs:
 
     - name: list S3 for human verification
       run: aws s3 ls "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
-
-    - name: Instruct human to update CLAW
-      run: |
-        echo "Please go to https://github.com/cloudfoundry/CLAW/blob/develop/claw-variables.yml and add the following line to the file:"
-        echo
-        echo "- ${VERSION_BUILD}"
-
-  github-release-draft:
-    name: Create GitHub Release Draft
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: write
-    needs:
-    - setup
-    - test-rpm-package
-    - test-deb-package
-    - test-macos
-    - test-windows
-    steps:
-    - name: Download signed artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: signed # download all artifacts to 'signed/'
-
-    - name: Create draft release
-      uses: pivotalsoftware/action-gh-release@v1
-      with:
-        draft:                   true
-        name:                    "DRAFT v${{ env.VERSION_BUILD }}"
-        # tag_name:                "v${{ env.VERSION_BUILD }}"
-        repository:              ${{ secrets.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
-        token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
-        fail_on_unmatched_files: true
 
   test-rpm-package:
     name: Test RPM Artifacts
@@ -1033,4 +1006,88 @@ jobs:
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\winx64\cf${env:VERSION_MAJOR}_installer.exe"
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop ".\win32\cf${env:VERSION_MAJOR}_installer.exe"
 
+  github-release-draft:
+    name: Create GitHub Release Draft
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    needs:
+    - setup
+    - test-rpm-package
+    - test-deb-package
+    - test-macos
+    - test-windows
+    steps:
+    - name: Download signed artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: final-artifacts
+        path: artifacts # download all artifacts to 'artifacts/'
+
+    - name: Checkout CLI
+      uses: actions/checkout@v4
+     
+    - name: Prepare release notes
+      run: |
+        sed -i 's/new-version/${{ needs.setup.outputs.version-build }}/g' .github/release/release-notes-template.txt
+        
+    - name: Create draft release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft:                   true
+        name:                    "DRAFT v${{ needs.setup.outputs.version-build }}"
+        tag_name:                "v${{ needs.setup.outputs.version-build }}"
+        body_path:               ".github/release/release-notes-template.txt"
+        fail_on_unmatched_files: true
+        generate_release_notes: true
+        files: |
+          artifacts/cf-cli-linux-rpm-packages/cf*rpm 
+          artifacts/cf-cli-linux-deb-packages/cf*deb
+          artifacts/cf-cli-macos-packages/cf*pkg
+          artifacts/cf-cli-windows-packages/cf*zip
+          artifacts/linux_i686/*tgz
+          artifacts/linux_x86-64/*tgz
+          artifacts/linux_arm64/*tgz
+          artifacts/osx/*tgz
+          artifacts/macosarm/*tgz
+          artifacts/win32/*zip
+          artifacts/winx64/*zip   
+          
+  update-claw:
+    name: Add new release version to CLAW
+    runs-on: ubuntu-latest
+    needs:
+    - setup
+    - s3-upload
+    env:
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+    steps:
+    - name: Checkout CLAW
+      uses: actions/checkout@v4
+      with:
+        repository: cloudfoundry/CLAW
+        ref: develop
+        path: CLAW
+        ssh-key: ${{ secrets.GIT_SSH_KEY_CLAW }}  
+
+    - name: Add new version to claw variables
+      run: |
+        set -ex
+
+        pushd CLAW
+          echo "- ${VERSION_BUILD}" >> claw-variables.yml
+
+          git add claw-variables.yml
+
+          if ! [ -z "$(git status --porcelain)"]; then
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git commit -m "Add CF CLI ${VERSION_BUILD}"
+          else
+              echo "no new version to commit"
+          fi
+          
+          git push
+        popd    
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
