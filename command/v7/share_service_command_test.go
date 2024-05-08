@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/command/flag"
@@ -138,6 +139,23 @@ var _ = Describe("share-service command", func() {
 					SpaceName: expectedSpaceName,
 					OrgName:   types.NewOptionalString(expectedSpecifiedOrgName),
 				}))
+			})
+		})
+
+		When("the service instance is already shared", func() {
+			BeforeEach(func() {
+				fakeActor.ShareServiceInstanceToSpaceAndOrgReturns(v7action.Warnings{"warning one", "warning two"}, ccerror.ServiceInstanceAlreadySharedError{})
+			})
+
+			It("succeeds, displaying warnings, 'OK' and an informative message", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(testUI.Out).To(Say(`OK`))
+				Expect(testUI.Err).To(SatisfyAll(
+					Say("warning one"),
+					Say("warning two"),
+				))
+				Expect(testUI.Out).To(Say("A service instance called %s has already been shared", expectedServiceInstanceName))
 			})
 		})
 
