@@ -25,6 +25,8 @@ code.cloudfoundry.org/lager/v3 v3.0.3 h1:/UTmadZfIaKuT/whEinSxK1mzRfNu1uPfvjFfGq
 code.cloudfoundry.org/lager/v3 v3.0.3/go.mod h1:Zn5q1SrIuuHjEUE7xerMKt3ztunrJQCZETAo7rV0CH8=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227 h1:QYyb6Ur0Ys6FciDB3+8zCW3eVk7AxAs2++Foa5DAdt0=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227/go.mod h1:C8SxvGRSutmgzV2FxH8Zwqz2Q8HsaAITQRQFKhlDzPw=
+code.cloudfoundry.org/tlsconfig v0.0.0-20240510172918-c1e19801fe80 h1:nxUb5mt6hUgetPgjwcApBzu7SvoweFyxeJndc6ueERU=
+code.cloudfoundry.org/tlsconfig v0.0.0-20240510172918-c1e19801fe80/go.mod h1:nrEZdor0XB7oBXmkKyVtYFk3oGF6eCmryhVBOeGaUso=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d h1:M+zXqtXJqcsmpL76aU0tdl1ho23eYa4axYoM4gD62UA=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d/go.mod h1:YUJiVOr5xl0N/RjMxM1tHmgSpBbi5UM+KoVR5AoejO0=
 filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmGfU=
