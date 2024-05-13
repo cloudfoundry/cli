@@ -138,7 +138,7 @@ var _ = Describe("Application Config", func() {
 
 			BeforeEach(func() {
 				parentDir := filepath.Dir(filesPath)
-				target = filepath.Join(parentDir, fmt.Sprintf("i-r-symlink%d", GinkgoParallelNode()))
+				target = filepath.Join(parentDir, fmt.Sprintf("i-r-symlink%d", GinkgoParallelProcess()))
 				Expect(os.Symlink(filesPath, target)).To(Succeed())
 				manifestApps[0].Path = target
 			})
