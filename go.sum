@@ -25,6 +25,8 @@ code.cloudfoundry.org/lager/v3 v3.0.3 h1:/UTmadZfIaKuT/whEinSxK1mzRfNu1uPfvjFfGq
 code.cloudfoundry.org/lager/v3 v3.0.3/go.mod h1:Zn5q1SrIuuHjEUE7xerMKt3ztunrJQCZETAo7rV0CH8=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227 h1:QYyb6Ur0Ys6FciDB3+8zCW3eVk7AxAs2++Foa5DAdt0=
 code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227/go.mod h1:C8SxvGRSutmgzV2FxH8Zwqz2Q8HsaAITQRQFKhlDzPw=
+code.cloudfoundry.org/tlsconfig v0.0.0-20240510172918-c1e19801fe80 h1:nxUb5mt6hUgetPgjwcApBzu7SvoweFyxeJndc6ueERU=
+code.cloudfoundry.org/tlsconfig v0.0.0-20240510172918-c1e19801fe80/go.mod h1:nrEZdor0XB7oBXmkKyVtYFk3oGF6eCmryhVBOeGaUso=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d h1:M+zXqtXJqcsmpL76aU0tdl1ho23eYa4axYoM4gD62UA=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d/go.mod h1:YUJiVOr5xl0N/RjMxM1tHmgSpBbi5UM+KoVR5AoejO0=
 filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmGfU=
@@ -58,8 +60,8 @@ github.com/cppforlife/go-patch v0.1.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaA
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.21 h1:1/QdRyBaHHJP61QkWMXlOIBfsgdDeeKfK8SYVUWJKf0=
 github.com/creack/pty v1.1.21/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
-github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
-github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
+github.com/cyphar/filepath-securejoin v0.2.5 h1:6iR5tXJ/e6tJZzzdMc1km3Sa7RRIVBKAK32O2s7AYfo=
+github.com/cyphar/filepath-securejoin v0.2.5/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
