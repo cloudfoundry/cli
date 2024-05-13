@@ -52,7 +52,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-20.04
           - macos-latest
-          - macos-11
+          - macos-13
     runs-on: ${{ matrix.os }}
     steps:
 
