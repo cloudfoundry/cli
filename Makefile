@@ -75,7 +75,6 @@ install-test-deps: ## Install "global" dependencies needed to run tests
 # Running `go install <pkg>` without a version specifier will use version specified in go.mod
 # See https://go.dev/ref/mod#go-install
 	go install github.com/onsi/ginkgo/v2/ginkgo
-	go install github.com/onsi/gomega/matchers
 
 integration-cleanup:
 	$(CURDIR)/bin/cleanup-integration
