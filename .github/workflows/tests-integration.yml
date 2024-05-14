@@ -33,16 +33,17 @@ jobs:
       name: Integration client creds
     secrets: inherit
 
-  # run-integration-tests-cf-env-with-min-capi:
-  #   name: MIN CAPI
-  #   # if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-  #   uses: ./.github/workflows/tests-integration-reusable.yml
-  #   with:
-  #     capi-version: min
-  #     run-with-client-creds: false
-  #     os: ubuntu-latest
-  #     name: Integration MIN CAPI
-  #   secrets: inherit
+  run-integration-tests-cf-env-with-min-capi:
+    name: MIN CAPI
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: min
+      run-with-client-creds: false
+      os: ubuntu-latest
+      name: Integration MIN CAPI
+      pool-name: cfd_16_11_0
+    secrets: inherit
 
   #run-integration-windows:
   #  name: Windows
