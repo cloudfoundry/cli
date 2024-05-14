@@ -1070,7 +1070,7 @@ jobs:
         set -ex
 
         pushd CLAW
-          if  grep -q "${VERSION_BUILD}" "claw-variables.yml" ; then
+          if  grep --quiet "${VERSION_BUILD}" "claw-variables.yml" ; then
             echo 'Version already exists in CLAW.'
             exit 1
           else
@@ -1086,7 +1086,7 @@ jobs:
                 echo "no new version to commit"
             fi
             
-            git push
+            # git push
           fi
         popd    
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
