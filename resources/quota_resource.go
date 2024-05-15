@@ -58,6 +58,13 @@ func (al *AppLimit) UnmarshalJSON(rawJSON []byte) error {
 		}
 	}
 
+	if al.PerAppTasks == nil {
+		al.PerAppTasks = &types.NullInt{
+			IsSet: false,
+			Value: 0,
+		}
+	}
+
 	return nil
 }
 
