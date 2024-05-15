@@ -871,34 +871,6 @@ jobs:
         echo
         echo "- ${VERSION_BUILD}"
 
-  github-release-draft:
-    name: Create GitHub Release Draft
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: write
-    needs:
-    - setup
-    - test-rpm-package
-    - test-deb-package
-    - test-macos
-    - test-windows
-    steps:
-    - name: Download signed artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: signed # download all artifacts to 'signed/'
-
-    - name: Create draft release
-      uses: pivotalsoftware/action-gh-release@v1
-      with:
-        draft:                   true
-        name:                    "DRAFT v${{ env.VERSION_BUILD }}"
-        # tag_name:                "v${{ env.VERSION_BUILD }}"
-        repository:              ${{ vars.GIT_RELEASE_TARGET_REPO }} # repo to draft a release under, in <user>/<repo> format
-        token:                   ${{ secrets.GIT_REPO_ACCESS_TOKEN }} # only needed when pushing to a repo other than 'self'
-        fail_on_unmatched_files: true
-
   test-rpm-package:
     name: Test RPM Artifacts
     needs:
@@ -1021,7 +993,7 @@ jobs:
 
     - name: Checkout CLI
       uses: actions/checkout@v4
-     
+    
     - name: Prepare release notes
       run: |
         sed -i 's/new-version/${{ needs.setup.outputs.version-build }}/g' .github/release/release-notes-template.txt
