@@ -1076,7 +1076,7 @@ jobs:
         set -ex
 
         pushd CLAW
-          if  grep -q "${VERSION_BUILD}" "claw-variables.yml" ; then
+          if  grep --quiet "${VERSION_BUILD}" "claw-variables.yml" ; then
             echo 'Version already exists in CLAW.'
             exit 1
           else
