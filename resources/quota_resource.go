@@ -84,6 +84,13 @@ func (sl *ServiceLimit) UnmarshalJSON(rawJSON []byte) error {
 		}
 	}
 
+	if sl.TotalServiceKeys == nil {
+		sl.TotalServiceKeys = &types.NullInt{
+			IsSet: false,
+			Value: 0,
+		}
+	}
+
 	return nil
 }
 
