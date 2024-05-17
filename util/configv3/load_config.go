@@ -2,6 +2,7 @@ package configv3
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"math"
 	"os"
@@ -183,7 +184,8 @@ func removeOldTempConfigFiles() error {
 
 	for _, oldTempFileName := range oldTempFileNames {
 		err = os.Remove(oldTempFileName)
-		if err != nil {
+		// ignore if file doesn't exist anymore due to race conditions if multiple cli commands are running
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return err
 		}
 	}
