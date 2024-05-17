@@ -249,8 +249,6 @@ jobs:
 
         make build
 
-        go install github.com/onsi/ginkgo/v2/ginkgo
-
         export CF_PASSWORD=${CF_INT_PASSWORD}
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
@@ -280,8 +278,6 @@ jobs:
         export PATH="$PWD/out:$PATH"
 
         make build
-
-        go install github.com/onsi/ginkgo/v2/ginkgo
 
         export CF_PASSWORD=${CF_INT_PASSWORD}
         cf api ${CF_INT_API} --skip-ssl-validation
