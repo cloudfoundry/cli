@@ -43,12 +43,6 @@ clean: ## Just remove all cf* files from the `out` directory
 
 clear: clean  ## Make everyone happy
 
-custom-lint: ## Run our custom linters
-	@echo "Running custom linters..." # this list will grow as we cleanup all the code:
-	bash -c "go run bin/style/main.go api util"
-	@echo "No custom lint errors!"
-	@echo
-
 # TODO: update these fly-windows* to point at the correct CI repo
 fly-windows-experimental: check-target-env
 	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
@@ -147,7 +141,7 @@ integration-tests-full-ci: install-test-deps integration-cleanup
 		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
 	$(ginkgo_int) -flake-attempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
-lint: custom-lint ## Runs all linters and formatters
+lint: ## Runs all linters and formatters
 	@echo "Running linters..."
 	go list -f "{{.Dir}}" ./... \
 		| grep -v -e "/cf/" -e "/fixtures/" -e "/assets/" -e "/plugin/" -e "/command/plugin" -e "fakes" \
@@ -229,7 +223,7 @@ units-full: build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-.PHONY: all build clean format version lint custom-lint
+.PHONY: all build clean format version lint
 .PHONY: test units units-full install-test-deps integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help
