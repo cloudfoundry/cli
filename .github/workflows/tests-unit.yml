@@ -65,11 +65,6 @@ jobs:
         go-version-file: go.mod
         check-latest: true
 
-    - name: Set Up Test
-      run: |
-        go install github.com/onsi/ginkgo/v2/ginkgo
-        go install github.com/onsi/gomega/matchers
-
     - name: Run Units
       run: make units
 
@@ -95,11 +90,6 @@ jobs:
       with:
         go-version-file: go.mod
         check-latest: true
-
-    - name: Set up Test
-      run: |
-        go install github.com/onsi/ginkgo/v2/ginkgo
-        go install github.com/onsi/gomega/matchers
 
     - name: Get build-time dependencies
       run: |
