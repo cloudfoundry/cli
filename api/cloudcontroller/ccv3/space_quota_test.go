@@ -1118,6 +1118,7 @@ var _ = Describe("Space Quotas", func() {
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
 							PaidServicePlans:      &trueValue,
+							TotalServiceKeys:      &types.NullInt{IsSet: false, Value: 0},
 						},
 						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
