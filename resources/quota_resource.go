@@ -24,6 +24,7 @@ type AppLimit struct {
 	InstanceMemory    *types.NullInt `json:"per_process_memory_in_mb,omitempty"`
 	TotalAppInstances *types.NullInt `json:"total_instances,omitempty"`
 	TotalLogVolume    *types.NullInt `json:"log_rate_limit_in_bytes_per_second,omitempty"`
+	PerAppTasks       *types.NullInt `json:"per_app_tasks,omitempty"`
 }
 
 func (al *AppLimit) UnmarshalJSON(rawJSON []byte) error {
@@ -60,6 +61,13 @@ func (al *AppLimit) UnmarshalJSON(rawJSON []byte) error {
 
 	if al.TotalLogVolume == nil {
 		al.TotalLogVolume = &types.NullInt{
+			IsSet: false,
+			Value: 0,
+		}
+	}
+
+	if al.PerAppTasks == nil {
+		al.PerAppTasks = &types.NullInt{
 			IsSet: false,
 			Value: 0,
 		}
