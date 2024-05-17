@@ -477,6 +477,7 @@ var _ = Describe("Organization Quotas", func() {
 					Services: resources.ServiceLimit{
 						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 						PaidServicePlans:      &trueValue,
+						TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 1},
 					},
 					Routes: resources.RouteLimit{
 						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
@@ -507,7 +508,7 @@ var _ = Describe("Organization Quotas", func() {
 					 "services": {
 						"paid_services_allowed": true,
 						"total_service_instances": 0,
-						"total_service_keys": null
+						"total_service_keys": 1
 					 },
 					 "routes": {
 						"total_routes": 6,
@@ -534,6 +535,7 @@ var _ = Describe("Organization Quotas", func() {
 					"services": map[string]interface{}{
 						"paid_services_allowed":   true,
 						"total_service_instances": 0,
+						"total_service_keys":      1,
 					},
 					"routes": map[string]interface{}{
 						"total_routes":         6,
@@ -814,6 +816,7 @@ var _ = Describe("Organization Quotas", func() {
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
 							PaidServicePlans:      &trueValue,
+							TotalServiceKeys:      &types.NullInt{IsSet: false, Value: 0},
 						},
 						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
