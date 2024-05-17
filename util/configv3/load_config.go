@@ -179,8 +179,11 @@ func removeOldTempConfigFiles() error {
 
 	for _, oldTempFileName := range oldTempFileNames {
 		fi, err := os.Lstat(oldTempFileName)
-		// ignore if file doesn't exist anymore due to race conditions if multiple cli commands are running in parallel
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
+		if err != nil {
+			// ignore if file doesn't exist anymore due to race conditions if multiple cli commands are running in parallel
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return err
 		}
 		// only delete old orphans which are not caught by the signal handler in WriteConfig
