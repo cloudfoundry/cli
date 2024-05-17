@@ -1094,6 +1094,7 @@ var _ = Describe("Space Quotas", func() {
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
 							TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
+							PerAppTasks:       &types.NullInt{IsSet: false, Value: 0},
 						},
 						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
