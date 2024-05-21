@@ -9,7 +9,7 @@
 // For more information on the Cloud Controller API see
 // https://apidocs.cloudfoundry.org/
 //
-// Method Naming Conventions
+// # Method Naming Conventions
 //
 // The client takes a '<Action Name><Top Level Endpoint><Return Value>'
 // approach to method names.  If the <Top Level Endpoint> and <Return Value>
@@ -21,48 +21,50 @@
 // word "Action" in the method name.
 //
 // For Example:
-//   Method Name: GetApplication
-//   Endpoint: /v3/applications/:guid
-//   Action Name: Get
-//   Top Level Endpoint: applications
-//   Return Value: Application
 //
-//   Method Name: GetServiceInstances
-//   Endpoint: /v3/service_instances
-//   Action Name: Get
-//   Top Level Endpoint: service_instances
-//   Return Value: []ServiceInstance
+//	Method Name: GetApplication
+//	Endpoint: /v3/applications/:guid
+//	Action Name: Get
+//	Top Level Endpoint: applications
+//	Return Value: Application
 //
-//   Method Name: GetSpaceServiceInstances
-//   Endpoint: /v3/spaces/:guid/service_instances
-//   Action Name: Get
-//   Top Level Endpoint: spaces
-//   Return Value: []ServiceInstance
+//	Method Name: GetServiceInstances
+//	Endpoint: /v3/service_instances
+//	Action Name: Get
+//	Top Level Endpoint: service_instances
+//	Return Value: []ServiceInstance
 //
-//   Method Name: CreateApplicationTask
-//   Endpoint: /v3/apps/:application_guid/task
-//   Action Name: Post
-//   Top Level Endpoint: apps
-//   Return Value: Task
+//	Method Name: GetSpaceServiceInstances
+//	Endpoint: /v3/spaces/:guid/service_instances
+//	Action Name: Get
+//	Top Level Endpoint: spaces
+//	Return Value: []ServiceInstance
+//
+//	Method Name: CreateApplicationTask
+//	Endpoint: /v3/apps/:application_guid/task
+//	Action Name: Post
+//	Top Level Endpoint: apps
+//	Return Value: Task
 //
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:
-//   HTTP Command -> Action Name
-//   POST -> Create OR Update*
-//   GET -> Get
-//   PUT -> Update
-//   DELETE -> Delete
-//   PATCH -> Update
+//
+//	HTTP Command -> Action Name
+//	POST -> Create OR Update*
+//	GET -> Get
+//	PUT -> Update
+//	DELETE -> Delete
+//	PATCH -> Update
 //
 // * - In some cases POSTs are updating resources, in these cases the method
 // should be called Update, not Create.
 //
-// Method Locations
+// # Method Locations
 //
 // Methods exist in the same file as their return type, regardless of which
 // endpoint they use.
 //
-// Error Handling
+// # Error Handling
 //
 // All error handling that requires parsing the error_code/code returned back
 // from the Cloud Controller should be placed in the errorWrapper. Everything

@@ -209,7 +209,8 @@ var _ = Describe("Service Credential Bindings", func() {
 		)
 
 		It("makes the right request", func() {
-			client.DeleteServiceCredentialBinding(guid)
+			_, _, err := client.DeleteServiceCredentialBinding(guid)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
@@ -258,7 +259,7 @@ var _ = Describe("Service Credential Bindings", func() {
 
 		BeforeEach(func() {
 			requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-				json.Unmarshal([]byte(`{"credentials":{"foo":"bar"}}`), params.ResponseBody)
+				Expect(json.Unmarshal([]byte(`{"credentials":{"foo":"bar"}}`), params.ResponseBody)).To(Succeed())
 				return "", Warnings{"warning-1", "warning-2"}, nil
 			})
 		})

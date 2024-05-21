@@ -1,10 +1,11 @@
 package v7
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"strings"
 )
 
 type RenameServiceCommand struct {

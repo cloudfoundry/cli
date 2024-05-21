@@ -22,9 +22,9 @@ const (
 type ColorSetting int
 
 // ColorEnabled returns the color setting based off:
-//   1. The $CF_COLOR environment variable if set (0/1/t/f/true/false)
-//   2. The 'ColorEnabled' value in the .cf/config.json if set
-//   3. Defaults to ColorAuto if nothing is set
+//  1. The $CF_COLOR environment variable if set (0/1/t/f/true/false)
+//  2. The 'ColorEnabled' value in the .cf/config.json if set
+//  3. Defaults to ColorAuto if nothing is set
 func (config *Config) ColorEnabled() ColorSetting {
 	if config.ENV.CFColor != "" {
 		val, err := strconv.ParseBool(config.ENV.CFColor)

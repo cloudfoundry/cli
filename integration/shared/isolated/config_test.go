@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -42,7 +41,7 @@ var _ = Describe("Config", func() {
 		When("lingering tmp files exist from previous failed attempts to write the config", func() {
 			BeforeEach(func() {
 				for i := 0; i < 3; i++ {
-					tmpFile, err := ioutil.TempFile(configDir, "temp-config")
+					tmpFile, err := os.CreateTemp(configDir, "temp-config")
 					Expect(err).ToNot(HaveOccurred())
 					tmpFile.Close()
 					oldTime := time.Now().Add(-time.Minute * 10)

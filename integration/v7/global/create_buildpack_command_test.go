@@ -2,7 +2,6 @@ package global
 
 import (
 	"bytes"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -84,9 +83,9 @@ var _ = Describe("create buildpack command", func() {
 			When("zipping the directory succeeds", func() {
 				BeforeEach(func() {
 					var err error
-					buildpackDir, err = ioutil.TempDir("", "buildpackdir-")
+					buildpackDir, err = os.MkdirTemp("", "buildpackdir-")
 					Expect(err).ToNot(HaveOccurred())
-					file, err := ioutil.TempFile(buildpackDir, "myfile-")
+					file, err := os.CreateTemp(buildpackDir, "myfile-")
 					Expect(err).ToNot(HaveOccurred())
 					defer file.Close()
 				})
@@ -104,7 +103,7 @@ var _ = Describe("create buildpack command", func() {
 			When("the specified directory is empty", func() {
 				BeforeEach(func() {
 					var err error
-					buildpackDir, err = ioutil.TempDir("", "empty-")
+					buildpackDir, err = os.MkdirTemp("", "empty-")
 					Expect(err).ToNot(HaveOccurred())
 				})
 

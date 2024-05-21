@@ -1,6 +1,6 @@
 package plugin
 
-import "io/ioutil"
+import "os"
 
 func (client *Client) DownloadPlugin(pluginURL string, path string, proxyReader ProxyReader) error {
 	request, err := client.newGETRequest(pluginURL)
@@ -14,7 +14,7 @@ func (client *Client) DownloadPlugin(pluginURL string, path string, proxyReader 
 		return err
 	}
 
-	err = ioutil.WriteFile(path, response.RawResponse, 0700)
+	err = os.WriteFile(path, response.RawResponse, 0700)
 	if err != nil {
 		return err
 	}

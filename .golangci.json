@@ -1,10 +1,7 @@
 {
   "run": {
     "concurrency": 4,
-    "timeout": "20m",
-    "skip-files": [
-      "integration/helpers/fake_server.go"
-    ]
+    "timeout": "20m"
   },
   "linters": {
     "disable-all": true,
@@ -14,15 +11,16 @@
       "errcheck",
       "staticcheck",
       "unused",
-      "structcheck",
-      "varcheck",
-      "ineffassign",
-      "deadcode"
+      "ineffassign"
     ]
   },
   "linters-settings": {},
   "issues": {
     "max-same-issue": 0,
+    "exclude-files":  [
+      "integration/helpers/fake_server.go",
+      "command/plugin/*.go$"
+    ],
     "exclude": [
       "Error return value of `client.GetApplicationTasks` is not checked",
       "Error return value of `logger.output.Stop` is not checked",

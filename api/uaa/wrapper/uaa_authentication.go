@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -54,13 +54,13 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 	var rawRequestBody []byte
 
 	if request.Body != nil {
-		rawRequestBody, err = ioutil.ReadAll(request.Body)
+		rawRequestBody, err = io.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {
 			return err
 		}
 
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+		request.Body = io.NopCloser(bytes.NewBuffer(rawRequestBody))
 
 		if skipAuthenticationHeader(request, rawRequestBody) {
 			return t.connection.Make(request, passedResponse)
@@ -80,7 +80,7 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 		t.cache.SetRefreshToken(tokens.RefreshToken)
 
 		if rawRequestBody != nil {
-			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+			request.Body = io.NopCloser(bytes.NewBuffer(rawRequestBody))
 		}
 		request.Header.Set("Authorization", t.cache.AccessToken())
 		return t.connection.Make(request, passedResponse)

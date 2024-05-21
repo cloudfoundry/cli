@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"log"
 	"net/url"
+	"testing"
 
 	"code.cloudfoundry.org/cli/api/router"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
-
-	"testing"
 )
 
 func TestRouter(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -136,7 +136,7 @@ var _ = Describe("WrapForCFOnK8sAuth", func() {
 
 		actualReq := wrappedRoundTripper.RoundTripArgsForCall(0)
 
-		body, err := ioutil.ReadAll(actualReq.Body)
+		body, err := io.ReadAll(actualReq.Body)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(body)).To(Equal("hello"))
 
@@ -396,7 +396,7 @@ var _ = Describe("WrapForCFOnK8sAuth", func() {
 			var tokenFilePath string
 
 			BeforeEach(func() {
-				tokenFile, err := ioutil.TempFile("", "")
+				tokenFile, err := os.CreateTemp("", "")
 				Expect(err).NotTo(HaveOccurred())
 				defer tokenFile.Close()
 				_, err = tokenFile.Write(token)
@@ -446,9 +446,10 @@ func base64Decode(encoded string) string {
 }
 
 func writeToFile(base64Data string) string {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	Expect(err).NotTo(HaveOccurred())
-	file.WriteString(base64Decode(base64Data))
+	_, err = file.WriteString(base64Decode(base64Data))
+	Expect(err).NotTo(HaveOccurred())
 	Expect(file.Close()).To(Succeed())
 	return file.Name()
 }

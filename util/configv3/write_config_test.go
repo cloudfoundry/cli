@@ -2,7 +2,7 @@ package configv3_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -45,7 +45,7 @@ var _ = Describe("Config", func() {
 			err := config.WriteConfig()
 			Expect(err).ToNot(HaveOccurred())
 
-			file, err = ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			file, err = os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).ToNot(HaveOccurred())
 		})
 

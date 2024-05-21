@@ -64,7 +64,7 @@ func (cmd MoveRouteCommand) Execute(args []string) error {
 	}
 
 	destinationOrg, warnings, err := cmd.Actor.GetOrganizationByName(destinationOrgName)
-
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.OrganizationNotFoundError); ok {
 			cmd.UI.DisplayText("Can not transfer ownership of route:")
@@ -73,6 +73,7 @@ func (cmd MoveRouteCommand) Execute(args []string) error {
 	}
 
 	targetedSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destinationOrg.GUID)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceNotFoundError); ok {
 			cmd.UI.DisplayText("Can not transfer ownership of route:")
@@ -91,6 +92,7 @@ func (cmd MoveRouteCommand) Execute(args []string) error {
 		route.GUID,
 		targetedSpace.GUID,
 	)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

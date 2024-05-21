@@ -4,7 +4,6 @@
 package manifest_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -21,12 +20,12 @@ var _ = Describe("Manifest with paths", func() {
 	)
 
 	JustBeforeEach(func() {
-		tempFile, err := ioutil.TempFile("", "manifest-test-")
+		tempFile, err := os.CreateTemp("", "manifest-test-")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(tempFile.Close()).ToNot(HaveOccurred())
 		pathToManifest = tempFile.Name()
 
-		err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+		err = os.WriteFile(pathToManifest, []byte(manifest), 0666)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
