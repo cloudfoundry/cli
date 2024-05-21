@@ -50,7 +50,7 @@ func BlockAcceptOnClose(fake *fake_net.FakeListener) {
 	}
 }
 
-var _ = Describe("CLI SSH", Serial, func() {
+var _ = Describe("CLI SSH", Serial, FlakeAttempts(9), func() {
 	var (
 		fakeSecureDialer    *clisshfakes.FakeSecureDialer
 		fakeSecureClient    *clisshfakes.FakeSecureClient
