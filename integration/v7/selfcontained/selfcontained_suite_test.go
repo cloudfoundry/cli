@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -58,7 +57,7 @@ var _ = AfterEach(func() {
 })
 
 func loadConfig() configv3.JSONConfig {
-	rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+	rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 	Expect(err).NotTo(HaveOccurred())
 
 	var configFile configv3.JSONConfig

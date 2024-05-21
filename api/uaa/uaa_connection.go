@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
+	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
-	"errors"
 
 	"code.cloudfoundry.org/cli/util"
 )
@@ -74,7 +74,7 @@ func (*UAAConnection) handleStatusCodes(response *http.Response, passedResponse 
 func (connection *UAAConnection) populateResponse(response *http.Response, passedResponse *Response) error {
 	passedResponse.HTTPResponse = response
 
-	rawBytes, err := ioutil.ReadAll(response.Body)
+	rawBytes, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
 		return err

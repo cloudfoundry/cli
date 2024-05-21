@@ -3,7 +3,6 @@ package v7_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -108,7 +107,7 @@ var _ = Describe("download-droplet Command", func() {
 			Expect(appArg).To(Equal("some-app"))
 			Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
-			fileContents, err := ioutil.ReadFile(pathToDropletFile)
+			fileContents, err := os.ReadFile(pathToDropletFile)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(fileContents)).To(Equal("some-droplet-bytes"))
 		})
@@ -150,7 +149,7 @@ var _ = Describe("download-droplet Command", func() {
 			Expect(appArg).To(Equal("some-app"))
 			Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
-			fileContents, err := ioutil.ReadFile(pathToDropletFile)
+			fileContents, err := os.ReadFile(pathToDropletFile)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(fileContents)).To(Equal("some-droplet-bytes"))
 		})
@@ -180,7 +179,7 @@ var _ = Describe("download-droplet Command", func() {
 		It("creates a droplet tarball at the specified path", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			fileContents, err := ioutil.ReadFile(filePath)
+			fileContents, err := os.ReadFile(filePath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(fileContents)).To(Equal("some-droplet"))
 		})
@@ -199,7 +198,7 @@ var _ = Describe("download-droplet Command", func() {
 
 		BeforeEach(func() {
 			var err error
-			tmpDir, err = ioutil.TempDir("", "droplets")
+			tmpDir, err = os.MkdirTemp("", "droplets")
 			Expect(err).NotTo(HaveOccurred())
 
 			setFlag(&cmd, "--path", tmpDir)
@@ -214,7 +213,7 @@ var _ = Describe("download-droplet Command", func() {
 		It("creates a droplet tarball at the specified path", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			fileContents, err := ioutil.ReadFile(filepath.Join(tmpDir, "droplet_some-droplet-guid.tgz"))
+			fileContents, err := os.ReadFile(filepath.Join(tmpDir, "droplet_some-droplet-guid.tgz"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(fileContents)).To(Equal("some-droplet"))
 		})

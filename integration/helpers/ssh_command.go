@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"encoding/json"
+
+	. "github.com/onsi/gomega"
 )
 
 func GetsEnablementValue(stream []byte) bool {
@@ -9,7 +11,7 @@ func GetsEnablementValue(stream []byte) bool {
 		Enabled bool `json:"enabled"`
 	}{}
 
-	json.Unmarshal(stream, &enablementResponse)
+	Expect(json.Unmarshal(stream, &enablementResponse)).To(Succeed())
 
 	return enablementResponse.Enabled
 }

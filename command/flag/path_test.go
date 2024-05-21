@@ -2,7 +2,6 @@ package flag_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -94,12 +93,12 @@ var _ = Describe("path types", func() {
 					)
 
 					BeforeEach(func() {
-						tempDir, err = ioutil.TempDir("", "")
+						tempDir, err = os.MkdirTemp("", "")
 						Expect(err).ToNot(HaveOccurred())
 						os.Setenv("HOME", tempDir)
 
 						for _, filename := range []string{"abc", "def"} {
-							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							err = os.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
 							Expect(err).ToNot(HaveOccurred())
 						}
 
@@ -144,12 +143,12 @@ var _ = Describe("path types", func() {
 					)
 
 					BeforeEach(func() {
-						tempDir, err = ioutil.TempDir("", "")
+						tempDir, err = os.MkdirTemp("", "")
 						Expect(err).ToNot(HaveOccurred())
 						os.Setenv("HOME", tempDir)
 
 						for _, filename := range []string{"abc", "def"} {
-							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							err = os.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
 							Expect(err).ToNot(HaveOccurred())
 						}
 
@@ -181,14 +180,14 @@ var _ = Describe("path types", func() {
 		currentDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
 
-		tempDir, err = ioutil.TempDir("", "")
+		tempDir, err = os.MkdirTemp("", "")
 		Expect(err).ToNot(HaveOccurred())
 
 		err = os.Chdir(tempDir)
 		Expect(err).ToNot(HaveOccurred())
 
 		for _, filename := range []string{"abc", "abd", "~abd", "tfg", "ABCD"} {
-			err = ioutil.WriteFile(filename, []byte{}, 0400)
+			err = os.WriteFile(filename, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 		}
 
@@ -484,12 +483,12 @@ var _ = Describe("path types", func() {
 					)
 
 					BeforeEach(func() {
-						tempDir, err = ioutil.TempDir("", "")
+						tempDir, err = os.MkdirTemp("", "")
 						Expect(err).ToNot(HaveOccurred())
 						os.Setenv("HOME", tempDir)
 
 						for _, filename := range []string{"abc", "def"} {
-							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							err = os.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
 							Expect(err).ToNot(HaveOccurred())
 						}
 
@@ -534,12 +533,12 @@ var _ = Describe("path types", func() {
 					)
 
 					BeforeEach(func() {
-						tempDir, err = ioutil.TempDir("", "")
+						tempDir, err = os.MkdirTemp("", "")
 						Expect(err).ToNot(HaveOccurred())
 						os.Setenv("HOME", tempDir)
 
 						for _, filename := range []string{"abc", "def"} {
-							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							err = os.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
 							Expect(err).ToNot(HaveOccurred())
 						}
 

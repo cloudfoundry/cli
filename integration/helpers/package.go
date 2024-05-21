@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 
@@ -15,7 +14,7 @@ import (
 // VerifyAppPackageContentsV3 verifies the contents of a V3 app package by downloading the package zip and
 // verifying the zipped files match the passed files.
 func VerifyAppPackageContentsV3(appName string, files ...string) {
-	tmpZipFilepath, err := ioutil.TempFile("", "")
+	tmpZipFilepath, err := os.CreateTemp("", "")
 	defer os.Remove(tmpZipFilepath.Name())
 	Expect(err).ToNot(HaveOccurred())
 
@@ -60,7 +59,7 @@ func downloadFirstAppPackage(appName string, tmpZipFilepath string) {
 // VerifyAppPackageContentsV2 verifies the contents of a V2 app package by downloading the package zip and
 // verifying the zipped files match the passed files.
 func VerifyAppPackageContentsV2(appName string, files ...string) {
-	tmpZipFilepath, err := ioutil.TempFile("", "")
+	tmpZipFilepath, err := os.CreateTemp("", "")
 	defer os.Remove(tmpZipFilepath.Name())
 	Expect(err).ToNot(HaveOccurred())
 

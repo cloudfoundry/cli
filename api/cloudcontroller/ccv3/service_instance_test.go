@@ -285,13 +285,14 @@ var _ = Describe("Service Instance", func() {
 
 		BeforeEach(func() {
 			requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-				json.Unmarshal([]byte(`{"foo":"bar"}`), params.ResponseBody)
+				Expect(json.Unmarshal([]byte(`{"foo":"bar"}`), params.ResponseBody)).To(Succeed())
 				return "", Warnings{"one", "two"}, nil
 			})
 		})
 
 		It("makes the correct API request", func() {
-			client.GetServiceInstanceParameters(guid)
+			_, _, err := client.GetServiceInstanceParameters(guid)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualRequest := requester.MakeRequestArgsForCall(0)
@@ -479,7 +480,8 @@ var _ = Describe("Service Instance", func() {
 		)
 
 		It("makes the right request", func() {
-			client.DeleteServiceInstance(guid)
+			_, _, err := client.DeleteServiceInstance(guid)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
@@ -490,7 +492,8 @@ var _ = Describe("Service Instance", func() {
 
 		When("there are query parameters", func() {
 			It("passes them through", func() {
-				client.DeleteServiceInstance(guid, Query{Key: NameFilter, Values: []string{"foo"}})
+				_, _, err := client.DeleteServiceInstance(guid, Query{Key: NameFilter, Values: []string{"foo"}})
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeRequestArgsForCall(0).Query).To(ConsistOf(Query{Key: NameFilter, Values: []string{"foo"}}))
@@ -539,7 +542,8 @@ var _ = Describe("Service Instance", func() {
 			})
 
 			It("makes the right request", func() {
-				client.ShareServiceInstanceToSpaces(serviceInstanceGUID, spaceGUIDs)
+				_, _, err := client.ShareServiceInstanceToSpaces(serviceInstanceGUID, spaceGUIDs)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
@@ -554,7 +558,7 @@ var _ = Describe("Service Instance", func() {
 			When("the request succeeds", func() {
 				BeforeEach(func() {
 					requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-						json.Unmarshal([]byte(`{"data":[{"guid":"some-space-guid"}, {"guid":"some-other-space-guid"}]}`), params.ResponseBody)
+						Expect(json.Unmarshal([]byte(`{"data":[{"guid":"some-space-guid"}, {"guid":"some-other-space-guid"}]}`), params.ResponseBody)).To(Succeed())
 						return "", Warnings{"fake-warning"}, nil
 					})
 				})
@@ -594,7 +598,8 @@ var _ = Describe("Service Instance", func() {
 			})
 
 			It("makes the right request", func() {
-				client.UnshareServiceInstanceFromSpace(serviceInstanceGUID, spaceGUID)
+				_, err := client.UnshareServiceInstanceFromSpace(serviceInstanceGUID, spaceGUID)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
@@ -642,7 +647,8 @@ var _ = Describe("Service Instance", func() {
 			})
 
 			It("makes the right request", func() {
-				client.GetServiceInstanceSharedSpaces(serviceInstanceGUID)
+				_, _, err := client.GetServiceInstanceSharedSpaces(serviceInstanceGUID)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
@@ -664,7 +670,7 @@ var _ = Describe("Service Instance", func() {
 			When("the request succeeds", func() {
 				BeforeEach(func() {
 					requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-						jsonry.Unmarshal([]byte(`{
+						Expect(jsonry.Unmarshal([]byte(`{
 								   "data": [{"guid":"some-space-guid"},{"guid":"some-other-space-guid"}],
 								   "links": {
 									  "self": {
@@ -703,7 +709,7 @@ var _ = Describe("Service Instance", func() {
 										 }
 									  ]
 								   }
-								}`), params.ResponseBody)
+								}`), params.ResponseBody)).To(Succeed())
 						return "", Warnings{"fake-warning"}, nil
 					})
 				})
@@ -754,7 +760,8 @@ var _ = Describe("Service Instance", func() {
 			})
 
 			It("makes the right request", func() {
-				client.GetServiceInstanceUsageSummary(serviceInstanceGUID)
+				_, _, err := client.GetServiceInstanceUsageSummary(serviceInstanceGUID)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
@@ -766,7 +773,7 @@ var _ = Describe("Service Instance", func() {
 			When("the request succeeds", func() {
 				BeforeEach(func() {
 					requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
-						jsonry.Unmarshal([]byte(`{
+						Expect(jsonry.Unmarshal([]byte(`{
 							"usage_summary": [
 								{
 									"space": {
@@ -792,7 +799,7 @@ var _ = Describe("Service Instance", func() {
 									"href": "https://api.example.org/v3/service_instances/some_instance_guid"
 								}
 							}
-						}`), params.ResponseBody)
+						}`), params.ResponseBody)).To(Succeed())
 						return "", Warnings{"fake-warning"}, nil
 					})
 				})

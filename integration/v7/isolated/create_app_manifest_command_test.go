@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -118,7 +117,7 @@ var _ = Describe("create-app-manifest command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				createdFile, err := os.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(createdFile).To(MatchRegexp("---"))
 				Expect(createdFile).To(MatchRegexp("applications:"))
@@ -163,7 +162,7 @@ var _ = Describe("create-app-manifest command", func() {
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
-						createdFile, err := ioutil.ReadFile(newFile)
+						createdFile, err := os.ReadFile(newFile)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(createdFile).To(MatchRegexp("---"))
 						Expect(createdFile).To(MatchRegexp("applications:"))
@@ -188,7 +187,7 @@ var _ = Describe("create-app-manifest command", func() {
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
-						createdFile, err := ioutil.ReadFile(existingFile)
+						createdFile, err := os.ReadFile(existingFile)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(createdFile).To(MatchRegexp("---"))
 						Expect(createdFile).To(MatchRegexp("applications:"))

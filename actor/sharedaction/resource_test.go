@@ -3,7 +3,6 @@ package sharedaction_test
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -34,20 +33,20 @@ var _ = Describe("Resource Actions", func() {
 		// tmpfile3
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "resource-actions-test")
+		srcDir, err = os.MkdirTemp("", "resource-actions-test")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
 		err = os.MkdirAll(subDir, 0777)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
+		err = os.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 
 		relativePath, err := filepath.Rel(srcDir, subDir)
@@ -69,7 +68,7 @@ var _ = Describe("Resource Actions", func() {
 	Describe("SharedToV3Resource", func() {
 
 		var returnedV3Resource V3Resource
-		var sharedResource = Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(644), Size: 100000}
+		var sharedResource = Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(0644), Size: 100000}
 
 		JustBeforeEach(func() {
 			returnedV3Resource = sharedResource.ToV3Resource()
@@ -82,7 +81,7 @@ var _ = Describe("Resource Actions", func() {
 					Value: "a43rknl",
 				},
 				SizeInBytes: 100000,
-				Mode:        os.FileMode(644),
+				Mode:        os.FileMode(0644),
 			}))
 		})
 
@@ -97,7 +96,7 @@ var _ = Describe("Resource Actions", func() {
 				Value: "a43rknl",
 			},
 			SizeInBytes: 100000,
-			Mode:        os.FileMode(644),
+			Mode:        os.FileMode(0644),
 		}
 
 		JustBeforeEach(func() {
@@ -105,7 +104,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		It("returns a ccv3 Resource", func() {
-			Expect(returnedSharedResource).To(Equal(Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(644), Size: 100000}))
+			Expect(returnedSharedResource).To(Equal(Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(0644), Size: 100000}))
 
 		})
 	})
@@ -137,7 +136,7 @@ var _ = Describe("Resource Actions", func() {
 
 		When("the archive can be accessed properly", func() {
 			BeforeEach(func() {
-				tmpfile, err := ioutil.TempFile("", "fake-archive")
+				tmpfile, err := os.CreateTemp("", "fake-archive")
 				Expect(err).ToNot(HaveOccurred())
 				_, err = tmpfile.Write([]byte("123456"))
 				Expect(err).ToNot(HaveOccurred())
@@ -176,7 +175,7 @@ var _ = Describe("Resource Actions", func() {
 		)
 
 		BeforeEach(func() {
-			tmpfile, err := ioutil.TempFile("", "zip-archive-resources")
+			tmpfile, err := os.CreateTemp("", "zip-archive-resources")
 			Expect(err).ToNot(HaveOccurred())
 			defer tmpfile.Close()
 			archive = tmpfile.Name()
@@ -429,7 +428,7 @@ func expectFileContentsToEqual(file *zip.File, expectedContents string) {
 	Expect(err).ToNot(HaveOccurred())
 	defer reader.Close()
 
-	body, err := ioutil.ReadAll(reader)
+	body, err := io.ReadAll(reader)
 	Expect(err).ToNot(HaveOccurred())
 
 	Expect(string(body)).To(Equal(expectedContents))

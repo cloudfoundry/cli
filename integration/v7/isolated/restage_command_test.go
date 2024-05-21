@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -175,7 +174,7 @@ applications:
   - route: %s.%s
 `, appName, appName, domainName))
 						manifestPath := filepath.Join(appDir, "manifest.yml")
-						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						err := os.WriteFile(manifestPath, manifestContents, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
