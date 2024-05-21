@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -23,7 +22,7 @@ var _ = Describe("when a droplet is provided", func() {
 		appName = helpers.NewAppName()
 
 		helpers.WithHelloWorldApp(func(appDir string) {
-			tmpfile, err := ioutil.TempFile("", "dropletFile")
+			tmpfile, err := os.CreateTemp("", "dropletFile")
 			Expect(err).ToNot(HaveOccurred())
 			dropletPath = tmpfile.Name()
 			Expect(tmpfile.Close()).ToNot(HaveOccurred())

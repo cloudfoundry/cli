@@ -1,7 +1,6 @@
 package v6manifestparser_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,7 +32,7 @@ var _ = Describe("Locator", func() {
 
 		BeforeEach(func() {
 			var err error
-			workingDir, err = ioutil.TempDir("", "manifest-locator-working-dir")
+			workingDir, err = os.MkdirTemp("", "manifest-locator-working-dir")
 			Expect(err).ToNot(HaveOccurred())
 			workingDir, err = filepath.EvalSymlinks(workingDir)
 			Expect(err).ToNot(HaveOccurred())
@@ -50,7 +49,7 @@ var _ = Describe("Locator", func() {
 		When("given a file path", func() {
 			BeforeEach(func() {
 				filepathOrDirectory = filepath.Join(workingDir, "some-manifest.yml")
-				Expect(ioutil.WriteFile(filepathOrDirectory, nil, 0600)).To(Succeed())
+				Expect(os.WriteFile(filepathOrDirectory, nil, 0600)).To(Succeed())
 			})
 
 			It("returns the path and true", func() {
@@ -67,7 +66,7 @@ var _ = Describe("Locator", func() {
 
 			When("a manifest.yml exists in the directory", func() {
 				BeforeEach(func() {
-					Expect(ioutil.WriteFile(filepath.Join(workingDir, "manifest.yml"), nil, 0600)).To(Succeed())
+					Expect(os.WriteFile(filepath.Join(workingDir, "manifest.yml"), nil, 0600)).To(Succeed())
 				})
 
 				It("returns the path and true", func() {
@@ -79,7 +78,7 @@ var _ = Describe("Locator", func() {
 
 			When("a manifest.yaml exists in the directory", func() {
 				BeforeEach(func() {
-					Expect(ioutil.WriteFile(filepath.Join(workingDir, "manifest.yaml"), nil, 0600)).To(Succeed())
+					Expect(os.WriteFile(filepath.Join(workingDir, "manifest.yaml"), nil, 0600)).To(Succeed())
 				})
 
 				It("returns the path and true", func() {
@@ -135,7 +134,7 @@ var _ = Describe("Locator", func() {
 		When("the path to the manifest is a symbolic link", func() {
 			BeforeEach(func() {
 				originalFilepathOrDirectory = filepath.Join(workingDir, "some-manifest.yml")
-				Expect(ioutil.WriteFile(originalFilepathOrDirectory, nil, 0600)).To(Succeed())
+				Expect(os.WriteFile(originalFilepathOrDirectory, nil, 0600)).To(Succeed())
 				filepathOrDirectory = filepath.Join(workingDir, "link-to-some-manifest.yml")
 				err := os.Symlink(originalFilepathOrDirectory, filepathOrDirectory)
 				Expect(err).To(BeNil())

@@ -1,7 +1,6 @@
 package v7pushaction_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -41,7 +40,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 		var relativeAppFilePath string
 
 		BeforeEach(func() {
-			file, err := ioutil.TempFile("", "")
+			file, err := os.CreateTemp("", "")
 			Expect(err).NotTo(HaveOccurred())
 			relativeAppFilePath = file.Name()
 			defer file.Close()
@@ -91,7 +90,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 				var cwd string
 				var absoluteAppFilehandle *os.File
 				BeforeEach(func() {
-					absoluteAppFilehandle, err = ioutil.TempFile("", "")
+					absoluteAppFilehandle, err = os.CreateTemp("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
 					relativeAppFilePath = filepath.Join("", absoluteAppFilehandle.Name())

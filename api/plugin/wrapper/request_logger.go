@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -90,13 +90,13 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 	}
 
 	if request.Body != nil && request.Header.Get("Content-Type") == "application/json" {
-		rawRequestBody, err := ioutil.ReadAll(request.Body)
+		rawRequestBody, err := io.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {
 			return err
 		}
 
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+		request.Body = io.NopCloser(bytes.NewBuffer(rawRequestBody))
 		err = logger.output.DisplayJSONBody(rawRequestBody)
 		if err != nil {
 			return err

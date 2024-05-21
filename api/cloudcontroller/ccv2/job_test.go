@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -546,7 +545,7 @@ var _ = Describe("Job", func() {
 						defer resourcesPart.Close()
 						expectedJSON, err := json.Marshal(resources)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+						Expect(io.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
 						// Verify that the application bits are sent properly
 						resourcesPart, err = requestReader.NextPart()
@@ -556,7 +555,7 @@ var _ = Describe("Job", func() {
 						Expect(resourcesPart.FileName()).To(Equal("application.zip"))
 
 						defer resourcesPart.Close()
-						Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+						Expect(io.ReadAll(resourcesPart)).To(Equal(readerBody))
 					}
 
 					response := `{
@@ -613,7 +612,7 @@ var _ = Describe("Job", func() {
 						defer resourcesPart.Close()
 						expectedJSON, err := json.Marshal(resources)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+						Expect(io.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
 						// Verify that the application bits are not sent
 						_, err = requestReader.NextPart()
@@ -711,7 +710,7 @@ var _ = Describe("Job", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
-							_, err := ioutil.ReadAll(request.Body)
+							_, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
@@ -742,7 +741,7 @@ var _ = Describe("Job", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
 							defer request.Body.Close()
-							readBytes, err := ioutil.ReadAll(request.Body)
+							readBytes, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(len(readBytes)).To(BeNumerically(">", UploadSize))
 							return expectedErr
@@ -792,7 +791,7 @@ var _ = Describe("Job", func() {
 
 					Expect(resourcesPart.FormName()).To(Equal("droplet"))
 					Expect(resourcesPart.FileName()).To(Equal("droplet.tgz"))
-					Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+					Expect(io.ReadAll(resourcesPart)).To(Equal(readerBody))
 				}
 
 				response := `{
@@ -878,7 +877,7 @@ var _ = Describe("Job", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/droplet/upload") {
-							_, err := ioutil.ReadAll(request.Body)
+							_, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
@@ -909,7 +908,7 @@ var _ = Describe("Job", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/droplet/upload") {
 							defer request.Body.Close()
-							readBytes, err := ioutil.ReadAll(request.Body)
+							readBytes, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(len(readBytes)).To(BeNumerically(">", UploadSize))
 							return expectedErr

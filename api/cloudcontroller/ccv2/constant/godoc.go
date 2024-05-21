@@ -7,13 +7,14 @@
 // values.
 //
 // For Example:
-//   Constant Type: PackageType
-//   Enum Name: Bits
-//   Enum Value: "bits"
-//   const PackageTypeBits PackageType = "bits"
 //
-//   Constant Type: PackageState
-//   Enum Name: Expired
-//   Enum Value: "EXPIRED"
-//   const PackageExpired PackageState = "EXPIRED"
+//	Constant Type: PackageType
+//	Enum Name: Bits
+//	Enum Value: "bits"
+//	const PackageTypeBits PackageType = "bits"
+//
+//	Constant Type: PackageState
+//	Enum Name: Expired
+//	Enum Value: "EXPIRED"
+//	const PackageExpired PackageState = "EXPIRED"
 package constant

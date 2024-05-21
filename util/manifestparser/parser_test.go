@@ -2,7 +2,6 @@ package manifestparser_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -31,7 +30,7 @@ var _ = Describe("ManifestParser", func() {
 		)
 
 		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile("", "manifest-test-")
+			tempFile, err := os.CreateTemp("", "manifest-test-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(tempFile.Close()).ToNot(HaveOccurred())
 			pathToManifest = tempFile.Name()
@@ -58,7 +57,7 @@ applications:
 - name: spark
 - name: flame
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := os.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -80,7 +79,7 @@ applications:
 				rawManifest = []byte(`---
 applications:
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := os.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -98,7 +97,7 @@ applications:
 - name: ((var1))
 - name: ((var2))
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := os.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -109,15 +108,15 @@ applications:
 
 				BeforeEach(func() {
 					var err error
-					varsDir, err = ioutil.TempDir("", "vars-test")
+					varsDir, err = os.MkdirTemp("", "vars-test")
 					Expect(err).ToNot(HaveOccurred())
 
 					varsFilePath1 := filepath.Join(varsDir, "vars-1")
-					err = ioutil.WriteFile(varsFilePath1, []byte("var1: spark"), 0666)
+					err = os.WriteFile(varsFilePath1, []byte("var1: spark"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					varsFilePath2 := filepath.Join(varsDir, "vars-2")
-					err = ioutil.WriteFile(varsFilePath2, []byte("var2: flame"), 0666)
+					err = os.WriteFile(varsFilePath2, []byte("var2: flame"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
@@ -130,11 +129,11 @@ applications:
 				When("multiple values for the same variable(s) are provided", func() {
 					BeforeEach(func() {
 						varsFilePath1 := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: spark\nvar2: doesn't matter"), 0666)
+						err := os.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: spark\nvar2: doesn't matter"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						varsFilePath2 := filepath.Join(varsDir, "vars-2")
-						err = ioutil.WriteFile(varsFilePath2, []byte("var2: flame"), 0666)
+						err = os.WriteFile(varsFilePath2, []byte("var2: flame"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
@@ -156,7 +155,7 @@ applications:
 				When("a variable in the manifest is not provided in the vars file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
+						err := os.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = []string{varsFilePath}
@@ -181,7 +180,7 @@ applications:
 				When("the provided file is not a valid yaml file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath, []byte(": bad"), 0666)
+						err := os.WriteFile(varsFilePath, []byte(": bad"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = []string{varsFilePath}
@@ -213,12 +212,12 @@ applications:
 			When("vars and vars files are provided", func() {
 				var varsFilePath string
 				BeforeEach(func() {
-					tmp, err := ioutil.TempFile("", "util-manifest-varsilfe")
+					tmp, err := os.CreateTemp("", "util-manifest-varsilfe")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(tmp.Close()).NotTo(HaveOccurred())
 
 					varsFilePath = tmp.Name()
-					err = ioutil.WriteFile(varsFilePath, []byte("var1: spark\nvar2: 12345"), 0666)
+					err = os.WriteFile(varsFilePath, []byte("var1: spark\nvar2: 12345"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					pathsToVarsFiles = []string{varsFilePath}
@@ -241,7 +240,7 @@ applications:
 		When("invalid yaml is passed", func() {
 			BeforeEach(func() {
 				rawManifest = []byte("\t\t")
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := os.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -255,7 +254,7 @@ applications:
 				rawManifest = []byte(`---
 blah blah
 `)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				err := os.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 

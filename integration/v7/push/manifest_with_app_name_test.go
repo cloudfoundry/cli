@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -26,7 +25,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 			appName = helpers.NewAppName()
 			secondName = helpers.NewAppName()
 			var err error
-			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -92,7 +91,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 	When("an appName is not given with a nameless manifest", func() {
 		BeforeEach(func() {
 			var err error
-			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{

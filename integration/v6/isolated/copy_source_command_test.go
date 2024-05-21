@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -51,7 +51,7 @@ var _ = Describe("copy-source command", func() {
 		resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName2, helpers.DefaultSharedDomain()))
 		Expect(err).ToNot(HaveOccurred())
 		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(string(body)).To(MatchRegexp("hello world"))
 	})

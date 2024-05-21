@@ -1,7 +1,6 @@
 package sharedaction_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -30,20 +29,20 @@ var _ = Describe("Resource Actions", func() {
 		// tmpfile3
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
+		srcDir, err = os.MkdirTemp("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
 		err = os.MkdirAll(subDir, 0777)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0666)
+		err = os.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0666)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0666)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0666)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0666)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0666)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -61,7 +60,7 @@ var _ = Describe("Resource Actions", func() {
 			)
 
 			BeforeEach(func() {
-				tmpfile, err := ioutil.TempFile("", "gather-archive-resource-test")
+				tmpfile, err := os.CreateTemp("", "gather-archive-resource-test")
 				Expect(err).ToNot(HaveOccurred())
 				defer tmpfile.Close()
 				archive = tmpfile.Name()
@@ -96,7 +95,7 @@ var _ = Describe("Resource Actions", func() {
 				var symlinkToArchive string
 
 				BeforeEach(func() {
-					tempFile, err := ioutil.TempFile("", "symlink-to-archive")
+					tempFile, err := os.CreateTemp("", "symlink-to-archive")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 					symlinkToArchive = tempFile.Name()
@@ -130,7 +129,7 @@ var _ = Describe("Resource Actions", func() {
 
 			When("a .cfignore file exists in the archive", func() {
 				BeforeEach(func() {
-					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
+					err := os.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -151,9 +150,9 @@ var _ = Describe("Resource Actions", func() {
 				BeforeEach(func() {
 					for _, filename := range DefaultIgnoreLines {
 						if filename != ".cfignore" {
-							err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
+							err := os.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
 							Expect(err).ToNot(HaveOccurred())
-							err = ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
+							err = os.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					}
@@ -213,7 +212,7 @@ var _ = Describe("Resource Actions", func() {
 				BeforeEach(func() {
 					tmpDir = srcDir
 
-					tmpFile, err := ioutil.TempFile("", "symlink-file-")
+					tmpFile, err := os.CreateTemp("", "symlink-file-")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tmpFile.Close()).To(Succeed())
 
@@ -243,7 +242,7 @@ var _ = Describe("Resource Actions", func() {
 			When("a .cfignore file exists in the sourceDir", func() {
 				Context("with relative paths", func() {
 					BeforeEach(func() {
-						err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0666)
+						err := os.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -261,7 +260,7 @@ var _ = Describe("Resource Actions", func() {
 
 				Context("with absolute paths - where '/' == sourceDir", func() {
 					BeforeEach(func() {
-						err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("/level1/level2"), 0666)
+						err := os.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("/level1/level2"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -282,9 +281,9 @@ var _ = Describe("Resource Actions", func() {
 				BeforeEach(func() {
 					for _, filename := range DefaultIgnoreLines {
 						if filename != ".cfignore" {
-							err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
+							err := os.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
 							Expect(err).ToNot(HaveOccurred())
-							err = ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
+							err = os.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					}
@@ -307,7 +306,7 @@ var _ = Describe("Resource Actions", func() {
 			When("trace files are in the source directory", func() {
 				BeforeEach(func() {
 					traceFilePath := filepath.Join(srcDir, "i-am-trace.txt")
-					err := ioutil.WriteFile(traceFilePath, nil, 0666)
+					err := os.WriteFile(traceFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					fakeConfig.VerboseReturns(false, []string{traceFilePath, "C:\\some-other-path"})
@@ -333,7 +332,7 @@ var _ = Describe("Resource Actions", func() {
 
 			BeforeEach(func() {
 				var err error
-				emptyDir, err = ioutil.TempDir("", "v2-resource-actions-empty")
+				emptyDir, err = os.MkdirTemp("", "v2-resource-actions-empty")
 				Expect(err).ToNot(HaveOccurred())
 			})
 

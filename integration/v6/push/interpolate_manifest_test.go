@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -25,7 +24,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		appName = helpers.NewAppName()
 		instances = 4
 
-		tmp, err := ioutil.TempFile("", "manifest-interpolation")
+		tmp, err := os.CreateTemp("", "manifest-interpolation")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(tmp.Close()).ToNot(HaveOccurred())
 		manifestPath = tmp.Name()
@@ -54,7 +53,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 
 		BeforeEach(func() {
 			var err error
-			tmpDir, err = ioutil.TempDir("", "vars-files")
+			tmpDir, err = os.MkdirTemp("", "vars-files")
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -66,12 +65,12 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s", appName)
-				err := ioutil.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
+				err := os.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				secondVarsFilePath = filepath.Join(tmpDir, "vars2")
 				vars2 := fmt.Sprintf("vars2: %d", instances)
-				err = ioutil.WriteFile(secondVarsFilePath, []byte(vars2), 0666)
+				err = os.WriteFile(secondVarsFilePath, []byte(vars2), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -97,7 +96,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s", appName)
-				err := ioutil.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
+				err := os.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				helpers.WriteManifest(manifestPath, map[string]interface{}{
@@ -122,12 +121,12 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s\nvars2: %d", "some-garbage-appname", instances)
-				err := ioutil.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
+				err := os.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				secondVarsFilePath = filepath.Join(tmpDir, "vars2")
 				vars2 := fmt.Sprintf("vars1: %s", appName)
-				err = ioutil.WriteFile(secondVarsFilePath, []byte(vars2), 0666)
+				err = os.WriteFile(secondVarsFilePath, []byte(vars2), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -170,13 +169,13 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 	When("`--vars-file` and `--var` flag vars are provided", func() {
 		var varsFilePath string
 		BeforeEach(func() {
-			tmp, err := ioutil.TempFile("", "varsfile-interpolation")
+			tmp, err := os.CreateTemp("", "varsfile-interpolation")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(tmp.Close()).ToNot(HaveOccurred())
 
 			varsFilePath = tmp.Name()
 			vars1 := fmt.Sprintf("vars1: %s\nvars2: %d", "some-garbage-appname", instances)
-			Expect(ioutil.WriteFile(varsFilePath, []byte(vars1), 0666)).ToNot(HaveOccurred())
+			Expect(os.WriteFile(varsFilePath, []byte(vars1), 0666)).ToNot(HaveOccurred())
 		})
 
 		AfterEach(func() {

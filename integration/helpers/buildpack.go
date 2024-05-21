@@ -3,7 +3,6 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -14,7 +13,7 @@ import (
 
 // MakeBuildpackArchive makes a simple buildpack zip for a given stack.
 func MakeBuildpackArchive(stackName string) string {
-	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
+	archiveFile, err := os.CreateTemp("", "buildpack-archive-file-")
 	Expect(err).ToNot(HaveOccurred())
 	err = archiveFile.Close()
 	Expect(err).ToNot(HaveOccurred())
@@ -23,12 +22,12 @@ func MakeBuildpackArchive(stackName string) string {
 
 	archiveName := archiveFile.Name() + ".zip"
 
-	dir, err := ioutil.TempDir("", "buildpack-dir-")
+	dir, err := os.MkdirTemp("", "buildpack-dir-")
 	Expect(err).ToNot(HaveOccurred())
 	defer os.RemoveAll(dir)
 
 	manifest := filepath.Join(dir, "manifest.yml")
-	err = ioutil.WriteFile(manifest, []byte(fmt.Sprintf("stack: %s", stackName)), 0666)
+	err = os.WriteFile(manifest, []byte(fmt.Sprintf("stack: %s", stackName)), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	err = Zipit(dir, archiveName, "")

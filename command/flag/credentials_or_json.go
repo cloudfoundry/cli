@@ -3,7 +3,7 @@ package flag
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	flags "github.com/jessevdk/go-flags"
@@ -54,7 +54,7 @@ func canParseAsJSON(input string) (value map[string]interface{}, ok bool) {
 }
 
 func canParseFileAsJSON(input string) (value map[string]interface{}, ok bool, parseError error) {
-	contents, err := ioutil.ReadFile(input)
+	contents, err := os.ReadFile(input)
 	if err != nil {
 		return
 	}

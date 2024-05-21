@@ -3,7 +3,6 @@ package pushaction_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -304,7 +303,7 @@ var _ = Describe("Resources", func() {
 
 		When("the archive can be accessed properly", func() {
 			BeforeEach(func() {
-				tmpfile, err := ioutil.TempFile("", "fake-archive")
+				tmpfile, err := os.CreateTemp("", "fake-archive")
 				Expect(err).ToNot(HaveOccurred())
 				_, err = tmpfile.Write([]byte("123456"))
 				Expect(err).ToNot(HaveOccurred())
@@ -454,7 +453,7 @@ var _ = Describe("Resources", func() {
 
 		When("the droplet can be accessed properly", func() {
 			BeforeEach(func() {
-				tmpfile, err := ioutil.TempFile("", "fake-droplet")
+				tmpfile, err := os.CreateTemp("", "fake-droplet")
 				Expect(err).ToNot(HaveOccurred())
 				_, err = tmpfile.Write([]byte("123456"))
 				Expect(err).ToNot(HaveOccurred())

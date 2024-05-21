@@ -3,14 +3,13 @@ package configv3
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func (c *Config) loadPluginConfig() error {
@@ -21,7 +20,7 @@ func (c *Config) loadPluginConfig() error {
 		}
 	} else {
 		var file []byte
-		file, err = ioutil.ReadFile(pluginFilePath)
+		file, err = os.ReadFile(pluginFilePath)
 		if err != nil {
 			return err
 		}
@@ -56,14 +55,14 @@ func GetCFConfig() (*Config, error) {
 //
 // The '.cf' directory will be read in one of the following locations on UNIX
 // Systems:
-//   1. $CF_HOME/.cf if $CF_HOME is set
-//   2. $HOME/.cf as the default
+//  1. $CF_HOME/.cf if $CF_HOME is set
+//  2. $HOME/.cf as the default
 //
 // The '.cf' directory will be read in one of the following locations on
 // Windows Systems:
-//   1. CF_HOME\.cf if CF_HOME is set
-//   2. HOMEDRIVE\HOMEPATH\.cf if HOMEDRIVE or HOMEPATH is set
-//   3. USERPROFILE\.cf as the default
+//  1. CF_HOME\.cf if CF_HOME is set
+//  2. HOMEDRIVE\HOMEPATH\.cf if HOMEDRIVE or HOMEPATH is set
+//  3. USERPROFILE\.cf as the default
 func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	err := removeOldTempConfigFiles()
 	if err != nil {
@@ -88,7 +87,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	if _, err = os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
 		var file []byte
-		file, err = ioutil.ReadFile(configFilePath)
+		file, err = os.ReadFile(configFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -151,12 +150,12 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	// Developer Note: The following is untested! Change at your own risk.
-	isTTY := terminal.IsTerminal(int(os.Stdout.Fd()))
+	isTTY := term.IsTerminal(int(os.Stdout.Fd()))
 	terminalWidth := math.MaxInt32
 
 	if isTTY {
 		var err error
-		terminalWidth, _, err = terminal.GetSize(int(os.Stdout.Fd()))
+		terminalWidth, _, err = term.GetSize(int(os.Stdout.Fd()))
 		if err != nil {
 			return nil, err
 		}

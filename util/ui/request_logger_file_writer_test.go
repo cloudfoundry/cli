@@ -3,7 +3,6 @@ package ui_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,7 +31,7 @@ var _ = Describe("Request Logger File Writer", func() {
 	Describe("Valid file paths", func() {
 		BeforeEach(func() {
 			var err error
-			tmpdir, err = ioutil.TempDir("", "request_logger")
+			tmpdir, err = os.MkdirTemp("", "request_logger")
 			Expect(err).ToNot(HaveOccurred())
 
 			logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile1")
@@ -53,11 +52,11 @@ var _ = Describe("Request Logger File Writer", func() {
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
 			})
@@ -71,11 +70,11 @@ var _ = Describe("Request Logger File Writer", func() {
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("this is a dump of stuff\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("this is a dump of stuff\n"))
 			})
@@ -96,7 +95,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				raw, err := ioutil.ReadFile(logFile1)
+				raw, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				contents := string(raw)
 
@@ -105,7 +104,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				Expect(contents).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Expect(contents).To(MatchRegexp("Origin: wss://doppler.bosh-lite.com:443"))
 
-				raw, err = ioutil.ReadFile(logFile2)
+				raw, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				contents = string(raw)
 
@@ -123,11 +122,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("Header: Value\n\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("Header: Value\n\n"))
 			})
@@ -141,11 +140,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("Host: banana\n\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("Host: banana\n\n"))
 			})
@@ -168,11 +167,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 					err = display.Stop()
 					Expect(err).ToNot(HaveOccurred())
 
-					contents, err := ioutil.ReadFile(logFile1)
+					contents, err := os.ReadFile(logFile1)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal(formatted))
 
-					contents, err = ioutil.ReadFile(logFile2)
+					contents, err = os.ReadFile(logFile2)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal(formatted))
 				})
@@ -186,11 +185,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 					err = display.Stop()
 					Expect(err).ToNot(HaveOccurred())
 
-					contents, err := ioutil.ReadFile(logFile1)
+					contents, err := os.ReadFile(logFile1)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal("\n"))
 
-					contents, err = ioutil.ReadFile(logFile2)
+					contents, err = os.ReadFile(logFile2)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal("\n"))
 				})
@@ -205,11 +204,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 					err = display.Stop()
 					Expect(err).ToNot(HaveOccurred())
 
-					contents, err := ioutil.ReadFile(logFile1)
+					contents, err := os.ReadFile(logFile1)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal(raw + "\n\n"))
 
-					contents, err = ioutil.ReadFile(logFile2)
+					contents, err = os.ReadFile(logFile2)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal(raw + "\n\n"))
 				})
@@ -225,11 +224,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(ContainSubstring(msg))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(ContainSubstring(msg))
 			})
@@ -243,11 +242,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("GET /v2/spaces/guid/summary HTTP/1.1\n\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("GET /v2/spaces/guid/summary HTTP/1.1\n\n"))
 			})
@@ -261,11 +260,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("HTTP/1.1 200 OK\n\n"))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal("HTTP/1.1 200 OK\n\n"))
 			})
@@ -280,11 +279,11 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(logFile1)
+				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal(fmt.Sprintf("banana: [%s]\n\n", passedTime.Format(time.RFC3339))))
 
-				contents, err = ioutil.ReadFile(logFile2)
+				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal(fmt.Sprintf("banana: [%s]\n\n", passedTime.Format(time.RFC3339))))
 			})
@@ -325,7 +324,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 
 		BeforeEach(func() {
 			var err error
-			tmpdir, err = ioutil.TempDir("", "request_logger")
+			tmpdir, err = os.MkdirTemp("", "request_logger")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathName = filepath.Join(tmpdir, "foo")

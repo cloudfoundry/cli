@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -129,7 +128,7 @@ var _ = Describe("download-droplet command", func() {
 
 			When("a path to a directory is provided", func() {
 				BeforeEach(func() {
-					tmpDir, err := ioutil.TempDir("", "droplets")
+					tmpDir, err := os.MkdirTemp("", "droplets")
 					Expect(err).NotTo(HaveOccurred())
 					dropletPath = tmpDir
 				})
@@ -148,7 +147,7 @@ var _ = Describe("download-droplet command", func() {
 
 			When("a path to a file is provided", func() {
 				BeforeEach(func() {
-					tmpDir, err := ioutil.TempDir("", "droplets")
+					tmpDir, err := os.MkdirTemp("", "droplets")
 					Expect(err).NotTo(HaveOccurred())
 					dropletPath = filepath.Join(tmpDir, "my-droplet.tgz")
 				})

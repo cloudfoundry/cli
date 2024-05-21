@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 	"regexp"
 
@@ -142,7 +141,7 @@ var _ = Describe("create-package command", func() {
 
 							BeforeEach(func() {
 								var err error
-								emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+								emptyDir, err = os.MkdirTemp("", "integration-push-path-empty")
 								Expect(err).ToNot(HaveOccurred())
 							})
 
@@ -172,7 +171,7 @@ var _ = Describe("create-package command", func() {
 
 							BeforeEach(func() {
 								helpers.WithHelloWorldApp(func(appDir string) {
-									tmpfile, err := ioutil.TempFile("", "package-archive-integration")
+									tmpfile, err := os.CreateTemp("", "package-archive-integration")
 									Expect(err).ToNot(HaveOccurred())
 									archive = tmpfile.Name()
 									Expect(tmpfile.Close())
@@ -203,7 +202,7 @@ var _ = Describe("create-package command", func() {
 						var symlinkPath string
 
 						BeforeEach(func() {
-							tempFile, err := ioutil.TempFile("", "symlink-")
+							tempFile, err := os.CreateTemp("", "symlink-")
 							Expect(err).ToNot(HaveOccurred())
 							Expect(tempFile.Close()).To(Succeed())
 
@@ -239,7 +238,7 @@ var _ = Describe("create-package command", func() {
 
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
-							tmpfile, err := ioutil.TempFile("", "package-archive-integration")
+							tmpfile, err := os.CreateTemp("", "package-archive-integration")
 							Expect(err).ToNot(HaveOccurred())
 							archive = tmpfile.Name()
 							Expect(tmpfile.Close())
@@ -248,7 +247,7 @@ var _ = Describe("create-package command", func() {
 							Expect(err).ToNot(HaveOccurred())
 						})
 
-						tempFile, err := ioutil.TempFile("", "symlink-to-archive-")
+						tempFile, err := os.CreateTemp("", "symlink-to-archive-")
 						Expect(err).ToNot(HaveOccurred())
 						Expect(tempFile.Close()).To(Succeed())
 

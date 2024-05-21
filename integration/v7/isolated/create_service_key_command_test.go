@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
@@ -171,7 +170,7 @@ var _ = Describe("create-service-key command", func() {
 					BeforeEach(func() {
 						var err error
 						content := []byte("{i-am-very-bad-json")
-						configurationFile, err = ioutil.TempFile("", "CF_CLI")
+						configurationFile, err = os.CreateTemp("", "CF_CLI")
 						Expect(err).NotTo(HaveOccurred())
 
 						_, err = configurationFile.Write(content)

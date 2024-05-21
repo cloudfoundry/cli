@@ -3,7 +3,6 @@ package v2action
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -334,7 +333,7 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 
 func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGUID string, progressBar SimpleProgressBar) (Warnings, error) {
 	downloader := download.NewDownloader(time.Second * 30)
-	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
+	tmpDirPath, err := os.MkdirTemp("", "buildpack-dir-")
 	if err != nil {
 		return Warnings{}, err
 	}

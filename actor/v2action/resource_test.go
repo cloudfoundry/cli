@@ -2,7 +2,6 @@ package v2action_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -25,20 +24,20 @@ var _ = Describe("Resource Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "resource-actions-test")
+		srcDir, err = os.MkdirTemp("", "resource-actions-test")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
 		err = os.MkdirAll(subDir, 0777)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
+		err = os.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
 		Expect(err).ToNot(HaveOccurred())
 	})
 

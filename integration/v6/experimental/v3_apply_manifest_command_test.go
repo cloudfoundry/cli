@@ -1,7 +1,6 @@
 package experimental
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -28,7 +27,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 		appName = helpers.PrefixedRandomName("app")
 
 		var err error
-		appDir, err = ioutil.TempDir("", "simple-app")
+		appDir, err = os.MkdirTemp("", "simple-app")
 		Expect(err).NotTo(HaveOccurred())
 
 		manifestPath = filepath.Join(appDir, "manifest.yml")

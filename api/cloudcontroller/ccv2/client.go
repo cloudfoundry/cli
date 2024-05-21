@@ -9,7 +9,7 @@
 // For more information on the Cloud Controller API see
 // https://apidocs.cloudfoundry.org/
 //
-// Method Naming Conventions
+// # Method Naming Conventions
 //
 // The client takes a '<Action Name><Top Level Endpoint><nth... level
 // endpoint><Return Value>' approach to method names.  If the <Top Level
@@ -18,59 +18,61 @@
 // removed from said endpoint in the method name.
 //
 // For Example:
-//   Method Name: GetApplication
-//   Endpoint: /v2/applications/:guid
-//   Action Name: GET
-//   Top Level Endpoint: applications
-//   Return Value: Application
 //
-//   Method Name: GetServiceInstances
-//   Endpoint: /v2/service_instances
-//   Action Name: GET
-//   Top Level Endpoint: service_instances
-//   Return Value: []ServiceInstance
+//	Method Name: GetApplication
+//	Endpoint: /v2/applications/:guid
+//	Action Name: GET
+//	Top Level Endpoint: applications
+//	Return Value: Application
 //
-//   Method Name: GetSpaceServiceInstances
-//   Endpoint: /v2/spaces/:guid/service_instances
-//   Action Name: GET
-//   Top Level Endpoint: spaces
-//   Return Value: []ServiceInstance
+//	Method Name: GetServiceInstances
+//	Endpoint: /v2/service_instances
+//	Action Name: GET
+//	Top Level Endpoint: service_instances
+//	Return Value: []ServiceInstance
 //
-//   Method Name: UpdateRouteApplication
-//   Endpoint: /v2/routes/:route_guid/apps/:app_guid
-//   Action Name: PUT
-//   Top Level Endpoint: routes
-//   Second Level Endpoint: Application
-//   Return Value: Route
+//	Method Name: GetSpaceServiceInstances
+//	Endpoint: /v2/spaces/:guid/service_instances
+//	Action Name: GET
+//	Top Level Endpoint: spaces
+//	Return Value: []ServiceInstance
 //
-//   Method Name: DeleteSpaceJob
-//   Endpoint: /v2/spaces/:space_guid
-//   Action Name: DELETE
-//   Top Level Endpoint: spaces
-//   Return Value: Job
+//	Method Name: UpdateRouteApplication
+//	Endpoint: /v2/routes/:route_guid/apps/:app_guid
+//	Action Name: PUT
+//	Top Level Endpoint: routes
+//	Second Level Endpoint: Application
+//	Return Value: Route
+//
+//	Method Name: DeleteSpaceJob
+//	Endpoint: /v2/spaces/:space_guid
+//	Action Name: DELETE
+//	Top Level Endpoint: spaces
+//	Return Value: Job
 //
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:
-//   HTTP Command -> Action Name
-//   POST -> Create
-//   GET -> Get
-//   PUT -> Update
-//   DELETE -> Delete
-//   PATCH -> Patch
 //
-// Method Locations
+//	HTTP Command -> Action Name
+//	POST -> Create
+//	GET -> Get
+//	PUT -> Update
+//	DELETE -> Delete
+//	PATCH -> Patch
+//
+// # Method Locations
 //
 // Methods exist in the same file as their return type, regardless of which
 // endpoint they use.
 //
-// Error Handling
+// # Error Handling
 //
 // All error handling that requires parsing the error_code/code returned back
 // from the Cloud Controller should be placed in the errorWrapper. Everything
 // else can be handled in the individual operations. All errors structs should
 // be placed in individual files in the ccerror package.
 //
-// No inline-relations-depth And summary Endpoints
+// # No inline-relations-depth And summary Endpoints
 //
 // This package will not ever use 'inline-relations-depth' or the
 // '/summary' endpoints for any operations. These requests can be extremely

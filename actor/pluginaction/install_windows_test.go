@@ -4,7 +4,6 @@
 package pluginaction_test
 
 import (
-	"io/ioutil"
 	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
@@ -23,7 +22,7 @@ var _ = Describe("install actions", func() {
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
 		var err error
-		tempPluginDir, err = ioutil.TempDir("", "")
+		tempPluginDir, err = os.MkdirTemp("", "")
 		Expect(err).ToNot(HaveOccurred())
 		actor = NewActor(fakeConfig, nil)
 	})
@@ -38,7 +37,7 @@ var _ = Describe("install actions", func() {
 			var pluginPath string
 
 			BeforeEach(func() {
-				tempFile, err := ioutil.TempFile("", "")
+				tempFile, err := os.CreateTemp("", "")
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = tempFile.WriteString("cthulhu")

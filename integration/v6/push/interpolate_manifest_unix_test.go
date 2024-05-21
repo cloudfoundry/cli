@@ -5,7 +5,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,12 +31,12 @@ var _ = Describe("push with a manifest and vars files via process substitution",
 		instances = 4
 
 		var err error
-		tmpDir, err = ioutil.TempDir("", "vars-files")
+		tmpDir, err = os.MkdirTemp("", "vars-files")
 		Expect(err).ToNot(HaveOccurred())
 
 		firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 		vars1 := fmt.Sprintf("vars1: %s", appName)
-		err = ioutil.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
+		err = os.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
 		Expect(err).ToNot(HaveOccurred())
 	})
 

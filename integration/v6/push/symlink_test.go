@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -22,7 +21,7 @@ var _ = Describe("push with symlink path", func() {
 		appName = helpers.NewAppName()
 
 		var err error
-		runningDir, err = ioutil.TempDir("", "push-with-symlink")
+		runningDir, err = os.MkdirTemp("", "push-with-symlink")
 		Expect(err).ToNot(HaveOccurred())
 		symlinkedPath = filepath.Join(runningDir, "symlink-dir")
 	})

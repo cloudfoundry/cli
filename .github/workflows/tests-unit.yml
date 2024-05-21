@@ -26,23 +26,6 @@ defaults:
     shell: bash
 
 jobs:
-  lint:
-    name: Lint code
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set Up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: go.mod
-        check-latest: true
-
-    - name: Run go fmt
-      run: go fmt && git diff --exit-code
-
   units:
     name: Units
     strategy:

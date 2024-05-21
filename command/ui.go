@@ -8,6 +8,7 @@ import (
 )
 
 // UI is the interface to STDOUT, STDERR, and STDIN.
+//
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UI
 type UI interface {
 	DeferText(template string, data ...map[string]interface{})

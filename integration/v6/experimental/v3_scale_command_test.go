@@ -354,7 +354,7 @@ var _ = Describe("v3-scale command", func() {
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					instanceSummary := appTable.Processes[0].Instances[0]
-					currentInstances = string(len(appTable.Processes[0].Instances))
+					currentInstances = fmt.Sprintf("%d", len(appTable.Processes[0].Instances))
 					maxMemory = strings.Fields(instanceSummary.Memory)[2]
 					maxDiskSize = strings.Fields(instanceSummary.Disk)[2]
 				})

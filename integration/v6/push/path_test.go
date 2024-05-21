@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -68,7 +67,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
-				tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+				tmpfile, err := os.CreateTemp("", "push-archive-integration")
 				Expect(err).ToNot(HaveOccurred())
 				archive = tmpfile.Name()
 				Expect(tmpfile.Close()).ToNot(HaveOccurred())

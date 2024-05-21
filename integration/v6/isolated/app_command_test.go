@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -181,7 +181,7 @@ applications:
   - route: %s.%s
 `, appName, appName, domainName))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							err := os.WriteFile(manifestPath, manifestContents, 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							// Create manifest
@@ -400,7 +400,7 @@ applications:
   - route: %s:1024
 `, appName, tcpDomain.Name))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							err := os.WriteFile(manifestPath, manifestContents, 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							// Create manifest
