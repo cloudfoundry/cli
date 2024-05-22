@@ -3,10 +3,9 @@ package helpers
 import (
 	"embed"
 	"fmt"
-	"net/http"
-
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
+	"net/http"
 )
 
 //go:embed fixtures

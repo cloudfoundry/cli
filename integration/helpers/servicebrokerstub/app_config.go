@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
@@ -54,7 +55,7 @@ func (s *ServiceBrokerStub) requestNewBrokerRoute() {
 	resp, err := http.DefaultClient.Do(req)
 	Expect(err).ToNot(HaveOccurred())
 
-	responseBody, err := io.ReadAll(resp.Body)
+	responseBody, err := ioutil.ReadAll(resp.Body)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(resp.StatusCode).To(
 		Equal(http.StatusCreated),

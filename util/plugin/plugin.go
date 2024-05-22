@@ -1,9 +1,10 @@
 package plugin
 
 import (
+	"os"
+
 	"errors"
 	"fmt"
-	"os"
 
 	plugin_transition "code.cloudfoundry.org/cli/plugin/transition"
 	"code.cloudfoundry.org/cli/util/configv3"

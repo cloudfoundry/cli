@@ -1,6 +1,7 @@
 package configv3_test
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -396,7 +397,7 @@ var _ = Describe("PluginsConfig", func() {
 				config = new(Config)
 
 				var err error
-				pluginHome, err = os.MkdirTemp("", "my-plugin-home")
+				pluginHome, err = ioutil.TempDir("", "my-plugin-home")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(os.RemoveAll(pluginHome)).ToNot(HaveOccurred())
 			})
@@ -426,7 +427,7 @@ var _ = Describe("PluginsConfig", func() {
 				var tempFile string
 
 				BeforeEach(func() {
-					f, err := os.CreateTemp("", "fail-plugin-home")
+					f, err := ioutil.TempFile("", "fail-plugin-home")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(f.Close()).ToNot(HaveOccurred())
 					tempFile = f.Name()
@@ -454,11 +455,11 @@ var _ = Describe("PluginsConfig", func() {
 
 				BeforeEach(func() {
 					var err error
-					file, err = os.CreateTemp("", "")
+					file, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer file.Close()
 
-					err = os.WriteFile(file.Name(), []byte("foo"), 0600)
+					err = ioutil.WriteFile(file.Name(), []byte("foo"), 0600)
 					Expect(err).NotTo(HaveOccurred())
 
 					plugin.Location = file.Name()
@@ -479,7 +480,7 @@ var _ = Describe("PluginsConfig", func() {
 
 				BeforeEach(func() {
 					var err error
-					dirPath, err = os.MkdirTemp("", "")
+					dirPath, err = ioutil.TempDir("", "")
 					Expect(err).NotTo(HaveOccurred())
 
 					plugin.Location = dirPath

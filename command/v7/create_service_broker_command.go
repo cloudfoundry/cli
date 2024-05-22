@@ -18,9 +18,7 @@ type CreateServiceBrokerCommand struct {
 	UpdateIfExists  bool                   `long:"update-if-exists" description:"If the broker already exists, update it rather than failing. Ignores --space-scoped."`
 	usage           any                    `usage:"CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]\n   CF_NAME create-service-broker SERVICE_BROKER USERNAME URL [--space-scoped] (omit password to specify interactively or via environment variable)\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"`
 	relatedCommands any                    `related_commands:"enable-service-access, service-brokers, target"`
-
-	// This field is not used, it is only present to ensure we print the description as part of the usage of the command
-	envPassword any `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"` //nolint:unused
+	envPassword     any                    `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"`
 }
 
 func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {

@@ -3,7 +3,7 @@ package wrapper_test
 import (
 	"bytes"
 	"errors"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -135,7 +135,7 @@ var _ = Describe("Request Logger", func() {
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
 
-					bytes, err := io.ReadAll(request.Body)
+					bytes, err := ioutil.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(Equal([]byte("foo")))
 				})
@@ -149,7 +149,7 @@ var _ = Describe("Request Logger", func() {
 				It("outputs the body", func() {
 					Expect(makeErr).NotTo(HaveOccurred())
 
-					bytes, err := io.ReadAll(request.Body)
+					bytes, err := ioutil.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(Equal([]byte("foo")))
 					Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(1))

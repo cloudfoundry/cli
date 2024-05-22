@@ -2,7 +2,7 @@ package push
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"time"
@@ -27,7 +27,7 @@ var _ = Describe("resource matching", func() {
 		It("uploads the unmatched resources", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				tempfile := filepath.Join(dir, "ignore.html")
-				err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s %s", time.Now(), strings.Repeat("a", 65*1024))), 0666)
+				err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s %s", time.Now(), strings.Repeat("a", 65*1024))), 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")

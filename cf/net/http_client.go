@@ -3,12 +3,12 @@ package net
 import (
 	_ "crypto/sha512" // #82254112: http://bridge.grumpy-troll.org/2014/05/golang-tls-comodo/
 	"crypto/x509"
-	asErrors "errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	asErrors "errors"
 
 	"code.cloudfoundry.org/cli/cf/errors"
 	. "code.cloudfoundry.org/cli/cf/i18n"
@@ -84,13 +84,13 @@ func WrapNetworkErrors(host string, err error) error {
 	}
 
 	if innerErr != nil {
-		if asErrors.As(innerErr, &x509.UnknownAuthorityError{}) {
+		if asErrors.As(innerErr, &x509.UnknownAuthorityError{}){
 			return errors.NewInvalidSSLCert(host, T("unknown authority"))
 		}
-		if asErrors.As(innerErr, &x509.HostnameError{}) {
+		if asErrors.As(innerErr, &x509.HostnameError{}){
 			return errors.NewInvalidSSLCert(host, T("not valid for the requested host"))
 		}
-		if asErrors.As(innerErr, &x509.CertificateInvalidError{}) {
+		if asErrors.As(innerErr, &x509.CertificateInvalidError{}){
 			return errors.NewInvalidSSLCert(host, "")
 		}
 		typedInnerErr := new(net.OpError)

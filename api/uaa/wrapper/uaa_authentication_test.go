@@ -3,7 +3,7 @@ package wrapper_test
 import (
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -113,13 +113,13 @@ var _ = Describe("UAA Authentication", func() {
 				request, err := http.NewRequest(
 					http.MethodGet,
 					server.URL(),
-					io.NopCloser(strings.NewReader(expectedBody)),
+					ioutil.NopCloser(strings.NewReader(expectedBody)),
 				)
 				Expect(err).NotTo(HaveOccurred())
 
 				makeCount := 0
 				fakeConnection.MakeStub = func(request *http.Request, response *uaa.Response) error {
-					body, readErr := io.ReadAll(request.Body)
+					body, readErr := ioutil.ReadAll(request.Body)
 					Expect(readErr).NotTo(HaveOccurred())
 					Expect(string(body)).To(Equal(expectedBody))
 

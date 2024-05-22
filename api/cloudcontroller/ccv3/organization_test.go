@@ -449,7 +449,7 @@ var _ = Describe("Organizations", func() {
 				}`
 
 				expectedBody := map[string]interface{}{
-					"name":      "some-org-name",
+					"name": "some-org-name",
 					"suspended": false,
 				}
 
@@ -485,7 +485,7 @@ var _ = Describe("Organizations", func() {
 				}`
 
 				expectedBody := map[string]interface{}{
-					"name":      "some-org-name",
+					"name": "some-org-name",
 					"suspended": false,
 				}
 
@@ -526,7 +526,7 @@ var _ = Describe("Organizations", func() {
 				}`
 
 				expectedBody := map[string]interface{}{
-					"name":      "some-org-name",
+					"name": "some-org-name",
 					"suspended": false,
 				}
 
@@ -586,7 +586,7 @@ var _ = Describe("Organizations", func() {
 				}`
 
 				expectedBody := map[string]interface{}{
-					"name":      "some-org-name",
+					"name": "some-org-name",
 					"suspended": false,
 					"metadata": map[string]interface{}{
 						"labels": map[string]string{

@@ -2,8 +2,9 @@ package v7pushaction_test
 
 import (
 	"os"
-	"testing"
 	"time"
+
+	"testing"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"

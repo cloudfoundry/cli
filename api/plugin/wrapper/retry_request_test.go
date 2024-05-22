@@ -2,7 +2,7 @@ package wrapper_test
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -22,7 +22,7 @@ var _ = Describe("Retry Request", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			rawRequestBody := "banana pants"
-			request.Body = io.NopCloser(strings.NewReader(rawRequestBody))
+			request.Body = ioutil.NopCloser(strings.NewReader(rawRequestBody))
 
 			response := &plugin.Response{
 				HTTPResponse: &http.Response{
@@ -36,7 +36,7 @@ var _ = Describe("Retry Request", func() {
 			}
 			fakeConnection.MakeStub = func(req *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 				defer req.Body.Close()
-				body, readErr := io.ReadAll(request.Body)
+				body, readErr := ioutil.ReadAll(request.Body)
 				Expect(readErr).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal(rawRequestBody))
 				return expectedErr

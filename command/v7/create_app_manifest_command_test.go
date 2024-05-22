@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -102,7 +103,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			BeforeEach(func() {
 				var err error
-				tempDir, err = os.MkdirTemp("", "create-app-manifest-unit")
+				tempDir, err = ioutil.TempDir("", "create-app-manifest-unit")
 				Expect(err).ToNot(HaveOccurred())
 				cmd.PWD = tempDir
 
@@ -123,7 +124,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Expect(appArg).To(Equal("some-app"))
 				Expect(spaceArg).To(Equal("some-space-guid"))
 
-				fileContents, err := os.ReadFile(pathToYAMLFile)
+				fileContents, err := ioutil.ReadFile(pathToYAMLFile)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(fileContents)).To(Equal(yamlContents))
 			})
@@ -156,7 +157,7 @@ var _ = Describe("create-app-manifest Command", func() {
 					Expect(appArg).To(Equal("some-app"))
 					Expect(spaceArg).To(Equal("some-space-guid"))
 
-					fileContents, err := os.ReadFile(flagPath)
+					fileContents, err := ioutil.ReadFile(flagPath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(fileContents)).To(Equal(yamlContents))
 				})

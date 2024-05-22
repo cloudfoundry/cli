@@ -2,7 +2,7 @@ package v7action
 
 import (
 	"encoding/json"
-	"io"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -389,7 +389,7 @@ func parsePath(path string) ([]byte, error) {
 		return nil, err
 	}
 
-	bytes, err := io.ReadAll(file)
+	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}

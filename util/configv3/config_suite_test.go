@@ -1,13 +1,15 @@
 package configv3_test
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"testing"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"testing"
 )
 
 const (
@@ -21,7 +23,7 @@ func TestConfig(t *testing.T) {
 }
 
 func setup() string {
-	homeDir, err := os.MkdirTemp("", "cli-config-tests")
+	homeDir, err := ioutil.TempDir("", "cli-config-tests")
 	Expect(err).NotTo(HaveOccurred())
 	err = os.Setenv("CF_HOME", homeDir)
 	Expect(err).NotTo(HaveOccurred())

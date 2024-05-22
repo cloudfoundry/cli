@@ -3,7 +3,7 @@ package flag
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 
 	"code.cloudfoundry.org/cli/types"
@@ -54,7 +54,7 @@ func canParseAsJSON(input string) (value map[string]interface{}, ok bool) {
 }
 
 func canParseFileAsJSON(input string) (value map[string]interface{}, ok bool, parseError error) {
-	contents, err := os.ReadFile(input)
+	contents, err := ioutil.ReadFile(input)
 	if err != nil {
 		return
 	}

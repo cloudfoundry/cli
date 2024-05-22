@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"bytes"
-	"io"
+	"io/ioutil"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -28,7 +28,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Re
 	var rawRequestBody []byte
 
 	if request.Body != nil {
-		rawRequestBody, err = io.ReadAll(request.Body)
+		rawRequestBody, err = ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {
 			return err
@@ -37,7 +37,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Re
 
 	for i := 0; i < retry.maxRetries+1; i++ {
 		if rawRequestBody != nil {
-			request.Body = io.NopCloser(bytes.NewBuffer(rawRequestBody))
+			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 		}
 		err = retry.connection.Make(request, passedResponse, proxyReader)
 		if err == nil {

@@ -2,6 +2,7 @@ package global
 
 import (
 	"bytes"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -292,7 +293,7 @@ var _ = Describe("update-buildpack command", func() {
 							When("the buildpack path is an empty directory", func() {
 								BeforeEach(func() {
 									var err error
-									buildpackPath, err = os.MkdirTemp("", "create-buildpack-test-")
+									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
 									Expect(err).ToNot(HaveOccurred())
 								})
 
@@ -311,9 +312,9 @@ var _ = Describe("update-buildpack command", func() {
 							When("the path is a buildpack directory", func() {
 								BeforeEach(func() {
 									var err error
-									buildpackPath, err = os.MkdirTemp("", "create-buildpack-test-")
+									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
 									Expect(err).ToNot(HaveOccurred())
-									file, err := os.CreateTemp(buildpackPath, "")
+									file, err := ioutil.TempFile(buildpackPath, "")
 									Expect(err).ToNot(HaveOccurred())
 									defer file.Close()
 								})

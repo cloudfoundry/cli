@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -22,7 +23,7 @@ var _ = Describe("Verbose", func() {
 
 	DescribeTable("displays verbose output to terminal",
 		func(env string, configTrace string, flag bool) {
-			tmpDir, err := os.MkdirTemp("", "")
+			tmpDir, err := ioutil.TempDir("", "")
 			defer os.RemoveAll(tmpDir)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -88,7 +89,7 @@ var _ = Describe("Verbose", func() {
 
 	DescribeTable("displays verbose output to multiple files",
 		func(env string, configTrace string, flag bool, location []string) {
-			tmpDir, err := os.MkdirTemp("", "")
+			tmpDir, err := ioutil.TempDir("", "")
 			defer os.RemoveAll(tmpDir)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -126,7 +127,7 @@ var _ = Describe("Verbose", func() {
 			Eventually(session).Should(Exit(1))
 
 			for _, filePath := range location {
-				contents, err := os.ReadFile(tmpDir + filePath)
+				contents, err := ioutil.ReadFile(tmpDir + filePath)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(string(contents)).To(MatchRegexp("REQUEST:"))
@@ -179,7 +180,7 @@ var _ = Describe("Verbose", func() {
 
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -238,7 +239,7 @@ var _ = Describe("Verbose", func() {
 
 		DescribeTable("displays verbose output to multiple files",
 			func(env string, configTrace string, location []string) {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -272,7 +273,7 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Exit())
 
 				for _, filePath := range location {
-					contents, err := os.ReadFile(tmpDir + filePath)
+					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
@@ -312,7 +313,7 @@ var _ = Describe("Verbose", func() {
 	Describe("uaa", func() {
 		When("the user does not provide the -v flag, the CF_TRACE env var, or the --trace config option", func() {
 			It("should not log requests", func() {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -331,7 +332,7 @@ var _ = Describe("Verbose", func() {
 
 		When("the user provides the -v flag", func() {
 			It("should log requests and redact cookies", func() {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -350,7 +351,7 @@ var _ = Describe("Verbose", func() {
 	Describe("ssh", func() {
 		When("the user is not in verbose mode", func() {
 			It("should not log requests", func() {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -367,7 +368,7 @@ var _ = Describe("Verbose", func() {
 
 		When("the user is in verbose mode", func() {
 			It("should redact their one time ssh code", func() {
-				tmpDir, err := os.MkdirTemp("", "")
+				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 

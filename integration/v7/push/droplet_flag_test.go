@@ -2,6 +2,7 @@ package push
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -23,7 +24,7 @@ var _ = Describe("--droplet flag", func() {
 			appName = helpers.NewAppName()
 
 			helpers.WithHelloWorldApp(func(appDir string) {
-				tmpfile, err := os.CreateTemp("", "dropletFile*.tgz")
+				tmpfile, err := ioutil.TempFile("", "dropletFile*.tgz")
 				Expect(err).ToNot(HaveOccurred())
 				dropletPath = tmpfile.Name()
 				Expect(tmpfile.Close()).ToNot(HaveOccurred())
@@ -76,7 +77,7 @@ var _ = Describe("--droplet flag", func() {
 
 		When("the droplet bits path is not a gzipped tarball", func() {
 			It("fails with a helpful error message", func() {
-				nonTgzFile, err := os.CreateTemp("", "dropletFile*.txt")
+				nonTgzFile, err := ioutil.TempFile("", "dropletFile*.txt")
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CF(PushCommandName, appName, "--droplet", nonTgzFile.Name())
 				Eventually(session).Should(Say(`FAILED`))

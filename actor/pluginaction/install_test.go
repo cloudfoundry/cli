@@ -2,6 +2,7 @@ package pluginaction_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -31,7 +32,7 @@ var _ = Describe("install actions", func() {
 		actor = NewActor(fakeConfig, fakeClient)
 
 		var err error
-		tempPluginDir, err = os.MkdirTemp("", "")
+		tempPluginDir, err = ioutil.TempDir("", "")
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -45,7 +46,7 @@ var _ = Describe("install actions", func() {
 			var pluginPath string
 
 			BeforeEach(func() {
-				tempFile, err := os.CreateTemp("", "")
+				tempFile, err := ioutil.TempFile("", "")
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = tempFile.WriteString("cthulhu")
@@ -65,7 +66,7 @@ var _ = Describe("install actions", func() {
 				copyPath, err := actor.CreateExecutableCopy(pluginPath, tempPluginDir)
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := os.ReadFile(copyPath)
+				contents, err := ioutil.ReadFile(copyPath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(contents).To(BeEquivalentTo("cthulhu"))
 			})
@@ -100,14 +101,14 @@ var _ = Describe("install actions", func() {
 			BeforeEach(func() {
 				data = []byte("some test data")
 				fakeClient.DownloadPluginStub = func(_ string, path string, _ plugin.ProxyReader) error {
-					err := os.WriteFile(path, data, 0700)
+					err := ioutil.WriteFile(path, data, 0700)
 					Expect(err).ToNot(HaveOccurred())
 					return nil
 				}
 			})
 			It("returns the path to the file and the size", func() {
 				Expect(downloadErr).ToNot(HaveOccurred())
-				fileData, err := os.ReadFile(path)
+				fileData, err := ioutil.ReadFile(path)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fileData).To(Equal(data))
 
@@ -138,7 +139,7 @@ var _ = Describe("install actions", func() {
 
 		When("the file exists", func() {
 			BeforeEach(func() {
-				pluginFile, err := os.CreateTemp("", "")
+				pluginFile, err := ioutil.TempFile("", "")
 				Expect(err).NotTo(HaveOccurred())
 				err = pluginFile.Close()
 				Expect(err).NotTo(HaveOccurred())
@@ -660,14 +661,14 @@ var _ = Describe("install actions", func() {
 				},
 			}
 
-			pluginFile, err := os.CreateTemp("", "")
+			pluginFile, err := ioutil.TempFile("", "")
 			Expect(err).NotTo(HaveOccurred())
 			err = pluginFile.Close()
 			Expect(err).NotTo(HaveOccurred())
 
 			pluginPath = pluginFile.Name()
 
-			tempDir, err = os.MkdirTemp("", "")
+			tempDir, err = ioutil.TempDir("", "")
 			Expect(err).ToNot(HaveOccurred())
 
 			pluginHomeDir = filepath.Join(tempDir, ".cf", "plugin")

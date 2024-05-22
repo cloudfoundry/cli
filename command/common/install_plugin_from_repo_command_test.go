@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"runtime"
@@ -55,7 +56,7 @@ var _ = Describe("install-plugin command", func() {
 		}
 
 		var err error
-		pluginHome, err = os.MkdirTemp("", "some-pluginhome")
+		pluginHome, err = ioutil.TempDir("", "some-pluginhome")
 		Expect(err).ToNot(HaveOccurred())
 		fakeConfig.PluginHomeReturns(pluginHome)
 		binaryName = helpers.PrefixedRandomName("bin")

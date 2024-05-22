@@ -2,7 +2,7 @@ package download_test
 
 import (
 	"errors"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -39,7 +39,7 @@ var _ = Describe("Downloader", func() {
 			url = "https://some.url"
 
 			var err error
-			tmpDirPath, err = os.MkdirTemp("", "bpdir-")
+			tmpDirPath, err = ioutil.TempDir("", "bpdir-")
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -57,7 +57,7 @@ var _ = Describe("Downloader", func() {
 			BeforeEach(func() {
 				responseBody = "some response body"
 				response := &http.Response{
-					Body:          io.NopCloser(strings.NewReader(responseBody)),
+					Body:          ioutil.NopCloser(strings.NewReader(responseBody)),
 					ContentLength: int64(len(responseBody)),
 					StatusCode:    http.StatusOK,
 				}
@@ -67,7 +67,7 @@ var _ = Describe("Downloader", func() {
 			It("returns correct path to the downloaded file", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				raw, err := os.ReadFile(file)
+				raw, err := ioutil.ReadFile(file)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(raw)).To(Equal(responseBody))
 			})
@@ -96,7 +96,7 @@ var _ = Describe("Downloader", func() {
 			BeforeEach(func() {
 				responseBody = "not found"
 				response := &http.Response{
-					Body:       io.NopCloser(strings.NewReader(responseBody)),
+					Body:       ioutil.NopCloser(strings.NewReader(responseBody)),
 					StatusCode: http.StatusNotFound,
 					Status:     "404 Not Found",
 				}

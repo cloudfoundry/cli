@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -73,7 +73,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})
@@ -147,7 +147,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})
@@ -194,7 +194,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})
@@ -312,7 +312,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})
@@ -353,7 +353,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})
@@ -394,7 +394,7 @@ var _ = Describe("copy-source command", func() {
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(body)).To(MatchRegexp("hello world"))
 		})

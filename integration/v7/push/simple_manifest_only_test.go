@@ -1,12 +1,13 @@
 package push
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
-	. "github.com/onsi/ginkgo/v2"
+  . "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -109,7 +110,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -167,7 +168,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -215,7 +216,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -266,7 +267,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -310,7 +311,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -351,7 +352,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = filepath.Join(tempDir, "manifest.yml")
 			helpers.WriteManifest(pathToManifest, map[string]interface{}{

@@ -2,13 +2,9 @@ package plugin
 
 import plugin_models "code.cloudfoundry.org/cli/plugin/models"
 
-/*
-*
-
+/**
 	Command interface needs to be implemented for a runnable plugin of `cf`
-
-*
-*/
+**/
 type Plugin interface {
 	Run(cliConnection CliConnection, args []string)
 	GetMetadata() PluginMetadata

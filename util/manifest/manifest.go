@@ -1,7 +1,7 @@
 package manifest
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -59,7 +59,7 @@ func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string
 // interpolates variables if a vars file is provided, and returns the
 // Unmarshalled result.
 func ReadAndInterpolateRawManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error) {
-	rawManifest, err := os.ReadFile(pathToManifest)
+	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func ReadAndInterpolateRawManifest(pathToManifest string, pathsToVarsFiles []str
 	fileVars := template.StaticVariables{}
 
 	for _, path := range pathsToVarsFiles {
-		rawVarsFile, ioerr := os.ReadFile(path)
+		rawVarsFile, ioerr := ioutil.ReadFile(path)
 		if ioerr != nil {
 			return nil, ioerr
 		}
@@ -105,7 +105,7 @@ func WriteApplicationManifest(application Application, filePath string) error {
 		return ManifestCreationError{Err: err}
 	}
 
-	err = os.WriteFile(filePath, manifestBytes, 0644)
+	err = ioutil.WriteFile(filePath, manifestBytes, 0644)
 	if err != nil {
 		return ManifestCreationError{Err: err}
 	}

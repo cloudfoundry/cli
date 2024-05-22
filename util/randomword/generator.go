@@ -193,36 +193,35 @@ wolverine
 wombat
 zebra`
 
-type Generator struct {
-	r *rand.Rand
-}
+type Generator struct{}
 
 func NewGenerator() Generator {
-	return Generator{r: rand.New(rand.NewSource(time.Now().UnixNano()))}
+	rand.Seed(time.Now().UnixNano())
+	return Generator{}
 }
 
 func (gen Generator) Babble() string {
 	return fmt.Sprintf("%s-%s-%s", gen.RandomAdjective(), gen.RandomNoun(), gen.RandomTwoLetters())
 }
 
-func (gen Generator) RandomAdjective() string {
-	return randomElement(gen.r, adjectives)
+func (Generator) RandomAdjective() string {
+	return randomElement(adjectives)
 }
 
-func (gen Generator) RandomNoun() string {
-	return randomElement(gen.r, nouns)
+func (Generator) RandomNoun() string {
+	return randomElement(nouns)
 }
 
-func (gen Generator) RandomTwoLetters() string {
+func (Generator) RandomTwoLetters() string {
 	var asciiLetterA = 97
-	letterOne := string(rune(gen.r.Intn(26) + asciiLetterA))
-	letterTwo := string(rune(gen.r.Intn(26) + asciiLetterA))
+	letterOne := string(rune(rand.Intn(26) + asciiLetterA))
+	letterTwo := string(rune(rand.Intn(26) + asciiLetterA))
 	return letterOne + letterTwo
 }
 
-func randomElement(r *rand.Rand, fullList string) string {
+func randomElement(fullList string) string {
 	wordList := strings.Split(fullList, "\n")
-	randomWordIndex := r.Int() % len(wordList)
+	randomWordIndex := rand.Int() % len(wordList)
 
 	return wordList[randomWordIndex]
 }

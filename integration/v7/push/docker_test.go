@@ -1,7 +1,7 @@
 package push
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -20,7 +20,7 @@ var _ = Describe("pushing docker images", func() {
 	BeforeEach(func() {
 		appName = helpers.PrefixedRandomName("app")
 		var err error
-		tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+		tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 		Expect(err).ToNot(HaveOccurred())
 	})
 

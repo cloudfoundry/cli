@@ -52,6 +52,8 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("Unbinding in progress. Use 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.names())
 		return nil
 	}
+
+	return nil
 }
 
 func (cmd UnbindServiceCommand) Usage() string {

@@ -348,7 +348,7 @@ var _ = Describe("service command", func() {
 					ServiceBrokerName: serviceBrokerName,
 					SharedStatus: v7action.SharedStatus{
 						IsSharedToOtherSpaces: true,
-						UsageSummary:          []v7action.UsageSummaryWithSpaceAndOrg{{SpaceName: "shared-to-space", OrganizationName: "some-org", BoundAppCount: 3}},
+						UsageSummary:          []v7action.UsageSummaryWithSpaceAndOrg{{"shared-to-space", "some-org", 3}},
 					},
 				},
 				v7action.Warnings{"warning one", "warning two"},

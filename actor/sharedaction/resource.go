@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -213,7 +214,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 // filemode for user is forced to be readable and executable.
 func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude []Resource) (string, error) {
 	log.WithField("sourceArchive", sourceArchivePath).Info("zipping source files from archive")
-	zipFile, err := os.CreateTemp("", "cf-cli-")
+	zipFile, err := ioutil.TempFile("", "cf-cli-")
 	if err != nil {
 		return "", err
 	}
@@ -273,7 +274,7 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 // filemode for user is forced to be readable and executable.
 func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Resource) (string, error) {
 	log.WithField("sourceDir", sourceDir).Info("zipping source files from directory")
-	zipFile, err := os.CreateTemp("", "cf-cli-")
+	zipFile, err := ioutil.TempFile("", "cf-cli-")
 	if err != nil {
 		return "", err
 	}
@@ -433,7 +434,7 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 			}
 			defer fileReader.Close()
 
-			raw, err := io.ReadAll(fileReader)
+			raw, err := ioutil.ReadAll(fileReader)
 			if err != nil {
 				return nil, err
 			}

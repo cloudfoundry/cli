@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -103,7 +104,7 @@ func (pluginRepoServer *PluginRepositoryServerWithPlugin) Init(pluginType string
 	jsonBytes, err := json.Marshal(pluginRepo)
 	Expect(err).ToNot(HaveOccurred())
 
-	pluginData, err := os.ReadFile(pluginPath)
+	pluginData, err := ioutil.ReadFile(pluginPath)
 	Expect(err).ToNot(HaveOccurred())
 
 	repoServer.AppendHandlers(

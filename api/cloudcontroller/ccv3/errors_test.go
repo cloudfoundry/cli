@@ -526,7 +526,7 @@ var _ = Describe("Error Wrapper", func() {
 								Message: "A service instance called foo has already been shared with foo-space.",
 							}))
 						})
-					})
+					})					
 
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {

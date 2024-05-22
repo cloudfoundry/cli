@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -192,7 +193,7 @@ var _ = Describe("Security Group Actions", func() {
 					},
 				},
 			}
-			tempFile, executeErr = os.CreateTemp("", "")
+			tempFile, executeErr = ioutil.TempFile("", "")
 			Expect(executeErr).ToNot(HaveOccurred())
 			filePath = tempFile.Name()
 
@@ -1145,7 +1146,7 @@ var _ = Describe("Security Group Actions", func() {
       "destination": "10.10.10.0/24"
     }
 ]`)
-			tempFile, executeErr = os.CreateTemp("", "")
+			tempFile, executeErr = ioutil.TempFile("", "")
 			Expect(executeErr).ToNot(HaveOccurred())
 			filePath = tempFile.Name()
 

@@ -214,10 +214,10 @@ func (cmd HelpCommand) displayCommonCommands() {
 func (cmd HelpCommand) displayCommand() error {
 	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
-		if err1, ok := err.(actionerror.InvalidCommandError); ok {
+		if err, ok := err.(actionerror.InvalidCommandError); ok {
 			var found bool
 			if cmdInfo, found = cmd.findPlugin(); !found {
-				return err1
+				return err
 			}
 		} else {
 			return err

@@ -109,11 +109,7 @@ func (client Client) getJtiFromToken(token string) (string, error) {
 	}
 
 	payload := make(map[string]interface{})
-	err = json.Unmarshal(jsonPayload, &payload)
-	if err != nil {
-		return "", err
-	}
-
+	json.Unmarshal(jsonPayload, &payload)
 	jti, ok := payload["jti"].(string)
 
 	if !ok {

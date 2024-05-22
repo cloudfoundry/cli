@@ -1,8 +1,8 @@
 package v7
 
 import (
+	"io/ioutil"
 	"net/http/httputil"
-	"os"
 
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -48,7 +48,7 @@ func (cmd CurlCommand) Execute(args []string) error {
 	bytesToWrite = append(bytesToWrite, responseBodyBytes...)
 
 	if cmd.OutputFile != "" {
-		err = os.WriteFile(cmd.OutputFile.String(), bytesToWrite, 0666)
+		err = ioutil.WriteFile(cmd.OutputFile.String(), bytesToWrite, 0666)
 		if err != nil {
 			return translatableerror.FileCreationError{Err: err}
 		}

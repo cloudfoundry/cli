@@ -9,10 +9,10 @@ import (
 // matching against paths.
 //
 // Glob notation:
-//   - `?` matches a single char in a single path component
-//   - `*` matches zero or more chars in a single path component
-//   - `**` matches zero or more chars in zero or more components
-//   - any other sequence matches itself
+//  - `?` matches a single char in a single path component
+//  - `*` matches zero or more chars in a single path component
+//  - `**` matches zero or more chars in zero or more components
+//  - any other sequence matches itself
 type Glob struct {
 	pattern string         // original glob pattern
 	regexp  *regexp.Regexp // compiled regexp
@@ -27,9 +27,9 @@ func mustBuildRe(p string) *regexp.Regexp {
 var globRe = mustBuildRe(`(` + charPat + `|[\*\?])`)
 
 // Supports unix/ruby-style glob patterns:
-//   - `?` matches a single char in a single path component
-//   - `*` matches zero or more chars in a single path component
-//   - `**` matches zero or more chars in zero or more components
+//  - `?` matches a single char in a single path component
+//  - `*` matches zero or more chars in a single path component
+//  - `**` matches zero or more chars in zero or more components
 func translateGlob(pat string) (string, error) {
 	if !globRe.MatchString(pat) {
 		return "", Error(pat)

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +18,7 @@ func ConvertPathToRegularExpression(path string) string {
 // TempFileWithContent writes a temp file with given content and return the
 // file name.
 func TempFileWithContent(contents string) string {
-	tempFile, err := os.CreateTemp("", "*")
+	tempFile, err := ioutil.TempFile("", "*")
 	Expect(err).NotTo(HaveOccurred())
 	defer tempFile.Close()
 
@@ -28,10 +29,10 @@ func TempFileWithContent(contents string) string {
 	return tempFile.Name()
 }
 
-// TempDirAbsolutePath wraps `os.MkdirTemp`, ensuring symlinks are expanded
+// TempDirAbsolutePath wraps `ioutil.TempDir`, ensuring symlinks are expanded
 // before returning the path
 func TempDirAbsolutePath(dir string, prefix string) string {
-	tempDir, err := os.MkdirTemp(dir, prefix)
+	tempDir, err := ioutil.TempDir(dir, prefix)
 	Expect(err).NotTo(HaveOccurred())
 
 	tempDir, err = filepath.EvalSymlinks(tempDir)
@@ -40,7 +41,7 @@ func TempDirAbsolutePath(dir string, prefix string) string {
 	return tempDir
 }
 
-// TempFileAbsolutePath wraps `os.CreateTemp`, ensuring symlinks are expanded
+// TempFileAbsolutePath wraps `ioutil.TempFile`, ensuring symlinks are expanded
 // before returning the path
 func TempFileAbsolutePath(dir string, pattern string) *os.File {
 	var (
@@ -55,7 +56,7 @@ func TempFileAbsolutePath(dir string, pattern string) *os.File {
 		absoluteDir, err = filepath.EvalSymlinks(dir)
 		Expect(err).NotTo(HaveOccurred())
 	}
-	tempFile, err := os.CreateTemp(absoluteDir, pattern)
+	tempFile, err := ioutil.TempFile(absoluteDir, pattern)
 	Expect(err).NotTo(HaveOccurred())
 
 	return tempFile

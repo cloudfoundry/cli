@@ -2,11 +2,12 @@ package plugin_test
 
 import (
 	"path/filepath"
-	"testing"
 
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"testing"
 )
 
 func TestPlugin(t *testing.T) {

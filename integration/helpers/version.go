@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -56,7 +56,7 @@ func IsUAAVersionAtLeast(minVersion string) bool {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		bodyBytes, err2 := io.ReadAll(resp.Body)
+		bodyBytes, err2 := ioutil.ReadAll(resp.Body)
 		Expect(err2).ToNot(HaveOccurred())
 
 		version := &UAAVersion{}

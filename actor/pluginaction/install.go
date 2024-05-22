@@ -1,6 +1,7 @@
 package pluginaction
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -188,7 +189,7 @@ func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) er
 }
 
 func makeTempFile(tempDir string) (*os.File, error) {
-	tempFile, err := os.CreateTemp(tempDir, "")
+	tempFile, err := ioutil.TempFile(tempDir, "")
 	if err != nil {
 		return nil, err
 	}

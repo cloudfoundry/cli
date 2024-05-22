@@ -219,8 +219,7 @@ var _ = Describe("unshare-service command", func() {
 
 		When("getting the username fails", func() {
 			BeforeEach(func() {
-				_, err := input.Write([]byte("y\n"))
-				Expect(err).NotTo(HaveOccurred())
+				input.Write([]byte("y\n"))
 				fakeActor.GetCurrentUserReturns(configv3.User{}, errors.New("boom"))
 			})
 

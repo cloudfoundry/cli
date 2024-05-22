@@ -2,6 +2,7 @@ package v7pushaction_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -125,7 +126,7 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 			var archivePath string
 
 			BeforeEach(func() {
-				archive, err := os.CreateTemp("", "push-plan-archive")
+				archive, err := ioutil.TempFile("", "push-plan-archive")
 				Expect(err).ToNot(HaveOccurred())
 				defer archive.Close()
 

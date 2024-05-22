@@ -141,9 +141,11 @@ integration-tests-full-ci: install-test-deps integration-cleanup
 		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
 	$(ginkgo_int) -flake-attempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
-lint: format ## Runs all linters and formatters
+lint: ## Runs all linters and formatters
 	@echo "Running linters..."
-	golangci-lint run --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+	go list -f "{{.Dir}}" ./... \
+		| grep -v -e "/cf/" -e "/fixtures/" -e "/assets/" -e "/plugin/" -e "/command/plugin" -e "fakes" \
+		| xargs golangci-lint run
 	@echo "No lint errors!"
 
 # TODO: version specific tagging for all these builds

@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -39,10 +40,10 @@ func WithHelloWorldApp(f func(dir string)) {
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -56,18 +57,18 @@ func WithMultiEndpointApp(f func(dir string)) {
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	tempfile = filepath.Join(dir, "other_endpoint.html")
-	err = os.WriteFile(tempfile, []byte("other endpoint"), 0666)
+	err = ioutil.WriteFile(tempfile, []byte("other endpoint"), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	tempfile = filepath.Join(dir, "third_endpoint.html")
-	err = os.WriteFile(tempfile, []byte("third endpoint"), 0666)
+	err = ioutil.WriteFile(tempfile, []byte("third endpoint"), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -75,7 +76,7 @@ func WithMultiEndpointApp(f func(dir string)) {
 
 func WithSidecarApp(f func(dir string), appName string) {
 	withSidecarManifest := func(dir string) {
-		err := os.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
+		err := ioutil.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
 applications:
   - name: %s
     sidecars:
@@ -93,7 +94,7 @@ applications:
 
 func WithTaskApp(f func(dir string), appName string) {
 	withTaskManifest := func(dir string) {
-		err := os.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
+		err := ioutil.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
 applications:
 - name: %s
   processes:
@@ -118,7 +119,7 @@ func WithNoResourceMatchedApp(f func(dir string)) {
 
 	tempfile := filepath.Join(dir, "index.html")
 
-	err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024))), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024))), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -135,7 +136,7 @@ func WithProcfileApp(f func(dir string)) {
 	dir := TempDirAbsolutePath("", "simple-ruby-app")
 	defer os.RemoveAll(dir)
 
-	err := os.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
+	err := ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
 web: ruby -run -e httpd . -p $PORT
 console: bundle exec irb`,
 	), 0666)
@@ -143,14 +144,14 @@ console: bundle exec irb`,
 
 	//TODO: Remove the ruby version once bundler issue(https://github.com/rubygems/rubygems/issues/6280)
 	// is solved
-	err = os.WriteFile(filepath.Join(dir, "Gemfile"), []byte(`source 'http://rubygems.org'
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), []byte(`source 'http://rubygems.org'
 ruby '~> 3.0'
 gem 'irb'
 gem 'webrick'`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
 GEM
   remote: http://rubygems.org/
   specs:
@@ -180,15 +181,15 @@ func WithCrashingApp(f func(dir string)) {
 	dir := TempDirAbsolutePath("", "crashing-ruby-app")
 	defer os.RemoveAll(dir)
 
-	err := os.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
+	err := ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
 web: bogus bogus`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Gemfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
 GEM
   specs:
 
@@ -214,10 +215,10 @@ func WithBananaPantsApp(f func(dir string)) {
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err := os.WriteFile(tempfile, []byte("Banana Pants"), 0666)
+	err := ioutil.WriteFile(tempfile, []byte("Banana Pants"), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -228,10 +229,10 @@ func WithEmptyFilesApp(f func(dir string)) {
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err := os.WriteFile(tempfile, nil, 0666)
+	err := ioutil.WriteFile(tempfile, nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = os.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -256,12 +257,12 @@ func AppJSON(appName string) string {
 func WriteManifest(path string, manifest map[string]interface{}) {
 	body, err := yaml.Marshal(manifest)
 	Expect(err).ToNot(HaveOccurred())
-	err = os.WriteFile(path, body, 0666)
+	err = ioutil.WriteFile(path, body, 0666)
 	Expect(err).ToNot(HaveOccurred())
 }
 
 func ReadManifest(path string) map[string]interface{} {
-	manifestBytes, err := os.ReadFile(path)
+	manifestBytes, err := ioutil.ReadFile(path)
 	Expect(err).ToNot(HaveOccurred())
 	var manifest map[string]interface{}
 	err = yaml.Unmarshal(manifestBytes, &manifest)

@@ -64,7 +64,6 @@ func (cmd UnshareRouteCommand) Execute(args []string) error {
 	}
 
 	destinationOrg, warnings, err := cmd.Actor.GetOrganizationByName(destinationOrgName)
-	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
 		if _, ok := err.(actionerror.OrganizationNotFoundError); ok {
@@ -74,7 +73,6 @@ func (cmd UnshareRouteCommand) Execute(args []string) error {
 	}
 
 	targetedSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destinationOrg.GUID)
-	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceNotFoundError); ok {
 			cmd.UI.DisplayText("Can not unshare route:")

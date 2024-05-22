@@ -2,13 +2,14 @@ package global
 
 import (
 	"fmt"
-	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"testing"
 )
 
 const (

@@ -3,12 +3,13 @@ package plugin_test
 import (
 	"bytes"
 	"log"
-	"testing"
 
 	. "code.cloudfoundry.org/cli/api/plugin"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
+
+	"testing"
 )
 
 func TestPlugin(t *testing.T) {

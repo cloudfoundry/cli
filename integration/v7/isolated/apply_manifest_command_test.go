@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -273,7 +274,7 @@ var _ = Describe("apply-manifest command", func() {
 
 			BeforeEach(func() {
 				var err error
-				tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+				tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 				Expect(err).ToNot(HaveOccurred())
 				pathToManifest = filepath.Join(tempDir, "manifest.yml")
 				helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -309,7 +310,7 @@ var _ = Describe("apply-manifest command", func() {
 
 			BeforeEach(func() {
 				var err error
-				tempDir, err = os.MkdirTemp("", "simple-manifest-test")
+				tempDir, err = ioutil.TempDir("", "simple-manifest-test")
 				Expect(err).ToNot(HaveOccurred())
 				pathToManifest = filepath.Join(tempDir, "manifest.yml")
 				helpers.WriteManifest(pathToManifest, map[string]interface{}{

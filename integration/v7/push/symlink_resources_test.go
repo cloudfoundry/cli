@@ -1,6 +1,7 @@
 package push
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -26,7 +27,7 @@ var _ = Describe("push with symlinked resources", func() {
 				It("should push the symlink", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						targetFile := filepath.Join(dir, "targetFile")
-						Expect(os.WriteFile(targetFile, []byte("foo bar baz"), 0777)).ToNot(HaveOccurred())
+						Expect(ioutil.WriteFile(targetFile, []byte("foo bar baz"), 0777)).ToNot(HaveOccurred())
 						relativePath, err := filepath.Rel(dir, targetFile)
 						Expect(err).ToNot(HaveOccurred())
 
@@ -45,7 +46,7 @@ var _ = Describe("push with symlinked resources", func() {
 			When("the file doesn't exists", func() {
 				It("should push the symlink", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
-						tempFile, err := os.CreateTemp(dir, "tempFile")
+						tempFile, err := ioutil.TempFile(dir, "tempFile")
 						Expect(err).ToNot(HaveOccurred())
 						tempFile.Close()
 						relativePath, err := filepath.Rel(dir, tempFile.Name())
@@ -68,7 +69,7 @@ var _ = Describe("push with symlinked resources", func() {
 		When("the directory contains a symlink to subdirectory in the directory", func() {
 			It("should push the symlink", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
-					targetDir, err := os.MkdirTemp(dir, "target-dir")
+					targetDir, err := ioutil.TempDir(dir, "target-dir")
 					Expect(err).ToNot(HaveOccurred())
 					relativePath, err := filepath.Rel(dir, targetDir)
 					Expect(err).ToNot(HaveOccurred())
@@ -98,13 +99,13 @@ var _ = Describe("push with symlinked resources", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						tmpfile, err := os.CreateTemp("", "push-archive-integration")
+						tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 						Expect(err).ToNot(HaveOccurred())
 						archive = tmpfile.Name()
 						Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 						targetFile := filepath.Join(appDir, "targetFile")
-						Expect(os.WriteFile(targetFile, []byte("some random data"), 0777)).ToNot(HaveOccurred())
+						Expect(ioutil.WriteFile(targetFile, []byte("some random data"), 0777)).ToNot(HaveOccurred())
 						relativePath, err := filepath.Rel(appDir, targetFile)
 						Expect(err).ToNot(HaveOccurred())
 

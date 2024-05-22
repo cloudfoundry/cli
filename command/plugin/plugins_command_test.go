@@ -1,6 +1,7 @@
 package plugin_test
 
 import (
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -137,11 +138,11 @@ var _ = Describe("plugins Command", func() {
 				cmd.Checksum = true
 
 				var err error
-				file, err = os.CreateTemp("", "")
+				file, err = ioutil.TempFile("", "")
 				Expect(err).NotTo(HaveOccurred())
 				defer file.Close()
 
-				err = os.WriteFile(file.Name(), []byte("some-text"), 0600)
+				err = ioutil.WriteFile(file.Name(), []byte("some-text"), 0600)
 				Expect(err).NotTo(HaveOccurred())
 
 				plugins[0].Location = file.Name()

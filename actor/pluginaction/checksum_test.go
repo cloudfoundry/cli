@@ -1,6 +1,7 @@
 package pluginaction_test
 
 import (
+	"io/ioutil"
 	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
@@ -24,11 +25,11 @@ var _ = Describe("Checksums", func() {
 		var file *os.File
 		BeforeEach(func() {
 			var err error
-			file, err = os.CreateTemp("", "")
+			file, err = ioutil.TempFile("", "")
 			Expect(err).NotTo(HaveOccurred())
 			defer file.Close()
 
-			err = os.WriteFile(file.Name(), []byte("foo"), 0600)
+			err = ioutil.WriteFile(file.Name(), []byte("foo"), 0600)
 			Expect(err).NotTo(HaveOccurred())
 		})
 

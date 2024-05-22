@@ -1,6 +1,7 @@
 package push
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -35,35 +36,35 @@ var _ = Describe("push with .cfignore", func() {
 			It("pushes all the files except .cfignore", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					file1 := filepath.Join(appDir, "file1")
-					err := os.WriteFile(file1, nil, 0666)
+					err := ioutil.WriteFile(file1, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					file2 := filepath.Join(appDir, "file2")
-					err = os.WriteFile(file2, nil, 0666)
+					err = ioutil.WriteFile(file2, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
-					err = os.WriteFile(cfIgnoreFilePath, nil, 0666)
+					err = ioutil.WriteFile(cfIgnoreFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					darcsFile := filepath.Join(appDir, "_darcs")
-					err = os.WriteFile(darcsFile, nil, 0666)
+					err = ioutil.WriteFile(darcsFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					dsFile := filepath.Join(appDir, ".DS_Store")
-					err = os.WriteFile(dsFile, nil, 0666)
+					err = ioutil.WriteFile(dsFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					gitFile := filepath.Join(appDir, ".git")
-					err = os.WriteFile(gitFile, nil, 0666)
+					err = ioutil.WriteFile(gitFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					gitIgnoreFile := filepath.Join(appDir, ".gitignore")
-					err = os.WriteFile(gitIgnoreFile, nil, 0666)
+					err = ioutil.WriteFile(gitIgnoreFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					hgFile := filepath.Join(appDir, ".hg")
-					err = os.WriteFile(hgFile, nil, 0666)
+					err = ioutil.WriteFile(hgFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					manifestFile := filepath.Join(appDir, "manifest.yml")
@@ -77,7 +78,7 @@ var _ = Describe("push with .cfignore", func() {
 					)
 
 					svnFile := filepath.Join(appDir, ".svn")
-					err = os.WriteFile(svnFile, nil, 0666)
+					err = ioutil.WriteFile(svnFile, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)
@@ -93,15 +94,15 @@ var _ = Describe("push with .cfignore", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						file1 := filepath.Join(appDir, "file1")
-						err := os.WriteFile(file1, nil, 0666)
+						err := ioutil.WriteFile(file1, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						file2 := filepath.Join(appDir, "file2")
-						err = os.WriteFile(file2, nil, 0666)
+						err = ioutil.WriteFile(file2, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
-						err = os.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)
@@ -116,15 +117,15 @@ var _ = Describe("push with .cfignore", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						file1 := filepath.Join(appDir, "file1")
-						err := os.WriteFile(file1, nil, 0666)
+						err := ioutil.WriteFile(file1, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						file2 := filepath.Join(appDir, "file2")
-						err = os.WriteFile(file2, nil, 0666)
+						err = ioutil.WriteFile(file2, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
-						err = os.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CF("push", appName, "-p", appDir)
@@ -140,18 +141,18 @@ var _ = Describe("push with .cfignore", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						file1 := filepath.Join(appDir, "file1")
-						err := os.WriteFile(file1, nil, 0666)
+						err := ioutil.WriteFile(file1, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						file2 := filepath.Join(appDir, "file2")
-						err = os.WriteFile(file2, nil, 0666)
+						err = ioutil.WriteFile(file2, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
-						err = os.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
-						tmpfile, err := os.CreateTemp("", "push-archive-integration")
+						tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 						Expect(err).ToNot(HaveOccurred())
 						archive = tmpfile.Name()
 						Expect(tmpfile.Close())
@@ -185,7 +186,7 @@ var _ = Describe("push with .cfignore", func() {
 			It("does not push it", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					traceFilePath := filepath.Join(appDir, "i-am-trace.txt")
-					err := os.WriteFile(traceFilePath, nil, 0666)
+					err := ioutil.WriteFile(traceFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					previousEnv = os.Getenv("CF_TRACE")
@@ -204,31 +205,31 @@ var _ = Describe("push with .cfignore", func() {
 		It("pushes all the files except for the files ignored by default", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				file1 := filepath.Join(appDir, "file1")
-				err := os.WriteFile(file1, nil, 0666)
+				err := ioutil.WriteFile(file1, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				file2 := filepath.Join(appDir, "file2")
-				err = os.WriteFile(file2, nil, 0666)
+				err = ioutil.WriteFile(file2, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				darcsFile := filepath.Join(appDir, "_darcs")
-				err = os.WriteFile(darcsFile, nil, 0666)
+				err = ioutil.WriteFile(darcsFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				dsFile := filepath.Join(appDir, ".DS_Store")
-				err = os.WriteFile(dsFile, nil, 0666)
+				err = ioutil.WriteFile(dsFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				gitFile := filepath.Join(appDir, ".git")
-				err = os.WriteFile(gitFile, nil, 0666)
+				err = ioutil.WriteFile(gitFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				gitIgnoreFile := filepath.Join(appDir, ".gitignore")
-				err = os.WriteFile(gitIgnoreFile, nil, 0666)
+				err = ioutil.WriteFile(gitIgnoreFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				hgFile := filepath.Join(appDir, ".hg")
-				err = os.WriteFile(hgFile, nil, 0666)
+				err = ioutil.WriteFile(hgFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				manifestFile := filepath.Join(appDir, "manifest.yml")
@@ -242,7 +243,7 @@ var _ = Describe("push with .cfignore", func() {
 				)
 
 				svnFile := filepath.Join(appDir, ".svn")
-				err = os.WriteFile(svnFile, nil, 0666)
+				err = ioutil.WriteFile(svnFile, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)

@@ -2,7 +2,7 @@ package wrapper_test
 
 import (
 	"errors"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -181,7 +181,7 @@ var _ = Describe("UAA Authentication", func() {
 				body := strings.NewReader(expectedBody)
 				request = cloudcontroller.NewRequest(&http.Request{
 					Header: http.Header{},
-					Body:   io.NopCloser(body),
+					Body:   ioutil.NopCloser(body),
 				}, body)
 
 				inMemoryCache.SetAccessToken(invalidAccessToken)

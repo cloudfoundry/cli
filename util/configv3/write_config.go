@@ -2,6 +2,7 @@ package configv3
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,7 +31,7 @@ func (c *Config) WriteConfig() error {
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
 	defer signal.Stop(sig)
 
-	tempConfigFile, err := os.CreateTemp(dir, "temp-config")
+	tempConfigFile, err := ioutil.TempFile(dir, "temp-config")
 	if err != nil {
 		return err
 	}
@@ -39,7 +40,7 @@ func (c *Config) WriteConfig() error {
 
 	go catchSignal(sig, tempConfigFileName)
 
-	err = os.WriteFile(tempConfigFileName, rawConfig, 0600)
+	err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
 	if err != nil {
 		return err
 	}

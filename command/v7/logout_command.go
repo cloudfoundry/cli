@@ -38,7 +38,7 @@ func (cmd LogoutCommand) Execute(args []string) error {
 			"Username": user.Name,
 		})
 
-	cmd.Actor.RevokeAccessAndRefreshTokens() //nolint:errcheck
+	cmd.Actor.RevokeAccessAndRefreshTokens()
 	cmd.Config.UnsetUserInformation()
 	cmd.UI.DisplayOK()
 

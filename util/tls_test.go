@@ -66,7 +66,6 @@ RVNEplh5ZEYbbWclddUBf46JPRU/eEu4JMqOJOykTdwbByFa3909Bzs=
 			})
 
 			It("adds them to the trusted CAs", func() {
-				//nolint:staticcheck
 				Expect(tlsConfig.RootCAs.Subjects()).To(ContainElement(ContainSubstring("Cloud Foundry")))
 			})
 		})

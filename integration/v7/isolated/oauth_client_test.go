@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,7 +15,7 @@ import (
 )
 
 func fileAsString(path string) string {
-	configBytes, err := os.ReadFile(path)
+	configBytes, err := ioutil.ReadFile(path)
 	Expect(err).ToNot(HaveOccurred())
 
 	return string(configBytes)
@@ -23,7 +24,7 @@ func fileAsString(path string) string {
 func replaceConfig(path string, old string, new string) {
 	r := regexp.MustCompile(old)
 	newConfig := r.ReplaceAllString(fileAsString(path), new)
-	err := os.WriteFile(path, []byte(newConfig), 0600)
+	err := ioutil.WriteFile(path, []byte(newConfig), 0600)
 	Expect(err).ToNot(HaveOccurred())
 }
 

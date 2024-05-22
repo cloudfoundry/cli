@@ -97,11 +97,7 @@ func (actor Actor) isTokenRevocable(token string) bool {
 	}
 
 	payload := make(map[string]interface{})
-	err = json.Unmarshal(jsonPayload, &payload)
-	if err != nil {
-		return false
-	}
-
+	json.Unmarshal(jsonPayload, &payload)
 	revocable, ok := payload["revocable"].(bool)
 
 	if !ok {

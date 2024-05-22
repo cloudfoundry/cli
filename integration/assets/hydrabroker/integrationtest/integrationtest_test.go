@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -56,7 +57,7 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 			Expect(err).NotTo(HaveOccurred())
 			expectStatusCode(response, http.StatusBadRequest)
 
-			b, err := io.ReadAll(response.Body)
+			b, err := ioutil.ReadAll(response.Body)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(b)).To(ContainSubstring("Error:Field validation for 'Username' failed on the 'min' tag"))
 		})
@@ -616,7 +617,7 @@ var _ = Describe("Integration Test For Hydrabroker", func() {
 
 func expectStatusCode(response *http.Response, statusCode int) {
 	ExpectWithOffset(1, response.StatusCode).To(Equal(statusCode), func() string {
-		b, err := io.ReadAll(response.Body)
+		b, err := ioutil.ReadAll(response.Body)
 		if err == nil {
 			response.Body.Close()
 			return "Body: " + string(b)
@@ -669,7 +670,7 @@ func toJSON(input interface{}) io.Reader {
 }
 
 func fromJSON(input io.ReadCloser, output interface{}) {
-	b, err := io.ReadAll(input)
+	b, err := ioutil.ReadAll(input)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = input.Close()

@@ -2,6 +2,7 @@ package common_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -46,7 +47,7 @@ var _ = Describe("install-plugin command", func() {
 		}
 
 		var err error
-		pluginHome, err = os.MkdirTemp("", "some-pluginhome")
+		pluginHome, err = ioutil.TempDir("", "some-pluginhome")
 		Expect(err).NotTo(HaveOccurred())
 
 		fakeConfig.PluginHomeReturns(pluginHome)

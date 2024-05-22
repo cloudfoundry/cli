@@ -3,10 +3,11 @@ package shared
 import (
 	"fmt"
 	"io"
-	netrpc "net/rpc"
 	"os"
 	"os/exec"
 	"time"
+
+	netrpc "net/rpc"
 
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/trace"

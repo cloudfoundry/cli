@@ -2,6 +2,7 @@ package push
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -22,7 +23,7 @@ var _ = Describe("push with health check timeout flag", func() {
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
 		var err error
-		tempDir, err = os.MkdirTemp("", "create-manifest")
+		tempDir, err = ioutil.TempDir("", "create-manifest")
 		Expect(err).ToNot(HaveOccurred())
 
 		manifestFilePath = filepath.Join(tempDir, fmt.Sprintf("%s_manifest.yml", appName))
@@ -56,7 +57,7 @@ var _ = Describe("push with health check timeout flag", func() {
 				"create-app-manifest", appName)
 			Eventually(session).Should(Exit(0))
 
-			createdFile, err := os.ReadFile(manifestFilePath)
+			createdFile, err := ioutil.ReadFile(manifestFilePath)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(createdFile).To(MatchRegexp("---"))

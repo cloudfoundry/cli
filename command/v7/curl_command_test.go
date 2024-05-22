@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -109,7 +110,7 @@ var _ = Describe("curl Command", func() {
 
 	When("an output file is given", func() {
 		BeforeEach(func() {
-			outputFile, err := os.CreateTemp("", "")
+			outputFile, err := ioutil.TempFile("", "")
 			Expect(err).NotTo(HaveOccurred())
 			outputFileName := outputFile.Name()
 			cmd.OutputFile = flag.Path(outputFileName)
@@ -120,7 +121,7 @@ var _ = Describe("curl Command", func() {
 		})
 
 		It("writes the output to the file", func() {
-			fileContents, err := os.ReadFile(string(cmd.OutputFile))
+			fileContents, err := ioutil.ReadFile(string(cmd.OutputFile))
 			Expect(string(fileContents)).To(Equal("sarah, teal, and reid were here"))
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -131,7 +132,7 @@ var _ = Describe("curl Command", func() {
 			})
 
 			It("includes the headers in the output", func() {
-				fileContents, err := os.ReadFile(string(cmd.OutputFile))
+				fileContents, err := ioutil.ReadFile(string(cmd.OutputFile))
 				Expect(string(fileContents)).To(ContainSubstring("X-Name: athleisure"))
 				Expect(string(fileContents)).To(ContainSubstring("sarah, teal, and reid were here"))
 				Expect(err).ToNot(HaveOccurred())

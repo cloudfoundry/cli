@@ -1,6 +1,7 @@
 package common
 
 import (
+	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
@@ -78,7 +79,7 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	log.WithField("PluginHome", cmd.Config.PluginHome()).Info("making plugin dir")
 
 	var tempPluginDir string
-	tempPluginDir, err = os.MkdirTemp(cmd.Config.PluginHome(), "temp")
+	tempPluginDir, err = ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")
 
 	defer func() {

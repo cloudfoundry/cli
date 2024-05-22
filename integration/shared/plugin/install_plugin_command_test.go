@@ -3,6 +3,7 @@ package plugin
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +25,7 @@ var _ = Describe("install-plugin command", func() {
 	)
 
 	AfterEach(func() {
-		pluginsHomeDirContents, err := os.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
+		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
 		if os.IsNotExist(err) {
 			return
 		}
@@ -87,7 +88,7 @@ var _ = Describe("install-plugin command", func() {
 			cfPluginHome = os.Getenv("CF_PLUGIN_HOME")
 
 			var err error
-			newPluginHome, err = os.MkdirTemp("", "plugin-temp-dir")
+			newPluginHome, err = ioutil.TempDir("", "plugin-temp-dir")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(os.RemoveAll(newPluginHome))
 
@@ -230,7 +231,7 @@ var _ = Describe("install-plugin command", func() {
 
 				When("the file is not an executable", func() {
 					BeforeEach(func() {
-						badPlugin, err := os.CreateTemp("", "")
+						badPlugin, err := ioutil.TempFile("", "")
 						Expect(err).ToNot(HaveOccurred())
 						pluginPath = badPlugin.Name()
 						err = badPlugin.Close()
@@ -661,7 +662,7 @@ var _ = Describe("install-plugin command", func() {
 					)
 
 					var err error
-					pluginData, err = os.ReadFile(pluginPath)
+					pluginData, err = ioutil.ReadFile(pluginPath)
 					Expect(err).ToNot(HaveOccurred())
 					server.AppendHandlers(
 						CombineHandlers(
@@ -770,7 +771,7 @@ var _ = Describe("install-plugin command", func() {
 					pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/non_plugin")
 					Expect(err).ToNot(HaveOccurred())
 
-					pluginData, err := os.ReadFile(pluginPath)
+					pluginData, err := ioutil.ReadFile(pluginPath)
 					Expect(err).ToNot(HaveOccurred())
 					server.AppendHandlers(
 						CombineHandlers(
@@ -810,7 +811,7 @@ var _ = Describe("install-plugin command", func() {
 				)
 
 				var err error
-				pluginData, err = os.ReadFile(pluginPath)
+				pluginData, err = ioutil.ReadFile(pluginPath)
 				Expect(err).ToNot(HaveOccurred())
 				server.AppendHandlers(
 					CombineHandlers(

@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"io/ioutil"
 	"os"
 	"time"
 
@@ -95,7 +96,7 @@ func (cmd UpdateBuildpackCommand) validateSetup() (configv3.User, error) {
 
 func (cmd UpdateBuildpackCommand) prepareBuildpackBits() (string, string, error) {
 	downloader := download.NewDownloader(time.Second * 30)
-	tmpDirPath, err := os.MkdirTemp("", "buildpack-dir-")
+	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
 	if err != nil {
 		return "", "", err
 	}

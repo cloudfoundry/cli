@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -497,7 +498,7 @@ var _ = Describe("Package", func() {
 						defer resourcesPart.Close()
 						expectedJSON, err := json.Marshal(inputResources)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(io.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
 						// Verify that the application bits are sent properly
 						resourcesPart, err = requestReader.NextPart()
@@ -507,7 +508,7 @@ var _ = Describe("Package", func() {
 						Expect(resourcesPart.FileName()).To(Equal("package.zip"))
 
 						defer resourcesPart.Close()
-						Expect(io.ReadAll(resourcesPart)).To(Equal(readerBody))
+						Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
 					}
 				})
 
@@ -541,7 +542,7 @@ var _ = Describe("Package", func() {
 						defer resourcesPart.Close()
 						expectedJSON, err := json.Marshal(inputResources)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(io.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
 						// Verify that the application bits are not sent
 						_, err = requestReader.NextPart()
@@ -625,7 +626,7 @@ var _ = Describe("Package", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v3/packages/package-guid/upload") {
-							_, err := io.ReadAll(request.Body)
+							_, err := ioutil.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
@@ -656,7 +657,7 @@ var _ = Describe("Package", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v3/packages/package-guid/upload") {
 							defer request.Body.Close()
-							readBytes, err := io.ReadAll(request.Body)
+							readBytes, err := ioutil.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(len(readBytes)).To(BeNumerically(">", UploadSize))
 							return expectedErr
@@ -700,7 +701,7 @@ var _ = Describe("Package", func() {
 					GUID:  "package-guid",
 				}
 
-				tempFile, err = os.CreateTemp("", "package-upload")
+				tempFile, err = ioutil.TempFile("", "package-upload")
 				Expect(err).ToNot(HaveOccurred())
 				defer tempFile.Close()
 
@@ -708,7 +709,7 @@ var _ = Describe("Package", func() {
 
 				fileSize := 1024
 				contents := strings.Repeat("A", fileSize)
-				err = os.WriteFile(tempFile.Name(), []byte(contents), 0666)
+				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
 				Expect(err).NotTo(HaveOccurred())
 
 				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
@@ -718,7 +719,7 @@ var _ = Describe("Package", func() {
 					boundary := contentType[30:]
 
 					defer req.Body.Close()
-					rawBody, err := io.ReadAll(req.Body)
+					rawBody, err := ioutil.ReadAll(req.Body)
 					Expect(err).NotTo(HaveOccurred())
 					body := BufferWithBytes(rawBody)
 					Expect(body).To(Say("--%s", boundary))
@@ -779,7 +780,7 @@ var _ = Describe("Package", func() {
 					State: constant.PackageAwaitingUpload,
 				}
 
-				tempFile, err = os.CreateTemp("", "package-upload")
+				tempFile, err = ioutil.TempFile("", "package-upload")
 				Expect(err).ToNot(HaveOccurred())
 				defer tempFile.Close()
 
@@ -787,7 +788,7 @@ var _ = Describe("Package", func() {
 
 				fileSize := 1024
 				contents := strings.Repeat("A", fileSize)
-				err = os.WriteFile(tempFile.Name(), []byte(contents), 0666)
+				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
 				Expect(err).NotTo(HaveOccurred())
 
 				response := ` {

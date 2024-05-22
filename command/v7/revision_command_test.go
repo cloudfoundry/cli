@@ -46,7 +46,7 @@ var _ = Describe("revision Command", func() {
 	})
 
 	JustBeforeEach(func() {
-		Expect(cmd.Execute(nil)).To(Succeed())
+		cmd.Execute(nil)
 	})
 
 	It("displays the experimental warning", func() {

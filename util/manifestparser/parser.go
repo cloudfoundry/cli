@@ -2,7 +2,7 @@ package manifestparser
 
 import (
 	"errors"
-	"os"
+	"io/ioutil"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	"gopkg.in/yaml.v2"
@@ -19,7 +19,7 @@ type ManifestParser struct{}
 // applications and leave only a single application in the resulting parsed
 // manifest structure.
 func (m ManifestParser) InterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error) {
-	rawManifest, err := os.ReadFile(pathToManifest)
+	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (m ManifestParser) InterpolateManifest(pathToManifest string, pathsToVarsFi
 	fileVars := template.StaticVariables{}
 
 	for _, path := range pathsToVarsFiles {
-		rawVarsFile, ioerr := os.ReadFile(path)
+		rawVarsFile, ioerr := ioutil.ReadFile(path)
 		if ioerr != nil {
 			return nil, ioerr
 		}

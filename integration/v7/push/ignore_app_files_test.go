@@ -1,7 +1,7 @@
 package push
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -26,15 +26,15 @@ var _ = Describe("ignoring files while gathering resources", func() {
 			It("pushes all the files", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					file1 := filepath.Join(dir, "file1")
-					err := os.WriteFile(file1, nil, 0666)
+					err := ioutil.WriteFile(file1, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					file2 := filepath.Join(dir, "file2")
-					err = os.WriteFile(file2, nil, 0666)
+					err = ioutil.WriteFile(file2, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
-					err = os.WriteFile(cfIgnoreFilePath, nil, 0666)
+					err = ioutil.WriteFile(cfIgnoreFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
@@ -50,15 +50,15 @@ var _ = Describe("ignoring files while gathering resources", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						file1 := filepath.Join(dir, "file1")
-						err := os.WriteFile(file1, nil, 0666)
+						err := ioutil.WriteFile(file1, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						file2 := filepath.Join(dir, "file2")
-						err = os.WriteFile(file2, nil, 0666)
+						err = ioutil.WriteFile(file2, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
-						err = os.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
@@ -73,15 +73,15 @@ var _ = Describe("ignoring files while gathering resources", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						file1 := filepath.Join(dir, "file1")
-						err := os.WriteFile(file1, nil, 0666)
+						err := ioutil.WriteFile(file1, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						file2 := filepath.Join(dir, "file2")
-						err = os.WriteFile(file2, nil, 0666)
+						err = ioutil.WriteFile(file2, nil, 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
-						err = os.WriteFile(cfIgnoreFilePath, []byte("/file*"), 0666)
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("/file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
@@ -98,7 +98,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 		It("does not push it", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				traceFilePath := filepath.Join(dir, "i-am-trace.txt")
-				err := os.WriteFile(traceFilePath, nil, 0666)
+				err := ioutil.WriteFile(traceFilePath, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				session := helpers.DebugCustomCF(helpers.CFEnv{

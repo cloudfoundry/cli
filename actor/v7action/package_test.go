@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -419,7 +420,7 @@ var _ = Describe("Package Actions", func() {
 			When("bits path is a directory", func() {
 				BeforeEach(func() {
 					var err error
-					bitsPath, err = os.MkdirTemp("", "example")
+					bitsPath, err = ioutil.TempDir("", "example")
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -641,7 +642,7 @@ var _ = Describe("Package Actions", func() {
 					oldCurrentDir, err = os.Getwd()
 					Expect(err).NotTo(HaveOccurred())
 
-					appDir, err = os.MkdirTemp("", "example")
+					appDir, err = ioutil.TempDir("", "example")
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(os.Chdir(appDir)).NotTo(HaveOccurred())
@@ -670,12 +671,12 @@ var _ = Describe("Package Actions", func() {
 			When("bits path is an archive", func() {
 				BeforeEach(func() {
 					var err error
-					tempFile, err := os.CreateTemp("", "bits-zip-test")
+					tempFile, err := ioutil.TempFile("", "bits-zip-test")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 					tempFilePath := tempFile.Name()
 
-					bitsPathFile, err := os.CreateTemp("", "example")
+					bitsPathFile, err := ioutil.TempFile("", "example")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(bitsPathFile.Close()).To(Succeed())
 					bitsPath = bitsPathFile.Name()
@@ -744,10 +745,10 @@ var _ = Describe("Package Actions", func() {
 
 				BeforeEach(func() {
 					var err error
-					tempDir, err = os.MkdirTemp("", "example")
+					tempDir, err = ioutil.TempDir("", "example")
 					Expect(err).ToNot(HaveOccurred())
 
-					tempFile, err := os.CreateTemp("", "example-file-")
+					tempFile, err := ioutil.TempFile("", "example-file-")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 
@@ -773,12 +774,12 @@ var _ = Describe("Package Actions", func() {
 
 				BeforeEach(func() {
 					var err error
-					tempArchiveFile, err := os.CreateTemp("", "bits-zip-test")
+					tempArchiveFile, err := ioutil.TempFile("", "bits-zip-test")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempArchiveFile.Close()).To(Succeed())
 					tempArchiveFilePath := tempArchiveFile.Name()
 
-					archivePathFile, err := os.CreateTemp("", "example")
+					archivePathFile, err := ioutil.TempFile("", "example")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(archivePathFile.Close()).To(Succeed())
 					archivePath = archivePathFile.Name()
@@ -787,7 +788,7 @@ var _ = Describe("Package Actions", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(os.Remove(tempArchiveFilePath)).To(Succeed())
 
-					tempFile, err := os.CreateTemp("", "example-file-")
+					tempFile, err := ioutil.TempFile("", "example-file-")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 

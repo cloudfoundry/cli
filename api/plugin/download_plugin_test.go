@@ -2,6 +2,7 @@ package plugin_test
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -23,7 +24,7 @@ var _ = Describe("DownloadPlugin", func() {
 	BeforeEach(func() {
 		client = NewTestClient()
 
-		tempFile, err := os.CreateTemp("", "")
+		tempFile, err := ioutil.TempFile("", "")
 		Expect(err).NotTo(HaveOccurred())
 		tempPath = tempFile.Name()
 
@@ -55,12 +56,12 @@ var _ = Describe("DownloadPlugin", func() {
 			fakeProxyReader := new(pluginfakes.FakeProxyReader)
 
 			fakeProxyReader.WrapStub = func(reader io.Reader) io.ReadCloser {
-				return io.NopCloser(reader)
+				return ioutil.NopCloser(reader)
 			}
 			err := client.DownloadPlugin(server.URL(), tempPath, fakeProxyReader)
 			Expect(err).ToNot(HaveOccurred())
 
-			fileData, err := os.ReadFile(tempPath)
+			fileData, err := ioutil.ReadFile(tempPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fileData).To(Equal(data))
 

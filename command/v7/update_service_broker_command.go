@@ -12,9 +12,7 @@ type UpdateServiceBrokerCommand struct {
 	PositionalArgs  flag.ServiceBrokerArgs `positional-args:"yes"`
 	usage           any                    `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL\n   CF_NAME update-service-broker SERVICE_BROKER USERNAME URL (omit password to specify interactively or via environment variable)\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"`
 	relatedCommands any                    `related_commands:"rename-service-broker, service-brokers"`
-
-	// This field is not used, it is only present to ensure we print the description as part of the usage of the command
-	envPassword any `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"` //nolint:unused
+	envPassword     any                    `environmentName:"CF_BROKER_PASSWORD" environmentDescription:"Password associated with user. Overridden if PASSWORD argument is provided" environmentDefault:"password"`
 }
 
 func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {

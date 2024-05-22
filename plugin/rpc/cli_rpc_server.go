@@ -1,15 +1,8 @@
 package rpc
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"net"
-	"net/rpc"
 	"os"
-	"strconv"
 	"strings"
-	"sync"
 
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -19,6 +12,16 @@ import (
 	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver/v4"
+
+	"fmt"
+	"net"
+	"net/rpc"
+	"strconv"
+
+	"bytes"
+	"io"
+
+	"sync"
 
 	"code.cloudfoundry.org/cli/cf/trace"
 )

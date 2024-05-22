@@ -2,8 +2,6 @@ package helpers
 
 import (
 	"encoding/json"
-
-	. "github.com/onsi/gomega"
 )
 
 func GetsDefaultEnvVarValue(stream []byte) string {
@@ -13,7 +11,7 @@ func GetsDefaultEnvVarValue(stream []byte) string {
 		} `json:"var"`
 	}{}
 
-	Expect(json.Unmarshal(stream, &envVariableJSON)).To(Succeed())
+	json.Unmarshal(stream, &envVariableJSON)
 
 	return envVariableJSON.Var.SomeEnvVar
 }

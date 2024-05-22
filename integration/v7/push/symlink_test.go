@@ -1,6 +1,7 @@
 package push
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -21,7 +22,7 @@ var _ = Describe("push with symlink path", func() {
 		appName = helpers.NewAppName()
 
 		var err error
-		runningDir, err = os.MkdirTemp("", "push-with-symlink")
+		runningDir, err = ioutil.TempDir("", "push-with-symlink")
 		Expect(err).ToNot(HaveOccurred())
 		symlinkedPath = filepath.Join(runningDir, "symlink-dir")
 	})
@@ -62,7 +63,7 @@ var _ = Describe("push with symlink path", func() {
 
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					tmpfile, err := os.CreateTemp("", "push-archive-integration")
+					tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 					Expect(err).ToNot(HaveOccurred())
 					archive = tmpfile.Name()
 					Expect(tmpfile.Close()).ToNot(HaveOccurred())
