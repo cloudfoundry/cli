@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -136,7 +136,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 		actualReq, actualResp := wrappedConnection.MakeArgsForCall(0)
 		Expect(actualResp.HTTPResponse).To(HaveHTTPStatus(http.StatusTeapot))
 
-		body, err := ioutil.ReadAll(actualReq.Body)
+		body, err := io.ReadAll(actualReq.Body)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(body)).To(Equal("hello"))
 
@@ -339,7 +339,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 			})
 
 			It("uses the exec command to generate the Bearer token", func() {
- 				helpers.SkipIfWindows()
+				helpers.SkipIfWindows()
 
 				Expect(makeErr).NotTo(HaveOccurred())
 				Expect(wrappedConnection.MakeCallCount()).To(Equal(1))
@@ -393,7 +393,7 @@ var _ = Describe("KubernetesAuthentication", func() {
 			var tokenFilePath string
 
 			BeforeEach(func() {
-				tokenFile, err := ioutil.TempFile("", "")
+				tokenFile, err := os.CreateTemp("", "")
 				Expect(err).NotTo(HaveOccurred())
 				defer tokenFile.Close()
 				_, err = tokenFile.Write(token)
@@ -443,9 +443,10 @@ func base64Decode(encoded string) string {
 }
 
 func writeToFile(base64Data string) string {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	Expect(err).NotTo(HaveOccurred())
-	file.WriteString(base64Decode(base64Data))
+	_, err = file.WriteString(base64Decode(base64Data))
+	Expect(err).NotTo(HaveOccurred())
 	Expect(file.Close()).To(Succeed())
 	return file.Name()
 }

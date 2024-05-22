@@ -21,7 +21,7 @@ require (
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 	github.com/creack/pty v1.1.21
 	github.com/cyphar/filepath-securejoin v0.2.5
-	github.com/docker/distribution v2.8.3+incompatible
+	github.com/distribution/reference v0.5.0
 	github.com/fatih/color v1.17.0
 	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.5.0
@@ -41,6 +41,7 @@ require (
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.23.0
 	golang.org/x/net v0.25.0
+	golang.org/x/term v0.20.0
 	golang.org/x/text v0.15.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
@@ -57,7 +58,6 @@ require (
 	github.com/cloudfoundry/bosh-utils v0.0.385 // indirect
 	github.com/cppforlife/go-patch v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/distribution/reference v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
@@ -81,7 +81,6 @@ require (
 	golang.org/x/oauth2 v0.17.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.20.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

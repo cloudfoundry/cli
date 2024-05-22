@@ -59,10 +59,10 @@ func CaptureOutput(block func()) []string {
 }
 
 /*
- The reason we're doing is that you can't write an infinite amount of bytes into a pipe.
- On some platforms, the limit is fairly high; on other platforms, the limit is infuriatingly small
- (looking at you, Windows). To counteract this, we need to read in a goroutine from one end of
- the pipe and return the result across a channel.
+The reason we're doing is that you can't write an infinite amount of bytes into a pipe.
+On some platforms, the limit is fairly high; on other platforms, the limit is infuriatingly small
+(looking at you, Windows). To counteract this, we need to read in a goroutine from one end of
+the pipe and return the result across a channel.
 */
 func captureOutputAsynchronously(doneWriting <-chan bool, result chan<- []string, reader io.Reader) {
 	var readingString string

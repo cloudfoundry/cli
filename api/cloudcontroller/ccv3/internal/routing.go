@@ -11,18 +11,22 @@ import (
 
 // Params map path keys to values.  For example, if your route has the path
 // pattern:
-//   /person/:person_id/pets/:pet_type
+//
+//	/person/:person_id/pets/:pet_type
+//
 // Then a correct Params map would look like:
-//   router.Params{
-//     "person_id": "123",
-//     "pet_type": "cats",
-//   }
+//
+//	router.Params{
+//	  "person_id": "123",
+//	  "pet_type": "cats",
+//	}
 type Params map[string]string
 
 // Route defines the property of a Cloud Controller V3 endpoint.
 //
 // Method can be one of the following:
-//  GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE
+//
+//	GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE
 //
 // Path conforms to Pat-style pattern matching. The following docs are taken
 // from http://godoc.org/github.com/bmizerany/pat#PatternServeMux
@@ -35,26 +39,36 @@ type Params map[string]string
 // string.
 //
 // Example pattern with one capture:
-//   /hello/:name
+//
+//	/hello/:name
+//
 // Will match:
-//   /hello/blake
-//   /hello/keith
+//
+//	/hello/blake
+//	/hello/keith
+//
 // Will not match:
-//   /hello/blake/
-//   /hello/blake/foo
-//   /foo
-//   /foo/bar
+//
+//	/hello/blake/
+//	/hello/blake/foo
+//	/foo
+//	/foo/bar
 //
 // Example 2:
-//    /hello/:name/
+//
+//	/hello/:name/
+//
 // Will match:
-//   /hello/blake/
-//   /hello/keith/foo
-//   /hello/blake
-//   /hello/keith
+//
+//	/hello/blake/
+//	/hello/keith/foo
+//	/hello/blake
+//	/hello/keith
+//
 // Will not match:
-//   /foo
-//   /foo/bar
+//
+//	/foo
+//	/foo/bar
 type Route struct {
 	// Method is any valid HTTP method
 	Method string

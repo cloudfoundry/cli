@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
@@ -234,7 +234,7 @@ var _ = Describe("auth command", func() {
 				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
 				Eventually(session).Should(Exit(0))
 
-				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+				rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(string(rawConfig)).ToNot(ContainSubstring(clientSecret))

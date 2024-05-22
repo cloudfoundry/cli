@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -106,7 +105,7 @@ var _ = Describe("api command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+				rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 				Expect(err).NotTo(HaveOccurred())
 
 				var configFile configv3.JSONConfig
@@ -243,7 +242,7 @@ var _ = Describe("api command", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(Exit(0))
 
-			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 
 			var configFile configv3.JSONConfig
@@ -274,7 +273,7 @@ var _ = Describe("api command", func() {
 			session := helpers.CF("api", apiURL)
 			Eventually(session).Should(Exit(0))
 
-			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 
 			var configFile configv3.JSONConfig
@@ -296,7 +295,7 @@ var _ = Describe("api command", func() {
 
 			Eventually(session).Should(Exit(0))
 
-			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 
 			var configFile configv3.JSONConfig
@@ -316,7 +315,7 @@ var _ = Describe("api command", func() {
 		}
 		Eventually(session).Should(Exit(0))
 
-		rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+		rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 		Expect(err).NotTo(HaveOccurred())
 
 		var configFile configv3.JSONConfig

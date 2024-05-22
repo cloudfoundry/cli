@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
-	"errors"
 
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/util"
@@ -74,7 +73,7 @@ func (*PluginConnection) handleStatusCodes(response *http.Response, passedRespon
 func (connection *PluginConnection) populateResponse(response *http.Response, passedResponse *Response, body io.ReadCloser) error {
 	passedResponse.HTTPResponse = response
 
-	rawBytes, err := ioutil.ReadAll(body)
+	rawBytes, err := io.ReadAll(body)
 	defer body.Close()
 	if err != nil {
 		return err

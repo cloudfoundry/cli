@@ -3,7 +3,6 @@ package manifest_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,7 +29,7 @@ var _ = Describe("Manifest", func() {
 		)
 
 		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile("", "manifest-test-")
+			tempFile, err := os.CreateTemp("", "manifest-test-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(tempFile.Close()).ToNot(HaveOccurred())
 			pathToManifest = tempFile.Name()
@@ -108,7 +107,7 @@ applications:
   random-route: true
 `
 
-				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -214,7 +213,7 @@ applications:
 				When("global fields are provided", func() {
 					DescribeTable("raises a GlobalFieldsError",
 						func(manifestProperty string, numberOfValues int) {
-							tempManifest, err := ioutil.TempFile("", "manifest-test-")
+							tempManifest, err := os.CreateTemp("", "manifest-test-")
 							Expect(err).ToNot(HaveOccurred())
 							Expect(tempManifest.Close()).ToNot(HaveOccurred())
 							manifestPath := tempManifest.Name()
@@ -226,7 +225,7 @@ applications:
 								values := []string{"A", "B"}
 								manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
 							}
-							err = ioutil.WriteFile(manifestPath, []byte(manifest), 0666)
+							err = os.WriteFile(manifestPath, []byte(manifest), 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							_, err = ReadAndInterpolateManifest(manifestPath, pathsToVarsFiles, vars)
@@ -267,7 +266,7 @@ applications:
 - name: "app-1"
 `
 
-					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -285,7 +284,7 @@ applications:
   memory: 200M
   instances: 10
 `
-					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -319,7 +318,7 @@ applications:
   - "some-other-buildpack-2"
   memory: 2048M
   instances: 0`
-					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -357,7 +356,7 @@ applications:
   memory: 200M
   instances: 10
 `
-					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -382,7 +381,7 @@ applications:
 - name: app-1
   buildpacks:
 `
-					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -399,7 +398,7 @@ applications:
 - name: ((var1))
   instances: ((var2))
 `
-				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				err := os.WriteFile(pathToManifest, []byte(manifest), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -410,15 +409,15 @@ applications:
 
 				BeforeEach(func() {
 					var err error
-					varsDir, err = ioutil.TempDir("", "vars-test")
+					varsDir, err = os.MkdirTemp("", "vars-test")
 					Expect(err).ToNot(HaveOccurred())
 
 					varsFilePath1 := filepath.Join(varsDir, "vars-1")
-					err = ioutil.WriteFile(varsFilePath1, []byte("var1: app-1"), 0666)
+					err = os.WriteFile(varsFilePath1, []byte("var1: app-1"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					varsFilePath2 := filepath.Join(varsDir, "vars-2")
-					err = ioutil.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
+					err = os.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
@@ -431,11 +430,11 @@ applications:
 				When("multiple values for the same variable(s) are provided", func() {
 					BeforeEach(func() {
 						varsFilePath1 := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: app-1\nvar2: 0"), 0666)
+						err := os.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: app-1\nvar2: 0"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						varsFilePath2 := filepath.Join(varsDir, "vars-2")
-						err = ioutil.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
+						err = os.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
@@ -459,7 +458,7 @@ applications:
 				When("a variable in the manifest is not provided in the vars file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
+						err := os.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = []string{varsFilePath}
@@ -484,7 +483,7 @@ applications:
 				When("the provided file is not a valid yaml file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
-						err := ioutil.WriteFile(varsFilePath, []byte(": bad"), 0666)
+						err := os.WriteFile(varsFilePath, []byte(": bad"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						pathsToVarsFiles = []string{varsFilePath}
@@ -522,12 +521,12 @@ applications:
 			When("vars and vars files are provided", func() {
 				var varsFilePath string
 				BeforeEach(func() {
-					tmp, err := ioutil.TempFile("", "util-manifest-varsilfe")
+					tmp, err := os.CreateTemp("", "util-manifest-varsilfe")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(tmp.Close()).NotTo(HaveOccurred())
 
 					varsFilePath = tmp.Name()
-					err = ioutil.WriteFile(varsFilePath, []byte("var1: app-1\nvar2: 12345"), 0666)
+					err = os.WriteFile(varsFilePath, []byte("var1: app-1\nvar2: 12345"), 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					pathsToVarsFiles = []string{varsFilePath}
@@ -560,7 +559,7 @@ applications:
 
 		BeforeEach(func() {
 			var err error
-			tmpDir, err = ioutil.TempDir("", "manifest-test-")
+			tmpDir, err = os.MkdirTemp("", "manifest-test-")
 			Expect(err).NotTo(HaveOccurred())
 			filePath = filepath.Join(tmpDir, "manifest.yml")
 		})
@@ -619,7 +618,7 @@ applications:
 
 			It("creates and writes the manifest to the specified filepath", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				manifestBytes, err := ioutil.ReadFile(filePath)
+				manifestBytes, err := os.ReadFile(filePath)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1
@@ -664,7 +663,7 @@ applications:
 
 			It("does not save them in manifest", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				manifestBytes, err := ioutil.ReadFile(filePath)
+				manifestBytes, err := os.ReadFile(filePath)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1
@@ -694,7 +693,7 @@ applications:
 
 			It("writes the file in an expanded path", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				manifestBytes, err := ioutil.ReadFile(filepath.Join(tmpDir, "manifest.yml"))
+				manifestBytes, err := os.ReadFile(filepath.Join(tmpDir, "manifest.yml"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1
@@ -704,7 +703,7 @@ applications:
 
 		When("the file already exists", func() {
 			BeforeEach(func() {
-				err := ioutil.WriteFile(filePath, []byte(`{}`), 0644)
+				err := os.WriteFile(filePath, []byte(`{}`), 0644)
 				Expect(err).ToNot(HaveOccurred())
 				application = Application{
 					Name: "app-1",
@@ -714,7 +713,7 @@ applications:
 			Context("writes the file", func() {
 				It("truncates and writes the manifest to specified filepath", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					manifestBytes, err := ioutil.ReadFile(filePath)
+					manifestBytes, err := os.ReadFile(filePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1

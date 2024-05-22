@@ -193,7 +193,8 @@ var _ = Describe("RouteBinding", func() {
 		)
 
 		It("makes the right request", func() {
-			client.DeleteRouteBinding(guid)
+			_, _, err := client.DeleteRouteBinding(guid)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{

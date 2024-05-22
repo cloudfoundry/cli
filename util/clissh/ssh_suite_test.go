@@ -1,16 +1,15 @@
 package clissh_test
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
-
-	"testing"
 )
 
 var (
@@ -26,12 +25,12 @@ func TestCmd(t *testing.T) {
 var _ = BeforeSuite(func() {
 	SetDefaultEventuallyTimeout(3 * time.Second)
 
-	hostKeyBytes, err := ioutil.ReadFile(filepath.Join("..", "..", "fixtures", "host-key"))
+	hostKeyBytes, err := os.ReadFile(filepath.Join("..", "..", "fixtures", "host-key"))
 	Expect(err).NotTo(HaveOccurred())
 	hostKey, err := ssh.ParsePrivateKey(hostKeyBytes)
 	Expect(err).NotTo(HaveOccurred())
 
-	privateKeyBytes, err := ioutil.ReadFile(filepath.Join("..", "..", "fixtures", "private-key"))
+	privateKeyBytes, err := os.ReadFile(filepath.Join("..", "..", "fixtures", "private-key"))
 	Expect(err).NotTo(HaveOccurred())
 	privateKey, err := ssh.ParsePrivateKey(privateKeyBytes)
 	Expect(err).NotTo(HaveOccurred())

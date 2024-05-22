@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -71,7 +71,7 @@ func (*RouterConnection) handleStatusCodes(httpResponse *http.Response, response
 func (connection *RouterConnection) populateResponse(httpResponse *http.Response, responseToPopulate *Response) error {
 	responseToPopulate.HTTPResponse = httpResponse
 
-	rawBytes, err := ioutil.ReadAll(httpResponse.Body)
+	rawBytes, err := io.ReadAll(httpResponse.Body)
 	defer httpResponse.Body.Close()
 	if err != nil {
 		return err

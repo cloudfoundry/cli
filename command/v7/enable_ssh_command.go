@@ -75,4 +75,3 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 
 	return nil
 }
-

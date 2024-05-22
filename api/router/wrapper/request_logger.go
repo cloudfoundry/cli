@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"strings"
@@ -93,7 +93,7 @@ func (logger *RequestLogger) displayRequest(request *router.Request) error {
 	contentType := request.Header.Get("Content-Type")
 	if request.Body != nil {
 		if strings.Contains(contentType, "json") {
-			rawRequestBody, err := ioutil.ReadAll(request.Body)
+			rawRequestBody, err := io.ReadAll(request.Body)
 			if err != nil {
 				return err
 			}
@@ -102,7 +102,7 @@ func (logger *RequestLogger) displayRequest(request *router.Request) error {
 
 			return logger.output.DisplayJSONBody(rawRequestBody)
 		} else if strings.Contains(contentType, "x-www-form-urlencoded") {
-			rawRequestBody, err := ioutil.ReadAll(request.Body)
+			rawRequestBody, err := io.ReadAll(request.Body)
 			if err != nil {
 				return err
 			}

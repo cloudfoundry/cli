@@ -3,7 +3,6 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -27,7 +26,7 @@ func NewSecurityGroup(name string, protocol string, destination string, ports *s
 
 // CreateSecurityGroup Creates a new security group on the API using the 'cf create-security-group'
 func CreateSecurityGroup(s resources.SecurityGroup) {
-	dir, err := ioutil.TempDir("", "simple-security-group")
+	dir, err := os.MkdirTemp("", "simple-security-group")
 	Expect(err).ToNot(HaveOccurred())
 	defer os.RemoveAll(dir)
 
@@ -36,7 +35,7 @@ func CreateSecurityGroup(s resources.SecurityGroup) {
 	securityGroup, err := json.Marshal(s.Rules)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = ioutil.WriteFile(tempfile, securityGroup, 0666)
+	err = os.WriteFile(tempfile, securityGroup, 0666)
 	Expect(err).ToNot(HaveOccurred())
 	Eventually(CF("create-security-group", s.Name, tempfile)).Should(Exit(0))
 }

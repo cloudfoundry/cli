@@ -52,7 +52,8 @@ var _ = Describe("Batcher", func() {
 	})
 
 	It("calls the callback", func() {
-		batcher.RequestByGUID([]string{"one", "two", "three"}, fakeCallback)
+		_, err := batcher.RequestByGUID([]string{"one", "two", "three"}, fakeCallback)
+		Expect(err).NotTo(HaveOccurred())
 
 		Expect(calls).To(HaveLen(1))
 		Expect(calls[0]).To(Equal([]string{"one", "two", "three"}))
@@ -60,7 +61,8 @@ var _ = Describe("Batcher", func() {
 
 	When("the guids list exceeds the batch size", func() {
 		It("calls the callback multiple times", func() {
-			batcher.RequestByGUID(spreadGuids(0, 520), fakeCallback)
+			_, err := batcher.RequestByGUID(spreadGuids(0, 520), fakeCallback)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(calls).To(HaveLen(3))
 			Expect(calls[0]).To(Equal(spreadGuids(0, 200)))

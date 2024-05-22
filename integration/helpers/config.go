@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -31,7 +30,7 @@ func TurnOffExperimental() {
 // the created directory through GinkgoWriter.
 func SetHomeDir() string {
 	var err error
-	homeDir, err := ioutil.TempDir("", "cli-integration-test")
+	homeDir, err := os.MkdirTemp("", "cli-integration-test")
 	Expect(err).NotTo(HaveOccurred())
 
 	setHomeDirsTo(homeDir, homeDir)
@@ -102,7 +101,7 @@ func SetConfig(cb func(conf *configv3.Config)) {
 func SetConfigContent(dir string, rawConfig string) {
 	err := os.MkdirAll(filepath.Join(dir), 0777)
 	Expect(err).ToNot(HaveOccurred())
-	err = ioutil.WriteFile(filepath.Join(dir, "config.json"), []byte(rawConfig), 0644)
+	err = os.WriteFile(filepath.Join(dir, "config.json"), []byte(rawConfig), 0644)
 	Expect(err).ToNot(HaveOccurred())
 }
 

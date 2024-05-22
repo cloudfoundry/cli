@@ -270,17 +270,6 @@ func (actor Actor) PurgeServiceInstance(serviceInstanceName, spaceGUID string) (
 	}
 }
 
-func (actor Actor) pollJob(jobURL ccv3.JobURL, wait bool) (ccv3.Warnings, error) {
-	switch {
-	case jobURL == "":
-		return ccv3.Warnings{}, nil
-	case wait:
-		return actor.CloudControllerClient.PollJob(jobURL)
-	default:
-		return actor.CloudControllerClient.PollJobForState(jobURL, constant.JobPolling)
-	}
-}
-
 func (actor Actor) getServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string, query ...ccv3.Query) (resources.ServiceInstance, ccv3.IncludedResources, ccv3.Warnings, error) {
 	serviceInstance, includedResources, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID, query...)
 	switch e := err.(type) {
