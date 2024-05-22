@@ -28,6 +28,9 @@ var _ = Describe("quota limits", func() {
 			Entry("total app instances", AppLimit{TotalAppInstances: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"total_instances":1}`)),
 			Entry("total app instances", AppLimit{TotalAppInstances: nil}, []byte(`{}`)),
 			Entry("total app instances", AppLimit{TotalAppInstances: &types.NullInt{IsSet: false}}, []byte(`{"total_instances":null}`)),
+			Entry("per app tasks", AppLimit{PerAppTasks: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"per_app_tasks":1}`)),
+			Entry("per app tasks", AppLimit{PerAppTasks: nil}, []byte(`{}`)),
+			Entry("per app tasks", AppLimit{PerAppTasks: &types.NullInt{IsSet: false}}, []byte(`{"per_app_tasks":null}`)),
 		)
 
 		DescribeTable("UnmarshalJSON",
@@ -39,48 +42,63 @@ var _ = Describe("quota limits", func() {
 			},
 			Entry(
 				"no null values",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4,"per_app_tasks":1}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
 					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+					PerAppTasks:       &types.NullInt{IsSet: true, Value: 1},
 				}),
 			Entry(
 				"total memory is null",
-				[]byte(`{"total_memory_in_mb":null,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
+				[]byte(`{"total_memory_in_mb":null,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4,"per_app_tasks":1}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: false, Value: 0},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
 					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+					PerAppTasks:       &types.NullInt{IsSet: true, Value: 1},
 				}),
 			Entry(
 				"per process memory is null",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":null,"total_instances":3,"log_rate_limit_in_bytes_per_second":4}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":null,"total_instances":3,"log_rate_limit_in_bytes_per_second":4,"per_app_tasks":1}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: false, Value: 0},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
 					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+					PerAppTasks:       &types.NullInt{IsSet: true, Value: 1},
 				}),
 			Entry(
 				"total instances is null",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":null,"log_rate_limit_in_bytes_per_second":4}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":null,"log_rate_limit_in_bytes_per_second":4,"per_app_tasks":1}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
 					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+					PerAppTasks:       &types.NullInt{IsSet: true, Value: 1},
 				}),
 			Entry(
 				"total log volume is null",
-				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":null}`),
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":null,"per_app_tasks":1}`),
 				AppLimit{
 					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
 					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
 					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
 					TotalLogVolume:    &types.NullInt{IsSet: false, Value: 0},
+					PerAppTasks:       &types.NullInt{IsSet: true, Value: 1},
+				}),
+			Entry(
+				"per_app_tasks is null",
+				[]byte(`{"total_memory_in_mb":1,"per_process_memory_in_mb":2,"total_instances":3,"log_rate_limit_in_bytes_per_second":4,"per_app_tasks":null}`),
+				AppLimit{
+					TotalMemory:       &types.NullInt{IsSet: true, Value: 1},
+					InstanceMemory:    &types.NullInt{IsSet: true, Value: 2},
+					TotalAppInstances: &types.NullInt{IsSet: true, Value: 3},
+					TotalLogVolume:    &types.NullInt{IsSet: true, Value: 4},
+					PerAppTasks:       &types.NullInt{IsSet: false, Value: 0},
 				}),
 		)
 	})
