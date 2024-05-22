@@ -2,10 +2,12 @@ package configv3
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
+	"time"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"golang.org/x/crypto/ssh/terminal"
@@ -182,8 +184,20 @@ func removeOldTempConfigFiles() error {
 	}
 
 	for _, oldTempFileName := range oldTempFileNames {
-		err = os.Remove(oldTempFileName)
+		fi, err := os.Lstat(oldTempFileName)
 		if err != nil {
+			// ignore if file doesn't exist anymore due to race conditions if multiple cli commands are running in parallel
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			return err
+		}
+		// only delete old orphans which are not caught by the signal handler in WriteConfig
+		if fi.ModTime().After(time.Now().Add(-5 * time.Minute)) {
+			continue
+		}
+		err = os.Remove(oldTempFileName)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return err
 		}
 	}
