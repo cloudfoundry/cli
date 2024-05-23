@@ -35,7 +35,7 @@ jobs:
           go-version-file: go.mod
           check-latest: true
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v1.58
           args: -v --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
