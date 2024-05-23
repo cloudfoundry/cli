@@ -17,10 +17,11 @@ var _ = Describe("Sequentially()", func() {
 				j = 0
 			)
 
-			railway.Sequentially(
+			_, err := railway.Sequentially(
 				func() (ccv3.Warnings, error) { i = 1; return ccv3.Warnings{}, nil },
 				func() (ccv3.Warnings, error) { j = 2; return ccv3.Warnings{}, nil },
 			)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(i).To(Equal(1))
 			Expect(j).To(Equal(2))
@@ -29,10 +30,11 @@ var _ = Describe("Sequentially()", func() {
 		It("calls the tracks in order", func() {
 			i := 0
 
-			railway.Sequentially(
+			_, err := railway.Sequentially(
 				func() (ccv3.Warnings, error) { i = 1; return ccv3.Warnings{}, nil },
 				func() (ccv3.Warnings, error) { i = 2; return ccv3.Warnings{}, nil },
 			)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(i).To(Equal(2))
 		})

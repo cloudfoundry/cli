@@ -2,9 +2,9 @@ package configv3_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -60,22 +60,48 @@ var _ = Describe("Config", func() {
 		})
 
 		When("there are old temp-config* files lingering from previous failed attempts to write the config", func() {
-			BeforeEach(func() {
-				configDir := filepath.Join(homeDir, ".cf")
-				Expect(os.MkdirAll(configDir, 0777)).To(Succeed())
-				for i := 0; i < 3; i++ {
-					tmpFile, fileErr := ioutil.TempFile(configDir, "temp-config")
-					Expect(fileErr).ToNot(HaveOccurred())
-					tmpFile.Close()
-				}
+			Context("and the files are younger than 5 minutes", func() {
+				BeforeEach(func() {
+					configDir := filepath.Join(homeDir, ".cf")
+					Expect(os.MkdirAll(configDir, 0777)).To(Succeed())
+					for i := 0; i < 3; i++ {
+						configDir := filepath.Join(homeDir, ".cf")
+						tmpFile, fileErr := os.CreateTemp(configDir, "temp-config")
+						Expect(fileErr).ToNot(HaveOccurred())
+						tmpFile.Close()
+					}
+				})
+
+				It("keeps the files", func() {
+					Expect(loadErr).ToNot(HaveOccurred())
+
+					oldTempFileNames, configErr := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
+					Expect(configErr).ToNot(HaveOccurred())
+					Expect(oldTempFileNames).To(HaveLen(3))
+				})
 			})
 
-			It("removes the lingering temp-config* files", func() {
-				Expect(loadErr).ToNot(HaveOccurred())
+			Context("and the files are older than 5 minutes", func() {
+				BeforeEach(func() {
+					configDir := filepath.Join(homeDir, ".cf")
+					Expect(os.MkdirAll(configDir, 0777)).To(Succeed())
+					for i := 0; i < 3; i++ {
+						tmpFile, fileErr := os.CreateTemp(configDir, "temp-config")
+						Expect(fileErr).ToNot(HaveOccurred())
+						tmpFile.Close()
+						oldTime := time.Now().Add(-time.Minute * 10)
+						err := os.Chtimes(tmpFile.Name(), oldTime, oldTime)
+						Expect(err).ToNot(HaveOccurred())
+					}
+				})
 
-				oldTempFileNames, configErr := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
-				Expect(configErr).ToNot(HaveOccurred())
-				Expect(oldTempFileNames).To(BeEmpty())
+				It("removes the lingering temp-config* files", func() {
+					Expect(loadErr).ToNot(HaveOccurred())
+
+					oldTempFileNames, configErr := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
+					Expect(configErr).ToNot(HaveOccurred())
+					Expect(oldTempFileNames).To(BeEmpty())
+				})
 			})
 		})
 

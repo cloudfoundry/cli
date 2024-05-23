@@ -2,7 +2,6 @@ package v7
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -66,7 +65,7 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 		pathToYAMLFile = filepath.Join(cmd.PWD, fmt.Sprintf("%s_manifest.yml", appName))
 	}
 
-	err = ioutil.WriteFile(pathToYAMLFile, manifestBytes, 0666)
+	err = os.WriteFile(pathToYAMLFile, manifestBytes, 0666)
 	if err != nil {
 		return translatableerror.FileCreationError{Err: err}
 	}

@@ -4,7 +4,6 @@
 package sharedaction_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -31,20 +30,20 @@ var _ = Describe("Resource Actions", func() {
 		// tmpfile3
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
+		srcDir, err = os.MkdirTemp("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
 		err = os.MkdirAll(subDir, 0777)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0644)
+		err = os.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0644)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0751)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0751)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0655)
+		err = os.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0655)
 		Expect(err).ToNot(HaveOccurred())
 
 		err = os.Symlink("file-that-may-or-may-not-exist", filepath.Join(srcDir, "symlink1"))
@@ -64,7 +63,7 @@ var _ = Describe("Resource Actions", func() {
 		)
 
 		BeforeEach(func() {
-			tmpfile, err := ioutil.TempFile("", "example")
+			tmpfile, err := os.CreateTemp("", "example")
 			Expect(err).ToNot(HaveOccurred())
 			archive = tmpfile.Name()
 			Expect(tmpfile.Close()).ToNot(HaveOccurred())
@@ -111,7 +110,7 @@ var _ = Describe("Resource Actions", func() {
 
 		When("a symlink file points to an existing file", func() {
 			BeforeEach(func() {
-				err := ioutil.WriteFile(filepath.Join(srcDir, "file-that-may-or-may-not-exist"), []byte("Bananarama"), 0655)
+				err := os.WriteFile(filepath.Join(srcDir, "file-that-may-or-may-not-exist"), []byte("Bananarama"), 0655)
 				Expect(err).ToNot(HaveOccurred())
 			})
 

@@ -2,7 +2,6 @@ package v7action_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -123,7 +122,7 @@ var _ = Describe("Curl Actions", func() {
 				var tempFile string
 
 				BeforeEach(func() {
-					file, err := ioutil.TempFile("", "")
+					file, err := os.CreateTemp("", "")
 					Expect(err).NotTo(HaveOccurred())
 					tempFile = file.Name()
 
@@ -156,7 +155,7 @@ var _ = Describe("Curl Actions", func() {
 				var tempFile string
 
 				BeforeEach(func() {
-					file, err := ioutil.TempFile("", "")
+					file, err := os.CreateTemp("", "")
 					Expect(err).NotTo(HaveOccurred())
 					tempFile = file.Name()
 

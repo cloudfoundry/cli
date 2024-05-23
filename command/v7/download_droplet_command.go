@@ -2,7 +2,6 @@ package v7
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -90,7 +89,7 @@ func (cmd DownloadDropletCommand) Execute(args []string) error {
 		}
 	}
 
-	err = ioutil.WriteFile(pathToDroplet, rawDropletBytes, 0666)
+	err = os.WriteFile(pathToDroplet, rawDropletBytes, 0666)
 	if err != nil {
 		return translatableerror.DropletFileError{Err: err}
 	}

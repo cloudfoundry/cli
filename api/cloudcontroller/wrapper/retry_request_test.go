@@ -2,7 +2,7 @@ package wrapper_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -37,7 +37,7 @@ var _ = Describe("Retry Request", func() {
 			}
 			fakeConnection.MakeStub = func(req *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 				defer req.Body.Close()
-				body, readErr := ioutil.ReadAll(request.Body)
+				body, readErr := io.ReadAll(request.Body)
 				Expect(readErr).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal(rawRequestBody))
 				return expectedErr

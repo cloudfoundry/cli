@@ -3,7 +3,6 @@ package configv3
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -114,8 +113,8 @@ func (config *Config) GetPluginCaseInsensitive(pluginName string) (Plugin, bool)
 }
 
 // PluginHome returns the plugin configuration directory to:
-//   1. The $CF_PLUGIN_HOME/.cf/plugins environment variable if set
-//   2. Defaults to the home directory (outlined in LoadConfig)/.cf/plugins
+//  1. The $CF_PLUGIN_HOME/.cf/plugins environment variable if set
+//  2. Defaults to the home directory (outlined in LoadConfig)/.cf/plugins
 func (config *Config) PluginHome() string {
 	if config.ENV.CFPluginHome != "" {
 		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
@@ -157,5 +156,5 @@ func (config *Config) WritePluginConfig() error {
 	}
 
 	// Write to file
-	return ioutil.WriteFile(filepath.Join(pluginFileDir, "config.json"), rawConfig, 0600)
+	return os.WriteFile(filepath.Join(pluginFileDir, "config.json"), rawConfig, 0600)
 }

@@ -4,7 +4,6 @@
 package pluginaction_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -26,7 +25,7 @@ var _ = Describe("install actions", func() {
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
 		var err error
-		tempPluginDir, err = ioutil.TempDir("", "")
+		tempPluginDir, err = os.MkdirTemp("", "")
 		Expect(err).ToNot(HaveOccurred())
 		actor = NewActor(fakeConfig, nil)
 	})
@@ -41,7 +40,7 @@ var _ = Describe("install actions", func() {
 			var pluginPath string
 
 			BeforeEach(func() {
-				tempFile, err := ioutil.TempFile("", "")
+				tempFile, err := os.CreateTemp("", "")
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = tempFile.WriteString("cthulhu")
@@ -86,14 +85,14 @@ var _ = Describe("install actions", func() {
 				},
 			}
 
-			pluginFile, err := ioutil.TempFile("", "")
+			pluginFile, err := os.CreateTemp("", "")
 			Expect(err).NotTo(HaveOccurred())
 			err = pluginFile.Close()
 			Expect(err).NotTo(HaveOccurred())
 
 			pluginPath = pluginFile.Name()
 
-			tempDir, err = ioutil.TempDir("", "")
+			tempDir, err = os.MkdirTemp("", "")
 			Expect(err).ToNot(HaveOccurred())
 
 			pluginHomeDir = filepath.Join(tempDir, ".cf", "plugin")

@@ -3,9 +3,9 @@ package v7action
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/textproto"
+	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -34,7 +34,7 @@ func (actor Actor) MakeCurlRequest(
 	trimmedData := strings.Trim(string(data), `"'`)
 	if strings.HasPrefix(trimmedData, "@") {
 		trimmedData = strings.Trim(trimmedData[1:], `"'`)
-		requestBodyBytes, err = ioutil.ReadFile(trimmedData)
+		requestBodyBytes, err = os.ReadFile(trimmedData)
 		if err != nil {
 			return nil, nil, translatableerror.RequestCreationError{Err: err}
 		}

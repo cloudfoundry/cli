@@ -29,7 +29,7 @@ func NewDownloader(saveDir string) Downloader {
 	}
 }
 
-//this func returns byte written, filename and error
+// this func returns byte written, filename and error
 func (d *downloader) DownloadFile(url string) (int64, string, error) {
 	c := http.Client{
 		Transport: &http.Transport{

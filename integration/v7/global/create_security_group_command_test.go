@@ -1,7 +1,6 @@
 package global
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -28,7 +27,7 @@ var _ = Describe("create-security-group command", func() {
 		dir = helpers.TempDirAbsolutePath("", "security-group")
 
 		tempPath = filepath.Join(dir, "tmpfile.json")
-		err := ioutil.WriteFile(tempPath, []byte(`[{
+		err := os.WriteFile(tempPath, []byte(`[{
 			"protocol": "tcp",
 			"destination": "10.0.11.0/24",
 			"ports": "80,443",
@@ -105,7 +104,7 @@ var _ = Describe("create-security-group command", func() {
 
 		When("the security group path has invalid JSON", func() {
 			BeforeEach(func() {
-				err := ioutil.WriteFile(tempPath, []byte("Invalid JSON!"), 0666)
+				err := os.WriteFile(tempPath, []byte("Invalid JSON!"), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 

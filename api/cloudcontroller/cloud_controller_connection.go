@@ -2,14 +2,14 @@ package cloudcontroller
 
 import (
 	"crypto/x509"
-	"io/ioutil"
+	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"errors"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/util"
 )
@@ -64,7 +64,7 @@ func (*CloudControllerConnection) handleStatusCodes(response *http.Response, pas
 	if response.StatusCode == http.StatusNoContent {
 		passedResponse.RawResponse = []byte("{}")
 	} else {
-		rawBytes, err := ioutil.ReadAll(response.Body)
+		rawBytes, err := io.ReadAll(response.Body)
 		if err != nil {
 			return err
 		}
@@ -141,7 +141,7 @@ func (*CloudControllerConnection) processRequestErrors(request *http.Request, er
 		}
 
 		hostnameError := x509.HostnameError{}
-	        if errors.As(err, &hostnameError) {
+		if errors.As(err, &hostnameError) {
 			return ccerror.SSLValidationHostnameError{
 				Message: hostnameError.Error(),
 			}

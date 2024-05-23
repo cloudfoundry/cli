@@ -2,7 +2,6 @@ package pluginaction_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -35,11 +34,11 @@ var _ = Describe("Plugin actor", func() {
 
 		BeforeEach(func() {
 			var err error
-			pluginHome, err = ioutil.TempDir("", "")
+			pluginHome, err = os.MkdirTemp("", "")
 			Expect(err).ToNot(HaveOccurred())
 
 			binaryPath = filepath.Join(pluginHome, "banana-faceman")
-			err = ioutil.WriteFile(binaryPath, nil, 0600)
+			err = os.WriteFile(binaryPath, nil, 0600)
 			Expect(err).ToNot(HaveOccurred())
 
 			fakePluginUninstaller = new(pluginactionfakes.FakePluginUninstaller)
@@ -188,7 +187,7 @@ var _ = Describe("Plugin actor", func() {
 					Expect(err).ToNot(HaveOccurred())
 					err = os.Mkdir(binaryPath, 0700)
 					Expect(err).ToNot(HaveOccurred())
-					err = ioutil.WriteFile(filepath.Join(binaryPath, "foooooo"), nil, 0500)
+					err = os.WriteFile(filepath.Join(binaryPath, "foooooo"), nil, 0500)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
