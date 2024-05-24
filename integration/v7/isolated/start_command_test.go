@@ -2,12 +2,11 @@ package isolated
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
-	"regexp"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

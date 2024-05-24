@@ -1,13 +1,12 @@
 package main_test
 
 import (
+	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"testing"
 )
 
 func TestTestRpcServerExample(t *testing.T) {

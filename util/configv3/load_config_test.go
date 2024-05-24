@@ -2,7 +2,6 @@ package configv3_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -67,7 +66,7 @@ var _ = Describe("Config", func() {
 					Expect(os.MkdirAll(configDir, 0777)).To(Succeed())
 					for i := 0; i < 3; i++ {
 						configDir := filepath.Join(homeDir, ".cf")
-						tmpFile, fileErr := ioutil.TempFile(configDir, "temp-config")
+						tmpFile, fileErr := os.CreateTemp(configDir, "temp-config")
 						Expect(fileErr).ToNot(HaveOccurred())
 						tmpFile.Close()
 					}
@@ -87,7 +86,7 @@ var _ = Describe("Config", func() {
 					configDir := filepath.Join(homeDir, ".cf")
 					Expect(os.MkdirAll(configDir, 0777)).To(Succeed())
 					for i := 0; i < 3; i++ {
-						tmpFile, fileErr := ioutil.TempFile(configDir, "temp-config")
+						tmpFile, fileErr := os.CreateTemp(configDir, "temp-config")
 						Expect(fileErr).ToNot(HaveOccurred())
 						tmpFile.Close()
 						oldTime := time.Now().Add(-time.Minute * 10)

@@ -92,8 +92,8 @@ func (config *Config) MinCLIVersion() string {
 
 // OverallPollingTimeout returns the overall polling timeout for async
 // operations. The time is based off of:
-//   1. The config file's AsyncTimeout value (integer) is > 0
-//   2. Defaults to the DefaultOverallPollingTimeout
+//  1. The config file's AsyncTimeout value (integer) is > 0
+//  2. Defaults to the DefaultOverallPollingTimeout
 func (config *Config) OverallPollingTimeout() time.Duration {
 	if config.ConfigFile.AsyncTimeout == 0 {
 		return DefaultOverallPollingTimeout

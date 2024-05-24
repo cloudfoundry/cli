@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -263,7 +262,7 @@ var _ = Describe("Droplet", func() {
 					Expect(dropletPart.FileName()).To(Equal("fake-droplet.tgz"))
 
 					defer dropletPart.Close()
-					partContents, err := ioutil.ReadAll(dropletPart)
+					partContents, err := io.ReadAll(dropletPart)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(partContents)).To(Equal(dropletContent))
 				}
@@ -375,7 +374,7 @@ var _ = Describe("Droplet", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
-							_, err := ioutil.ReadAll(request.Body)
+							_, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
@@ -404,7 +403,7 @@ var _ = Describe("Droplet", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
 							defer request.Body.Close()
-							readBytes, err := ioutil.ReadAll(request.Body)
+							readBytes, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(len(readBytes)).To(BeNumerically(">", len(dropletContent)))
 							return expectedErr

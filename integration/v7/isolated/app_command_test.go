@@ -3,9 +3,8 @@ package isolated
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-
 	"path"
+	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"

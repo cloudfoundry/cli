@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -67,7 +66,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.DestroyHomeDir(homeDir)
 
 	var err error
-	realDir, err = ioutil.TempDir("", "push-real-dir")
+	realDir, err = os.MkdirTemp("", "push-real-dir")
 	Expect(err).ToNot(HaveOccurred())
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelProcess())))
 })

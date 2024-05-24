@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,7 +26,7 @@ var _ = Describe("handle path in manifest and flag override", func() {
 		appName = helpers.NewAppName()
 		secondName = helpers.NewAppName()
 		var err error
-		tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+		tempDir, err = os.MkdirTemp("", "simple-manifest-test")
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -224,7 +223,7 @@ var _ = Describe("handle path in manifest and flag override", func() {
 						manifestDir := helpers.TempDirAbsolutePath("", "manifest-dir")
 						defer os.RemoveAll(manifestDir)
 
-						err := ioutil.WriteFile(
+						err := os.WriteFile(
 							filepath.Join(manifestDir, "manifest.yml"),
 							[]byte(fmt.Sprintf(`---
 applications:
@@ -248,7 +247,7 @@ applications:
 				var emptyDir string
 
 				BeforeEach(func() {
-					sympath, err := ioutil.TempDir("", "integration-push-path-empty")
+					sympath, err := os.MkdirTemp("", "integration-push-path-empty")
 					Expect(err).ToNot(HaveOccurred())
 					emptyDir, err = filepath.EvalSymlinks(sympath)
 					Expect(err).ToNot(HaveOccurred())
@@ -272,7 +271,7 @@ applications:
 
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+						tmpfile, err := os.CreateTemp("", "push-archive-integration")
 						Expect(err).ToNot(HaveOccurred())
 						archive = tmpfile.Name()
 						Expect(tmpfile.Close())

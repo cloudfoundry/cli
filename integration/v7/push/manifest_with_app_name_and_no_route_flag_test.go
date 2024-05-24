@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -27,7 +26,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 		randomHostName = helpers.RandomName()
 
 		var err error
-		tempDir, err = ioutil.TempDir("", "no-route-flag-with-manifest-test")
+		tempDir, err = os.MkdirTemp("", "no-route-flag-with-manifest-test")
 		Expect(err).ToNot(HaveOccurred())
 		pathToSetupManifest := filepath.Join(tempDir, "setup-manifest.yml")
 		helpers.WriteManifest(pathToSetupManifest, map[string]interface{}{

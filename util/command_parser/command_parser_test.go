@@ -1,13 +1,14 @@
 package command_parser_test
 
 import (
+	"io"
+
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/util/command_parser"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("Command 'Parser'", func() {
@@ -18,7 +19,7 @@ var _ = Describe("Command 'Parser'", func() {
 	BeforeEach(func() {
 		var err error
 		v3Config = new(configv3.Config)
-		pluginUI, err = ui.NewPluginUI(v3Config, ioutil.Discard, ioutil.Discard)
+		pluginUI, err = ui.NewPluginUI(v3Config, io.Discard, io.Discard)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
