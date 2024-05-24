@@ -2,7 +2,6 @@ package download
 
 import (
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -43,7 +42,7 @@ func (downloader Downloader) Download(url string, tmpDirPath string) (string, er
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		rawBytes, readErr := ioutil.ReadAll(resp.Body)
+		rawBytes, readErr := io.ReadAll(resp.Body)
 		if readErr != nil {
 			return bpFileName, readErr
 		}

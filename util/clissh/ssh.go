@@ -264,6 +264,7 @@ func (c *SecureShell) localForwardAcceptLoop(listener net.Listener, addr string)
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			//nolint:staticcheck
 			if netErr, ok := err.(net.Error); ok && netErr.Temporary() {
 				time.Sleep(100 * time.Millisecond)
 				continue

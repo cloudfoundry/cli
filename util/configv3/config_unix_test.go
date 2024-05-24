@@ -5,7 +5,6 @@ package configv3_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -100,13 +99,13 @@ var _ = Describe("Verbose", func() {
 
 			BeforeEach(func() {
 				var err error
-				tempDir, err = ioutil.TempDir("", "config-trace")
+				tempDir, err = os.MkdirTemp("", "config-trace")
 				Expect(err).ToNot(HaveOccurred())
 
 				tempDirAbs, err := filepath.EvalSymlinks(tempDir)
 				Expect(err).ToNot(HaveOccurred())
 				ogLogPath = filepath.Join(tempDirAbs, "og.log")
-				err = ioutil.WriteFile(ogLogPath, nil, 0666)
+				err = os.WriteFile(ogLogPath, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
 				symlinkLogPath = filepath.Join(tempDirAbs, "sym.log")

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -156,7 +155,7 @@ var _ = Describe("Request Logger", func() {
 
 			When("the body is not JSON", func() {
 				BeforeEach(func() {
-					originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
+					originalBody = io.NopCloser(bytes.NewReader([]byte("foo")))
 					request.Body = originalBody
 				})
 
@@ -166,7 +165,7 @@ var _ = Describe("Request Logger", func() {
 					Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("foo")))
 
-					bytes, err := ioutil.ReadAll(request.Body)
+					bytes, err := io.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(Equal([]byte("foo")))
 				})
@@ -177,7 +176,7 @@ var _ = Describe("Request Logger", func() {
 
 				BeforeEach(func() {
 					jsonBody = `{"some-key": "some-value"}`
-					originalBody = ioutil.NopCloser(bytes.NewReader([]byte(jsonBody)))
+					originalBody = io.NopCloser(bytes.NewReader([]byte(jsonBody)))
 					request.Body = originalBody
 					request.Header.Add("Content-Type", "application/json")
 				})
@@ -188,7 +187,7 @@ var _ = Describe("Request Logger", func() {
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte(jsonBody)))
 
-					bytes, err := ioutil.ReadAll(request.Body)
+					bytes, err := io.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(Equal([]byte(jsonBody)))
 				})

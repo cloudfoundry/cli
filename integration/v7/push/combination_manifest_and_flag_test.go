@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -154,7 +153,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 
 			BeforeEach(func() {
 				var err error
-				tempDir, err = ioutil.TempDir("", "combination-manifest-with-p")
+				tempDir, err = os.MkdirTemp("", "combination-manifest-with-p")
 				Expect(err).ToNot(HaveOccurred())
 
 				helpers.WriteManifest(filepath.Join(tempDir, "manifest.yml"), map[string]interface{}{

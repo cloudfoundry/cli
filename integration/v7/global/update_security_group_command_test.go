@@ -2,7 +2,6 @@ package global
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -56,7 +55,7 @@ var _ = Describe("update-security-group command", func() {
 			},
 		}
 
-		tmpRulesDir, err = ioutil.TempDir("", "spam-security-group")
+		tmpRulesDir, err = os.MkdirTemp("", "spam-security-group")
 		Expect(err).ToNot(HaveOccurred())
 
 		updatedRulesPath = filepath.Join(tmpRulesDir, "spam-security-group.json")
@@ -64,7 +63,7 @@ var _ = Describe("update-security-group command", func() {
 		securityGroup, err := json.Marshal(updatedSecurityGroupRules)
 		Expect(err).ToNot(HaveOccurred())
 
-		err = ioutil.WriteFile(updatedRulesPath, securityGroup, 0666)
+		err = os.WriteFile(updatedRulesPath, securityGroup, 0666)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -121,7 +120,7 @@ var _ = Describe("update-security-group command", func() {
 
 	When("the JSON file with the security group's rules is not JSON", func() {
 		BeforeEach(func() {
-			err = ioutil.WriteFile(updatedRulesPath, []byte("I'm definitely not JSON"), 0666)
+			err = os.WriteFile(updatedRulesPath, []byte("I'm definitely not JSON"), 0666)
 			Expect(err).ToNot(HaveOccurred())
 		})
 		It("displays a an incorrect JSON format message and fails", func() {

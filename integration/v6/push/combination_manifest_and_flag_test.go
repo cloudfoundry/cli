@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -31,7 +30,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 
 				When("the manifest file is passed", func() {
 					BeforeEach(func() {
-						tmpFile, err := ioutil.TempFile("", "combination-manifest")
+						tmpFile, err := os.CreateTemp("", "combination-manifest")
 						Expect(err).ToNot(HaveOccurred())
 						pathToManifest = tmpFile.Name()
 						Expect(tmpFile.Close()).ToNot(HaveOccurred())
@@ -112,7 +111,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 
 					BeforeEach(func() {
 						var err error
-						pathToManifest, err = ioutil.TempDir("", "manifest-integration-")
+						pathToManifest, err = os.MkdirTemp("", "manifest-integration-")
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -256,7 +255,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 
 				BeforeEach(func() {
 					var err error
-					tempDir, err = ioutil.TempDir("", "combination-manifest-with-p")
+					tempDir, err = os.MkdirTemp("", "combination-manifest-with-p")
 					Expect(err).ToNot(HaveOccurred())
 
 					helpers.WriteManifest(filepath.Join(tempDir, "manifest.yml"), map[string]interface{}{
@@ -463,7 +462,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 
 				BeforeEach(func() {
 					var err error
-					tempDir, err = ioutil.TempDir("", "combination-manifest-with-p")
+					tempDir, err = os.MkdirTemp("", "combination-manifest-with-p")
 					Expect(err).ToNot(HaveOccurred())
 
 					helpers.WriteManifest(filepath.Join(tempDir, "manifest.yml"), map[string]interface{}{

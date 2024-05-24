@@ -3,7 +3,7 @@ package flag
 import (
 	"fmt"
 
-	"github.com/docker/distribution/reference"
+	"github.com/distribution/reference"
 	flags "github.com/jessevdk/go-flags"
 )
 

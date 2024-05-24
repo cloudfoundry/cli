@@ -2,7 +2,6 @@ package util_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	. "code.cloudfoundry.org/cli/util"
@@ -35,7 +34,7 @@ var _ = Describe("Sha1Checksum", func() {
 			)
 
 			BeforeEach(func() {
-				f, err = ioutil.TempFile("", "sha1_test_")
+				f, err = os.CreateTemp("", "sha1_test_")
 				Expect(err).NotTo(HaveOccurred())
 				defer f.Close()
 				_, err = f.Write([]byte("abc"))
@@ -79,7 +78,7 @@ var _ = Describe("Sha1Checksum", func() {
 			)
 
 			BeforeEach(func() {
-				f, err = ioutil.TempFile("", "sha1_test_")
+				f, err = os.CreateTemp("", "sha1_test_")
 				Expect(err).NotTo(HaveOccurred())
 				defer f.Close()
 				_, err = f.Write([]byte("abc"))

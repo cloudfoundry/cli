@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +16,7 @@ import (
 )
 
 func createManifest(appName string) (manifest.Manifest, string, error) {
-	tmpDir, err := ioutil.TempDir("", "")
+	tmpDir, err := os.MkdirTemp("", "")
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		return manifest.Manifest{}, "", err
@@ -26,7 +25,7 @@ func createManifest(appName string) (manifest.Manifest, string, error) {
 	manifestPath := filepath.Join(tmpDir, "manifest.yml")
 	Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tmpDir}, "create-app-manifest", appName, "-p", manifestPath)).Should(Exit(0))
 
-	manifestContents, err := ioutil.ReadFile(manifestPath)
+	manifestContents, err := os.ReadFile(manifestPath)
 	if err != nil {
 		return manifest.Manifest{}, "", err
 	}
@@ -48,7 +47,7 @@ var _ = Describe("create-app-manifest command", func() {
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
 		var err error
-		tempDir, err = ioutil.TempDir("", "create-manifest")
+		tempDir, err = os.MkdirTemp("", "create-manifest")
 		Expect(err).ToNot(HaveOccurred())
 
 		manifestFilePath = filepath.Join(tempDir, fmt.Sprintf("%s_manifest.yml", appName))
@@ -148,7 +147,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName)
 
-					createdFile, err := ioutil.ReadFile(manifestFilePath)
+					createdFile, err := os.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
@@ -180,7 +179,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
-					createdFile, err := ioutil.ReadFile(manifestFilePath)
+					createdFile, err := os.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
@@ -222,7 +221,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
-							createdFile, err := ioutil.ReadFile(newFile)
+							createdFile, err := os.ReadFile(newFile)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
@@ -256,7 +255,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
-							createdFile, err := ioutil.ReadFile(existingFile)
+							createdFile, err := os.ReadFile(existingFile)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
@@ -292,7 +291,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName, DockerImage, strings.ToLower(appName), domainName)
 
-				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				createdFile, err := os.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 			})
@@ -332,7 +331,7 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs\d
 `, appName, DockerImage, strings.ToLower(appName), domainName)
 
-				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				createdFile, err := os.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 

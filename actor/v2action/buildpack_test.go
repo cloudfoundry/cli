@@ -3,7 +3,6 @@ package v2action_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -147,7 +146,7 @@ var _ = Describe("Buildpack", func() {
 				fakeDownloader = new(v2actionfakes.FakeDownloader)
 
 				var err error
-				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				tmpDirPath, err = os.MkdirTemp("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -185,13 +184,13 @@ var _ = Describe("Buildpack", func() {
 			var tempFile *os.File
 			BeforeEach(func() {
 				var err error
-				inPath, err = ioutil.TempDir("", "buildpackdir-")
+				inPath, err = os.MkdirTemp("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 
-				tempFile, err = ioutil.TempFile(inPath, "foo")
+				tempFile, err = os.CreateTemp(inPath, "foo")
 				Expect(err).ToNot(HaveOccurred())
 
-				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				tmpDirPath, err = os.MkdirTemp("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -212,10 +211,10 @@ var _ = Describe("Buildpack", func() {
 		When("the buildpack path points to an empty directory", func() {
 			BeforeEach(func() {
 				var err error
-				inPath, err = ioutil.TempDir("", "some-empty-dir")
+				inPath, err = os.MkdirTemp("", "some-empty-dir")
 				Expect(err).ToNot(HaveOccurred())
 
-				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				tmpDirPath, err = os.MkdirTemp("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 			})
 

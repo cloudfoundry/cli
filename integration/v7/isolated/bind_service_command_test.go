@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -192,7 +191,7 @@ var _ = Describe("bind-service command", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{i-am-very-bad-json")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							configurationFile, err = os.CreateTemp("", "CF_CLI")
 							Expect(err).ToNot(HaveOccurred())
 
 							_, err = configurationFile.Write(content)
@@ -218,7 +217,7 @@ var _ = Describe("bind-service command", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							configurationFile, err = os.CreateTemp("", "CF_CLI")
 							Expect(err).ToNot(HaveOccurred())
 
 							_, err = configurationFile.Write(content)
@@ -246,7 +245,7 @@ var _ = Describe("bind-service command", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
-							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							configurationFile, err = os.CreateTemp("", "CF_CLI")
 							Expect(err).ToNot(HaveOccurred())
 
 							_, err = configurationFile.Write(content)

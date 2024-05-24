@@ -2,7 +2,6 @@ package pushaction_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -179,7 +178,7 @@ var _ = Describe("Apply", func() {
 								var archivePath string
 
 								BeforeEach(func() {
-									tmpfile, err := ioutil.TempFile("", "fake-archive")
+									tmpfile, err := os.CreateTemp("", "fake-archive")
 									Expect(err).ToNot(HaveOccurred())
 									_, err = tmpfile.Write([]byte("123456"))
 									Expect(err).ToNot(HaveOccurred())
@@ -262,7 +261,7 @@ var _ = Describe("Apply", func() {
 						var dropletPath string
 
 						BeforeEach(func() {
-							tmpfile, err := ioutil.TempFile("", "fake-droplet")
+							tmpfile, err := os.CreateTemp("", "fake-droplet")
 							Expect(err).ToNot(HaveOccurred())
 							_, err = tmpfile.Write([]byte("123456"))
 							Expect(err).ToNot(HaveOccurred())
@@ -534,7 +533,7 @@ var _ = Describe("Apply", func() {
 			var dropletPath string
 
 			BeforeEach(func() {
-				tmpfile, err := ioutil.TempFile("", "fake-droplet")
+				tmpfile, err := os.CreateTemp("", "fake-droplet")
 				Expect(err).ToNot(HaveOccurred())
 				_, err = tmpfile.Write([]byte("123456"))
 				Expect(err).ToNot(HaveOccurred())
@@ -623,7 +622,7 @@ var _ = Describe("Apply", func() {
 					var archivePath string
 
 					BeforeEach(func() {
-						tmpfile, err := ioutil.TempFile("", "fake-archive")
+						tmpfile, err := os.CreateTemp("", "fake-archive")
 						Expect(err).ToNot(HaveOccurred())
 						_, err = tmpfile.Write([]byte("123456"))
 						Expect(err).ToNot(HaveOccurred())

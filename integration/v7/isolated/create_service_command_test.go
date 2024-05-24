@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -147,7 +146,7 @@ var _ = Describe("create-service command", func() {
 
 					BeforeEach(func() {
 						var err error
-						emptyDir, err = ioutil.TempDir("", "")
+						emptyDir, err = os.MkdirTemp("", "")
 						Expect(err).NotTo(HaveOccurred())
 					})
 

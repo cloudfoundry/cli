@@ -2,7 +2,6 @@ package experimental
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
@@ -354,7 +353,7 @@ var _ = Describe("v3-push command", func() {
 
 					BeforeEach(func() {
 						var err error
-						emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+						emptyDir, err = os.MkdirTemp("", "integration-push-path-empty")
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -376,7 +375,7 @@ var _ = Describe("v3-push command", func() {
 
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
-							tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+							tmpfile, err := os.CreateTemp("", "push-archive-integration")
 							Expect(err).ToNot(HaveOccurred())
 							archive = tmpfile.Name()
 							Expect(tmpfile.Close())
@@ -418,7 +417,7 @@ var _ = Describe("v3-push command", func() {
 				var symlinkPath string
 
 				BeforeEach(func() {
-					tempFile, err := ioutil.TempFile("", "symlink-")
+					tempFile, err := os.CreateTemp("", "symlink-")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 
@@ -465,7 +464,7 @@ var _ = Describe("v3-push command", func() {
 
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						tmpfile, err := ioutil.TempFile("", "package-archive-integration")
+						tmpfile, err := os.CreateTemp("", "package-archive-integration")
 						Expect(err).ToNot(HaveOccurred())
 						archive = tmpfile.Name()
 						Expect(tmpfile.Close())
@@ -474,7 +473,7 @@ var _ = Describe("v3-push command", func() {
 						Expect(err).ToNot(HaveOccurred())
 					})
 
-					tempFile, err := ioutil.TempFile("", "symlink-to-archive-")
+					tempFile, err := os.CreateTemp("", "symlink-to-archive-")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(tempFile.Close()).To(Succeed())
 

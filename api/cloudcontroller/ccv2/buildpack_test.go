@@ -3,7 +3,6 @@ package ccv2_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -540,7 +539,7 @@ var _ = Describe("Buildpack", func() {
 					Expect(buildpackPart.FileName()).To(Equal("fake-buildpack.zip"))
 
 					defer buildpackPart.Close()
-					partContents, err := ioutil.ReadAll(buildpackPart)
+					partContents, err := io.ReadAll(buildpackPart)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(partContents)).To(Equal(bpContent))
 				}
@@ -611,7 +610,7 @@ var _ = Describe("Buildpack", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v2/buildpacks/some-buildpack-guid/bits") {
-							_, err := ioutil.ReadAll(request.Body)
+							_, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
@@ -640,7 +639,7 @@ var _ = Describe("Buildpack", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/buildpacks/some-buildpack-guid/bits") {
 							defer request.Body.Close()
-							readBytes, err := ioutil.ReadAll(request.Body)
+							readBytes, err := io.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(len(readBytes)).To(BeNumerically(">", len(bpContent)))
 							return expectedErr

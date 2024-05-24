@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -290,7 +289,7 @@ func validateDockerPush(session *Session, appName string, dockerImage string) {
 }
 
 func withManifest(manifest map[string]interface{}, f func(manifestDir string)) {
-	dir, err := ioutil.TempDir("", "simple-app")
+	dir, err := os.MkdirTemp("", "simple-app")
 	Expect(err).ToNot(HaveOccurred())
 	defer os.RemoveAll(dir)
 

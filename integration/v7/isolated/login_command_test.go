@@ -3,9 +3,9 @@ package isolated
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"regexp"
 
@@ -114,7 +114,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 					It("writes fields to the config file when targeting an API", func() {
-						rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+						rawConfig, err := os.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 						Expect(err).NotTo(HaveOccurred())
 
 						var configFile configv3.JSONConfig

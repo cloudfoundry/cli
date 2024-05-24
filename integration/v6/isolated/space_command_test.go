@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -102,7 +101,7 @@ var _ = Describe("space command", func() {
 					Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 
 					securityGroupName2 = helpers.NewSecurityGroupName("2")
-					securityGroupRules2, err = ioutil.TempFile("", "security-group-rules")
+					securityGroupRules2, err = os.CreateTemp("", "security-group-rules")
 					Expect(err).ToNot(HaveOccurred())
 
 					_, err := securityGroupRules2.Write([]byte(`

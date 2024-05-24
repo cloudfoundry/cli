@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -96,7 +95,7 @@ Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attribute
 		)
 
 		BeforeEach(func() {
-			tmpFile, err := ioutil.TempFile("", "manifest.yml")
+			tmpFile, err := os.CreateTemp("", "manifest.yml")
 			Expect(err).ToNot(HaveOccurred())
 			pathToManifest = tmpFile.Name()
 			Expect(tmpFile.Close()).ToNot(HaveOccurred())

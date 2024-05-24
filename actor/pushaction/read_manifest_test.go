@@ -1,7 +1,6 @@
 package pushaction_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -32,7 +31,7 @@ var _ = Describe("ReadManifest", func() {
 		actor, _, _, _ = getTestPushActor()
 
 		var err error
-		tmpDir, err = ioutil.TempDir("", "read-manifest-test")
+		tmpDir, err = os.MkdirTemp("", "read-manifest-test")
 		Expect(err).ToNot(HaveOccurred())
 		manifestPath = filepath.Join(tmpDir, "manifest.yml")
 
@@ -59,7 +58,7 @@ applications:
     buildpack: some-other-buildpack
 `)
 
-			Expect(ioutil.WriteFile(manifestPath, manifest, 0666)).To(Succeed())
+			Expect(os.WriteFile(manifestPath, manifest, 0666)).To(Succeed())
 		})
 
 		It("sets the buildpack on the app and returns a deprecated field warning", func() {

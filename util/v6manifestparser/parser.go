@@ -2,7 +2,6 @@ package v6manifestparser
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -69,7 +68,7 @@ func (parser Parser) GetPathToManifest() string {
 // applications and leave only a single application in the resulting parsed
 // manifest structure.
 func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error {
-	rawManifest, err := ioutil.ReadFile(pathToManifest)
+	rawManifest, err := os.ReadFile(pathToManifest)
 	if err != nil {
 		return err
 	}
@@ -78,7 +77,7 @@ func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFile
 	fileVars := template.StaticVariables{}
 
 	for _, path := range pathsToVarsFiles {
-		rawVarsFile, ioerr := ioutil.ReadFile(path)
+		rawVarsFile, ioerr := os.ReadFile(path)
 		if ioerr != nil {
 			return ioerr
 		}

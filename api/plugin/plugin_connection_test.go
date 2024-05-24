@@ -3,7 +3,6 @@ package plugin_test
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"runtime"
 	"strings"
@@ -33,7 +32,7 @@ var _ = Describe("Plugin Connection", func() {
 		fakeProxyReader = new(pluginfakes.FakeProxyReader)
 
 		fakeProxyReader.WrapStub = func(reader io.Reader) io.ReadCloser {
-			return ioutil.NopCloser(reader)
+			return io.NopCloser(reader)
 		}
 	})
 

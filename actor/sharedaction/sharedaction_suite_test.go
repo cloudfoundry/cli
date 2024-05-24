@@ -6,12 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
-
-	"testing"
 )
 
 func TestSharedAction(t *testing.T) {

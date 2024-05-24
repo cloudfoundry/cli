@@ -1,7 +1,6 @@
 package pushaction_test
 
 import (
-	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -238,7 +237,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}
 
 			var err error
-			tempDir, err = ioutil.TempDir("", "merge-push-settings-")
+			tempDir, err = os.MkdirTemp("", "merge-push-settings-")
 			Expect(err).ToNot(HaveOccurred())
 		})
 

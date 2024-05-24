@@ -3,7 +3,6 @@ package flag
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,7 +92,7 @@ func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
 
 	_, err := os.Stat(pathOrJSON)
 	if err == nil {
-		jsonBytes, err = ioutil.ReadFile(pathOrJSON)
+		jsonBytes, err = os.ReadFile(pathOrJSON)
 		if err != nil {
 			return errorToReturn
 		}

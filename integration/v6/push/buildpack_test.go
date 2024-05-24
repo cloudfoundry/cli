@@ -2,7 +2,6 @@ package push
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -85,7 +84,7 @@ var _ = Describe("push with different buildpack values", func() {
 					It("pushes the app successfully with multiple buildpacks using the stack specified", func() {
 						helpers.WithProcfileApp(func(dir string) {
 							tempfile := filepath.Join(dir, "index.html")
-							err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+							err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 							Expect(err).ToNot(HaveOccurred())
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -110,7 +109,7 @@ var _ = Describe("push with different buildpack values", func() {
 				It("pushes the app successfully with multiple buildpacks", func() {
 					helpers.WithProcfileApp(func(dir string) {
 						tempfile := filepath.Join(dir, "index.html")
-						err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+						err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -191,7 +190,7 @@ var _ = Describe("push with different buildpack values", func() {
 				It("fails and prints an error", func() {
 					helpers.WithProcfileApp(func(dir string) {
 						tempfile := filepath.Join(dir, "index.html")
-						err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+						err := os.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -385,7 +384,7 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			f, err := os.CreateTemp("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())
 
@@ -418,7 +417,7 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			f, err := os.CreateTemp("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())
 
@@ -453,7 +452,7 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			f, err := os.CreateTemp("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())
 
@@ -480,7 +479,7 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			f, err := os.CreateTemp("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())
 

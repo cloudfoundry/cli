@@ -5,7 +5,6 @@ package v7action_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -36,14 +35,14 @@ var _ = Describe("Buildpack", func() {
 			BeforeEach(func() {
 				var err error
 
-				source, err = ioutil.TempDir("", "zipit-source-")
+				source, err = os.MkdirTemp("", "zipit-source-")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(ioutil.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)).To(Succeed())
-				Expect(ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)).To(Succeed())
-				subDir, err = ioutil.TempDir(source, "zipit-subdir-")
+				Expect(os.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)).To(Succeed())
+				subDir, err = os.MkdirTemp(source, "zipit-subdir-")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0755)).To(Succeed())
+				Expect(os.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0755)).To(Succeed())
 
 				p := filepath.FromSlash(fmt.Sprintf("buildpack-%s.zip", helpers.RandomName()))
 				target, err = filepath.Abs(p)

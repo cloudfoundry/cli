@@ -43,8 +43,8 @@ func (config *Config) CFUsername() string {
 }
 
 // DialTimeout returns the timeout to use when dialing. This is based off of:
-//   1. The $CF_DIAL_TIMEOUT environment variable if set
-//   2. Falling back to the default
+//  1. The $CF_DIAL_TIMEOUT environment variable if set
+//  2. Falling back to the default
 func (config *Config) DialTimeout() time.Duration {
 	if config.ENV.CFDialTimeout != "" {
 		envVal, err := strconv.ParseInt(config.ENV.CFDialTimeout, 10, 64)
@@ -63,8 +63,8 @@ func (config *Config) DockerPassword() string {
 
 // Experimental returns whether or not to run experimental CLI commands. This
 // is based on the following:
-//   1. The $CF_CLI_EXPERIMENTAL environment variable if set
-//   2. Defaults to false
+//  1. The $CF_CLI_EXPERIMENTAL environment variable if set
+//  2. Defaults to false
 func (config *Config) Experimental() bool {
 	if config.ENV.Experimental != "" {
 		envVal, err := strconv.ParseBool(config.ENV.Experimental)
@@ -78,8 +78,8 @@ func (config *Config) Experimental() bool {
 
 // HTTPSProxy returns the proxy url that the CLI should use. The url is based
 // off of:
-//   1. The $https_proxy environment variable if set
-//   2. Defaults to the empty string
+//  1. The $https_proxy environment variable if set
+//  2. Defaults to the empty string
 func (config *Config) HTTPSProxy() string {
 	return config.ENV.HTTPSProxy
 }
@@ -114,8 +114,8 @@ func (config *Config) LogLevel() int {
 
 // StagingTimeout returns the max time an application staging should take. The
 // time is based off of:
-//   1. The $CF_STAGING_TIMEOUT environment variable if set
-//   2. Defaults to the DefaultStagingTimeout
+//  1. The $CF_STAGING_TIMEOUT environment variable if set
+//  2. Defaults to the DefaultStagingTimeout
 func (config *Config) StagingTimeout() time.Duration {
 	if config.ENV.CFStagingTimeout != "" {
 		timeoutInMin, err := strconv.ParseFloat(config.ENV.CFStagingTimeout, 64)
@@ -130,8 +130,8 @@ func (config *Config) StagingTimeout() time.Duration {
 
 // StartupTimeout returns the max time an application should take to start. The
 // time is based off of:
-//   1. The $CF_STARTUP_TIMEOUT environment variable if set
-//   2. Defaults to the DefaultStartupTimeout
+//  1. The $CF_STARTUP_TIMEOUT environment variable if set
+//  2. Defaults to the DefaultStartupTimeout
 func (config *Config) StartupTimeout() time.Duration {
 	if config.ENV.CFStartupTimeout != "" {
 		timeoutInMin, err := strconv.ParseFloat(config.ENV.CFStartupTimeout, 64)

@@ -2,7 +2,6 @@ package global
 
 import (
 	"bytes"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -391,7 +390,7 @@ var _ = Describe("update-buildpack command", func() {
 							When("the buildpack path is an empty directory", func() {
 								BeforeEach(func() {
 									var err error
-									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
+									buildpackPath, err = os.MkdirTemp("", "create-buildpack-test-")
 									Expect(err).ToNot(HaveOccurred())
 								})
 
@@ -410,9 +409,9 @@ var _ = Describe("update-buildpack command", func() {
 							When("uploading from a directory", func() {
 								BeforeEach(func() {
 									var err error
-									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
+									buildpackPath, err = os.MkdirTemp("", "create-buildpack-test-")
 									Expect(err).ToNot(HaveOccurred())
-									file, err := ioutil.TempFile(buildpackPath, "")
+									file, err := os.CreateTemp(buildpackPath, "")
 									defer file.Close() // nolint
 									Expect(err).ToNot(HaveOccurred())
 								})

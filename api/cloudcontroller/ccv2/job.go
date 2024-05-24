@@ -187,10 +187,11 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 // resources to the cloud controller. A job that combines the requested/newly
 // uploaded bits is returned. The function will act differently given the
 // following Readers:
-//   io.ReadSeeker: Will function properly on retry.
-//   io.Reader: Will return a ccerror.PipeSeekError on retry.
-//   nil: Will not add the "application" section to the request.
-//   newResourcesLength is ignored in this case.
+//
+//	io.ReadSeeker: Will function properly on retry.
+//	io.Reader: Will return a ccerror.PipeSeekError on retry.
+//	nil: Will not add the "application" section to the request.
+//	newResourcesLength is ignored in this case.
 func (client *Client) UploadApplicationPackage(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
 	if existingResources == nil {
 		return Job{}, nil, ccerror.NilObjectError{Object: "existingResources"}
