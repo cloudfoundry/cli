@@ -43,12 +43,6 @@ clean: ## Just remove all cf* files from the `out` directory
 
 clear: clean  ## Make everyone happy
 
-custom-lint: ## Run our custom linters
-	@echo "Running custom linters..." # this list will grow as we cleanup all the code:
-	bash -c "go run bin/style/main.go api util"
-	@echo "No custom lint errors!"
-	@echo
-
 # TODO: update these fly-windows* to point at the correct CI repo
 fly-windows-experimental: check-target-env
 	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
@@ -71,6 +65,11 @@ fly-windows-units:
 format: ## Run go fmt
 	go fmt ./...
 
+install-test-deps: ## Install "global" dependencies needed to run tests
+# Running `go install <pkg>` without a version specifier will use version specified in go.mod
+# See https://go.dev/ref/mod#go-install
+	go install github.com/onsi/ginkgo/v2/ginkgo
+
 integration-cleanup:
 	$(CURDIR)/bin/cleanup-integration
 
@@ -79,12 +78,12 @@ integration-experimental: build integration-cleanup integration-shared-experimen
 
 ise: integration-shared-experimental
 integration-experimental-shared: integration-shared-experimental
-integration-shared-experimental: build integration-cleanup ## Run experimental integration tests that are shared between v6 and v7
+integration-shared-experimental: build install-test-deps integration-cleanup ## Run experimental integration tests that are shared between v6 and v7
 	$(ginkgo_int) -nodes $(NODES) integration/shared/experimental
 
 ive: integration-versioned-experimental
 integration-experimental-versioned: integration-versioned-experimental
-integration-versioned-experimental: build integration-cleanup ## Run experimental integration tests that are specific to your CLI version
+integration-versioned-experimental: build install-test-deps integration-cleanup ## Run experimental integration tests that are specific to your CLI version
 	$(ginkgo_int) -nodes $(NODES) integration/v7/experimental
 
 ig: integration-global
@@ -92,12 +91,12 @@ integration-global: build integration-cleanup integration-shared-global integrat
 
 isg: integration-shared-global
 integration-global-shared: integration-shared-global
-integration-shared-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are shared between v6 and v7
+integration-shared-global: build install-test-deps integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are shared between v6 and v7
 	$(ginkgo_int) integration/shared/global
 
 ivg: integration-versioned-global
 integration-global-versioned: integration-versioned-global
-integration-versioned-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
+integration-versioned-global: build install-test-deps integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
 	$(ginkgo_int) integration/v7/global
 
 ii: integration-isolated
@@ -105,29 +104,29 @@ integration-isolated: build integration-cleanup integration-shared-isolated inte
 
 isi: integration-shared-isolated
 integration-isolated-shared: integration-shared-isolated
-integration-shared-isolated: build integration-cleanup ## Run all parallel-enabled integration tests that are shared between v6 and v7
+integration-shared-isolated: build install-test-deps integration-cleanup ## Run all parallel-enabled integration tests that are shared between v6 and v7
 	$(ginkgo_int) -nodes $(NODES) integration/shared/isolated
 
 integration-performance: build integration-cleanup integration-shared-performance
 
 isp: integration-shared-performance
 integration-performance-shared: integration-shared-performance
-integration-shared-performance: build integration-cleanup
+integration-shared-performance: build install-test-deps integration-cleanup
 	$(ginkgo_int) integration/shared/performance
 
 ivi: integration-versioned-isolated
 integration-isolated-versioned: integration-versioned-isolated
-integration-versioned-isolated: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
+integration-versioned-isolated: build install-test-deps integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
 	$(ginkgo_int) -nodes $(NODES) integration/v7/isolated
 
-integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
+integration-plugin: build install-test-deps integration-cleanup ## Run all plugin-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 ip: integration-push
-integration-push: build integration-cleanup  ## Run all push-related integration tests
+integration-push: build install-test-deps integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/v7/push
 
-integration-selfcontained: build
+integration-selfcontained: build install-test-deps 
 	$(ginkgo_int) -nodes $(NODES) integration/v7/selfcontained
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
@@ -137,12 +136,12 @@ i: integration-tests-full
 integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global integration-selfcontained ## Run all isolated, push, experimental, plugin, selfcontained, and global integration tests
 
-integration-tests-full-ci: integration-cleanup
+integration-tests-full-ci: install-test-deps integration-cleanup
 	$(ginkgo_int) -nodes $(NODES)  -flake-attempts $(FLAKE_ATTEMPTS) \
 		integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
 	$(ginkgo_int) -flake-attempts $(FLAKE_ATTEMPTS) integration/shared/global integration/v7/global
 
-lint: custom-lint ## Runs all linters and formatters
+lint: ## Runs all linters and formatters
 	@echo "Running linters..."
 	go list -f "{{.Dir}}" ./... \
 		| grep -v -e "/cf/" -e "/fixtures/" -e "/assets/" -e "/plugin/" -e "/command/plugin" -e "fakes" \
@@ -199,23 +198,21 @@ test: units ## (synonym for units)
 
 units: units-full ## (synonym for units-full)
 
-units-plugin:
+units-plugin: install-test-deps
 	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -nodes 1 -flake-attempts 2 -skip-package integration ./**/plugin* ./plugin
 
 ifeq ($(OS),Windows_NT)
-units-non-plugin:
+units-non-plugin: install-test-deps
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skip-package integration,cf\ssh,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
-	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flake-attempts 3 cf/ssh
+		-skip-package integration,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
 else
-units-non-plugin:
+units-non-plugin: install-test-deps
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
-		-skip-package integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
-	CF_HOME=$(CURDIR)/fixtures $(ginkgo_units) -flake-attempts 3 cf/ssh
+		-skip-package integration,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword
 endif
 
 units-full: build units-plugin units-non-plugin
@@ -224,8 +221,8 @@ units-full: build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-.PHONY: all build clean format version lint custom-lint
-.PHONY: test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
+.PHONY: all build clean format version lint
+.PHONY: test units units-full install-test-deps integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help
 

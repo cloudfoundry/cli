@@ -2,7 +2,9 @@ package isolated
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"time"
 
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
@@ -43,6 +45,9 @@ var _ = Describe("Config", func() {
 					tmpFile, err := ioutil.TempFile(configDir, "temp-config")
 					Expect(err).ToNot(HaveOccurred())
 					tmpFile.Close()
+					oldTime := time.Now().Add(-time.Minute * 10)
+					err = os.Chtimes(tmpFile.Name(), oldTime, oldTime)
+					Expect(err).ToNot(HaveOccurred())
 				}
 			})
 
