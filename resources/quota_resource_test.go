@@ -175,4 +175,40 @@ var _ = Describe("quota limits", func() {
 		)
 
 	})
+
+	Describe("DomainLimit", func() {
+		DescribeTable("MarshalJSON",
+			func(domainLimit DomainLimit, expectedBytes []byte) {
+				bytes, err := json.Marshal(domainLimit)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(bytes).To(Equal(expectedBytes))
+			},
+			Entry("total domain", DomainLimit{TotalDomains: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"total_domains":1}`)),
+			Entry("total domain", DomainLimit{TotalDomains: nil}, []byte(`{}`)),
+			Entry("total domain", DomainLimit{TotalDomains: &types.NullInt{IsSet: false}}, []byte(`{"total_domains":null}`)),
+		)
+
+		DescribeTable("UnmarshalJSON",
+			func(givenBytes []byte, expectedStruct DomainLimit) {
+				var actualStruct DomainLimit
+				err := json.Unmarshal(givenBytes, &actualStruct)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(actualStruct).To(Equal(expectedStruct))
+			},
+			Entry(
+				"no null values",
+				[]byte(`{"total_domains":1}`),
+				DomainLimit{
+					TotalDomains: &types.NullInt{IsSet: true, Value: 1},
+				}),
+			Entry(
+				"total domains is null",
+				[]byte(`{"total_domains":null}`),
+				DomainLimit{
+					TotalDomains: &types.NullInt{IsSet: false, Value: 0},
+				}),
+		)
+
+	})
+
 })

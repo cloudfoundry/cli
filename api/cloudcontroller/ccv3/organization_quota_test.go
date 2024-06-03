@@ -168,6 +168,9 @@ var _ = Describe("Organization Quotas", func() {
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: false, Value: 0},
+							},
 						},
 					},
 					resources.OrganizationQuota{
@@ -187,6 +190,9 @@ var _ = Describe("Organization Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: false, Value: 0},
 							},
 						},
 					},
@@ -271,6 +277,9 @@ var _ = Describe("Organization Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: false, Value: 0},
 							},
 						},
 					},
@@ -401,6 +410,9 @@ var _ = Describe("Organization Quotas", func() {
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: false, Value: 0},
+							},
 						},
 					},
 				))
@@ -478,6 +490,9 @@ var _ = Describe("Organization Quotas", func() {
 						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
 						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 					},
+					Domains: resources.DomainLimit{
+						TotalDomains: &types.NullInt{IsSet: true, Value: 1},
+					},
 				},
 			}
 		})
@@ -510,7 +525,7 @@ var _ = Describe("Organization Quotas", func() {
 						"total_reserved_ports": 5
 					 },
 					 "domains": {
-						"total_domains": null
+						"total_domains": 1
 					 },
 					 "links": {
 						"self": {
@@ -534,6 +549,9 @@ var _ = Describe("Organization Quotas", func() {
 					"routes": map[string]interface{}{
 						"total_routes":         6,
 						"total_reserved_ports": 5,
+					},
+					"domains": map[string]interface{}{
+						"total_domains": 1,
 					},
 				}
 
@@ -781,7 +799,8 @@ var _ = Describe("Organization Quotas", func() {
 						"paid_services_allowed":   true,
 						"total_service_instances": 0,
 					},
-					"routes": map[string]interface{}{},
+					"routes":  map[string]interface{}{},
+					"domains": map[string]interface{}{},
 				}
 
 				server.AppendHandlers(
@@ -814,6 +833,9 @@ var _ = Describe("Organization Quotas", func() {
 						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
 							TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
+						},
+						Domains: resources.DomainLimit{
+							TotalDomains: &types.NullInt{IsSet: false, Value: 0},
 						},
 					},
 				}))
