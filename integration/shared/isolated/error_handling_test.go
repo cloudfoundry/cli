@@ -11,7 +11,7 @@ import (
 var _ = Describe("curl command", func() {
 	It("returns the expected request", func() {
 		session := helpers.CF("curl", "/v2/banana")
-		Eventually(session).Should(Say(`"error_code": "CF-NotFound"`))
+		Eventually(session).Should(Say(`"error_code":"CF-NotFound"`))
 		Eventually(session).Should(Exit(0))
 	})
 
