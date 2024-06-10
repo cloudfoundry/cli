@@ -103,6 +103,9 @@ var _ = Describe("quota limits", func() {
 			Entry("paid service plans", ServiceLimit{PaidServicePlans: &trueValue}, []byte(`{"paid_services_allowed":true}`)),
 			Entry("paid service plans", ServiceLimit{PaidServicePlans: nil}, []byte(`{}`)),
 			Entry("paid service plans", ServiceLimit{PaidServicePlans: &falseValue}, []byte(`{"paid_services_allowed":false}`)),
+			Entry("total service keys", ServiceLimit{TotalServiceKeys: &types.NullInt{IsSet: true, Value: 1}}, []byte(`{"total_service_keys":1}`)),
+			Entry("total service keys", ServiceLimit{TotalServiceKeys: nil}, []byte(`{}`)),
+			Entry("total service keys", ServiceLimit{TotalServiceKeys: &types.NullInt{IsSet: false}}, []byte(`{"total_service_keys":null}`)),
 		)
 
 		DescribeTable("UnmarshalJSON",
@@ -114,17 +117,19 @@ var _ = Describe("quota limits", func() {
 			},
 			Entry(
 				"no null values",
-				[]byte(`{"total_service_instances":1,"paid_services_allowed":true}`),
+				[]byte(`{"total_service_instances":1,"paid_services_allowed":true,"total_service_keys":1}`),
 				ServiceLimit{
 					TotalServiceInstances: &types.NullInt{IsSet: true, Value: 1},
 					PaidServicePlans:      &trueValue,
+					TotalServiceKeys:      &types.NullInt{IsSet: true, Value: 1},
 				}),
 			Entry(
-				"total service instances is null and paid services allowed is false",
-				[]byte(`{"total_service_instances":null,"paid_services_allowed":false}`),
+				"total service instances is null and paid services allowed is false and total_service_keys is null",
+				[]byte(`{"total_service_instances":null,"paid_services_allowed":false,"total_service_keys":null}`),
 				ServiceLimit{
 					TotalServiceInstances: &types.NullInt{IsSet: false, Value: 0},
 					PaidServicePlans:      &falseValue,
+					TotalServiceKeys:      &types.NullInt{IsSet: false, Value: 0},
 				}),
 		)
 	})
