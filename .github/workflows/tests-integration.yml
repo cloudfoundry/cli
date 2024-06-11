@@ -17,9 +17,14 @@ on:
         options:
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
-          - run-integration-tests-cf-env-with-min-capi
-          # - run-integration-windows
-          # - run-integration-windows-client-credentials
+          # - run-integration-tests-cf-env-with-min-capi
+          - run-cats-cf-env
+  workflow_run:
+    workflows:
+      - "Tests"
+    types:
+      - completed
+
 jobs:
   run-integration-tests-cf-env:
     name: Integration tests
@@ -43,37 +48,31 @@ jobs:
       name: Integration client creds
     secrets: inherit
 
-  run-integration-tests-cf-env-with-min-capi:
-    name: MIN CAPI
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
+  # run-integration-tests-cf-env-with-min-capi:
+  #   name: MIN CAPI
+  #   if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
+  #   uses: ./.github/workflows/tests-integration-reusable.yml
+  #   with:
+  #     capi-version: min
+  #     run-with-client-creds: false
+  #     os: ubuntu-latest
+  #     name: Integration MIN CAPI
+  #     pool-name: cfd_16_11_0
+  #     pool-namespace: tas-devex
+  #     is-pr: ${{ github.event_name != 'workflow_dispatch' }}
+  #   secrets: inherit
+
+  run-cats-cf-env:
+    name: CATS
+    needs:
+      - run-integration-tests-cf-env
+      - run-integration-tests-cf-env-with-client-creds
+    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: min
+      capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
-      name: Integration MIN CAPI
-      pool-name: cfd_16_11_0
-      pool-namespace: tas-devex
+      name: cats
+      is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
-
-  #run-integration-windows:
-  #  name: Windows
-  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows' }}
-  #  uses: ./.github/workflows/tests-integration-reusable.yml
-  #  with:
-  #    capi-version: edge
-  #    run-with-client-creds: false
-  #    os: windows-latest
-  #    name: Integration windows
-  #  secrets: inherit
-
-  #run-integration-windows-client-credentials:
-  #  name: Windows with client credentials
-  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows-client-credentials' }}
-  #  uses: ./.github/workflows/tests-integration-reusable.yml
-  #  with:
-  #    capi-version: edge
-  #    run-with-client-creds: true
-  #    os: windows-latest
-  #    name: Integration windows client credentials
-  #  secrets: inherit
