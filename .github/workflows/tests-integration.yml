@@ -56,6 +56,7 @@ jobs:
       os: ubuntu-latest
       name: Integration MIN CAPI
       pool-name: cfd_16_11_0
+      pool-namespace: tas-devex
       is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
 
