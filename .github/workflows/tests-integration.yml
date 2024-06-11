@@ -3,6 +3,11 @@ name: "Tests: Integration"
 run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
 
 on:
+  workflow_call:
+    inputs:
+      workflow:
+        default: all
+        type: string
   workflow_dispatch:
     inputs:
       workflow:
@@ -15,40 +20,32 @@ on:
           - run-integration-tests-cf-env-with-min-capi
           # - run-integration-windows
           # - run-integration-windows-client-credentials
-  workflow_run:
-    workflows:
-      - "Tests"
-    types:
-      - completed
-
-jobs: 
+jobs:
   run-integration-tests-cf-env:
     name: Integration tests
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.workflow == 'run-integration-tests-cf-env') || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
-      is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
       name: Integration client creds
-      is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.workflow == 'run-integration-tests-cf-env-with-min-capi') || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: min
@@ -57,12 +54,11 @@ jobs:
       name: Integration MIN CAPI
       pool-name: cfd_16_11_0
       pool-namespace: tas-devex
-      is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
 
   #run-integration-windows:
   #  name: Windows
-  #  if: ${{ (github.event_name == 'workflow_dispatch' && inputs.workflow == 'run-integration-windows') || github.event.workflow_run.conclusion == 'success' }}
+  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows' }}
   #  uses: ./.github/workflows/tests-integration-reusable.yml
   #  with:
   #    capi-version: edge
@@ -73,7 +69,7 @@ jobs:
 
   #run-integration-windows-client-credentials:
   #  name: Windows with client credentials
-  #  if: ${{ (github.event_name == 'workflow_dispatch' && inputs.workflow == 'run-integration-windows-client-credentials') || github.event.workflow_run.conclusion == 'success' }}
+  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows-client-credentials' }}
   #  uses: ./.github/workflows/tests-integration-reusable.yml
   #  with:
   #    capi-version: edge
