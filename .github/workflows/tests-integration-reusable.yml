@@ -28,12 +28,6 @@ on:
       pool-namespace:
         type: string
         default: 'official'
-    secrets:
-      SHEPHERD_SERVICE_ACCOUNT_TOKEN:
-        required: true
-      CLIENT_SECRET:
-        required: true
-
 jobs:
   run-integration-tests:
     defaults:

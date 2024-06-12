@@ -30,9 +30,7 @@ jobs:
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
-    secrets:
-      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
@@ -43,9 +41,7 @@ jobs:
       run-with-client-creds: true
       os: ubuntu-latest
       name: Integration client creds
-    secrets:
-      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    secrets: inherit
 
   run-integration-tests-cf-env-with-min-capi:
     name: MIN CAPI
@@ -58,9 +54,7 @@ jobs:
       name: Integration MIN CAPI
       pool-name: cfd_16_11_0
       pool-namespace: tas-devex
-    secrets:
-      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    secrets: inherit
 
   #run-integration-windows:
   #  name: Windows
@@ -71,9 +65,7 @@ jobs:
   #    run-with-client-creds: false
   #    os: windows-latest
   #    name: Integration windows
-  #  secrets:
-  #    SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-  #    CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  #  secrets: inherit
 
   #run-integration-windows-client-credentials:
   #  name: Windows with client credentials
@@ -84,6 +76,4 @@ jobs:
   #    run-with-client-creds: true
   #    os: windows-latest
   #    name: Integration windows client credentials
-  #  secrets:
-  #    SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-  #    CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  #  secrets: inherit
