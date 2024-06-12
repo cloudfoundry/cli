@@ -154,6 +154,9 @@ var _ = Describe("Space Quotas", func() {
 							TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
 							TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 						},
+						Domains: resources.DomainLimit{
+							TotalDomains: &types.NullInt{IsSet: true, Value: 0},
+						},
 					},
 					OrgGUID: "some-org-guid",
 				}
@@ -178,6 +181,9 @@ var _ = Describe("Space Quotas", func() {
   "routes": {
     "total_routes": 6,
     "total_reserved_ports": 7
+  },
+  "domains": {
+	"total_domains": 2
   },
   "relationships": {
     "organization": {
@@ -255,6 +261,9 @@ var _ = Describe("Space Quotas", func() {
 								TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
 								TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 2},
+							},
 						},
 						OrgGUID: "some-org-guid",
 					}))
@@ -305,6 +314,9 @@ var _ = Describe("Space Quotas", func() {
   "routes": {
     "total_routes": 8,
     "total_reserved_ports": 9
+  },
+  "domains": {
+	"total_domains": 2
   },
   "relationships": {
     "organization": {
@@ -388,6 +400,9 @@ var _ = Describe("Space Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
 								TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 2},
 							},
 						},
 						OrgGUID:    "some-org-guid",
@@ -543,7 +558,7 @@ var _ = Describe("Space Quotas", func() {
 							"total_reserved_ports": 5
 						  },
 						  "domains": {
-							"total_private_domains": 7
+							"total_domains": 7
 						  },
 						  "relationships": {
 							"organization": {
@@ -584,6 +599,9 @@ var _ = Describe("Space Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 7},
 							},
 						},
 					},
@@ -686,7 +704,7 @@ var _ = Describe("Space Quotas", func() {
 						"total_reserved_ports": 4
 					  },
 					  "domains": {
-						"total_private_domains": 7
+						"total_domains": 7
 					  },
 					  "relationships": {
 						"organization": {
@@ -727,7 +745,7 @@ var _ = Describe("Space Quotas", func() {
 							"total_reserved_ports": 5
 						  },
 						  "domains": {
-							"total_private_domains": 7
+							"total_domains": 7
 						  },
 						  "relationships": {
 							"organization": {
@@ -778,6 +796,9 @@ var _ = Describe("Space Quotas", func() {
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 7},
+							},
 						},
 						OrgGUID: "org-guid-1",
 					},
@@ -798,6 +819,9 @@ var _ = Describe("Space Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 7},
 							},
 						},
 					},
@@ -839,7 +863,7 @@ var _ = Describe("Space Quotas", func() {
 							"total_reserved_ports": 5
 						  },
 						  "domains": {
-							"total_private_domains": 7
+							"total_domains": 7
 						  },
 						  "relationships": {
 							"organization": {
@@ -882,6 +906,9 @@ var _ = Describe("Space Quotas", func() {
 							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+							Domains: resources.DomainLimit{
+								TotalDomains: &types.NullInt{IsSet: true, Value: 7},
 							},
 						},
 					},
@@ -1064,6 +1091,9 @@ var _ = Describe("Space Quotas", func() {
 						"total_routes": null,
 						"total_reserved_ports": null
 					 },
+					 "domains": {
+					   "total_domains": null
+					 },
 					 "links": {
 						"self": {
 						   "href": "https://api.foil-venom.lite.cli.fun/v3/space_quotas/08357710-8106-4d14-b0ea-03154a36fb79"
@@ -1116,6 +1146,9 @@ var _ = Describe("Space Quotas", func() {
 						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
 							TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
+						},
+						Domains: resources.DomainLimit{
+							TotalDomains: &types.NullInt{IsSet: false, Value: 0},
 						},
 					},
 				}))
