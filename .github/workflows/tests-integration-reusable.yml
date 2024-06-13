@@ -142,8 +142,6 @@ jobs:
 
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
-      env:
-        CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         env_name=$(jq -r .name metadata.json)
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
@@ -157,7 +155,7 @@ jobs:
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
-          -v client-secret="${CF_INT_CLIENT_SECRET}" \
+          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
           > ./director.yml
 
         bosh -d cf deploy director.yml -n
