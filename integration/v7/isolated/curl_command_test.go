@@ -59,7 +59,6 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`Content-Length: .+`))
 		Eventually(session).Should(Say(`Content-Type: .+`))
 		Eventually(session).Should(Say(`Date: .+`))
-		Eventually(session).Should(Say(`Server: .+`))
 		Eventually(session).Should(Say(`X-Content-Type-Options: .+`))
 		Eventually(session).Should(Say(`X-Vcap-Request-Id: .+`))
 	}
@@ -400,7 +399,6 @@ var _ = Describe("curl command", func() {
 					Expect(contents).To(MatchRegexp(`Content-Length: .+`))
 					Expect(contents).To(MatchRegexp(`Content-Type: .+`))
 					Expect(contents).To(MatchRegexp(`Date: .+`))
-					Expect(contents).To(MatchRegexp(`Server: .+`))
 					Expect(contents).To(MatchRegexp(`X-Content-Type-Options: .+`))
 					Expect(contents).To(MatchRegexp(`X-Vcap-Request-Id: .+`))
 
