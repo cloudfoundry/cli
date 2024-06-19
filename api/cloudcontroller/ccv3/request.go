@@ -69,7 +69,7 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 		request.Header.Set("Accept", "application/json")
 	}
 
-	if request.Header.Get("Content-Type") == "" {
+	if passedRequest.RequestName != internal.GetDropletBitsRequest && request.Header.Get("Content-Type") == "" {
 		request.Header.Set("Content-Type", "application/json")
 	}
 
