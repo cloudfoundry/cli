@@ -27,11 +27,7 @@ on:
         default: ${{ vars.SHEPHERD_POOL_NAME }}
       pool-namespace:
         type: string
-        default: 'tas-devex'
-      is-pr:
-        type: boolean
-        default: true
-
+        default: 'official'
 jobs:
   run-integration-tests:
     defaults:
@@ -40,17 +36,6 @@ jobs:
     runs-on: ${{ inputs.os }} 
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     steps:
-    - uses: LouisBrunner/checks-action@v2.0.0
-      if: always() && inputs.is-pr
-      id: check
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: "${{ inputs.name }}"
-        status: in_progress
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-    
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
@@ -100,16 +85,16 @@ jobs:
       run: |
         shepherd login service-account ${account_token}
 
-        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace tas-devex --namespace ${pool_namespace}"
-        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace tas-devex --namespace ${pool_namespace} --json | jq -r .id)
+        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
+        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
         # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
         # if the pool is empty.
         count=0
         while [ $count -lt 360 ] ; do
           sleep 30
-          status=$(shepherd get lease ${lease_id} --namespace ${pool_namespace} --json | jq -r .status)
+          status=$(shepherd get lease ${lease_id} --namespace tas-devex --json | jq -r .status)
           if [ $status == "LEASED" ] ; then
-            shepherd get lease ${lease_id} --namespace ${pool_namespace} --json | jq .output > metadata.json
+            shepherd get lease ${lease_id} --namespace tas-devex --json | jq .output > metadata.json
             break
           elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
             echo "There was an error obtaining the lease. Lease status is ${status}."
@@ -157,8 +142,6 @@ jobs:
 
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
-      env:
-        CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         env_name=$(jq -r .name metadata.json)
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
@@ -172,7 +155,7 @@ jobs:
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
-          -v client-secret="${CF_INT_CLIENT_SECRET}" \
+          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
           > ./director.yml
 
         bosh -d cf deploy director.yml -n
@@ -272,13 +255,3 @@ jobs:
         shepherd login service-account ${account_token}
         set -x
         shepherd delete lease ${{ steps.claim-env.outputs.lease-id }} --namespace tas-devex
-
-    - uses: LouisBrunner/checks-action@v2.0.0
-      if: always() && inputs.is-pr
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        check_id: ${{ steps.check.outputs.check_id }}
-        conclusion: ${{ job.status }}
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"finished ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}

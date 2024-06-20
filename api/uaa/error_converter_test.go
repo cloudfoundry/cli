@@ -135,6 +135,22 @@ var _ = Describe("Error Wrapper", func() {
 					})
 				})
 
+				Context("invalid_client with bad credentials", func() {
+					BeforeEach(func() {
+						fakeConnectionErr.RawResponse = []byte(`{
+  "error": "invalid_client",
+  "error_description": "Bad credentials"
+}`)
+						fakeConnection.MakeReturns(fakeConnectionErr)
+					})
+
+					It("returns a BadCredentialsError", func() {
+						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+
+						Expect(makeErr).To(MatchError(UnauthorizedError{Message: "Bad credentials"}))
+					})
+				})
+
 				Context("unauthorized - too many failed login attempts", func() {
 					BeforeEach(func() {
 						fakeConnectionErr.RawResponse = []byte(`{
