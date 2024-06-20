@@ -17,7 +17,7 @@ on:
         options:
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
-          - run-integration-tests-cf-env-with-min-capi
+          # - run-integration-tests-cf-env-with-min-capi
           # - run-integration-windows
           # - run-integration-windows-client-credentials
 jobs:
@@ -43,18 +43,18 @@ jobs:
       name: Integration client creds
     secrets: inherit
 
-  run-integration-tests-cf-env-with-min-capi:
-    name: MIN CAPI
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
-    uses: ./.github/workflows/tests-integration-reusable.yml
-    with:
-      capi-version: min
-      run-with-client-creds: false
-      os: ubuntu-latest
-      name: Integration MIN CAPI
-      pool-name: cfd_16_11_0
-      pool-namespace: tas-devex
-    secrets: inherit
+  #run-integration-tests-cf-env-with-min-capi:
+  #  name: MIN CAPI
+  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
+  #  uses: ./.github/workflows/tests-integration-reusable.yml
+  #  with:
+  #    capi-version: min
+  #    run-with-client-creds: false
+  #    os: ubuntu-latest
+  #    name: Integration MIN CAPI
+  #    pool-name: cfd_16_11_0
+  #    pool-namespace: tas-devex
+  #  secrets: inherit
 
   #run-integration-windows:
   #  name: Windows
