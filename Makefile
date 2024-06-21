@@ -143,7 +143,7 @@ integration-tests-full-ci: install-test-deps integration-cleanup
 
 lint: format ## Runs all linters and formatters
 	@echo "Running linters..."
-	golangci-lint run --skip-dirs cf --skip-dirs fixtures --skip-dirs plugin --skip-dirs command/plugin
+	golangci-lint run --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
 	@echo "No lint errors!"
 
 # TODO: version specific tagging for all these builds
@@ -162,6 +162,11 @@ out/cf-cli_linux_i686: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
 							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_i686 .
+
+out/cf-cli_linux_x86-64: $(GOSRC)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
 							
 out/cf-cli_linux_arm64: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build \
