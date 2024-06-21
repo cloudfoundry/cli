@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"runtime"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -159,10 +158,6 @@ func (requester *RealRequester) MakeRequestSendReceiveRaw(
 	})
 	if err != nil {
 		return nil, nil, err
-	}
-
-	if strings.Contains(URL, "droplet") && strings.Contains(URL, "download") {
-		request.Header.Del("Content-Type")
 	}
 
 	response := cloudcontroller.Response{}
