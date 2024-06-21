@@ -1070,7 +1070,6 @@ var _ = Describe("shared request helpers", func() {
 								VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
 								VerifyHeaderKV("Accept", "application/x-yaml"),
 								func(w http.ResponseWriter, req *http.Request) {
-									// key := http.CanonicalHeaderKey("Content-Type")
 									Expect(req.Header).To(HaveKey("Content-Type"), "Header Content-Type is not present")
 								},
 								RespondWith(
