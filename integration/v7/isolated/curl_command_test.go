@@ -391,19 +391,7 @@ var _ = Describe("curl command", func() {
 					ExpectResponseHeaders(session)
 					body, err := os.ReadFile(outFile.Name())
 					Expect(err).ToNot(HaveOccurred())
-
-					contents := string(body)
-					jsonStartsAt := strings.Index(contents, "{")
-
-					Expect(contents).To(ContainSubstring("HTTP/1.1 200 OK"))
-					Expect(contents).To(MatchRegexp(`Content-Length: .+`))
-					Expect(contents).To(MatchRegexp(`Content-Type: .+`))
-					Expect(contents).To(MatchRegexp(`Date: .+`))
-					Expect(contents).To(MatchRegexp(`X-Content-Type-Options: .+`))
-					Expect(contents).To(MatchRegexp(`X-Vcap-Request-Id: .+`))
-
-					actualJSON := contents[jsonStartsAt:]
-					Expect(actualJSON).To(MatchJSON(expectedJSON))
+					Expect(string(body)).To(MatchJSON(expectedJSON))
 				})
 
 				When("--output is passed and CF_TRACE is set to a file", func() {
