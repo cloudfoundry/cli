@@ -1,0 +1,33 @@
+name: "Check CVEs"
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  check-cves:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out codebase
+      uses: actions/checkout@v4
+
+    - name: Scan current project
+      uses: anchore/scan-action@v3
+      with:
+        path: "."
+        add-cpes-if-none: true
+        by-cve: true
+        output-format: json
+
+    - name: Print scan results
+      run: .github/scripts/format-cve-scan-results.sh results.json > $GITHUB_STEP_SUMMARY
+      if: always()
+
+    - name: Archive CVE scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cve-scan-results-${{ github.sha }}-${{ github.run_id }}-${{ github.run_number }}
+        path: results.json
