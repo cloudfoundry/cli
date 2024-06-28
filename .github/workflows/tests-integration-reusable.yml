@@ -22,7 +22,12 @@ on:
       name:
         required: true
         type: string
-
+      pool-name:
+        type: string
+        default: ${{ vars.SHEPHERD_POOL_NAME }}
+      pool-namespace:
+        type: string
+        default: 'official'
 jobs:
   run-integration-tests:
     defaults:
@@ -31,17 +36,6 @@ jobs:
     runs-on: ${{ inputs.os }} 
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     steps:
-    - uses: LouisBrunner/checks-action@v2.0.0
-      if: always()
-      id: check
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: "${{ inputs.name }}"
-        status: in_progress
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"started ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-    
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
@@ -86,12 +80,14 @@ jobs:
       name: Claim Environment
       env:
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-        pool_name: ${{ vars.SHEPHERD_POOL_NAME }}
+        pool_name: ${{ inputs.pool-name }}
+        pool_namespace: ${{ inputs.pool-namespace }}
       run: |
         shepherd login service-account ${account_token}
-        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace official --namespace tas-devex --json | jq -r .id) 
 
-        # Give somtime for the lease to complete. Shepherd may take upto an 3 hours to create an env
+        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
+        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
+        # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
         # if the pool is empty.
         count=0
         while [ $count -lt 360 ] ; do
@@ -112,7 +108,7 @@ jobs:
         env_name=$(jq -r .name metadata.json)
         cat metadata.json | jq -r '.name'
         echo "lease-id=$lease_id" >> "${GITHUB_OUTPUT}"
-    
+
     - name: Install Tools
       run: |
         if [[ ${{ inputs.os }} =~ "windows" ]]
@@ -146,8 +142,6 @@ jobs:
 
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
-      env:
-        CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         env_name=$(jq -r .name metadata.json)
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
@@ -161,7 +155,7 @@ jobs:
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
-          -v client-secret="${CF_INT_CLIENT_SECRET}" \
+          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
           > ./director.yml
 
         bosh -d cf deploy director.yml -n
@@ -171,57 +165,24 @@ jobs:
     - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version != 'edge' }}
       run: |
-        # TODO: Make this actually deploy min capi
-        # Creates vars files
-        mkdir vars-files
-        echo "cs = ${{ secrets.CLIENT_SECRET }}"
-        cat << EOF > vars-files/vars.yml
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-        EOF
-
-        # Copy Ops files
-        mkdir ops-files
-        cp cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml ops-files/
-        cp cli-ci/ci/infrastructure/operations/add-oidc-provider.yml ops-files/
-        cp cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml ops-files/
-        cp cli-ci/ci/infrastructure/operations/diego-cell-instances.yml ops-files/
-        cp cli-ci/ci/infrastructure/operations/use-latest-ruby-buildpack.yml ops-files/
-
-        # Deletes CF-D
         env_name=$(jq -r .name metadata.json)
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file metadata.json)"
-        bosh -d cf delete-deployment -n
 
-        # Deploy CF-D
-        mkdir toolsmiths-env
-        cp metadata.json toolsmiths-env/metadata
-        cat metadata.json | jq -r .name > toolsmiths-env/name
-        export VARS_FILES="vars.yml"
-        export MANIFEST_FILE="cf-deployment.yml"
-        export SYSTEM_DOMAIN=""
-        export REGENERATE_CREDENTIALS=false
-        export DEPLOY_WITH_UPTIME_MEASUREMENTS=false
-        export MEASURE_SYSLOG_AVAILABILITY=false
-        export TCP_DOMAIN=""
-        export AVAILABLE_PORT=""
-        export FAIL_ON_DOWNTIME=false
-        export APP_PUSHABILITY_THRESHOLD=0
-        export HTTP_AVAILABILITY_THRESHOLD=0
-        export RECENT_LOGS_THRESHOLD=0
-        export STREAMING_LOGS_THRESHOLD=0
-        export APP_SYSLOG_AVAILABILITY_THRESHOLD=0
-        export USE_SINGLE_APP_INSTANCE=false
-        export BOSH_DEPLOY_ARGS=""
-        export BOSH_LITE=false
-        export BBL_JSON_CONFIG=""
-        export SKIP_STEMCELL_UPLOAD=false
-        export OPS_FILES="add-persistent-isolation-segment-diego-cell.yml \
-                          add-uaa-client-credentials.yml \
-                          diego-cell-instances.yml \
-                          add-oidc-provider.yml \
-                          use-latest-ruby-buildpack.yml"
-        ./cf-deployment-concourse-tasks/bosh-deploy/task
+        # deploy
+        bosh -d cf manifest > /tmp/manifest.yml
+        bosh interpolate /tmp/manifest.yml \
+          -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
+          -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
+          -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
+          -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
+          -o cli-ci/ci/infrastructure/operations/use-latest-ruby-buildpack.yml \
+          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
+          > ./director.yml
+
+        bosh -d cf deploy director.yml -n
+        echo "Deployed CAPI version:"
+        bosh -d cf releases | grep capi
 
     - name: Set Up Go
       uses: actions/setup-go@v5
@@ -294,13 +255,3 @@ jobs:
         shepherd login service-account ${account_token}
         set -x
         shepherd delete lease ${{ steps.claim-env.outputs.lease-id }} --namespace tas-devex
-        
-    - uses: LouisBrunner/checks-action@v2.0.0
-      if: always()
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        check_id: ${{ steps.check.outputs.check_id }}
-        conclusion: ${{ job.status }}
-        sha:  ${{github.event.workflow_run.head_sha}}
-        output: |
-          {"title": "${{ inputs.name }}", "summary":"finished ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}

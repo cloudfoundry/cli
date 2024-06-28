@@ -53,7 +53,7 @@ func convert(rawHTTPStatusErr RawHTTPStatusError) error {
 		if uaaErrorResponse.Type == "invalid_token" {
 			return InvalidAuthTokenError{Message: uaaErrorResponse.Description}
 		}
-		if uaaErrorResponse.Type == "unauthorized" {
+		if uaaErrorResponse.Type == "unauthorized" || uaaErrorResponse.Type == "invalid_client" {
 			if uaaErrorResponse.Description == "Your account has been locked because of too many failed attempts to login." {
 				return AccountLockedError{Message: "Your account has been locked because of too many failed attempts to login."}
 			}

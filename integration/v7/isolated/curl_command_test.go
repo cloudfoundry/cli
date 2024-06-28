@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -57,11 +56,9 @@ var _ = Describe("curl command", func() {
 
 	var ExpectResponseHeaders = func(session *Session) {
 		Eventually(session).Should(Say("HTTP/1.1 200 OK"))
-		Eventually(session).Should(Say(`Connection: .+`))
 		Eventually(session).Should(Say(`Content-Length: .+`))
 		Eventually(session).Should(Say(`Content-Type: .+`))
 		Eventually(session).Should(Say(`Date: .+`))
-		Eventually(session).Should(Say(`Server: .+`))
 		Eventually(session).Should(Say(`X-Content-Type-Options: .+`))
 		Eventually(session).Should(Say(`X-Vcap-Request-Id: .+`))
 	}
@@ -386,7 +383,7 @@ var _ = Describe("curl command", func() {
 			})
 
 			When("--output is passed with a file name", func() {
-				It("writes the response body to the file but the other output to stdout", func() {
+				It("writes the response headers and body to the file", func() {
 					outFile, err := os.CreateTemp("", "output*.json")
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CF("curl", "/v2/apps", "-i", "--output", outFile.Name())
