@@ -28,6 +28,9 @@ on:
       pool-namespace:
         type: string
         default: 'official'
+      something:
+        type: string
+        required: false
 jobs:
   run-integration-tests:
     defaults:
@@ -84,7 +87,8 @@ jobs:
         pool_name: ${{ inputs.pool-name }}
         pool_namespace: ${{ inputs.pool-namespace }}
       run: |
-        echo "This is my mega secret secret ${test_secret}"
+        echo "From input: -> ${{ inputs.something }} <-"
+        echo "This is my mega secret secret ->${test_secret}<-"
         shepherd login service-account ${account_token}
 
         echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
