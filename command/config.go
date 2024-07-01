@@ -24,6 +24,7 @@ type Config interface {
 	CurrentUserName() (string, error)
 	DialTimeout() time.Duration
 	DockerPassword() string
+	CNBCredentials() (map[string]interface{}, error)
 	Experimental() bool
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool)
