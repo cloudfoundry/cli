@@ -79,10 +79,12 @@ jobs:
     - id: claim-env
       name: Claim Environment
       env:
+        test_secret: ${{ secrets.TEST_SECRET }}
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
         pool_name: ${{ inputs.pool-name }}
         pool_namespace: ${{ inputs.pool-namespace }}
       run: |
+        echo "This is my mega secret secret ${test_secret}"
         shepherd login service-account ${account_token}
 
         echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
