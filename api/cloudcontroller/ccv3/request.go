@@ -3,6 +3,7 @@ package ccv3
 import (
 	"io"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -57,6 +58,7 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 	}
 
 	request.Header = http.Header{}
+
 	if passedRequest.Header != nil {
 		request.Header = passedRequest.Header
 	}
@@ -69,9 +71,15 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 		request.Header.Set("Accept", "application/json")
 	}
 
-	if request.Header.Get("Content-Type") == "" {
+	if !isDownloadDroplet(passedRequest.URL, passedRequest.RequestName) && request.Header.Get("Content-Type") == "" {
 		request.Header.Set("Content-Type", "application/json")
+	} else if isDownloadDroplet(passedRequest.URL, passedRequest.RequestName) && request.Header.Get("Content-Type") != "" {
+		request.Header.Del("Content-Type")
 	}
 
 	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
+}
+
+func isDownloadDroplet(URL string, requestName string) bool {
+	return (strings.Contains(URL, "droplet") && strings.Contains(URL, "download")) || (requestName == internal.GetDropletBitsRequest)
 }
