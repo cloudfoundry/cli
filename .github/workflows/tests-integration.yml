@@ -37,7 +37,10 @@ jobs:
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
-    secrets: inherit
+    secrets:
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds

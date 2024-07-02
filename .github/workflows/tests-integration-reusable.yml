@@ -31,6 +31,13 @@ on:
       something:
         type: string
         required: false
+    secrets:
+      TEST_SECRET:
+        required: true
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN:
+        required: true
+      CLIENT_SECRET:
+        required: true
 jobs:
   run-integration-tests:
     defaults:
