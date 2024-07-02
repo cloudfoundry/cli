@@ -13,6 +13,10 @@ on:
       - v9
       - v8
       - v7
+    types:
+      - synchronize
+      - opened
+      - reopened
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"

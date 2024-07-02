@@ -8,6 +8,13 @@ on:
       workflow:
         default: all
         type: string
+    secrets:
+      TEST_SECRET:
+        required: true
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN:
+        required: true
+      CLIENT_SECRET:
+        required: true
   workflow_dispatch:
     inputs:
       workflow:
