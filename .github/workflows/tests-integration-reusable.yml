@@ -38,6 +38,8 @@ on:
         required: true
       CLIENT_SECRET:
         required: true
+      RANDOM_THAT_DOES_NOT_EXIST:
+        required: true
 jobs:
   run-integration-tests:
     defaults:
