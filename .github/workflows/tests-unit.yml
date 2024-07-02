@@ -18,8 +18,8 @@ on:
       - ".gitpod.yml"
       - "README.md"
 
-#permissions:
-#  contents: read
+permissions:
+  contents: write
 
 defaults:
   run:
