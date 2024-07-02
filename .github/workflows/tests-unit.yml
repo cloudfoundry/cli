@@ -98,7 +98,7 @@ jobs:
       SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
   direct-integration-stuff:
-    name: Integration tests
+    name: Direct integration stuff
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
