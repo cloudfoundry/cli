@@ -87,9 +87,9 @@ jobs:
 
 
   integration:
-    needs:
-      - units
-      - units-windows
+    #needs:
+    #  - units
+    #  - units-windows
     name: Integration tests
     if: ${{ github.event != 'workflow_dispatch' }}
     uses: ./.github/workflows/tests-integration.yml
