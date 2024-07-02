@@ -97,4 +97,16 @@ jobs:
       TEST_SECRET: ${{ secrets.TEST_SECRET }}
       SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  direct-integration-stuff:
+    name: Integration tests
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: edge
+      run-with-client-creds: false
+      os: ubuntu-latest
+      name: Integration
+    secrets:
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
