@@ -37,7 +37,6 @@ jobs:
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
-      something: ${{ secrets.TEST_SECRET }}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
