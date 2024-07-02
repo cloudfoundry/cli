@@ -85,7 +85,14 @@ jobs:
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
-
+    - id: check-env
+      name: Check what is present in the environment
+      env:
+        test_secret: ${{ secrets.TEST_SECRET }}
+        pool_name: ${{ inputs.pool-name }}
+        pool_namespace: ${{ inputs.pool-namespace }}
+      run: |
+        env
     - id: claim-env
       name: Claim Environment
       env:
