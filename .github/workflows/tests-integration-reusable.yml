@@ -97,7 +97,7 @@ jobs:
         echo "From input: -> ${{ inputs.something }} <-"
         echo "This is my mega secret secret ->${test_secret}<-"
         echo "Trying to get it directly from secret itself ->${{ secrets.TEST_SECRET }}<-"
-        shepherd login service-account ${account_token}
+        shepherd login service-account ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
 
         echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
         lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
