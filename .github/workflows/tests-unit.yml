@@ -7,7 +7,7 @@ on:
       - "v9.*"
       - "v8.*"
       - "v7.*"
-  pull_request:
+  pull_request_target:
     branches:
       - main
       - v9
@@ -18,8 +18,8 @@ on:
       - ".gitpod.yml"
       - "README.md"
 
-permissions:
-  contents: write
+#permissions:
+#  contents: write
 
 defaults:
   run:
