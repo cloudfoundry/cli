@@ -28,6 +28,16 @@ on:
       pool-namespace:
         type: string
         default: 'official'
+      something:
+        type: string
+        required: false
+    secrets:
+      TEST_SECRET:
+        required: true
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN:
+        required: true
+      CLIENT_SECRET:
+        required: true
 jobs:
   run-integration-tests:
     defaults:
@@ -75,15 +85,26 @@ jobs:
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
-
+    - id: check-env
+      name: Check what is present in the environment
+      env:
+        test_secret: ${{ secrets.TEST_SECRET }}
+        pool_name: ${{ inputs.pool-name }}
+        pool_namespace: ${{ inputs.pool-namespace }}
+      run: |
+        env
     - id: claim-env
       name: Claim Environment
       env:
+        test_secret: ${{ secrets.TEST_SECRET }}
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
         pool_name: ${{ inputs.pool-name }}
         pool_namespace: ${{ inputs.pool-namespace }}
       run: |
-        shepherd login service-account ${account_token}
+        echo "From input: -> ${{ inputs.something }} <-"
+        echo "This is my mega secret secret ->${test_secret}<-"
+        echo "Trying to get it directly from secret itself ->${{ secrets.TEST_SECRET }}<-"
+        shepherd login service-account ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
 
         echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
         lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)

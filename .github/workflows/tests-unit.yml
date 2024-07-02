@@ -7,7 +7,7 @@ on:
       - "v9.*"
       - "v8.*"
       - "v7.*"
-  pull_request:
+  pull_request_target:
     branches:
       - main
       - v9
@@ -18,8 +18,8 @@ on:
       - ".gitpod.yml"
       - "README.md"
 
-permissions:
-  contents: read
+#permissions:
+#  contents: write
 
 defaults:
   run:
@@ -87,11 +87,26 @@ jobs:
 
 
   integration:
-    needs:
-      - units
-      - units-windows
+    # needs:
+    #   - units
+    #   - units-windows
     name: Integration tests
     if: ${{ github.event != 'workflow_dispatch' }}
     uses: ./.github/workflows/tests-integration.yml
-    secrets: inherit
+    secrets:
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  direct-integration-stuff:
+    name: Direct integration stuff
+    uses: ./.github/workflows/tests-integration-reusable.yml
+    with:
+      capi-version: edge
+      run-with-client-creds: false
+      os: ubuntu-latest
+      name: Integration
+    secrets:
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      SHEPHERD_SERVICE_ACCOUNT_TOKEN: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
