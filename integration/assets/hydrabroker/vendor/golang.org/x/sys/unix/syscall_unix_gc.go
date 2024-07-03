@@ -2,11 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build (darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris) && !gccgo && !ppc64le && !ppc64
-// +build darwin dragonfly freebsd linux netbsd openbsd solaris
-// +build !gccgo
-// +build !ppc64le
-// +build !ppc64
+//go:build (darwin || dragonfly || freebsd || (linux && !ppc64 && !ppc64le) || netbsd || openbsd || solaris) && gc
 
 package unix
 

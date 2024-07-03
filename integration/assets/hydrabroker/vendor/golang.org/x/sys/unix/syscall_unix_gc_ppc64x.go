@@ -2,10 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build linux && (ppc64le || ppc64) && !gccgo
-// +build linux
-// +build ppc64le ppc64
-// +build !gccgo
+//go:build linux && (ppc64le || ppc64) && gc
 
 package unix
 

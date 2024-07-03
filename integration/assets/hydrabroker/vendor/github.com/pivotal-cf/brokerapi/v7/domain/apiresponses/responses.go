@@ -29,8 +29,9 @@ type CatalogResponse struct {
 }
 
 type ProvisioningResponse struct {
-	DashboardURL  string `json:"dashboard_url,omitempty"`
-	OperationData string `json:"operation,omitempty"`
+	DashboardURL  string      `json:"dashboard_url,omitempty"`
+	OperationData string      `json:"operation,omitempty"`
+	Metadata      interface{} `json:"metadata,omitempty"`
 }
 
 type GetInstanceResponse struct {

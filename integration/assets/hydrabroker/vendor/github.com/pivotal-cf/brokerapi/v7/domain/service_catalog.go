@@ -21,17 +21,19 @@ type Service struct {
 	Requires             []RequiredPermission    `json:"requires,omitempty"`
 	Metadata             *ServiceMetadata        `json:"metadata,omitempty"`
 	DashboardClient      *ServiceDashboardClient `json:"dashboard_client,omitempty"`
+	AllowContextUpdates  bool                    `json:"allow_context_updates,omitempty"`
 }
 
 type ServicePlan struct {
-	ID              string               `json:"id"`
-	Name            string               `json:"name"`
-	Description     string               `json:"description"`
-	Free            *bool                `json:"free,omitempty"`
-	Bindable        *bool                `json:"bindable,omitempty"`
-	Metadata        *ServicePlanMetadata `json:"metadata,omitempty"`
-	Schemas         *ServiceSchemas      `json:"schemas,omitempty"`
-	MaintenanceInfo *MaintenanceInfo     `json:"maintenance_info,omitempty"`
+	ID                     string               `json:"id"`
+	Name                   string               `json:"name"`
+	Description            string               `json:"description"`
+	Free                   *bool                `json:"free,omitempty"`
+	Bindable               *bool                `json:"bindable,omitempty"`
+	Metadata               *ServicePlanMetadata `json:"metadata,omitempty"`
+	Schemas                *ServiceSchemas      `json:"schemas,omitempty"`
+	MaximumPollingDuration *int                 `json:"maximum_polling_duration,omitempty"`
+	MaintenanceInfo        *MaintenanceInfo     `json:"maintenance_info,omitempty"`
 }
 
 type ServiceSchemas struct {

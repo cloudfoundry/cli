@@ -94,6 +94,12 @@ type ProvisionedServiceSpec struct {
 	AlreadyExists bool
 	DashboardURL  string
 	OperationData string
+	Metadata      InstanceMetadata
+}
+
+type InstanceMetadata struct {
+	Labels     map[string]string `json:"labels,omitempty"`
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 type DeprovisionDetails struct {
@@ -203,6 +209,10 @@ func (d BindDetails) GetRawContext() json.RawMessage {
 
 func (d BindDetails) GetRawParameters() json.RawMessage {
 	return d.RawParameters
+}
+
+func (m InstanceMetadata) IsEmpty() bool {
+	return len(m.Attributes) == 0 && len(m.Labels) == 0
 }
 
 func (d UpdateDetails) GetRawContext() json.RawMessage {

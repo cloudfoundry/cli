@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 //go:build arm64 && netbsd
-// +build arm64,netbsd
 
 package unix
 
@@ -27,6 +26,10 @@ func (iov *Iovec) SetLen(length int) {
 
 func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint32(length)
+}
+
+func (msghdr *Msghdr) SetIovlen(length int) {
+	msghdr.Iovlen = int32(length)
 }
 
 func (cmsg *Cmsghdr) SetLen(length int) {
