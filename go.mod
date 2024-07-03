@@ -1,11 +1,11 @@
 module code.cloudfoundry.org/cli
 
-go 1.22
+go 1.22.5
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20230612151507-41ef4d1f67a4
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
-	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
+	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.1.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82

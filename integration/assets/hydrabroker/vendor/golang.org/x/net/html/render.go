@@ -85,7 +85,7 @@ func render1(w writer, n *Node) error {
 		if _, err := w.WriteString("<!--"); err != nil {
 			return err
 		}
-		if _, err := w.WriteString(n.Data); err != nil {
+		if err := escapeComment(w, n.Data); err != nil {
 			return err
 		}
 		if _, err := w.WriteString("-->"); err != nil {
@@ -96,7 +96,7 @@ func render1(w writer, n *Node) error {
 		if _, err := w.WriteString("<!DOCTYPE "); err != nil {
 			return err
 		}
-		if _, err := w.WriteString(n.Data); err != nil {
+		if err := escape(w, n.Data); err != nil {
 			return err
 		}
 		if n.Attr != nil {
@@ -134,6 +134,9 @@ func render1(w writer, n *Node) error {
 			}
 		}
 		return w.WriteByte('>')
+	case RawNode:
+		_, err := w.WriteString(n.Data)
+		return err
 	default:
 		return errors.New("html: unknown node type")
 	}
@@ -191,9 +194,8 @@ func render1(w writer, n *Node) error {
 		}
 	}
 
-	// Render any child nodes.
-	switch n.Data {
-	case "iframe", "noembed", "noframes", "noscript", "plaintext", "script", "style", "xmp":
+	// Render any child nodes
+	if childTextNodesAreLiteral(n) {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			if c.Type == TextNode {
 				if _, err := w.WriteString(c.Data); err != nil {
@@ -210,7 +212,7 @@ func render1(w writer, n *Node) error {
 			// last element in the file, with no closing tag.
 			return plaintextAbort
 		}
-	default:
+	} else {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			if err := render1(w, c); err != nil {
 				return err
@@ -226,6 +228,27 @@ func render1(w writer, n *Node) error {
 		return err
 	}
 	return w.WriteByte('>')
+}
+
+func childTextNodesAreLiteral(n *Node) bool {
+	// Per WHATWG HTML 13.3, if the parent of the current node is a style,
+	// script, xmp, iframe, noembed, noframes, or plaintext element, and the
+	// current node is a text node, append the value of the node's data
+	// literally. The specification is not explicit about it, but we only
+	// enforce this if we are in the HTML namespace (i.e. when the namespace is
+	// "").
+	// NOTE: we also always include noscript elements, although the
+	// specification states that they should only be rendered as such if
+	// scripting is enabled for the node (which is not something we track).
+	if n.Namespace != "" {
+		return false
+	}
+	switch n.Data {
+	case "iframe", "noembed", "noframes", "noscript", "plaintext", "script", "style", "xmp":
+		return true
+	default:
+		return false
+	}
 }
 
 // writeQuoted writes s to w surrounded by quotes. Normally it will use double
@@ -252,20 +275,19 @@ func writeQuoted(w writer, s string) error {
 // Section 12.1.2, "Elements", gives this list of void elements. Void elements
 // are those that can't have any contents.
 var voidElements = map[string]bool{
-	"area":    true,
-	"base":    true,
-	"br":      true,
-	"col":     true,
-	"command": true,
-	"embed":   true,
-	"hr":      true,
-	"img":     true,
-	"input":   true,
-	"keygen":  true,
-	"link":    true,
-	"meta":    true,
-	"param":   true,
-	"source":  true,
-	"track":   true,
-	"wbr":     true,
+	"area":   true,
+	"base":   true,
+	"br":     true,
+	"col":    true,
+	"embed":  true,
+	"hr":     true,
+	"img":    true,
+	"input":  true,
+	"keygen": true, // "keygen" has been removed from the spec, but are kept here for backwards compatibility.
+	"link":   true,
+	"meta":   true,
+	"param":  true,
+	"source": true,
+	"track":  true,
+	"wbr":    true,
 }

@@ -1,9 +1,12 @@
 package validator
 
 import (
+	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // extractTypeInternal gets the actual underlying type of field value.
@@ -81,7 +84,7 @@ BEGIN:
 		fld := namespace
 		var ns string
 
-		if typ != timeType {
+		if !typ.ConvertibleTo(timeType) {
 
 			idx := strings.Index(namespace, namespaceSeparator)
 
@@ -222,11 +225,32 @@ BEGIN:
 // asInt returns the parameter as a int64
 // or panics if it can't convert
 func asInt(param string) int64 {
-
 	i, err := strconv.ParseInt(param, 0, 64)
 	panicIf(err)
 
 	return i
+}
+
+// asIntFromTimeDuration parses param as time.Duration and returns it as int64
+// or panics on error.
+func asIntFromTimeDuration(param string) int64 {
+	d, err := time.ParseDuration(param)
+	if err != nil {
+		// attempt parsing as an integer assuming nanosecond precision
+		return asInt(param)
+	}
+	return int64(d)
+}
+
+// asIntFromType calls the proper function to parse param as int64,
+// given a field's Type t.
+func asIntFromType(t reflect.Type, param string) int64 {
+	switch t {
+	case timeDurationType:
+		return asIntFromTimeDuration(param)
+	default:
+		return asInt(param)
+	}
 }
 
 // asUint returns the parameter as a uint64
@@ -239,13 +263,19 @@ func asUint(param string) uint64 {
 	return i
 }
 
-// asFloat returns the parameter as a float64
+// asFloat64 returns the parameter as a float64
 // or panics if it can't convert
-func asFloat(param string) float64 {
-
+func asFloat64(param string) float64 {
 	i, err := strconv.ParseFloat(param, 64)
 	panicIf(err)
+	return i
+}
 
+// asFloat32 returns the parameter as a float32
+// or panics if it can't convert
+func asFloat32(param string) float64 {
+	i, err := strconv.ParseFloat(param, 32)
+	panicIf(err)
 	return i
 }
 
@@ -262,5 +292,21 @@ func asBool(param string) bool {
 func panicIf(err error) {
 	if err != nil {
 		panic(err.Error())
+	}
+}
+
+// Checks if field value matches regex. If fl.Field can be cast to Stringer, it uses the Stringer interfaces
+// String() return value. Otherwise, it uses fl.Field's String() value.
+func fieldMatchesRegexByStringerValOrString(regexFn func() *regexp.Regexp, fl FieldLevel) bool {
+	regex := regexFn()
+	switch fl.Field().Kind() {
+	case reflect.String:
+		return regex.MatchString(fl.Field().String())
+	default:
+		if stringer, ok := fl.Field().Interface().(fmt.Stringer); ok {
+			return regex.MatchString(stringer.String())
+		} else {
+			return regex.MatchString(fl.Field().String())
+		}
 	}
 }
