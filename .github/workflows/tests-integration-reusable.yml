@@ -30,6 +30,7 @@ on:
         default: 'official'
 jobs:
   run-integration-tests:
+    name: ${{ inputs.name }}
     defaults:
       run:
         shell: bash
