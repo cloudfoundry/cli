@@ -1069,6 +1069,9 @@ var _ = Describe("shared request helpers", func() {
 							CombineHandlers(
 								VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
 								VerifyHeaderKV("Accept", "application/x-yaml"),
+								func(w http.ResponseWriter, req *http.Request) {
+									Expect(req.Header).To(HaveKey("Content-Type"), "Header Content-Type is not present")
+								},
 								RespondWith(
 									http.StatusOK,
 									expectedResponseBody,
@@ -1131,6 +1134,31 @@ var _ = Describe("shared request helpers", func() {
 						},
 					}))
 					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+
+		Context("Download a droplet", func() {
+			BeforeEach(func() {
+				requestName = internal.GetDropletBitsRequest
+				uriParams = internal.Params{"droplet_guid": "some-droplet-guid"}
+			})
+
+			When("The server returns an unauthorized error", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/droplets/some-droplet-guid/download"),
+							func(w http.ResponseWriter, req *http.Request) {
+								Expect(req.Header).NotTo(HaveKey("Content-Type"), "Header Content-Type is present")
+							},
+							RespondWith(http.StatusUnauthorized, "", http.Header{}),
+						),
+					)
+				})
+
+				It("fails", func() {
+					Expect(executeErr).To(HaveOccurred())
 				})
 			})
 		})
