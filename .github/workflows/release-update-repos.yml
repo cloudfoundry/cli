@@ -589,7 +589,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and export to Docker locally
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: docker
         load: true
@@ -636,7 +636,7 @@ jobs:
 
     - name: Push image if its from v8
       if: ${{ env.LATEST_DOCKER }} == v8
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: docker
         push: true
@@ -644,7 +644,7 @@ jobs:
     
     - name: Push image if its from v7
       if: ${{ env.LATEST_DOCKER }} == v7
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: docker
         push: true
