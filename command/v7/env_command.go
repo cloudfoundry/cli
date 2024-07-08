@@ -93,7 +93,7 @@ func (cmd EnvCommand) displayEnvGroup(group map[string]interface{}) {
 	keys := sortKeys(group)
 
 	for _, key := range keys {
-		cmd.UI.DisplayText(fmt.Sprintf("%s: %v", key, group[key]))
+		cmd.UI.DisplayTextLiteral(fmt.Sprintf("%s: %v", key, group[key]))
 	}
 }
 

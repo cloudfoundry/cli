@@ -232,6 +232,42 @@ var _ = Describe("env Command", func() {
 					Expect(testUI.Err).To(Say("get-warning-2"))
 				})
 			})
+
+			When("getting the environment returns env vars with special templating characters", func() {
+				BeforeEach(func() {
+					envGroups := v7action.EnvironmentVariableGroups{
+						System:               map[string]interface{}{"system-name": map[string]interface{}{"mysql": []string{"system-value"}, "password": "{{test<3"}},
+						Application:          map[string]interface{}{"application-name": "{{application-value"},
+						EnvironmentVariables: map[string]interface{}{"user-name": "{{user-value"},
+						Running:              map[string]interface{}{"running-name": "{{running-value"},
+						Staging:              map[string]interface{}{"staging-name": "{{staging-value"},
+					}
+					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, nil, nil)
+				})
+
+				It("displays the environment variable and value pair", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
+					Expect(testUI.Out).To(Say("System-Provided:"))
+					Expect(testUI.Out).To(Say("system-name: {"))
+					Expect(testUI.Out).To(Say(`"mysql": \[`))
+					Expect(testUI.Out).To(Say(`"system-value"`))
+					Expect(testUI.Out).To(Say(`\],`))
+					Expect(testUI.Out).To(Say(`"password": "{{test<3"`))
+					Expect(testUI.Out).To(Say("}"))
+					Expect(testUI.Out).To(Say(`application-name: "{{application-value"`))
+
+					Expect(testUI.Out).To(Say("User-Provided:"))
+					Expect(testUI.Out).To(Say(`user-name: {{user-value`))
+
+					Expect(testUI.Out).To(Say("Running Environment Variable Groups:"))
+					Expect(testUI.Out).To(Say(`running-name: {{running-value`))
+
+					Expect(testUI.Out).To(Say("Staging Environment Variable Groups:"))
+					Expect(testUI.Out).To(Say(`staging-name: {{staging-value`))
+				})
+			})
 		})
 	})
 })
