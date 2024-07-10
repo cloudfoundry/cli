@@ -826,27 +826,21 @@ jobs:
           signed/win32/*zip \
           signed/winx64/*zip
 
-    - name: Setup aws to upload installers to CLAW S3 bucket
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id:     ${{ vars.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY  }}
-        aws-region:            ${{ vars.AWS_REGION }}
-        role-to-assume:        ${{ vars.AWS_S3_ROLE_ARN }}
-        role-skip-session-tagging: true
-        role-duration-seconds:     1200
+    # - name: Setup aws to upload installers to CLAW S3 bucket
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id:     ${{ vars.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY  }}
+    #     aws-region:            ${{ vars.AWS_REGION }}
+    #     role-to-assume:        ${{ vars.AWS_S3_ROLE_ARN }}
+    #     role-skip-session-tagging: true
+    #     role-duration-seconds:     1200
 
-    - name: Upload installers to CLAW S3 bucket
-      run: aws s3 sync upload "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
+    # - name: Upload installers to CLAW S3 bucket
+    #   run: aws s3 sync upload "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
 
-    - name: list S3 for human verification
-      run: aws s3 ls "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
-
-    - name: Instruct human to update CLAW
-      run: |
-        echo "Please go to https://github.com/cloudfoundry/CLAW/blob/develop/claw-variables.yml and add the following line to the file:"
-        echo
-        echo "- ${VERSION_BUILD}"
+    # - name: list S3 for human verification
+    #   run: aws s3 ls "s3://v${VERSION_MAJOR}-cf-cli-releases/releases/v${VERSION_BUILD}/"
 
   test-rpm-package:
     name: Test RPM Artifacts
@@ -1037,7 +1031,6 @@ jobs:
                 echo "no new version to commit"
             fi
             
-            git push
-          fi
+            # git push
           fi
         popd
