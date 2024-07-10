@@ -108,6 +108,7 @@ func (repo CloudControllerBuildpackBitsRepository) CreateBuildpackZipFile(buildp
 			if err != nil {
 				return nil, "", fmt.Errorf("%s: %s", T("Couldn't open buildpack file"), err.Error())
 			}
+			defer specifiedFile.Close()
 			err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
 			if err != nil {
 				return nil, "", zipErrorHelper(err)
