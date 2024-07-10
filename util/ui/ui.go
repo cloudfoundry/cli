@@ -248,6 +248,15 @@ func (ui *UI) DisplayText(template string, templateValues ...map[string]interfac
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, templateValues...))
 }
 
+// DisplayTextLiteral outputs the text to ui.Out without modification.
+// This function should only be used when no translation or templating is required.
+func (ui *UI) DisplayTextLiteral(text string) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	fmt.Fprintf(ui.Out, "%s\n", text)
+}
+
 // DisplayTextWithBold translates the template, bolds the templateValues,
 // substitutes templateValues into the template, and outputs
 // the result to ui.Out. Only the first map in templateValues is used.
