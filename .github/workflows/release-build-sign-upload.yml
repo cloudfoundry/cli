@@ -826,6 +826,13 @@ jobs:
           signed/win32/*zip \
           signed/winx64/*zip
 
+    - name: Store Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: final-artifacts
+        path: signed/*          
+        
     # - name: Setup aws to upload installers to CLAW S3 bucket
     #   uses: aws-actions/configure-aws-credentials@v4
     #   with:
