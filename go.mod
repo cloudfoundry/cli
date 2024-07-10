@@ -26,7 +26,7 @@ require (
 	github.com/distribution/reference v0.6.0
 	github.com/fatih/color v1.17.0
 	github.com/google/go-querystring v1.1.0
-	github.com/jessevdk/go-flags v1.5.0
+	github.com/jessevdk/go-flags v1.6.1
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-runewidth v0.0.15
