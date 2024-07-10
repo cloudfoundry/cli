@@ -36,7 +36,6 @@ run-name: "Release: Build Sign Upload [${{ github.ref_name }}]"
 #    SIGNING_KEY_WINDOWS_PASSPHRASE
 #    SIGNING_KEY_WINDOWS_PFX
 
-
 on:
   workflow_dispatch:
 
@@ -50,7 +49,6 @@ defaults:
 jobs:
   setup:
     name: Setup
-    # needs: test
     runs-on: ubuntu-latest
 
     outputs:
@@ -644,24 +642,6 @@ jobs:
           smctl windows certsync
         shell: cmd
 
-      # This is for debugging windows
-      # - name: enable ssh
-      #   if: always()
-      #   run: |
-      #     Get-WindowsCapability -Online
-      #     $componentName = $(Get-WindowsCapability -Online |Where-Object Name -like 'OpenSSH.Server*').Name
-      #     Add-WindowsCapability -Online -Name $componentName
-      #     Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP"
-
-      # - name: ssh session
-      #   if: always()
-      #   run: |
-      #     Start-Service sshd
-      #     echo "IP address below:"
-      #     Get-NetIPAddress | Select-Object -Property IPAddress
-      #     sleep 3600
-      #     Stop-Service sshd
-
       - name: Sign Windows binaries
         run: |
           smctl healthcheck --all
@@ -724,9 +704,6 @@ jobs:
             Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
           popd
           Get-ChildItem "${env:RUNNER_TEMP}"
-
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
 
       - name: Save installer and dist files as a GitHub Action Artifact
         uses: actions/upload-artifact@v4
@@ -975,28 +952,30 @@ jobs:
   github-release-draft:
     name: Create GitHub Release Draft
     runs-on: ubuntu-latest
+    env:
+      REPO_DIR: repo
+      ARTIFACTS_DIR: artifacts
     permissions:
       actions: read
       contents: write
     needs:
     - setup
-    - test-rpm-package
-    - test-deb-package
-    - test-macos
-    - test-windows
+    - s3-upload
     steps:
     - name: Download signed artifacts
       uses: actions/download-artifact@v4
       with:
         name: final-artifacts
-        path: artifacts # download all artifacts to 'artifacts/'
+        path: ${{ env.ARTIFACTS_DIR }}
 
     - name: Checkout CLI
       uses: actions/checkout@v4
-    
+      with:
+        path: ${{ env.REPO_DIR }}
+       
     - name: Prepare release notes
       run: |
-        sed -i 's/new-version/${{ needs.setup.outputs.version-build }}/g' .github/release/release-notes-template.txt
+        sed -i 's/new-version/${{ needs.setup.outputs.version-build }}/g' "${{ env.REPO_DIR }}/.github/release/release-notes-template.txt"
         
     - name: Create draft release
       uses: softprops/action-gh-release@v2
@@ -1004,22 +983,22 @@ jobs:
         draft:                   true
         name:                    "DRAFT v${{ needs.setup.outputs.version-build }}"
         tag_name:                "v${{ needs.setup.outputs.version-build }}"
-        body_path:               ".github/release/release-notes-template.txt"
+        body_path:               "${{ env.REPO_DIR }}/.github/release/release-notes-template.txt"
         fail_on_unmatched_files: true
         generate_release_notes: true
         files: |
-          artifacts/cf-cli-linux-rpm-packages/cf*rpm 
-          artifacts/cf-cli-linux-deb-packages/cf*deb
-          artifacts/cf-cli-macos-packages/cf*pkg
-          artifacts/cf-cli-windows-packages/cf*zip
-          artifacts/linux_i686/*tgz
-          artifacts/linux_x86-64/*tgz
-          artifacts/linux_arm64/*tgz
-          artifacts/osx/*tgz
-          artifacts/macosarm/*tgz
-          artifacts/win32/*zip
-          artifacts/winx64/*zip   
-          
+          ${{ env.ARTIFACTS_DIR }}/cf-cli-linux-rpm-packages/cf*rpm 
+          ${{ env.ARTIFACTS_DIR }}/cf-cli-linux-deb-packages/cf*deb
+          ${{ env.ARTIFACTS_DIR }}/cf-cli-macos-packages/cf*pkg
+          ${{ env.ARTIFACTS_DIR }}/cf-cli-windows-packages/cf*zip
+          ${{ env.ARTIFACTS_DIR }}/linux_i686/*tgz
+          ${{ env.ARTIFACTS_DIR }}/linux_x86-64/*tgz
+          ${{ env.ARTIFACTS_DIR }}/linux_arm64/*tgz
+          ${{ env.ARTIFACTS_DIR }}/osx/*tgz
+          ${{ env.ARTIFACTS_DIR }}/macosarm/*tgz
+          ${{ env.ARTIFACTS_DIR }}/win32/*zip
+          ${{ env.ARTIFACTS_DIR }}/winx64/*zip 
+
   update-claw:
     name: Add new release version to CLAW
     runs-on: ubuntu-latest
@@ -1060,5 +1039,5 @@ jobs:
             
             git push
           fi
-        popd    
-# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
+          fi
+        popd
