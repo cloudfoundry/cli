@@ -1,0 +1,23 @@
+Package Manager Installation
+----------
+- [apt-get, yum, homebrew](https://github.com/cloudfoundry/cli#getting-started)
+
+Installers
+----------
+- Debian [64 bit](https://packages.cloudfoundry.org/stable?release=debian64&version=new-version&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=debian32&version=new-version&source=github-rel) / [arm64](https://packages.cloudfoundry.org/stable?release=debianarm64&version=new-version&source=github-rel) (deb)
+- Redhat [64 bit](https://packages.cloudfoundry.org/stable?release=redhat64&version=new-version&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=redhat32&version=new-version&source=github-rel) / [aarch64](https://packages.cloudfoundry.org/stable?release=redhataarch64&version=new-version&source=github-rel) (rpm)
+- macOS [64 bit](https://packages.cloudfoundry.org/stable?release=macosx64&version=new-version&source=github-rel) / [arm](https://packages.cloudfoundry.org/stable?release=macosarm&version=new-version&source=github-rel) (pkg)
+- Windows [64 bit](https://packages.cloudfoundry.org/stable?release=windows64&version=new-version&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=windows32&version=new-version&source=github-rel) (zip)
+
+Binaries
+--------
+- Linux [64 bit](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=new-version&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=linux32-binary&version=new-version&source=github-rel) / [arm64](https://packages.cloudfoundry.org/stable?release=linuxarm64-binary&version=new-version&source=github-rel) (tgz)
+- macOS [64 bit](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=new-version&source=github-rel) / [arm](https://packages.cloudfoundry.org/stable?release=macosarm-binary&version=new-version&source=github-rel) (tgz)
+- Windows [64 bit](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=new-version&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=windows32-exe&version=new-version&source=github-rel) (zip)
+
+
+Docker
+--------
+```shell
+docker pull cloudfoundry/cli:new-version
+```
