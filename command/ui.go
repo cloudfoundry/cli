@@ -33,6 +33,7 @@ type UI interface {
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
+	DisplayTextLiteral(text string)
 	DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextWithBold(text string, keys ...map[string]interface{})
