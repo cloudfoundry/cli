@@ -186,6 +186,13 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DisplayTextLiteral", func() {
+		It("displays the text into ui.Out with a newline", func() {
+			ui.DisplayTextLiteral("some text")
+			Expect(out).To(Say("some text\n"))
+		})
+	})
+
 	Describe("Display JSON", func() {
 		It("displays the indented JSON object", func() {
 			obj := map[string]interface{}{

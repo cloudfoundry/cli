@@ -153,6 +153,11 @@ type FakeUI struct {
 		arg1 string
 		arg2 []map[string]interface{}
 	}
+	DisplayTextLiteralStub        func(string)
+	displayTextLiteralMutex       sync.RWMutex
+	displayTextLiteralArgsForCall []struct {
+		arg1 string
+	}
 	DisplayTextMenuStub        func([]string, string, ...map[string]interface{}) (string, error)
 	displayTextMenuMutex       sync.RWMutex
 	displayTextMenuArgsForCall []struct {
@@ -1049,6 +1054,38 @@ func (fake *FakeUI) DisplayTextArgsForCall(i int) (string, []map[string]interfac
 	return argsForCall.arg1, argsForCall.arg2
 }
 
+func (fake *FakeUI) DisplayTextLiteral(arg1 string) {
+	fake.displayTextLiteralMutex.Lock()
+	fake.displayTextLiteralArgsForCall = append(fake.displayTextLiteralArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DisplayTextLiteralStub
+	fake.recordInvocation("DisplayTextLiteral", []interface{}{arg1})
+	fake.displayTextLiteralMutex.Unlock()
+	if stub != nil {
+		fake.DisplayTextLiteralStub(arg1)
+	}
+}
+
+func (fake *FakeUI) DisplayTextLiteralCallCount() int {
+	fake.displayTextLiteralMutex.RLock()
+	defer fake.displayTextLiteralMutex.RUnlock()
+	return len(fake.displayTextLiteralArgsForCall)
+}
+
+func (fake *FakeUI) DisplayTextLiteralCalls(stub func(string)) {
+	fake.displayTextLiteralMutex.Lock()
+	defer fake.displayTextLiteralMutex.Unlock()
+	fake.DisplayTextLiteralStub = stub
+}
+
+func (fake *FakeUI) DisplayTextLiteralArgsForCall(i int) string {
+	fake.displayTextLiteralMutex.RLock()
+	defer fake.displayTextLiteralMutex.RUnlock()
+	argsForCall := fake.displayTextLiteralArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeUI) DisplayTextMenu(arg1 []string, arg2 string, arg3 ...map[string]interface{}) (string, error) {
 	var arg1Copy []string
 	if arg1 != nil {
@@ -1802,6 +1839,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayTableWithHeaderMutex.RUnlock()
 	fake.displayTextMutex.RLock()
 	defer fake.displayTextMutex.RUnlock()
+	fake.displayTextLiteralMutex.RLock()
+	defer fake.displayTextLiteralMutex.RUnlock()
 	fake.displayTextMenuMutex.RLock()
 	defer fake.displayTextMenuMutex.RUnlock()
 	fake.displayTextPromptMutex.RLock()
