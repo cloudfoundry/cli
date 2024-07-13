@@ -28,10 +28,7 @@ on:
       pool-namespace:
         type: string
         default: 'official'
-      is-pr:
-        type: boolean
-        default: true
-
+        
 jobs:
   run-integration-tests:
     defaults:
