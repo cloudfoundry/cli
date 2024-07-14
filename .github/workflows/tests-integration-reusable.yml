@@ -140,6 +140,17 @@ jobs:
         apt-get update
         apt-get install -y build-essential
 
+    - name: Upload latest CAPI release
+      if: ${{ inputs.capi-version == 'edge' }}
+      run: |
+        capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
+        echo "Latest CAPI release is $capi_release_version"
+        
+        eval "$(bbl print-env --metadata-file metadata.json)"
+        env_name=$(jq -r .name metadata.json)
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
+        bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
+
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
       run: |
@@ -152,6 +163,7 @@ jobs:
         bosh interpolate /tmp/manifest.yml \
           -o .github/ops-files/use-cflinuxfs3.yml \
           -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
+          -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
