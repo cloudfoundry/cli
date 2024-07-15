@@ -41,7 +41,7 @@ Once installed, you can log in and push an app.
 There are now three supported versions of the cf CLI:
 1. The v8 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins). See [our v8 documentation](https://docs.cloudfoundry.org/cf-cli/v8.html) for more information.
 1. The v7 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins). See [our v7 documentation](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information.
-1. The v6 cf CLI is backed by the [v2 CC API](https://apidocs.cloudfoundry.org/13.5.0/) See [our v6 documentation](https://docs.cloudfoundry.org/cf-cli) for more information.
+1. The v6 cf CLI is backed by the [v2 CC API](https://v2-apidocs.cloudfoundry.org/13.5.0/) See [our v6 documentation](https://docs.cloudfoundry.org/cf-cli) for more information.
 
 View our [CLI v6 & v7 & v8 Versioning and Support Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-and-Support-Policy) documentation.
 
