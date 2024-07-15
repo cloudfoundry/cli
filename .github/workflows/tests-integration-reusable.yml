@@ -28,6 +28,7 @@ on:
       pool-namespace:
         type: string
         default: 'official'
+        
 jobs:
   run-integration-tests:
     defaults:
@@ -46,6 +47,13 @@ jobs:
       with:
         repository: cloudfoundry/cli-ci
         path: cli-ci
+
+    - name: Checkout cf-acceptance-tests
+      uses: actions/checkout@v4
+      with:
+        repository: cloudfoundry/cf-acceptance-tests
+        ref: release-candidate
+        path: cf-acceptance-tests
 
     - id: read-min-capi
       name: Read MIN CAPI
@@ -109,8 +117,16 @@ jobs:
         cat metadata.json | jq -r '.name'
         echo "lease-id=$lease_id" >> "${GITHUB_OUTPUT}"
 
+    - name: Set Up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        check-latest: true
+
     - name: Install Tools
       run: |
+        go version
+
         if [[ ${{ inputs.os }} =~ "windows" ]]
         then
           install_location=/usr/bin
@@ -138,7 +154,19 @@ jobs:
         credhub --version
 
         apt-get update
-        apt-get install -y build-essential
+        apt-get install -y build-essential unzip
+
+    - name: Upload latest CAPI release
+      if: ${{ inputs.capi-version == 'edge' }}
+      run: |
+        capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
+        echo "Latest CAPI release is $capi_release_version"
+        
+        eval "$(bbl print-env --metadata-file metadata.json)"
+        env_name=$(jq -r .name metadata.json)
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
+
+        bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
 
     - name: Deploy Isolation Segment and OIDC Provider
       if: ${{ inputs.capi-version == 'edge' }}
@@ -151,7 +179,9 @@ jobs:
         bosh -d cf manifest > /tmp/manifest.yml
         bosh interpolate /tmp/manifest.yml \
           -o .github/ops-files/use-cflinuxfs3.yml \
+          -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
           -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
+          -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
           -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
           -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
@@ -184,14 +214,99 @@ jobs:
         echo "Deployed CAPI version:"
         bosh -d cf releases | grep capi
 
-    - name: Set Up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: go.mod
-        check-latest: true
+    - name: Add CATS config
+      if: ${{ inputs.name == 'cats' }}
+      run: |
+        set -eu
+
+        ENV=$(jq -r .name metadata.json)
+        API="$(jq -r .cf.api_url metadata.json)"
+        DOMAIN=$(echo $API | sed "s/^api\.//")
+        CF_INT_USERNAME="admin"
+
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        eval "$(bbl print-env --metadata-file ./metadata.json)"
+
+        credhub login
+        CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+
+        cat << EOF | jq -S . > cats_config.json
+        {
+          "admin_password": "${CF_INT_PASSWORD}",
+          "admin_user": "${CF_INT_USERNAME}",
+          "api": "${API}",
+          "apps_domain": "${DOMAIN}",
+          "backend" : "diego",
+          "broker_start_timeout": 330,
+          "cf_push_timeout": 210,
+          "default_timeout": 120,
+          "long_curl_timeout": 210,
+          "skip_ssl_validation": true,
+          "use_http": true,
+          "include_apps": true,
+          "include_backend_compatibility": false,
+          "include_container_networking": true,
+          "include_detect": true,
+          "include_docker": true,
+          "include_internet_dependent": true,
+          "include_isolation_segments": true,
+          "isolation_segment_name": "persistent_isolation_segment",
+          "include_private_docker_registry": false,
+          "include_route_services": true,
+          "include_routing": true,
+          "include_routing_isolation_segments": false,
+          "include_security_groups": true,
+          "include_services": true,
+          "include_service_discovery": true,
+          "include_service_instance_sharing": true,
+          "include_ssh": true,
+          "include_sso": false,
+          "include_tasks": true,
+          "include_tcp_routing": true,
+          "include_v3": true,
+          "include_zipkin": true
+        }
+        EOF
+
+        make build
+        echo "$PWD/out" >> $GITHUB_PATH
+        export PATH="$PWD/out:$PATH"
+        cf version
+
+        export CF_USERNAME=${CF_INT_USERNAME}
+        export CF_PASSWORD=${CF_INT_PASSWORD}
+        cf api ${API} --skip-ssl-validation
+        cf auth
+        cf enable-feature-flag diego_docker
+        cf enable-feature-flag service_instance_sharing
+
+    - name: Run CATS Tests
+      if: ${{ inputs.name == 'cats' }}
+      run: |
+        set -xeu
+
+        export CONFIG
+        CONFIG=$(mktemp)
+
+        original_config="${PWD}/cats_config.json"
+        cp ${original_config} ${CONFIG}
+
+        cd ./cf-acceptance-tests
+        export CF_DIAL_TIMEOUT=11
+        export CF_PLUGIN_HOME=$HOME
+        go version
+
+        ./bin/test \
+          --keep-going \
+          --randomize-all \
+          --skip-package=helpers \
+          --nodes="12" \
+          --flake-attempts=2 \
+          --timeout="2h" \
+          --no-color
 
     - name: Run Integration Tests
-      if: ${{ !inputs.run-with-client-creds }}
+      if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
         ENV=$(cat metadata.json | jq -r '.name')
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
