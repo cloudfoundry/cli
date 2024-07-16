@@ -54,7 +54,7 @@ func (cmd *Curl) MetaData() commandregistry.CommandMetadata {
    will be set to application/json. You may override headers with -H and the
    request method with -X.
 
-   For API documentation, please visit http://apidocs.cloudfoundry.org.`),
+   For API documentation, please visit http://v2-apidocs.cloudfoundry.org.`),
 		},
 		Examples: []string{
 			`CF_NAME curl "/v2/apps" -X GET -H "Content-Type: application/x-www-form-urlencoded" -d 'q=name:myapp'`,
