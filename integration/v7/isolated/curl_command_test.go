@@ -27,7 +27,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`\s+is provided via -d, a POST will be performed instead, and the Content-Type\n`))
 		Eventually(session).Should(Say(`\s+will be set to application/json. You may override headers with -H and the\n`))
 		Eventually(session).Should(Say(`\s+request method with -X.\n`))
-		Eventually(session).Should(Say(`\s+For API documentation, please visit http://v2-apidocs.cloudfoundry.org.\n`))
+		Eventually(session).Should(Say(`\s+For API documentation, please visit http://apidocs.cloudfoundry.org.\n`))
 		Eventually(session).Should(Say(`\n`))
 
 		Eventually(session).Should(Say(`EXAMPLES:\n`))

@@ -7,7 +7,7 @@
 // may include features and endpoints of later API versions.
 //
 // For more information on the Cloud Controller API see
-// https://v2-apidocs.cloudfoundry.org/
+// https://apidocs.cloudfoundry.org/
 //
 // # Method Naming Conventions
 //
