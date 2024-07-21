@@ -28,6 +28,12 @@ const (
 type DeploymentStatusReason string
 
 const (
+	// DeploymentStatusReasonDeploying means the deployment is in state 'DEPLOYING'
+	DeploymentStatusReasonDeploying DeploymentStatusReason = "DEPLOYING"
+
+	// DeploymentCanceled means the deployment is in state 'CANCELING'
+	DeploymentStatusReasonCanceling DeploymentStatusReason = "CANCELING"
+
 	// DeploymentStatusReasonDeployed means the deployment's status.value is
 	// 'DEPLOYED'
 	DeploymentStatusReasonDeployed DeploymentStatusReason = "DEPLOYED"
