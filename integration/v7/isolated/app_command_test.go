@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"time"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -276,10 +275,9 @@ applications:
 					When("the deployment is cancelled", func() {
 						It("displays the message", func() {
 							helpers.CF("restart", appName, "--strategy", "rolling")
-							time.Sleep(3 * time.Second)
-							session1 := helpers.CF("cancel-deployment", appName)
-							Eventually(session1).Should(Exit(0))
-
+							Eventually(func() *Session {
+								return helpers.CF("cancel-deployment", appName).Wait()
+							}).Should(Exit(0))
 							session2 := helpers.CF("app", appName)
 							Eventually(session2).Should(Say("Rolling deployment currently CANCELING"))
 							Eventually(session2).Should(Exit(0))

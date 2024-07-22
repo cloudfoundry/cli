@@ -1,6 +1,8 @@
 package v7action
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -218,10 +220,8 @@ func (actor Actor) addDeployment(detailedSummary DetailedApplicationSummary) (De
 
 	deployment, warnings, err := actor.GetLatestActiveDeploymentForApp(detailedSummary.GUID)
 	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		if _, ok := err.(actionerror.ActiveDeploymentNotFoundError); !ok {
-			return DetailedApplicationSummary{}, allWarnings, err
-		}
+	if err != nil && !errors.Is(err, actionerror.ActiveDeploymentNotFoundError{}) {
+		return DetailedApplicationSummary{}, allWarnings, err
 	}
 
 	detailedSummary.Deployment = deployment
