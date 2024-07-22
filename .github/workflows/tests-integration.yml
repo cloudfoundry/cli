@@ -74,5 +74,4 @@ jobs:
       run-with-client-creds: false
       os: ubuntu-latest
       name: cats
-      is-pr: ${{ github.event_name != 'workflow_dispatch' }}
     secrets: inherit
