@@ -295,7 +295,7 @@ applications:
 					})
 				})
 
-				It("doesn not display the message", func() {
+				It("does not display the message", func() {
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Exit(0))
 					Eventually(session).ShouldNot(Say(`\w+ deployment currently \w+`))
