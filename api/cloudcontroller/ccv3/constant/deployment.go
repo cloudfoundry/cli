@@ -14,7 +14,7 @@ const (
 	// DeploymentDeployed means the deployment is in state 'DEPLOYED'
 	DeploymentDeployed DeploymentState = "DEPLOYED"
 
-	// DeploymentCanceled means the deployment is in state 'CANCELING'
+	// DeploymentCanceling means the deployment is in state 'CANCELING'
 	DeploymentCanceling DeploymentState = "CANCELING"
 
 	// DeploymentFailing means the deployment is in state 'FAILING'
