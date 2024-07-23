@@ -163,7 +163,8 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 	}
 
 	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
-		display.UI.DisplayText(fmt.Sprintf("%s deployment currently %s",
+		display.UI.DisplayNewline()
+		display.UI.DisplayText(fmt.Sprintf("%s deployment currently %s.",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
 			summary.Deployment.StatusReason))
 	}
