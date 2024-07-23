@@ -630,7 +630,7 @@ var _ = Describe("Application Summary Actions", func() {
 							})
 						})
 
-						When("the deployment is finalized", func() {
+						When("the deployment is not active", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.GetDeploymentsReturns(
 									[]resources.Deployment{
