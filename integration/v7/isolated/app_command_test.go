@@ -253,6 +253,53 @@ applications:
 					Eventually(session).Should(Exit(0))
 				})
 			})
+
+			When("there is an active deployment", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
+				})
+
+				When("the deployment strategy is rolling", func() {
+					When("the deployment is in progress", func() {
+						It("displays the message", func() {
+							session := helpers.CF("restart", appName, "--strategy", "rolling")
+
+							session1 := helpers.CF("app", appName)
+							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING."))
+							Eventually(session).Should(Exit(0))
+							Eventually(session1).Should(Exit(0))
+						})
+					})
+					When("the deployment is cancelled", func() {
+						It("displays the message", func() {
+							helpers.CF("restart", appName, "--strategy", "rolling")
+							Eventually(func() *Session {
+								return helpers.CF("cancel-deployment", appName).Wait()
+							}).Should(Exit(0))
+
+							session2 := helpers.CF("app", appName)
+							Eventually(session2).Should(Say("Rolling deployment currently CANCELING."))
+							Eventually(session2).Should(Exit(0))
+						})
+					})
+				})
+			})
+
+			When("there is no active deployment", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
+				})
+
+				It("does not display the message", func() {
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Exit(0))
+					Eventually(session).ShouldNot(Say(`\w+ deployment currently \w+`))
+				})
+			})
 		})
 
 		Describe("version independent display", func() {
