@@ -267,7 +267,7 @@ applications:
 							session := helpers.CF("restart", appName, "--strategy", "rolling")
 
 							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING"))
+							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING."))
 							Eventually(session).Should(Exit(0))
 							Eventually(session1).Should(Exit(0))
 						})
@@ -278,8 +278,9 @@ applications:
 							Eventually(func() *Session {
 								return helpers.CF("cancel-deployment", appName).Wait()
 							}).Should(Exit(0))
+
 							session2 := helpers.CF("app", appName)
-							Eventually(session2).Should(Say("Rolling deployment currently CANCELING"))
+							Eventually(session2).Should(Say("Rolling deployment currently CANCELING."))
 							Eventually(session2).Should(Exit(0))
 						})
 					})
