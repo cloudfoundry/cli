@@ -1,6 +1,8 @@
 package v7action
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -18,6 +20,7 @@ type ApplicationSummary struct {
 type DetailedApplicationSummary struct {
 	ApplicationSummary
 	CurrentDroplet resources.Droplet
+	Deployment     resources.Deployment
 }
 
 func (a ApplicationSummary) GetIsolationSegmentName() (string, bool) {
@@ -120,6 +123,12 @@ func (actor Actor) GetDetailedAppSummary(appName, spaceGUID string, withObfuscat
 		return DetailedApplicationSummary{}, allWarnings, err
 	}
 
+	detailedSummary, warnings, err = actor.addDeployment(detailedSummary)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return DetailedApplicationSummary{}, allWarnings, err
+	}
+
 	return detailedSummary, allWarnings, err
 }
 
@@ -204,6 +213,19 @@ func (actor Actor) addDroplet(summary ApplicationSummary) (DetailedApplicationSu
 		ApplicationSummary: summary,
 		CurrentDroplet:     droplet,
 	}, allWarnings, nil
+}
+
+func (actor Actor) addDeployment(detailedSummary DetailedApplicationSummary) (DetailedApplicationSummary, Warnings, error) {
+	var allWarnings Warnings
+
+	deployment, warnings, err := actor.GetLatestActiveDeploymentForApp(detailedSummary.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil && !errors.Is(err, actionerror.ActiveDeploymentNotFoundError{}) {
+		return DetailedApplicationSummary{}, allWarnings, err
+	}
+
+	detailedSummary.Deployment = deployment
+	return detailedSummary, allWarnings, nil
 }
 
 func toAppGUIDs(apps []resources.Application) []string {

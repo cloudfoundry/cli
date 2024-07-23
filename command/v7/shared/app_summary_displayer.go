@@ -12,6 +12,8 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type AppSummaryDisplayer struct {
@@ -155,6 +157,13 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 			continue
 		}
 		display.displayAppInstancesTable(process)
+	}
+
+	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
+		display.UI.DisplayNewline()
+		display.UI.DisplayText(fmt.Sprintf("%s deployment currently %s.",
+			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+			summary.Deployment.StatusReason))
 	}
 }
 
