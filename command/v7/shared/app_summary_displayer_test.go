@@ -670,7 +670,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say("Rolling deployment currently DEPLOYING"))
+						Expect(testUI.Out).To(Say("Rolling deployment currently DEPLOYING."))
 					})
 				})
 
@@ -686,7 +686,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say("Rolling deployment currently CANCELING"))
+						Expect(testUI.Out).To(Say("Rolling deployment currently CANCELING."))
 					})
 				})
 			})
