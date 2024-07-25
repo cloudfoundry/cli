@@ -116,6 +116,28 @@ var _ = Describe("restart command", func() {
 				})
 			})
 
+			When("strategy canary is given", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					})
+				})
+				It("creates a deploy", func() {
+					session := helpers.CF("restart", appName, "--strategy=canary")
+					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+					Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
+					Eventually(session).Should(Say(instanceStatsTitles))
+					Eventually(session).Should(Say(instanceStatsValues))
+				})
+			})
+
 			When("the app is running with no new packages", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {

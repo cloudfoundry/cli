@@ -56,13 +56,12 @@ type Stager struct {
 }
 
 type stagingAndStartActor interface {
-	CreateDeploymentByApplicationAndDroplet(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
-	CreateDeploymentByApplicationAndRevision(appGUID string, revisionGUID string) (string, v7action.Warnings, error)
+	CreateDeployment(dep resources.Deployment) (string, v7action.Warnings, error)
 	GetCurrentUser() (configv3.User, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
-	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
+	PollStartForDeployment(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
@@ -135,7 +134,7 @@ func (stager *Stager) StartApp(
 	organization configv3.Organization,
 	appAction constant.ApplicationAction,
 ) error {
-	if strategy == constant.DeploymentStrategyRolling {
+	if len(strategy) > 0 {
 		stager.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
 			map[string]interface{}{
 				"AppName": app.Name,
@@ -148,11 +147,17 @@ func (stager *Stager) StartApp(
 			err            error
 		)
 
+		dep := resources.Deployment{
+			Strategy: strategy,
+			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}}
+		}
 		switch appAction {
 		case constant.ApplicationRollingBack:
-			deploymentGUID, warnings, err = stager.Actor.CreateDeploymentByApplicationAndRevision(app.GUID, resourceGuid)
+			dep.RevisionGUID = resourceGuid
+			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		default:
-			deploymentGUID, warnings, err = stager.Actor.CreateDeploymentByApplicationAndDroplet(app.GUID, resourceGuid)
+			dep.DropletGUID = resourceGuid
+			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		}
 
 		stager.UI.DisplayWarnings(warnings)
@@ -166,13 +171,14 @@ func (stager *Stager) StartApp(
 			stager.UI.DisplayText(instanceDetails)
 		}
 
-		warnings, err = stager.Actor.PollStartForRolling(app, deploymentGUID, noWait, handleInstanceDetails)
+		warnings, err = stager.Actor.PollStartForDeployment(app, deploymentGUID, noWait, handleInstanceDetails)
 		stager.UI.DisplayNewline()
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}
-		if noWait == true {
+
+		if noWait && strategy != constant.DeploymentStrategyCanary {
 			stager.UI.DisplayText("First instance restaged correctly, restaging remaining in the background")
 			return nil
 		}

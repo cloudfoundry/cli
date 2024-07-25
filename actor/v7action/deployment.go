@@ -7,15 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
-func (actor Actor) CreateDeploymentByApplicationAndDroplet(appGUID string, dropletGUID string) (string, Warnings, error) {
-	deploymentGUID, warnings, err := actor.CloudControllerClient.CreateApplicationDeployment(appGUID, dropletGUID)
-
-	return deploymentGUID, Warnings(warnings), err
-}
-
-func (actor Actor) CreateDeploymentByApplicationAndRevision(appGUID string, revisionGUID string) (string, Warnings, error) {
-	deploymentGUID, warnings, err := actor.CloudControllerClient.CreateApplicationDeploymentByRevision(appGUID, revisionGUID)
-
+func (actor Actor) CreateDeployment(dep resources.Deployment) (string, Warnings, error) {
+	deploymentGUID, warnings, err := actor.CloudControllerClient.CreateApplicationDeployment(dep)
 	return deploymentGUID, Warnings(warnings), err
 }
 

@@ -298,9 +298,9 @@ func (actor Actor) PollStart(app resources.Application, noWait bool, handleInsta
 	}
 }
 
-// PollStartForRolling polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling deployments and whether
+// PollStartForDeployment polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling/canary deployments and whether
 // they have failed or been canceled during polling.
-func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
+func (actor Actor) PollStartForDeployment(app resources.Application, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var (
 		deployment  resources.Deployment
 		processes   []resources.Process
@@ -321,7 +321,7 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 			}
 			return allWarnings, actionerror.StartupTimeoutError{Name: app.Name}
 		case <-timer.C():
-			if !isDeployed(deployment) {
+			if !isDeployProcessed(deployment) {
 				ccDeployment, warnings, err := actor.getDeployment(deploymentGUID)
 				allWarnings = append(allWarnings, warnings...)
 				if err != nil {
@@ -335,7 +335,7 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 				}
 			}
 
-			if noWait || isDeployed(deployment) {
+			if noWait || isDeployProcessed(deployment) {
 				stopPolling, warnings, err := actor.PollProcesses(processes, handleInstanceDetails)
 				allWarnings = append(allWarnings, warnings...)
 				if stopPolling || err != nil {
@@ -348,7 +348,11 @@ func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID
 	}
 }
 
-func isDeployed(d resources.Deployment) bool {
+func isDeployProcessed(d resources.Deployment) bool {
+	if d.Strategy == constant.DeploymentStrategyCanary {
+		return d.StatusValue == constant.DeploymentStatusValueActive && d.StatusReason == constant.DeploymentStatusReasonPaused
+	}
+
 	return d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
 }
 

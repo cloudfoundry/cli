@@ -377,13 +377,13 @@ var _ = Describe("app stager", func() {
 		When("the deployment strategy is rolling", func() {
 			BeforeEach(func() {
 				strategy = constant.DeploymentStrategyRolling
-				fakeActor.CreateDeploymentByApplicationAndDropletReturns(
+				fakeActor.CreateDeploymentReturns(
 					"some-deployment-guid",
 					v7action.Warnings{"create-deployment-warning"},
 					nil,
 				)
 
-				fakeActor.PollStartForRollingReturns(
+				fakeActor.PollStartForDeploymentReturns(
 					v7action.Warnings{"poll-start-warning"},
 					nil,
 				)
@@ -393,7 +393,7 @@ var _ = Describe("app stager", func() {
 				BeforeEach(func() {
 					appAction = constant.ApplicationRollingBack
 					resourceGUID = "revision-guid"
-					fakeActor.CreateDeploymentByApplicationAndRevisionReturns(
+					fakeActor.CreateDeploymentReturns(
 						"some-deployment-guid",
 						v7action.Warnings{"create-deployment-warning"},
 						nil,
@@ -404,14 +404,14 @@ var _ = Describe("app stager", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("Creating deployment for app %s...", app.Name))
-					Expect(fakeActor.CreateDeploymentByApplicationAndRevisionCallCount()).To(Equal(1), "CreateDeployment...")
-					appGUID, revisionGUID := fakeActor.CreateDeploymentByApplicationAndRevisionArgsForCall(0)
-					Expect(appGUID).To(Equal(app.GUID))
-					Expect(revisionGUID).To(Equal("revision-guid"))
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1), "CreateDeployment...")
+					dep := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(dep.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal(app.GUID))
+					Expect(dep.RevisionGUID).To(Equal("revision-guid"))
 					Expect(testUI.Err).To(Say("create-deployment-warning"))
 
 					Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
-					Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+					Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
 					Expect(testUI.Err).To(Say("poll-start-warning"))
 				})
 			})
@@ -421,21 +421,21 @@ var _ = Describe("app stager", func() {
 					Expect(executeErr).To(BeNil())
 
 					Expect(testUI.Out).To(Say("Creating deployment for app %s...", app.Name))
-					Expect(fakeActor.CreateDeploymentByApplicationAndDropletCallCount()).To(Equal(1))
-					appGUID, dropletGUID := fakeActor.CreateDeploymentByApplicationAndDropletArgsForCall(0)
-					Expect(appGUID).To(Equal(app.GUID))
-					Expect(dropletGUID).To(Equal("droplet-guid"))
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
+					dep := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(dep.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal(app.GUID))
+					Expect(dep.DropletGUID).To(Equal("droplet-guid"))
 					Expect(testUI.Err).To(Say("create-deployment-warning"))
 
 					Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
-					Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+					Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
 					Expect(testUI.Err).To(Say("poll-start-warning"))
 				})
 			})
 
 			When("creating a deployment fails", func() {
 				BeforeEach(func() {
-					fakeActor.CreateDeploymentByApplicationAndDropletReturns(
+					fakeActor.CreateDeploymentReturns(
 						"",
 						v7action.Warnings{"create-deployment-warning"},
 						errors.New("create-deployment-error"),
@@ -449,7 +449,7 @@ var _ = Describe("app stager", func() {
 
 			When("polling fails for a rolling restage", func() {
 				BeforeEach(func() {
-					fakeActor.PollStartForRollingReturns(
+					fakeActor.PollStartForDeploymentReturns(
 						v7action.Warnings{"poll-start-warning"},
 						errors.New("poll-start-error"),
 					)

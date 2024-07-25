@@ -1,9 +1,17 @@
 package v7pushaction
 
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
+)
+
 func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	eventStream <- &PushEvent{Plan: pushPlan, Event: StartingDeployment}
 
-	deploymentGUID, warnings, err := actor.V7Actor.CreateDeploymentByApplicationAndDroplet(pushPlan.Application.GUID, pushPlan.DropletGUID)
+	var dep resources.Deployment
+	dep.DropletGUID = pushPlan.DropletGUID
+	dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}}
+	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
 
 	if err != nil {
 		return pushPlan, Warnings(warnings), err
@@ -19,7 +27,7 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 		}
 	}
 
-	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
+	pollWarnings, err := actor.V7Actor.PollStartForDeployment(pushPlan.Application, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
 	warnings = append(warnings, pollWarnings...)
 
 	return pushPlan, Warnings(warnings), err
