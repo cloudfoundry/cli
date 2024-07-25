@@ -104,7 +104,8 @@ var _ = Describe("Cancel Deployment", func() {
 				})
 			})
 
-			When("There is a canary deployment", func() {
+			//TODO: Enable this when cf push command supports canary
+			XWhen("There is a canary deployment", func() {
 				It("succeeds", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--no-wait")).Should(Exit(0))

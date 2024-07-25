@@ -13,7 +13,7 @@ type RestartCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
-	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either canary, rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	usage               interface{}             `usage:"CF_NAME restart APP_NAME\n\n   This command will cause downtime unless you use '--strategy canary' or '--strategy rolling'.\n\n   If the app's most recent package is unstaged, restarting the app will stage and run that package.\n   Otherwise, the app's current droplet will be run."`
 	relatedCommands     interface{}             `related_commands:"restage, restart-app-instance"`

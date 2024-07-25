@@ -293,7 +293,6 @@ var _ = Describe("Deployment", func() {
 
 		When("the cloud controller version does not support canary deployment", func() {
 			BeforeEach(func() {
-				revisionGUID = "some-revision-guid"
 				response := `{
   "errors": [
     {
@@ -306,7 +305,7 @@ var _ = Describe("Deployment", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/deployments"),
-						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+						VerifyJSON(`{"strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 						RespondWith(http.StatusTeapot, response, http.Header{}),
 					),
 				)

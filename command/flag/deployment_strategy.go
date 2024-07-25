@@ -30,7 +30,7 @@ func (h *DeploymentStrategy) UnmarshalFlag(val string) error {
 	default:
 		return &flags.Error{
 			Type:    flags.ErrInvalidChoice,
-			Message: `STRATEGY must be "canary", "rolling" or not set`,
+			Message: `STRATEGY must be "canary" or "rolling" or not set`,
 		}
 	}
 

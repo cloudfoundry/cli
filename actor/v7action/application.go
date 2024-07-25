@@ -350,8 +350,7 @@ func (actor Actor) PollStartForDeployment(app resources.Application, deploymentG
 
 func isDeployProcessed(d resources.Deployment) bool {
 	if d.Strategy == constant.DeploymentStrategyCanary {
-		return d.StatusValue == constant.DeploymentStatusValueActive && d.StatusReason == constant.DeploymentStatusReasonPaused ||
-			d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
+		return d.StatusValue == constant.DeploymentStatusValueActive && d.StatusReason == constant.DeploymentStatusReasonPaused
 	}
 
 	return d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
