@@ -148,8 +148,8 @@ func (stager *Stager) StartApp(
 		)
 
 		dep := resources.Deployment{
-			Strategy: strategy,
-			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}}
+			Strategy:      strategy,
+			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}},
 		}
 		switch appAction {
 		case constant.ApplicationRollingBack:

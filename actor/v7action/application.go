@@ -443,7 +443,7 @@ func (actor Actor) getProcesses(deployment resources.Deployment, appGUID string,
 
 	// if the deployment is deployed we know web are all running and PollProcesses will see those as stable
 	// so just getting all processes is equivalent to just getting non-web ones and polling those
-	if isDeployed(deployment) {
+	if isDeployProcessed(deployment) {
 		processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
 		if err != nil {
 			return processes, Warnings(warnings), err
