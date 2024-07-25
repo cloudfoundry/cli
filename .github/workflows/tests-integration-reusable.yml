@@ -162,6 +162,7 @@ jobs:
         bosh -d cf manifest > /tmp/manifest.yml
         bosh interpolate /tmp/manifest.yml \
           -o .github/ops-files/use-cflinuxfs3.yml \
+          -o .github/ops-files/replace-redis.yml \
           -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
           -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
           -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
