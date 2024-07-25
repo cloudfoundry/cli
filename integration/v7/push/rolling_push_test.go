@@ -53,6 +53,30 @@ var _ = Describe("push with --strategy rolling", func() {
 				Expect(session).To(Say(`#0\s+running`))
 			})
 		})
+
+		It("pushes the app and creates a new deployment with max in flight set", func() {
+			helpers.WithHelloWorldApp(func(appDir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+					PushCommandName, appName, "--strategy", "rolling", "--max-in-flight", "3",
+				)
+
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+				Expect(session).To(Say(`Packaging files to upload\.\.\.`))
+				Expect(session).To(Say(`Uploading files\.\.\.`))
+				Expect(session).To(Say(`100.00%`))
+				Expect(session).To(Say(`Waiting for API to complete processing files\.\.\.`))
+				Expect(session).To(Say(`Staging app and tracing logs\.\.\.`))
+				Expect(session).To(Say(`Starting deployment for app %s\.\.\.`, appName))
+				Expect(session).To(Say(`Waiting for app to deploy\.\.\.`))
+				Expect(session).To(Say(`name:\s+%s`, appName))
+				Expect(session).To(Say(`requested state:\s+started`))
+				Expect(session).To(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+				Expect(session).To(Say(`type:\s+web`))
+				Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
+				Expect(session).To(Say(`#0\s+running`))
+			})
+		})
 	})
 
 	When("canceling the deployment", func() {
