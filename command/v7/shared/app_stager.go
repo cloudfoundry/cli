@@ -21,31 +21,17 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AppStager
 
 type AppStager interface {
-	StageAndStart(
-		app resources.Application,
-		space configv3.Space,
-		organization configv3.Organization,
-		packageGUID string,
-		strategy constant.DeploymentStrategy,
-		noWait bool,
-		appAction constant.ApplicationAction,
-	) error
+	StageAndStart(app resources.Application, space configv3.Space, organization configv3.Organization, packageGUID string, opts AppStartOpts) error
 
-	StageApp(
-		app resources.Application,
-		packageGUID string,
-		space configv3.Space,
-	) (resources.Droplet, error)
+	StageApp(app resources.Application, packageGUID string, space configv3.Space) (resources.Droplet, error)
 
-	StartApp(
-		app resources.Application,
-		resourceGuid string,
-		strategy constant.DeploymentStrategy,
-		noWait bool,
-		space configv3.Space,
-		organization configv3.Organization,
-		appAction constant.ApplicationAction,
-	) error
+	StartApp(app resources.Application, space configv3.Space, organization configv3.Organization, resourceGuid string, opts AppStartOpts) error
+}
+
+type AppStartOpts struct {
+	Strategy  constant.DeploymentStrategy
+	NoWait    bool
+	AppAction constant.ApplicationAction
 }
 
 type Stager struct {
@@ -77,15 +63,7 @@ func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Conf
 	}
 }
 
-func (stager *Stager) StageAndStart(
-	app resources.Application,
-	space configv3.Space,
-	organization configv3.Organization,
-	packageGUID string,
-	strategy constant.DeploymentStrategy,
-	noWait bool,
-	appAction constant.ApplicationAction,
-) error {
+func (stager *Stager) StageAndStart(app resources.Application, space configv3.Space, organization configv3.Organization, packageGUID string, opts AppStartOpts) error {
 
 	droplet, err := stager.StageApp(app, packageGUID, space)
 	if err != nil {
@@ -94,7 +72,7 @@ func (stager *Stager) StageAndStart(
 
 	stager.UI.DisplayNewline()
 
-	err = stager.StartApp(app, droplet.GUID, strategy, noWait, space, organization, appAction)
+	err = stager.StartApp(app, space, organization, droplet.GUID, opts)
 	if err != nil {
 		return err
 	}
@@ -125,16 +103,8 @@ func (stager *Stager) StageApp(app resources.Application, packageGUID string, sp
 	return droplet, nil
 }
 
-func (stager *Stager) StartApp(
-	app resources.Application,
-	resourceGuid string,
-	strategy constant.DeploymentStrategy,
-	noWait bool,
-	space configv3.Space,
-	organization configv3.Organization,
-	appAction constant.ApplicationAction,
-) error {
-	if len(strategy) > 0 {
+func (stager *Stager) StartApp(app resources.Application, space configv3.Space, organization configv3.Organization, resourceGuid string, opts AppStartOpts) error {
+	if len(opts.Strategy) > 0 {
 		stager.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
 			map[string]interface{}{
 				"AppName": app.Name,
@@ -148,10 +118,10 @@ func (stager *Stager) StartApp(
 		)
 
 		dep := resources.Deployment{
-			Strategy:      strategy,
+			Strategy:      opts.Strategy,
 			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}},
 		}
-		switch appAction {
+		switch opts.AppAction {
 		case constant.ApplicationRollingBack:
 			dep.RevisionGUID = resourceGuid
 			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
@@ -171,14 +141,14 @@ func (stager *Stager) StartApp(
 			stager.UI.DisplayText(instanceDetails)
 		}
 
-		warnings, err = stager.Actor.PollStartForDeployment(app, deploymentGUID, noWait, handleInstanceDetails)
+		warnings, err = stager.Actor.PollStartForDeployment(app, deploymentGUID, opts.NoWait, handleInstanceDetails)
 		stager.UI.DisplayNewline()
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}
 
-		if noWait && strategy != constant.DeploymentStrategyCanary {
+		if opts.NoWait && opts.Strategy != constant.DeploymentStrategyCanary {
 			stager.UI.DisplayText("First instance restaged correctly, restaging remaining in the background")
 			return nil
 		}
@@ -188,7 +158,7 @@ func (stager *Stager) StartApp(
 			return err
 		}
 
-		flavorText := fmt.Sprintf("%s app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...", appAction)
+		flavorText := fmt.Sprintf("%s app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...", opts.AppAction)
 		stager.UI.DisplayTextWithFlavor(flavorText,
 			map[string]interface{}{
 				"App":      app.Name,
@@ -200,7 +170,7 @@ func (stager *Stager) StartApp(
 		stager.UI.DisplayNewline()
 
 		if app.Started() {
-			if appAction == constant.ApplicationStarting {
+			if opts.AppAction == constant.ApplicationStarting {
 				stager.UI.DisplayText("App '{{.AppName}}' is already started.",
 					map[string]interface{}{
 						"AppName": app.Name,
@@ -243,7 +213,7 @@ func (stager *Stager) StartApp(
 			stager.UI.DisplayText(instanceDetails)
 		}
 
-		warnings, err = stager.Actor.PollStart(app, noWait, handleInstanceDetails)
+		warnings, err = stager.Actor.PollStart(app, opts.NoWait, handleInstanceDetails)
 		stager.UI.DisplayNewline()
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {

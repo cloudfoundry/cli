@@ -72,13 +72,18 @@ func (cmd RestartCommand) Execute(args []string) error {
 		cmd.UI.DisplayNewline()
 	}
 
+	opts := shared.AppStartOpts{
+		Strategy:  cmd.Strategy.Name,
+		NoWait:    cmd.NoWait,
+		AppAction: constant.ApplicationRestarting,
+	}
 	if packageGUID != "" {
-		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, cmd.Strategy.Name, cmd.NoWait, constant.ApplicationRestarting)
+		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, opts)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, "", cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
+		err = cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), "", opts)
 		if err != nil {
 			return err
 		}

@@ -77,15 +77,12 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return mapErr(cmd.Config, cmd.RequiredArgs.AppName, err)
 	}
 
-	err = cmd.Stager.StageAndStart(
-		app,
-		cmd.Config.TargetedSpace(),
-		cmd.Config.TargetedOrganization(),
-		pkg.GUID,
-		cmd.Strategy.Name,
-		cmd.NoWait,
-		constant.ApplicationRestarting,
-	)
+	opts := shared.AppStartOpts{
+		Strategy:  cmd.Strategy.Name,
+		NoWait:    cmd.NoWait,
+		AppAction: constant.ApplicationRestarting,
+	}
+	err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), pkg.GUID, opts)
 	if err != nil {
 		return mapErr(cmd.Config, cmd.RequiredArgs.AppName, err)
 	}

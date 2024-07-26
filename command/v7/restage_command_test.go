@@ -165,14 +165,14 @@ var _ = Describe("restage Command", func() {
 
 	It("stages and starts the app", func() {
 		Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
-		returnedApp, spaceForApp, orgForApp, pkgGUID, strategy, noWait, appAction := fakeAppStager.StageAndStartArgsForCall(0)
+		returnedApp, spaceForApp, orgForApp, pkgGUID, opts := fakeAppStager.StageAndStartArgsForCall(0)
 		Expect(returnedApp).To(Equal(app))
 		Expect(spaceForApp).To(Equal(fakeConfig.TargetedSpace()))
 		Expect(orgForApp).To(Equal(fakeConfig.TargetedOrganization()))
 		Expect(pkgGUID).To(Equal("earliest-package-guid"))
-		Expect(strategy).To(Equal(constant.DeploymentStrategyDefault))
-		Expect(noWait).To(Equal(false))
-		Expect(appAction).To(Equal(constant.ApplicationRestarting))
+		Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyDefault))
+		Expect(opts.NoWait).To(Equal(false))
+		Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
 	})
 
 	When("staging and starting the app fails", func() {

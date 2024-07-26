@@ -159,15 +159,12 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 		)
 		cmd.UI.DisplayNewline()
 
-		err = cmd.Stager.StageAndStart(
-			targetApp,
-			targetSpace,
-			targetOrg,
-			pkg.GUID,
-			cmd.Strategy.Name,
-			cmd.NoWait,
-			constant.ApplicationRestarting,
-		)
+		opts := shared.AppStartOpts{
+			Strategy:  cmd.Strategy.Name,
+			NoWait:    cmd.NoWait,
+			AppAction: constant.ApplicationRestarting,
+		}
+		err = cmd.Stager.StageAndStart(targetApp, targetSpace, targetOrg, pkg.GUID, opts)
 		if err != nil {
 			return mapErr(cmd.Config, targetApp.Name, err)
 		}

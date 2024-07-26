@@ -106,15 +106,12 @@ var _ = Describe("app stager", func() {
 
 		JustBeforeEach(func() {
 			appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
-			executeErr = appStager.StageAndStart(
-				app,
-				space,
-				organization,
-				pkgGUID,
-				strategy,
-				noWait,
-				appAction,
-			)
+			opts := shared.AppStartOpts{
+				Strategy:  strategy,
+				NoWait:    noWait,
+				AppAction: appAction,
+			}
+			executeErr = appStager.StageAndStart(app, space, organization, pkgGUID, opts)
 		})
 
 		It("stages and starts the app", func() {
@@ -177,15 +174,12 @@ var _ = Describe("app stager", func() {
 				strategy = constant.DeploymentStrategyRolling
 				noWait = true
 				appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
-				executeErr = appStager.StageAndStart(
-					app,
-					space,
-					organization,
-					pkgGUID,
-					strategy,
-					noWait,
-					appAction,
-				)
+				opts := shared.AppStartOpts{
+					Strategy:  strategy,
+					NoWait:    noWait,
+					AppAction: appAction,
+				}
+				executeErr = appStager.StageAndStart(app, space, organization, pkgGUID, opts)
 			})
 
 			It("Restages and starts the app", func() {
@@ -363,15 +357,12 @@ var _ = Describe("app stager", func() {
 
 		JustBeforeEach(func() {
 			appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
-			executeErr = appStager.StartApp(
-				app,
-				resourceGUID,
-				strategy,
-				noWait,
-				space,
-				organization,
-				appAction,
-			)
+			opts := shared.AppStartOpts{
+				Strategy:  strategy,
+				NoWait:    noWait,
+				AppAction: appAction,
+			}
+			executeErr = appStager.StartApp(app, space, organization, resourceGUID, opts)
 		})
 
 		When("the deployment strategy is rolling", func() {
