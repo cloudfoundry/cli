@@ -105,7 +105,7 @@ var _ = Describe("restage Command", func() {
 		})
 	})
 
-	When("it's NOT a rolling deploy", func() {
+	When("No strategy flag is given", func() {
 		BeforeEach(func() {
 			cmd.Strategy.Name = constant.DeploymentStrategyDefault
 		})
