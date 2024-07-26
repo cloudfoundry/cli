@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -73,6 +74,9 @@ var _ = Describe("restage Command", func() {
 			v7action.Warnings{"get-package-warning"},
 			nil,
 		)
+
+		cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+		cmd.MaxInFlight = 4
 	})
 
 	JustBeforeEach(func() {
@@ -108,6 +112,7 @@ var _ = Describe("restage Command", func() {
 	When("No strategy flag is given", func() {
 		BeforeEach(func() {
 			cmd.Strategy.Name = constant.DeploymentStrategyDefault
+			cmd.MaxInFlight = 0
 		})
 		It("warns that there will be app downtime", func() {
 			Expect(testUI.Err).To(Say("This action will cause app downtime."))
@@ -170,7 +175,8 @@ var _ = Describe("restage Command", func() {
 		Expect(spaceForApp).To(Equal(fakeConfig.TargetedSpace()))
 		Expect(orgForApp).To(Equal(fakeConfig.TargetedOrganization()))
 		Expect(pkgGUID).To(Equal("earliest-package-guid"))
-		Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyDefault))
+		Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
+		Expect(opts.MaxInFlight).To(Equal(4))
 		Expect(opts.NoWait).To(Equal(false))
 		Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
 	})
@@ -188,4 +194,34 @@ var _ = Describe("restage Command", func() {
 	It("succeeds", func() {
 		Expect(executeErr).To(Not(HaveOccurred()))
 	})
+
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
+		},
+		Entry("max-in-flight is passed without strategy",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyDefault}
+				cmd.MaxInFlight = 10
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--max-in-flight",
+				Arg2: "--strategy",
+			}),
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.MaxInFlight = 0
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+	)
 })
