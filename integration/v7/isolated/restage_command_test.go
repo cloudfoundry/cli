@@ -32,6 +32,7 @@ var _ = Describe("restage command", func() {
 				Eventually(session).Should(Say("rg"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("--strategy      Deployment strategy can be either canary, rolling or null"))
+				Eventually(session).Should(Say("--max-in-flight"))
 				Eventually(session).Should(Say("--no-wait       Exit when the first instance of the web process is healthy"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
@@ -145,7 +146,7 @@ var _ = Describe("restage command", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CustomCF(helpers.CFEnv{
 							EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
-						}, "restage", appName, "--strategy", "rolling")
+						}, "restage", appName, "--strategy", "rolling", "--max-in-flight", "3")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
