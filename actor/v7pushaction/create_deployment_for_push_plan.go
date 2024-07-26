@@ -10,6 +10,7 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 
 	var dep resources.Deployment
 	dep.DropletGUID = pushPlan.DropletGUID
+	dep.Strategy = pushPlan.Strategy
 	dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}}
 	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
 

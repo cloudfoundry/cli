@@ -43,7 +43,7 @@ var _ = Describe("DeploymentStrategy", func() {
 				err := strategy.UnmarshalFlag("banana")
 				Expect(err).To(MatchError(&flags.Error{
 					Type:    flags.ErrInvalidChoice,
-					Message: `STRATEGY must be "canary" or "rolling" or not set`,
+					Message: `STRATEGY must be "canary", "rolling" or not set`,
 				}))
 				Expect(strategy.Name).To(BeEmpty())
 			})

@@ -305,7 +305,7 @@ var _ = Describe("Deployment", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/deployments"),
-						VerifyJSON(`{"strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 						RespondWith(http.StatusTeapot, response, http.Header{}),
 					),
 				)
