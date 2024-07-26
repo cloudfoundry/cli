@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -187,4 +188,33 @@ var _ = Describe("restart Command", func() {
 		})
 	})
 
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
+		},
+
+		Entry("max-in-flight is passed without strategy",
+			func() {
+				cmd.MaxInFlight = 10
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--max-in-flight",
+				Arg2: "--strategy",
+			}),
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.MaxInFlight = 0
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+	)
 })

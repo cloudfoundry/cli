@@ -29,9 +29,10 @@ type AppStager interface {
 }
 
 type AppStartOpts struct {
-	Strategy  constant.DeploymentStrategy
-	NoWait    bool
-	AppAction constant.ApplicationAction
+	AppAction   constant.ApplicationAction
+	MaxInFlight int
+	NoWait      bool
+	Strategy    constant.DeploymentStrategy
 }
 
 type Stager struct {
@@ -124,9 +125,11 @@ func (stager *Stager) StartApp(app resources.Application, space configv3.Space, 
 		switch opts.AppAction {
 		case constant.ApplicationRollingBack:
 			dep.RevisionGUID = resourceGuid
+			dep.Options.MaxInFlight = opts.MaxInFlight
 			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		default:
 			dep.DropletGUID = resourceGuid
+			dep.Options.MaxInFlight = opts.MaxInFlight
 			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		}
 
