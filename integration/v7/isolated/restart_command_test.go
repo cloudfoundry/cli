@@ -53,6 +53,7 @@ var _ = Describe("restart command", func() {
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("--strategy      Deployment strategy, either rolling or null"))
 				Eventually(session).Should(Say("--no-wait       Exit when the first instance of the web process is healthy"))
+				Eventually(session).Should(Say("--max-in-flight"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
@@ -101,7 +102,7 @@ var _ = Describe("restart command", func() {
 					})
 				})
 				It("creates a deploy", func() {
-					session := helpers.CF("restart", appName, "--strategy=rolling")
+					session := helpers.CF("restart", appName, "--strategy=rolling", "--max-in-flight=3")
 					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 					Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
