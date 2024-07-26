@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
@@ -19,6 +20,7 @@ type RollbackCommand struct {
 	Version         flag.Revision `long:"version" required:"true" description:"Roll back to the specified revision"`
 	relatedCommands interface{}   `related_commands:"revisions"`
 	usage           interface{}   `usage:"CF_NAME rollback APP_NAME [--version VERSION] [-f]"`
+	MaxInFlight     int           `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being rolled back."`
 
 	LogCacheClient sharedaction.LogCacheClient
 	Stager         shared.AppStager
@@ -49,6 +51,11 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = cmd.ValidateFlags()
+	if err != nil {
+		return err
+	}
+
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -67,10 +74,6 @@ func (cmd RollbackCommand) Execute(args []string) error {
 
 	revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(app.GUID, targetRevision)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
 	if err != nil {
 		return err
 	}
@@ -107,9 +110,10 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	})
 
 	opts := shared.AppStartOpts{
-		Strategy:  constant.DeploymentStrategyRolling,
-		NoWait:    false,
-		AppAction: constant.ApplicationRollingBack,
+		AppAction:   constant.ApplicationRollingBack,
+		MaxInFlight: cmd.MaxInFlight,
+		NoWait:      false,
+		Strategy:    constant.DeploymentStrategyRolling,
 	}
 
 	startAppErr := cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), revision.GUID, opts)
@@ -118,6 +122,15 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+
+	return nil
+}
+
+func (cmd RollbackCommand) ValidateFlags() error {
+	switch {
+	case cmd.MaxInFlight < 1:
+		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
+	}
 
 	return nil
 }

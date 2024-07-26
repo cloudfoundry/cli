@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -76,6 +77,7 @@ var _ = Describe("rollback Command", func() {
 			},
 			Stager: fakeAppStager,
 		}
+		cmd.MaxInFlight = 5
 	})
 
 	JustBeforeEach(func() {
@@ -219,6 +221,8 @@ var _ = Describe("rollback Command", func() {
 					Expect(application.GUID).To(Equal("123"))
 					Expect(revisionGUID).To(Equal("some-1-guid"))
 					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
+					Expect(opts.MaxInFlight).To(Equal(5))
 
 					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", app))
 					Expect(testUI.Out).To(Say("Are you sure you want to continue?"))
@@ -265,4 +269,24 @@ var _ = Describe("rollback Command", func() {
 			})
 		})
 	})
+
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
+		},
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.MaxInFlight = 0
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+	)
 })
