@@ -49,7 +49,7 @@ var _ = Describe("revision Command", func() {
 		Expect(cmd.Execute(nil)).To(Succeed())
 	})
 
-	It("displays the experimental warning", func() {
-		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+	It("no longer displays the experimental warning", func() {
+		Expect(testUI.Err).NotTo(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 })

@@ -15,7 +15,7 @@ var _ = Describe("revision command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("revision", "EXPERIMENTAL COMMANDS", "Show details for a specific app revision"))
+				Expect(session).NotTo(HaveCommandInCategoryWithDescription("revision", "EXPERIMENTAL COMMANDS", "Show details for a specific app revision"))
 			})
 
 			It("Displays revision command usage to output", func() {
