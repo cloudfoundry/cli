@@ -344,6 +344,26 @@ var _ = Describe("copy-source Command", func() {
 		})
 	})
 
+	When("the strategy flag is set to canary", func() {
+		BeforeEach(func() {
+			cmd.Strategy = flag.DeploymentStrategy{
+				Name: constant.DeploymentStrategyCanary,
+			}
+		})
+
+		It("stages and starts the app with the appropriate strategy", func() {
+			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
+			returnedApp, spaceForApp, orgForApp, pkgGUID, opts := fakeAppStager.StageAndStartArgsForCall(0)
+			Expect(returnedApp).To(Equal(targetApp))
+			Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
+			Expect(orgForApp).To(Equal(configv3.Organization{Name: "some-org"}))
+			Expect(pkgGUID).To(Equal("target-package-guid"))
+			Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+			Expect(opts.NoWait).To(Equal(false))
+			Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
+		})
+	})
+
 	When("the no-wait flag is set", func() {
 		BeforeEach(func() {
 			cmd.NoWait = true
