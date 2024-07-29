@@ -164,10 +164,22 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 
 	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
 		display.UI.DisplayNewline()
-		display.UI.DisplayText(fmt.Sprintf("%s deployment currently %s (since %s)",
+		display.UI.DisplayText(display.getDeploymentStatusText(summary))
+	}
+}
+
+func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.DetailedApplicationSummary) string {
+	var lastStatusChangeTime = display.getLastStatusChangeTime(summary)
+
+	if lastStatusChangeTime != "" {
+		return fmt.Sprintf("%s deployment currently %s (since %s)",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
 			summary.Deployment.StatusReason,
-			display.getLastStatusChangeTime(summary)))
+			lastStatusChangeTime)
+	} else {
+		return fmt.Sprintf("%s deployment currently %s",
+			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+			summary.Deployment.StatusReason)
 	}
 }
 
