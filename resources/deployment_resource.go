@@ -59,7 +59,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 		State         constant.DeploymentState `json:"state,omitempty"`
 		Status        struct {
 			Details struct {
-				LastStatusChange string `json:"last_status_change,omitempty"`
+				LastStatusChange string `json:"last_status_change"`
 			}
 			Value  constant.DeploymentStatusValue  `json:"value"`
 			Reason constant.DeploymentStatusReason `json:"reason"`
