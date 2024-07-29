@@ -166,7 +166,7 @@ var _ = Describe("revisions Command", func() {
 				})
 
 				It("does not display an informative message", func() {
-					Expect(testUI.Out).NotTo(Say("Info: this app is in the middle of a rolling deployment. More than one revision is deployed."))
+					Expect(testUI.Out).NotTo(Say("Info: this app is in the middle of a deployment. More than one revision is deployed."))
 				})
 
 				When("there is more than one revision deployed", func() {
@@ -195,7 +195,7 @@ var _ = Describe("revisions Command", func() {
 						Expect(testUI.Out).To(Say("2\\(deployed\\)   Something else        true         A89F8259-D32B-491A-ABD6-F100AC42D74C   2020-03-08T12:43:30Z"))
 					})
 					It("displays an informative message", func() {
-						Expect(testUI.Out).To(Say("Info: this app is in the middle of a rolling deployment. More than one revision is deployed."))
+						Expect(testUI.Out).To(Say("Info: this app is in the middle of a deployment. More than one revision is deployed."))
 					})
 				})
 
