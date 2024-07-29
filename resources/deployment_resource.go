@@ -8,17 +8,18 @@ import (
 )
 
 type Deployment struct {
-	GUID          string
-	State         constant.DeploymentState
-	StatusValue   constant.DeploymentStatusValue
-	StatusReason  constant.DeploymentStatusReason
-	RevisionGUID  string
-	DropletGUID   string
-	CreatedAt     string
-	UpdatedAt     string
-	Relationships Relationships
-	NewProcesses  []Process
-	Strategy      constant.DeploymentStrategy
+	GUID             string
+	State            constant.DeploymentState
+	StatusValue      constant.DeploymentStatusValue
+	StatusReason     constant.DeploymentStatusReason
+	LastStatusChange string
+	RevisionGUID     string
+	DropletGUID      string
+	CreatedAt        string
+	UpdatedAt        string
+	Relationships    Relationships
+	NewProcesses     []Process
+	Strategy         constant.DeploymentStrategy
 }
 
 // MarshalJSON converts a Deployment into a Cloud Controller Deployment.
@@ -57,6 +58,9 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 		Relationships Relationships            `json:"relationships,omitempty"`
 		State         constant.DeploymentState `json:"state,omitempty"`
 		Status        struct {
+			Details struct {
+				LastStatusChange string `json:"last_status_change,omitempty"`
+			}
 			Value  constant.DeploymentStatusValue  `json:"value"`
 			Reason constant.DeploymentStatusReason `json:"reason"`
 		} `json:"status"`
@@ -76,6 +80,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.State = ccDeployment.State
 	d.StatusValue = ccDeployment.Status.Value
 	d.StatusReason = ccDeployment.Status.Reason
+	d.LastStatusChange = ccDeployment.Status.Details.LastStatusChange
 	d.DropletGUID = ccDeployment.Droplet.GUID
 	d.NewProcesses = ccDeployment.NewProcesses
 	d.Strategy = ccDeployment.Strategy
