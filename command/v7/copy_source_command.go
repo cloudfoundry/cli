@@ -17,6 +17,7 @@ type CopySourceCommand struct {
 	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
 	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY] [--no-wait]"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null"`
+	MaxInFlight         int                     `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	NoRestart           bool                    `long:"no-restart" description:"Do not restage the destination application"`
 	Organization        string                  `short:"o" long:"organization" description:"Org that contains the destination application"`
@@ -46,6 +47,14 @@ func (cmd *CopySourceCommand) ValidateFlags() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--no-restart", "--no-wait"},
 		}
+	}
+
+	if cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight > 0 {
+		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
+	}
+
+	if cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight < 1 {
+		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 
 	return nil
@@ -160,9 +169,10 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 		cmd.UI.DisplayNewline()
 
 		opts := shared.AppStartOpts{
-			Strategy:  cmd.Strategy.Name,
-			NoWait:    cmd.NoWait,
-			AppAction: constant.ApplicationRestarting,
+			AppAction:   constant.ApplicationRestarting,
+			MaxInFlight: cmd.MaxInFlight,
+			NoWait:      cmd.NoWait,
+			Strategy:    cmd.Strategy.Name,
 		}
 		err = cmd.Stager.StageAndStart(targetApp, targetSpace, targetOrg, pkg.GUID, opts)
 		if err != nil {
