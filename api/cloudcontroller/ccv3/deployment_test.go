@@ -293,6 +293,7 @@ var _ = Describe("Deployment", func() {
 
 		When("the cloud controller version does not support canary deployment", func() {
 			BeforeEach(func() {
+				revisionGUID = "some-revision-guid"
 				response := `{
   "errors": [
     {
