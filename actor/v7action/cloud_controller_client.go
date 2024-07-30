@@ -18,6 +18,7 @@ type CloudControllerClient interface {
 	ApplySpaceQuota(quotaGUID string, spaceGUID string) (resources.RelationshipList, ccv3.Warnings, error)
 	CheckRoute(domainGUID string, hostname string, path string, port int) (bool, ccv3.Warnings, error)
 	CancelDeployment(deploymentGUID string) (ccv3.Warnings, error)
+	ContinueDeployment(deploymentGUID string) (ccv3.Warnings, error)
 	CopyPackage(sourcePackageGUID string, targetAppGUID string) (resources.Package, ccv3.Warnings, error)
 	CreateApplication(app resources.Application) (resources.Application, ccv3.Warnings, error)
 	CreateApplicationDeployment(dep resources.Deployment) (string, ccv3.Warnings, error)

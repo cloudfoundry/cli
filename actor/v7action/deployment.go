@@ -36,3 +36,8 @@ func (actor Actor) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.CancelDeployment(deploymentGUID)
 	return Warnings(warnings), err
 }
+
+func (actor Actor) ContinueDeployment(deploymentGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.ContinueDeployment(deploymentGUID)
+	return Warnings(warnings), err
+}

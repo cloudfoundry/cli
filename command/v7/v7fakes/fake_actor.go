@@ -128,6 +128,19 @@ type FakeActor struct {
 	clearTargetMutex       sync.RWMutex
 	clearTargetArgsForCall []struct {
 	}
+	ContinueDeploymentStub        func(string) (v7action.Warnings, error)
+	continueDeploymentMutex       sync.RWMutex
+	continueDeploymentArgsForCall []struct {
+		arg1 string
+	}
+	continueDeploymentReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	continueDeploymentReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CopyPackageStub        func(resources.Application, resources.Application) (resources.Package, v7action.Warnings, error)
 	copyPackageMutex       sync.RWMutex
 	copyPackageArgsForCall []struct {
@@ -4106,6 +4119,70 @@ func (fake *FakeActor) ClearTargetCalls(stub func()) {
 	fake.clearTargetMutex.Lock()
 	defer fake.clearTargetMutex.Unlock()
 	fake.ClearTargetStub = stub
+}
+
+func (fake *FakeActor) ContinueDeployment(arg1 string) (v7action.Warnings, error) {
+	fake.continueDeploymentMutex.Lock()
+	ret, specificReturn := fake.continueDeploymentReturnsOnCall[len(fake.continueDeploymentArgsForCall)]
+	fake.continueDeploymentArgsForCall = append(fake.continueDeploymentArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.ContinueDeploymentStub
+	fakeReturns := fake.continueDeploymentReturns
+	fake.recordInvocation("ContinueDeployment", []interface{}{arg1})
+	fake.continueDeploymentMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) ContinueDeploymentCallCount() int {
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
+	return len(fake.continueDeploymentArgsForCall)
+}
+
+func (fake *FakeActor) ContinueDeploymentCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = stub
+}
+
+func (fake *FakeActor) ContinueDeploymentArgsForCall(i int) string {
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
+	argsForCall := fake.continueDeploymentArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ContinueDeploymentReturns(result1 v7action.Warnings, result2 error) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = nil
+	fake.continueDeploymentReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) ContinueDeploymentReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = nil
+	if fake.continueDeploymentReturnsOnCall == nil {
+		fake.continueDeploymentReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.continueDeploymentReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) CopyPackage(arg1 resources.Application, arg2 resources.Application) (resources.Package, v7action.Warnings, error) {
@@ -19415,6 +19492,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.checkRouteMutex.RUnlock()
 	fake.clearTargetMutex.RLock()
 	defer fake.clearTargetMutex.RUnlock()
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
 	fake.copyPackageMutex.RLock()
 	defer fake.copyPackageMutex.RUnlock()
 	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()

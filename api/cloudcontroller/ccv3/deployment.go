@@ -5,6 +5,15 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 )
 
+func (client *Client) ContinueDeployment(deploymentGUID string) (Warnings, error) {
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.PostApplicationDeploymentActionContinueRequest,
+		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
+	})
+
+	return warnings, err
+}
+
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostApplicationDeploymentActionCancelRequest,

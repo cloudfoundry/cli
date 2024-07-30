@@ -77,6 +77,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	ContinueDeploymentStub        func(string) (ccv3.Warnings, error)
+	continueDeploymentMutex       sync.RWMutex
+	continueDeploymentArgsForCall []struct {
+		arg1 string
+	}
+	continueDeploymentReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	continueDeploymentReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	CopyPackageStub        func(string, string) (resources.Package, ccv3.Warnings, error)
 	copyPackageMutex       sync.RWMutex
 	copyPackageArgsForCall []struct {
@@ -3022,6 +3035,70 @@ func (fake *FakeCloudControllerClient) CheckRouteReturnsOnCall(i int, result1 bo
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeployment(arg1 string) (ccv3.Warnings, error) {
+	fake.continueDeploymentMutex.Lock()
+	ret, specificReturn := fake.continueDeploymentReturnsOnCall[len(fake.continueDeploymentArgsForCall)]
+	fake.continueDeploymentArgsForCall = append(fake.continueDeploymentArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.ContinueDeploymentStub
+	fakeReturns := fake.continueDeploymentReturns
+	fake.recordInvocation("ContinueDeployment", []interface{}{arg1})
+	fake.continueDeploymentMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeploymentCallCount() int {
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
+	return len(fake.continueDeploymentArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeploymentCalls(stub func(string) (ccv3.Warnings, error)) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = stub
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeploymentArgsForCall(i int) string {
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
+	argsForCall := fake.continueDeploymentArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeploymentReturns(result1 ccv3.Warnings, result2 error) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = nil
+	fake.continueDeploymentReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) ContinueDeploymentReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.continueDeploymentMutex.Lock()
+	defer fake.continueDeploymentMutex.Unlock()
+	fake.ContinueDeploymentStub = nil
+	if fake.continueDeploymentReturnsOnCall == nil {
+		fake.continueDeploymentReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.continueDeploymentReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) CopyPackage(arg1 string, arg2 string) (resources.Package, ccv3.Warnings, error) {
@@ -14889,6 +14966,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cancelDeploymentMutex.RUnlock()
 	fake.checkRouteMutex.RLock()
 	defer fake.checkRouteMutex.RUnlock()
+	fake.continueDeploymentMutex.RLock()
+	defer fake.continueDeploymentMutex.RUnlock()
 	fake.copyPackageMutex.RLock()
 	defer fake.copyPackageMutex.RUnlock()
 	fake.createApplicationMutex.RLock()

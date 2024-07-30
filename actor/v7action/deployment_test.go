@@ -214,4 +214,49 @@ var _ = Describe("Deployment Actions", func() {
 			})
 		})
 	})
+
+	Describe("ContinueDeployment", func() {
+		var (
+			deploymentGUID string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			deploymentGUID = "dep-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.ContinueDeployment(deploymentGUID)
+		})
+
+		It("delegates to the cc client", func() {
+			Expect(fakeCloudControllerClient.ContinueDeploymentCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.ContinueDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+		})
+
+		When("the client fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.ContinueDeploymentReturns(ccv3.Warnings{"continue-deployment-warnings"}, errors.New("continue-deployment-error"))
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).To(MatchError("continue-deployment-error"))
+				Expect(warnings).To(ConsistOf("continue-deployment-warnings"))
+			})
+
+		})
+
+		When("the client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.ContinueDeploymentReturns(ccv3.Warnings{"continue-deployment-warnings"}, nil)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("continue-deployment-warnings"))
+			})
+		})
+	})
 })
