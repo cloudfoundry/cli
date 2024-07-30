@@ -162,6 +162,10 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
 		display.UI.DisplayNewline()
 		display.UI.DisplayText(display.getDeploymentStatusText(summary))
+		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
+			display.UI.DisplayNewline()
+			display.UI.DisplayText(fmt.Sprintf("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", summary.Application.Name, summary.Application.Name))
+		}
 	}
 }
 

@@ -766,12 +766,18 @@ var _ = Describe("app summary displayer", func() {
 
 					It("displays the message", func() {
 						Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
 
 				When("the deployment is paused", func() {
 					BeforeEach(func() {
 						summary = v7action.DetailedApplicationSummary{
+							ApplicationSummary: v7action.ApplicationSummary{
+								Application: resources.Application{
+									Name: "foobar",
+								},
+							},
 							Deployment: resources.Deployment{
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
@@ -783,6 +789,7 @@ var _ = Describe("app summary displayer", func() {
 
 					It("displays the message", func() {
 						Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 					})
 				})
 
@@ -800,6 +807,7 @@ var _ = Describe("app summary displayer", func() {
 
 					It("displays the message", func() {
 						Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
 			})
