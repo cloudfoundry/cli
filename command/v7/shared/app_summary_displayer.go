@@ -164,9 +164,26 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 
 	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
 		display.UI.DisplayNewline()
-		display.UI.DisplayText(fmt.Sprintf("%s deployment currently %s.",
+		display.UI.DisplayText(display.getDeploymentStatusText(summary))
+		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
+			display.UI.DisplayNewline()
+			display.UI.DisplayText(fmt.Sprintf("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", summary.Application.Name, summary.Application.Name))
+		}
+	}
+}
+
+func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.DetailedApplicationSummary) string {
+	var lastStatusChangeTime = display.getLastStatusChangeTime(summary)
+
+	if lastStatusChangeTime != "" {
+		return fmt.Sprintf("%s deployment currently %s (since %s)",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
-			summary.Deployment.StatusReason))
+			summary.Deployment.StatusReason,
+			lastStatusChangeTime)
+	} else {
+		return fmt.Sprintf("%s deployment currently %s",
+			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+			summary.Deployment.StatusReason)
 	}
 }
 
@@ -175,6 +192,19 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 		timestamp, err := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 		if err != nil {
 			log.WithField("createdAt", summary.CurrentDroplet.CreatedAt).Errorln("error parsing created at:", err)
+		}
+
+		return display.UI.UserFriendlyDate(timestamp)
+	}
+
+	return ""
+}
+
+func (display AppSummaryDisplayer) getLastStatusChangeTime(summary v7action.DetailedApplicationSummary) string {
+	if summary.Deployment.LastStatusChange != "" {
+		timestamp, err := time.Parse(time.RFC3339, summary.Deployment.LastStatusChange)
+		if err != nil {
+			log.WithField("last_status_change", summary.Deployment.LastStatusChange).Errorln("error parsing last status change:", err)
 		}
 
 		return display.UI.UserFriendlyDate(timestamp)

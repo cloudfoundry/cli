@@ -659,18 +659,39 @@ var _ = Describe("app summary displayer", func() {
 		When("there is an active deployment", func() {
 			When("the deployment strategy is rolling", func() {
 				When("the deployment is in progress", func() {
-					BeforeEach(func() {
-						summary = v7action.DetailedApplicationSummary{
-							Deployment: resources.Deployment{
-								Strategy:     constant.DeploymentStrategyRolling,
-								StatusValue:  constant.DeploymentStatusValueActive,
-								StatusReason: constant.DeploymentStatusReasonDeploying,
-							},
-						}
+					When("last status change has a timestamp", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: "2024-07-29T17:32:29Z",
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						})
 					})
 
-					It("displays the message", func() {
-						Expect(testUI.Out).To(Say("Rolling deployment currently DEPLOYING."))
+					When("last status change is an empty string", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: "",
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING\n`))
+							Expect(testUI.Out).NotTo(Say(`\(since`))
+						})
 					})
 				})
 
@@ -678,15 +699,76 @@ var _ = Describe("app summary displayer", func() {
 					BeforeEach(func() {
 						summary = v7action.DetailedApplicationSummary{
 							Deployment: resources.Deployment{
-								Strategy:     constant.DeploymentStrategyRolling,
-								StatusValue:  constant.DeploymentStatusValueActive,
-								StatusReason: constant.DeploymentStatusReasonCanceling,
+								Strategy:         constant.DeploymentStrategyRolling,
+								StatusValue:      constant.DeploymentStatusValueActive,
+								StatusReason:     constant.DeploymentStatusReasonCanceling,
+								LastStatusChange: "2024-07-29T17:32:29Z",
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say("Rolling deployment currently CANCELING."))
+						Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+					})
+				})
+			})
+			When("the deployment strategy is canary", func() {
+				When("the deployment is in progress", func() {
+					BeforeEach(func() {
+						summary = v7action.DetailedApplicationSummary{
+							Deployment: resources.Deployment{
+								Strategy:         constant.DeploymentStrategyCanary,
+								StatusValue:      constant.DeploymentStatusValueActive,
+								StatusReason:     constant.DeploymentStatusReasonDeploying,
+								LastStatusChange: "2024-07-29T17:32:29Z",
+							},
+						}
+					})
+
+					It("displays the message", func() {
+						Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+					})
+				})
+
+				When("the deployment is paused", func() {
+					BeforeEach(func() {
+						summary = v7action.DetailedApplicationSummary{
+							ApplicationSummary: v7action.ApplicationSummary{
+								Application: resources.Application{
+									Name: "foobar",
+								},
+							},
+							Deployment: resources.Deployment{
+								Strategy:         constant.DeploymentStrategyCanary,
+								StatusValue:      constant.DeploymentStatusValueActive,
+								StatusReason:     constant.DeploymentStatusReasonPaused,
+								LastStatusChange: "2024-07-29T17:32:29Z",
+							},
+						}
+					})
+
+					It("displays the message", func() {
+						Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
+					})
+				})
+
+				When("the deployment is canceling", func() {
+					BeforeEach(func() {
+						summary = v7action.DetailedApplicationSummary{
+							Deployment: resources.Deployment{
+								Strategy:         constant.DeploymentStrategyCanary,
+								StatusValue:      constant.DeploymentStatusValueActive,
+								StatusReason:     constant.DeploymentStatusReasonCanceling,
+								LastStatusChange: "2024-07-29T17:32:29Z",
+							},
+						}
+					})
+
+					It("displays the message", func() {
+						Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
 			})
