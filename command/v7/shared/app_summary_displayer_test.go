@@ -689,7 +689,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING\n`))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
 							Expect(testUI.Out).NotTo(Say(`\(since`))
 						})
 					})
@@ -776,6 +776,11 @@ var _ = Describe("app summary displayer", func() {
 				When("the deployment is paused", func() {
 					BeforeEach(func() {
 						summary = v7action.DetailedApplicationSummary{
+							ApplicationSummary: v7action.ApplicationSummary{
+								Application: resources.Application{
+									Name: "some-app",
+								},
+							},
 							Deployment: resources.Deployment{
 								Strategy:     constant.DeploymentStrategyCanary,
 								StatusValue:  constant.DeploymentStatusValueActive,
@@ -786,7 +791,7 @@ var _ = Describe("app summary displayer", func() {
 
 					It("displays the message", func() {
 						Expect(testUI.Out).To(Say("Canary deployment currently PAUSED."))
-						Expect(testUI.Out).To(Say("Please run `cf continue-deployment myapp` to promote the canary deployment, or `cf cancel-deployment myapp` to rollback to the previous version."))
+						Expect(testUI.Out).To(Say("Please run `cf continue-deployment some-app` to promote the canary deployment, or `cf cancel-deployment some-app` to rollback to the previous version."))
 					})
 				})
 
