@@ -45,6 +45,10 @@ const (
 	// DeploymentStatusReasonSuperseded means the deployment's status.value is
 	// 'SUPERSEDED'
 	DeploymentStatusReasonSuperseded DeploymentStatusReason = "SUPERSEDED"
+
+	// DeploymentStatusReasonPaused means the deployment's status.value is
+	// 'PAUSED'
+	DeploymentStatusReasonPaused DeploymentStatusReason = "PAUSED"
 )
 
 // DeploymentStatusValue describes the status values a deployment can have
