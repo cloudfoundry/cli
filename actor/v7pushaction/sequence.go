@@ -21,7 +21,7 @@ func ShouldStagePackage(plan PushPlan) bool {
 }
 
 func ShouldCreateDeployment(plan PushPlan) bool {
-	return plan.Strategy == constant.DeploymentStrategyRolling || plan.Strategy == constant.DeploymentStrategyCanary
+	return plan.Strategy != ""
 }
 
 func ShouldStopApplication(plan PushPlan) bool {
