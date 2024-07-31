@@ -696,6 +696,8 @@ var _ = Describe("app summary displayer", func() {
 		})
 
 		When("there is an active deployment", func() {
+			var LastStatusChangeTimeString = "2024-07-29T17:32:29Z"
+
 			When("the deployment strategy is rolling", func() {
 				When("the deployment is in progress", func() {
 					When("last status change has a timestamp", func() {
@@ -705,13 +707,17 @@ var _ = Describe("app summary displayer", func() {
 									Strategy:         constant.DeploymentStrategyRolling,
 									StatusValue:      constant.DeploymentStatusValueActive,
 									StatusReason:     constant.DeploymentStatusReasonDeploying,
-									LastStatusChange: "2024-07-29T17:32:29Z",
+									LastStatusChange: LastStatusChangeTimeString,
 								},
 							}
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+							parsedTime, err := time.Parse(time.RFC3339, LastStatusChangeTimeString)
+							Expect(err).To(Not(HaveOccurred()))
+
+							timeString := parsedTime.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, timeString))
 						})
 					})
 
@@ -741,13 +747,17 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyRolling,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						parsedTime, err := time.Parse(time.RFC3339, LastStatusChangeTimeString)
+						Expect(err).To(Not(HaveOccurred()))
+
+						timeString := parsedTime.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+						Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since %s\)`, timeString))
 					})
 				})
 			})
@@ -759,13 +769,17 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonDeploying,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						parsedTime, err := time.Parse(time.RFC3339, LastStatusChangeTimeString)
+						Expect(err).To(Not(HaveOccurred()))
+
+						timeString := parsedTime.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+						Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since %s\)`, timeString))
 						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
@@ -782,13 +796,17 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonPaused,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						parsedTime, err := time.Parse(time.RFC3339, LastStatusChangeTimeString)
+						Expect(err).To(Not(HaveOccurred()))
+
+						timeString := parsedTime.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+						Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since %s\)`, timeString))
 						Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 					})
 				})
@@ -800,13 +818,17 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						parsedTime, err := time.Parse(time.RFC3339, LastStatusChangeTimeString)
+						Expect(err).To(Not(HaveOccurred()))
+
+						timeString := parsedTime.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+						Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since %s\)`, timeString))
 						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
