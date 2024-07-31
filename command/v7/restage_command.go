@@ -15,7 +15,7 @@ type RestageCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
-	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canaray, rolling or null."`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\n   This command will cause downtime unless you use '--strategy' flag.\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy rolling\n   CF_NAME restage APP_NAME --strategy canray --no-wait"`
 	relatedCommands     interface{}             `related_commands:"restart"`
