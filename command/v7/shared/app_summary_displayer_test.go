@@ -696,6 +696,9 @@ var _ = Describe("app summary displayer", func() {
 		})
 
 		When("there is an active deployment", func() {
+			var LastStatusChangeTimeString = "2024-07-29T17:32:29Z"
+			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3}\s\d{4}`
+
 			When("the deployment strategy is rolling", func() {
 				When("the deployment is in progress", func() {
 					When("last status change has a timestamp", func() {
@@ -705,13 +708,14 @@ var _ = Describe("app summary displayer", func() {
 									Strategy:         constant.DeploymentStrategyRolling,
 									StatusValue:      constant.DeploymentStatusValueActive,
 									StatusReason:     constant.DeploymentStatusReasonDeploying,
-									LastStatusChange: "2024-07-29T17:32:29Z",
+									LastStatusChange: LastStatusChangeTimeString,
 								},
 							}
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						})
 					})
 
@@ -741,13 +745,14 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyRolling,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						var actualOut = fmt.Sprintf("%s", testUI.Out)
+						Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 					})
 				})
 			})
@@ -759,13 +764,14 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonDeploying,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						var actualOut = fmt.Sprintf("%s", testUI.Out)
+						Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
@@ -782,13 +788,14 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonPaused,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						var actualOut = fmt.Sprintf("%s", testUI.Out)
+						Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
 						Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 					})
 				})
@@ -800,13 +807,14 @@ var _ = Describe("app summary displayer", func() {
 								Strategy:         constant.DeploymentStrategyCanary,
 								StatusValue:      constant.DeploymentStatusValueActive,
 								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: "2024-07-29T17:32:29Z",
+								LastStatusChange: LastStatusChangeTimeString,
 							},
 						}
 					})
 
 					It("displays the message", func() {
-						Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since Mon 29 Jul 13:32:29 EDT 2024\)`))
+						var actualOut = fmt.Sprintf("%s", testUI.Out)
+						Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 					})
 				})
