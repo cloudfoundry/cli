@@ -1,13 +1,8 @@
 name: "Tests: Integration"
 
-run-name: "Integration [${{ github.event.workflow_run.head_branch }}]: ${{ github.event.workflow_run.head_commit.message }}"
+run-name: "Integration [${{ github.event_name }}: ${{ github.event.pull_request.head.sha || github.event.push.after || github.event.workflow_run.head_sha}}]: ${{ github.event.workflow_run.head_commit.message }}"
 
 on:
-  workflow_call:
-    inputs:
-      workflow:
-        default: all
-        type: string
   workflow_dispatch:
     inputs:
       workflow:
@@ -15,47 +10,97 @@ on:
         required: true
         type: choice
         options:
+          - all
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
           # - run-integration-tests-cf-env-with-min-capi
           - run-cats-cf-env
-  workflow_run:
-    workflows:
-      - "Tests"
-    types:
-      - completed
   push:
+    tags:
+      - "v9.*"
+      - "v8.*"
+      - "v7.*"
+  pull_request_target:
     branches:
       - main
+      - v9
       - v8
       - v7
-
+    paths-ignore:
+      - "doc/**"
+      - ".gitpod.yml"
+      - "README.md"
 jobs:
+  get-sha:
+    runs-on: ubuntu-latest
+    outputs:
+      gitRef: ${{steps.calculate.outputs.ref}}
+    steps:
+      - id: calculate
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+            echo "checkout pull request head ${{ github.event.pull_request.head.sha }}"
+            echo "ref=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "checkout push request ${{github.event.push.after}}"
+            echo "ref=${{github.event.push.after}}" >> $GITHUB_OUTPUT
+          else
+            echo "checkout else ${{ github.event.workflow_run.head_sha }}"
+            echo "ref=${{github.event.workflow_run.head_sha}}" >> $GITHUB_OUTPUT
+          fi
+  units:
+    name: Basic units to gate for integration tests
+    runs-on: ubuntu-latest
+    needs:
+      - get-sha
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{needs.get-sha.outputs.gitRef}}
+      - name: Set Up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - name: Run Units
+        run: make units
   run-integration-tests-cf-env:
     name: Integration tests
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
+    needs:
+      - get-sha
+      - units
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
+      gitRef: ${{needs.get-sha.outputs.gitRef}}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
+    needs:
+      - get-sha
+      - units
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
       name: Integration client creds
+      gitRef: ${{needs.get-sha.outputs.gitRef}}
     secrets: inherit
 
   # run-integration-tests-cf-env-with-min-capi:
   #   name: MIN CAPI
-  #   if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
+  #   needs:
+  #     - get-sha
+  #     - units
+  #   if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
   #   uses: ./.github/workflows/tests-integration-reusable.yml
   #   with:
   #     capi-version: min
@@ -70,13 +115,15 @@ jobs:
   run-cats-cf-env:
     name: CATS
     needs:
+      - get-sha
       - run-integration-tests-cf-env
       - run-integration-tests-cf-env-with-client-creds
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: cats
+      gitRef: ${{needs.get-sha.outputs.gitRef}}
     secrets: inherit

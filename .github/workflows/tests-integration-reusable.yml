@@ -28,6 +28,9 @@ on:
       pool-namespace:
         type: string
         default: 'official'
+      gitRef:
+        type: string
+        default: ${{github.event.workflow_run.head_sha}}
         
 jobs:
   run-integration-tests:
@@ -40,7 +43,7 @@ jobs:
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
-        ref: ${{github.event.workflow_run.head_sha}}
+        ref: ${{inputs.gitRef}}
 
     - name: Checkout cli-ci
       uses: actions/checkout@v4
