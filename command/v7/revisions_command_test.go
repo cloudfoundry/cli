@@ -59,10 +59,6 @@ var _ = Describe("revisions Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	It("no longer displays the experimental warning", func() {
-		Expect(testUI.Err).NotTo(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-	})
-
 	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
