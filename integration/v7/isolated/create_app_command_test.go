@@ -105,6 +105,18 @@ var _ = Describe("create-app command", func() {
 					Eventually(session).Should(Say("docker image:"))
 					Eventually(session).Should(Exit(0))
 				})
+
+				It("creates the app with the cnb app type", func() {
+					session := helpers.CF("create-app", appName, "--app-type", "cnb", "-b", "docker://foobar.test")
+					userName, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Creating app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("app", appName)
+					Eventually(session).ShouldNot(Say("docker image:"))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
