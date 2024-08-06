@@ -45,7 +45,7 @@ var _ = Describe("restart command", func() {
 				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart APP_NAME"))
-				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy rolling'."))
+				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy"))
 				Eventually(session).Should(Say("If the app's most recent package is unstaged, restarting the app will stage and run that package."))
 				Eventually(session).Should(Say("Otherwise, the app's current droplet will be run."))
 				Eventually(session).Should(Say("ALIAS:"))

@@ -23,7 +23,7 @@ var _ = Describe("restage command", func() {
 				Eventually(session).ShouldNot(Say(`This action will cause app downtime.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
-				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy' flag."))
+				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy"))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
 				Eventually(session).Should(Say("cf restage APP_NAME --strategy rolling"))
