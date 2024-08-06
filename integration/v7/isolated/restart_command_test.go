@@ -51,7 +51,7 @@ var _ = Describe("restart command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rs"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--strategy      Deployment strategy, either rolling or null"))
+				Eventually(session).Should(Say("--strategy      Deployment strategy can be canary, rolling or null."))
 				Eventually(session).Should(Say("--no-wait       Exit when the first instance of the web process is healthy"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
