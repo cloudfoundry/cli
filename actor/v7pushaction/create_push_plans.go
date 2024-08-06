@@ -31,6 +31,18 @@ func (actor Actor) CreatePushPlans(
 			BitsPath:    manifestApplication.Path,
 		}
 
+		if manifestApplication.Lifecycle != "" {
+			plan.Application.LifecycleType = manifestApplication.Lifecycle
+		}
+
+		if overrides.Lifecycle != "" {
+			plan.Application.LifecycleType = overrides.Lifecycle
+		}
+
+		if overrides.CNBCredentials != nil {
+			plan.Application.Credentials = overrides.CNBCredentials
+		}
+
 		if manifestApplication.Docker != nil {
 			plan.DockerImageCredentials = v7action.DockerImageCredentials{
 				Path:     manifestApplication.Docker.Image,

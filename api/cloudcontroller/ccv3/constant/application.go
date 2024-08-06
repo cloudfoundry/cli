@@ -9,6 +9,9 @@ const (
 	// AppLifecycleTypeDocker will pull a docker image from a registry to run an
 	// app.
 	AppLifecycleTypeDocker AppLifecycleType = "docker"
+	// AppLifecycleTypeCNB will use a droplet (created with cloud native buildpacks)
+	// and a rootfs to run the app.
+	AppLifecycleTypeCNB AppLifecycleType = "cnb"
 )
 
 // ApplicationAction represents the action being taken on an application
