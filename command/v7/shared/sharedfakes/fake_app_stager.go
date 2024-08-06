@@ -4,23 +4,20 @@ package sharedfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeAppStager struct {
-	StageAndStartStub        func(resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error
+	StageAndStartStub        func(resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) error
 	stageAndStartMutex       sync.RWMutex
 	stageAndStartArgsForCall []struct {
 		arg1 resources.Application
 		arg2 configv3.Space
 		arg3 configv3.Organization
 		arg4 string
-		arg5 constant.DeploymentStrategy
-		arg6 bool
-		arg7 constant.ApplicationAction
+		arg5 shared.AppStartOpts
 	}
 	stageAndStartReturns struct {
 		result1 error
@@ -43,16 +40,14 @@ type FakeAppStager struct {
 		result1 resources.Droplet
 		result2 error
 	}
-	StartAppStub        func(resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error
+	StartAppStub        func(resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) error
 	startAppMutex       sync.RWMutex
 	startAppArgsForCall []struct {
 		arg1 resources.Application
-		arg2 string
-		arg3 constant.DeploymentStrategy
-		arg4 bool
-		arg5 configv3.Space
-		arg6 configv3.Organization
-		arg7 constant.ApplicationAction
+		arg2 configv3.Space
+		arg3 configv3.Organization
+		arg4 string
+		arg5 shared.AppStartOpts
 	}
 	startAppReturns struct {
 		result1 error
@@ -64,7 +59,7 @@ type FakeAppStager struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppStager) StageAndStart(arg1 resources.Application, arg2 configv3.Space, arg3 configv3.Organization, arg4 string, arg5 constant.DeploymentStrategy, arg6 bool, arg7 constant.ApplicationAction) error {
+func (fake *FakeAppStager) StageAndStart(arg1 resources.Application, arg2 configv3.Space, arg3 configv3.Organization, arg4 string, arg5 shared.AppStartOpts) error {
 	fake.stageAndStartMutex.Lock()
 	ret, specificReturn := fake.stageAndStartReturnsOnCall[len(fake.stageAndStartArgsForCall)]
 	fake.stageAndStartArgsForCall = append(fake.stageAndStartArgsForCall, struct {
@@ -72,19 +67,18 @@ func (fake *FakeAppStager) StageAndStart(arg1 resources.Application, arg2 config
 		arg2 configv3.Space
 		arg3 configv3.Organization
 		arg4 string
-		arg5 constant.DeploymentStrategy
-		arg6 bool
-		arg7 constant.ApplicationAction
-	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
-	fake.recordInvocation("StageAndStart", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+		arg5 shared.AppStartOpts
+	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.StageAndStartStub
+	fakeReturns := fake.stageAndStartReturns
+	fake.recordInvocation("StageAndStart", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.stageAndStartMutex.Unlock()
-	if fake.StageAndStartStub != nil {
-		return fake.StageAndStartStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.stageAndStartReturns
 	return fakeReturns.result1
 }
 
@@ -94,17 +88,17 @@ func (fake *FakeAppStager) StageAndStartCallCount() int {
 	return len(fake.stageAndStartArgsForCall)
 }
 
-func (fake *FakeAppStager) StageAndStartCalls(stub func(resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error) {
+func (fake *FakeAppStager) StageAndStartCalls(stub func(resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) error) {
 	fake.stageAndStartMutex.Lock()
 	defer fake.stageAndStartMutex.Unlock()
 	fake.StageAndStartStub = stub
 }
 
-func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) {
+func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) {
 	fake.stageAndStartMutex.RLock()
 	defer fake.stageAndStartMutex.RUnlock()
 	argsForCall := fake.stageAndStartArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeAppStager) StageAndStartReturns(result1 error) {
@@ -138,15 +132,16 @@ func (fake *FakeAppStager) StageApp(arg1 resources.Application, arg2 string, arg
 		arg2 string
 		arg3 configv3.Space
 	}{arg1, arg2, arg3})
+	stub := fake.StageAppStub
+	fakeReturns := fake.stageAppReturns
 	fake.recordInvocation("StageApp", []interface{}{arg1, arg2, arg3})
 	fake.stageAppMutex.Unlock()
-	if fake.StageAppStub != nil {
-		return fake.StageAppStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stageAppReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -195,27 +190,26 @@ func (fake *FakeAppStager) StageAppReturnsOnCall(i int, result1 resources.Drople
 	}{result1, result2}
 }
 
-func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 string, arg3 constant.DeploymentStrategy, arg4 bool, arg5 configv3.Space, arg6 configv3.Organization, arg7 constant.ApplicationAction) error {
+func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 configv3.Space, arg3 configv3.Organization, arg4 string, arg5 shared.AppStartOpts) error {
 	fake.startAppMutex.Lock()
 	ret, specificReturn := fake.startAppReturnsOnCall[len(fake.startAppArgsForCall)]
 	fake.startAppArgsForCall = append(fake.startAppArgsForCall, struct {
 		arg1 resources.Application
-		arg2 string
-		arg3 constant.DeploymentStrategy
-		arg4 bool
-		arg5 configv3.Space
-		arg6 configv3.Organization
-		arg7 constant.ApplicationAction
-	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
-	fake.recordInvocation("StartApp", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+		arg2 configv3.Space
+		arg3 configv3.Organization
+		arg4 string
+		arg5 shared.AppStartOpts
+	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.StartAppStub
+	fakeReturns := fake.startAppReturns
+	fake.recordInvocation("StartApp", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.startAppMutex.Unlock()
-	if fake.StartAppStub != nil {
-		return fake.StartAppStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.startAppReturns
 	return fakeReturns.result1
 }
 
@@ -225,17 +219,17 @@ func (fake *FakeAppStager) StartAppCallCount() int {
 	return len(fake.startAppArgsForCall)
 }
 
-func (fake *FakeAppStager) StartAppCalls(stub func(resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error) {
+func (fake *FakeAppStager) StartAppCalls(stub func(resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) error) {
 	fake.startAppMutex.Lock()
 	defer fake.startAppMutex.Unlock()
 	fake.StartAppStub = stub
 }
 
-func (fake *FakeAppStager) StartAppArgsForCall(i int) (resources.Application, string, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) {
+func (fake *FakeAppStager) StartAppArgsForCall(i int) (resources.Application, configv3.Space, configv3.Organization, string, shared.AppStartOpts) {
 	fake.startAppMutex.RLock()
 	defer fake.startAppMutex.RUnlock()
 	argsForCall := fake.startAppArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeAppStager) StartAppReturns(result1 error) {

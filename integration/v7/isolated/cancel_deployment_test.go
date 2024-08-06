@@ -90,16 +90,33 @@ var _ = Describe("Cancel Deployment", func() {
 				})
 			})
 
-			It("succeeds", func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=rolling", "--no-wait")).Should(Exit(0))
-				})
+			When("There is a rolling deployment", func() {
+				It("succeeds", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=rolling", "--no-wait")).Should(Exit(0))
+					})
 
-				session := helpers.CF("cancel-deployment", appName)
-				Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say(fmt.Sprintf(`TIP: Run 'cf app %s' to view app status.`, appName)))
-				Eventually(session).Should(Exit(0))
+					session := helpers.CF("cancel-deployment", appName)
+					Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(fmt.Sprintf(`TIP: Run 'cf app %s' to view app status.`, appName)))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			//TODO: Enable this when cf push command supports canary
+			XWhen("There is a canary deployment", func() {
+				It("succeeds", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--no-wait")).Should(Exit(0))
+					})
+
+					session := helpers.CF("cancel-deployment", appName)
+					Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(fmt.Sprintf(`TIP: Run 'cf app %s' to view app status.`, appName)))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})

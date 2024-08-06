@@ -113,7 +113,7 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	}
 
 	if len(revisionsDeployed) > 1 {
-		cmd.UI.DisplayText("Info: this app is in the middle of a rolling deployment. More than one revision is deployed.")
+		cmd.UI.DisplayText("Info: this app is in the middle of a deployment. More than one revision is deployed.")
 		cmd.UI.DisplayNewline()
 	}
 

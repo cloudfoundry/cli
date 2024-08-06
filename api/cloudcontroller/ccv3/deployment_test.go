@@ -165,7 +165,7 @@ var _ = Describe("Deployment", func() {
 		})
 	})
 
-	Describe("CreateApplicationDeployment", func() {
+	Describe("Create a deployment with app and droplet guids", func() {
 		var (
 			deploymentGUID string
 			warnings       Warnings
@@ -174,7 +174,11 @@ var _ = Describe("Deployment", func() {
 		)
 
 		JustBeforeEach(func() {
-			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment("some-app-guid", dropletGUID)
+			var dep resources.Deployment
+			dep.Strategy = constant.DeploymentStrategyRolling
+			dep.DropletGUID = dropletGUID
+			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
+			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment(dep)
 		})
 
 		Context("when the application exists", func() {
@@ -184,6 +188,7 @@ var _ = Describe("Deployment", func() {
 				response = `{
   "guid": "some-deployment-guid",
   "created_at": "2018-04-25T22:42:10Z",
+	"strategy": "rolling",
   "relationships": {
     "app": {
       "data": {
@@ -199,7 +204,7 @@ var _ = Describe("Deployment", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"droplet":{ "guid":"some-droplet-guid" }, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							VerifyJSON(`{"droplet":{ "guid":"some-droplet-guid" }, "strategy": "rolling", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
@@ -219,7 +224,7 @@ var _ = Describe("Deployment", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							VerifyJSON(`{"strategy":"rolling", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
@@ -233,7 +238,7 @@ var _ = Describe("Deployment", func() {
 		})
 	})
 
-	Describe("CreateApplicationDeploymentByRevision", func() {
+	Describe("Create a deployment with app and revision guids", func() {
 		var (
 			deploymentGUID string
 			warnings       Warnings
@@ -242,7 +247,11 @@ var _ = Describe("Deployment", func() {
 		)
 
 		JustBeforeEach(func() {
-			deploymentGUID, warnings, executeErr = client.CreateApplicationDeploymentByRevision("some-app-guid", revisionGUID)
+			var dep resources.Deployment
+			dep.Strategy = constant.DeploymentStrategyCanary
+			dep.RevisionGUID = revisionGUID
+			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
+			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment(dep)
 		})
 
 		Context("when the application exists", func() {
@@ -252,6 +261,7 @@ var _ = Describe("Deployment", func() {
 				response = `{
   "guid": "some-deployment-guid",
   "created_at": "2018-04-25T22:42:10Z",
+	"strategy": "canary",
   "relationships": {
     "app": {
       "data": {
@@ -267,7 +277,7 @@ var _ = Describe("Deployment", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
@@ -280,6 +290,42 @@ var _ = Describe("Deployment", func() {
 				})
 			})
 		})
+
+		When("the cloud controller version does not support canary deployment", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "Strategy 'canary' is not a supported deployment strategy",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/deployments"),
+						VerifyJSON(`{"strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+						RespondWith(http.StatusTeapot, response, http.Header{}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				fmt.Printf("executeErr: %v\n", executeErr)
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{{
+							Code:   10008,
+							Detail: "Strategy 'canary' is not a supported deployment strategy",
+							Title:  "CF-UnprocessableEntity",
+						}}},
+				},
+				))
+			})
+		})
 	})
 
 	Describe("GetDeployment", func() {
@@ -289,6 +335,7 @@ var _ = Describe("Deployment", func() {
 				response = `{
 				    "guid": "some-deployment-guid",
 					"state": "DEPLOYED",
+					"strategy": "canary",
 					"status": {
 						"value": "FINALIZED",
 						"reason": "SUPERSEDED"
@@ -325,6 +372,7 @@ var _ = Describe("Deployment", func() {
 				Expect(deployment.State).To(Equal(constant.DeploymentDeployed))
 				Expect(deployment.StatusValue).To(Equal(constant.DeploymentStatusValueFinalized))
 				Expect(deployment.StatusReason).To(Equal(constant.DeploymentStatusReasonSuperseded))
+				Expect(deployment.Strategy).To(Equal(constant.DeploymentStrategyCanary))
 			})
 		})
 

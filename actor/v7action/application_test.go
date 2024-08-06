@@ -1033,7 +1033,7 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("PollStartForRolling", func() {
+	Describe("PollStartForDeployment", func() {
 		var (
 			app                   resources.Application
 			deploymentGUID        string
@@ -1065,7 +1065,7 @@ var _ = Describe("Application Actions", func() {
 
 		JustBeforeEach(func() {
 			go func() {
-				warnings, executeErr = actor.PollStartForRolling(app, deploymentGUID, noWait, handleInstanceDetails)
+				warnings, executeErr = actor.PollStartForDeployment(app, deploymentGUID, noWait, handleInstanceDetails)
 				done <- true
 			}()
 		})
@@ -1367,160 +1367,205 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		When("things eventually become healthy", func() {
-			When("the no wait flag is given", func() {
-				BeforeEach(func() {
-					// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
-					noWait = true
+			When("it is a rolling deployment", func() {
+				When("the no wait flag is given", func() {
+					BeforeEach(func() {
+						// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
+						noWait = true
 
-					// Always return deploying as a way to check we respect no wait
-					fakeCloudControllerClient.GetDeploymentReturns(
-						resources.Deployment{
-							StatusValue:  constant.DeploymentStatusValueActive,
-							NewProcesses: []resources.Process{{GUID: "new-deployment-process"}},
-						},
-						ccv3.Warnings{"get-deployment-warning"},
-						nil,
-					)
+						// Always return deploying as a way to check we respect no wait
+						fakeCloudControllerClient.GetDeploymentReturns(
+							resources.Deployment{
+								Strategy:     constant.DeploymentStrategyRolling,
+								StatusValue:  constant.DeploymentStatusValueActive,
+								NewProcesses: []resources.Process{{GUID: "new-deployment-process"}},
+							},
+							ccv3.Warnings{"get-deployment-warning"},
+							nil,
+						)
 
-					// We only poll the processes. Two loops for fun
-					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
-						[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
-						ccv3.Warnings{"poll-processes-warning-1"},
-						nil,
-					)
+						// We only poll the processes. Two loops for fun
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
+							ccv3.Warnings{"poll-processes-warning-1"},
+							nil,
+						)
 
-					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
-						[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}},
-						ccv3.Warnings{"poll-processes-warning-2"},
-						nil,
-					)
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}},
+							ccv3.Warnings{"poll-processes-warning-2"},
+							nil,
+						)
+					})
+
+					It("polls the start of the application correctly and returns warnings and no error", func() {
+						// Initial tick
+						fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
+
+						// assert one of our watcher is the timeout
+						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+
+						// the first time through we always get the deployment regardless of no-wait
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+						Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("new-deployment-process"))
+						Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(1))
+
+						fakeClock.Increment(1 * time.Second)
+
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+						Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(2))
+						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("new-deployment-process"))
+
+						Eventually(done).Should(Receive(BeTrue()))
+
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf(
+							"get-deployment-warning",
+							"poll-processes-warning-1",
+							"get-deployment-warning",
+							"poll-processes-warning-2",
+						))
+
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
+						Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					})
 				})
+				When("the no wait flag is not given", func() {
+					BeforeEach(func() {
+						// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
+							resources.Deployment{StatusValue: constant.DeploymentStatusValueActive},
+							ccv3.Warnings{"get-deployment-warning-1"},
+							nil,
+						)
 
-				It("polls the start of the application correctly and returns warnings and no error", func() {
-					// Initial tick
-					fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
+						// Poll the deployment twice to make sure we are polling (one in the above before each)
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
+							resources.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
+							ccv3.Warnings{"get-deployment-warning-2"},
+							nil,
+						)
 
-					// assert one of our watcher is the timeout
-					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+						// then we get the processes. This should only be called once
+						fakeCloudControllerClient.GetApplicationProcessesReturns(
+							[]resources.Process{{GUID: "process-guid"}},
+							ccv3.Warnings{"get-processes-warning"},
+							nil,
+						)
 
-					// the first time through we always get the deployment regardless of no-wait
-					Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
-					Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("new-deployment-process"))
-					Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(1))
+						// then we poll the processes. Two loops for fun
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
+							ccv3.Warnings{"poll-processes-warning-1"},
+							nil,
+						)
 
-					fakeClock.Increment(1 * time.Second)
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}},
+							ccv3.Warnings{"poll-processes-warning-2"},
+							nil,
+						)
+					})
 
-					Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
-					Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
-					Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(2))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("new-deployment-process"))
+					It("polls the start of the application correctly and returns warnings and no error", func() {
+						// Initial tick
+						fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
 
-					Eventually(done).Should(Receive(BeTrue()))
+						// assert one of our watchers is for the timeout
+						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
 
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf(
-						"get-deployment-warning",
-						"poll-processes-warning-1",
-						"get-deployment-warning",
-						"poll-processes-warning-2",
-					))
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+						Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(1))
 
-					Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
-					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+						// start the second loop where the deployment is deployed so we poll processes
+						fakeClock.Increment(1 * time.Second)
 
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(1)).To(Equal(deploymentGUID))
+						Eventually(fakeCloudControllerClient.GetApplicationProcessesCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(app.GUID))
+						Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
+						Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(2))
+
+						fakeClock.Increment(1 * time.Second)
+
+						// we should stop polling because it is deployed
+						Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(2))
+						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
+
+						Eventually(done).Should(Receive(BeTrue()))
+
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf(
+							"get-deployment-warning-1",
+							"get-deployment-warning-2",
+							"get-processes-warning",
+							"poll-processes-warning-1",
+							"poll-processes-warning-2",
+						))
+
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
+						Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+					})
 				})
-
 			})
 
-			When("the no wait flag is not given", func() {
-				BeforeEach(func() {
-					// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
-					fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
-						resources.Deployment{StatusValue: constant.DeploymentStatusValueActive},
-						ccv3.Warnings{"get-deployment-warning-1"},
-						nil,
-					)
+			When("it is a canary deployment", func() {
+				When("the no wait flag is not given", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
+							resources.Deployment{
+								Strategy:     constant.DeploymentStrategyCanary,
+								StatusValue:  constant.DeploymentStatusValueActive,
+								StatusReason: constant.DeploymentStatusReasonDeploying,
+							},
+							nil,
+							nil,
+						)
 
-					// Poll the deployment twice to make sure we are polling (one in the above before each)
-					fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
-						resources.Deployment{StatusValue: constant.DeploymentStatusValueFinalized, StatusReason: constant.DeploymentStatusReasonDeployed},
-						ccv3.Warnings{"get-deployment-warning-2"},
-						nil,
-					)
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
+							resources.Deployment{
+								Strategy:     constant.DeploymentStrategyCanary,
+								StatusValue:  constant.DeploymentStatusValueActive,
+								StatusReason: constant.DeploymentStatusReasonPaused,
+							},
+							nil,
+							nil,
+						)
+					})
 
-					// then we get the processes. This should only be called once
-					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]resources.Process{{GUID: "process-guid"}},
-						ccv3.Warnings{"get-processes-warning"},
-						nil,
-					)
+					It("stops polling when the deployment status is paused", func() {
+						// Initial tick
+						fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
 
-					// then we poll the processes. Two loops for fun
-					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
-						[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
-						ccv3.Warnings{"poll-processes-warning-1"},
-						nil,
-					)
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
 
-					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
-						[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}},
-						ccv3.Warnings{"poll-processes-warning-2"},
-						nil,
-					)
+						// start the second loop where the deployment is deployed so we poll processes
+						fakeClock.Increment(1 * time.Second)
+
+						Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
+						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(1)).To(Equal(deploymentGUID))
+
+						fakeClock.Increment(1 * time.Second)
+
+						// we should stop polling because it is deployed
+						Eventually(done).Should(Receive(BeTrue()))
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					})
 				})
-
-				It("polls the start of the application correctly and returns warnings and no error", func() {
-					// Initial tick
-					fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
-
-					// assert one of our watchers is for the timeout
-					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-
-					Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
-					Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(1))
-
-					// start the second loop where the deployment is deployed so we poll processes
-					fakeClock.Increment(1 * time.Second)
-
-					Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
-					Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(1)).To(Equal(deploymentGUID))
-					Eventually(fakeCloudControllerClient.GetApplicationProcessesCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(app.GUID))
-					Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
-					Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(2))
-
-					fakeClock.Increment(1 * time.Second)
-
-					// we should stop polling because it is deployed
-					Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(2))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
-
-					Eventually(done).Should(Receive(BeTrue()))
-
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf(
-						"get-deployment-warning-1",
-						"get-deployment-warning-2",
-						"get-processes-warning",
-						"poll-processes-warning-1",
-						"poll-processes-warning-2",
-					))
-
-					Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
-					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
-
-				})
-
 			})
-
 		})
 	})
 

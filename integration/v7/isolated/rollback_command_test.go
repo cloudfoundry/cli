@@ -36,6 +36,7 @@ var _ = Describe("rollback command", func() {
 				Expect(session).To(Say("OPTIONS:"))
 				Expect(session).To(Say("-f             Force rollback without confirmation"))
 				Expect(session).To(Say("--version      Roll back to the specified revision"))
+				Expect(session).To(Say("--max-in-flight"))
 				Expect(session).To(Say("SEE ALSO:"))
 				Expect(session).To(Say("revisions"))
 			})
@@ -112,7 +113,7 @@ applications:
 
 				When("the -f flag is provided", func() {
 					It("does not prompt the user, and just rolls back", func() {
-						session := helpers.CF("rollback", appName, "--version", "1", "-f")
+						session := helpers.CF("rollback", appName, "--version", "1", "-f", "--max-in-flight", "3")
 						Eventually(session).Should(Exit(0))
 
 						Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))

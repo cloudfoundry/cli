@@ -181,9 +181,18 @@ func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.Deta
 			summary.Deployment.StatusReason,
 			lastStatusChangeTime)
 	} else {
-		return fmt.Sprintf("%s deployment currently %s",
+		var sb strings.Builder
+		sb.WriteString(fmt.Sprintf("%s deployment currently %s.",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
-			summary.Deployment.StatusReason)
+			summary.Deployment.StatusReason))
+
+		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
+			sb.WriteString("\n")
+			sb.WriteString(fmt.Sprintf(
+				"Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.",
+				summary.Application.Name, summary.Application.Name))
+		}
+		return sb.String()
 	}
 }
 

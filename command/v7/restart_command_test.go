@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -136,14 +137,14 @@ var _ = Describe("restart Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
 
-			inputApp, inputSpace, inputOrg, inputPkgGUID, inputStrategy, inputNoWait, inputAppAction := fakeAppStager.StageAndStartArgsForCall(0)
+			inputApp, inputSpace, inputOrg, inputPkgGUID, opts := fakeAppStager.StageAndStartArgsForCall(0)
 			Expect(inputApp).To(Equal(app))
 			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
 			Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
 			Expect(inputPkgGUID).To(Equal("package-guid"))
-			Expect(inputStrategy).To(Equal(strategy))
-			Expect(inputNoWait).To(Equal(noWait))
-			Expect(inputAppAction).To(Equal(constant.ApplicationRestarting))
+			Expect(opts.Strategy).To(Equal(strategy))
+			Expect(opts.NoWait).To(Equal(noWait))
+			Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
 		})
 
 		Context("staging and starting the app returns an error", func() {
@@ -166,14 +167,14 @@ var _ = Describe("restart Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
-			inputApp, inputDropletGuid, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
+			inputApp, inputSpace, inputOrg, inputDropletGuid, opts := fakeAppStager.StartAppArgsForCall(0)
 			Expect(inputApp).To(Equal(app))
 			Expect(inputDropletGuid).To(Equal(""))
-			Expect(inputStrategy).To(Equal(strategy))
-			Expect(inputNoWait).To(Equal(noWait))
 			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
 			Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
-			Expect(inputAppAction).To(Equal(constant.ApplicationRestarting))
+			Expect(opts.Strategy).To(Equal(strategy))
+			Expect(opts.NoWait).To(Equal(noWait))
+			Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
 		})
 
 		When("starting the app returns an error", func() {
@@ -187,4 +188,33 @@ var _ = Describe("restart Command", func() {
 		})
 	})
 
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
+		},
+
+		Entry("max-in-flight is passed without strategy",
+			func() {
+				cmd.MaxInFlight = 10
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--max-in-flight",
+				Arg2: "--strategy",
+			}),
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.MaxInFlight = 0
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+	)
 })

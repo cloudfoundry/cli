@@ -140,14 +140,14 @@ var _ = Describe("start Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
 
-				inputApp, inputSpace, inputOrg, inputPkgGUID, inputStrategy, inputNoWait, inputAppAction := fakeAppStager.StageAndStartArgsForCall(0)
+				inputApp, inputSpace, inputOrg, inputPkgGUID, opts := fakeAppStager.StageAndStartArgsForCall(0)
 				Expect(inputApp).To(Equal(app))
 				Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
 				Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
 				Expect(inputPkgGUID).To(Equal("package-guid"))
-				Expect(inputStrategy).To(Equal(constant.DeploymentStrategyDefault))
-				Expect(inputNoWait).To(Equal(false))
-				Expect(inputAppAction).To(Equal(constant.ApplicationStarting))
+				Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyDefault))
+				Expect(opts.NoWait).To(Equal(false))
+				Expect(opts.AppAction).To(Equal(constant.ApplicationStarting))
 			})
 
 			When("staging and starting the app returns an error", func() {
@@ -171,14 +171,14 @@ var _ = Describe("start Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
-				inputApp, inputDropletGuid, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
+				inputApp, inputSpace, inputOrg, inputDropletGuid, opts := fakeAppStager.StartAppArgsForCall(0)
 				Expect(inputApp).To(Equal(app))
 				Expect(inputDropletGuid).To(Equal(""))
-				Expect(inputStrategy).To(Equal(constant.DeploymentStrategyDefault))
-				Expect(inputNoWait).To(Equal(false))
 				Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
 				Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
-				Expect(inputAppAction).To(Equal(constant.ApplicationStarting))
+				Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyDefault))
+				Expect(opts.NoWait).To(Equal(false))
+				Expect(opts.AppAction).To(Equal(constant.ApplicationStarting))
 			})
 
 			When("starting the app returns an error", func() {
@@ -202,14 +202,14 @@ var _ = Describe("start Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
-			inputApp, inputDropletGuid, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
+			inputApp, inputSpace, inputOrg, inputDropletGuid, opts := fakeAppStager.StartAppArgsForCall(0)
 			Expect(inputApp).To(Equal(app))
 			Expect(inputDropletGuid).To(Equal(""))
-			Expect(inputStrategy).To(Equal(constant.DeploymentStrategyDefault))
-			Expect(inputNoWait).To(Equal(false))
 			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
 			Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
-			Expect(inputAppAction).To(Equal(constant.ApplicationStarting))
+			Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyDefault))
+			Expect(opts.NoWait).To(Equal(false))
+			Expect(opts.AppAction).To(Equal(constant.ApplicationStarting))
 		})
 
 		When("starting the app returns an error", func() {

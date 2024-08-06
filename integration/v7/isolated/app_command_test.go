@@ -285,6 +285,29 @@ applications:
 						})
 					})
 				})
+
+				When("the deployment strategy is canary", func() {
+					When("the deployment is paused", func() {
+						It("displays the message", func() {
+							Eventually(helpers.CF("restart", appName, "--strategy", "canary")).Should(Exit(0))
+
+							session1 := helpers.CF("app", appName)
+							Eventually(session1).Should(Say("Canary deployment currently PAUSED."))
+							Eventually(session1).Should(Exit(0))
+						})
+					})
+
+					When("the deployment is cancelled after it is paused", func() {
+						It("no deployment information is displayed", func() {
+							Eventually(helpers.CF("restart", appName, "--strategy", "canary")).Should(Exit(0))
+							Eventually(helpers.CF("cancel-deployment", appName)).Should(Exit(0))
+
+							session2 := helpers.CF("app", appName)
+							Eventually(session2).ShouldNot(Say("Canary deployment currently CANCELING."))
+							Eventually(session2).Should(Exit(0))
+						})
+					})
+				})
 			})
 
 			When("there is no active deployment", func() {

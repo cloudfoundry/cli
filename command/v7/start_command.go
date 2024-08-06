@@ -62,6 +62,12 @@ func (cmd StartCommand) Execute(args []string) error {
 		return err
 	}
 
+	opts := shared.AppStartOpts{
+		Strategy:  constant.DeploymentStrategyDefault,
+		NoWait:    false,
+		AppAction: constant.ApplicationStarting,
+	}
+
 	if packageGUID != "" && app.Stopped() {
 		cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"AppName":   cmd.RequiredArgs.AppName,
@@ -71,17 +77,8 @@ func (cmd StartCommand) Execute(args []string) error {
 		})
 		cmd.UI.DisplayNewline()
 
-		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, constant.DeploymentStrategyDefault, false, constant.ApplicationStarting)
-		if err != nil {
-			return err
-		}
-	} else {
-		err = cmd.Stager.StartApp(app, "", constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
-		if err != nil {
-			return err
-		}
+		return cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, opts)
 	}
 
-	return nil
-
+	return cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), "", opts)
 }

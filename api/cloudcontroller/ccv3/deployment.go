@@ -1,10 +1,18 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
+
+func (client *Client) ContinueDeployment(deploymentGUID string) (Warnings, error) {
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.PostApplicationDeploymentActionContinueRequest,
+		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
+	})
+
+	return warnings, err
+}
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
@@ -15,28 +23,7 @@ func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) 
 	return warnings, err
 }
 
-func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID string) (string, Warnings, error) {
-	dep := resources.Deployment{
-		DropletGUID:   dropletGUID,
-		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID}},
-	}
-
-	var responseBody resources.Deployment
-
-	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationDeploymentRequest,
-		RequestBody:  dep,
-		ResponseBody: &responseBody,
-	})
-
-	return responseBody.GUID, warnings, err
-}
-
-func (client *Client) CreateApplicationDeploymentByRevision(appGUID string, revisionGUID string) (string, Warnings, error) {
-	dep := resources.Deployment{
-		RevisionGUID:  revisionGUID,
-		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID}},
-	}
+func (client *Client) CreateApplicationDeployment(dep resources.Deployment) (string, Warnings, error) {
 
 	var responseBody resources.Deployment
 

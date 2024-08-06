@@ -91,6 +91,7 @@ type PushCommand struct {
 	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory                  string                              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	MaxInFlight             int                                 `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
 	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
@@ -100,7 +101,7 @@ type PushCommand struct {
 	RedactEnv               bool                                `long:"redact-env" description:"Do not print values for environment vars set in the application manifest"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
-	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy, either rolling or null."`
+	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
 	Task                    bool                                `long:"task" description:"Push an app that is used only to execute tasks. The app will be staged, but not started and will have no route assigned."`
 	Vars                    []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
@@ -347,6 +348,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		HealthCheckType:     cmd.HealthCheckType.Type,
 		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value,
 		Instances:           cmd.Instances.NullInt,
+		MaxInFlight:         cmd.MaxInFlight,
 		Memory:              cmd.Memory,
 		NoStart:             cmd.NoStart,
 		NoWait:              cmd.NoWait,
@@ -452,6 +454,22 @@ func (cmd PushCommand) ValidateFlags() error {
 			},
 		}
 
+	case cmd.NoStart && cmd.Strategy == flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-start",
+				"--strategy=canary",
+			},
+		}
+
+	case cmd.Task && cmd.Strategy == flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--task",
+				"--strategy=canary",
+			},
+		}
+
 	case cmd.NoStart && cmd.NoWait:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -469,6 +487,11 @@ func (cmd PushCommand) ValidateFlags() error {
 		}
 	case !cmd.validBuildpacks():
 		return translatableerror.InvalidBuildpacksError{}
+
+	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight > 0:
+		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
+	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight < 1:
+		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 
 	return nil

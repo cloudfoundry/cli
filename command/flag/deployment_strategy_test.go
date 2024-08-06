@@ -34,7 +34,7 @@ var _ = Describe("DeploymentStrategy", func() {
 				Expect(strategy.Name).To(Equal(expectedType))
 			},
 			Entry("sets 'rolling' when passed 'rolling'", "rolling", constant.DeploymentStrategyRolling),
-			Entry("sets 'rolling' when passed 'rOlliNg'", "rOlliNg", constant.DeploymentStrategyRolling),
+			Entry("sets 'rolling' when passed 'cAnaRy'", "cAnaRy", constant.DeploymentStrategyCanary),
 			Entry("sets 'rolling' when passed 'ROLLING'", "ROLLING", constant.DeploymentStrategyRolling),
 		)
 
@@ -43,7 +43,7 @@ var _ = Describe("DeploymentStrategy", func() {
 				err := strategy.UnmarshalFlag("banana")
 				Expect(err).To(MatchError(&flags.Error{
 					Type:    flags.ErrInvalidChoice,
-					Message: `STRATEGY must be "rolling" or not set`,
+					Message: `STRATEGY must be "canary" or "rolling" or not set`,
 				}))
 				Expect(strategy.Name).To(BeEmpty())
 			})

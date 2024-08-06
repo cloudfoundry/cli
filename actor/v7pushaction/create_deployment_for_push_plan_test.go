@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -47,12 +48,12 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 	Describe("creating deployment", func() {
 		When("creating the deployment is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.PollStartForRollingCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+				fakeV7Actor.PollStartForDeploymentCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
 					handleInstanceDetails("Instances starting...")
 					return nil, nil
 				})
 
-				fakeV7Actor.CreateDeploymentByApplicationAndDropletReturns(
+				fakeV7Actor.CreateDeploymentReturns(
 					"some-deployment-guid",
 					v7action.Warnings{"some-deployment-warning"},
 					nil,
@@ -60,8 +61,8 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("waits for the app to start", func() {
-				Expect(fakeV7Actor.PollStartForRollingCallCount()).To(Equal(1))
-				givenApp, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForRollingArgsForCall(0)
+				Expect(fakeV7Actor.PollStartForDeploymentCallCount()).To(Equal(1))
+				givenApp, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForDeploymentArgsForCall(0)
 				Expect(givenApp).To(Equal(resources.Application{GUID: "some-app-guid"}))
 				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
 				Expect(noWait).To(Equal(false))
@@ -85,7 +86,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			BeforeEach(func() {
 				someErr = errors.New("failed to create deployment")
 
-				fakeV7Actor.CreateDeploymentByApplicationAndDropletReturns(
+				fakeV7Actor.CreateDeploymentReturns(
 					"",
 					v7action.Warnings{"some-deployment-warning"},
 					someErr,
@@ -93,7 +94,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("does not wait for the app to start", func() {
-				Expect(fakeV7Actor.PollStartForRollingCallCount()).To(Equal(0))
+				Expect(fakeV7Actor.PollStartForDeploymentCallCount()).To(Equal(0))
 			})
 
 			It("returns errors and warnings", func() {
@@ -106,12 +107,57 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				Expect(events).To(ConsistOf(StartingDeployment))
 			})
 		})
+
+		When("strategy is provided", func() {
+			BeforeEach(func() {
+				fakeV7Actor.PollStartForDeploymentCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+					handleInstanceDetails("Instances starting...")
+					return nil, nil
+				})
+
+				fakeV7Actor.CreateDeploymentReturns(
+					"some-deployment-guid",
+					v7action.Warnings{"some-deployment-warning"},
+					nil,
+				)
+				paramPlan.Strategy = "rolling"
+				paramPlan.MaxInFlight = 10
+			})
+
+			It("waits for the app to start", func() {
+				Expect(fakeV7Actor.PollStartForDeploymentCallCount()).To(Equal(1))
+				givenApp, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForDeploymentArgsForCall(0)
+				Expect(givenApp).To(Equal(resources.Application{GUID: "some-app-guid"}))
+				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
+				Expect(noWait).To(Equal(false))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
+				Expect(fakeV7Actor.CreateDeploymentCallCount()).To(Equal(1))
+				dep := fakeV7Actor.CreateDeploymentArgsForCall(0)
+				Expect(dep).To(Equal(resources.Deployment{
+					Strategy: "rolling",
+					Options:  resources.DeploymentOpts{MaxInFlight: 10},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
+					},
+				}))
+			})
+
+			It("returns errors and warnings", func() {
+				Expect(returnedPushPlan).To(Equal(paramPlan))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-deployment-warning"))
+			})
+
+			It("records deployment events", func() {
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
+			})
+		})
 	})
 
 	Describe("waiting for app to start", func() {
 		When("the the polling is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.PollStartForRollingReturns(v7action.Warnings{"some-poll-start-warning"}, nil)
+				fakeV7Actor.PollStartForDeploymentReturns(v7action.Warnings{"some-poll-start-warning"}, nil)
 			})
 
 			It("returns warnings and unchanged push plan", func() {
@@ -129,7 +175,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 
 			BeforeEach(func() {
 				someErr = errors.New("app failed to start")
-				fakeV7Actor.PollStartForRollingReturns(v7action.Warnings{"some-poll-start-warning"}, someErr)
+				fakeV7Actor.PollStartForDeploymentReturns(v7action.Warnings{"some-poll-start-warning"}, someErr)
 			})
 
 			It("returns errors and warnings", func() {
@@ -148,7 +194,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("passes in the noWait flag", func() {
-				_, _, noWait, _ := fakeV7Actor.PollStartForRollingArgsForCall(0)
+				_, _, noWait, _ := fakeV7Actor.PollStartForDeploymentArgsForCall(0)
 				Expect(noWait).To(Equal(true))
 			})
 		})
