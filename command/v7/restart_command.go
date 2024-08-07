@@ -104,7 +104,7 @@ func (cmd RestartCommand) ValidateFlags() error {
 	switch true {
 	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight > 0:
 		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
-	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight < 1:
+	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && (cmd.MaxInFlight < -1 || cmd.MaxInFlight == 0):
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 
