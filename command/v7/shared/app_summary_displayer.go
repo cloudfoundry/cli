@@ -165,6 +165,12 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
 		display.UI.DisplayNewline()
 		display.UI.DisplayText(display.getDeploymentStatusText(summary))
+
+		var maxInFlight = summary.Deployment.Options.MaxInFlight
+		if maxInFlight > 0 && maxInFlight != constant.DeploymentMaxInFlightDefaultValue {
+			display.UI.DisplayText(fmt.Sprintf("max-in-flight: %d", maxInFlight))
+		}
+
 		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
 			display.UI.DisplayNewline()
 			display.UI.DisplayText(fmt.Sprintf("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", summary.Application.Name, summary.Application.Name))
@@ -174,25 +180,15 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 
 func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.DetailedApplicationSummary) string {
 	var lastStatusChangeTime = display.getLastStatusChangeTime(summary)
-
 	if lastStatusChangeTime != "" {
 		return fmt.Sprintf("%s deployment currently %s (since %s)",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
 			summary.Deployment.StatusReason,
 			lastStatusChangeTime)
 	} else {
-		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("%s deployment currently %s.",
+		return fmt.Sprintf("%s deployment currently %s.",
 			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
-			summary.Deployment.StatusReason))
-
-		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
-			sb.WriteString("\n")
-			sb.WriteString(fmt.Sprintf(
-				"Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.",
-				summary.Application.Name, summary.Application.Name))
-		}
-		return sb.String()
+			summary.Deployment.StatusReason)
 	}
 }
 
