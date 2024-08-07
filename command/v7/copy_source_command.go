@@ -16,7 +16,7 @@ type CopySourceCommand struct {
 
 	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
 	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY] [--no-wait]"`
-	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null"`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null"`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	NoRestart           bool                    `long:"no-restart" description:"Do not restage the destination application"`
 	Organization        string                  `short:"o" long:"organization" description:"Org that contains the destination application"`
@@ -159,15 +159,12 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 		)
 		cmd.UI.DisplayNewline()
 
-		err = cmd.Stager.StageAndStart(
-			targetApp,
-			targetSpace,
-			targetOrg,
-			pkg.GUID,
-			cmd.Strategy.Name,
-			cmd.NoWait,
-			constant.ApplicationRestarting,
-		)
+		opts := shared.AppStartOpts{
+			Strategy:  cmd.Strategy.Name,
+			NoWait:    cmd.NoWait,
+			AppAction: constant.ApplicationRestarting,
+		}
+		err = cmd.Stager.StageAndStart(targetApp, targetSpace, targetOrg, pkg.GUID, opts)
 		if err != nil {
 			return mapErr(cmd.Config, targetApp.Name, err)
 		}

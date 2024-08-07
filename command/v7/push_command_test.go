@@ -1218,6 +1218,17 @@ var _ = Describe("push Command", func() {
 				},
 			}),
 
+		Entry("when strategy 'canary' and no-start flags are passed",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+				cmd.NoStart = true
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-start", "--strategy=canary",
+				},
+			}),
+
 		Entry("when strategy is not set and no-start flags are passed",
 			func() {
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyDefault}
@@ -1258,7 +1269,7 @@ var _ = Describe("push Command", func() {
 			},
 			translatableerror.InvalidBuildpacksError{}),
 
-		Entry("task and strategy flags are passed",
+		Entry("task and 'rolling' strategy flags are passed",
 			func() {
 				cmd.Task = true
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
@@ -1266,6 +1277,17 @@ var _ = Describe("push Command", func() {
 			translatableerror.ArgumentCombinationError{
 				Args: []string{
 					"--task", "--strategy=rolling",
+				},
+			}),
+
+		Entry("task and 'canary' strategy flags are passed",
+			func() {
+				cmd.Task = true
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--task", "--strategy=canary",
 				},
 			}),
 	)

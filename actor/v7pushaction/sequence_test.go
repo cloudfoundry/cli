@@ -113,6 +113,18 @@ var _ = Describe("Actor", func() {
 			})
 		})
 
+		When("the plan has strategy 'canary'", func() {
+			BeforeEach(func() {
+				plan = PushPlan{
+					Strategy: constant.DeploymentStrategyCanary,
+				}
+			})
+
+			It("returns a sequence that creates a canary deployment", func() {
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.CreateDeploymentForApplication))
+			})
+		})
+
 		When("the plan has task application type", func() {
 			BeforeEach(func() {
 				plan = PushPlan{

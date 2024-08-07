@@ -106,15 +106,13 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		"Username":       user.Name,
 	})
 
-	startAppErr := cmd.Stager.StartApp(
-		app,
-		revision.GUID,
-		constant.DeploymentStrategyRolling,
-		false,
-		cmd.Config.TargetedSpace(),
-		cmd.Config.TargetedOrganization(),
-		constant.ApplicationRollingBack,
-	)
+	opts := shared.AppStartOpts{
+		Strategy:  constant.DeploymentStrategyRolling,
+		NoWait:    false,
+		AppAction: constant.ApplicationRollingBack,
+	}
+
+	startAppErr := cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), revision.GUID, opts)
 	if startAppErr != nil {
 		return startAppErr
 	}
