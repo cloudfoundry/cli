@@ -31,7 +31,7 @@ var _ = Describe("restage command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rg"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--strategy      Deployment strategy can be canary, rolling or null"))
+				Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
 				Eventually(session).Should(Say("--max-in-flight"))
 				Eventually(session).Should(Say("--no-wait       Exit when the first instance of the web process is healthy"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
