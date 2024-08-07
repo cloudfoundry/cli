@@ -125,49 +125,6 @@ var _ = Describe("copy-source Command", func() {
 		})
 	})
 
-	When("the target organization is specified but the targeted space isn't", func() {
-		BeforeEach(func() {
-			cmd.Organization = "some-other-organization"
-		})
-
-		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.RequiredFlagsError{
-				Arg1: "--organization, -o",
-				Arg2: "--space, -s",
-			}))
-		})
-	})
-
-	When("the no restart and strategy flags are both provided", func() {
-		BeforeEach(func() {
-			cmd.NoRestart = true
-			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
-		})
-
-		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-				Args: []string{
-					"--no-restart", "--strategy",
-				},
-			}))
-		})
-	})
-
-	When("the no restart and no wait flags are both provided", func() {
-		BeforeEach(func() {
-			cmd.NoRestart = true
-			cmd.NoWait = true
-		})
-
-		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-				Args: []string{
-					"--no-restart", "--no-wait",
-				},
-			}))
-		})
-	})
-
 	When("a target org and space is provided", func() {
 		BeforeEach(func() {
 			cmd.Organization = "destination-org"
@@ -329,6 +286,7 @@ var _ = Describe("copy-source Command", func() {
 			cmd.Strategy = flag.DeploymentStrategy{
 				Name: constant.DeploymentStrategyRolling,
 			}
+			cmd.MaxInFlight = 5
 		})
 
 		It("stages and starts the app with the appropriate strategy", func() {
@@ -338,9 +296,10 @@ var _ = Describe("copy-source Command", func() {
 			Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
 			Expect(orgForApp).To(Equal(configv3.Organization{Name: "some-org"}))
 			Expect(pkgGUID).To(Equal("target-package-guid"))
-			Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
-			Expect(opts.NoWait).To(Equal(false))
 			Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
+			Expect(opts.MaxInFlight).To(Equal(5))
+			Expect(opts.NoWait).To(Equal(false))
+			Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 		})
 	})
 
@@ -349,6 +308,7 @@ var _ = Describe("copy-source Command", func() {
 			cmd.Strategy = flag.DeploymentStrategy{
 				Name: constant.DeploymentStrategyCanary,
 			}
+			cmd.MaxInFlight = 1
 		})
 
 		It("stages and starts the app with the appropriate strategy", func() {
@@ -417,4 +377,64 @@ var _ = Describe("copy-source Command", func() {
 	It("succeeds", func() {
 		Expect(executeErr).To(Not(HaveOccurred()))
 	})
+
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
+		},
+		Entry("the target organization is specified but the targeted space isn't",
+			func() {
+				cmd.Organization = "some-other-organization"
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--organization, -o",
+				Arg2: "--space, -s",
+			}),
+
+		Entry("the no restart and strategy flags are both provided",
+			func() {
+				cmd.NoRestart = true
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-restart", "--strategy",
+				},
+			}),
+
+		Entry("the no restart and no wait flags are both provided",
+			func() {
+				cmd.NoRestart = true
+				cmd.NoWait = true
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-restart", "--no-wait",
+				},
+			}),
+
+		Entry("max-in-flight is passed without strategy",
+			func() {
+				cmd.MaxInFlight = 10
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--max-in-flight",
+				Arg2: "--strategy",
+			}),
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.MaxInFlight = 0
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+	)
 })

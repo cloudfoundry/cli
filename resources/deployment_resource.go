@@ -13,6 +13,7 @@ type Deployment struct {
 	StatusValue      constant.DeploymentStatusValue
 	StatusReason     constant.DeploymentStatusReason
 	LastStatusChange string
+	Options          DeploymentOpts
 	RevisionGUID     string
 	DropletGUID      string
 	CreatedAt        string
@@ -20,6 +21,10 @@ type Deployment struct {
 	Relationships    Relationships
 	NewProcesses     []Process
 	Strategy         constant.DeploymentStrategy
+}
+
+type DeploymentOpts struct {
+	MaxInFlight int `json:"max_in_flight"`
 }
 
 // MarshalJSON converts a Deployment into a Cloud Controller Deployment.
@@ -33,6 +38,7 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 
 	var ccDeployment struct {
 		Droplet       *Droplet                    `json:"droplet,omitempty"`
+		Options       *DeploymentOpts             `json:"options,omitempty"`
 		Revision      *Revision                   `json:"revision,omitempty"`
 		Strategy      constant.DeploymentStrategy `json:"strategy,omitempty"`
 		Relationships Relationships               `json:"relationships,omitempty"`
@@ -48,6 +54,14 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 
 	if d.Strategy != "" {
 		ccDeployment.Strategy = d.Strategy
+	}
+
+	var b DeploymentOpts
+	if d.Options != b {
+		ccDeployment.Options = &d.Options
+		if d.Options.MaxInFlight < 1 {
+			ccDeployment.Options.MaxInFlight = 1
+		}
 	}
 
 	ccDeployment.Relationships = d.Relationships
@@ -72,6 +86,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 		Droplet      Droplet                     `json:"droplet,omitempty"`
 		NewProcesses []Process                   `json:"new_processes,omitempty"`
 		Strategy     constant.DeploymentStrategy `json:"strategy"`
+		Options      DeploymentOpts              `json:"options,omitempty"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccDeployment)
@@ -89,6 +104,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.DropletGUID = ccDeployment.Droplet.GUID
 	d.NewProcesses = ccDeployment.NewProcesses
 	d.Strategy = ccDeployment.Strategy
+	d.Options = ccDeployment.Options
 
 	return nil
 }

@@ -8,10 +8,15 @@ import (
 func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	eventStream <- &PushEvent{Plan: pushPlan, Event: StartingDeployment}
 
-	var dep resources.Deployment
-	dep.DropletGUID = pushPlan.DropletGUID
-	dep.Strategy = pushPlan.Strategy
-	dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}}
+	dep := resources.Deployment{
+		Strategy: pushPlan.Strategy,
+		Options: resources.DeploymentOpts{
+			MaxInFlight: pushPlan.MaxInFlight,
+		},
+		DropletGUID:   pushPlan.DropletGUID,
+		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}},
+	}
+
 	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
 
 	if err != nil {
