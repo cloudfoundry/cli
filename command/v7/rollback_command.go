@@ -128,7 +128,7 @@ func (cmd RollbackCommand) Execute(args []string) error {
 
 func (cmd RollbackCommand) ValidateFlags() error {
 	switch {
-	case cmd.MaxInFlight < 1:
+	case cmd.MaxInFlight < -1 || cmd.MaxInFlight == 0:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 
