@@ -574,6 +574,142 @@ var _ = Describe("Application Summary Actions", func() {
 						)
 					})
 
+					When("getting application deployment succeeds", func() {
+						When("the deployment is active", func() {
+							When("the deployment strategy is rolling", func() {
+								When("the deployment is in progress", func() {
+									BeforeEach(func() {
+										fakeCloudControllerClient.GetDeploymentsReturns(
+											[]resources.Deployment{
+												{
+													GUID:         "some-deployment-guid",
+													Strategy:     "rolling",
+													StatusValue:  "ACTIVE",
+													StatusReason: "DEPLOYING",
+												},
+											},
+											nil,
+											nil,
+										)
+									})
+									It("returns the deployment information", func() {
+										Expect(summary.Deployment).To(Equal(resources.Deployment{
+											GUID:         "some-deployment-guid",
+											Strategy:     "rolling",
+											StatusValue:  "ACTIVE",
+											StatusReason: "DEPLOYING",
+										}))
+									})
+								})
+
+								When("the deployment is canceled", func() {
+									When("the deployment is in progress", func() {
+										BeforeEach(func() {
+											fakeCloudControllerClient.GetDeploymentsReturns(
+												[]resources.Deployment{
+													{
+														GUID:         "some-deployment-guid",
+														Strategy:     "rolling",
+														StatusValue:  "ACTIVE",
+														StatusReason: "CANCELLING",
+													},
+												},
+												nil,
+												nil,
+											)
+										})
+										It("returns the deployment information", func() {
+											Expect(summary.Deployment).To(Equal(resources.Deployment{
+												GUID:         "some-deployment-guid",
+												Strategy:     "rolling",
+												StatusValue:  "ACTIVE",
+												StatusReason: "CANCELLING",
+											}))
+										})
+									})
+								})
+							})
+
+							When("the deployment strategy is canary", func() {
+								When("the deployment is paused", func() {
+									BeforeEach(func() {
+										fakeCloudControllerClient.GetDeploymentsReturns(
+											[]resources.Deployment{
+												{
+													GUID:         "some-deployment-guid",
+													Strategy:     "canary",
+													StatusValue:  "ACTIVE",
+													StatusReason: "PAUSED",
+												},
+											},
+											nil,
+											nil,
+										)
+									})
+									It("returns the deployment information", func() {
+										Expect(summary.Deployment).To(Equal(resources.Deployment{
+											GUID:         "some-deployment-guid",
+											Strategy:     "canary",
+											StatusValue:  "ACTIVE",
+											StatusReason: "PAUSED",
+										}))
+									})
+								})
+							})
+						})
+
+						When("the deployment is not active", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetDeploymentsReturns(
+									[]resources.Deployment{
+										{
+											GUID:         "",
+											Strategy:     "",
+											StatusValue:  "",
+											StatusReason: "",
+										},
+									},
+									nil,
+									nil,
+								)
+							})
+							It("returns no deployment information", func() {
+								Expect(summary.Deployment).To(Equal(resources.Deployment{
+									GUID:         "",
+									Strategy:     "",
+									StatusValue:  "",
+									StatusReason: "",
+								}))
+							})
+						})
+					})
+
+					When("getting application deployment fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetDeploymentsReturns(
+								nil,
+								ccv3.Warnings{"get-deployments-warning"},
+								errors.New("some-error"),
+							)
+						})
+
+						It("returns the warnings and error", func() {
+							Expect(executeErr).To(MatchError("some-error"))
+							Expect(warnings).To(ConsistOf(
+								"get-apps-warning",
+								"get-app-processes-warning",
+								"get-process-by-type-warning",
+								"get-process-sidecars-warning",
+								"get-process-instances-warning",
+								"get-process-by-type-warning",
+								"get-process-sidecars-warning",
+								"get-process-instances-warning",
+								"get-app-droplet-warning",
+								"get-deployments-warning",
+							))
+						})
+					})
+
 					When("getting application routes succeeds", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetApplicationRoutesReturns(

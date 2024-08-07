@@ -12,6 +12,8 @@ import (
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type AppSummaryDisplayer struct {
@@ -155,6 +157,39 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 			continue
 		}
 		display.displayAppInstancesTable(process)
+	}
+
+	if summary.Deployment.StatusValue == constant.DeploymentStatusValueActive {
+		display.UI.DisplayNewline()
+		display.UI.DisplayText(display.getDeploymentStatusText(summary))
+		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
+			display.UI.DisplayNewline()
+			display.UI.DisplayText(fmt.Sprintf("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", summary.Application.Name, summary.Application.Name))
+		}
+	}
+}
+
+func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.DetailedApplicationSummary) string {
+	var lastStatusChangeTime = display.getLastStatusChangeTime(summary)
+
+	if lastStatusChangeTime != "" {
+		return fmt.Sprintf("%s deployment currently %s (since %s)",
+			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+			summary.Deployment.StatusReason,
+			lastStatusChangeTime)
+	} else {
+		var sb strings.Builder
+		sb.WriteString(fmt.Sprintf("%s deployment currently %s.",
+			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+			summary.Deployment.StatusReason))
+
+		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
+			sb.WriteString("\n")
+			sb.WriteString(fmt.Sprintf(
+				"Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.",
+				summary.Application.Name, summary.Application.Name))
+		}
+		return sb.String()
 	}
 }
 

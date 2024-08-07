@@ -25,21 +25,25 @@ var _ = Describe("Deployment Actions", func() {
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
-		fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+		fakeCloudControllerClient.CreateApplicationDeploymentReturns(
 			"some-deployment-guid",
 			ccv3.Warnings{"create-warning-1", "create-warning-2"},
 			errors.New("create-error"),
 		)
 	})
 
-	Describe("CreateDeploymentByApplicationAndRevision", func() {
+	Describe("Create a deployment with app and revision guids", func() {
 		JustBeforeEach(func() {
-			returnedDeploymentGUID, warnings, executeErr = actor.CreateDeploymentByApplicationAndRevision("some-app-guid", "some-revision-guid")
+			var dep resources.Deployment
+			dep.Strategy = constant.DeploymentStrategyRolling
+			dep.RevisionGUID = "some-revision-guid"
+			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
+			returnedDeploymentGUID, warnings, executeErr = actor.CreateDeployment(dep)
 		})
 
 		When("the client fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.CreateApplicationDeploymentByRevisionReturns(
+				fakeCloudControllerClient.CreateApplicationDeploymentReturns(
 					"some-deployment-guid",
 					ccv3.Warnings{"create-warning-1", "create-warning-2"},
 					errors.New("create-deployment-error"),
@@ -54,28 +58,32 @@ var _ = Describe("Deployment Actions", func() {
 
 		It("delegates to the cloud controller client", func() {
 
-			Expect(fakeCloudControllerClient.CreateApplicationDeploymentByRevisionCallCount()).To(Equal(1), "CreateApplicationDeploymentByRevision call count")
-			givenAppGUID, givenRevisionGUID := fakeCloudControllerClient.CreateApplicationDeploymentByRevisionArgsForCall(0)
+			Expect(fakeCloudControllerClient.CreateApplicationDeploymentCallCount()).To(Equal(1), "CreateApplicationDeploymentByRevision call count")
+			dep := fakeCloudControllerClient.CreateApplicationDeploymentArgsForCall(0)
 
-			Expect(givenAppGUID).To(Equal("some-app-guid"))
-			Expect(givenRevisionGUID).To(Equal("some-revision-guid"))
+			Expect(dep.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal("some-app-guid"))
+			Expect(dep.RevisionGUID).To(Equal("some-revision-guid"))
 
 			Expect(returnedDeploymentGUID).To(Equal("some-deployment-guid"))
 			Expect(warnings).To(Equal(Warnings{"create-warning-1", "create-warning-2"}))
 		})
 	})
 
-	Describe("CreateDeploymentByApplicationAndDroplet", func() {
+	Describe("Create a deployment with app and droplet guids", func() {
 		It("delegates to the cloud controller client", func() {
 			fakeCloudControllerClient.CreateApplicationDeploymentReturns("some-deployment-guid", ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
 
-			returnedDeploymentGUID, warnings, executeErr := actor.CreateDeploymentByApplicationAndDroplet("some-app-guid", "some-droplet-guid")
+			var dep resources.Deployment
+			dep.Strategy = constant.DeploymentStrategyCanary
+			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
+			dep.DropletGUID = "some-droplet-guid"
+			returnedDeploymentGUID, warnings, executeErr := actor.CreateDeployment(dep)
 
 			Expect(fakeCloudControllerClient.CreateApplicationDeploymentCallCount()).To(Equal(1))
-			givenAppGUID, givenDropletGUID := fakeCloudControllerClient.CreateApplicationDeploymentArgsForCall(0)
+			dep1 := fakeCloudControllerClient.CreateApplicationDeploymentArgsForCall(0)
 
-			Expect(givenAppGUID).To(Equal("some-app-guid"))
-			Expect(givenDropletGUID).To(Equal("some-droplet-guid"))
+			Expect(dep1.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal("some-app-guid"))
+			Expect(dep1.DropletGUID).To(Equal("some-droplet-guid"))
 
 			Expect(returnedDeploymentGUID).To(Equal("some-deployment-guid"))
 			Expect(warnings).To(Equal(Warnings{"create-warning-1", "create-warning-2"}))
@@ -203,6 +211,51 @@ var _ = Describe("Deployment Actions", func() {
 			It("returns the warnings and error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("cancel-deployment-warnings"))
+			})
+		})
+	})
+
+	Describe("ContinueDeployment", func() {
+		var (
+			deploymentGUID string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			deploymentGUID = "dep-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.ContinueDeployment(deploymentGUID)
+		})
+
+		It("delegates to the cc client", func() {
+			Expect(fakeCloudControllerClient.ContinueDeploymentCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.ContinueDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+		})
+
+		When("the client fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.ContinueDeploymentReturns(ccv3.Warnings{"continue-deployment-warnings"}, errors.New("continue-deployment-error"))
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).To(MatchError("continue-deployment-error"))
+				Expect(warnings).To(ConsistOf("continue-deployment-warnings"))
+			})
+
+		})
+
+		When("the client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.ContinueDeploymentReturns(ccv3.Warnings{"continue-deployment-warnings"}, nil)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("continue-deployment-warnings"))
 			})
 		})
 	})

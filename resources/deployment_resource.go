@@ -30,9 +30,10 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 	}
 
 	var ccDeployment struct {
-		Droplet       *Droplet      `json:"droplet,omitempty"`
-		Revision      *Revision     `json:"revision,omitempty"`
-		Relationships Relationships `json:"relationships,omitempty"`
+		Droplet       *Droplet                    `json:"droplet,omitempty"`
+		Revision      *Revision                   `json:"revision,omitempty"`
+		Strategy      constant.DeploymentStrategy `json:"strategy,omitempty"`
+		Relationships Relationships               `json:"relationships,omitempty"`
 	}
 
 	if d.DropletGUID != "" {
@@ -41,6 +42,10 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 
 	if d.RevisionGUID != "" {
 		ccDeployment.Revision = &Revision{d.RevisionGUID}
+	}
+
+	if d.Strategy != "" {
+		ccDeployment.Strategy = d.Strategy
 	}
 
 	ccDeployment.Relationships = d.Relationships

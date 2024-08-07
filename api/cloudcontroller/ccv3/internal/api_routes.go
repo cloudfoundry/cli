@@ -137,6 +137,7 @@ const (
 	PostApplicationActionStartRequest                           = "PostApplicationActionStart"
 	PostApplicationActionStopRequest                            = "PostApplicationActionStop"
 	PostApplicationDeploymentActionCancelRequest                = "PostApplicationDeploymentActionCancel"
+	PostApplicationDeploymentActionContinueRequest              = "PostApplicationDeploymentActionContinue"
 	PostApplicationDeploymentRequest                            = "PostApplicationDeployment"
 	PostApplicationProcessActionScaleRequest                    = "PostApplicationProcessActionScale"
 	PostApplicationRequest                                      = "PostApplication"
@@ -218,6 +219,7 @@ var APIRoutes = map[string]Route{
 	PostApplicationDeploymentRequest:                            {Path: "/v3/deployments", Method: http.MethodPost},
 	GetDeploymentRequest:                                        {Path: "/v3/deployments/:deployment_guid", Method: http.MethodGet},
 	PostApplicationDeploymentActionCancelRequest:                {Path: "/v3/deployments/:deployment_guid/actions/cancel", Method: http.MethodPost},
+	PostApplicationDeploymentActionContinueRequest:              {Path: "/v3/deployments/:deployment_guid/actions/continue", Method: http.MethodPost},
 	GetDomainsRequest:                                           {Path: "/v3/domains", Method: http.MethodGet},
 	PostDomainRequest:                                           {Path: "/v3/domains", Method: http.MethodPost},
 	DeleteDomainRequest:                                         {Path: "/v3/domains/:domain_guid", Method: http.MethodDelete},

@@ -13,9 +13,9 @@ type RestartCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
-	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null."`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
-	usage               interface{}             `usage:"CF_NAME restart APP_NAME\n\n   This command will cause downtime unless you use '--strategy rolling'.\n\n   If the app's most recent package is unstaged, restarting the app will stage and run that package.\n   Otherwise, the app's current droplet will be run."`
+	usage               interface{}             `usage:"CF_NAME restart APP_NAME\n\n   This command will cause downtime unless you use '--strategy canary' or '--strategy rolling'.\n\n   If the app's most recent package is unstaged, restarting the app will stage and run that package.\n   Otherwise, the app's current droplet will be run."`
 	relatedCommands     interface{}             `related_commands:"restage, restart-app-instance"`
 	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
@@ -62,7 +62,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 		return err
 	}
 
-	if packageGUID != "" || cmd.Strategy.Name == constant.DeploymentStrategyRolling {
+	if packageGUID != "" || len(cmd.Strategy.Name) > 0 {
 		cmd.UI.DisplayTextWithFlavor("Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"AppName":   cmd.RequiredArgs.AppName,
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -72,13 +72,18 @@ func (cmd RestartCommand) Execute(args []string) error {
 		cmd.UI.DisplayNewline()
 	}
 
+	opts := shared.AppStartOpts{
+		Strategy:  cmd.Strategy.Name,
+		NoWait:    cmd.NoWait,
+		AppAction: constant.ApplicationRestarting,
+	}
 	if packageGUID != "" {
-		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, cmd.Strategy.Name, cmd.NoWait, constant.ApplicationRestarting)
+		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, opts)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, "", cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
+		err = cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), "", opts)
 		if err != nil {
 			return err
 		}
