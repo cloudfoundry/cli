@@ -698,10 +698,58 @@ var _ = Describe("app summary displayer", func() {
 		When("there is an active deployment", func() {
 			var LastStatusChangeTimeString = "2024-07-29T17:32:29Z"
 			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3}\s\d{4}`
+			var maxInFlightDefaultValue = 1
 
 			When("the deployment strategy is rolling", func() {
 				When("the deployment is in progress", func() {
-					When("last status change has a timestamp", func() {
+					When("last status change has a timestamp and max-in-flight is non-default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
+					})
+					When("last status change has a timestamp and max-in-flight is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
+					})
+					// 'unset' is important for the newer-CLI-than-CAPI scenario
+					When("last status change has a timestamp and max-in-flight is unset", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
@@ -717,9 +765,12 @@ var _ = Describe("app summary displayer", func() {
 							var actualOut = fmt.Sprintf("%s", testUI.Out)
 							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
 					})
 
-					When("last status change is an empty string", func() {
+					When("last status change is an empty string and max-in-flight is non-default", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
@@ -727,6 +778,9 @@ var _ = Describe("app summary displayer", func() {
 									StatusValue:      constant.DeploymentStatusValueActive,
 									StatusReason:     constant.DeploymentStatusReasonDeploying,
 									LastStatusChange: "",
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
 								},
 							}
 						})
@@ -735,89 +789,246 @@ var _ = Describe("app summary displayer", func() {
 							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
 							Expect(testUI.Out).NotTo(Say(`\(since`))
 						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
+					})
+					When("last status change is an empty string and max-in-flight is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: "",
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
+							Expect(testUI.Out).NotTo(Say(`\(since`))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
 					})
 				})
 
 				When("the deployment is cancelled", func() {
-					BeforeEach(func() {
-						summary = v7action.DetailedApplicationSummary{
-							Deployment: resources.Deployment{
-								Strategy:         constant.DeploymentStrategyRolling,
-								StatusValue:      constant.DeploymentStatusValueActive,
-								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: LastStatusChangeTimeString,
-							},
-						}
-					})
+					When("max-in-flight value is non-default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonCanceling,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
+								},
+							}
+						})
 
-					It("displays the message", func() {
-						var actualOut = fmt.Sprintf("%s", testUI.Out)
-						Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
+					})
+					When("max-in-flight value is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyRolling,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonCanceling,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
 					})
 				})
 			})
 			When("the deployment strategy is canary", func() {
 				When("the deployment is in progress", func() {
-					BeforeEach(func() {
-						summary = v7action.DetailedApplicationSummary{
-							Deployment: resources.Deployment{
-								Strategy:         constant.DeploymentStrategyCanary,
-								StatusValue:      constant.DeploymentStatusValueActive,
-								StatusReason:     constant.DeploymentStatusReasonDeploying,
-								LastStatusChange: LastStatusChangeTimeString,
-							},
-						}
-					})
+					When("max-in-flight value is non-default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
+								},
+							}
+						})
 
-					It("displays the message", func() {
-						var actualOut = fmt.Sprintf("%s", testUI.Out)
-						Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
-						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
+					})
+					When("max-in-flight value is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
 					})
 				})
 
 				When("the deployment is paused", func() {
-					BeforeEach(func() {
-						summary = v7action.DetailedApplicationSummary{
-							ApplicationSummary: v7action.ApplicationSummary{
-								Application: resources.Application{
-									Name: "foobar",
+					When("max-in-flight value is non-default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								ApplicationSummary: v7action.ApplicationSummary{
+									Application: resources.Application{
+										Name: "foobar",
+									},
 								},
-							},
-							Deployment: resources.Deployment{
-								Strategy:         constant.DeploymentStrategyCanary,
-								StatusValue:      constant.DeploymentStatusValueActive,
-								StatusReason:     constant.DeploymentStatusReasonPaused,
-								LastStatusChange: LastStatusChangeTimeString,
-							},
-						}
-					})
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonPaused,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
+								},
+							}
+						})
 
-					It("displays the message", func() {
-						var actualOut = fmt.Sprintf("%s", testUI.Out)
-						Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
-						Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
+						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
+					})
+					When("max-in-flight value is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								ApplicationSummary: v7action.ApplicationSummary{
+									Application: resources.Application{
+										Name: "foobar",
+									},
+								},
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonPaused,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
+
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
 					})
 				})
 
 				When("the deployment is canceling", func() {
-					BeforeEach(func() {
-						summary = v7action.DetailedApplicationSummary{
-							Deployment: resources.Deployment{
-								Strategy:         constant.DeploymentStrategyCanary,
-								StatusValue:      constant.DeploymentStatusValueActive,
-								StatusReason:     constant.DeploymentStatusReasonCanceling,
-								LastStatusChange: LastStatusChangeTimeString,
-							},
-						}
-					})
+					When("max-in-flight value is non-default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonCanceling,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: 2,
+									},
+								},
+							}
+						})
 
-					It("displays the message", func() {
-						var actualOut = fmt.Sprintf("%s", testUI.Out)
-						Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
-						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						})
+						It("displays max-in-flight value", func() {
+							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+						})
 					})
+					When("max-in-flight value is default", func() {
+						BeforeEach(func() {
+							summary = v7action.DetailedApplicationSummary{
+								Deployment: resources.Deployment{
+									Strategy:         constant.DeploymentStrategyCanary,
+									StatusValue:      constant.DeploymentStatusValueActive,
+									StatusReason:     constant.DeploymentStatusReasonCanceling,
+									LastStatusChange: LastStatusChangeTimeString,
+									Options: resources.DeploymentOpts{
+										MaxInFlight: maxInFlightDefaultValue,
+									},
+								},
+							}
+						})
 
+						It("displays the message", func() {
+							var actualOut = fmt.Sprintf("%s", testUI.Out)
+							Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+						})
+						It("does not display max-in-flight", func() {
+							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+						})
+					})
 				})
 			})
 		})
@@ -837,6 +1048,9 @@ var _ = Describe("app summary displayer", func() {
 				Expect(testUI.Out).NotTo(Say(fmt.Sprintf("%s deployment currently %s",
 					cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
 					summary.Deployment.StatusReason)))
+			})
+			It("does not display max-in-flight", func() {
+				Expect(testUI.Out).NotTo(Say(`max-in-flight`))
 			})
 		})
 	})
