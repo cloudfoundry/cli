@@ -732,7 +732,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING\n`))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
 							Expect(testUI.Out).NotTo(Say(`\(since`))
 						})
 					})
@@ -816,6 +816,45 @@ var _ = Describe("app summary displayer", func() {
 						var actualOut = fmt.Sprintf("%s", testUI.Out)
 						Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 						Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
+					})
+				})
+			})
+			When("the deployment strategy is canary", func() {
+				When("the deployment is paused", func() {
+					BeforeEach(func() {
+						summary = v7action.DetailedApplicationSummary{
+							ApplicationSummary: v7action.ApplicationSummary{
+								Application: resources.Application{
+									Name: "some-app",
+								},
+							},
+							Deployment: resources.Deployment{
+								Strategy:     constant.DeploymentStrategyCanary,
+								StatusValue:  constant.DeploymentStatusValueActive,
+								StatusReason: constant.DeploymentStatusReasonPaused,
+							},
+						}
+					})
+
+					It("displays the message", func() {
+						Expect(testUI.Out).To(Say("Canary deployment currently PAUSED."))
+						Expect(testUI.Out).To(Say("Please run `cf continue-deployment some-app` to promote the canary deployment, or `cf cancel-deployment some-app` to rollback to the previous version."))
+					})
+				})
+
+				When("the deployment is cancelled", func() {
+					BeforeEach(func() {
+						summary = v7action.DetailedApplicationSummary{
+							Deployment: resources.Deployment{
+								Strategy:     constant.DeploymentStrategyCanary,
+								StatusValue:  constant.DeploymentStatusValueActive,
+								StatusReason: constant.DeploymentStatusReasonCanceling,
+							},
+						}
+					})
+
+					It("displays the message", func() {
+						Expect(testUI.Out).To(Say("Canary deployment currently CANCELING."))
 					})
 				})
 			})

@@ -628,6 +628,33 @@ var _ = Describe("Application Summary Actions", func() {
 									})
 								})
 							})
+
+							When("the deployment strategy is canary", func() {
+								When("the deployment is paused", func() {
+									BeforeEach(func() {
+										fakeCloudControllerClient.GetDeploymentsReturns(
+											[]resources.Deployment{
+												{
+													GUID:         "some-deployment-guid",
+													Strategy:     "canary",
+													StatusValue:  "ACTIVE",
+													StatusReason: "PAUSED",
+												},
+											},
+											nil,
+											nil,
+										)
+									})
+									It("returns the deployment information", func() {
+										Expect(summary.Deployment).To(Equal(resources.Deployment{
+											GUID:         "some-deployment-guid",
+											Strategy:     "canary",
+											StatusValue:  "ACTIVE",
+											StatusReason: "PAUSED",
+										}))
+									})
+								})
+							})
 						})
 
 						When("the deployment is not active", func() {
