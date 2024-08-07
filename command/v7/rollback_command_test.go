@@ -188,10 +188,10 @@ var _ = Describe("rollback Command", func() {
 				It("skips the prompt and executes the rollback", func() {
 					Expect(fakeAppStager.StartAppCallCount()).To(Equal(1), "GetStartApp call count")
 
-					application, revisionGUID, _, _, _, _, appAction := fakeAppStager.StartAppArgsForCall(0)
+					application, _, _, revisionGUID, opts := fakeAppStager.StartAppArgsForCall(0)
 					Expect(application.GUID).To(Equal("123"))
 					Expect(revisionGUID).To(Equal("some-1-guid"))
-					Expect(appAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
 
 					Expect(testUI.Out).ToNot(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", app))
 					Expect(testUI.Out).ToNot(Say("Are you sure you want to continue?"))
@@ -215,10 +215,10 @@ var _ = Describe("rollback Command", func() {
 				It("successfully executes the command and outputs warnings", func() {
 					Expect(fakeAppStager.StartAppCallCount()).To(Equal(1), "GetStartApp call count")
 
-					application, revisionGUID, _, _, _, _, appAction := fakeAppStager.StartAppArgsForCall(0)
+					application, _, _, revisionGUID, opts := fakeAppStager.StartAppArgsForCall(0)
 					Expect(application.GUID).To(Equal("123"))
 					Expect(revisionGUID).To(Equal("some-1-guid"))
-					Expect(appAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
 
 					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", app))
 					Expect(testUI.Out).To(Say("Are you sure you want to continue?"))

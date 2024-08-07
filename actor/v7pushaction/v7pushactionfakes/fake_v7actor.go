@@ -58,18 +58,17 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateDeploymentByApplicationAndDropletStub        func(string, string) (string, v7action.Warnings, error)
-	createDeploymentByApplicationAndDropletMutex       sync.RWMutex
-	createDeploymentByApplicationAndDropletArgsForCall []struct {
-		arg1 string
-		arg2 string
+	CreateDeploymentStub        func(resources.Deployment) (string, v7action.Warnings, error)
+	createDeploymentMutex       sync.RWMutex
+	createDeploymentArgsForCall []struct {
+		arg1 resources.Deployment
 	}
-	createDeploymentByApplicationAndDropletReturns struct {
+	createDeploymentReturns struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}
-	createDeploymentByApplicationAndDropletReturnsOnCall map[int]struct {
+	createDeploymentReturnsOnCall map[int]struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -295,19 +294,19 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollStartForRollingStub        func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)
-	pollStartForRollingMutex       sync.RWMutex
-	pollStartForRollingArgsForCall []struct {
+	PollStartForDeploymentStub        func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)
+	pollStartForDeploymentMutex       sync.RWMutex
+	pollStartForDeploymentArgsForCall []struct {
 		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
 	}
-	pollStartForRollingReturns struct {
+	pollStartForDeploymentReturns struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	pollStartForRollingReturnsOnCall map[int]struct {
+	pollStartForDeploymentReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -512,15 +511,16 @@ func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (resources.Drople
 	fake.createApplicationDropletArgsForCall = append(fake.createApplicationDropletArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateApplicationDropletStub
+	fakeReturns := fake.createApplicationDropletReturns
 	fake.recordInvocation("CreateApplicationDroplet", []interface{}{arg1})
 	fake.createApplicationDropletMutex.Unlock()
-	if fake.CreateApplicationDropletStub != nil {
-		return fake.CreateApplicationDropletStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createApplicationDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -579,15 +579,16 @@ func (fake *FakeV7Actor) CreateApplicationInSpace(arg1 resources.Application, ar
 		arg1 resources.Application
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateApplicationInSpaceStub
+	fakeReturns := fake.createApplicationInSpaceReturns
 	fake.recordInvocation("CreateApplicationInSpace", []interface{}{arg1, arg2})
 	fake.createApplicationInSpaceMutex.Unlock()
-	if fake.CreateApplicationInSpaceStub != nil {
-		return fake.CreateApplicationInSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createApplicationInSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -645,15 +646,16 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplication(arg1 string) (resources.
 	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateBitsPackageByApplicationStub
+	fakeReturns := fake.createBitsPackageByApplicationReturns
 	fake.recordInvocation("CreateBitsPackageByApplication", []interface{}{arg1})
 	fake.createBitsPackageByApplicationMutex.Unlock()
-	if fake.CreateBitsPackageByApplicationStub != nil {
-		return fake.CreateBitsPackageByApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createBitsPackageByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -705,67 +707,67 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDroplet(arg1 string, arg2 string) (string, v7action.Warnings, error) {
-	fake.createDeploymentByApplicationAndDropletMutex.Lock()
-	ret, specificReturn := fake.createDeploymentByApplicationAndDropletReturnsOnCall[len(fake.createDeploymentByApplicationAndDropletArgsForCall)]
-	fake.createDeploymentByApplicationAndDropletArgsForCall = append(fake.createDeploymentByApplicationAndDropletArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("CreateDeploymentByApplicationAndDroplet", []interface{}{arg1, arg2})
-	fake.createDeploymentByApplicationAndDropletMutex.Unlock()
-	if fake.CreateDeploymentByApplicationAndDropletStub != nil {
-		return fake.CreateDeploymentByApplicationAndDropletStub(arg1, arg2)
+func (fake *FakeV7Actor) CreateDeployment(arg1 resources.Deployment) (string, v7action.Warnings, error) {
+	fake.createDeploymentMutex.Lock()
+	ret, specificReturn := fake.createDeploymentReturnsOnCall[len(fake.createDeploymentArgsForCall)]
+	fake.createDeploymentArgsForCall = append(fake.createDeploymentArgsForCall, struct {
+		arg1 resources.Deployment
+	}{arg1})
+	stub := fake.CreateDeploymentStub
+	fakeReturns := fake.createDeploymentReturns
+	fake.recordInvocation("CreateDeployment", []interface{}{arg1})
+	fake.createDeploymentMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentByApplicationAndDropletReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletCallCount() int {
-	fake.createDeploymentByApplicationAndDropletMutex.RLock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
-	return len(fake.createDeploymentByApplicationAndDropletArgsForCall)
+func (fake *FakeV7Actor) CreateDeploymentCallCount() int {
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
+	return len(fake.createDeploymentArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletCalls(stub func(string, string) (string, v7action.Warnings, error)) {
-	fake.createDeploymentByApplicationAndDropletMutex.Lock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
-	fake.CreateDeploymentByApplicationAndDropletStub = stub
+func (fake *FakeV7Actor) CreateDeploymentCalls(stub func(resources.Deployment) (string, v7action.Warnings, error)) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = stub
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletArgsForCall(i int) (string, string) {
-	fake.createDeploymentByApplicationAndDropletMutex.RLock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
-	argsForCall := fake.createDeploymentByApplicationAndDropletArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+func (fake *FakeV7Actor) CreateDeploymentArgsForCall(i int) resources.Deployment {
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
+	argsForCall := fake.createDeploymentArgsForCall[i]
+	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletReturns(result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentByApplicationAndDropletMutex.Lock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
-	fake.CreateDeploymentByApplicationAndDropletStub = nil
-	fake.createDeploymentByApplicationAndDropletReturns = struct {
+func (fake *FakeV7Actor) CreateDeploymentReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = nil
+	fake.createDeploymentReturns = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateDeploymentByApplicationAndDropletReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
-	fake.createDeploymentByApplicationAndDropletMutex.Lock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.Unlock()
-	fake.CreateDeploymentByApplicationAndDropletStub = nil
-	if fake.createDeploymentByApplicationAndDropletReturnsOnCall == nil {
-		fake.createDeploymentByApplicationAndDropletReturnsOnCall = make(map[int]struct {
+func (fake *FakeV7Actor) CreateDeploymentReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = nil
+	if fake.createDeploymentReturnsOnCall == nil {
+		fake.createDeploymentReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.createDeploymentByApplicationAndDropletReturnsOnCall[i] = struct {
+	fake.createDeploymentReturnsOnCall[i] = struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
@@ -779,15 +781,16 @@ func (fake *FakeV7Actor) CreateDockerPackageByApplication(arg1 string, arg2 v7ac
 		arg1 string
 		arg2 v7action.DockerImageCredentials
 	}{arg1, arg2})
+	stub := fake.CreateDockerPackageByApplicationStub
+	fakeReturns := fake.createDockerPackageByApplicationReturns
 	fake.recordInvocation("CreateDockerPackageByApplication", []interface{}{arg1, arg2})
 	fake.createDockerPackageByApplicationMutex.Unlock()
-	if fake.CreateDockerPackageByApplicationStub != nil {
-		return fake.CreateDockerPackageByApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDockerPackageByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -849,15 +852,16 @@ func (fake *FakeV7Actor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4
 		arg4 string
 		arg5 int
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.CreateRouteStub
+	fakeReturns := fake.createRouteReturns
 	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createRouteMutex.Unlock()
-	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createRouteReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -916,15 +920,16 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpace(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -983,15 +988,16 @@ func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]res
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationDropletsStub
+	fakeReturns := fake.getApplicationDropletsReturns
 	fake.recordInvocation("GetApplicationDroplets", []interface{}{arg1, arg2})
 	fake.getApplicationDropletsMutex.Unlock()
-	if fake.GetApplicationDropletsStub != nil {
-		return fake.GetApplicationDropletsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationDropletsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1049,15 +1055,16 @@ func (fake *FakeV7Actor) GetApplicationRoutes(arg1 string) ([]resources.Route, v
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationRoutesStub
+	fakeReturns := fake.getApplicationRoutesReturns
 	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
 	fake.getApplicationRoutesMutex.Unlock()
-	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1121,15 +1128,16 @@ func (fake *FakeV7Actor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 stri
 		arg1 []string
 		arg2 string
 	}{arg1Copy, arg2})
+	stub := fake.GetApplicationsByNamesAndSpaceStub
+	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
 	fake.recordInvocation("GetApplicationsByNamesAndSpace", []interface{}{arg1Copy, arg2})
 	fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	if fake.GetApplicationsByNamesAndSpaceStub != nil {
-		return fake.GetApplicationsByNamesAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1187,15 +1195,16 @@ func (fake *FakeV7Actor) GetDefaultDomain(arg1 string) (resources.Domain, v7acti
 	fake.getDefaultDomainArgsForCall = append(fake.getDefaultDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDefaultDomainStub
+	fakeReturns := fake.getDefaultDomainReturns
 	fake.recordInvocation("GetDefaultDomain", []interface{}{arg1})
 	fake.getDefaultDomainMutex.Unlock()
-	if fake.GetDefaultDomainStub != nil {
-		return fake.GetDefaultDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDefaultDomainReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1253,15 +1262,16 @@ func (fake *FakeV7Actor) GetDomain(arg1 string) (resources.Domain, v7action.Warn
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDomainStub
+	fakeReturns := fake.getDomainReturns
 	fake.recordInvocation("GetDomain", []interface{}{arg1})
 	fake.getDomainMutex.Unlock()
-	if fake.GetDomainStub != nil {
-		return fake.GetDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDomainReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1322,15 +1332,16 @@ func (fake *FakeV7Actor) GetRouteByAttributes(arg1 resources.Domain, arg2 string
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetRouteByAttributesStub
+	fakeReturns := fake.getRouteByAttributesReturns
 	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getRouteByAttributesMutex.Unlock()
-	if fake.GetRouteByAttributesStub != nil {
-		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRouteByAttributesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1389,15 +1400,16 @@ func (fake *FakeV7Actor) GetRouteDestinationByAppGUID(arg1 resources.Route, arg2
 		arg1 resources.Route
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRouteDestinationByAppGUIDStub
+	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
 	fake.recordInvocation("GetRouteDestinationByAppGUID", []interface{}{arg1, arg2})
 	fake.getRouteDestinationByAppGUIDMutex.Unlock()
-	if fake.GetRouteDestinationByAppGUIDStub != nil {
-		return fake.GetRouteDestinationByAppGUIDStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1454,15 +1466,16 @@ func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string, arg3 string) (v7acti
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.MapRouteStub
+	fakeReturns := fake.mapRouteReturns
 	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
 	fake.mapRouteMutex.Unlock()
-	if fake.MapRouteStub != nil {
-		return fake.MapRouteStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.mapRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1518,15 +1531,16 @@ func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (resources.Droplet,
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PollBuildStub
+	fakeReturns := fake.pollBuildReturns
 	fake.recordInvocation("PollBuild", []interface{}{arg1, arg2})
 	fake.pollBuildMutex.Unlock()
-	if fake.PollBuildStub != nil {
-		return fake.PollBuildStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollBuildReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1584,15 +1598,16 @@ func (fake *FakeV7Actor) PollPackage(arg1 resources.Package) (resources.Package,
 	fake.pollPackageArgsForCall = append(fake.pollPackageArgsForCall, struct {
 		arg1 resources.Package
 	}{arg1})
+	stub := fake.PollPackageStub
+	fakeReturns := fake.pollPackageReturns
 	fake.recordInvocation("PollPackage", []interface{}{arg1})
 	fake.pollPackageMutex.Unlock()
-	if fake.PollPackageStub != nil {
-		return fake.PollPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1652,15 +1667,16 @@ func (fake *FakeV7Actor) PollStart(arg1 resources.Application, arg2 bool, arg3 f
 		arg2 bool
 		arg3 func(string)
 	}{arg1, arg2, arg3})
+	stub := fake.PollStartStub
+	fakeReturns := fake.pollStartReturns
 	fake.recordInvocation("PollStart", []interface{}{arg1, arg2, arg3})
 	fake.pollStartMutex.Unlock()
-	if fake.PollStartStub != nil {
-		return fake.PollStartStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollStartReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1709,67 +1725,68 @@ func (fake *FakeV7Actor) PollStartReturnsOnCall(i int, result1 v7action.Warnings
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollStartForRolling(arg1 resources.Application, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
-	fake.pollStartForRollingMutex.Lock()
-	ret, specificReturn := fake.pollStartForRollingReturnsOnCall[len(fake.pollStartForRollingArgsForCall)]
-	fake.pollStartForRollingArgsForCall = append(fake.pollStartForRollingArgsForCall, struct {
+func (fake *FakeV7Actor) PollStartForDeployment(arg1 resources.Application, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
+	fake.pollStartForDeploymentMutex.Lock()
+	ret, specificReturn := fake.pollStartForDeploymentReturnsOnCall[len(fake.pollStartForDeploymentArgsForCall)]
+	fake.pollStartForDeploymentArgsForCall = append(fake.pollStartForDeploymentArgsForCall, struct {
 		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
 	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("PollStartForRolling", []interface{}{arg1, arg2, arg3, arg4})
-	fake.pollStartForRollingMutex.Unlock()
-	if fake.PollStartForRollingStub != nil {
-		return fake.PollStartForRollingStub(arg1, arg2, arg3, arg4)
+	stub := fake.PollStartForDeploymentStub
+	fakeReturns := fake.pollStartForDeploymentReturns
+	fake.recordInvocation("PollStartForDeployment", []interface{}{arg1, arg2, arg3, arg4})
+	fake.pollStartForDeploymentMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollStartForRollingReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeV7Actor) PollStartForRollingCallCount() int {
-	fake.pollStartForRollingMutex.RLock()
-	defer fake.pollStartForRollingMutex.RUnlock()
-	return len(fake.pollStartForRollingArgsForCall)
+func (fake *FakeV7Actor) PollStartForDeploymentCallCount() int {
+	fake.pollStartForDeploymentMutex.RLock()
+	defer fake.pollStartForDeploymentMutex.RUnlock()
+	return len(fake.pollStartForDeploymentArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)) {
-	fake.pollStartForRollingMutex.Lock()
-	defer fake.pollStartForRollingMutex.Unlock()
-	fake.PollStartForRollingStub = stub
+func (fake *FakeV7Actor) PollStartForDeploymentCalls(stub func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)) {
+	fake.pollStartForDeploymentMutex.Lock()
+	defer fake.pollStartForDeploymentMutex.Unlock()
+	fake.PollStartForDeploymentStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (resources.Application, string, bool, func(string)) {
-	fake.pollStartForRollingMutex.RLock()
-	defer fake.pollStartForRollingMutex.RUnlock()
-	argsForCall := fake.pollStartForRollingArgsForCall[i]
+func (fake *FakeV7Actor) PollStartForDeploymentArgsForCall(i int) (resources.Application, string, bool, func(string)) {
+	fake.pollStartForDeploymentMutex.RLock()
+	defer fake.pollStartForDeploymentMutex.RUnlock()
+	argsForCall := fake.pollStartForDeploymentArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeV7Actor) PollStartForRollingReturns(result1 v7action.Warnings, result2 error) {
-	fake.pollStartForRollingMutex.Lock()
-	defer fake.pollStartForRollingMutex.Unlock()
-	fake.PollStartForRollingStub = nil
-	fake.pollStartForRollingReturns = struct {
+func (fake *FakeV7Actor) PollStartForDeploymentReturns(result1 v7action.Warnings, result2 error) {
+	fake.pollStartForDeploymentMutex.Lock()
+	defer fake.pollStartForDeploymentMutex.Unlock()
+	fake.PollStartForDeploymentStub = nil
+	fake.pollStartForDeploymentReturns = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollStartForRollingReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.pollStartForRollingMutex.Lock()
-	defer fake.pollStartForRollingMutex.Unlock()
-	fake.PollStartForRollingStub = nil
-	if fake.pollStartForRollingReturnsOnCall == nil {
-		fake.pollStartForRollingReturnsOnCall = make(map[int]struct {
+func (fake *FakeV7Actor) PollStartForDeploymentReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.pollStartForDeploymentMutex.Lock()
+	defer fake.pollStartForDeploymentMutex.Unlock()
+	fake.PollStartForDeploymentStub = nil
+	if fake.pollStartForDeploymentReturnsOnCall == nil {
+		fake.pollStartForDeploymentReturnsOnCall = make(map[int]struct {
 			result1 v7action.Warnings
 			result2 error
 		})
 	}
-	fake.pollStartForRollingReturnsOnCall[i] = struct {
+	fake.pollStartForDeploymentReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -1786,15 +1803,16 @@ func (fake *FakeV7Actor) ResourceMatch(arg1 []sharedaction.V3Resource) ([]shared
 	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
 		arg1 []sharedaction.V3Resource
 	}{arg1Copy})
+	stub := fake.ResourceMatchStub
+	fakeReturns := fake.resourceMatchReturns
 	fake.recordInvocation("ResourceMatch", []interface{}{arg1Copy})
 	fake.resourceMatchMutex.Unlock()
-	if fake.ResourceMatchStub != nil {
-		return fake.ResourceMatchStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.resourceMatchReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -1853,15 +1871,16 @@ func (fake *FakeV7Actor) RestartApplication(arg1 string, arg2 bool) (v7action.Wa
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.RestartApplicationStub
+	fakeReturns := fake.restartApplicationReturns
 	fake.recordInvocation("RestartApplication", []interface{}{arg1, arg2})
 	fake.restartApplicationMutex.Unlock()
-	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.restartApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1917,15 +1936,16 @@ func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 resources.P
 		arg1 string
 		arg2 resources.Process
 	}{arg1, arg2})
+	stub := fake.ScaleProcessByApplicationStub
+	fakeReturns := fake.scaleProcessByApplicationReturns
 	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
 	fake.scaleProcessByApplicationMutex.Unlock()
-	if fake.ScaleProcessByApplicationStub != nil {
-		return fake.ScaleProcessByApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.scaleProcessByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1981,15 +2001,16 @@ func (fake *FakeV7Actor) SetApplicationDroplet(arg1 string, arg2 string) (v7acti
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SetApplicationDropletStub
+	fakeReturns := fake.setApplicationDropletReturns
 	fake.recordInvocation("SetApplicationDroplet", []interface{}{arg1, arg2})
 	fake.setApplicationDropletMutex.Unlock()
-	if fake.SetApplicationDropletStub != nil {
-		return fake.SetApplicationDropletStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationDropletReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2050,15 +2071,16 @@ func (fake *FakeV7Actor) SetApplicationManifest(arg1 string, arg2 []byte) (v7act
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.SetApplicationManifestStub
+	fakeReturns := fake.setApplicationManifestReturns
 	fake.recordInvocation("SetApplicationManifest", []interface{}{arg1, arg2Copy})
 	fake.setApplicationManifestMutex.Unlock()
-	if fake.SetApplicationManifestStub != nil {
-		return fake.SetApplicationManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2119,15 +2141,16 @@ func (fake *FakeV7Actor) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Wa
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.SetSpaceManifestStub
+	fakeReturns := fake.setSpaceManifestReturns
 	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
 	fake.setSpaceManifestMutex.Unlock()
-	if fake.SetSpaceManifestStub != nil {
-		return fake.SetSpaceManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setSpaceManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2182,15 +2205,16 @@ func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (resources.Build, 
 	fake.stageApplicationPackageArgsForCall = append(fake.stageApplicationPackageArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StageApplicationPackageStub
+	fakeReturns := fake.stageApplicationPackageReturns
 	fake.recordInvocation("StageApplicationPackage", []interface{}{arg1})
 	fake.stageApplicationPackageMutex.Unlock()
-	if fake.StageApplicationPackageStub != nil {
-		return fake.StageApplicationPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.stageApplicationPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -2248,15 +2272,16 @@ func (fake *FakeV7Actor) StopApplication(arg1 string) (v7action.Warnings, error)
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StopApplicationStub
+	fakeReturns := fake.stopApplicationReturns
 	fake.recordInvocation("StopApplication", []interface{}{arg1})
 	fake.stopApplicationMutex.Unlock()
-	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stopApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2312,15 +2337,16 @@ func (fake *FakeV7Actor) UnmapRoute(arg1 string, arg2 string) (v7action.Warnings
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnmapRouteStub
+	fakeReturns := fake.unmapRouteReturns
 	fake.recordInvocation("UnmapRoute", []interface{}{arg1, arg2})
 	fake.unmapRouteMutex.Unlock()
-	if fake.UnmapRouteStub != nil {
-		return fake.UnmapRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unmapRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2375,15 +2401,16 @@ func (fake *FakeV7Actor) UpdateApplication(arg1 resources.Application) (resource
 	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
 		arg1 resources.Application
 	}{arg1})
+	stub := fake.UpdateApplicationStub
+	fakeReturns := fake.updateApplicationReturns
 	fake.recordInvocation("UpdateApplication", []interface{}{arg1})
 	fake.updateApplicationMutex.Unlock()
-	if fake.UpdateApplicationStub != nil {
-		return fake.UpdateApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.updateApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -2443,15 +2470,16 @@ func (fake *FakeV7Actor) UpdateProcessByTypeAndApplication(arg1 string, arg2 str
 		arg2 string
 		arg3 resources.Process
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateProcessByTypeAndApplicationStub
+	fakeReturns := fake.updateProcessByTypeAndApplicationReturns
 	fake.recordInvocation("UpdateProcessByTypeAndApplication", []interface{}{arg1, arg2, arg3})
 	fake.updateProcessByTypeAndApplicationMutex.Unlock()
-	if fake.UpdateProcessByTypeAndApplicationStub != nil {
-		return fake.UpdateProcessByTypeAndApplicationStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateProcessByTypeAndApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2514,15 +2542,16 @@ func (fake *FakeV7Actor) UploadBitsPackage(arg1 resources.Package, arg2 []shared
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2Copy, arg3, arg4})
+	stub := fake.UploadBitsPackageStub
+	fakeReturns := fake.uploadBitsPackageReturns
 	fake.recordInvocation("UploadBitsPackage", []interface{}{arg1, arg2Copy, arg3, arg4})
 	fake.uploadBitsPackageMutex.Unlock()
-	if fake.UploadBitsPackageStub != nil {
-		return fake.UploadBitsPackageStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.uploadBitsPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -2583,15 +2612,16 @@ func (fake *FakeV7Actor) UploadDroplet(arg1 string, arg2 string, arg3 io.Reader,
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UploadDropletStub
+	fakeReturns := fake.uploadDropletReturns
 	fake.recordInvocation("UploadDroplet", []interface{}{arg1, arg2, arg3, arg4})
 	fake.uploadDropletMutex.Unlock()
-	if fake.UploadDropletStub != nil {
-		return fake.UploadDropletStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.uploadDropletReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -2649,8 +2679,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	fake.createBitsPackageByApplicationMutex.RLock()
 	defer fake.createBitsPackageByApplicationMutex.RUnlock()
-	fake.createDeploymentByApplicationAndDropletMutex.RLock()
-	defer fake.createDeploymentByApplicationAndDropletMutex.RUnlock()
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
 	fake.createDockerPackageByApplicationMutex.RLock()
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
@@ -2679,8 +2709,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.pollPackageMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
-	fake.pollStartForRollingMutex.RLock()
-	defer fake.pollStartForRollingMutex.RUnlock()
+	fake.pollStartForDeploymentMutex.RLock()
+	defer fake.pollStartForDeploymentMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()
 	defer fake.resourceMatchMutex.RUnlock()
 	fake.restartApplicationMutex.RLock()
