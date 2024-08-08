@@ -5,8 +5,8 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 func SetupDeploymentInformationForPushPlan(pushPlan PushPlan, overrides FlagOverrides) (PushPlan, error) {
 	pushPlan.Strategy = overrides.Strategy
 
-	if overrides.Strategy != constant.DeploymentStrategyDefault {
-		pushPlan.MaxInFlight = overrides.MaxInFlight
+	if overrides.Strategy != constant.DeploymentStrategyDefault && overrides.MaxInFlight != nil {
+		pushPlan.MaxInFlight = *overrides.MaxInFlight
 	}
 
 	return pushPlan, nil

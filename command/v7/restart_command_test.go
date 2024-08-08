@@ -201,7 +201,8 @@ var _ = Describe("restart Command", func() {
 
 		Entry("max-in-flight is passed without strategy",
 			func() {
-				cmd.MaxInFlight = 10
+				maxInFlight := 10
+				cmd.MaxInFlight = &maxInFlight
 			},
 			translatableerror.RequiredFlagsError{
 				Arg1: "--max-in-flight",
@@ -211,7 +212,8 @@ var _ = Describe("restart Command", func() {
 		Entry("max-in-flight is smaller than 1",
 			func() {
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
-				cmd.MaxInFlight = 0
+				maxInFlight := 0
+				cmd.MaxInFlight = &maxInFlight
 			},
 			translatableerror.IncorrectUsageError{
 				Message: "--max-in-flight must be greater than or equal to 1",

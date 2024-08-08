@@ -16,7 +16,7 @@ type RestageCommand struct {
 
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
-	MaxInFlight         int                     `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being restaged. Only applies when --strategy flag is specified."`
+	MaxInFlight         *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being restaged. Only applies when --strategy flag is specified."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\n   This command will cause downtime unless you use '--strategy' flag.\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy rolling\n   CF_NAME restage APP_NAME --strategy canary --no-wait"`
 	relatedCommands     interface{}             `related_commands:"restart"`
@@ -84,11 +84,15 @@ func (cmd RestageCommand) Execute(args []string) error {
 	}
 
 	opts := shared.AppStartOpts{
-		AppAction:   constant.ApplicationRestarting,
-		MaxInFlight: cmd.MaxInFlight,
-		NoWait:      cmd.NoWait,
-		Strategy:    cmd.Strategy.Name,
+		AppAction: constant.ApplicationRestarting,
+		NoWait:    cmd.NoWait,
+		Strategy:  cmd.Strategy.Name,
 	}
+
+	if cmd.MaxInFlight != nil {
+		opts.MaxInFlight = *cmd.MaxInFlight
+	}
+
 	err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), pkg.GUID, opts)
 	if err != nil {
 		return mapErr(cmd.Config, cmd.RequiredArgs.AppName, err)
@@ -99,9 +103,9 @@ func (cmd RestageCommand) Execute(args []string) error {
 
 func (cmd RestageCommand) ValidateFlags() error {
 	switch {
-	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight > 0:
+	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil:
 		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
-	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && (cmd.MaxInFlight < -1 || cmd.MaxInFlight == 0):
+	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 

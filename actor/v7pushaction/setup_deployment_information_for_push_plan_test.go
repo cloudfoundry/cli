@@ -30,7 +30,8 @@ var _ = Describe("SetupDeploymentInformationForPushPlan", func() {
 	When("flag overrides specifies strategy", func() {
 		BeforeEach(func() {
 			overrides.Strategy = "rolling"
-			overrides.MaxInFlight = 5
+			maxInFlight := 5
+			overrides.MaxInFlight = &maxInFlight
 		})
 
 		It("sets the strategy on the push plan", func() {
@@ -46,13 +47,21 @@ var _ = Describe("SetupDeploymentInformationForPushPlan", func() {
 
 	When("flag overrides does not specify strategy", func() {
 		BeforeEach(func() {
-			overrides.MaxInFlight = 10
+			maxInFlight := 10
+			overrides.MaxInFlight = &maxInFlight
 		})
 		It("leaves the strategy as its default value on the push plan", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(expectedPushPlan.Strategy).To(Equal(constant.DeploymentStrategyDefault))
 		})
 
+		It("does not set MaxInFlight", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(expectedPushPlan.MaxInFlight).To(Equal(0))
+		})
+	})
+
+	When("flag not provided", func() {
 		It("does not set MaxInFlight", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(expectedPushPlan.MaxInFlight).To(Equal(0))

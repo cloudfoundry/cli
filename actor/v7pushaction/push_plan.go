@@ -48,7 +48,7 @@ type FlagOverrides struct {
 	HealthCheckType     constant.HealthCheckType
 	Instances           types.NullInt
 	Memory              string
-	MaxInFlight         int
+	MaxInFlight         *int
 	NoStart             bool
 	NoWait              bool
 	ProvidedAppPath     string

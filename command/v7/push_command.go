@@ -90,7 +90,7 @@ type PushCommand struct {
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
 	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
-	MaxInFlight             int                                 `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
+	MaxInFlight             *int                                `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
 	Memory                  string                              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
@@ -488,9 +488,9 @@ func (cmd PushCommand) ValidateFlags() error {
 	case !cmd.validBuildpacks():
 		return translatableerror.InvalidBuildpacksError{}
 
-	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight > 0:
+	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil:
 		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
-	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && (cmd.MaxInFlight < -1 || cmd.MaxInFlight == 0):
+	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 

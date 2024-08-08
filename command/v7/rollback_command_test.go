@@ -77,7 +77,8 @@ var _ = Describe("rollback Command", func() {
 			},
 			Stager: fakeAppStager,
 		}
-		cmd.MaxInFlight = 5
+		maxInFlight := 5
+		cmd.MaxInFlight = &maxInFlight
 	})
 
 	JustBeforeEach(func() {
@@ -302,7 +303,8 @@ var _ = Describe("rollback Command", func() {
 
 		Entry("max-in-flight is smaller than 1",
 			func() {
-				cmd.MaxInFlight = 0
+				maxInFlight := 0
+				cmd.MaxInFlight = &maxInFlight
 			},
 			translatableerror.IncorrectUsageError{
 				Message: "--max-in-flight must be greater than or equal to 1",

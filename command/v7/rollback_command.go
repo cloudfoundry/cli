@@ -21,7 +21,7 @@ type RollbackCommand struct {
 	Version         flag.Revision           `long:"version" required:"true" description:"Roll back to the specified revision"`
 	relatedCommands interface{}             `related_commands:"revisions"`
 	usage           interface{}             `usage:"CF_NAME rollback APP_NAME [--version VERSION] [-f]"`
-	MaxInFlight     int           `long:"max-in-flight" default:"-1" description:"Defines the maximum number of instances that will be actively being rolled back."`
+	MaxInFlight     *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being rolled back."`
 
 	LogCacheClient sharedaction.LogCacheClient
 	Stager         shared.AppStager
@@ -111,10 +111,12 @@ func (cmd RollbackCommand) Execute(args []string) error {
 	})
 
 	opts := shared.AppStartOpts{
-		AppAction:   constant.ApplicationRollingBack,
-		MaxInFlight: cmd.MaxInFlight,
-		NoWait:      false,
-		Strategy:    constant.DeploymentStrategyRolling,
+		AppAction: constant.ApplicationRollingBack,
+		NoWait:    false,
+		Strategy:  constant.DeploymentStrategyRolling,
+	}
+	if cmd.MaxInFlight != nil {
+		opts.MaxInFlight = *cmd.MaxInFlight
 	}
 
 	if cmd.Strategy.Name != "" {
@@ -133,7 +135,7 @@ func (cmd RollbackCommand) Execute(args []string) error {
 
 func (cmd RollbackCommand) ValidateFlags() error {
 	switch {
-	case cmd.MaxInFlight < -1 || cmd.MaxInFlight == 0:
+	case cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 

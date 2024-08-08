@@ -9,12 +9,13 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 	eventStream <- &PushEvent{Plan: pushPlan, Event: StartingDeployment}
 
 	dep := resources.Deployment{
-		Strategy: pushPlan.Strategy,
-		Options: resources.DeploymentOpts{
-			MaxInFlight: pushPlan.MaxInFlight,
-		},
+		Strategy:      pushPlan.Strategy,
 		DropletGUID:   pushPlan.DropletGUID,
 		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}},
+	}
+
+	if pushPlan.MaxInFlight != 0 {
+		dep.Options = resources.DeploymentOpts{MaxInFlight: pushPlan.MaxInFlight}
 	}
 
 	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
