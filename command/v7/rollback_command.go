@@ -14,11 +14,12 @@ import (
 type RollbackCommand struct {
 	BaseCommand
 
-	Force           bool          `short:"f" description:"Force rollback without confirmation"`
-	RequiredArgs    flag.AppName  `positional-args:"yes"`
-	Version         flag.Revision `long:"version" required:"true" description:"Roll back to the specified revision"`
-	relatedCommands interface{}   `related_commands:"revisions"`
-	usage           interface{}   `usage:"CF_NAME rollback APP_NAME [--version VERSION] [-f]"`
+	Force           bool                    `short:"f" description:"Force rollback without confirmation"`
+	RequiredArgs    flag.AppName            `positional-args:"yes"`
+	Strategy        flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary or rolling. When not specified, it defaults to rolling."`
+	Version         flag.Revision           `long:"version" required:"true" description:"Roll back to the specified revision"`
+	relatedCommands interface{}             `related_commands:"revisions"`
+	usage           interface{}             `usage:"CF_NAME rollback APP_NAME [--version VERSION] [-f]"`
 
 	LogCacheClient sharedaction.LogCacheClient
 	Stager         shared.AppStager
@@ -110,6 +111,10 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		Strategy:  constant.DeploymentStrategyRolling,
 		NoWait:    false,
 		AppAction: constant.ApplicationRollingBack,
+	}
+
+	if cmd.Strategy.Name != "" {
+		opts.Strategy = cmd.Strategy.Name
 	}
 
 	startAppErr := cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), revision.GUID, opts)
