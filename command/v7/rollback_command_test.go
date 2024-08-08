@@ -219,6 +219,7 @@ var _ = Describe("rollback Command", func() {
 					Expect(application.GUID).To(Equal("123"))
 					Expect(revisionGUID).To(Equal("some-1-guid"))
 					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 
 					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", app))
 					Expect(testUI.Out).To(Say("Are you sure you want to continue?"))
@@ -229,6 +230,25 @@ var _ = Describe("rollback Command", func() {
 					Expect(testUI.Err).To(Say("warning-3"))
 
 					Expect(testUI.Out).To(Say("OK"))
+				})
+			})
+
+			When("the strategy flag is passed", func() {
+				BeforeEach(func() {
+					cmd.Strategy.Name = constant.DeploymentStrategyCanary
+
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
+				})
+				It("uses the specified strategy to rollback", func() {
+					Expect(fakeAppStager.StartAppCallCount()).To(Equal(1), "GetStartApp call count")
+
+					application, _, _, revisionGUID, opts := fakeAppStager.StartAppArgsForCall(0)
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(application.GUID).To(Equal("123"))
+					Expect(revisionGUID).To(Equal("some-1-guid"))
+					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyCanary))
 				})
 			})
 
@@ -265,4 +285,5 @@ var _ = Describe("rollback Command", func() {
 			})
 		})
 	})
+
 })
