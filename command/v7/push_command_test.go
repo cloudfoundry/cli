@@ -1072,6 +1072,8 @@ var _ = Describe("push Command", func() {
 			cmd.RandomRoute = false
 			cmd.NoStart = true
 			cmd.NoWait = true
+			maxInFlight := 1
+			cmd.MaxInFlight = &maxInFlight
 			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
 			cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 10, IsSet: true}}
 			cmd.PathToManifest = "/manifest/path"
@@ -1108,6 +1110,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
 			Expect(overrides.Task).To(BeTrue())
 			Expect(overrides.LogRateLimit).To(Equal("512M"))
+			Expect(*overrides.MaxInFlight).To(Equal(1))
 		})
 
 		When("a docker image is provided", func() {
@@ -1289,6 +1292,26 @@ var _ = Describe("push Command", func() {
 				Args: []string{
 					"--task", "--strategy=canary",
 				},
+			}),
+
+		Entry("max-in-flight is passed without strategy",
+			func() {
+				maxInFlight := 10
+				cmd.MaxInFlight = &maxInFlight
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--max-in-flight",
+				Arg2: "--strategy",
+			}),
+
+		Entry("max-in-flight is smaller than 1",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				maxInFlight := 0
+				cmd.MaxInFlight = &maxInFlight
+			},
+			translatableerror.IncorrectUsageError{
+				Message: "--max-in-flight must be greater than or equal to 1",
 			}),
 	)
 })

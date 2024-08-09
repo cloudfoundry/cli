@@ -188,6 +188,13 @@ func ConvertToTranslatableError(err error) error {
 			return RunTaskError{Message: "App is not staged."}
 		}
 
+		if strings.Contains(e.Message, "Unknown field(s): 'options'") {
+			return MinimumCFAPIVersionNotMetError{
+				Command:        "'--max-in-flight' flag",
+				MinimumVersion: "3.173.0",
+			}
+		}
+
 	// JSON Errors
 	case *json.SyntaxError:
 		return JSONSyntaxError{Err: e}

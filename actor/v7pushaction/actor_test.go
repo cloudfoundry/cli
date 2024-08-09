@@ -22,7 +22,7 @@ var _ = Describe("Actor", func() {
 				SetDefaultBitsPathForPushPlan,
 				SetupDropletPathForPushPlan,
 				actor.SetupAllResourcesForPushPlan,
-				SetupDeploymentStrategyForPushPlan,
+				SetupDeploymentInformationForPushPlan,
 				SetupNoStartForPushPlan,
 				SetupNoWaitForPushPlan,
 				SetupTaskAppForPushPlan,
