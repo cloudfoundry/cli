@@ -31,7 +31,7 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/moby/term v0.5.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/onsi/ginkgo/v2 v2.19.1
+	github.com/onsi/ginkgo/v2 v2.20.0
 	github.com/onsi/gomega v1.34.1
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
@@ -40,7 +40,7 @@ require (
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.26.0
-	golang.org/x/net v0.27.0
+	golang.org/x/net v0.28.0
 	golang.org/x/term v0.23.0
 	golang.org/x/text v0.17.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -65,7 +65,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/pprof v0.0.0-20240625030939-27f56978b8b0 // indirect
+	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -78,12 +78,12 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
-	golang.org/x/mod v0.19.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/oauth2 v0.17.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.23.0 // indirect
+	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de // indirect
