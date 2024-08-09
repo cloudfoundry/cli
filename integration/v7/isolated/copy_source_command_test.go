@@ -449,6 +449,7 @@ func helpText(session *Session) {
 	Eventually(session).Should(Say(`cf copy-source SOURCE_APP DESTINATION_APP \[-s TARGET_SPACE \[-o TARGET_ORG\]\] \[--no-restart\] \[--strategy STRATEGY\] \[--no-wait\]`))
 	Eventually(session).Should(Say("OPTIONS:"))
 	Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
+	Eventually(session).Should(Say(`--max-in-flight\s+Defines the maximum number of instances`))
 	Eventually(session).Should(Say(`--no-wait\s+ Exit when the first instance of the web process is healthy`))
 	Eventually(session).Should(Say(`--no-restart\s+Do not restage the destination application`))
 	Eventually(session).Should(Say(`--organization, -o\s+Org that contains the destination application`))

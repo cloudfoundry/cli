@@ -6,12 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 type RestartCommand struct {
 	BaseCommand
 
+	MaxInFlight         *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively restarted at any given time. Only applies when --strategy flag is specified."`
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
@@ -50,6 +52,11 @@ func (cmd RestartCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = cmd.ValidateFlags()
+	if err != nil {
+		return err
+	}
+
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -77,6 +84,11 @@ func (cmd RestartCommand) Execute(args []string) error {
 		NoWait:    cmd.NoWait,
 		AppAction: constant.ApplicationRestarting,
 	}
+
+	if cmd.MaxInFlight != nil {
+		opts.MaxInFlight = *cmd.MaxInFlight
+	}
+
 	if packageGUID != "" {
 		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, opts)
 		if err != nil {
@@ -87,6 +99,17 @@ func (cmd RestartCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (cmd RestartCommand) ValidateFlags() error {
+	switch true {
+	case cmd.Strategy.Name == constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil:
+		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
+	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
+		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	}
 
 	return nil

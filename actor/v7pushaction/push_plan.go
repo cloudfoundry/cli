@@ -20,6 +20,7 @@ type PushPlan struct {
 	NoStart             bool
 	NoWait              bool
 	Strategy            constant.DeploymentStrategy
+	MaxInFlight         int
 	TaskTypeApplication bool
 
 	DockerImageCredentials v7action.DockerImageCredentials
@@ -47,6 +48,7 @@ type FlagOverrides struct {
 	HealthCheckType     constant.HealthCheckType
 	Instances           types.NullInt
 	Memory              string
+	MaxInFlight         *int
 	NoStart             bool
 	NoWait              bool
 	ProvidedAppPath     string

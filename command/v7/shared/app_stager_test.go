@@ -35,6 +35,7 @@ var _ = Describe("app stager", func() {
 		organization configv3.Organization
 		pkgGUID      string
 		strategy     constant.DeploymentStrategy
+		maxInFlight  int
 		noWait       bool
 		appAction    constant.ApplicationAction
 
@@ -58,6 +59,7 @@ var _ = Describe("app stager", func() {
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
 			strategy = constant.DeploymentStrategyDefault
+			maxInFlight = 2
 			appAction = constant.ApplicationRestarting
 
 			fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
@@ -107,9 +109,10 @@ var _ = Describe("app stager", func() {
 		JustBeforeEach(func() {
 			appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
 			opts := shared.AppStartOpts{
-				Strategy:  strategy,
-				NoWait:    noWait,
-				AppAction: appAction,
+				AppAction:   appAction,
+				MaxInFlight: maxInFlight,
+				NoWait:      noWait,
+				Strategy:    strategy,
 			}
 			executeErr = appStager.StageAndStart(app, space, organization, pkgGUID, opts)
 		})
@@ -173,13 +176,8 @@ var _ = Describe("app stager", func() {
 			BeforeEach(func() {
 				strategy = constant.DeploymentStrategyRolling
 				noWait = true
+				maxInFlight = 5
 				appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
-				opts := shared.AppStartOpts{
-					Strategy:  strategy,
-					NoWait:    noWait,
-					AppAction: appAction,
-				}
-				executeErr = appStager.StageAndStart(app, space, organization, pkgGUID, opts)
 			})
 
 			It("Restages and starts the app", func() {
@@ -189,6 +187,13 @@ var _ = Describe("app stager", func() {
 				Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
 
 				Expect(testUI.Out).To(Say("First instance restaged correctly, restaging remaining in the background"))
+			})
+
+			It("creates expected deployment", func() {
+				Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1), "CreateDeployment...")
+				dep := fakeActor.CreateDeploymentArgsForCall(0)
+				Expect(dep.Options.MaxInFlight).To(Equal(5))
+				Expect(string(dep.Strategy)).To(Equal("rolling"))
 			})
 		})
 	})
@@ -344,6 +349,7 @@ var _ = Describe("app stager", func() {
 
 			strategy = constant.DeploymentStrategyDefault
 			noWait = true
+			maxInFlight = 2
 			appAction = constant.ApplicationRestarting
 
 			app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
@@ -358,9 +364,10 @@ var _ = Describe("app stager", func() {
 		JustBeforeEach(func() {
 			appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
 			opts := shared.AppStartOpts{
-				Strategy:  strategy,
-				NoWait:    noWait,
-				AppAction: appAction,
+				Strategy:    strategy,
+				NoWait:      noWait,
+				MaxInFlight: maxInFlight,
+				AppAction:   appAction,
 			}
 			executeErr = appStager.StartApp(app, space, organization, resourceGUID, opts)
 		})
@@ -399,6 +406,7 @@ var _ = Describe("app stager", func() {
 					dep := fakeActor.CreateDeploymentArgsForCall(0)
 					Expect(dep.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal(app.GUID))
 					Expect(dep.RevisionGUID).To(Equal("revision-guid"))
+					Expect(dep.Options.MaxInFlight).To(Equal(2))
 					Expect(testUI.Err).To(Say("create-deployment-warning"))
 
 					Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
@@ -408,6 +416,10 @@ var _ = Describe("app stager", func() {
 			})
 
 			When("the app starts successfully", func() {
+				BeforeEach(func() {
+					maxInFlight = 3
+				})
+
 				It("displays output for each step of deploying", func() {
 					Expect(executeErr).To(BeNil())
 
@@ -416,6 +428,7 @@ var _ = Describe("app stager", func() {
 					dep := fakeActor.CreateDeploymentArgsForCall(0)
 					Expect(dep.Relationships[constant.RelationshipTypeApplication].GUID).To(Equal(app.GUID))
 					Expect(dep.DropletGUID).To(Equal("droplet-guid"))
+					Expect(dep.Options.MaxInFlight).To(Equal(3))
 					Expect(testUI.Err).To(Say("create-deployment-warning"))
 
 					Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
@@ -627,5 +640,4 @@ var _ = Describe("app stager", func() {
 			Expect(executeErr).To(Not(HaveOccurred()))
 		})
 	})
-
 })
