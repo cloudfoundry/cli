@@ -718,8 +718,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						})
 
 						It("displays max-in-flight value", func() {
@@ -743,8 +742,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						})
 
 						It("does not display max-in-flight", func() {
@@ -752,8 +750,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 					})
 
-					// 'unset' is important for the newer-CLI-than-CAPI scenario
-					When("last status change has a timestamp and max-in-flight is unset", func() {
+					When("an older version of CAPI does not return max-in-flight", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
@@ -766,8 +763,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 						})
 
 						It("does not display max-in-flight", func() {
@@ -843,8 +839,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 						})
 
 						It("displays max-in-flight value", func() {
@@ -868,8 +863,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 						})
 
 						It("does not display max-in-flight", func() {
@@ -878,6 +872,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 				})
 			})
+
 			When("the deployment strategy is canary", func() {
 				When("the deployment is in progress", func() {
 					When("max-in-flight value is non-default", func() {
@@ -896,8 +891,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
@@ -922,8 +916,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
@@ -955,8 +948,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 						})
 
@@ -964,6 +956,7 @@ var _ = Describe("app summary displayer", func() {
 							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
 						})
 					})
+
 					When("max-in-flight value is default", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
@@ -985,8 +978,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 						})
 
@@ -1013,8 +1005,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
@@ -1022,6 +1013,7 @@ var _ = Describe("app summary displayer", func() {
 							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
 						})
 					})
+
 					When("max-in-flight value is default", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
@@ -1038,8 +1030,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							var actualOut = fmt.Sprintf("%s", testUI.Out)
-							Expect(actualOut).To(MatchRegexp(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
