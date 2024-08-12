@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -104,6 +105,51 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 
 			It("records deployment events", func() {
 				Expect(events).To(ConsistOf(StartingDeployment))
+			})
+		})
+
+		When("strategy is provided", func() {
+			BeforeEach(func() {
+				fakeV7Actor.PollStartForDeploymentCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+					handleInstanceDetails("Instances starting...")
+					return nil, nil
+				})
+
+				fakeV7Actor.CreateDeploymentReturns(
+					"some-deployment-guid",
+					v7action.Warnings{"some-deployment-warning"},
+					nil,
+				)
+				paramPlan.Strategy = "rolling"
+				paramPlan.MaxInFlight = 10
+			})
+
+			It("waits for the app to start", func() {
+				Expect(fakeV7Actor.PollStartForDeploymentCallCount()).To(Equal(1))
+				givenApp, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForDeploymentArgsForCall(0)
+				Expect(givenApp).To(Equal(resources.Application{GUID: "some-app-guid"}))
+				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
+				Expect(noWait).To(Equal(false))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
+				Expect(fakeV7Actor.CreateDeploymentCallCount()).To(Equal(1))
+				dep := fakeV7Actor.CreateDeploymentArgsForCall(0)
+				Expect(dep).To(Equal(resources.Deployment{
+					Strategy: "rolling",
+					Options:  resources.DeploymentOpts{MaxInFlight: 10},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
+					},
+				}))
+			})
+
+			It("returns errors and warnings", func() {
+				Expect(returnedPushPlan).To(Equal(paramPlan))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-deployment-warning"))
+			})
+
+			It("records deployment events", func() {
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 		})
 	})

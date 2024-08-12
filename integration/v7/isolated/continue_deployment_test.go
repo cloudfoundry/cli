@@ -87,7 +87,7 @@ var _ = Describe("Continue Deployment", func() {
 			When("There is a canary deployment", func() {
 				It("succeeds", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--no-wait").Wait()
+						helpers.CF("push", appName, "-p", appDir, "--strategy=canary").Wait()
 					})
 
 					session := helpers.CF("continue-deployment", appName)
