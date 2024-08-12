@@ -267,7 +267,7 @@ applications:
 							session := helpers.CF("restart", appName, "--strategy", "rolling")
 
 							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING."))
+							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING"))
 							Eventually(session).Should(Exit(0))
 							Eventually(session1).Should(Exit(0))
 						})
@@ -279,9 +279,11 @@ applications:
 								return helpers.CF("cancel-deployment", appName).Wait()
 							}).Should(Exit(0))
 
-							session2 := helpers.CF("app", appName)
-							Eventually(session2).Should(Say("Rolling deployment currently CANCELING."))
-							Eventually(session2).Should(Exit(0))
+							Eventually(func(g Gomega) {
+								session := helpers.CF("app", appName).Wait()
+								g.Expect(session).Should(Say("Rolling deployment currently CANCELING"))
+								g.Expect(session).Should(Exit(0))
+							  }).Should(Succeed())
 						})
 					})
 				})
@@ -292,19 +294,21 @@ applications:
 							Eventually(helpers.CF("restart", appName, "--strategy", "canary")).Should(Exit(0))
 
 							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Canary deployment currently PAUSED."))
+							Eventually(session1).Should(Say("Canary deployment currently PAUSED"))
 							Eventually(session1).Should(Exit(0))
 						})
 					})
 
 					When("the deployment is cancelled after it is paused", func() {
-						It("no deployment information is displayed", func() {
+						It("displays the message", func() {
 							Eventually(helpers.CF("restart", appName, "--strategy", "canary")).Should(Exit(0))
 							Eventually(helpers.CF("cancel-deployment", appName)).Should(Exit(0))
 
-							session2 := helpers.CF("app", appName)
-							Eventually(session2).ShouldNot(Say("Canary deployment currently CANCELING."))
-							Eventually(session2).Should(Exit(0))
+							Eventually(func(g Gomega) {
+								session := helpers.CF("app", appName).Wait()
+								g.Expect(session).Should(Say("Canary deployment currently CANCELING"))
+								g.Expect(session).Should(Exit(0))
+							  }).Should(Succeed())
 						})
 					})
 				})
