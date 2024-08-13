@@ -21,7 +21,7 @@ var _ = Describe("rollback command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("rollback", "EXPERIMENTAL COMMANDS", "Rollback to the specified revision of an app"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("rollback", "APPS", "Rollback to the specified revision of an app"))
 			})
 
 			It("Displays rollback command usage to output", func() {

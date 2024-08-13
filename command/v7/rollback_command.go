@@ -35,9 +35,6 @@ func (cmd *RollbackCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd RollbackCommand) Execute(args []string) error {
-	cmd.UI.DisplayWarning(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	targetRevision := int(cmd.Version.Value)
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
