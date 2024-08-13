@@ -25,8 +25,6 @@ type RevisionsCommand struct {
 }
 
 func (cmd RevisionsCommand) Execute(_ []string) error {
-	cmd.UI.DisplayNewline()
-
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
