@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -13,6 +14,7 @@ type RevisionCommand struct {
 }
 
 func (cmd RevisionCommand) Execute(_ []string) error {
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 	return nil
 }
