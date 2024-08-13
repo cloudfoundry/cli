@@ -17,7 +17,7 @@ var HelpCategoryList = []HelpCategory{
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
-			{"revisions"},
+			{"revisions", "rollback"},
 			{"droplets", "set-droplet", "download-droplet"},
 			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
@@ -168,7 +168,7 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "EXPERIMENTAL COMMANDS:",
 		CommandList: [][]string{
-			{"revision", "rollback"},
+			{"revision"},
 		},
 	},
 }
