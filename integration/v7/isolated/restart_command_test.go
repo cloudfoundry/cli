@@ -117,13 +117,13 @@ var _ = Describe("restart command", func() {
 				})
 			})
 
-			When("strategy canary is given", func() {
+			When("strategy canary is given without the max-in-flight flag", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 					})
 				})
-				It("creates a deploy", func() {
+				It("creates a deploy without noting max-in-flight", func() {
 					session := helpers.CF("restart", appName, "--strategy=canary")
 					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
@@ -136,6 +136,36 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
 					Eventually(session).Should(Say(instanceStatsTitles))
 					Eventually(session).Should(Say(instanceStatsValues))
+					Eventually(session).Should(Say("Canary deployment currently PAUSED"))
+					Eventually(session).ShouldNot(Say("max-in-flight"))
+					Eventually(session).Should(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("strategy canary is given with a non-default max-in-flight value", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					})
+				})
+				It("creates a deploy and notes the max-in-flight value", func() {
+					session := helpers.CF("restart", appName, "--strategy=canary", "--max-in-flight", "3")
+					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+					Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
+					Eventually(session).Should(Say(instanceStatsTitles))
+					Eventually(session).Should(Say(instanceStatsValues))
+					Eventually(session).Should(Say("Canary deployment currently PAUSED"))
+					Eventually(session).Should(Say("max-in-flight: 3"))
+					Eventually(session).Should(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
