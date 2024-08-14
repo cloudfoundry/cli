@@ -40,6 +40,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	helpers.SetupSynchronizedSuite(func() {
 		helpers.EnableFeatureFlag("diego_docker")
+		helpers.EnableFeatureFlag("diego_cnb")
 		helpers.EnableFeatureFlag("service_instance_sharing")
 	})
 
