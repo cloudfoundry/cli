@@ -30,28 +30,63 @@ var _ = Describe("push with --strategy canary", func() {
 			})
 		})
 
-		It("pushes the app and creates a new deployment", func() {
-			helpers.WithHelloWorldApp(func(appDir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
-					PushCommandName, appName, "--strategy", "canary",
-				)
+		When("the max-in-flight flag is not given", func() {
+			It("pushes the app and creates a new deployment without noting max-in-flight", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+						PushCommandName, appName, "--strategy", "canary",
+					)
 
-				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
-				Expect(session).To(Say(`Packaging files to upload\.\.\.`))
-				Expect(session).To(Say(`Uploading files\.\.\.`))
-				Expect(session).To(Say(`100.00%`))
-				Expect(session).To(Say(`Waiting for API to complete processing files\.\.\.`))
-				Expect(session).To(Say(`Staging app and tracing logs\.\.\.`))
-				Expect(session).To(Say(`Starting deployment for app %s\.\.\.`, appName))
-				Expect(session).To(Say(`Waiting for app to deploy\.\.\.`))
-				Expect(session).To(Say(`name:\s+%s`, appName))
-				Expect(session).To(Say(`requested state:\s+started`))
-				Expect(session).To(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
-				Expect(session).To(Say(`type:\s+web`))
-				Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
-				Expect(session).To(Say(`#0\s+running`))
-				Expect(session).To(Say(`Canary deployment currently PAUSED.`))
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+					Expect(session).To(Say(`Packaging files to upload\.\.\.`))
+					Expect(session).To(Say(`Uploading files\.\.\.`))
+					Expect(session).To(Say(`100.00%`))
+					Expect(session).To(Say(`Waiting for API to complete processing files\.\.\.`))
+					Expect(session).To(Say(`Staging app and tracing logs\.\.\.`))
+					Expect(session).To(Say(`Starting deployment for app %s\.\.\.`, appName))
+					Expect(session).To(Say(`Waiting for app to deploy\.\.\.`))
+					Expect(session).To(Say(`name:\s+%s`, appName))
+					Expect(session).To(Say(`requested state:\s+started`))
+					Expect(session).To(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Expect(session).To(Say(`type:\s+web`))
+					Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
+					Expect(session).To(Say(`#0\s+running`))
+					Expect(session).To(Say(`Canary deployment currently PAUSED`))
+					Expect(session).ToNot(Say("max-in-flight"))
+					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
+					Expect(session).To(Exit(0))
+				})
+			})
+		})
+
+		When("the max-in-flight flag is given with a non-default value", func() {
+			It("pushes the app and creates a new deployment and notes the max-in-flight value", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+						PushCommandName, appName, "--strategy", "canary", "--max-in-flight", "2",
+					)
+
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+					Expect(session).To(Say(`Packaging files to upload\.\.\.`))
+					Expect(session).To(Say(`Uploading files\.\.\.`))
+					Expect(session).To(Say(`100.00%`))
+					Expect(session).To(Say(`Waiting for API to complete processing files\.\.\.`))
+					Expect(session).To(Say(`Staging app and tracing logs\.\.\.`))
+					Expect(session).To(Say(`Starting deployment for app %s\.\.\.`, appName))
+					Expect(session).To(Say(`Waiting for app to deploy\.\.\.`))
+					Expect(session).To(Say(`name:\s+%s`, appName))
+					Expect(session).To(Say(`requested state:\s+started`))
+					Expect(session).To(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Expect(session).To(Say(`type:\s+web`))
+					Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
+					Expect(session).To(Say(`#0\s+running`))
+					Expect(session).To(Say(`Canary deployment currently PAUSED`))
+					Expect(session).To(Say("max-in-flight: 2"))
+					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
+					Expect(session).To(Exit(0))
+				})
 			})
 		})
 	})
