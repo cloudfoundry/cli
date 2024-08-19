@@ -232,15 +232,16 @@ applications:
 				})
 
 				When("strategy canary is given without the max-in-flight flag", func() {
-					It("restages successfully without noting max-in-flight", func() {
+					It("restages successfully and notes the max-in-flight value", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CF("restage", appName, "--strategy", "canary")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
-						Eventually(session).Should(Say("Canary deployment currently PAUSED"))
-						Eventually(session).ShouldNot(Say("max-in-flight"))
+						Eventually(session).Should(Say("Active deployment with status PAUSED"))
+						Eventually(session).Should(Say("strategy:        canary"))
+						Eventually(session).Should(Say("max-in-flight:   1"))
 						Eventually(session).Should(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 						Eventually(session).Should(Exit(0))
 					})
@@ -254,8 +255,9 @@ applications:
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
-						Eventually(session).Should(Say("Canary deployment currently PAUSED"))
-						Eventually(session).Should(Say("max-in-flight: 2"))
+						Eventually(session).Should(Say("Active deployment with status PAUSED"))
+						Eventually(session).Should(Say("strategy:        canary"))
+						Eventually(session).Should(Say("max-in-flight:   2"))
 						Eventually(session).Should(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 						Eventually(session).Should(Exit(0))
 					})
