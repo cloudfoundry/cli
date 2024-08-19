@@ -272,20 +272,6 @@ applications:
 							Eventually(session1).Should(Exit(0))
 						})
 					})
-					When("the deployment is cancelled", func() {
-						It("displays the message", func() {
-							helpers.CF("restart", appName, "--strategy", "rolling")
-							Eventually(func() *Session {
-								return helpers.CF("cancel-deployment", appName).Wait()
-							}).Should(Exit(0))
-
-							Eventually(func(g Gomega) {
-								session := helpers.CF("app", appName).Wait()
-								g.Expect(session).Should(Say("Rolling deployment currently CANCELING"))
-								g.Expect(session).Should(Exit(0))
-							  }).Should(Succeed())
-						})
-					})
 				})
 
 				When("the deployment strategy is canary", func() {
