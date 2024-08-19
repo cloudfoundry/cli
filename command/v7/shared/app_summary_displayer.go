@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,8 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 type AppSummaryDisplayer struct {
@@ -58,7 +57,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 		}
 	}
 
-	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
+	display.UI.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
 
 	if summary.LifecycleType == constant.AppLifecycleTypeBuildpack {
 		display.displayBuildpackTable(summary.CurrentDroplet.Buildpacks)
@@ -153,7 +152,7 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 			startCommandRow,
 		}
 
-		display.UI.DisplayKeyValueTable("", keyValueTable, 3)
+		display.UI.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
 
 		if len(process.InstanceDetails) == 0 {
 			display.UI.DisplayText("There are no running instances of this process.")
@@ -166,10 +165,18 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 		display.UI.DisplayNewline()
 		display.UI.DisplayText(display.getDeploymentStatusText(summary))
 
+		var maxInFlightRow []string
 		var maxInFlight = summary.Deployment.Options.MaxInFlight
-		if maxInFlight > 0 && maxInFlight != constant.DeploymentMaxInFlightDefaultValue {
-			display.UI.DisplayText(fmt.Sprintf("max-in-flight: %d", maxInFlight))
+		if maxInFlight > 0 {
+			maxInFlightRow = append(maxInFlightRow, display.UI.TranslateText("max-in-flight:"), strconv.Itoa(maxInFlight))
 		}
+
+		keyValueTable := [][]string{
+			{display.UI.TranslateText("strategy:"), strings.ToLower(string(summary.Deployment.Strategy))},
+			maxInFlightRow,
+		}
+
+		display.UI.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
 
 		if summary.Deployment.Strategy == constant.DeploymentStrategyCanary && summary.Deployment.StatusReason == constant.DeploymentStatusReasonPaused {
 			display.UI.DisplayNewline()
@@ -181,13 +188,11 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 func (display AppSummaryDisplayer) getDeploymentStatusText(summary v7action.DetailedApplicationSummary) string {
 	var lastStatusChangeTime = display.getLastStatusChangeTime(summary)
 	if lastStatusChangeTime != "" {
-		return fmt.Sprintf("%s deployment currently %s (since %s)",
-			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+		return fmt.Sprintf("Active deployment with status %s (since %s)",
 			summary.Deployment.StatusReason,
 			lastStatusChangeTime)
 	} else {
-		return fmt.Sprintf("%s deployment currently %s.",
-			cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
+		return fmt.Sprintf("Active deployment with status %s.",
 			summary.Deployment.StatusReason)
 	}
 }
