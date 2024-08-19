@@ -264,13 +264,15 @@ applications:
 				When("the deployment strategy is rolling", func() {
 					When("the deployment is in progress", func() {
 						It("displays the message", func() {
-							session := helpers.CF("restart", appName, "--strategy", "rolling")
+							restartSession := helpers.CF("restart", appName, "--strategy", "rolling")
 
-							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Active deployment with status DEPLOYING"))
-							Eventually(session1).Should(Say("strategy:        rolling"))
-							Eventually(session).Should(Exit(0))
-							Eventually(session1).Should(Exit(0))
+							Eventually(func(g Gomega) {
+								session := helpers.CF("app", appName).Wait()
+								g.Expect(session).Should(Say("Active deployment with status DEPLOYING"))
+								g.Expect(session).Should(Say("strategy:        rolling"))
+								g.Expect(session).Should(Exit(0))
+							  }).Should(Succeed())
+							Eventually(restartSession).Should(Exit(0))
 						})
 					})
 				})
