@@ -215,7 +215,7 @@ var _ = Describe("Continue deployment command", func() {
 						It("polls and waits", func() {
 							Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
 
-							var invokedApplication, invokedGuid, invokedNoWait, _ = fakeActor.PollStartForDeploymentArgsForCall(0)
+							invokedApplication, invokedGuid, invokedNoWait, _ := fakeActor.PollStartForDeploymentArgsForCall(0)
 							Expect(invokedApplication).To(Equal(returnedApplication))
 							Expect(invokedGuid).To(Equal(deploymentGUID))
 							Expect(invokedNoWait).To(Equal(false))
@@ -230,7 +230,7 @@ var _ = Describe("Continue deployment command", func() {
 						It("polls without waiting", func() {
 							Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
 
-							var invokedApplication, invokedGuid, invokedNoWait, _ = fakeActor.PollStartForDeploymentArgsForCall(0)
+							invokedApplication, invokedGuid, invokedNoWait, _ := fakeActor.PollStartForDeploymentArgsForCall(0)
 							Expect(invokedApplication).To(Equal(returnedApplication))
 							Expect(invokedGuid).To(Equal(deploymentGUID))
 							Expect(invokedNoWait).To(Equal(true))
