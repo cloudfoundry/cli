@@ -45,6 +45,7 @@ var _ = Describe("Continue deployment command", func() {
 
 		cmd = ContinueDeploymentCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
+			NoWait:       noWait,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -68,7 +69,6 @@ var _ = Describe("Continue deployment command", func() {
 	})
 
 	JustBeforeEach(func() {
-		cmd.NoWait = noWait
 		executeErr = cmd.Execute(nil)
 	})
 
@@ -208,10 +208,6 @@ var _ = Describe("Continue deployment command", func() {
 					})
 
 					When("the --no-wait flag is not provided", func() {
-						BeforeEach(func() {
-							noWait = false
-						})
-
 						It("polls and waits", func() {
 							Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
 
@@ -224,7 +220,7 @@ var _ = Describe("Continue deployment command", func() {
 
 					When("the --no-wait flag is provided", func() {
 						BeforeEach(func() {
-							noWait = true
+							cmd.NoWait = true
 						})
 
 						It("polls without waiting", func() {
