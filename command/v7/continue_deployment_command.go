@@ -9,7 +9,8 @@ type ContinueDeploymentCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
-	usage           interface{}  `usage:"CF_NAME continue-deployment APP_NAME\n\nEXAMPLES:\n   cf continue-deployment my-app"`
+	NoWait          bool         `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
+	usage           interface{}  `usage:"CF_NAME continue-deployment APP_NAME [--no-wait]\n\nEXAMPLES:\n   cf continue-deployment my-app"`
 	relatedCommands interface{}  `related_commands:"app, push"`
 }
 
@@ -58,7 +59,7 @@ func (cmd *ContinueDeploymentCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	warnings, err = cmd.Actor.PollStartForDeployment(application, deployment.GUID, false, handleInstanceDetails)
+	warnings, err = cmd.Actor.PollStartForDeployment(application, deployment.GUID, cmd.NoWait, handleInstanceDetails)
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
