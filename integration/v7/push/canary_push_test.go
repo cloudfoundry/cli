@@ -31,7 +31,7 @@ var _ = Describe("push with --strategy canary", func() {
 		})
 
 		When("the max-in-flight flag is not given", func() {
-			It("pushes the app and creates a new deployment without noting max-in-flight", func() {
+			It("pushes the app and creates a new deployment and notes the max-in-flight value", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
 						PushCommandName, appName, "--strategy", "canary",
@@ -52,8 +52,9 @@ var _ = Describe("push with --strategy canary", func() {
 					Expect(session).To(Say(`type:\s+web`))
 					Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
 					Expect(session).To(Say(`#0\s+running`))
-					Expect(session).To(Say(`Canary deployment currently PAUSED`))
-					Expect(session).ToNot(Say("max-in-flight"))
+					Expect(session).To(Say("Active deployment with status PAUSED"))
+					Expect(session).To(Say("strategy:        canary"))
+					Expect(session).To(Say("max-in-flight:   1"))
 					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 					Expect(session).To(Exit(0))
 				})
@@ -82,8 +83,9 @@ var _ = Describe("push with --strategy canary", func() {
 					Expect(session).To(Say(`type:\s+web`))
 					Expect(session).To(Say(`start command:\s+%s`, helpers.StaticfileBuildpackStartCommand))
 					Expect(session).To(Say(`#0\s+running`))
-					Expect(session).To(Say(`Canary deployment currently PAUSED`))
-					Expect(session).To(Say("max-in-flight: 2"))
+					Expect(session).To(Say("Active deployment with status PAUSED"))
+					Expect(session).To(Say("strategy:        canary"))
+					Expect(session).To(Say("max-in-flight:   2"))
 					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 					Expect(session).To(Exit(0))
 				})

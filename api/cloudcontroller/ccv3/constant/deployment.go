@@ -31,5 +31,3 @@ const (
 	DeploymentStatusValueActive    DeploymentStatusValue = "ACTIVE"
 	DeploymentStatusValueFinalized DeploymentStatusValue = "FINALIZED"
 )
-
-const DeploymentMaxInFlightDefaultValue int = 1

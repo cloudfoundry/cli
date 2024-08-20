@@ -264,12 +264,15 @@ applications:
 				When("the deployment strategy is rolling", func() {
 					When("the deployment is in progress", func() {
 						It("displays the message", func() {
-							session := helpers.CF("restart", appName, "--strategy", "rolling")
+							restartSession := helpers.CF("restart", appName, "--strategy", "rolling")
 
-							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Rolling deployment currently DEPLOYING"))
-							Eventually(session).Should(Exit(0))
-							Eventually(session1).Should(Exit(0))
+							Eventually(func(g Gomega) {
+								session := helpers.CF("app", appName).Wait()
+								g.Expect(session).Should(Say("Active deployment with status DEPLOYING"))
+								g.Expect(session).Should(Say("strategy:        rolling"))
+								g.Expect(session).Should(Exit(0))
+							  }).Should(Succeed())
+							Eventually(restartSession).Should(Exit(0))
 						})
 					})
 				})
@@ -280,7 +283,8 @@ applications:
 							Eventually(helpers.CF("restart", appName, "--strategy", "canary")).Should(Exit(0))
 
 							session1 := helpers.CF("app", appName)
-							Eventually(session1).Should(Say("Canary deployment currently PAUSED"))
+							Eventually(session1).Should(Say("Active deployment with status PAUSED"))
+							Eventually(session1).Should(Say("strategy:        canary"))
 							Eventually(session1).Should(Exit(0))
 						})
 					})
@@ -292,7 +296,8 @@ applications:
 
 							Eventually(func(g Gomega) {
 								session := helpers.CF("app", appName).Wait()
-								g.Expect(session).Should(Say("Canary deployment currently CANCELING"))
+								g.Expect(session).Should(Say("Active deployment with status CANCELING"))
+								g.Expect(session).Should(Say("strategy:        canary"))
 								g.Expect(session).Should(Exit(0))
 							  }).Should(Succeed())
 						})
@@ -310,7 +315,7 @@ applications:
 				It("doesn not display the message", func() {
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Exit(0))
-					Eventually(session).ShouldNot(Say(`\w+ deployment currently \w+`))
+					Eventually(session).ShouldNot(Say(`Active deployment with status \w+`))
 				})
 			})
 		})

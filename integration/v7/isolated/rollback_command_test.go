@@ -157,14 +157,15 @@ applications:
 								Expect(err).ToNot(HaveOccurred())
 							})
 
-							It("uses the given strategy to rollback without noting max-in-flight", func() {
+							It("uses the given strategy to rollback and notes the max-in-flight value", func() {
 								session := helpers.CFWithStdin(buffer, "rollback", appName, "--version", "1", "--strategy", "canary")
 								Eventually(session).Should(Exit(0))
 
 								Expect(session).To(HaveRollbackPrompt())
 								Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))
-								Expect(session).To(Say("Canary deployment currently PAUSED"))
-								Expect(session).NotTo(Say("max-in-flight"))
+								Expect(session).To(Say("Active deployment with status PAUSED"))
+								Expect(session).To(Say("strategy:        canary"))
+								Expect(session).To(Say("max-in-flight:   1"))
 								Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 								Expect(session).To(Say("OK"))
 							})
@@ -182,8 +183,9 @@ applications:
 
 								Expect(session).To(HaveRollbackPrompt())
 								Expect(session).To(HaveRollbackOutput(appName, orgName, spaceName, userName))
-								Expect(session).To(Say("Canary deployment currently PAUSED"))
-								Expect(session).To(Say("max-in-flight: 2"))
+								Expect(session).To(Say("Active deployment with status PAUSED"))
+								Expect(session).To(Say("strategy:        canary"))
+								Expect(session).To(Say("max-in-flight:   2"))
 								Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 								Expect(session).To(Say("OK"))
 							})

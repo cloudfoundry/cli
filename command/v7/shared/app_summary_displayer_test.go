@@ -1,7 +1,6 @@
 package shared_test
 
 import (
-	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -14,8 +13,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 var _ = Describe("app summary displayer", func() {
@@ -718,11 +715,12 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -742,11 +740,9 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 						})
 					})
 
@@ -763,11 +759,9 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:   rolling`))
+							Expect(testUI.Out).ToNot(Say(`max-in-flight`))
 						})
 					})
 
@@ -787,12 +781,13 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING`))
 							Expect(testUI.Out).NotTo(Say(`\(since`))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -812,12 +807,10 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently DEPLOYING`))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING`))
 							Expect(testUI.Out).NotTo(Say(`\(since`))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 						})
 					})
 				})
@@ -839,11 +832,12 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -863,11 +857,9 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Rolling deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+							Expect(testUI.Out).To(Say(`Active deployment with status CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        rolling`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 						})
 					})
 				})
@@ -891,12 +883,13 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -916,12 +909,10 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status DEPLOYING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 						})
 					})
 				})
@@ -948,12 +939,13 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
 							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -978,12 +970,10 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status PAUSED \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 							Expect(testUI.Out).To(Say("Please run `cf continue-deployment foobar` to promote the canary deployment, or `cf cancel-deployment foobar` to rollback to the previous version."))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
 						})
 					})
 				})
@@ -1005,12 +995,13 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
 						})
 
 						It("displays max-in-flight value", func() {
-							Expect(testUI.Out).To(Say(`max-in-flight: 2`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
 					})
 
@@ -1030,12 +1021,10 @@ var _ = Describe("app summary displayer", func() {
 						})
 
 						It("displays the message", func() {
-							Expect(testUI.Out).To(Say(`Canary deployment currently CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`Active deployment with status CANCELING \(since %s\)`, dateTimeRegexPattern))
+							Expect(testUI.Out).To(Say(`strategy:        canary`))
+							Expect(testUI.Out).To(Say(`max-in-flight:   1`))
 							Expect(testUI.Out).NotTo(Say(`promote the canary deployment`))
-						})
-
-						It("does not display max-in-flight", func() {
-							Expect(testUI.Out).NotTo(Say(`max-in-flight`))
 						})
 					})
 				})
@@ -1054,9 +1043,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display deployment info", func() {
-				Expect(testUI.Out).NotTo(Say(fmt.Sprintf("%s deployment currently %s",
-					cases.Title(language.English, cases.NoLower).String(string(summary.Deployment.Strategy)),
-					summary.Deployment.StatusReason)))
+				Expect(testUI.Out).NotTo(Say(`Active deployment with status`))
 			})
 
 			It("does not display max-in-flight", func() {
