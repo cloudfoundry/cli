@@ -23,21 +23,22 @@ var _ = Describe("Continue Deployment", func() {
 
 		It("displays the help information", func() {
 			session := helpers.CF("continue-deployment", "--help")
+			Eventually(session).Should(Say(`NAME:`))
+			Eventually(session).Should(Say(`continue-deployment - Continue the most recent deployment for an app.\n`))
+			Eventually(session).Should(Say(`\n`))
 
-			Eventually(session).Should(Say(`NAME:
-   continue-deployment - Continue the most recent deployment for an app.
+			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`cf continue-deployment APP_NAME\n`))
+			Eventually(session).Should(Say(`\n`))
 
-USAGE:
-   cf continue-deployment APP_NAME [--no-wait]
+			Eventually(session).Should(Say(`EXAMPLES:`))
+			Eventually(session).Should(Say(`cf continue-deployment my-app\n`))
+			Eventually(session).Should(Say(`\n`))
 
-EXAMPLES:
-   cf continue-deployment my-app
+			Eventually(session).Should(Say(`SEE ALSO:`))
+			Eventually(session).Should(Say(`app, push`))
 
-OPTIONS:
-   --no-wait      Exit when the first instance of the web process is healthy
-
-SEE ALSO:
-   app, push`))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
