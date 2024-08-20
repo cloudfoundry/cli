@@ -28,11 +28,15 @@ var _ = Describe("Continue Deployment", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`cf continue-deployment APP_NAME\n`))
+			Eventually(session).Should(Say(`cf continue-deployment APP_NAME \[--no-wait\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf continue-deployment my-app\n`))
+			Eventually(session).Should(Say(`\n`))
+
+			Eventually(session).Should(Say(`OPTIONS:`))
+			Eventually(session).Should(Say(`--no-wait\s+Exit when the first instance of the web process is healthy`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
