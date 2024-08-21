@@ -30,13 +30,13 @@ var _ = Describe("restart-app-instance command", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("restart-app-instance", "APPS", "Terminate, then instantiate an app instance"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("restart-app-instance", "APPS", "Stop, then start application instance without updating application environment"))
 		})
 
 		It("Displays command usage to output", func() {
 			session := helpers.CF("restart-app-instance", "--help")
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("restart-app-instance - Terminate, then instantiate an app instance"))
+			Eventually(session).Should(Say("restart-app-instance - Stop, then start application instance without updating application environment"))
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`cf restart-app-instance APP_NAME INDEX [--process PROCESS]`))
 			Eventually(session).Should(Say(`OPTIONS:`))
