@@ -59,7 +59,7 @@ var _ = Describe("create-app command", func() {
 		It("tells the user that the app type is incorrect, prints help text, and exits 1", func() {
 			session := helpers.CF("create-app", appName, "--app-type", "unknown-app-type")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `unknown-app-type' for option `--app-type'. Allowed values are: buildpack or docker"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `unknown-app-type' for option `--app-type'. Allowed values are: buildpack, docker or cnb"))
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
