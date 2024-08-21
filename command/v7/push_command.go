@@ -378,7 +378,6 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 func (cmd PushCommand) ValidateFlags() error {
 	switch {
 	// Lifecycle buildpack requested
-
 	case cmd.Lifecycle == constant.AppLifecycleTypeBuildpack && cmd.DockerImage.Path != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -396,7 +395,6 @@ func (cmd PushCommand) ValidateFlags() error {
 		}
 
 	// Lifecycle docker requested
-
 	case cmd.Lifecycle == constant.AppLifecycleTypeDocker && cmd.Buildpacks != nil:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -421,7 +419,6 @@ func (cmd PushCommand) ValidateFlags() error {
 		}
 
 	// Lifecycle cnb requested
-
 	case cmd.Lifecycle == constant.AppLifecycleTypeCNB && cmd.DockerImage.Path != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{

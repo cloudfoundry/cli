@@ -12,7 +12,6 @@ func HandleCNBCredentialsOverride(manifest manifestparser.Manifest, overrides Fl
 		}
 
 		app := manifest.GetFirstApp()
-
 		if app.RemainingManifestFields == nil {
 			app.RemainingManifestFields = map[string]interface{}{}
 		}
