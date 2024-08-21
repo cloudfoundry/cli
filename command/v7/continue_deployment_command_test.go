@@ -28,6 +28,7 @@ var _ = Describe("Continue deployment command", func() {
 		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		appName         string
+		noWait          bool
 		spaceGUID       string
 		executeErr      error
 	)
@@ -44,6 +45,7 @@ var _ = Describe("Continue deployment command", func() {
 
 		cmd = ContinueDeploymentCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
+			NoWait:       noWait,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -126,10 +128,13 @@ var _ = Describe("Continue deployment command", func() {
 
 		When("getting the app succeeds", func() {
 			var appGUID string
+			var returnedApplication resources.Application
+
 			BeforeEach(func() {
 				appGUID = "some-app-guid"
+				returnedApplication = resources.Application{Name: appName, GUID: appGUID}
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					resources.Application{Name: appName, GUID: appGUID},
+					returnedApplication,
 					v7action.Warnings{"get-app-warning"},
 					nil,
 				)
@@ -200,6 +205,32 @@ var _ = Describe("Continue deployment command", func() {
 
 					It("returns success", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
+					})
+
+					When("the --no-wait flag is not provided", func() {
+						It("polls and waits", func() {
+							Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
+
+							invokedApplication, invokedGuid, invokedNoWait, _ := fakeActor.PollStartForDeploymentArgsForCall(0)
+							Expect(invokedApplication).To(Equal(returnedApplication))
+							Expect(invokedGuid).To(Equal(deploymentGUID))
+							Expect(invokedNoWait).To(Equal(false))
+						})
+					})
+
+					When("the --no-wait flag is provided", func() {
+						BeforeEach(func() {
+							cmd.NoWait = true
+						})
+
+						It("polls without waiting", func() {
+							Expect(fakeActor.PollStartForDeploymentCallCount()).To(Equal(1))
+
+							invokedApplication, invokedGuid, invokedNoWait, _ := fakeActor.PollStartForDeploymentArgsForCall(0)
+							Expect(invokedApplication).To(Equal(returnedApplication))
+							Expect(invokedGuid).To(Equal(deploymentGUID))
+							Expect(invokedNoWait).To(Equal(true))
+						})
 					})
 
 					When("polling the application fails", func() {
