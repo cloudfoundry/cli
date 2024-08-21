@@ -53,6 +53,7 @@ var _ = Describe("HandleCNBCredentialsOverride", func() {
 		BeforeEach(func() {
 			overrides.CNBCredentials = nil
 		})
+
 		It("does not add it to the raw manifest", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(transformedManifest).To(Equal(manifestparser.Manifest{

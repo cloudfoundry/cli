@@ -12,7 +12,6 @@ func HandleLifecycleOverride(manifest manifestparser.Manifest, overrides FlagOve
 		}
 
 		app := manifest.GetFirstApp()
-
 		app.Lifecycle = overrides.Lifecycle
 	}
 
