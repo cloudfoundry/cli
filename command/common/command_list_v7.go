@@ -125,7 +125,7 @@ type commandList struct {
 	Rollback                           v7.RollbackCommand                           `command:"rollback" description:"Rollback to the specified revision of an app"`
 	StagePackage                       v7.StagePackageCommand                       `command:"stage-package" alias:"stage" description:"Stage a package into a droplet"`
 	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again."`
-	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
+	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Stop, then start application instance without updating application environment"`
 	RouterGroups                       v7.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
 	Route                              v7.RouteCommand                              `command:"route" alias:"ro" description:"Display route details and mapped destinations"`
 	Routes                             v7.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
