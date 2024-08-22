@@ -152,8 +152,8 @@ var _ = Describe("start command", func() {
 		logRepo = new(logsfakes.FakeRepository)
 		logMessages.Store([]logs.Loggable{})
 
-		closeWait := sync.WaitGroup{}
-		closeWait.Add(1)
+		m := sync.Mutex{}
+		m.Lock()
 
 		logRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 			onConnect()
@@ -163,13 +163,13 @@ var _ = Describe("start command", func() {
 					logChan <- log
 				}
 
-				closeWait.Wait()
+				m.Lock()
 				close(logChan)
 			}()
 		}
 
 		logRepo.CloseStub = func() {
-			closeWait.Done()
+			m.Unlock()
 		}
 	})
 
