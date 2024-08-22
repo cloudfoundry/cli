@@ -53,4 +53,4 @@ jobs:
         go-version-file: go.mod
         check-latest: true
     - name: Run go fmt
-      run: go fmt && git diff --exit-code
+      run: make format && git diff --exit-code
