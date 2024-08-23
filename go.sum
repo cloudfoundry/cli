@@ -6,8 +6,8 @@ code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8 h1:U9t+
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8/go.mod h1:cf3zRgfxIBUHx8FmX9SgiQ0QWVxRsH+begnYUdigZag=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4 h1:O+j8afQWaDuxzKGcculsjgHGK+biBTn6iMjgFpBf54c=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4/go.mod h1:dVTgo9kQbYns/QM4A1C2GtxqUnFSvJTk2Qhw+M0/uzk=
-code.cloudfoundry.org/clock v1.3.0 h1:0P9zWwt9eSCHYTFWSCT7FkX21x/dEDHKTlSbvJG80RI=
-code.cloudfoundry.org/clock v1.3.0/go.mod h1:U4uytQbm9TLDZh+pwNaIKBINM1FIgHPQuH0IewhtNMk=
+code.cloudfoundry.org/clock v1.4.0 h1:yzDh3Zji/fvxQCxwpvtJOo8NhXLLw9ikInoWrhYiFTE=
+code.cloudfoundry.org/clock v1.4.0/go.mod h1:MCgDYOoZzZIIxNtWLf2A8/2vV+6d0tCcmAK8y9yNkqg=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82 h1:Bns1y0jSlcvfP0u8ael+TUlnyNHsNX808zuo58bf5so=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82/go.mod h1:L2/glHnSK+wKnsG8oZZqdV2sgYY9NDo/I1aDJGhcWaM=
 code.cloudfoundry.org/go-log-cache/v2 v2.0.7 h1:yR/JjQ/RscO1n4xVAT9HDYcpx5ET/3Cq2/RhpJml6ZU=
@@ -239,8 +239,8 @@ golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDf
 golang.org/x/crypto v0.21.0/go.mod h1:0BP7YvVV9gBbVKyeTG0Gyn+gZm94bibOW5BjDEYAOMs=
 golang.org/x/crypto v0.26.0 h1:RrRspgV4mU+YwB4FYnuBoKsUapNIL5cohGAmSH3azsw=
 golang.org/x/crypto v0.26.0/go.mod h1:GY7jblb9wI+FOo5y8/S2oY4zWP07AkOJ4+jxCqdqn54=
-golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa h1:ELnwvuAXPNtPk1TJRuGkI9fDTwym6AYBu0qzT8AcHdI=
-golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa/go.mod h1:akd2r19cwCdwSwWeIdzYQGa/EZZyqcOdwWiwj5L5eKQ=
+golang.org/x/exp v0.0.0-20240822175202-778ce7bba035 h1:VkSUcpKXdGwUpn/JsiWXwSNnIJVXRfMA4ThL5vwljWg=
+golang.org/x/exp v0.0.0-20240822175202-778ce7bba035/go.mod h1:akd2r19cwCdwSwWeIdzYQGa/EZZyqcOdwWiwj5L5eKQ=
 golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e/go.mod h1:AbB0pIl9nAr9wVwH+Z2ZpaocVmF5I4GyWCDIsVjR0bk=
 golang.org/x/mod v0.0.0-20190513183733-4bf6d317e70e/go.mod h1:mXi4GBBbnImb6dmsKGUJ2LatrhH/nqhxcFungHvyanc=
 golang.org/x/mod v0.3.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
