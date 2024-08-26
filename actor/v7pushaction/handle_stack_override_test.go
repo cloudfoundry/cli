@@ -51,7 +51,7 @@ var _ = Describe("HandleStackOverride", func() {
 
 				originalManifest.Applications = []manifestparser.Application{
 					{
-						Stack: "cflinuxfs3",
+						Stack: "cflinuxfs4",
 					},
 				}
 			})

@@ -31,7 +31,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf unset-label app dora ci_signature_sha2`))
 			Eventually(session).Should(Say(`\s+cf unset-label org business pci public-facing`))
-			Eventually(session).Should(Say(`\s+cf unset-label buildpack go_buildpack go -s cflinuxfs3`))
+			Eventually(session).Should(Say(`\s+cf unset-label buildpack go_buildpack go -s cflinuxfs4`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))

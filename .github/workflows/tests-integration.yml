@@ -13,7 +13,6 @@ on:
           - all
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
-          # - run-integration-tests-cf-env-with-min-capi
           - run-cats-cf-env
   push:
     tags:
@@ -73,7 +72,6 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
@@ -88,29 +86,11 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
       name: Integration client creds
       gitRef: ${{needs.get-sha.outputs.gitRef}}
     secrets: inherit
-
-  # run-integration-tests-cf-env-with-min-capi:
-  #   name: MIN CAPI
-  #   needs:
-  #     - get-sha
-  #     - units
-  #   if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
-  #   uses: ./.github/workflows/tests-integration-reusable.yml
-  #   with:
-  #     capi-version: min
-  #     run-with-client-creds: false
-  #     os: ubuntu-latest
-  #     name: Integration MIN CAPI
-  #     pool-name: cfd_16_11_0
-  #     pool-namespace: tas-devex
-  #     is-pr: ${{ github.event_name != 'workflow_dispatch' }}
-  #   secrets: inherit
 
   run-cats-cf-env:
     name: CATS
@@ -121,7 +101,6 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: cats

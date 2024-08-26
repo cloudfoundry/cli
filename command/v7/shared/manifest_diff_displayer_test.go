@@ -66,7 +66,7 @@ applications:
     parameters:
       key1: value1
       key2: value2
-  stack: cflinuxfs3
+  stack: cflinuxfs4
   metadata:
     annotations:
       contact: "bob@example.com jane@example.com"
@@ -112,7 +112,7 @@ applications:
       parameters:
         key1: value1
         key2: value2
-    stack: cflinuxfs3
+    stack: cflinuxfs4
     metadata:
       annotations:
         contact: "bob@example.com jane@example.com"
@@ -379,7 +379,7 @@ applications:
     parameters:
       key1: value1
       key2: value2
-  stack: cflinuxfs3
+  stack: cflinuxfs4
   metadata:
     annotations:
       contact: "bob@example.com jane@example.com"
@@ -426,7 +426,7 @@ applications:
       parameters:
         key1: value1
         key2: value2
-    stack: cflinuxfs3
+    stack: cflinuxfs4
     metadata:
       annotations:
         contact: bob@example.com jane@example.com

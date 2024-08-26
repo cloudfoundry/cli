@@ -116,7 +116,7 @@ func (cmd LabelsCommand) Examples() string {
 	return `
 cf labels app dora
 cf labels org business
-cf labels buildpack go_buildpack --stack cflinuxfs3`
+cf labels buildpack go_buildpack --stack cflinuxfs4`
 }
 
 func (cmd LabelsCommand) Resources() string {

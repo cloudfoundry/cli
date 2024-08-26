@@ -73,7 +73,7 @@ var _ = Describe("labels command", func() {
 			"Failure when --stack is combined with anything other than 'buildpack'",
 			func(resourceType string) {
 				cmd.RequiredArgs.ResourceType = resourceType
-				cmd.BuildpackStack = "cflinuxfs3"
+				cmd.BuildpackStack = "cflinuxfs4"
 
 				executeErr = cmd.Execute(nil)
 
@@ -751,14 +751,14 @@ var _ = Describe("labels command", func() {
 						ResourceType: "buildpack",
 						ResourceName: "oshkosh",
 					}
-					cmd.BuildpackStack = "cflinuxfs3"
+					cmd.BuildpackStack = "cflinuxfs4"
 				})
 				It("retrieves the labels when resource type is buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
 					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
 					Expect(buildpackName).To(Equal("oshkosh"))
-					Expect(stackName).To(Equal("cflinuxfs3"))
+					Expect(stackName).To(Equal("cflinuxfs4"))
 				})
 			})
 		})

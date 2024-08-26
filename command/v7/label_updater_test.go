@@ -131,7 +131,7 @@ var _ = Describe("LabelUpdater", func() {
 			func(resourceType string) {
 				targetResource = TargetResource{
 					ResourceType:   resourceType,
-					BuildpackStack: "cflinuxfs3",
+					BuildpackStack: "cflinuxfs4",
 				}
 
 				err := cmd.Execute(targetResource, nil)
