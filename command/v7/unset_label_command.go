@@ -64,7 +64,7 @@ func (cmd UnsetLabelCommand) Examples() string {
 	return `
 cf unset-label app dora ci_signature_sha2
 cf unset-label org business pci public-facing
-cf unset-label buildpack go_buildpack go -s cflinuxfs3`
+cf unset-label buildpack go_buildpack go -s cflinuxfs4`
 }
 
 func (cmd UnsetLabelCommand) Resources() string {

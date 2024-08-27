@@ -615,7 +615,7 @@ var _ = Describe("app summary displayer", func() {
 						},
 					},
 					CurrentDroplet: resources.Droplet{
-						Stack: "cflinuxfs2",
+						Stack: "cflinuxfs4",
 						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:          "ruby_buildpack",
@@ -645,7 +645,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays stack and buildpacks", func() {
-				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2\n`))
+				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs4\n`))
 				Expect(testUI.Out).To(Say(`buildpacks:\s+\n`))
 				Expect(testUI.Out).To(Say(`name\s+version\s+detect output\s+buildpack name\n`))
 				Expect(testUI.Out).To(Say(`ruby_buildpack\s+0.0.1\s+some-detect-output\s+ruby_buildpack_name\n`))

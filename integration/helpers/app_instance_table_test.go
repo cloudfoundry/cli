@@ -15,7 +15,7 @@ Showing health and status for app dora in org wut / space wut as admin...
 name:              dora
 requested state:   started
 routes:            dora.bosh-lite.com
-stack:             cflinuxfs2
+stack:             cflinuxfs4
 buildpacks:        ruby 1.6.44
 
 type:         web

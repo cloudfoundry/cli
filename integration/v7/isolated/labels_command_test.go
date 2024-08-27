@@ -32,7 +32,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
 			Eventually(session).Should(Say(`\s+cf labels org business`))
-			Eventually(session).Should(Say(`\s+cf labels buildpack go_buildpack --stack cflinuxfs3`))
+			Eventually(session).Should(Say(`\s+cf labels buildpack go_buildpack --stack cflinuxfs4`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
@@ -184,12 +184,12 @@ var _ = Describe("labels command", func() {
 
 				When("the buildpack is bound to a stack", func() {
 					BeforeEach(func() {
-						helpers.SetupBuildpackWithStack(buildpackName, "cflinuxfs3")
-						session := helpers.CF("set-label", "buildpack", buildpackName, "-s", "cflinuxfs3", "some-other-key=some-other-value", "some-key=some-value")
+						helpers.SetupBuildpackWithStack(buildpackName, "cflinuxfs4")
+						session := helpers.CF("set-label", "buildpack", buildpackName, "-s", "cflinuxfs4", "some-other-key=some-other-value", "some-key=some-value")
 						Eventually(session).Should(Exit(0))
 					})
 					AfterEach(func() {
-						session := helpers.CF("delete-buildpack", buildpackName, "-f", "-s", "cflinuxfs3")
+						session := helpers.CF("delete-buildpack", buildpackName, "-f", "-s", "cflinuxfs4")
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -203,8 +203,8 @@ var _ = Describe("labels command", func() {
 					})
 
 					It("lists the labels when the stack is specified", func() {
-						session := helpers.CF("labels", "buildpack", buildpackName, "-s", "cflinuxfs3")
-						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack %s as %s...\n\n"), buildpackName, "cflinuxfs3", username))
+						session := helpers.CF("labels", "buildpack", buildpackName, "-s", "cflinuxfs4")
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack %s as %s...\n\n"), buildpackName, "cflinuxfs4", username))
 						Eventually(session).Should(Say(`key\s+value`))
 						Eventually(session).Should(Say(`some-key\s+some-value`))
 						Eventually(session).Should(Say(`some-other-key\s+some-other-value`))
@@ -229,16 +229,16 @@ var _ = Describe("labels command", func() {
 					newStackName = helpers.NewStackName()
 					helpers.CreateStack(newStackName)
 					helpers.SetupBuildpackWithStack(buildpackName, newStackName)
-					helpers.SetupBuildpackWithStack(buildpackName, "cflinuxfs3")
+					helpers.SetupBuildpackWithStack(buildpackName, "cflinuxfs4")
 					session := helpers.CF("set-label", "buildpack", buildpackName, "-s", newStackName,
 						"my-stack-some-other-key=some-other-value", "some-key=some-value")
 					Eventually(session).Should(Exit(0))
-					session = helpers.CF("set-label", "buildpack", buildpackName, "--stack", "cflinuxfs3",
+					session = helpers.CF("set-label", "buildpack", buildpackName, "--stack", "cflinuxfs4",
 						"cfl2=var2", "cfl1=var1")
 					Eventually(session).Should(Exit(0))
 				})
 				AfterEach(func() {
-					session := helpers.CF("delete-buildpack", buildpackName, "-f", "-s", "cflinuxfs3")
+					session := helpers.CF("delete-buildpack", buildpackName, "-f", "-s", "cflinuxfs4")
 					Eventually(session).Should(Exit(0))
 					session = helpers.CF("delete-buildpack", buildpackName, "-f", "-s", newStackName)
 					Eventually(session).Should(Exit(0))
@@ -275,9 +275,9 @@ var _ = Describe("labels command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				It("lists the labels for buildpackName/cflinuxfs3", func() {
-					session := helpers.CF("labels", "buildpack", buildpackName, "--stack", "cflinuxfs3")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack cflinuxfs3 as %s...\n\n"), buildpackName, username))
+				It("lists the labels for buildpackName/cflinuxfs4", func() {
+					session := helpers.CF("labels", "buildpack", buildpackName, "--stack", "cflinuxfs4")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack cflinuxfs4 as %s...\n\n"), buildpackName, username))
 					Eventually(session).Should(Say(`key\s+value`))
 					Eventually(session).Should(Say(`cfl1\s+var1`))
 					Eventually(session).Should(Say(`cfl2\s+var2`))

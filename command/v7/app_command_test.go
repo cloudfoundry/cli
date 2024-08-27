@@ -203,7 +203,7 @@ var _ = Describe("app Command", func() {
 						},
 					},
 					CurrentDroplet: resources.Droplet{
-						Stack: "cflinuxfs2",
+						Stack: "cflinuxfs4",
 						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
