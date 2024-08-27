@@ -12,9 +12,8 @@ on:
         options:
           - all
           - run-integration-tests-cf-env
-          # - run-integration-tests-cf-env-with-min-capi
-          # - run-integration-windows
-          # - run-integration-windows-client-credentials
+          - run-integration-tests-cf-env-with-client-creds
+          - run-cats-cf-env
   push:
     tags:
       - "v9.*"
@@ -73,7 +72,6 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: edge
       run-with-client-creds: false
       os: ubuntu-latest
       name: Integration
@@ -88,7 +86,6 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      capi-version: edge
       run-with-client-creds: true
       os: ubuntu-latest
       name: Integration client creds

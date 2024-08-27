@@ -53,7 +53,7 @@ V6
   "StagingFailedReason": "",
   "Stack": {
     "Guid": "881b268c-d234-4c08-b5c5-50099ccb02bc",
-    "Name": "cflinuxfs3",
+    "Name": "cflinuxfs4",
     "Description": ""
   },
   "Instances": [
@@ -180,7 +180,7 @@ V7
     "GUID": "0110f8db-f426-4aad-87d1-4106050cd129",
     "State": "STAGED",
     "CreatedAt": "2020-01-14T22:51:13Z",
-    "Stack": "cflinuxfs3",
+    "Stack": "cflinuxfs4",
     "Image": "",
     "Buildpacks": [
       {
@@ -439,7 +439,7 @@ V7
   {
     "Name": "some-app",
     "GUID": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
-    "StackName": "cflinuxfs3",
+    "StackName": "cf4",
     "State": "STARTED",
     "LifecycleType": "buildpack",
     "LifecycleBuildpacks": null,
