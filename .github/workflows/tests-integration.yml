@@ -13,7 +13,6 @@ on:
           - all
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
-          - run-cats-cf-env
   push:
     tags:
       - "v9.*"
@@ -22,7 +21,6 @@ on:
   pull_request_target:
     branches:
       - main
-      - v9
       - v8
       - v7
     paths-ignore:
@@ -91,41 +89,3 @@ jobs:
       name: Integration client creds
       gitRef: ${{needs.get-sha.outputs.gitRef}}
     secrets: inherit
-
-  #run-integration-tests-cf-env-with-min-capi:
-  #  name: MIN CAPI
-  #  needs:
-  #     - get-sha
-  #     - units
-  #   if: ${{ github.event_name != 'workflow_dispatch' ||inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
-  #  uses: ./.github/workflows/tests-integration-reusable.yml
-  #  with:
-  #    capi-version: min
-  #    run-with-client-creds: false
-  #    os: ubuntu-latest
-  #    name: Integration MIN CAPI
-  #    pool-name: cfd_16_11_0
-  #    pool-namespace: tas-devex
-  #  secrets: inherit
-
-  #run-integration-windows:
-  #  name: Windows
-  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows' }}
-  #  uses: ./.github/workflows/tests-integration-reusable.yml
-  #  with:
-  #    capi-version: edge
-  #    run-with-client-creds: false
-  #    os: windows-latest
-  #    name: Integration windows
-  #  secrets: inherit
-
-  #run-integration-windows-client-credentials:
-  #  name: Windows with client credentials
-  #  if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-windows-client-credentials' }}
-  #  uses: ./.github/workflows/tests-integration-reusable.yml
-  #  with:
-  #    capi-version: edge
-  #    run-with-client-creds: true
-  #    os: windows-latest
-  #    name: Integration windows client credentials
-  #  secrets: inherit
