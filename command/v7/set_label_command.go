@@ -72,7 +72,7 @@ func (cmd SetLabelCommand) Examples() string {
 	return `
 cf set-label app dora env=production
 cf set-label org business pci=true public-facing=false
-cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3`
+cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs4`
 }
 
 func (cmd SetLabelCommand) Resources() string {

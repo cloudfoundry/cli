@@ -79,7 +79,7 @@ var _ = Describe("ListBuildpacks", func() {
 			p3 := 15
 			t := true
 			f := false
-			linux := "cflinuxfs2"
+			linux := "cflinuxfs4"
 
 			buildpackRepo.Buildpacks = []models.Buildpack{
 				{Name: "Buildpack-1", Stack: linux, Position: &p1, Enabled: &t, Locked: &f},
@@ -92,9 +92,9 @@ var _ = Describe("ListBuildpacks", func() {
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting buildpacks"},
 				[]string{"buildpack", "stack", "position", "enabled"},
-				[]string{"Buildpack-1", "cflinuxfs2", "5", "true", "false"},
-				[]string{"Buildpack-2", "cflinuxfs2", "10", "false", "true"},
-				[]string{"Buildpack-3", "cflinuxfs2", "15", "true", "false"},
+				[]string{"Buildpack-1", "cflinuxfs4", "5", "true", "false"},
+				[]string{"Buildpack-2", "cflinuxfs4", "10", "false", "true"},
+				[]string{"Buildpack-3", "cflinuxfs4", "15", "true", "false"},
 			))
 		})
 
