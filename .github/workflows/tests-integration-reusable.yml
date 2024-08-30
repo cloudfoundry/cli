@@ -10,9 +10,6 @@ name: "pvt: run integration tests"
 on:
   workflow_call:
     inputs:
-      capi-version:
-        required: true
-        type: string
       run-with-client-creds:
         required: true
         type: boolean
@@ -69,7 +66,6 @@ jobs:
 
     - name: Checkout cf-deployment
       uses: actions/checkout@v4
-      if: ${{ inputs.capi-version == 'edge' }}
       with:
         repository: cloudfoundry/cf-deployment
         path: cf-deployment
@@ -89,7 +85,7 @@ jobs:
       run: |
         shepherd login service-account ${account_token}
 
-        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex"
+        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --description 'CLI GHA'"
         lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
         # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
         # if the pool is empty.
@@ -145,9 +141,14 @@ jobs:
         apt-get install -y build-essential
 
     - name: Upload latest CAPI release
-      if: ${{ inputs.capi-version == 'edge' }}
+      env:
+        capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
       run: |
-        capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
+        if [ -z "$capi_release_version" ]
+        then
+          capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
+        fi
+        
         echo "Latest CAPI release is $capi_release_version"
         
         eval "$(bbl print-env --metadata-file metadata.json)"
@@ -156,7 +157,6 @@ jobs:
         bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
 
     - name: Deploy Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version == 'edge' }}
       run: |
         env_name=$(jq -r .name metadata.json)
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
@@ -165,35 +165,13 @@ jobs:
         # deploy
         bosh -d cf manifest > /tmp/manifest.yml
         bosh interpolate /tmp/manifest.yml \
-          -o .github/ops-files/use-cflinuxfs3.yml \
-          -o .github/ops-files/replace-redis.yml \
+          -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
           -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
-          -o cli-ci/ci/infrastructure/operations/use-latest-capi.yml \
-          -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
-          -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
-          -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
-          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
-          > ./director.yml
-
-        bosh -d cf deploy director.yml -n
-        echo "Deployed CAPI version:"
-        bosh -d cf releases | grep capi
-
-    - name: Deploy MIN CAPI with Isolation Segment and OIDC Provider
-      if: ${{ inputs.capi-version != 'edge' }}
-      run: |
-        env_name=$(jq -r .name metadata.json)
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-        eval "$(bbl print-env --metadata-file metadata.json)"
-
-        # deploy
-        bosh -d cf manifest > /tmp/manifest.yml
-        bosh interpolate /tmp/manifest.yml \
-          -o cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml \
-          -o cli-ci/ci/infrastructure/operations/add-oidc-provider.yml \
-          -o cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml \
-          -o cli-ci/ci/infrastructure/operations/diego-cell-instances.yml \
-          -o cli-ci/ci/infrastructure/operations/use-latest-ruby-buildpack.yml \
+          -o .github/ops-files/replace-redis.yml \
+          -o .github/ops-files/use-latest-capi.yml \
+          -o .github/ops-files/add-oidc-provider.yml \
+          -o .github/ops-files/add-uaa-client-credentials.yml \
+          -o .github/ops-files/diego-cell-instances.yml \
           -v client-secret="${{ secrets.CLIENT_SECRET }}" \
           > ./director.yml
 
