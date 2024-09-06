@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -14,13 +15,24 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var appOrg = "fakeservicebroker"
+
 const (
 	appNamePrefix      = "hydrabroker"
-	appOrg             = "fakeservicebroker"
 	appSpace           = "integration"
 	defaultMemoryLimit = "32M"
 	pathToApp          = "../../assets/hydrabroker"
 )
+
+var once sync.Once
+var mutex sync.Mutex
+
+func initialize() {
+	testName := os.Getenv("CF_INT_TEST_NAME")
+	if len(testName) > 0 {
+		appOrg += "-" + testName
+	}
+}
 
 func ensureAppIsDeployed() {
 	if !appResponds() {
@@ -70,6 +82,14 @@ func ensureAppIsPushed() {
 			}
 		}
 	}
+
+	once.Do(func() {
+		initialize()
+	})
+
+	// mutex protects from goroutines, and we retry later to protect from other test processes
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	helpers.CreateOrgAndSpaceUnlessExists(appOrg, appSpace)
 	helpers.WithRandomHomeDir(func() {
