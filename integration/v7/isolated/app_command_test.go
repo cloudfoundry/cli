@@ -296,8 +296,8 @@ applications:
 
 							Eventually(func(g Gomega) {
 								session := helpers.CF("app", appName).Wait()
-								g.Expect(session).Should(Say("Active deployment with status CANCELING"))
-								g.Expect(session).Should(Say("strategy:        canary"))
+								g.Expect(session).Should(Say("instances:\\s+1/1"))
+								g.Expect(session).ShouldNot(Say("instances:\\s+1/1"))
 								g.Expect(session).Should(Exit(0))
 							}).Should(Succeed())
 						})

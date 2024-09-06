@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -141,4 +142,13 @@ func (r Route) GUID() string {
 	Expect(routeReceiver.Routes).To(HaveLen(1))
 
 	return routeReceiver.Routes[0].GUID
+}
+
+func GetPort() int {
+	port := 1024
+	testName := os.Getenv("CF_INT_TEST_NAME")
+	if testName == "cc" {
+		port = 1025
+	}
+	return port
 }
