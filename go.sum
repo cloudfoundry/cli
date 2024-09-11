@@ -6,8 +6,8 @@ code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8 h1:U9t+
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8/go.mod h1:cf3zRgfxIBUHx8FmX9SgiQ0QWVxRsH+begnYUdigZag=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4 h1:O+j8afQWaDuxzKGcculsjgHGK+biBTn6iMjgFpBf54c=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4/go.mod h1:dVTgo9kQbYns/QM4A1C2GtxqUnFSvJTk2Qhw+M0/uzk=
-code.cloudfoundry.org/clock v1.12.0 h1:281cHkSdznhaEBMfx+sVFF4vTT4kyRrCRaNpzSsYToM=
-code.cloudfoundry.org/clock v1.12.0/go.mod h1:334lEJ3CzdaQLu9f5AHvMLj3zBhuHQVDecBfJrZ6Igs=
+code.cloudfoundry.org/clock v1.13.0 h1:cXtygQ9nD+uVtzjamX9puLvdkvgJsBpCgxlRPqP5Wh4=
+code.cloudfoundry.org/clock v1.13.0/go.mod h1:vRE++3mqcB+fAoY4Dd9ru2Tp+6tmGqdGrp6qP92QKwE=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82 h1:Bns1y0jSlcvfP0u8ael+TUlnyNHsNX808zuo58bf5so=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82/go.mod h1:L2/glHnSK+wKnsG8oZZqdV2sgYY9NDo/I1aDJGhcWaM=
 code.cloudfoundry.org/go-log-cache/v2 v2.0.7 h1:yR/JjQ/RscO1n4xVAT9HDYcpx5ET/3Cq2/RhpJml6ZU=
