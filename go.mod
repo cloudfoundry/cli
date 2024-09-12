@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.12.0
+	code.cloudfoundry.org/clock v1.13.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
