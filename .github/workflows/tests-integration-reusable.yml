@@ -322,7 +322,7 @@ jobs:
         make integration-tests-full-ci
 
     - name: Unclaim environment
-      if: always()
+      if: ${{ always() && !runner.debug }}
       env:
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
       run: |
