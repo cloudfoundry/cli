@@ -167,7 +167,6 @@ jobs:
         bosh interpolate /tmp/manifest.yml \
           -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
           -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
-          -o .github/ops-files/replace-redis.yml \
           -o .github/ops-files/use-latest-capi.yml \
           -o .github/ops-files/add-oidc-provider.yml \
           -o .github/ops-files/add-uaa-client-credentials.yml \
