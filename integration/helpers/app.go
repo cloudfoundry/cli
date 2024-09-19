@@ -129,6 +129,11 @@ func WithMultiBuildpackApp(f func(dir string)) {
 	f("../../assets/go_calls_ruby")
 }
 
+// WithJSHelloWorld creates a simple JS Hello World HTTP application to use with the CF push command.
+func WithJSHelloWorld(f func(dir string)) {
+	f("../../assets/js-hello")
+}
+
 // WithProcfileApp creates an application to use with your CLI command
 // that contains Procfile defining web and worker processes.
 func WithProcfileApp(f func(dir string)) {

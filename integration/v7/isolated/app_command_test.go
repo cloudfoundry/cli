@@ -409,14 +409,14 @@ applications:
 
 				When("the app is a CNB app", func() {
 					BeforeEach(func() {
-						helpers.WithProcfileApp(func(appDir string) {
-							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://gcr.io/paketo-buildpacks/ruby:latest")).Should(Exit())
+						helpers.WithJSHelloWorld(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://gcr.io/paketo-buildpacks/nodejs:latest")).Should(Exit())
 						})
 					})
 
 					It("displays the app buildpacks", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say(`paketo-buildpacks\/ruby`))
+						Eventually(session).Should(Say(`paketo-buildpacks\/nodejs`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
