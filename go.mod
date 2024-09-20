@@ -3,7 +3,7 @@ module code.cloudfoundry.org/cli
 go 1.23.1
 
 require (
-	code.cloudfoundry.org/bytefmt v0.9.0
+	code.cloudfoundry.org/bytefmt v0.10.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
