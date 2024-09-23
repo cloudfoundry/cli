@@ -43,6 +43,7 @@ type FlagOverrides struct {
 	DockerImage         string
 	DockerPassword      string
 	DockerUsername      string
+	CNBCredentials      map[string]interface{}
 	HealthCheckEndpoint string
 	HealthCheckTimeout  int64
 	HealthCheckType     constant.HealthCheckType
@@ -62,6 +63,7 @@ type FlagOverrides struct {
 	NoManifest          bool
 	Task                bool
 	LogRateLimit        string
+	Lifecycle           constant.AppLifecycleType
 }
 
 func (state PushPlan) String() string {
