@@ -32,3 +32,4 @@ jobs:
           close-issue-label: 'auto-closed-issue'
           close-pr-label: 'auto-closed-pr'
         #   only-labels: 'awaiting-feedback,awaiting-answers'
+          operations-per-run: 200
