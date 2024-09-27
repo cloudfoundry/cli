@@ -29,6 +29,6 @@ jobs:
           exempt-issue-labels: 'awaiting-approval,work-in-progress'
           stale-pr-label: 'no-pr-activity'
           exempt-pr-labels: 'awaiting-approval,work-in-progress'
-          close-issue-label: 'issue-closed-automatically'
-          close-pr-label: 'pr-closed-automatically'
+          close-issue-label: 'auto-closed-issue'
+          close-pr-label: 'auto-closed-pr'
         #   only-labels: 'awaiting-feedback,awaiting-answers'
