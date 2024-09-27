@@ -1,0 +1,31 @@
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+name: 'Close stale issues and PRs'
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  stale:
+    name: Close Stale Issues
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed.'
+          stale-pr-message: 'This PR is stale because it has been open 45 days with no activity. Remove stale label or comment or this will be closed.'
+          close-issue-message: 'Thank you for your submission. If you encounter this issue with the latest version of CF CLI, please open a new ticket with the necessary information as per our issue template.'
+          close-pr-message: 'Thank you for your submission. If your change is still relevant, please update and reopen it.'
+          days-before-issue-stale: 30
+          days-before-pr-stale: 45
+          days-before-issue-close: 365
+          days-before-pr-close: 365
+          stale-issue-label: 'no-issue-activity'
+          exempt-issue-labels: 'awaiting-approval,work-in-progress'
+          stale-pr-label: 'no-pr-activity'
+          exempt-pr-labels: 'awaiting-approval,work-in-progress'
+        #   only-labels: 'awaiting-feedback,awaiting-answers'
