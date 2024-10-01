@@ -21,8 +21,8 @@ code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6/go.mod h1:1ZB1JCh
 code.cloudfoundry.org/jsonry v1.1.4 h1:P9N7IlH1/4aRCLcXLgLFj1hkcBmV7muijJzY+K6U4hE=
 code.cloudfoundry.org/jsonry v1.1.4/go.mod h1:6aKilShQP7w/Ez76h1El2/n9y2OkHuU56nKSBB9Gp0A=
 code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be/go.mod h1:O2sS7gKP3HM2iemG+EnwvyNQK7pTSC6Foi4QiMp9sSk=
-code.cloudfoundry.org/lager/v3 v3.6.0 h1:7SRXrt8N/QzR36yU45wd+oD1dAGhkNE3CrO+9wb6OJs=
-code.cloudfoundry.org/lager/v3 v3.6.0/go.mod h1:gVXmBdSINVyV5bzwY8YOUO7ELszPIHzqCrUA3PcMy2Y=
+code.cloudfoundry.org/lager/v3 v3.7.0 h1:Ock99/CnBfKdrt7CK8R+MuJ3iwdfvt1a6oAfOglq37w=
+code.cloudfoundry.org/lager/v3 v3.7.0/go.mod h1:mjCN1W7Jdy2PLFbSN/kX3NpR3wMi+JZfp3aFd2h3n+8=
 code.cloudfoundry.org/tlsconfig v0.5.0 h1:wkdwdVPMPUowUyR4jzl7EttWD6j3Y8uQKcc2VxBh+Nk=
 code.cloudfoundry.org/tlsconfig v0.5.0/go.mod h1:hwoQOMSbbpu1doDFFDK8h5EpM/cWREyWMXEo0H1MFeA=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d h1:M+zXqtXJqcsmpL76aU0tdl1ho23eYa4axYoM4gD62UA=
@@ -115,8 +115,8 @@ github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeN
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38/go.mod h1:kpwsk12EmLew5upagYY7GY0pfYCcupk39gWOCRROcvE=
-github.com/google/pprof v0.0.0-20240910150728-a0b0bb1d4134 h1:c5FlPPgxOn7kJz3VoPLkQYQXGBS3EklQ4Zfi57uOuqQ=
-github.com/google/pprof v0.0.0-20240910150728-a0b0bb1d4134/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
+github.com/google/pprof v0.0.0-20240929191954-255acd752d31 h1:LcRdQWywSgfi5jPsYZ1r2avbbs5IQ5wtyhMBCcokyo4=
+github.com/google/pprof v0.0.0-20240929191954-255acd752d31/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
