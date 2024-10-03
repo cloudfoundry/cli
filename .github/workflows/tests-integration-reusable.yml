@@ -207,6 +207,7 @@ jobs:
           "include_container_networking": true,
           "include_detect": true,
           "include_docker": true,
+          "include_cnb": true,
           "include_internet_dependent": true,
           "include_isolation_segments": true,
           "isolation_segment_name": "persistent_isolation_segment",
@@ -237,6 +238,7 @@ jobs:
         cf api ${API} --skip-ssl-validation
         cf auth
         cf enable-feature-flag diego_docker
+        cf enable-feature-flag diego_cnb
         cf enable-feature-flag service_instance_sharing
 
     - name: Run CATS Tests

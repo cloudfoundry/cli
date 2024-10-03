@@ -26,6 +26,7 @@ var _ = Describe("help", func() {
 				"[-b BUILDPACK_NAME]",
 				"[-c COMMAND]",
 				"[-f MANIFEST_PATH | --no-manifest]",
+				"[--lifecycle (buildpack | docker | cnb)]",
 				"[--no-start]",
 				"[--no-wait]",
 				"[-i NUM_INSTANCES]",

@@ -32,33 +32,24 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
 	}
 
+	keyValueTable = [][]string{
+		{display.UI.TranslateText("name:"), summary.Application.Name},
+		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+		isoRow,
+		{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
+		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
+		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+	}
+
 	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
-		keyValueTable = [][]string{
-			{display.UI.TranslateText("name:"), summary.Application.Name},
-			{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
-			isoRow,
-			{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
-			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
-			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-			{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image},
-			isoRow,
-		}
+		keyValueTable = append(keyValueTable, []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}, isoRow)
 	} else {
-		keyValueTable = [][]string{
-			{display.UI.TranslateText("name:"), summary.Application.Name},
-			{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
-			isoRow,
-			{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
-			{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
-			{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-			{display.UI.TranslateText("buildpacks:"), ""},
-			isoRow,
-		}
+		keyValueTable = append(keyValueTable, []string{display.UI.TranslateText("buildpacks:"), ""}, isoRow)
 	}
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
 
-	if summary.LifecycleType == constant.AppLifecycleTypeBuildpack {
+	if summary.LifecycleType != constant.AppLifecycleTypeDocker {
 		display.displayBuildpackTable(summary.CurrentDroplet.Buildpacks)
 	}
 
