@@ -11,13 +11,13 @@
 #
 #  - `gh auth login` - hit enter; it will open browser
 #  - `echo "All future steps will be applied to: ${GITHUB_REPOSITORY:?}"`
-#  - `gh secret list -R ${GITHUB_REPOSITORY:?} -e PROD`
+#  - `gh secret list -R ${GITHUB_REPOSITORY:?}`
 #
 #  ## Backup previous working GPG key
 #
 #    DO THIS STEP ONLY WHEN YOU KNOW THAT SIGNING_KEY_GPG KEY IS WORKING
 #
-#  - `gh secret set BACKUP_SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?} -e PROD -b"${SIGNING_KEY_GPG:?}"`
+#  - `gh secret set BACKUP_SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?} -b"${SIGNING_KEY_GPG:?}"`
 #
 #  ## Update GPG key expiration date
 #
@@ -45,12 +45,12 @@
 #
 #  - `gpg --armor --export "${SIGNING_KEY_GPG_ID:?}"` - we need this public key to update CLAW
 #
-#  - `gpg --export-secret-key "${SIGNING_KEY_GPG_ID:?}" | base64 | gh secret set SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?} -e PROD`
+#  - `gpg --export-secret-key "${SIGNING_KEY_GPG_ID:?}" | base64 | gh secret set SIGNING_KEY_GPG -R ${GITHUB_REPOSITORY:?}`
 #
 #  to keep GPG Passphrase UI without distortion use snippet below instead of the top one
 #  ```
 #  key_pvt="$(gpg --export-secret-key "${SIGNING_KEY_GPG_ID:?}" | base64)"
-#  gh secret set SIGNING_KEY_GPG2 -R ${GITHUB_REPOSITORY:?} -e PROD  -b"${key_pvt}"
+#  gh secret set SIGNING_KEY_GPG2 -R ${GITHUB_REPOSITORY:?}  -b"${key_pvt}"
 #  ```
 #
 # List of GHA secrets:
