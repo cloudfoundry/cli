@@ -25,7 +25,6 @@ on:
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
-        
 jobs:
   run-integration-tests:
     defaults:
