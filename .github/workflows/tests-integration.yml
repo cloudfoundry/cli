@@ -29,6 +29,10 @@ on:
       - "doc/**"
       - ".gitpod.yml"
       - "README.md"
+      - ".github/**"
+      - ".grype.yaml"
+      - ".git*"
+      - ".golangci.json"
 jobs:
   get-sha:
     runs-on: ubuntu-latest
