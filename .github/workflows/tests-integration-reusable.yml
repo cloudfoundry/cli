@@ -101,7 +101,6 @@ jobs:
       if: ${{ inputs.name == 'cats' }}
       run: |
         set -eu
-        
         ENV=$(jq -r .name metadata.json)
         API="$(jq -r .cf.api_url metadata.json)"
         DOMAIN=$(echo $API | sed "s/^api\.//")
