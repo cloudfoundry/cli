@@ -105,7 +105,7 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(createSession).Should(Exit(0))
 						})
 
-						listSession := helpers.CF("buildpacks")
+						listSession := helpers.CF("buildpacks").Wait()
 						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
 							Name: buildpackName, Stack: stacks[0]})))
 						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
