@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -152,6 +153,10 @@ func NewPath() string {
 
 // PrefixedRandomName provides a random name with structure "namePrefix-randomstring"
 func PrefixedRandomName(namePrefix string) string {
+	testName := os.Getenv("CF_INT_TEST_NAME")
+	if len(testName) > 0 {
+		namePrefix += "-" + testName
+	}
 	return namePrefix + "-" + RandomName()
 }
 
