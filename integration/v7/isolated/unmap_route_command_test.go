@@ -117,7 +117,7 @@ var _ = Describe("unmap-route command", func() {
 			})
 			When("it's a TCP route", func() {
 				BeforeEach(func() {
-					port = 1024
+					port = helpers.GetPort()
 					tcpRoute = helpers.NewTCPRoute(spaceName, tcpDomain.Name, port)
 					session := helpers.CF("map-route", appName, tcpDomain.Name, "--port", fmt.Sprintf("%d", tcpRoute.Port))
 					Eventually(session).Should(Exit(0))
