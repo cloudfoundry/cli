@@ -119,7 +119,7 @@ jobs:
           echo "env name is ${env_name}"
           echo "leaseid=${lease_id}" >> "${GITHUB_OUTPUT}"
 
-          cf_deployment_version=$(jq -r '."cf-deployment_version"' metadata.json)
+          cf_deployment_version=$(jq -r '."cf_deployment_version"' metadata.json)
           echo "cf_deployment_version is ${cf_deployment_version}"
           echo "cf_deployment_version=${cf_deployment_version}" >> "${GITHUB_OUTPUT}"
 
