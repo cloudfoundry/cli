@@ -88,23 +88,39 @@ jobs:
       - name: claim
         id: claim
         env:
-          account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          pool_name: ${{ vars.SHEPHERD_POOL_NAME }}
-          pool_namespace: official
+          account_token:  ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          pool_name:      ${{ vars.SHEPHERD_POOL_NAME }}
+          pool_duration:  ${{ vars.SHEPHERD_POOL_DURATION  || '8h' }}
+          pool_namespace: ${{ vars.SHEPHERD_POOL_NAMESPACE || 'official' }}
+          namespace:      ${{ vars.POOL_NAMESPACE          || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
 
-          echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --description 'CLI GHA'"
-          lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
+          lease_id=$( shepherd create lease \
+                        --duration       ${pool_duration}  \
+                        --pool           ${pool_name}      \
+                        --pool-namespace ${pool_namespace} \
+                        --namespace      ${namespace}      \
+                        --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
+                        --json \
+                      | jq -r .id
+                    )
           
           # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
           # if the pool is empty.
           count=0
           while [ $count -lt 360 ] ; do
             sleep 30
-            status=$(shepherd get lease ${lease_id} --namespace tas-devex --json | jq -r .status)
+            status=$( shepherd get lease ${lease_id} \
+                        --namespace ${namespace} \
+                        --json \
+                      | jq -r .status
+                    )
             if [ $status == "LEASED" ] ; then
-              shepherd get lease ${lease_id} --namespace tas-devex --json | jq .output > metadata.json
+              shepherd get lease ${lease_id} \
+                --namespace ${namespace} \
+                --json \
+              | jq .output > metadata.json
               break
             elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
               echo "There was an error obtaining the lease. Lease status is ${status}."
@@ -250,12 +266,13 @@ jobs:
     needs:
       - claim-env
       - run-cats-cf-env
-    if: always()
     steps:
       - name: unclaim
         env:
           account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          namespace:     ${{ vars.POOL_NAMESPACE || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
           set -x
-          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} --namespace tas-devex
+          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
+            --namespace ${namespace}
