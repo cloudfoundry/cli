@@ -3,6 +3,7 @@ package v7
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -13,8 +14,9 @@ type AppsCommand struct {
 	usage           interface{} `usage:"CF_NAME apps [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME apps\n   CF_NAME apps --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME apps --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"events, logs, map-route, push, scale, start, stop, restart"`
 
-	Labels    string `long:"labels" description:"Selector to filter apps by labels"`
-	OmitStats bool   `long:"no-stats" description:"Do not retrieve process stats"`
+	Labels     string `long:"labels" description:"Selector to filter apps by labels"`
+	OmitStats  bool   `long:"no-stats" description:"Do not retrieve process stats"`
+	JSONOutput bool   `long:"json" description:"Output in json form"`
 }
 
 func (cmd AppsCommand) Execute(args []string) error {
@@ -39,6 +41,10 @@ func (cmd AppsCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	if cmd.JSONOutput {
+		return cmd.UI.DisplayJSON("", map[string][]v7action.ApplicationSummary{"apps": summaries})
 	}
 
 	if len(summaries) == 0 {
