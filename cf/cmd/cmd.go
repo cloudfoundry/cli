@@ -226,3 +226,22 @@ func handleVerbose(args []string) ([]string, bool) {
 
 	return args, verbose
 }
+
+func handleJSON(args []string) ([]string, bool) {
+	var isJSON bool
+	idx := -1
+
+	for i, arg := range args {
+		if arg == "--json" {
+			idx = i
+			break
+		}
+	}
+
+	if idx != -1 && len(args) > 1 {
+		isJSON = true
+		args = append(args[:idx], args[idx+1:]...)
+	}
+
+	return args, isJSON
+}
