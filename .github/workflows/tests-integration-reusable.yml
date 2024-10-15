@@ -102,16 +102,16 @@ jobs:
       run: |
         set -eu
         
-        ENV=$(jq -r .name metadata.json)
+        env_name=$(jq -r .name metadata.json)
         API="$(jq -r .cf.api_url metadata.json)"
         DOMAIN=$(echo $API | sed "s/^api\.//")
         CF_INT_USERNAME="admin"
 
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
 
         credhub login
-        CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+        CF_INT_PASSWORD=$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)
 
         cat << EOF | jq -S . > cats_config.json
         {
@@ -193,12 +193,12 @@ jobs:
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
@@ -224,12 +224,12 @@ jobs:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
