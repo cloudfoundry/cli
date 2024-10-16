@@ -28,7 +28,7 @@ on:
 
 env:
   NODES: ${{ vars.TEST_NODES || '10' }}
-
+  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '2' }}
 jobs:
   run-integration-tests:
     defaults:
@@ -188,8 +188,8 @@ jobs:
           --keep-going \
           --randomize-all \
           --skip-package=helpers \
-          --nodes="12" \
-          --flake-attempts=2 \
+          --nodes="${NODES}" \
+          --flake-attempts=${FLAKE_ATTEMPTS} \
           --timeout="2h" \
           --no-color
 
@@ -206,8 +206,6 @@ jobs:
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
@@ -237,8 +235,6 @@ jobs:
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
