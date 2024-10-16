@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/resources"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/store"
 	"github.com/pivotal-cf/brokerapi/v7/domain"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )

@@ -3,19 +3,19 @@ package organization
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/api/featureflags"
-	"code.cloudfoundry.org/cli/cf/api/organizations"
-	"code.cloudfoundry.org/cli/cf/api/quotas"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/user"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf"
+	"code.cloudfoundry.org/cli/v8/cf/api/featureflags"
+	"code.cloudfoundry.org/cli/v8/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v8/cf/api/quotas"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands/user"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 type CreateOrg struct {
@@ -66,7 +66,7 @@ func (cmd *CreateOrg) SetDependency(deps commandregistry.Dependency, pluginCall 
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 
-	//get command from registry for dependency
+	// get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("set-org-role")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.orgRoleSetter = commandDep.(user.OrgRoleSetter)

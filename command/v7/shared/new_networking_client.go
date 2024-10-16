@@ -3,9 +3,9 @@ package shared
 import (
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 // NewNetworkingClient creates a new cfnetworking client.
@@ -24,7 +24,7 @@ func NewNetworkingClient(apiURL string, config command.Config, uaaClient *uaa.Cl
 		wrappers = append(wrappers, wrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	authWrapper := wrapper.NewUAAAuthentication(uaaClient, config)
+	authWrapper := wrapper.NewUAAAuthentication(uaaClient.LegacyClient(), config)
 	wrappers = append(wrappers, authWrapper)
 
 	wrappers = append(wrappers, wrapper.NewRetryRequest(config.RequestRetryCount()))

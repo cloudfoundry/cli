@@ -1,12 +1,12 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/extract"
-	"code.cloudfoundry.org/cli/util/railway"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/extract"
+	"code.cloudfoundry.org/cli/v8/util/railway"
 )
 
 const featureFlagServiceInstanceSharing string = "service_instance_sharing"

@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServicePlanVisibilityRepository struct {

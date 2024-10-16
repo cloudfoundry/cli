@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
 type OrgsCommand struct {

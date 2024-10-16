@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/api/uaa/internal"
+	"code.cloudfoundry.org/cli/v8/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v8/api/uaa/internal"
 )
 
 // AuthResponse contains the access token and refresh token which are granted

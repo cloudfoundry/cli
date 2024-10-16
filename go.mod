@@ -1,8 +1,9 @@
-module code.cloudfoundry.org/cli
+module code.cloudfoundry.org/cli/v8
 
 go 1.23.1
 
 require (
+    code.cloudfoundry.org/cli v7.1.0+incompatible
 	code.cloudfoundry.org/bytefmt v0.11.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85

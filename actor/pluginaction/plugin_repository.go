@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
 func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {

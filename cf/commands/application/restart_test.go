@@ -3,18 +3,18 @@ package application_test
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/commands/application/applicationfakes"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/commands/application/applicationfakes"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v8/cf/trace/tracefakes"
+	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -37,7 +37,7 @@ var _ = Describe("restart command", func() {
 		deps.UI = ui
 		deps.Config = config
 
-		//inject fake 'stopper and starter' into registry
+		// inject fake 'stopper and starter' into registry
 		commandregistry.Register(starter)
 		commandregistry.Register(stopper)
 
@@ -63,11 +63,11 @@ var _ = Describe("restart command", func() {
 		applicationReq = new(requirementsfakes.FakeApplicationRequirement)
 		applicationReq.GetApplicationReturns(app)
 
-		//save original command and restore later
+		// save original command and restore later
 		originalStart = commandregistry.Commands.FindCommand("start")
 		originalStop = commandregistry.Commands.FindCommand("stop")
 
-		//setup fakes to correctly interact with commandregistry
+		// setup fakes to correctly interact with commandregistry
 		starter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return starter
 		}

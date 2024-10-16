@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"time"
 
-	. "code.cloudfoundry.org/cli/util/ui"
+	. "code.cloudfoundry.org/cli/v8/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

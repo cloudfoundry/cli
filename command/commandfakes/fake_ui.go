@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
 type FakeUI struct {

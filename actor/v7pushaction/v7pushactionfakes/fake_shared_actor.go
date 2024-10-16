@@ -5,8 +5,8 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v8/actor/v7pushaction"
 )
 
 type FakeSharedActor struct {

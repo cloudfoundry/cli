@@ -1,18 +1,18 @@
 package organization_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v8/plugin/models"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/commands/organization"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/commands/organization"
+	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -1,8 +1,8 @@
 package store_test
 
 import (
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/store"
 )
 
 var _ = Describe("Brokers", func() {

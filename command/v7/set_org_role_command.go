@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 type SetOrgRoleCommand struct {

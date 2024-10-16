@@ -1,7 +1,7 @@
 package downloader
 
 import (
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v8/util"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,7 +38,7 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
 			r.URL.Opaque = r.URL.Path
 
-			//some redirect return '/' as url
+			// some redirect return '/' as url
 			if strings.Trim(r.URL.Opaque, "/") != "" {
 				url = r.URL.Opaque
 			}

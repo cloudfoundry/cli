@@ -1,16 +1,16 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/command/commandfakes"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 
-	. "code.cloudfoundry.org/cli/command/v7"
+	. "code.cloudfoundry.org/cli/v8/command/v7"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

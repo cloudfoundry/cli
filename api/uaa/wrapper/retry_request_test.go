@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
-	. "code.cloudfoundry.org/cli/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
+	"code.cloudfoundry.org/cli/v8/api/uaa/uaafakes"
+	. "code.cloudfoundry.org/cli/v8/api/uaa/wrapper"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

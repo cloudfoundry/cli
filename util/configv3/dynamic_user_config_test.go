@@ -3,8 +3,8 @@ package configv3_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/configv3/configv3fakes"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/configv3/configv3fakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

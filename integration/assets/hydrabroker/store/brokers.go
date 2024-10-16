@@ -1,8 +1,8 @@
 package store
 
 import (
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/database"
 )
 
 func (st *Store) CreateBroker(cfg config.BrokerConfiguration) BrokerID {

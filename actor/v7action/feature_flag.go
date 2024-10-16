@@ -1,9 +1,9 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 // GetFeatureFlagByName returns a featureFlag with the provided name.

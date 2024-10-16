@@ -1,18 +1,18 @@
 package application_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications/applicationsfakes"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -34,7 +34,7 @@ var _ = Describe("restage command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.Config = configRepo
 
-		//inject fake 'command dependency' into registry
+		// inject fake 'command dependency' into registry
 		commandregistry.Register(stagingWatcher)
 
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restage").SetDependency(deps, pluginCall))
@@ -54,7 +54,7 @@ var _ = Describe("restage command", func() {
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
-		//save original command and restore later
+		// save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("start")
 
 		stagingWatcher = &fakeStagingWatcher{}

@@ -1,7 +1,7 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
 )
 
 // JobURL is the URL to a given Job.

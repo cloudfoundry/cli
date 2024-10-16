@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v8/cf/api/resources"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/net"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ClientRepository

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	. "code.cloudfoundry.org/cli/cf/actors/pluginrepo"
-	"code.cloudfoundry.org/cli/cf/models"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v8/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

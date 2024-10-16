@@ -4,8 +4,8 @@ package appinstancesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/appinstances"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/appinstances"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeRepository struct {

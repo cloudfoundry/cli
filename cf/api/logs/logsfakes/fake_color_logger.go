@@ -4,7 +4,7 @@ package logsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/v8/cf/api/logs"
 )
 
 type FakeColorLogger struct {

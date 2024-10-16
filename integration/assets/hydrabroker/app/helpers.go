@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/store"
 	"github.com/gorilla/mux"
 	uuid "github.com/nu7hatch/gouuid"
 )

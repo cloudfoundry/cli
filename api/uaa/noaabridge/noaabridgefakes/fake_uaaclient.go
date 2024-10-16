@@ -4,8 +4,8 @@ package noaabridgefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
+	"code.cloudfoundry.org/cli/v8/api/uaa/noaabridge"
 )
 
 type FakeUAAClient struct {

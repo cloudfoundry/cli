@@ -4,8 +4,8 @@ package organizationsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/organizations"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeOrganizationRepository struct {

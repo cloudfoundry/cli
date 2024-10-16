@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/appfiles"
+	"code.cloudfoundry.org/cli/v8/cf/appfiles"
 )
 
 type FakeZipper struct {

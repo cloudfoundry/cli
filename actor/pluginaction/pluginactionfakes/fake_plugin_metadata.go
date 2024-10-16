@@ -4,8 +4,8 @@ package pluginactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
 type FakePluginMetadata struct {

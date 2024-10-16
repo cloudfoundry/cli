@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v8/actor/v7pushaction"
 )
 
 type FakeProgressBar struct {

@@ -4,10 +4,10 @@ package commandsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 type FakeSSHCodeGetter struct {

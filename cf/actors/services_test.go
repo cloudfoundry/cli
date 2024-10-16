@@ -1,12 +1,12 @@
 package actors_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/actors/brokerbuilder/brokerbuilderfakes"
-	"code.cloudfoundry.org/cli/cf/actors/servicebuilder/servicebuilderfakes"
-	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/actors"
+	"code.cloudfoundry.org/cli/v8/cf/actors/brokerbuilder/brokerbuilderfakes"
+	"code.cloudfoundry.org/cli/v8/cf/actors/servicebuilder/servicebuilderfakes"
+	"code.cloudfoundry.org/cli/v8/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -1,8 +1,8 @@
 package commandregistry_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/trace/tracefakes"
 
 	"os"
 

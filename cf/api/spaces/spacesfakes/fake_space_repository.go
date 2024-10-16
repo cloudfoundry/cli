@@ -4,8 +4,8 @@ package spacesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/spaces"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/spaces"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeSpaceRepository struct {
