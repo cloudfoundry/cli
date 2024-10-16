@@ -25,7 +25,10 @@ on:
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
-        
+
+env:
+  NODES: ${{ vars.TEST_NODES || '10' }}
+
 jobs:
   run-integration-tests:
     defaults:
