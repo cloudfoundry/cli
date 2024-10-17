@@ -1,5 +1,6 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
+FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
