@@ -14,6 +14,12 @@ on:
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
           - run-cats-cf-env
+      nodes:
+        description: Number of test nodes
+        required: false
+        type: number
+        default: 8
+
   push:
     tags:
       - "v8.*"
@@ -224,6 +230,7 @@ jobs:
       name: Integration
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      nodes: ${{ inputs.nodes }}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:

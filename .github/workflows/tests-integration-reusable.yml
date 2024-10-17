@@ -25,9 +25,12 @@ on:
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
+      nodes:
+        type: number
+        default: 8
 
 env:
-  NODES: ${{ vars.TEST_NODES || '10' }}
+  NODES: ${{ inputs.nodes }}
   FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '2' }}
 
 jobs:
