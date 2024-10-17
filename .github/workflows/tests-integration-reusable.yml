@@ -29,13 +29,15 @@ on:
 env:
   NODES: ${{ vars.TEST_NODES || '10' }}
   FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '2' }}
+
 jobs:
   run-integration-tests:
     defaults:
       run:
         shell: bash
-    runs-on: ${{ inputs.os }} 
+    runs-on: ${{ inputs.os }}
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
+    timeout-minutes: 120
     steps:
     - name: Checkout cli
       uses: actions/checkout@v4
