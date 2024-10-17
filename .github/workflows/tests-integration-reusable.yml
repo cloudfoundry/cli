@@ -26,8 +26,8 @@ on:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
       nodes:
-        type: number
-        default: 8
+        type: string
+        default: "8"
 
 env:
   NODES: ${{ inputs.nodes }}

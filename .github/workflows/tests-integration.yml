@@ -17,8 +17,8 @@ on:
       nodes:
         description: Number of test nodes
         required: false
-        type: number
-        default: 8
+        type: string
+        default: "8"
 
   push:
     tags:
