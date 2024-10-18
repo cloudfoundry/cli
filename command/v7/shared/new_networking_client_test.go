@@ -17,7 +17,7 @@ var _ = Describe("New Clients", func() {
 		binaryName    string
 		fakeConfig    *commandfakes.FakeConfig
 		testUI        *ui.UI
-		fakeUAAClient *uaa.Client
+		fakeUAAClient = &uaa.Client{}
 	)
 
 	BeforeEach(func() {
