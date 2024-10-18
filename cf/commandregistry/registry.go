@@ -6,13 +6,13 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/cf"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 
-	. "code.cloudfoundry.org/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 var _ = initI18nFunc()

@@ -4,7 +4,7 @@ package passwordfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/password"
+	"code.cloudfoundry.org/cli/v8/cf/api/password"
 )
 
 type FakeRepository struct {
@@ -31,15 +31,16 @@ func (fake *FakeRepository) UpdatePassword(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UpdatePasswordStub
+	fakeReturns := fake.updatePasswordReturns
 	fake.recordInvocation("UpdatePassword", []interface{}{arg1, arg2})
 	fake.updatePasswordMutex.Unlock()
-	if fake.UpdatePasswordStub != nil {
-		return fake.UpdatePasswordStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updatePasswordReturns
 	return fakeReturns.result1
 }
 

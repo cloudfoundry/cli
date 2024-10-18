@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v8/cf/net"
 )
 
 type FakeRequestDumperInterface struct {
@@ -28,9 +28,10 @@ func (fake *FakeRequestDumperInterface) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	stub := fake.DumpRequestStub
 	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
-	if fake.DumpRequestStub != nil {
+	if stub != nil {
 		fake.DumpRequestStub(arg1)
 	}
 }
@@ -59,9 +60,10 @@ func (fake *FakeRequestDumperInterface) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
+	stub := fake.DumpResponseStub
 	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
-	if fake.DumpResponseStub != nil {
+	if stub != nil {
 		fake.DumpResponseStub(arg1)
 	}
 }

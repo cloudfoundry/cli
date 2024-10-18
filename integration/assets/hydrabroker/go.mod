@@ -1,4 +1,4 @@
-module code.cloudfoundry.org/cli/integration/assets/hydrabroker
+module code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker
 
 go 1.13
 

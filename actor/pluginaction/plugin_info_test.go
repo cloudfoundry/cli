@@ -3,11 +3,11 @@ package pluginaction_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
-	"code.cloudfoundry.org/cli/api/plugin"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v8/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v8/actor/pluginaction/pluginactionfakes"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

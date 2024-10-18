@@ -4,7 +4,7 @@ package tracefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/v8/cf/trace"
 )
 
 type FakePrinter struct {
@@ -43,9 +43,10 @@ func (fake *FakePrinter) Print(arg1 ...interface{}) {
 	fake.printArgsForCall = append(fake.printArgsForCall, struct {
 		arg1 []interface{}
 	}{arg1})
+	stub := fake.PrintStub
 	fake.recordInvocation("Print", []interface{}{arg1})
 	fake.printMutex.Unlock()
-	if fake.PrintStub != nil {
+	if stub != nil {
 		fake.PrintStub(arg1...)
 	}
 }
@@ -75,9 +76,10 @@ func (fake *FakePrinter) Printf(arg1 string, arg2 ...interface{}) {
 		arg1 string
 		arg2 []interface{}
 	}{arg1, arg2})
+	stub := fake.PrintfStub
 	fake.recordInvocation("Printf", []interface{}{arg1, arg2})
 	fake.printfMutex.Unlock()
-	if fake.PrintfStub != nil {
+	if stub != nil {
 		fake.PrintfStub(arg1, arg2...)
 	}
 }
@@ -106,9 +108,10 @@ func (fake *FakePrinter) Println(arg1 ...interface{}) {
 	fake.printlnArgsForCall = append(fake.printlnArgsForCall, struct {
 		arg1 []interface{}
 	}{arg1})
+	stub := fake.PrintlnStub
 	fake.recordInvocation("Println", []interface{}{arg1})
 	fake.printlnMutex.Unlock()
-	if fake.PrintlnStub != nil {
+	if stub != nil {
 		fake.PrintlnStub(arg1...)
 	}
 }
@@ -137,15 +140,16 @@ func (fake *FakePrinter) WritesToConsole() bool {
 	ret, specificReturn := fake.writesToConsoleReturnsOnCall[len(fake.writesToConsoleArgsForCall)]
 	fake.writesToConsoleArgsForCall = append(fake.writesToConsoleArgsForCall, struct {
 	}{})
+	stub := fake.WritesToConsoleStub
+	fakeReturns := fake.writesToConsoleReturns
 	fake.recordInvocation("WritesToConsole", []interface{}{})
 	fake.writesToConsoleMutex.Unlock()
-	if fake.WritesToConsoleStub != nil {
-		return fake.WritesToConsoleStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.writesToConsoleReturns
 	return fakeReturns.result1
 }
 

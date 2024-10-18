@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
-	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v8/cf/actors/pluginrepo"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/util"
 )
 
 type pluginInstallerWithRepo struct {

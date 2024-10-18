@@ -4,7 +4,7 @@ package rpcfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/v8/plugin/rpc"
 )
 
 type FakeTerminalOutputSwitch struct {
@@ -22,9 +22,10 @@ func (fake *FakeTerminalOutputSwitch) DisableTerminalOutput(arg1 bool) {
 	fake.disableTerminalOutputArgsForCall = append(fake.disableTerminalOutputArgsForCall, struct {
 		arg1 bool
 	}{arg1})
+	stub := fake.DisableTerminalOutputStub
 	fake.recordInvocation("DisableTerminalOutput", []interface{}{arg1})
 	fake.disableTerminalOutputMutex.Unlock()
-	if fake.DisableTerminalOutputStub != nil {
+	if stub != nil {
 		fake.DisableTerminalOutputStub(arg1)
 	}
 }

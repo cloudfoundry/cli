@@ -1,6 +1,6 @@
 package v7action
 
-import "code.cloudfoundry.org/cli/actor/actionerror"
+import "code.cloudfoundry.org/cli/v8/actor/actionerror"
 
 func (actor Actor) UpdateSpaceFeature(spaceName string, orgGUID string, enabled bool, feature string) (Warnings, error) {
 	var allWarnings Warnings

@@ -17,13 +17,13 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/trace"
+	"code.cloudfoundry.org/cli/v8/util"
+	"code.cloudfoundry.org/cli/v8/version"
 )
 
 const (

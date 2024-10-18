@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/util"
 )
 
 // Config is for configuring a CloudControllerConnection.

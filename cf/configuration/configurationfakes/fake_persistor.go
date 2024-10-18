@@ -4,7 +4,7 @@ package configurationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/v8/cf/configuration"
 )
 
 type FakePersistor struct {
@@ -52,9 +52,10 @@ func (fake *FakePersistor) Delete() {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 	}{})
+	stub := fake.DeleteStub
 	fake.recordInvocation("Delete", []interface{}{})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
+	if stub != nil {
 		fake.DeleteStub()
 	}
 }
@@ -76,15 +77,16 @@ func (fake *FakePersistor) Exists() bool {
 	ret, specificReturn := fake.existsReturnsOnCall[len(fake.existsArgsForCall)]
 	fake.existsArgsForCall = append(fake.existsArgsForCall, struct {
 	}{})
+	stub := fake.ExistsStub
+	fakeReturns := fake.existsReturns
 	fake.recordInvocation("Exists", []interface{}{})
 	fake.existsMutex.Unlock()
-	if fake.ExistsStub != nil {
-		return fake.ExistsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.existsReturns
 	return fakeReturns.result1
 }
 
@@ -129,15 +131,16 @@ func (fake *FakePersistor) Load(arg1 configuration.DataInterface) error {
 	fake.loadArgsForCall = append(fake.loadArgsForCall, struct {
 		arg1 configuration.DataInterface
 	}{arg1})
+	stub := fake.LoadStub
+	fakeReturns := fake.loadReturns
 	fake.recordInvocation("Load", []interface{}{arg1})
 	fake.loadMutex.Unlock()
-	if fake.LoadStub != nil {
-		return fake.LoadStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.loadReturns
 	return fakeReturns.result1
 }
 
@@ -189,15 +192,16 @@ func (fake *FakePersistor) Save(arg1 configuration.DataInterface) error {
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
 		arg1 configuration.DataInterface
 	}{arg1})
+	stub := fake.SaveStub
+	fakeReturns := fake.saveReturns
 	fake.recordInvocation("Save", []interface{}{arg1})
 	fake.saveMutex.Unlock()
-	if fake.SaveStub != nil {
-		return fake.SaveStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.saveReturns
 	return fakeReturns.result1
 }
 

@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/helpers"
 	. "github.com/onsi/gomega"
 )
 

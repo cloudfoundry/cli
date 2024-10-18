@@ -4,7 +4,7 @@ package routerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/router"
+	"code.cloudfoundry.org/cli/v8/api/router"
 )
 
 type FakeConnectionWrapper struct {
@@ -42,15 +42,16 @@ func (fake *FakeConnectionWrapper) Make(arg1 *router.Request, arg2 *router.Respo
 		arg1 *router.Request
 		arg2 *router.Response
 	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 
@@ -102,15 +103,16 @@ func (fake *FakeConnectionWrapper) Wrap(arg1 router.Connection) router.Connectio
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
 		arg1 router.Connection
 	}{arg1})
+	stub := fake.WrapStub
+	fakeReturns := fake.wrapReturns
 	fake.recordInvocation("Wrap", []interface{}{arg1})
 	fake.wrapMutex.Unlock()
-	if fake.WrapStub != nil {
-		return fake.WrapStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.wrapReturns
 	return fakeReturns.result1
 }
 

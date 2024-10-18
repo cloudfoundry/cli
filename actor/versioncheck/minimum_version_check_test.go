@@ -1,7 +1,7 @@
 package versioncheck_test
 
 import (
-	. "code.cloudfoundry.org/cli/actor/versioncheck"
+	. "code.cloudfoundry.org/cli/v8/actor/versioncheck"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -4,7 +4,7 @@ package commandfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/v8/command"
 )
 
 type FakeSharedActor struct {
@@ -85,15 +85,16 @@ func (fake *FakeSharedActor) CheckTarget(arg1 bool, arg2 bool) error {
 		arg1 bool
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.CheckTargetStub
+	fakeReturns := fake.checkTargetReturns
 	fake.recordInvocation("CheckTarget", []interface{}{arg1, arg2})
 	fake.checkTargetMutex.Unlock()
-	if fake.CheckTargetStub != nil {
-		return fake.CheckTargetStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.checkTargetReturns
 	return fakeReturns.result1
 }
 
@@ -144,15 +145,16 @@ func (fake *FakeSharedActor) IsLoggedIn() bool {
 	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
 	}{})
+	stub := fake.IsLoggedInStub
+	fakeReturns := fake.isLoggedInReturns
 	fake.recordInvocation("IsLoggedIn", []interface{}{})
 	fake.isLoggedInMutex.Unlock()
-	if fake.IsLoggedInStub != nil {
-		return fake.IsLoggedInStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isLoggedInReturns
 	return fakeReturns.result1
 }
 
@@ -196,15 +198,16 @@ func (fake *FakeSharedActor) IsOrgTargeted() bool {
 	ret, specificReturn := fake.isOrgTargetedReturnsOnCall[len(fake.isOrgTargetedArgsForCall)]
 	fake.isOrgTargetedArgsForCall = append(fake.isOrgTargetedArgsForCall, struct {
 	}{})
+	stub := fake.IsOrgTargetedStub
+	fakeReturns := fake.isOrgTargetedReturns
 	fake.recordInvocation("IsOrgTargeted", []interface{}{})
 	fake.isOrgTargetedMutex.Unlock()
-	if fake.IsOrgTargetedStub != nil {
-		return fake.IsOrgTargetedStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isOrgTargetedReturns
 	return fakeReturns.result1
 }
 
@@ -248,15 +251,16 @@ func (fake *FakeSharedActor) IsSpaceTargeted() bool {
 	ret, specificReturn := fake.isSpaceTargetedReturnsOnCall[len(fake.isSpaceTargetedArgsForCall)]
 	fake.isSpaceTargetedArgsForCall = append(fake.isSpaceTargetedArgsForCall, struct {
 	}{})
+	stub := fake.IsSpaceTargetedStub
+	fakeReturns := fake.isSpaceTargetedReturns
 	fake.recordInvocation("IsSpaceTargeted", []interface{}{})
 	fake.isSpaceTargetedMutex.Unlock()
-	if fake.IsSpaceTargetedStub != nil {
-		return fake.IsSpaceTargetedStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isSpaceTargetedReturns
 	return fakeReturns.result1
 }
 
@@ -300,15 +304,16 @@ func (fake *FakeSharedActor) RequireCurrentUser() (string, error) {
 	ret, specificReturn := fake.requireCurrentUserReturnsOnCall[len(fake.requireCurrentUserArgsForCall)]
 	fake.requireCurrentUserArgsForCall = append(fake.requireCurrentUserArgsForCall, struct {
 	}{})
+	stub := fake.RequireCurrentUserStub
+	fakeReturns := fake.requireCurrentUserReturns
 	fake.recordInvocation("RequireCurrentUser", []interface{}{})
 	fake.requireCurrentUserMutex.Unlock()
-	if fake.RequireCurrentUserStub != nil {
-		return fake.RequireCurrentUserStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requireCurrentUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -355,15 +360,16 @@ func (fake *FakeSharedActor) RequireTargetedOrg() (string, error) {
 	ret, specificReturn := fake.requireTargetedOrgReturnsOnCall[len(fake.requireTargetedOrgArgsForCall)]
 	fake.requireTargetedOrgArgsForCall = append(fake.requireTargetedOrgArgsForCall, struct {
 	}{})
+	stub := fake.RequireTargetedOrgStub
+	fakeReturns := fake.requireTargetedOrgReturns
 	fake.recordInvocation("RequireTargetedOrg", []interface{}{})
 	fake.requireTargetedOrgMutex.Unlock()
-	if fake.RequireTargetedOrgStub != nil {
-		return fake.RequireTargetedOrgStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requireTargetedOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

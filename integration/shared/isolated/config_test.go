@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	helpers "code.cloudfoundry.org/cli/integration/helpers"
+	helpers "code.cloudfoundry.org/cli/v8/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

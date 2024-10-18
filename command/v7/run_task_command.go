@@ -3,8 +3,8 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 type RunTaskCommand struct {

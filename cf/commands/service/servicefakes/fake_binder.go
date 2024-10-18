@@ -4,8 +4,8 @@ package servicefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commands/service"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/commands/service"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeBinder struct {
@@ -34,15 +34,16 @@ func (fake *FakeBinder) BindApplication(arg1 models.Application, arg2 models.Ser
 		arg2 models.ServiceInstance
 		arg3 map[string]interface{}
 	}{arg1, arg2, arg3})
+	stub := fake.BindApplicationStub
+	fakeReturns := fake.bindApplicationReturns
 	fake.recordInvocation("BindApplication", []interface{}{arg1, arg2, arg3})
 	fake.bindApplicationMutex.Unlock()
-	if fake.BindApplicationStub != nil {
-		return fake.BindApplicationStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.bindApplicationReturns
 	return fakeReturns.result1
 }
 

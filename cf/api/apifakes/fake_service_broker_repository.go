@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServiceBrokerRepository struct {
@@ -109,15 +109,16 @@ func (fake *FakeServiceBrokerRepository) Create(arg1 string, arg2 string, arg3 s
 		arg4 string
 		arg5 string
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -169,15 +170,16 @@ func (fake *FakeServiceBrokerRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -229,15 +231,16 @@ func (fake *FakeServiceBrokerRepository) FindByGUID(arg1 string) (models.Service
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByGUIDStub
+	fakeReturns := fake.findByGUIDReturns
 	fake.recordInvocation("FindByGUID", []interface{}{arg1})
 	fake.findByGUIDMutex.Unlock()
-	if fake.FindByGUIDStub != nil {
-		return fake.FindByGUIDStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -292,15 +295,16 @@ func (fake *FakeServiceBrokerRepository) FindByName(arg1 string) (models.Service
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByNameStub
+	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if fake.FindByNameStub != nil {
-		return fake.FindByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -355,15 +359,16 @@ func (fake *FakeServiceBrokerRepository) ListServiceBrokers(arg1 func(models.Ser
 	fake.listServiceBrokersArgsForCall = append(fake.listServiceBrokersArgsForCall, struct {
 		arg1 func(models.ServiceBroker) bool
 	}{arg1})
+	stub := fake.ListServiceBrokersStub
+	fakeReturns := fake.listServiceBrokersReturns
 	fake.recordInvocation("ListServiceBrokers", []interface{}{arg1})
 	fake.listServiceBrokersMutex.Unlock()
-	if fake.ListServiceBrokersStub != nil {
-		return fake.ListServiceBrokersStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listServiceBrokersReturns
 	return fakeReturns.result1
 }
 
@@ -416,15 +421,16 @@ func (fake *FakeServiceBrokerRepository) Rename(arg1 string, arg2 string) error 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.RenameStub
+	fakeReturns := fake.renameReturns
 	fake.recordInvocation("Rename", []interface{}{arg1, arg2})
 	fake.renameMutex.Unlock()
-	if fake.RenameStub != nil {
-		return fake.RenameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.renameReturns
 	return fakeReturns.result1
 }
 
@@ -476,15 +482,16 @@ func (fake *FakeServiceBrokerRepository) Update(arg1 models.ServiceBroker) error
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.ServiceBroker
 	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

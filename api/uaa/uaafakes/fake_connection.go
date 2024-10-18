@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
 )
 
 type FakeConnection struct {
@@ -32,15 +32,16 @@ func (fake *FakeConnection) Make(arg1 *http.Request, arg2 *uaa.Response) error {
 		arg1 *http.Request
 		arg2 *uaa.Response
 	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 

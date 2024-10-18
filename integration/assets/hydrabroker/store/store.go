@@ -1,7 +1,7 @@
 package store
 
 import (
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/database"
 )
 
 type BrokerID database.ID

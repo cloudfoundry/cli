@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServiceBindingRepository struct {
@@ -61,15 +61,16 @@ func (fake *FakeServiceBindingRepository) Create(arg1 string, arg2 string, arg3 
 		arg2 string
 		arg3 map[string]interface{}
 	}{arg1, arg2, arg3})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -122,15 +123,16 @@ func (fake *FakeServiceBindingRepository) Delete(arg1 models.ServiceInstance, ar
 		arg1 models.ServiceInstance
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1, arg2})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -185,15 +187,16 @@ func (fake *FakeServiceBindingRepository) ListAllForService(arg1 string) ([]mode
 	fake.listAllForServiceArgsForCall = append(fake.listAllForServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ListAllForServiceStub
+	fakeReturns := fake.listAllForServiceReturns
 	fake.recordInvocation("ListAllForService", []interface{}{arg1})
 	fake.listAllForServiceMutex.Unlock()
-	if fake.ListAllForServiceStub != nil {
-		return fake.ListAllForServiceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listAllForServiceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

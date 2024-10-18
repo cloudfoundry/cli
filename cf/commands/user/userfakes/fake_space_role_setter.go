@@ -4,11 +4,11 @@ package userfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/user"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands/user"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 type FakeSpaceRoleSetter struct {
@@ -85,15 +85,16 @@ func (fake *FakeSpaceRoleSetter) Execute(arg1 flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		arg1 flags.FlagContext
 	}{arg1})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -144,15 +145,16 @@ func (fake *FakeSpaceRoleSetter) MetaData() commandregistry.CommandMetadata {
 	ret, specificReturn := fake.metaDataReturnsOnCall[len(fake.metaDataArgsForCall)]
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct {
 	}{})
+	stub := fake.MetaDataStub
+	fakeReturns := fake.metaDataReturns
 	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
-	if fake.MetaDataStub != nil {
-		return fake.MetaDataStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.metaDataReturns
 	return fakeReturns.result1
 }
 
@@ -198,15 +200,16 @@ func (fake *FakeSpaceRoleSetter) Requirements(arg1 requirements.Factory, arg2 fl
 		arg1 requirements.Factory
 		arg2 flags.FlagContext
 	}{arg1, arg2})
+	stub := fake.RequirementsStub
+	fakeReturns := fake.requirementsReturns
 	fake.recordInvocation("Requirements", []interface{}{arg1, arg2})
 	fake.requirementsMutex.Unlock()
-	if fake.RequirementsStub != nil {
-		return fake.RequirementsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requirementsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -262,15 +265,16 @@ func (fake *FakeSpaceRoleSetter) SetDependency(arg1 commandregistry.Dependency, 
 		arg1 commandregistry.Dependency
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.SetDependencyStub
+	fakeReturns := fake.setDependencyReturns
 	fake.recordInvocation("SetDependency", []interface{}{arg1, arg2})
 	fake.setDependencyMutex.Unlock()
-	if fake.SetDependencyStub != nil {
-		return fake.SetDependencyStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setDependencyReturns
 	return fakeReturns.result1
 }
 
@@ -327,15 +331,16 @@ func (fake *FakeSpaceRoleSetter) SetSpaceRole(arg1 models.Space, arg2 string, ar
 		arg5 string
 		arg6 string
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	stub := fake.SetSpaceRoleStub
+	fakeReturns := fake.setSpaceRoleReturns
 	fake.recordInvocation("SetSpaceRole", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.setSpaceRoleMutex.Unlock()
-	if fake.SetSpaceRoleStub != nil {
-		return fake.SetSpaceRoleStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setSpaceRoleReturns
 	return fakeReturns.result1
 }
 

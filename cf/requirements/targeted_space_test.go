@@ -1,10 +1,10 @@
 package requirements_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	. "code.cloudfoundry.org/cli/cf/requirements"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	. "code.cloudfoundry.org/cli/v8/cf/requirements"
+	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

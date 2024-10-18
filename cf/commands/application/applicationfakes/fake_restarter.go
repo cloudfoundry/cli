@@ -4,11 +4,11 @@ package applicationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands/application"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 type FakeRestarter struct {
@@ -84,15 +84,16 @@ func (fake *FakeRestarter) ApplicationRestart(arg1 models.Application, arg2 stri
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ApplicationRestartStub
+	fakeReturns := fake.applicationRestartReturns
 	fake.recordInvocation("ApplicationRestart", []interface{}{arg1, arg2, arg3})
 	fake.applicationRestartMutex.Unlock()
-	if fake.ApplicationRestartStub != nil {
-		return fake.ApplicationRestartStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.applicationRestartReturns
 	return fakeReturns.result1
 }
 
@@ -144,15 +145,16 @@ func (fake *FakeRestarter) Execute(arg1 flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		arg1 flags.FlagContext
 	}{arg1})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -203,15 +205,16 @@ func (fake *FakeRestarter) MetaData() commandregistry.CommandMetadata {
 	ret, specificReturn := fake.metaDataReturnsOnCall[len(fake.metaDataArgsForCall)]
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct {
 	}{})
+	stub := fake.MetaDataStub
+	fakeReturns := fake.metaDataReturns
 	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
-	if fake.MetaDataStub != nil {
-		return fake.MetaDataStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.metaDataReturns
 	return fakeReturns.result1
 }
 
@@ -257,15 +260,16 @@ func (fake *FakeRestarter) Requirements(arg1 requirements.Factory, arg2 flags.Fl
 		arg1 requirements.Factory
 		arg2 flags.FlagContext
 	}{arg1, arg2})
+	stub := fake.RequirementsStub
+	fakeReturns := fake.requirementsReturns
 	fake.recordInvocation("Requirements", []interface{}{arg1, arg2})
 	fake.requirementsMutex.Unlock()
-	if fake.RequirementsStub != nil {
-		return fake.RequirementsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requirementsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -321,15 +325,16 @@ func (fake *FakeRestarter) SetDependency(arg1 commandregistry.Dependency, arg2 b
 		arg1 commandregistry.Dependency
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.SetDependencyStub
+	fakeReturns := fake.setDependencyReturns
 	fake.recordInvocation("SetDependency", []interface{}{arg1, arg2})
 	fake.setDependencyMutex.Unlock()
-	if fake.SetDependencyStub != nil {
-		return fake.SetDependencyStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setDependencyReturns
 	return fakeReturns.result1
 }
 
