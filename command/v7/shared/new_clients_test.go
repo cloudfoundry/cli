@@ -52,8 +52,8 @@ var _ = Describe("New Clients", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeConfig.TargetCallCount()).To(Equal(2))
-			Expect(fakeConfig.DialTimeoutCallCount()).To(Equal(3))
-			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(3))
+			Expect(fakeConfig.DialTimeoutCallCount()).To(Equal(4))
+			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(4))
 		})
 	})
 
