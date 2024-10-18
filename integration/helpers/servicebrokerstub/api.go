@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/integration/helpers"
 
-	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 )
 
 type ServiceAccessConfig struct {
