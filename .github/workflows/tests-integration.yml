@@ -19,6 +19,20 @@ on:
         required: false
         type: string
         default: "8"
+      lease_id:
+        description: When running in a pre-provisioned environment if the user provides the lease-id the workflow will not try to claim a new one
+        required: false
+        type: string
+      run_unit_tests:
+        description: allow users to skip running unit tests whe calling the workflow directly
+        required: false
+        type: boolean
+        default: true
+      reinstall_cfd:
+        description: When lease_id is provided the user can opt out of reinstalling CFD
+        required: false
+        type: boolean
+        default: true
 
   push:
     tags:
@@ -39,7 +53,7 @@ on:
       - ".golangci.json"
 
 env:
-  SHEPHERD_LEASE_ID: ${{ vars.SHEPHERD_LEASE_ID }}
+  SHEPHERD_LEASE_ID: ${{ vars.SHEPHERD_LEASE_ID || inputs.lease_id }}
 
 jobs:
 
@@ -62,6 +76,7 @@ jobs:
           fi
   units:
     name: Basic units to gate for integration tests
+    if: ${{ inputs.run_unit_tests == 'true' }}
     runs-on: ubuntu-latest
     needs:
       - get-sha
@@ -76,10 +91,7 @@ jobs:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
-        run: |
-          if [[ -z $SHEPHERD_LEASE_ID ]]; then
-            make units
-          fi
+        run: make units
 
   claim-env:
     name: Claim and Prep Environment
@@ -185,6 +197,7 @@ jobs:
           apt-get install -y build-essential unzip
 
       - name: Upload latest CAPI release
+        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
         env:
           capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
         run: |
@@ -198,11 +211,10 @@ jobs:
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
 
-          if [[ -z $SHEPHERD_LEASE_ID ]]; then
-            bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
-          fi
+          bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
 
       - name: Checkout cf-deployment
+        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
         uses: actions/checkout@v4
         with:
           repository: cloudfoundry/cf-deployment
@@ -210,6 +222,7 @@ jobs:
           ref: ${{steps.claim.outputs.cf_deployment_version}}    
   
       - name: Deploy Isolation Segment and OIDC Provider
+        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
         run: |
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
@@ -284,6 +297,7 @@ jobs:
 
   unclaim-env:
     name: Unclaim environment
+    if: ${{ inputs.lease_id == '' }}
     runs-on: ubuntu-latest
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     needs:
