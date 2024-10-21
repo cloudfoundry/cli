@@ -180,6 +180,7 @@ jobs:
           check-latest: true
         
       - name: Install Tools
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         run: |
           go version
 
@@ -199,7 +200,7 @@ jobs:
           apt-get install -y build-essential unzip
 
       - name: Upload latest CAPI release
-        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         env:
           capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
         run: |
@@ -216,7 +217,7 @@ jobs:
           bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
 
       - name: Checkout cf-deployment
-        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         uses: actions/checkout@v4
         with:
           repository: cloudfoundry/cf-deployment
@@ -224,7 +225,7 @@ jobs:
           ref: ${{steps.claim.outputs.cf_deployment_version}}    
   
       - name: Deploy Isolation Segment and OIDC Provider
-        if: ${{ inputs.lease_id == '' || inputs.reinstall_cfd == 'true' }}
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         run: |
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
