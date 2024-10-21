@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
 )
 
 const (

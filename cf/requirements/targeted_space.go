@@ -5,10 +5,10 @@ import (
 
 	"errors"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v7/cf"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
 )
 
 type TargetedSpaceRequirement struct {

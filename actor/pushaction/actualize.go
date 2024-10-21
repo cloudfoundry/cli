@@ -3,8 +3,8 @@ package pushaction
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
 	log "github.com/sirupsen/logrus"
 )
 

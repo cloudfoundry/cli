@@ -3,14 +3,14 @@ package serviceaccess
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/api/authentication"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v7/cf/actors"
+	"code.cloudfoundry.org/cli/v7/cf/api/authentication"
+	"code.cloudfoundry.org/cli/v7/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/cf/flags"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
 )
 
 type DisableServiceAccess struct {

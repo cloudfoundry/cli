@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/api/spacequotas"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/formatters"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v7/cf/api/resources"
+	"code.cloudfoundry.org/cli/v7/cf/api/spacequotas"
+	"code.cloudfoundry.org/cli/v7/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/cf/errors"
+	"code.cloudfoundry.org/cli/v7/cf/flags"
+	"code.cloudfoundry.org/cli/v7/cf/formatters"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
+	"code.cloudfoundry.org/cli/v7/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
 )
 
 type CreateSpaceQuota struct {

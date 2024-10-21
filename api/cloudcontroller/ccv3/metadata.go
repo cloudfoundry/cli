@@ -3,8 +3,8 @@ package ccv3
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata resources.Metadata) (JobURL, Warnings, error) {

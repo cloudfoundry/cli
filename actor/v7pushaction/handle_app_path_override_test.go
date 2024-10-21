@@ -4,10 +4,10 @@ import (
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	. "code.cloudfoundry.org/cli/v7/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v7/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/util/manifestparser"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

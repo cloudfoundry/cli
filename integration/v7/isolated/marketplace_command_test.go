@@ -4,13 +4,9 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
-	. "github.com/onsi/gomega/gexec"
+	"code.cloudfoundry.org/cli/v7/integration/helpers/servicebrokerstub"
 )
 
 var _ = Describe("marketplace command", func() {

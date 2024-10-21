@@ -1,9 +1,9 @@
 package pushaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
 )
 
 type PushPlan struct {

@@ -1,7 +1,7 @@
 package pushaction
 
 import (
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 

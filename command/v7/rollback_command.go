@@ -3,12 +3,12 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v7/cf/errors"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	"code.cloudfoundry.org/cli/v7/command/v7/shared"
 )
 
 type RollbackCommand struct {

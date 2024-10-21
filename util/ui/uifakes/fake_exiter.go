@@ -4,7 +4,7 @@ package uifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type FakeExiter struct {

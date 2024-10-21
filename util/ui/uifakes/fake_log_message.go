@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type FakeLogMessage struct {

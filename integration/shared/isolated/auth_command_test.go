@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/api/uaa/uaaversion"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

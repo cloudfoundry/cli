@@ -3,7 +3,7 @@ package v2action
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CloudControllerClient

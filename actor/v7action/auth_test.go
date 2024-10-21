@@ -3,10 +3,10 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v7/api/uaa/constant"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -3,8 +3,8 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/command/flag"
 )
 
 type CreatePrivateDomainCommand struct {

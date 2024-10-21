@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/errors"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/util/generic"
+	"code.cloudfoundry.org/cli/v7/cf/errors"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
+	"code.cloudfoundry.org/cli/v7/util/generic"
 	"gopkg.in/yaml.v2"
 )
 

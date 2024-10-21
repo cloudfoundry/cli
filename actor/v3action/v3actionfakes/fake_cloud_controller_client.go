@@ -5,9 +5,9 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 type FakeCloudControllerClient struct {

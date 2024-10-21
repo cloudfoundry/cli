@@ -3,8 +3,8 @@ package pushaction
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3Actor

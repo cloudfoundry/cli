@@ -5,12 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/configuration"
-	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
-	. "code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v7/cf/configuration"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/confighelpers"
+	. "code.cloudfoundry.org/cli/v7/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v7/plugin"
 
-	"code.cloudfoundry.org/cli/cf/configuration/configurationfakes"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/configurationfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

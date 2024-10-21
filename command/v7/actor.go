@@ -5,14 +5,14 @@ import (
 	"io"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	uaa "code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/constant"
+	uaa "code.cloudfoundry.org/cli/v7/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/resources"
+	"code.cloudfoundry.org/cli/v7/types"
 	"github.com/SermoDigital/jose/jwt"
 )
 

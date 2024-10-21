@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/resources"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type MarketplaceCommand struct {

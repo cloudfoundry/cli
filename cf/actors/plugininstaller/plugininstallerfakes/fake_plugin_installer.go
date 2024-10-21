@@ -4,7 +4,7 @@ package plugininstallerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors/plugininstaller"
+	"code.cloudfoundry.org/cli/v7/cf/actors/plugininstaller"
 )
 
 type FakePluginInstaller struct {

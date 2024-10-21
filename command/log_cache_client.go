@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v7/util"
 	logcache "code.cloudfoundry.org/go-log-cache/v2"
 )
 
@@ -30,31 +30,31 @@ type DebugPrinter struct {
 
 func (p DebugPrinter) PrintError(err error) {
 	for _, output := range p.outputs {
-		_ = output.Start()                          //nolint
-		_ = output.DisplayType("ERROR", time.Now()) //nolint
-		_ = output.DisplayDump(err.Error())         //nolint
-		_ = output.Stop()                           //nolint
+		_ = output.Start()                          // nolint
+		_ = output.DisplayType("ERROR", time.Now()) // nolint
+		_ = output.DisplayDump(err.Error())         // nolint
+		_ = output.Stop()                           // nolint
 	}
 }
 
 func (p DebugPrinter) PrintRequest(req *http.Request) {
 	for _, output := range p.outputs {
-		_ = output.Start()                                                           //nolint
-		_ = output.DisplayType("REQUEST", time.Now())                                //nolint
-		_ = output.DisplayRequestHeader(req.Method, req.URL.RequestURI(), req.Proto) //nolint
-		_ = output.DisplayHost(req.URL.Host)                                         //nolint
-		_ = output.DisplayDump(headersString(req.Header))                            //nolint
-		_ = output.Stop()                                                            //nolint
+		_ = output.Start()                                                           // nolint
+		_ = output.DisplayType("REQUEST", time.Now())                                // nolint
+		_ = output.DisplayRequestHeader(req.Method, req.URL.RequestURI(), req.Proto) // nolint
+		_ = output.DisplayHost(req.URL.Host)                                         // nolint
+		_ = output.DisplayDump(headersString(req.Header))                            // nolint
+		_ = output.Stop()                                                            // nolint
 	}
 }
 
 func (p DebugPrinter) PrintResponse(resp *http.Response) {
 	for _, output := range p.outputs {
-		_ = output.Start()                                        //nolint
-		_ = output.DisplayType("RESPONSE", time.Now())            //nolint
-		_ = output.DisplayResponseHeader(resp.Proto, resp.Status) //nolint
-		_ = output.DisplayDump(headersString(resp.Header))        //nolint
-		_ = output.Stop()                                         //nolint
+		_ = output.Start()                                        // nolint
+		_ = output.DisplayType("RESPONSE", time.Now())            // nolint
+		_ = output.DisplayResponseHeader(resp.Proto, resp.Status) // nolint
+		_ = output.DisplayDump(headersString(resp.Header))        // nolint
+		_ = output.Stop()                                         // nolint
 	}
 }
 
@@ -104,7 +104,7 @@ func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.
 		}).DialContext,
 	}
 
-	var client logcache.HTTPClient //nolint
+	var client logcache.HTTPClient // nolint
 	client = &http.Client{Transport: tr}
 
 	verbose, location := config.Verbose()

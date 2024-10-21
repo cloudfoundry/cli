@@ -1,9 +1,9 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 func (actor Actor) GetServiceBrokers() ([]resources.ServiceBroker, Warnings, error) {

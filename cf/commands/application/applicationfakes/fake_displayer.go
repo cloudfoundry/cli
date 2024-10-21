@@ -4,8 +4,8 @@ package applicationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/commands/application"
+	"code.cloudfoundry.org/cli/v7/cf/models"
 )
 
 type FakeDisplayer struct {

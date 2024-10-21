@@ -1,8 +1,8 @@
 package v2v3action
 
 import (
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V3Actor

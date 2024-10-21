@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/types"
+	v7 "code.cloudfoundry.org/cli/v7/command/v7"
+	"code.cloudfoundry.org/cli/v7/types"
 )
 
 type FakeLabelSetter struct {

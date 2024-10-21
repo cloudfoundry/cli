@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/manifest"
+	. "code.cloudfoundry.org/cli/v7/actor/pushaction"
+	"code.cloudfoundry.org/cli/v7/types"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo/v2"

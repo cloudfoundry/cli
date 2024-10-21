@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
 

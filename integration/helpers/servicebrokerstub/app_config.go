@@ -8,8 +8,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/helpers"
-	. "github.com/onsi/gomega"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 )
 
 func newDefaultConfig() *ServiceBrokerStub {

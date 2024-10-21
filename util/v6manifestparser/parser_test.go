@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	. "code.cloudfoundry.org/cli/util/v6manifestparser"
+	"code.cloudfoundry.org/cli/v7/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v7/util/v6manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

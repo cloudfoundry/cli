@@ -1,7 +1,7 @@
 package global
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -219,7 +219,7 @@ var _ = Describe("rename buildpack command", func() {
 			})
 		})
 
-		//If the user does not provide a stack, and there are multiple ambiguous buildpacks, we assume that they intended to rename the one with an empty stack.
+		// If the user does not provide a stack, and there are multiple ambiguous buildpacks, we assume that they intended to rename the one with an empty stack.
 		When("the user does not provide a stack", func() {
 			var session *Session
 

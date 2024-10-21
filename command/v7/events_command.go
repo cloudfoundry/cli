@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type EventsCommand struct {

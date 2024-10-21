@@ -3,7 +3,7 @@ package v3action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
 )
 
 type SSHAuthentication struct {

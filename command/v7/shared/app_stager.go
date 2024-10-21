@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/resources"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 )
 
 /*

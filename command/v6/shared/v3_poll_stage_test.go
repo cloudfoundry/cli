@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
-	. "code.cloudfoundry.org/cli/command/v6/shared"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	. "code.cloudfoundry.org/cli/v7/command/v6/shared"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

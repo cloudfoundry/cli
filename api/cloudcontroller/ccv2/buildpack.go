@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/uploads"
+	"code.cloudfoundry.org/cli/v7/types"
 )
 
 // Buildpack represents a Cloud Controller Buildpack.

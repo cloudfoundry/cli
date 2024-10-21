@@ -4,7 +4,7 @@ package pushactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/v7/actor/pushaction"
 )
 
 type FakeRandomWordGenerator struct {

@@ -1,12 +1,12 @@
 package helpers
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
-	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	ccWrapper "code.cloudfoundry.org/cli/v7/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	uaaWrapper "code.cloudfoundry.org/cli/v7/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 )
 
 // CreateCCV2Client constructs a client object able to communicate with the

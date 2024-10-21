@@ -1,6 +1,6 @@
 package errors
 
-import . "code.cloudfoundry.org/cli/cf/i18n"
+import . "code.cloudfoundry.org/cli/v7/cf/i18n"
 
 type AccessDeniedError struct {
 }

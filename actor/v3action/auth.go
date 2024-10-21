@@ -3,9 +3,9 @@ package v3action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
 )
 
 func (actor Actor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {

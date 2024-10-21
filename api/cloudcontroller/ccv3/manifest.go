@@ -1,7 +1,7 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/internal"
 )
 
 // GetApplicationManifest returns a (YAML) manifest for an application and its

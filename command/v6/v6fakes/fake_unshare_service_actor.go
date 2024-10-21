@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v2v3action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeUnshareServiceActor struct {

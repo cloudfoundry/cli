@@ -1,6 +1,6 @@
 package v2action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 
 type ServiceInstanceSharedTo ccv2.ServiceInstanceSharedTo
 

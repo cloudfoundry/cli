@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v7/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v7/cf/flags"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
+	testterm "code.cloudfoundry.org/cli/v7/cf/util/testhelpers/terminal"
 )
 
 type RunCommandResult int

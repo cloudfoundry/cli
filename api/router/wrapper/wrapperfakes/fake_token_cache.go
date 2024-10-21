@@ -4,7 +4,7 @@ package wrapperfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/router/wrapper"
+	"code.cloudfoundry.org/cli/v7/api/router/wrapper"
 )
 
 type FakeTokenCache struct {

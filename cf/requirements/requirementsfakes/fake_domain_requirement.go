@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v7/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
 )
 
 type FakeDomainRequirement struct {

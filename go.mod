@@ -1,4 +1,4 @@
-module code.cloudfoundry.org/cli
+module code.cloudfoundry.org/cli/v7
 
 go 1.23.1
 
@@ -50,6 +50,7 @@ require (
 )
 
 require (
+	code.cloudfoundry.org/cli v7.1.0+incompatible // indirect
 	code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect

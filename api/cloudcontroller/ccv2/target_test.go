@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
+	. "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/ccv2fakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

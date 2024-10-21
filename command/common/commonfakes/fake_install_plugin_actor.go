@@ -4,10 +4,10 @@ package commonfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/api/plugin"
-	"code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v7/api/plugin"
+	"code.cloudfoundry.org/cli/v7/command/common"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 )
 
 type FakeInstallPluginActor struct {

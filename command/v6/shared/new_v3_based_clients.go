@@ -1,12 +1,12 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
-	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	ccWrapper "code.cloudfoundry.org/cli/v7/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	uaaWrapper "code.cloudfoundry.org/cli/v7/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
 )
 
 // NewV3BasedClients creates a new V3 Cloud Controller client and UAA client using the

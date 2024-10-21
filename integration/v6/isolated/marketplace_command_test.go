@@ -3,9 +3,9 @@ package isolated
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	"code.cloudfoundry.org/cli/v7/integration/helpers/servicebrokerstub"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

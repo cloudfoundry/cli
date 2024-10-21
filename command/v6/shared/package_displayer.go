@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/v7/command"
 )
 
 type PackageDisplayer struct {

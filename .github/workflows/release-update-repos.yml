@@ -143,7 +143,7 @@ jobs:
           cat <<EOF > cf-cli@${VERSION_MAJOR}.rb
         class CfCliAT${VERSION_MAJOR} < Formula
           desc     "Cloud Foundry CLI"
-          homepage "https://code.cloudfoundry.org/cli"
+          homepage "https://code.cloudfoundry.org/cli/v7"
           version  "${VERSION_BUILD}"
 
           if OS.mac?

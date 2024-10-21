@@ -1,8 +1,8 @@
 package isolated
 
 import (
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	. "code.cloudfoundry.org/cli/v7/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -57,7 +57,7 @@ var _ = Describe("set-space-quota command", func() {
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Out).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 			Eventually(session).Should(Exit(1))
-			//helpers.CheckEnvironmentTargetedCorrectly(true, false, orgName, "set-space-quota", spaceName, quotaName)
+			// helpers.CheckEnvironmentTargetedCorrectly(true, false, orgName, "set-space-quota", spaceName, quotaName)
 		})
 	})
 

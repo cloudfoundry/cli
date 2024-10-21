@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sort"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/util/sorting"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/util/sorting"
 	log "github.com/sirupsen/logrus"
 )
 

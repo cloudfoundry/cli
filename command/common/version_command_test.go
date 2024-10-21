@@ -1,9 +1,9 @@
 package common_test
 
 import (
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/command/commandfakes"
+	. "code.cloudfoundry.org/cli/v7/command/common"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -4,9 +4,9 @@ package cfnetworkingactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 type FakeCloudControllerClient struct {

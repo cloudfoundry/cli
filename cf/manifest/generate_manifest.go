@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/models"
 
 	"gopkg.in/yaml.v2"
 
 	"io"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . App

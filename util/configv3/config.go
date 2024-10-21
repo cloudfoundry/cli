@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v7/version"
 )
 
 // Config combines the settings taken from the .cf/config.json, os.ENV, and the

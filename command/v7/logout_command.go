@@ -1,10 +1,10 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
 

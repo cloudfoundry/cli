@@ -1,6 +1,6 @@
 package v2action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 
 // User represents a CLI user.
 type User ccv2.User

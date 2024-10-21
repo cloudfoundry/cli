@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v7/command/flag"
 )
 
 type BindStagingSecurityGroupCommand struct {

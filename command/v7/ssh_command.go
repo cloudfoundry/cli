@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/util/clissh"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SharedSSHActor

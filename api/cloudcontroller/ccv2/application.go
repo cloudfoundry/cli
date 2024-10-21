@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/v7/types"
 )
 
 // Application represents a Cloud Controller Application.

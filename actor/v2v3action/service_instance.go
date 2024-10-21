@@ -3,9 +3,9 @@ package v2v3action
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 )
 
 func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(shareToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, shareToOrgName string) (Warnings, error) {

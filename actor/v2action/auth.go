@@ -3,8 +3,8 @@ package v2action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
 )
 
 // Authenticate authenticates the user in UAA and sets the returned tokens in

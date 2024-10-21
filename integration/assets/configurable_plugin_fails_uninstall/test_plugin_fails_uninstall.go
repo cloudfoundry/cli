@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v7/plugin"
 	"github.com/blang/semver/v4"
 )
 

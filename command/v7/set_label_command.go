@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	"code.cloudfoundry.org/cli/v7/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LabelSetter

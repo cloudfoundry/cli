@@ -5,7 +5,7 @@ package pushaction
 import (
 	"regexp"
 
-	"code.cloudfoundry.org/cli/util/randomword"
+	"code.cloudfoundry.org/cli/v7/util/randomword"
 )
 
 // Warnings is a list of warnings returned back from the cloud controller

@@ -1,6 +1,6 @@
 package shared
 
-import "code.cloudfoundry.org/cli/actor/v2v3action"
+import "code.cloudfoundry.org/cli/v7/actor/v2v3action"
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ApplicationSummaryActor
 

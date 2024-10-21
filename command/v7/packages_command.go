@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type PackagesCommand struct {

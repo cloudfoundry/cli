@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/internal"
 )
 
 // ServicePlan represents a predefined set of configurations for a Cloud
 // Controller service object.
 type ServicePlan struct {
-	//GUID is the unique identifier of the service plan.
+	// GUID is the unique identifier of the service plan.
 	GUID string
 
 	// Name is the name of the service plan.

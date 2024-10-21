@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v7/api/plugin"
 )
 
 type FakeConnectionWrapper struct {

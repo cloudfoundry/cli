@@ -1,7 +1,7 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 )
 
 // ServiceKey represents a set of credentials for a service instance.

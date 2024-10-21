@@ -1,9 +1,9 @@
 package userprint
 
 import (
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/v7/cf/i18n"
+	"code.cloudfoundry.org/cli/v7/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
 )
 
 type SpaceUsersUIPrinter struct {

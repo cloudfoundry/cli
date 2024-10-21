@@ -1,7 +1,7 @@
 package flag
 
 import (
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/types"
 )
 
 type MemoryWithUnlimited types.NullInt

@@ -6,9 +6,9 @@ package pushaction_test
 import (
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v7/actor/pushaction"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

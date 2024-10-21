@@ -2,8 +2,8 @@ package shared
 
 import (
 	"code.cloudfoundry.org/bytefmt"
-	"code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/actor/pushaction"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {

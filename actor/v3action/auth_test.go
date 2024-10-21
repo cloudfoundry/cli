@@ -6,11 +6,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v7/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/v7/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
 )
 
 var _ = Describe("Auth Actions", func() {

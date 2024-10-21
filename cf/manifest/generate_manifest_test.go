@@ -5,7 +5,7 @@ import (
 
 	"bytes"
 
-	. "code.cloudfoundry.org/cli/cf/manifest"
+	. "code.cloudfoundry.org/cli/v7/cf/manifest"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

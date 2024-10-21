@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/internal"
 )
 
 // User represents a Cloud Controller User.

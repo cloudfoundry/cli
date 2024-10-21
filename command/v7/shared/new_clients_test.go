@@ -5,11 +5,11 @@ import (
 	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/command/commandfakes"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v7/command/v7/shared"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

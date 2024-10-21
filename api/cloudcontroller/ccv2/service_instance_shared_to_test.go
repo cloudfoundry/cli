@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	. "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

@@ -3,8 +3,8 @@ package pushaction
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -15,7 +15,7 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	var archivePath string
 	var err error
 
-	//change to look at unmatched
+	// change to look at unmatched
 	if config.Archive {
 		archivePath, err = actor.SharedActor.ZipArchiveResources(config.Path, actor.ConvertV2ResourcesToSharedResources(config.UnmatchedResources))
 	} else {

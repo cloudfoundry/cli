@@ -3,7 +3,7 @@ package actionerror
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 )
 
 // SecurityGroupNotBoundError is returned when a requested security group is

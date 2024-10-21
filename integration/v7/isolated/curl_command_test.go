@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	. "code.cloudfoundry.org/cli/v7/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

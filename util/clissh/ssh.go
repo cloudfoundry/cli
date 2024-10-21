@@ -17,8 +17,8 @@ import (
 	"syscall"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
-	"code.cloudfoundry.org/cli/util/clissh/ssherror"
+	"code.cloudfoundry.org/cli/v7/cf/ssh/sigwinch"
+	"code.cloudfoundry.org/cli/v7/util/clissh/ssherror"
 	"github.com/moby/term"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"

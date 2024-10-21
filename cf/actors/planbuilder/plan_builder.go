@@ -1,9 +1,9 @@
 package planbuilder
 
 import (
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/api/organizations"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/api"
+	"code.cloudfoundry.org/cli/v7/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v7/cf/models"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PlanBuilder

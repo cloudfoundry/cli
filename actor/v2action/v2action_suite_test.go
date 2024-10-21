@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	. "code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	. "code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2action/v2actionfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"

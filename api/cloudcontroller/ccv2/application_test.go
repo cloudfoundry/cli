@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	. "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -524,7 +524,7 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplication", func() {
 		When("the update is successful", func() {
-			When("updating all fields", func() { //are we encoding everything correctly?
+			When("updating all fields", func() { // are we encoding everything correctly?
 				BeforeEach(func() {
 					response1 := `{
 				"metadata": {

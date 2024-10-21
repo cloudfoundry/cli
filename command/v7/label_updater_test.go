@@ -5,14 +5,14 @@ import (
 	"regexp"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/command/commandfakes"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v7/command/v7"
+	"code.cloudfoundry.org/cli/v7/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v7/types"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -306,7 +306,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
-					//FIXME do we want to change the labels to all have nil values?
+					// FIXME do we want to change the labels to all have nil values?
 				})
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
@@ -316,7 +316,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
-					//FIXME do we want to change the labels to all have not nil values?
+					// FIXME do we want to change the labels to all have not nil values?
 				})
 
 				It("shows 'Setting' as action", func() {
@@ -456,7 +456,7 @@ var _ = Describe("LabelUpdater", func() {
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
-					//FIXME do we want to change the labels to all have not nil values?
+					// FIXME do we want to change the labels to all have not nil values?
 				})
 
 				When("stack is passed", func() {
