@@ -3,9 +3,9 @@ package api
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 )
 
 type ServiceInstancesSummaries struct {

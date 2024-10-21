@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/resources"
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 type UpdateUserProvidedServiceCommand struct {

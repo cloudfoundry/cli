@@ -1,8 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (resources.RelationshipList, Warnings, error) {

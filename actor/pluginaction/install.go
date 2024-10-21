@@ -8,10 +8,10 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/plugin"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
-	"code.cloudfoundry.org/cli/v8/util/generic"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/plugin"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
+	"code.cloudfoundry.org/cli/v9/util/generic"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 

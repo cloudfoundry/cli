@@ -3,13 +3,13 @@ package space_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
-	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

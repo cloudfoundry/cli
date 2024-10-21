@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/v7/shared"
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 type BindServiceCommand struct {

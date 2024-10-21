@@ -1,22 +1,22 @@
 package organization_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/cf/commands/user/userfakes"
-	"code.cloudfoundry.org/cli/v8/cf/errors"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/user/userfakes"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
 
-	"code.cloudfoundry.org/cli/v8/cf/api/featureflags/featureflagsfakes"
-	"code.cloudfoundry.org/cli/v8/cf/api/organizations/organizationsfakes"
-	"code.cloudfoundry.org/cli/v8/cf/api/quotas/quotasfakes"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/featureflags/featureflagsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/quotas/quotasfakes"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

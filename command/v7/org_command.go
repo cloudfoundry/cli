@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/flag"
 )
 
 type OrgCommand struct {

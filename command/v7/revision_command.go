@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/command"
-	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/flag"
 )
 
 type RevisionCommand struct {

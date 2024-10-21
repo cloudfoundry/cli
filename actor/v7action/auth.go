@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/uaa/constant"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 type defaultAuthActor struct {

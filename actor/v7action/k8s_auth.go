@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"sort"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v8/api/uaa/constant"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/resources"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )

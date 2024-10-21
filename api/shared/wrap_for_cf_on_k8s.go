@@ -15,8 +15,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/transport"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command"
 
 	// imported for the side effects
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"

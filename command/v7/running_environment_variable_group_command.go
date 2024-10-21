@@ -1,8 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type RunningEnvironmentVariableGroupCommand struct {

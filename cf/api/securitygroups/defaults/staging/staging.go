@@ -1,11 +1,11 @@
 package staging
 
 import (
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 
-	. "code.cloudfoundry.org/cli/v8/cf/api/securitygroups/defaults"
+	. "code.cloudfoundry.org/cli/v9/cf/api/securitygroups/defaults"
 )
 
 const urlPath = "/v2/config/staging_security_groups"

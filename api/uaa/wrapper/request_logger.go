@@ -8,7 +8,7 @@ import (
 	"sort"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RequestLoggerOutput

@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/integration/helpers"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

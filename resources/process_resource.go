@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 type Process struct {

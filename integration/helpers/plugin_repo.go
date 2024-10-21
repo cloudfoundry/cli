@@ -9,8 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/v8/util"
-	"code.cloudfoundry.org/cli/v8/util/generic"
+	"code.cloudfoundry.org/cli/v9/util"
+	"code.cloudfoundry.org/cli/v9/util/generic"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

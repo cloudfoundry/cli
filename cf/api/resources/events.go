@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/util/generic"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/util/generic"
 )
 
 type EventResource interface {

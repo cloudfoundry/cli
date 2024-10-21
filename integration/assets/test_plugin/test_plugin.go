@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/v8/plugin"
+	"code.cloudfoundry.org/cli/v9/plugin"
 )
 
 type Test1 struct {

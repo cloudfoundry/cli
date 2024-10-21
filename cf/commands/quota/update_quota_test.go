@@ -1,23 +1,23 @@
 package quota_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/cf/api/quotas/quotasfakes"
-	"code.cloudfoundry.org/cli/v8/cf/api/resources"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	cmdsQuota "code.cloudfoundry.org/cli/v8/cf/commands/quota"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/errors"
-	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
-	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/quotas/quotasfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/resources"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	cmdsQuota "code.cloudfoundry.org/cli/v9/cf/commands/quota"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/v8/cf/flags"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

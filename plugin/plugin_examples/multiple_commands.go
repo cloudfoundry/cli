@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/plugin"
+	"code.cloudfoundry.org/cli/v9/plugin"
 )
 
 type MultiCmd struct{}

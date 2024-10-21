@@ -1,9 +1,9 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 // CreateApplication creates an application with the given settings.

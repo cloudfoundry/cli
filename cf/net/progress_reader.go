@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/cf/formatters"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/formatters"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type ProgressReader struct {

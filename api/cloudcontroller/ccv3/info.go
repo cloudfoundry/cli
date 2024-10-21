@@ -3,9 +3,9 @@ package ccv3
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 type InfoLinks struct {

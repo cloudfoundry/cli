@@ -3,10 +3,10 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/api/uaa"
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 )
 
 type CreateUserCommand struct {

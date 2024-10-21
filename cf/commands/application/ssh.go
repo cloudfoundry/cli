@@ -8,17 +8,17 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/commands"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/flags"
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
-	"code.cloudfoundry.org/cli/v8/cf/net"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	sshCmd "code.cloudfoundry.org/cli/v8/cf/ssh"
-	"code.cloudfoundry.org/cli/v8/cf/ssh/options"
-	sshTerminal "code.cloudfoundry.org/cli/v8/cf/ssh/terminal"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commands"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	sshCmd "code.cloudfoundry.org/cli/v9/cf/ssh"
+	"code.cloudfoundry.org/cli/v9/cf/ssh/options"
+	sshTerminal "code.cloudfoundry.org/cli/v9/cf/ssh/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type SSH struct {

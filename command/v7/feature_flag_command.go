@@ -1,10 +1,10 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/v7/shared"
-	"code.cloudfoundry.org/cli/v8/resources"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type FeatureFlagCommand struct {

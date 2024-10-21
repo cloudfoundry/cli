@@ -1,6 +1,6 @@
 package plugin
 
-import plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+import plugin_models "code.cloudfoundry.org/cli/v9/plugin/models"
 
 /*
 *

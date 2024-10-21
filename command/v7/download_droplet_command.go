@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 )
 
 type DownloadDropletCommand struct {

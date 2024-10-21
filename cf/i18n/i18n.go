@@ -1,6 +1,6 @@
 package i18n
 
-import "code.cloudfoundry.org/cli/v8/util/ui"
+import "code.cloudfoundry.org/cli/v9/util/ui"
 
 var T ui.TranslateFunc
 

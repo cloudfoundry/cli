@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/bytefmt"
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/command"
-	"code.cloudfoundry.org/cli/v8/resources"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/v8/cf/configuration"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/version"
+	"code.cloudfoundry.org/cli/v9/cf/configuration"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/version"
 	"github.com/blang/semver/v4"
 )
 

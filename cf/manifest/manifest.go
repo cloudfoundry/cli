@@ -7,12 +7,12 @@ import (
 	"regexp"
 	"strconv"
 
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
 
-	"code.cloudfoundry.org/cli/v8/cf/formatters"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/util/generic"
-	"code.cloudfoundry.org/cli/v8/util/randomword"
+	"code.cloudfoundry.org/cli/v9/cf/formatters"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/util/generic"
+	"code.cloudfoundry.org/cli/v9/util/randomword"
 )
 
 type Manifest struct {

@@ -4,9 +4,9 @@ package pluginrepofakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/v8-plugin-repo/web"
-	"code.cloudfoundry.org/cli/v8/cf/actors/pluginrepo"
-	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli-plugin-repo/web"
+	"code.cloudfoundry.org/cli/v9/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakePluginRepo struct {

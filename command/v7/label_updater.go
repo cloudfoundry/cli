@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
-	"code.cloudfoundry.org/cli/v8/types"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SetLabelActor

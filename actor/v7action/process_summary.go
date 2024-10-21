@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/resources"
 	log "github.com/sirupsen/logrus"
 )
 

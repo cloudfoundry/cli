@@ -3,12 +3,12 @@ package v7action_test
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
-	. "code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	. "code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 // ProcessInstance represents a single process instance for a particular

@@ -1,9 +1,9 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/router"
-	"code.cloudfoundry.org/cli/v8/api/router/routererror"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/router"
+	"code.cloudfoundry.org/cli/v9/api/router/routererror"
 )
 
 type RouterGroup router.RouterGroup

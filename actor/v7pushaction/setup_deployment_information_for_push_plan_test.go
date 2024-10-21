@@ -1,9 +1,9 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 
-	. "code.cloudfoundry.org/cli/v8/actor/v7pushaction"
+	. "code.cloudfoundry.org/cli/v9/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

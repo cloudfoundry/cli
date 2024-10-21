@@ -3,9 +3,9 @@ package shared
 import (
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
-	"code.cloudfoundry.org/cli/v8/api/uaa"
-	"code.cloudfoundry.org/cli/v8/command"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 )
 
 // NewNetworkingClient creates a new cfnetworking client.

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/types"
 	flags "github.com/jessevdk/go-flags"
 )
 

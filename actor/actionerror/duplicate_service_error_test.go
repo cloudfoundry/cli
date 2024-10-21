@@ -1,7 +1,7 @@
 package actionerror_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

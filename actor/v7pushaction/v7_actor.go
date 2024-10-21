@@ -3,9 +3,9 @@ package v7pushaction
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . V7Actor

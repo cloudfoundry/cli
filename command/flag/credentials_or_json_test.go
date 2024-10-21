@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	. "code.cloudfoundry.org/cli/v8/command/flag"
+	. "code.cloudfoundry.org/cli/v9/command/flag"
 	flags "github.com/jessevdk/go-flags"
 
 	. "github.com/onsi/ginkgo/v2"

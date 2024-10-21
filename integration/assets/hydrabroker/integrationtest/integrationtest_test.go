@@ -11,10 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/app"
-	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/resources"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	uuid2 "github.com/nu7hatch/gouuid"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 

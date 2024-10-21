@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
-	"code.cloudfoundry.org/cli/v8/cf/trace"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/trace"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RequestDumperInterface

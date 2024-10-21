@@ -8,11 +8,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 io.Reader

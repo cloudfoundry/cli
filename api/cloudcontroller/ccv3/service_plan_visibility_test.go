@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
-	. "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/resources"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

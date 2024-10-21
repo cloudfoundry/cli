@@ -1,16 +1,16 @@
 package environmentvariablegroup_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/cf/api/environmentvariablegroups/environmentvariablegroupsfakes"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	cf_errors "code.cloudfoundry.org/cli/v8/cf/errors"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
-	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/environmentvariablegroups/environmentvariablegroupsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	cf_errors "code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

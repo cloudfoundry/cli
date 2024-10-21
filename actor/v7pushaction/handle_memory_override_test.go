@@ -1,10 +1,10 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
-	"code.cloudfoundry.org/cli/v8/util/manifestparser"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/util/manifestparser"
 
-	. "code.cloudfoundry.org/cli/v8/actor/v7pushaction"
+	. "code.cloudfoundry.org/cli/v9/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

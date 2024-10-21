@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/v8/command/v7"
-	"code.cloudfoundry.org/cli/v8/resources"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 type FakeDiffDisplayer struct {
@@ -37,15 +37,16 @@ func (fake *FakeDiffDisplayer) DisplayDiff(arg1 []byte, arg2 resources.ManifestD
 		arg1 []byte
 		arg2 resources.ManifestDiff
 	}{arg1Copy, arg2})
+	stub := fake.DisplayDiffStub
+	fakeReturns := fake.displayDiffReturns
 	fake.recordInvocation("DisplayDiff", []interface{}{arg1Copy, arg2})
 	fake.displayDiffMutex.Unlock()
-	if fake.DisplayDiffStub != nil {
-		return fake.DisplayDiffStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.displayDiffReturns
 	return fakeReturns.result1
 }
 

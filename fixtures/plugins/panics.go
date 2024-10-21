@@ -10,7 +10,7 @@ package main
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/v8/plugin"
+	"code.cloudfoundry.org/cli/v9/plugin"
 )
 
 type Panics struct {

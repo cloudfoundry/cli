@@ -1,6 +1,6 @@
 package v7pushaction
 
-import "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+import "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 
 func SetupDeploymentInformationForPushPlan(pushPlan PushPlan, overrides FlagOverrides) (PushPlan, error) {
 	pushPlan.Strategy = overrides.Strategy

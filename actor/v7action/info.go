@@ -1,6 +1,6 @@
 package v7action
 
-import "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+import "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 
 type Info ccv3.Info
 

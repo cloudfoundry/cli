@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/v8/plugin"
+	"code.cloudfoundry.org/cli/v9/plugin"
 )
 
 type TestPluginWithCommandOverrides struct {

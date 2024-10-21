@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sort"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 type ServicePlanWithSpaceAndOrganization ccv3.ServicePlanWithSpaceAndOrganization

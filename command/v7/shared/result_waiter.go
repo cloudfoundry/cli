@@ -3,8 +3,8 @@ package shared
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command"
 )
 
 func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, error) {

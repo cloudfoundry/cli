@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/v8/command/flag"
+	. "code.cloudfoundry.org/cli/v9/command/flag"
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

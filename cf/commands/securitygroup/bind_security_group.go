@@ -3,17 +3,17 @@ package securitygroup
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/cf/api/organizations"
-	"code.cloudfoundry.org/cli/v8/cf/api/securitygroups"
-	sgbinder "code.cloudfoundry.org/cli/v8/cf/api/securitygroups/spaces"
-	"code.cloudfoundry.org/cli/v8/cf/api/spaces"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/flags"
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/requirements"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v9/cf/api/securitygroups"
+	sgbinder "code.cloudfoundry.org/cli/v9/cf/api/securitygroups/spaces"
+	"code.cloudfoundry.org/cli/v9/cf/api/spaces"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type BindSecurityGroup struct {

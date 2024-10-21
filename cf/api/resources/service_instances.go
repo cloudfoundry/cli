@@ -1,6 +1,6 @@
 package resources
 
-import "code.cloudfoundry.org/cli/v8/cf/models"
+import "code.cloudfoundry.org/cli/v9/cf/models"
 
 type PaginatedServiceInstanceResources struct {
 	TotalResults int `json:"total_results"`

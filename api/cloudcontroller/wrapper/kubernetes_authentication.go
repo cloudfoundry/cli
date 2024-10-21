@@ -3,10 +3,10 @@ package wrapper
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/api/shared"
-	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/shared"
+	"code.cloudfoundry.org/cli/v9/command"
 )
 
 type KubernetesAuthentication struct {

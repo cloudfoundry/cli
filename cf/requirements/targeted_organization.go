@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/cf"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	. "code.cloudfoundry.org/cli/v8/cf/i18n"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TargetedOrgRequirement

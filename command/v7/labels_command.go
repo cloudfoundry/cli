@@ -5,11 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
-	"code.cloudfoundry.org/cli/v8/types"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type ResourceType string

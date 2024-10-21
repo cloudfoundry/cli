@@ -3,9 +3,9 @@ package pluginaction
 import (
 	"runtime"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/util/configv3"
-	"code.cloudfoundry.org/cli/v8/util/generic"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
+	"code.cloudfoundry.org/cli/v9/util/generic"
 )
 
 type PluginInfo struct {

@@ -1,4 +1,4 @@
-module code.cloudfoundry.org/cli/v8
+module code.cloudfoundry.org/cli/v9
 
 go 1.23.1
 

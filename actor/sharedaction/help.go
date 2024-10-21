@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/util/sorting"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/util/sorting"
 )
 
 const (

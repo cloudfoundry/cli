@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
 	"github.com/SermoDigital/jose/jws"
 )
 

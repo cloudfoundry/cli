@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v8/cf/api/resources"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/api/resources"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceBindingRepository

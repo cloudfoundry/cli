@@ -3,8 +3,8 @@ package resources
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 // Buildpack represents a Cloud Controller V3 buildpack.

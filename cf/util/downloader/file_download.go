@@ -1,7 +1,7 @@
 package downloader
 
 import (
-	"code.cloudfoundry.org/cli/v8/util"
+	"code.cloudfoundry.org/cli/v9/util"
 	"fmt"
 	"io"
 	"net/http"

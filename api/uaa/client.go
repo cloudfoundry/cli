@@ -10,7 +10,7 @@ import (
 	"runtime"
 
 	legacy "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/v8/api/uaa/internal"
+	"code.cloudfoundry.org/cli/v9/api/uaa/internal"
 )
 
 // Client is the UAA client

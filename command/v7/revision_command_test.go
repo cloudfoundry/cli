@@ -1,10 +1,10 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/v8/command/commandfakes"
-	v7 "code.cloudfoundry.org/cli/v8/command/v7"
-	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/cli/v9/command/commandfakes"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

@@ -1,8 +1,8 @@
 package cfnetworkingaction
 
 import (
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CloudControllerClient

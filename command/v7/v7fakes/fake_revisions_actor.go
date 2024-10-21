@@ -4,9 +4,9 @@ package v7fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	v7 "code.cloudfoundry.org/cli/v8/command/v7"
-	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 type FakeRevisionsActor struct {
@@ -37,15 +37,16 @@ func (fake *FakeRevisionsActor) GetRevisionsByApplicationNameAndSpace(arg1 strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetRevisionsByApplicationNameAndSpaceStub
+	fakeReturns := fake.getRevisionsByApplicationNameAndSpaceReturns
 	fake.recordInvocation("GetRevisionsByApplicationNameAndSpace", []interface{}{arg1, arg2})
 	fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
-	if fake.GetRevisionsByApplicationNameAndSpaceStub != nil {
-		return fake.GetRevisionsByApplicationNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRevisionsByApplicationNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
