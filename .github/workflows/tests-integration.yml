@@ -20,16 +20,16 @@ on:
         type: string
         default: "8"
       lease_id:
-        description: When running in a pre-provisioned environment if the user provides the lease-id the workflow will not try to claim a new one
+        description: Pre-provisioned environment lease-id to use in tests
         required: false
         type: string
       run_unit_tests:
-        description: allow users to skip running unit tests whe calling the workflow directly
+        description: Run unit tests
         required: false
         type: boolean
         default: true
       reinstall_cfd:
-        description: When lease_id is provided the user can opt out of reinstalling CFD
+        description: Force re-installation of CFD
         required: false
         type: boolean
         default: true
