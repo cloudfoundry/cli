@@ -76,21 +76,23 @@ jobs:
           fi
   units:
     name: Basic units to gate for integration tests
-    if: ${{ inputs.run_unit_tests == 'true' }}
     runs-on: ubuntu-latest
     needs:
       - get-sha
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        if: ${{ inputs.run_unit_tests == 'true' }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
       - name: Set Up Go
         uses: actions/setup-go@v5
+        if: ${{ inputs.run_unit_tests == 'true' }}
         with:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
+        if: ${{ inputs.run_unit_tests == 'true' }}
         run: make units
 
   claim-env:
