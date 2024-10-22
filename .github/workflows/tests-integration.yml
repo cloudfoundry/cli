@@ -231,20 +231,18 @@ jobs:
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
           eval "$(bbl print-env --metadata-file metadata.json)"
 
-          if [[ -z $SHEPHERD_LEASE_ID ]]; then
-            bosh -d cf manifest > /tmp/manifest.yml
-            bosh interpolate /tmp/manifest.yml \
-              -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
-              -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
-              -o .github/ops-files/use-latest-capi.yml \
-              -o .github/ops-files/add-oidc-provider.yml \
-              -o .github/ops-files/add-uaa-client-credentials.yml \
-              -o .github/ops-files/diego-cell-instances.yml \
-              -v client-secret="${{ secrets.CLIENT_SECRET }}" \
-              > ./director.yml
+          bosh -d cf manifest > /tmp/manifest.yml
+          bosh interpolate /tmp/manifest.yml \
+            -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
+            -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
+            -o .github/ops-files/use-latest-capi.yml \
+            -o .github/ops-files/add-oidc-provider.yml \
+            -o .github/ops-files/add-uaa-client-credentials.yml \
+            -o .github/ops-files/diego-cell-instances.yml \
+            -v client-secret="${{ secrets.CLIENT_SECRET }}" \
+            > ./director.yml
 
-            bosh -d cf deploy director.yml -n
-          fi
+          bosh -d cf deploy director.yml -n
           echo "Deployed CAPI version:"
           bosh -d cf releases | grep capi
 
