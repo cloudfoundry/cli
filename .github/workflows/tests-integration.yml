@@ -53,7 +53,7 @@ on:
       - ".golangci.json"
 
 env:
-  SHEPHERD_LEASE_ID: ${{ vars.SHEPHERD_LEASE_ID || inputs.lease_id }}
+  SHEPHERD_LEASE_ID: ${{ inputs.lease_id || vars.SHEPHERD_LEASE_ID}}
 
 jobs:
 
