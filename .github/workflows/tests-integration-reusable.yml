@@ -22,6 +22,9 @@ on:
       lease-id:
         required: true
         type: string
+      lease-namespace:
+        required: false
+        type: string
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
@@ -70,6 +73,7 @@ jobs:
     - name: Install Tools
       env:
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        namespace:     ${{ inputs.lease-namespace || vars.POOL_NAMESPACE || 'tas-devex' }}
       run: |
         go version
 
