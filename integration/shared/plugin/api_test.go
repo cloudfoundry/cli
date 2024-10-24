@@ -15,6 +15,7 @@ import (
 var _ = Describe("plugin API", func() {
 	var orgName string
 	BeforeEach(func() {
+		orgName = ""
 		installTestPlugin()
 	})
 
