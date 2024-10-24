@@ -23,6 +23,10 @@ on:
         description: Pre-provisioned environment lease-id to use in tests
         required: false
         type: string
+      lease_namespace:
+        description: Pre-provisioned environment lease namespace to use in tests
+        required: false
+        type: string
       run_unit_tests:
         description: Run unit tests
         required: false
@@ -120,7 +124,7 @@ jobs:
           pool_name:      ${{ vars.SHEPHERD_POOL_NAME }}
           pool_duration:  ${{ vars.SHEPHERD_POOL_DURATION  || '8h' }}
           pool_namespace: ${{ vars.SHEPHERD_POOL_NAMESPACE || 'official' }}
-          namespace:      ${{ vars.POOL_NAMESPACE          || 'tas-devex' }}
+          namespace:      ${{ inputs.lease_namespace       || vars.POOL_NAMESPACE || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
 
