@@ -170,7 +170,6 @@ var _ = Describe("plugin API", func() {
 		})
 
 		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
 			broker.Forget()
 		})
 
