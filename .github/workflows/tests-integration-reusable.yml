@@ -251,4 +251,4 @@ jobs:
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
-        make integration-tests-full-ci
+        make integration-tests-ci-client-creds

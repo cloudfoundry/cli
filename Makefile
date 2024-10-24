@@ -132,6 +132,7 @@ integration-selfcontained: build install-test-deps
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
 
+integration-tests-ci-client-creds: build integration-cleanup integration-push integration-global integration-selfcontained
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
