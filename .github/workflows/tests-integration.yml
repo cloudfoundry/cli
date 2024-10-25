@@ -1,3 +1,13 @@
+# GitHub repo level Secrets and Variables
+
+# secrets.CLIENT_SECRET
+# secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
+# vars.CAPI_RELEASE_VERSION
+# vars.SHEPHERD_LEASE_NAMESPACE
+# vars.SHEPHERD_POOL_DURATION
+# vars.SHEPHERD_POOL_NAME
+# vars.SHEPHERD_POOL_NAMESPACE
+
 name: "Tests: Integration"
 
 run-name: "Integration [${{ github.event_name }}: ${{ github.event.pull_request.head.sha || github.event.push.after || github.event.workflow_run.head_sha}}]: ${{ github.event.workflow_run.head_commit.message }}"
@@ -57,7 +67,7 @@ on:
       - ".golangci.json"
 
 env:
-  SHEPHERD_LEASE_ID: ${{ inputs.lease_id || vars.SHEPHERD_LEASE_ID}}
+  SHEPHERD_LEASE_ID: ${{ inputs.lease_id }}
 
 jobs:
 
@@ -120,20 +130,20 @@ jobs:
       - name: claim
         id: claim
         env:
-          account_token:  ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          pool_name:      ${{ vars.SHEPHERD_POOL_NAME }}
-          pool_duration:  ${{ vars.SHEPHERD_POOL_DURATION  || '8h' }}
-          pool_namespace: ${{ vars.SHEPHERD_POOL_NAMESPACE || 'official' }}
-          namespace:      ${{ inputs.lease_namespace       || vars.POOL_NAMESPACE || 'tas-devex' }}
+          account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          pool_name:        ${{ vars.SHEPHERD_POOL_NAME }}
+          pool_duration:    ${{ vars.SHEPHERD_POOL_DURATION  || '8h' }}
+          pool_namespace:   ${{ vars.SHEPHERD_POOL_NAMESPACE || 'official' }}
+          lease_namespace:  ${{ inputs.lease_namespace       || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
 
           if [[ -z $SHEPHERD_LEASE_ID ]]; then
             lease_id=$( shepherd create lease \
-                          --duration       ${pool_duration}  \
-                          --pool           ${pool_name}      \
-                          --pool-namespace ${pool_namespace} \
-                          --namespace      ${namespace}      \
+                          --duration       ${pool_duration}   \
+                          --pool           ${pool_name}       \
+                          --pool-namespace ${pool_namespace}  \
+                          --namespace      ${lease_namespace} \
                           --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
                           --json \
                         | jq -r .id
@@ -150,13 +160,13 @@ jobs:
           while [ $count -lt 360 ] ; do
             sleep 30
             status=$( shepherd get lease ${lease_id} \
-                        --namespace ${namespace} \
+                        --namespace ${lease_namespace} \
                         --json \
                       | jq -r .status
                     )
             if [ $status == "LEASED" ] ; then
               shepherd get lease ${lease_id} \
-                --namespace ${namespace} \
+                --namespace ${lease_namespace} \
                 --json \
               | jq .output > metadata.json
               break
@@ -314,10 +324,11 @@ jobs:
     steps:
       - name: unclaim
         env:
-          account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          namespace:     ${{ vars.POOL_NAMESPACE || 'tas-devex' }}
+          account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          lease_namespace:  ${{ inputs.lease_namespace || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
           set -x
           shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
-            --namespace ${namespace}
+            --namespace ${lease_namespace}
+

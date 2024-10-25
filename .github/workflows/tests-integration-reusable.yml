@@ -3,7 +3,7 @@
 # secrets.CLIENT_SECRET
 # secrets.GITHUB_TOKEN
 # secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
-# vars.SHEPHERD_POOL_NAME
+# vars.TEST_FLAKE_ATTEMPTS
 
 name: "pvt: run integration tests"
 
@@ -25,6 +25,7 @@ on:
       lease-namespace:
         required: false
         type: string
+        default: 'tas-devex'
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
@@ -72,8 +73,9 @@ jobs:
 
     - name: Install Tools
       env:
-        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-        namespace:     ${{ inputs.lease-namespace || vars.POOL_NAMESPACE || 'tas-devex' }}
+        account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        lease_namespace:  ${{ inputs.lease-namespace }}
+        lease_id:         ${{ inputs.lease-id }}
       run: |
         go version
 
@@ -107,7 +109,7 @@ jobs:
         apt-get install -y build-essential unzip
 
         shepherd login service-account ${account_token}
-        shepherd get lease ${{ inputs.lease-id }} --namespace tas-devex --json | jq .output > metadata.json
+        shepherd get lease ${lease_id} --namespace ${lease_namespace} --json | jq .output > metadata.json
 
     - name: Add CATS config
       if: ${{ inputs.name == 'cats' }}
