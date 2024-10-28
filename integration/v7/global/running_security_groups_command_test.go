@@ -70,6 +70,7 @@ var _ = Describe("running-security-groups command", func() {
 
 			AfterEach(func() {
 				helpers.DeleteSecurityGroup(securityGroup)
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("displays the globally enabled running security groups exits 0", func() {
