@@ -30,6 +30,10 @@ var _ = Describe("spaces command", func() {
 			helpers.TargetOrg(orgName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("there are no spaces", func() {
 			It("displays no spaces found", func() {
 				session := helpers.CF("spaces")

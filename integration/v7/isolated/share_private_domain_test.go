@@ -58,6 +58,11 @@ var _ = Describe("share-private-domain command", func() {
 			domain.CreatePrivate()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(sharedWithOrgName)
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		It("should create the shared domain", func() {
 			session := helpers.CF("share-private-domain", sharedWithOrgName, domainName)
 

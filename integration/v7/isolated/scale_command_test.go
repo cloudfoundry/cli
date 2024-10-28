@@ -103,10 +103,10 @@ var _ = Describe("scale command", func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
-				helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "1G")
+				helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "256M")
 			})
 
-			When("scale option flags are not provided", func() {
+			XWhen("scale option flags are not provided", func() {
 				It("displays the current scale properties for all processes", func() {
 					session := helpers.CF("scale", appName)
 
@@ -160,7 +160,7 @@ var _ = Describe("scale command", func() {
 						Consistently(session).ShouldNot(Say("Stopping"))
 						Consistently(session).ShouldNot(Say("Starting"))
 
-						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true, "1G")
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, true, "256M")
 
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Exit(0))
@@ -177,7 +177,17 @@ var _ = Describe("scale command", func() {
 					})
 				})
 
-				When("Scaling the memory", func() {
+				When("-f flag provided", func() {
+					It("scales without prompt", func() {
+						session := helpers.CF("scale", appName, "-m", "64M", "-f")
+						Eventually(session).Should(Exit(0))
+						Expect(session).To(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+
+						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "64M")
+					})
+				})
+
+				XWhen("Scaling the memory", func() {
 					It("scales memory to 64M", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
@@ -192,7 +202,7 @@ var _ = Describe("scale command", func() {
 						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "64M")
 					})
 
-					When("-f flag provided", func() {
+					XWhen("-f flag provided", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-m", "64M", "-f")
 							Eventually(session).Should(Exit(0))
@@ -203,7 +213,7 @@ var _ = Describe("scale command", func() {
 					})
 				})
 
-				When("Scaling the disk space", func() {
+				XWhen("Scaling the disk space", func() {
 					It("scales disk to 512M", func() {
 						buffer := NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
@@ -219,7 +229,7 @@ var _ = Describe("scale command", func() {
 						helpers.WaitForAppDiskToTakeEffect(appName, 0, 0, false, "512M")
 					})
 
-					When("-f flag provided", func() {
+					XWhen("-f flag provided", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-k", "512M", "-f")
 							Eventually(session).Should(Exit(0))

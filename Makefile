@@ -1,5 +1,6 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
+FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
@@ -131,6 +132,7 @@ integration-selfcontained: build install-test-deps
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
 
+integration-tests-ci-client-creds: build integration-cleanup integration-push integration-global integration-selfcontained
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full

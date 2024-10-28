@@ -107,7 +107,7 @@ func GetSpaceGUID(spaceName string) string {
 }
 
 // QuickDeleteOrg deletes the org with the given name, if provided, using
-// 'cf curl /v2/organizations... -X DELETE'.
+// 'cf curl /v3/organizations... -X DELETE'.
 func QuickDeleteOrg(orgName string) {
 	// If orgName is empty, the BeforeSuite has failed and attempting to delete
 	// will produce a meaningless error.
@@ -117,13 +117,13 @@ func QuickDeleteOrg(orgName string) {
 	}
 
 	guid := GetOrgGUID(orgName)
-	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
+	url := fmt.Sprintf("/v3/organizations/%s", guid)
 	session := CF("curl", "-X", "DELETE", url)
 	Eventually(session).Should(Exit(0))
 }
 
 // QuickDeleteOrgIfExists deletes the org with the given name, if it exists, using
-// 'cf curl /v2/organizations... -X DELETE'.
+// 'cf curl /v3/organizations... -X DELETE'.
 func QuickDeleteOrgIfExists(orgName string) {
 	session := CF("org", "--guid", orgName)
 	Eventually(session).Should(Exit())
@@ -131,16 +131,16 @@ func QuickDeleteOrgIfExists(orgName string) {
 		return
 	}
 	guid := strings.TrimSpace(string(session.Out.Contents()))
-	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
+	url := fmt.Sprintf("/v3/organizations/%s", guid)
 	session = CF("curl", "-X", "DELETE", url)
 	Eventually(session).Should(Exit())
 }
 
 // QuickDeleteSpace deletes the space with the given name, if it exists, using
-// 'cf curl /v2/spaces... -X DELETE'.
+// 'cf curl /v3/spaces... -X DELETE'.
 func QuickDeleteSpace(spaceName string) {
 	guid := GetSpaceGUID(spaceName)
-	url := fmt.Sprintf("/v2/spaces/%s?recursive=true&async=true", guid)
+	url := fmt.Sprintf("/v3/spaces/%s", guid)
 	session := CF("curl", "-X", "DELETE", url)
 	Eventually(session).Should(Exit(0))
 }

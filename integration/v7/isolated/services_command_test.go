@@ -199,6 +199,10 @@ var _ = Describe("services command", func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			It("displays all service information", func() {
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))

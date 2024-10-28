@@ -70,6 +70,10 @@ var _ = Describe("unshare-private-domain command", func() {
 				domain.V7Share(sharedToOrgName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(sharedToOrgName)
+			})
+
 			It("unshares the domain from the org", func() {
 				buffer := NewBuffer()
 				_, err := buffer.Write([]byte("y\n"))
@@ -96,6 +100,10 @@ var _ = Describe("unshare-private-domain command", func() {
 				domain := helpers.NewDomain(owningOrgName, domainName)
 				domain.CreatePrivate()
 				domain.V7Share(sharedToOrgName)
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(sharedToOrgName)
 			})
 
 			It("does not unshare the domain from the org", func() {
