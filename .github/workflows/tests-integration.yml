@@ -293,6 +293,7 @@ jobs:
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
       lease-namespace: ${{ inputs.lease_namespace }}
+      nodes: ${{ inputs.nodes }}
     secrets: inherit
 
   run-cats-cf-env:
@@ -311,6 +312,7 @@ jobs:
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
       lease-namespace: ${{ inputs.lease_namespace }}
+      nodes: ${{ inputs.nodes }}
     secrets: inherit
 
   unclaim-env:

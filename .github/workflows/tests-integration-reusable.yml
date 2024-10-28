@@ -31,7 +31,7 @@ on:
         default: ${{github.event.workflow_run.head_sha}}
       nodes:
         type: string
-        default: "8"
+        default: "12"
 
 env:
   NODES: ${{ inputs.nodes }}
