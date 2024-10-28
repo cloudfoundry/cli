@@ -62,7 +62,7 @@ jobs:
     env:
       VERSION_MAJOR: 8
     outputs:
-      aws-s3-bucket:       "v${{ steps.bump-version.outputs.version-major }}-cf-cli-releases"
+      aws-s3-bucket: "v${{ steps.bump-version.outputs.version-major }}-cf-cli-releases"
 
       version-build: ${{ steps.bump-version.outputs.version-build }}
       version-major: ${{ env.VERSION_MAJOR }}
