@@ -38,6 +38,10 @@ on:
         description: Pre-provisioned environment lease namespace to use in tests
         required: false
         type: string
+      cfd_version:
+        description: Use specific version of CFD. Leave empty to use latest.
+        default: ""
+        type: string
       run_unit_tests:
         description: Run unit tests
         required: false
@@ -137,18 +141,24 @@ jobs:
           template_namespace:  ${{ vars.SHEPHERD_TEMPLATE_NAMESPACE  || 'official'          }}
           lease_duration:      ${{ vars.SHEPHERD_LEASE_DURATION      || '8h'                }}
           lease_namespace:     ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+          cfd_version:         ${{ inputs.cfd_version      || vars.CFD_VERSION              || '' }}
         run: |
           shepherd login service-account ${account_token}
 
           if [[ -z $SHEPHERD_LEASE_ID ]]; then
 
             if [ -z "$template_argument" ]; then
-              export template_argument='{"gcp_region":    "us-west2",
-                                         "vm_type":       "n1-standard-8",
-                                         "root_disk_gb":  32,
-                                         "disk_pool_gb":  150,
-                                         "cfd_version":   "",
-                                         "additional_opsfiles_b64": ""}'
+              export template_argument=$(cat <<EOF
+          {
+            "gcp_region": "us-west2",
+            "vm_type": "n1-standard-8",
+            "root_disk_gb": 32,
+            "disk_pool_gb": 150,
+            "cfd_version": "${cfd_version}",
+            "additional_opsfiles_b64": ""
+          }
+          EOF
+              )
             fi
 
             lease_id=$( shepherd create lease                           \
