@@ -68,3 +68,5 @@ integration/assets/test_plugin/test_plugin
 
 ### VisualStudioCode ###
 .vscode
+.secrets
+.vars

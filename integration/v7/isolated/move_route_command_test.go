@@ -147,6 +147,8 @@ var _ = Describe("move route command", func() {
 
 					AfterEach(func() {
 						domain.DeleteShared()
+						helpers.QuickDeleteOrg(targetOrgName)
+						helpers.QuickDeleteOrg(orgName)
 					})
 
 					It("Transfers ownership of the route to the destination space", func() {
