@@ -3,10 +3,10 @@ package requirements_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
 
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/applications/applicationsfakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

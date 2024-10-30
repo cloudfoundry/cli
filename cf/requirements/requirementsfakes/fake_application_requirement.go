@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
 )
 
 type FakeApplicationRequirement struct {
@@ -38,15 +38,16 @@ func (fake *FakeApplicationRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -90,15 +91,16 @@ func (fake *FakeApplicationRequirement) GetApplication() models.Application {
 	ret, specificReturn := fake.getApplicationReturnsOnCall[len(fake.getApplicationArgsForCall)]
 	fake.getApplicationArgsForCall = append(fake.getApplicationArgsForCall, struct {
 	}{})
+	stub := fake.GetApplicationStub
+	fakeReturns := fake.getApplicationReturns
 	fake.recordInvocation("GetApplication", []interface{}{})
 	fake.getApplicationMutex.Unlock()
-	if fake.GetApplicationStub != nil {
-		return fake.GetApplicationStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getApplicationReturns
 	return fakeReturns.result1
 }
 

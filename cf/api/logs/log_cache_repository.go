@@ -3,8 +3,8 @@ package logs
 import (
 	"context"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type terminalColorLogger struct {

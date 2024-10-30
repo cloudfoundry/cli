@@ -5,8 +5,8 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/manifest"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/manifest"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeApp struct {
@@ -117,9 +117,10 @@ func (fake *FakeApp) BuildpackURL(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.BuildpackURLStub
 	fake.recordInvocation("BuildpackURL", []interface{}{arg1, arg2})
 	fake.buildpackURLMutex.Unlock()
-	if fake.BuildpackURLStub != nil {
+	if stub != nil {
 		fake.BuildpackURLStub(arg1, arg2)
 	}
 }
@@ -149,9 +150,10 @@ func (fake *FakeApp) DiskQuota(arg1 string, arg2 int64) {
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.DiskQuotaStub
 	fake.recordInvocation("DiskQuota", []interface{}{arg1, arg2})
 	fake.diskQuotaMutex.Unlock()
-	if fake.DiskQuotaStub != nil {
+	if stub != nil {
 		fake.DiskQuotaStub(arg1, arg2)
 	}
 }
@@ -182,9 +184,10 @@ func (fake *FakeApp) EnvironmentVars(arg1 string, arg2 string, arg3 string) {
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.EnvironmentVarsStub
 	fake.recordInvocation("EnvironmentVars", []interface{}{arg1, arg2, arg3})
 	fake.environmentVarsMutex.Unlock()
-	if fake.EnvironmentVarsStub != nil {
+	if stub != nil {
 		fake.EnvironmentVarsStub(arg1, arg2, arg3)
 	}
 }
@@ -213,15 +216,16 @@ func (fake *FakeApp) GetContents() []models.Application {
 	ret, specificReturn := fake.getContentsReturnsOnCall[len(fake.getContentsArgsForCall)]
 	fake.getContentsArgsForCall = append(fake.getContentsArgsForCall, struct {
 	}{})
+	stub := fake.GetContentsStub
+	fakeReturns := fake.getContentsReturns
 	fake.recordInvocation("GetContents", []interface{}{})
 	fake.getContentsMutex.Unlock()
-	if fake.GetContentsStub != nil {
-		return fake.GetContentsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getContentsReturns
 	return fakeReturns.result1
 }
 
@@ -266,9 +270,10 @@ func (fake *FakeApp) HealthCheckHTTPEndpoint(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.HealthCheckHTTPEndpointStub
 	fake.recordInvocation("HealthCheckHTTPEndpoint", []interface{}{arg1, arg2})
 	fake.healthCheckHTTPEndpointMutex.Unlock()
-	if fake.HealthCheckHTTPEndpointStub != nil {
+	if stub != nil {
 		fake.HealthCheckHTTPEndpointStub(arg1, arg2)
 	}
 }
@@ -298,9 +303,10 @@ func (fake *FakeApp) HealthCheckTimeout(arg1 string, arg2 int) {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	stub := fake.HealthCheckTimeoutStub
 	fake.recordInvocation("HealthCheckTimeout", []interface{}{arg1, arg2})
 	fake.healthCheckTimeoutMutex.Unlock()
-	if fake.HealthCheckTimeoutStub != nil {
+	if stub != nil {
 		fake.HealthCheckTimeoutStub(arg1, arg2)
 	}
 }
@@ -330,9 +336,10 @@ func (fake *FakeApp) HealthCheckType(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.HealthCheckTypeStub
 	fake.recordInvocation("HealthCheckType", []interface{}{arg1, arg2})
 	fake.healthCheckTypeMutex.Unlock()
-	if fake.HealthCheckTypeStub != nil {
+	if stub != nil {
 		fake.HealthCheckTypeStub(arg1, arg2)
 	}
 }
@@ -362,9 +369,10 @@ func (fake *FakeApp) Instances(arg1 string, arg2 int) {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	stub := fake.InstancesStub
 	fake.recordInvocation("Instances", []interface{}{arg1, arg2})
 	fake.instancesMutex.Unlock()
-	if fake.InstancesStub != nil {
+	if stub != nil {
 		fake.InstancesStub(arg1, arg2)
 	}
 }
@@ -394,9 +402,10 @@ func (fake *FakeApp) Memory(arg1 string, arg2 int64) {
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.MemoryStub
 	fake.recordInvocation("Memory", []interface{}{arg1, arg2})
 	fake.memoryMutex.Unlock()
-	if fake.MemoryStub != nil {
+	if stub != nil {
 		fake.MemoryStub(arg1, arg2)
 	}
 }
@@ -429,9 +438,10 @@ func (fake *FakeApp) Route(arg1 string, arg2 string, arg3 string, arg4 string, a
 		arg4 string
 		arg5 int
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.RouteStub
 	fake.recordInvocation("Route", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.routeMutex.Unlock()
-	if fake.RouteStub != nil {
+	if stub != nil {
 		fake.RouteStub(arg1, arg2, arg3, arg4, arg5)
 	}
 }
@@ -461,15 +471,16 @@ func (fake *FakeApp) Save(arg1 io.Writer) error {
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
 		arg1 io.Writer
 	}{arg1})
+	stub := fake.SaveStub
+	fakeReturns := fake.saveReturns
 	fake.recordInvocation("Save", []interface{}{arg1})
 	fake.saveMutex.Unlock()
-	if fake.SaveStub != nil {
-		return fake.SaveStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.saveReturns
 	return fakeReturns.result1
 }
 
@@ -521,9 +532,10 @@ func (fake *FakeApp) Service(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ServiceStub
 	fake.recordInvocation("Service", []interface{}{arg1, arg2})
 	fake.serviceMutex.Unlock()
-	if fake.ServiceStub != nil {
+	if stub != nil {
 		fake.ServiceStub(arg1, arg2)
 	}
 }
@@ -553,9 +565,10 @@ func (fake *FakeApp) Stack(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.StackStub
 	fake.recordInvocation("Stack", []interface{}{arg1, arg2})
 	fake.stackMutex.Unlock()
-	if fake.StackStub != nil {
+	if stub != nil {
 		fake.StackStub(arg1, arg2)
 	}
 }
@@ -585,9 +598,10 @@ func (fake *FakeApp) StartCommand(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.StartCommandStub
 	fake.recordInvocation("StartCommand", []interface{}{arg1, arg2})
 	fake.startCommandMutex.Unlock()
-	if fake.StartCommandStub != nil {
+	if stub != nil {
 		fake.StartCommandStub(arg1, arg2)
 	}
 }

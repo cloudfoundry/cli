@@ -1,6 +1,6 @@
 package requirements
 
-import "code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+import "code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
 
 type configRefreshingRequirement struct {
 	requirement     Requirement

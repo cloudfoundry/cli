@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"code.cloudfoundry.org/cli/cf/util/spellcheck"
-	"code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/v9/cf/util/spellcheck"
+	"code.cloudfoundry.org/cli/v9/command/common"
 )
 
 type UnknownCommandError struct {

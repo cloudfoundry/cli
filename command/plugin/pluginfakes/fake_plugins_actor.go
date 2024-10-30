@@ -4,8 +4,8 @@ package pluginfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/command/plugin"
+	"code.cloudfoundry.org/cli/v9/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v9/command/plugin"
 )
 
 type FakePluginsActor struct {
@@ -30,15 +30,16 @@ func (fake *FakePluginsActor) GetOutdatedPlugins() ([]pluginaction.OutdatedPlugi
 	ret, specificReturn := fake.getOutdatedPluginsReturnsOnCall[len(fake.getOutdatedPluginsArgsForCall)]
 	fake.getOutdatedPluginsArgsForCall = append(fake.getOutdatedPluginsArgsForCall, struct {
 	}{})
+	stub := fake.GetOutdatedPluginsStub
+	fakeReturns := fake.getOutdatedPluginsReturns
 	fake.recordInvocation("GetOutdatedPlugins", []interface{}{})
 	fake.getOutdatedPluginsMutex.Unlock()
-	if fake.GetOutdatedPluginsStub != nil {
-		return fake.GetOutdatedPluginsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getOutdatedPluginsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

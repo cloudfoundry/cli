@@ -1,6 +1,6 @@
 package plugin
 
-import plugin_models "code.cloudfoundry.org/cli/plugin/models"
+import plugin_models "code.cloudfoundry.org/cli/v9/plugin/models"
 
 /*
 *
@@ -74,5 +74,5 @@ type Command struct {
 	Name         string
 	Alias        string
 	HelpText     string
-	UsageDetails Usage //Detail usage to be displayed in `cf help <cmd>`
+	UsageDetails Usage // Detail usage to be displayed in `cf help <cmd>`
 }

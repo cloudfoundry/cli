@@ -1,6 +1,6 @@
 package actionerror
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+import "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 
 type ServiceOfferingNameAmbiguityError struct {
 	ccerror.ServiceOfferingNameAmbiguityError

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	"golang.org/x/term"
 )
 

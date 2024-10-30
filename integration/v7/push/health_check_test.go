@@ -3,7 +3,7 @@ package push
 import (
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -84,7 +84,7 @@ var _ = Describe("push with health check type", func() {
 
 						session := helpers.CF("get-health-check", appName)
 						Eventually(session).Should(Say("web\\s+http\\s+/third_endpoint.html"))
-						Eventually(session).Should(Exit(0)) //})
+						Eventually(session).Should(Exit(0)) // })
 					})
 				})
 

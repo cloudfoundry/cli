@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/versioncheck"
+	"code.cloudfoundry.org/cli/v9/actor/versioncheck"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

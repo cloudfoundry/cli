@@ -3,7 +3,7 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type IsolationSegmentsCommand struct {
