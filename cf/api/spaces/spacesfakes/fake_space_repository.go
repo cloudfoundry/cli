@@ -4,8 +4,8 @@ package spacesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/spaces"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/spaces"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeSpaceRepository struct {
@@ -121,15 +121,16 @@ func (fake *FakeSpaceRepository) Create(arg1 string, arg2 string, arg3 string) (
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -184,15 +185,16 @@ func (fake *FakeSpaceRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -244,15 +246,16 @@ func (fake *FakeSpaceRepository) FindByName(arg1 string) (models.Space, error) {
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByNameStub
+	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if fake.FindByNameStub != nil {
-		return fake.FindByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -308,15 +311,16 @@ func (fake *FakeSpaceRepository) FindByNameInOrg(arg1 string, arg2 string) (mode
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FindByNameInOrgStub
+	fakeReturns := fake.findByNameInOrgReturns
 	fake.recordInvocation("FindByNameInOrg", []interface{}{arg1, arg2})
 	fake.findByNameInOrgMutex.Unlock()
-	if fake.FindByNameInOrgStub != nil {
-		return fake.FindByNameInOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameInOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -371,15 +375,16 @@ func (fake *FakeSpaceRepository) ListSpaces(arg1 func(models.Space) bool) error 
 	fake.listSpacesArgsForCall = append(fake.listSpacesArgsForCall, struct {
 		arg1 func(models.Space) bool
 	}{arg1})
+	stub := fake.ListSpacesStub
+	fakeReturns := fake.listSpacesReturns
 	fake.recordInvocation("ListSpaces", []interface{}{arg1})
 	fake.listSpacesMutex.Unlock()
-	if fake.ListSpacesStub != nil {
-		return fake.ListSpacesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listSpacesReturns
 	return fakeReturns.result1
 }
 
@@ -432,15 +437,16 @@ func (fake *FakeSpaceRepository) ListSpacesFromOrg(arg1 string, arg2 func(models
 		arg1 string
 		arg2 func(models.Space) bool
 	}{arg1, arg2})
+	stub := fake.ListSpacesFromOrgStub
+	fakeReturns := fake.listSpacesFromOrgReturns
 	fake.recordInvocation("ListSpacesFromOrg", []interface{}{arg1, arg2})
 	fake.listSpacesFromOrgMutex.Unlock()
-	if fake.ListSpacesFromOrgStub != nil {
-		return fake.ListSpacesFromOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listSpacesFromOrgReturns
 	return fakeReturns.result1
 }
 
@@ -493,15 +499,16 @@ func (fake *FakeSpaceRepository) Rename(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.RenameStub
+	fakeReturns := fake.renameReturns
 	fake.recordInvocation("Rename", []interface{}{arg1, arg2})
 	fake.renameMutex.Unlock()
-	if fake.RenameStub != nil {
-		return fake.RenameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.renameReturns
 	return fakeReturns.result1
 }
 
@@ -554,15 +561,16 @@ func (fake *FakeSpaceRepository) SetAllowSSH(arg1 string, arg2 bool) error {
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.SetAllowSSHStub
+	fakeReturns := fake.setAllowSSHReturns
 	fake.recordInvocation("SetAllowSSH", []interface{}{arg1, arg2})
 	fake.setAllowSSHMutex.Unlock()
-	if fake.SetAllowSSHStub != nil {
-		return fake.SetAllowSSHStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setAllowSSHReturns
 	return fakeReturns.result1
 }
 

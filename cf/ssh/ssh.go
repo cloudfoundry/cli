@@ -19,10 +19,10 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/ssh/options"
-	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
-	"code.cloudfoundry.org/cli/cf/ssh/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/ssh/options"
+	"code.cloudfoundry.org/cli/v8/cf/ssh/sigwinch"
+	"code.cloudfoundry.org/cli/v8/cf/ssh/terminal"
 	"github.com/moby/term"
 )
 

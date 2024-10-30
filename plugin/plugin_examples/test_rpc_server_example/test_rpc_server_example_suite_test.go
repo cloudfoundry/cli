@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/pluginbuilder"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

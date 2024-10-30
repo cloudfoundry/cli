@@ -9,12 +9,12 @@ import (
 	neturl "net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v8/cf/api/resources"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/net"
 )
 
 var orgRoleToPathMap = map[models.Role]string{
@@ -312,8 +312,8 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 	setOrgRoleErr := apiErrResponse{}
 	apiErr = repo.assocUserWithOrgByUsername(username, orgGUID, &setOrgRoleErr)
 	if setOrgRoleErr.Code == 10003 {
-		//operator lacking the privilege to set org role
-		//user might already be in org, so ignoring error and attempt to set space role
+		// operator lacking the privilege to set org role
+		// user might already be in org, so ignoring error and attempt to set space role
 	} else if apiErr != nil {
 		return
 	}

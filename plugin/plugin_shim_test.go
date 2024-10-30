@@ -4,9 +4,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver"
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver/rpcserverfakes"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/rpcserver"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/rpcserver/rpcserverfakes"
+	"code.cloudfoundry.org/cli/v8/plugin"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"

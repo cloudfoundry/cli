@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
-	"code.cloudfoundry.org/cli/cf/help"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/confighelpers"
+	"code.cloudfoundry.org/cli/v8/cf/help"
 
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/io"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/io"
 
 	"os"
 

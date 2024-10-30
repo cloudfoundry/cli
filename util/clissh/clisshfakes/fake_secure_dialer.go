@@ -4,7 +4,7 @@ package clisshfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/v8/util/clissh"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -36,15 +36,16 @@ func (fake *FakeSecureDialer) Dial(arg1 string, arg2 string, arg3 *ssh.ClientCon
 		arg2 string
 		arg3 *ssh.ClientConfig
 	}{arg1, arg2, arg3})
+	stub := fake.DialStub
+	fakeReturns := fake.dialReturns
 	fake.recordInvocation("Dial", []interface{}{arg1, arg2, arg3})
 	fake.dialMutex.Unlock()
-	if fake.DialStub != nil {
-		return fake.DialStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.dialReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

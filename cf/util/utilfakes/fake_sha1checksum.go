@@ -4,7 +4,7 @@ package utilfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v8/util"
 )
 
 type FakeSha1Checksum struct {

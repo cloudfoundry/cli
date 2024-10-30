@@ -3,7 +3,7 @@ package pluginconfig
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/v8/cf/configuration"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginConfiguration
@@ -74,7 +74,7 @@ func (c *PluginConfig) ListCommands() []string {
 }
 
 func (c *PluginConfig) init() {
-	//only read from disk if it was never read
+	// only read from disk if it was never read
 	c.initOnce.Do(func() {
 		err := c.persistor.Load(c.data)
 		if err != nil {

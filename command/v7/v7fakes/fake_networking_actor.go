@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/v8/actor/cfnetworkingaction"
+	v7 "code.cloudfoundry.org/cli/v8/command/v7"
 )
 
 type FakeNetworkingActor struct {
@@ -44,15 +44,16 @@ func (fake *FakeNetworkingActor) AddNetworkPolicy(arg1 string, arg2 string, arg3
 		arg6 int
 		arg7 int
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	stub := fake.AddNetworkPolicyStub
+	fakeReturns := fake.addNetworkPolicyReturns
 	fake.recordInvocation("AddNetworkPolicy", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.addNetworkPolicyMutex.Unlock()
-	if fake.AddNetworkPolicyStub != nil {
-		return fake.AddNetworkPolicyStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.addNetworkPolicyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -3,7 +3,7 @@ package actionerror_test
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

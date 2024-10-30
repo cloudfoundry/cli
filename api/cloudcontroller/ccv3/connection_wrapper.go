@@ -1,6 +1,6 @@
 package ccv3
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller"
+import "code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConnectionWrapper
 

@@ -4,8 +4,8 @@ package pluginfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/command/plugin"
+	"code.cloudfoundry.org/cli/v8/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v8/command/plugin"
 )
 
 type FakeUninstallPluginActor struct {
@@ -32,15 +32,16 @@ func (fake *FakeUninstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUn
 		arg1 pluginaction.PluginUninstaller
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UninstallPluginStub
+	fakeReturns := fake.uninstallPluginReturns
 	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
 	fake.uninstallPluginMutex.Unlock()
-	if fake.UninstallPluginStub != nil {
-		return fake.UninstallPluginStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uninstallPluginReturns
 	return fakeReturns.result1
 }
 

@@ -4,7 +4,7 @@ package v7actionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
 )
 
 type FakeDownloader struct {
@@ -33,15 +33,16 @@ func (fake *FakeDownloader) Download(arg1 string, arg2 string) (string, error) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DownloadStub
+	fakeReturns := fake.downloadReturns
 	fake.recordInvocation("Download", []interface{}{arg1, arg2})
 	fake.downloadMutex.Unlock()
-	if fake.DownloadStub != nil {
-		return fake.DownloadStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.downloadReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

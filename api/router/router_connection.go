@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/router/routererror"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/router/routererror"
+	"code.cloudfoundry.org/cli/v8/util"
 )
 
 // ConnectionConfig is for configuring the RouterConnection

@@ -3,7 +3,7 @@ package isolated
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v8/integration/helpers"
 
 	"github.com/blang/semver/v4"
 	. "github.com/onsi/ginkgo/v2"

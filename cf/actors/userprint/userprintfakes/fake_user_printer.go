@@ -4,7 +4,7 @@ package userprintfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors/userprint"
+	"code.cloudfoundry.org/cli/v8/cf/actors/userprint"
 )
 
 type FakeUserPrinter struct {
@@ -24,9 +24,10 @@ func (fake *FakeUserPrinter) PrintUsers(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PrintUsersStub
 	fake.recordInvocation("PrintUsers", []interface{}{arg1, arg2})
 	fake.printUsersMutex.Unlock()
-	if fake.PrintUsersStub != nil {
+	if stub != nil {
 		fake.PrintUsersStub(arg1, arg2)
 	}
 }

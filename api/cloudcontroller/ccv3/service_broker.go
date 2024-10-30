@@ -3,8 +3,8 @@ package ccv3
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 // CreateServiceBroker registers a new service broker.

@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServiceKeyRepository struct {
@@ -72,15 +72,16 @@ func (fake *FakeServiceKeyRepository) CreateServiceKey(arg1 string, arg2 string,
 		arg2 string
 		arg3 map[string]interface{}
 	}{arg1, arg2, arg3})
+	stub := fake.CreateServiceKeyStub
+	fakeReturns := fake.createServiceKeyReturns
 	fake.recordInvocation("CreateServiceKey", []interface{}{arg1, arg2, arg3})
 	fake.createServiceKeyMutex.Unlock()
-	if fake.CreateServiceKeyStub != nil {
-		return fake.CreateServiceKeyStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createServiceKeyReturns
 	return fakeReturns.result1
 }
 
@@ -132,15 +133,16 @@ func (fake *FakeServiceKeyRepository) DeleteServiceKey(arg1 string) error {
 	fake.deleteServiceKeyArgsForCall = append(fake.deleteServiceKeyArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteServiceKeyStub
+	fakeReturns := fake.deleteServiceKeyReturns
 	fake.recordInvocation("DeleteServiceKey", []interface{}{arg1})
 	fake.deleteServiceKeyMutex.Unlock()
-	if fake.DeleteServiceKeyStub != nil {
-		return fake.DeleteServiceKeyStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteServiceKeyReturns
 	return fakeReturns.result1
 }
 
@@ -193,15 +195,16 @@ func (fake *FakeServiceKeyRepository) GetServiceKey(arg1 string, arg2 string) (m
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceKeyStub
+	fakeReturns := fake.getServiceKeyReturns
 	fake.recordInvocation("GetServiceKey", []interface{}{arg1, arg2})
 	fake.getServiceKeyMutex.Unlock()
-	if fake.GetServiceKeyStub != nil {
-		return fake.GetServiceKeyStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getServiceKeyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -256,15 +259,16 @@ func (fake *FakeServiceKeyRepository) ListServiceKeys(arg1 string) ([]models.Ser
 	fake.listServiceKeysArgsForCall = append(fake.listServiceKeysArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ListServiceKeysStub
+	fakeReturns := fake.listServiceKeysReturns
 	fake.recordInvocation("ListServiceKeys", []interface{}{arg1})
 	fake.listServiceKeysMutex.Unlock()
-	if fake.ListServiceKeysStub != nil {
-		return fake.ListServiceKeysStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listServiceKeysReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

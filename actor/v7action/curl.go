@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 func (actor Actor) MakeCurlRequest(

@@ -3,7 +3,7 @@ package internal_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/uaa/internal"
+	. "code.cloudfoundry.org/cli/v8/api/uaa/internal"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

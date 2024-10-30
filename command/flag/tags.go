@@ -3,7 +3,7 @@ package flag
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 type Tags types.OptionalStringSlice

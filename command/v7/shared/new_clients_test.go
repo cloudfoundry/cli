@@ -4,10 +4,10 @@ import (
 	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/command/commandfakes"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v8/command/v7/shared"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -52,8 +52,8 @@ var _ = Describe("New Clients", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeConfig.TargetCallCount()).To(Equal(2))
-			Expect(fakeConfig.DialTimeoutCallCount()).To(Equal(3))
-			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(3))
+			Expect(fakeConfig.DialTimeoutCallCount()).To(Equal(4))
+			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(4))
 		})
 	})
 

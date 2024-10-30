@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v8/cf/configuration"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
 )
 
@@ -40,7 +40,7 @@ func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Reposi
 func NewRepositoryFromPersistor(persistor configuration.Persistor, errorHandler func(error)) Repository {
 	data := NewData()
 	if !persistor.Exists() {
-		//set default plugin repo
+		// set default plugin repo
 		data.PluginRepos = append(data.PluginRepos, models.PluginRepo{
 			Name: "CF-Community",
 			URL:  "https://plugins.cloudfoundry.org",

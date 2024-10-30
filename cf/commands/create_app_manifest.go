@@ -6,18 +6,18 @@ import (
 	"os"
 	"sort"
 
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/api/appinstances"
-	"code.cloudfoundry.org/cli/cf/api/stacks"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/manifest"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/api/appinstances"
+	"code.cloudfoundry.org/cli/v8/cf/api/stacks"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/manifest"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 type CreateAppManifest struct {
@@ -157,7 +157,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) error {
 			default:
 				return errors.New(T("Failed to create manifest, unable to parse environment variable: ") + envVarKey)
 			case float64:
-				//json.Unmarshal turn all numbers to float64
+				// json.Unmarshal turn all numbers to float64
 				value := int(app.EnvironmentVars[envVarKey].(float64))
 				cmd.manifest.EnvironmentVars(app.Name, envVarKey, fmt.Sprintf("%d", value))
 			case bool:

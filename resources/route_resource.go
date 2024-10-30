@@ -3,7 +3,7 @@ package resources
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 type RouteDestinationApp struct {

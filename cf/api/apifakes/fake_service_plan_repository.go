@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServicePlanRepository struct {
@@ -63,15 +63,16 @@ func (fake *FakeServicePlanRepository) ListPlansFromManyServices(arg1 []string) 
 	fake.listPlansFromManyServicesArgsForCall = append(fake.listPlansFromManyServicesArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.ListPlansFromManyServicesStub
+	fakeReturns := fake.listPlansFromManyServicesReturns
 	fake.recordInvocation("ListPlansFromManyServices", []interface{}{arg1Copy})
 	fake.listPlansFromManyServicesMutex.Unlock()
-	if fake.ListPlansFromManyServicesStub != nil {
-		return fake.ListPlansFromManyServicesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listPlansFromManyServicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -126,15 +127,16 @@ func (fake *FakeServicePlanRepository) Search(arg1 map[string]string) ([]models.
 	fake.searchArgsForCall = append(fake.searchArgsForCall, struct {
 		arg1 map[string]string
 	}{arg1})
+	stub := fake.SearchStub
+	fakeReturns := fake.searchReturns
 	fake.recordInvocation("Search", []interface{}{arg1})
 	fake.searchMutex.Unlock()
-	if fake.SearchStub != nil {
-		return fake.SearchStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.searchReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -191,15 +193,16 @@ func (fake *FakeServicePlanRepository) Update(arg1 models.ServicePlanFields, arg
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1, arg2, arg3})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

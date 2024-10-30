@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeDomainRepository struct {
@@ -134,15 +134,16 @@ func (fake *FakeDomainRepository) Create(arg1 string, arg2 string) (models.Domai
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -198,15 +199,16 @@ func (fake *FakeDomainRepository) CreateSharedDomain(arg1 string, arg2 string) e
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateSharedDomainStub
+	fakeReturns := fake.createSharedDomainReturns
 	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2})
 	fake.createSharedDomainMutex.Unlock()
-	if fake.CreateSharedDomainStub != nil {
-		return fake.CreateSharedDomainStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createSharedDomainReturns
 	return fakeReturns.result1
 }
 
@@ -258,15 +260,16 @@ func (fake *FakeDomainRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -318,15 +321,16 @@ func (fake *FakeDomainRepository) DeleteSharedDomain(arg1 string) error {
 	fake.deleteSharedDomainArgsForCall = append(fake.deleteSharedDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteSharedDomainStub
+	fakeReturns := fake.deleteSharedDomainReturns
 	fake.recordInvocation("DeleteSharedDomain", []interface{}{arg1})
 	fake.deleteSharedDomainMutex.Unlock()
-	if fake.DeleteSharedDomainStub != nil {
-		return fake.DeleteSharedDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteSharedDomainReturns
 	return fakeReturns.result1
 }
 
@@ -379,15 +383,16 @@ func (fake *FakeDomainRepository) FindByNameInOrg(arg1 string, arg2 string) (mod
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FindByNameInOrgStub
+	fakeReturns := fake.findByNameInOrgReturns
 	fake.recordInvocation("FindByNameInOrg", []interface{}{arg1, arg2})
 	fake.findByNameInOrgMutex.Unlock()
-	if fake.FindByNameInOrgStub != nil {
-		return fake.FindByNameInOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameInOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -442,15 +447,16 @@ func (fake *FakeDomainRepository) FindPrivateByName(arg1 string) (models.DomainF
 	fake.findPrivateByNameArgsForCall = append(fake.findPrivateByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindPrivateByNameStub
+	fakeReturns := fake.findPrivateByNameReturns
 	fake.recordInvocation("FindPrivateByName", []interface{}{arg1})
 	fake.findPrivateByNameMutex.Unlock()
-	if fake.FindPrivateByNameStub != nil {
-		return fake.FindPrivateByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findPrivateByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -505,15 +511,16 @@ func (fake *FakeDomainRepository) FindSharedByName(arg1 string) (models.DomainFi
 	fake.findSharedByNameArgsForCall = append(fake.findSharedByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindSharedByNameStub
+	fakeReturns := fake.findSharedByNameReturns
 	fake.recordInvocation("FindSharedByName", []interface{}{arg1})
 	fake.findSharedByNameMutex.Unlock()
-	if fake.FindSharedByNameStub != nil {
-		return fake.FindSharedByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findSharedByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -569,15 +576,16 @@ func (fake *FakeDomainRepository) FirstOrDefault(arg1 string, arg2 *string) (mod
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
+	stub := fake.FirstOrDefaultStub
+	fakeReturns := fake.firstOrDefaultReturns
 	fake.recordInvocation("FirstOrDefault", []interface{}{arg1, arg2})
 	fake.firstOrDefaultMutex.Unlock()
-	if fake.FirstOrDefaultStub != nil {
-		return fake.FirstOrDefaultStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.firstOrDefaultReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -633,15 +641,16 @@ func (fake *FakeDomainRepository) ListDomainsForOrg(arg1 string, arg2 func(model
 		arg1 string
 		arg2 func(models.DomainFields) bool
 	}{arg1, arg2})
+	stub := fake.ListDomainsForOrgStub
+	fakeReturns := fake.listDomainsForOrgReturns
 	fake.recordInvocation("ListDomainsForOrg", []interface{}{arg1, arg2})
 	fake.listDomainsForOrgMutex.Unlock()
-	if fake.ListDomainsForOrgStub != nil {
-		return fake.ListDomainsForOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listDomainsForOrgReturns
 	return fakeReturns.result1
 }
 

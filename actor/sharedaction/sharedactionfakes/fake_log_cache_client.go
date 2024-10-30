@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	client "code.cloudfoundry.org/go-log-cache/v2"
 	"code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2"
 )
@@ -41,15 +41,16 @@ func (fake *FakeLogCacheClient) Read(arg1 context.Context, arg2 string, arg3 tim
 		arg3 time.Time
 		arg4 []client.ReadOption
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.ReadStub
+	fakeReturns := fake.readReturns
 	fake.recordInvocation("Read", []interface{}{arg1, arg2, arg3, arg4})
 	fake.readMutex.Unlock()
-	if fake.ReadStub != nil {
-		return fake.ReadStub(arg1, arg2, arg3, arg4...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

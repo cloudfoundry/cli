@@ -4,8 +4,8 @@ package applicationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/commands/application"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeDisplayer struct {
@@ -34,15 +34,16 @@ func (fake *FakeDisplayer) ShowApp(arg1 models.Application, arg2 string, arg3 st
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ShowAppStub
+	fakeReturns := fake.showAppReturns
 	fake.recordInvocation("ShowApp", []interface{}{arg1, arg2, arg3})
 	fake.showAppMutex.Unlock()
-	if fake.ShowAppStub != nil {
-		return fake.ShowAppStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.showAppReturns
 	return fakeReturns.result1
 }
 

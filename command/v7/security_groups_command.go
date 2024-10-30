@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
 type SecurityGroupsCommand struct {
