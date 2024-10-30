@@ -118,6 +118,7 @@ var _ = Describe("security-groups command", func() {
 				helpers.DeleteSecurityGroup(securityGroup3)
 				helpers.DeleteSecurityGroup(securityGroup4)
 				helpers.DeleteSecurityGroup(securityGroup5)
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("displays the security groups exits 0", func() {

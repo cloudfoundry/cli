@@ -13,11 +13,16 @@ import (
 )
 
 var _ = Describe("plugin API", func() {
+	var orgName string
 	BeforeEach(func() {
+		orgName = ""
 		installTestPlugin()
 	})
 
 	AfterEach(func() {
+		if orgName != "" {
+			helpers.QuickDeleteOrg(orgName)
+		}
 		uninstallTestPlugin()
 	})
 
@@ -63,7 +68,7 @@ var _ = Describe("plugin API", func() {
 	Describe("GetApp", func() {
 		var appName string
 		BeforeEach(func() {
-			createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			appName = helpers.PrefixedRandomName("APP")
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -78,7 +83,7 @@ var _ = Describe("plugin API", func() {
 	Describe("GetApps", func() {
 		var appName1, appName2 string
 		BeforeEach(func() {
-			createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			appName1 = helpers.PrefixedRandomName("APP")
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -97,29 +102,35 @@ var _ = Describe("plugin API", func() {
 
 	Describe("GetCurrentOrg", func() {
 		It("gets the current targeted org", func() {
-			org, _ := createTargetedOrgAndSpace()
-			confirmTestPluginOutput("GetCurrentOrg", org)
+			orgName, _ = createTargetedOrgAndSpace()
+			confirmTestPluginOutput("GetCurrentOrg", orgName)
 		})
 	})
 
 	Describe("GetCurrentSpace", func() {
 		It("gets the current targeted Space", func() {
-			_, space := createTargetedOrgAndSpace()
+			var space string
+			orgName, space = createTargetedOrgAndSpace()
 			confirmTestPluginOutput("GetCurrentSpace", space)
 		})
 	})
 
 	Describe("GetOrg", func() {
 		It("gets the given org", func() {
-			org, _ := createTargetedOrgAndSpace()
-			confirmTestPluginOutputWithArg("GetOrg", org, org)
+			orgName, _ = createTargetedOrgAndSpace()
+			confirmTestPluginOutputWithArg("GetOrg", orgName, orgName)
 		})
 	})
 
 	Describe("GetOrgs", func() {
+		var org1, org2 string
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(org1)
+			helpers.QuickDeleteOrg(org2)
+		})
 		It("gets information for multiple orgs", func() {
-			org1, _ := createTargetedOrgAndSpace()
-			org2, _ := createTargetedOrgAndSpace()
+			org1, _ = createTargetedOrgAndSpace()
+			org2, _ = createTargetedOrgAndSpace()
 			orgNameRegexp := fmt.Sprintf("(?:%s|%s)", org1, org2)
 			confirmTestPluginOutput("GetOrgs", orgNameRegexp, orgNameRegexp)
 		})
@@ -127,17 +138,17 @@ var _ = Describe("plugin API", func() {
 
 	Describe("GetOrgUsers", func() {
 		It("returns the org users", func() {
-			org, _ := createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			username, _ := helpers.GetCredentials()
-			confirmTestPluginOutputWithArg("GetOrgUsers", org, username)
+			confirmTestPluginOutputWithArg("GetOrgUsers", orgName, username)
 		})
 	})
 
 	Describe("GetOrgUsers", func() {
 		It("returns the org users", func() {
-			org, _ := createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			username, _ := helpers.GetCredentials()
-			confirmTestPluginOutputWithArg("GetOrgUsers", org, username)
+			confirmTestPluginOutputWithArg("GetOrgUsers", orgName, username)
 		})
 	})
 
@@ -148,7 +159,7 @@ var _ = Describe("plugin API", func() {
 			broker           *servicebrokerstub.ServiceBrokerStub
 		)
 		BeforeEach(func() {
-			createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")
 			serviceInstance2 = helpers.PrefixedRandomName("SI2")
 
@@ -172,7 +183,8 @@ var _ = Describe("plugin API", func() {
 
 	Describe("GetSpace", func() {
 		It("gets the given space", func() {
-			_, space := createTargetedOrgAndSpace()
+			var space string
+			orgName, space = createTargetedOrgAndSpace()
 			confirmTestPluginOutputWithArg("GetSpace", space, space)
 		})
 	})
@@ -181,7 +193,7 @@ var _ = Describe("plugin API", func() {
 		var space1, space2 string
 
 		BeforeEach(func() {
-			_, space1 = createTargetedOrgAndSpace()
+			orgName, space1 = createTargetedOrgAndSpace()
 			space2 = helpers.NewSpaceName()
 			helpers.CreateSpace(space2)
 		})
@@ -195,8 +207,9 @@ var _ = Describe("plugin API", func() {
 	Describe("GetSpaceUsers", func() {
 		It("returns the space users", func() {
 			username, _ := helpers.GetCredentials()
-			org, space := createTargetedOrgAndSpace()
-			session := helpers.CF("GetSpaceUsers", org, space)
+			var space string
+			orgName, space = createTargetedOrgAndSpace()
+			session := helpers.CF("GetSpaceUsers", orgName, space)
 			Eventually(session).Should(Say(username))
 			Eventually(session).Should(Exit(0))
 		})
@@ -210,14 +223,14 @@ var _ = Describe("plugin API", func() {
 
 	Describe("HasOrganization", func() {
 		It("returns true", func() {
-			createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			confirmTestPluginOutput("HasOrganization", "true")
 		})
 	})
 
 	Describe("HasSpace", func() {
 		It("returns true", func() {
-			createTargetedOrgAndSpace()
+			orgName, _ = createTargetedOrgAndSpace()
 			confirmTestPluginOutput("HasSpace", "true")
 		})
 	})

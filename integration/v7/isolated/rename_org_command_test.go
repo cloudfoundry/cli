@@ -107,6 +107,10 @@ var _ = Describe("rename-org command", func() {
 					helpers.CreateOrg(orgNameNew)
 				})
 
+				AfterEach(func() {
+					helpers.QuickDeleteOrg(orgNameNew)
+				})
+
 				It("fails to rename the org", func() {
 					session := helpers.CF("rename-org", orgName, orgNameNew)
 					userName, _ := helpers.GetCredentials()
