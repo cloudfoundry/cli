@@ -4,8 +4,8 @@ package pluginfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/plugin"
-	plugin_models "code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/v7/plugin"
+	plugin_models "code.cloudfoundry.org/cli/v7/plugin/models"
 )
 
 type FakeCliConnection struct {

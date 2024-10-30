@@ -64,9 +64,9 @@ $Env:CF_DIAL_TIMEOUT=15
 Import-Certificate -Filepath "$pwd\$CF_INT_NAME.router.ca" -CertStoreLocation "cert:\LocalMachine\root"
 
 New-Item "go/src/code.cloudfoundry.org" -Type Directory
-New-Item -ItemType SymbolicLink -Path "$pwd/go/src/code.cloudfoundry.org/cli" -Target "$pwd"
+New-Item -ItemType SymbolicLink -Path "$pwd/go/src/code.cloudfoundry.org/cli/v7" -Target "$pwd"
 
-cd go/src/code.cloudfoundry.org/cli
+cd go/src/code.cloudfoundry.org/cli/v7
 go install github.com/akavel/rsrc@v0.10.2
 
 Get-Command make

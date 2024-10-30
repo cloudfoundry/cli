@@ -1,7 +1,7 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 func (actor Actor) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, Warnings, error) {

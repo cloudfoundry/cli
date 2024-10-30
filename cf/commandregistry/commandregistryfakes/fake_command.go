@@ -4,9 +4,9 @@ package commandregistryfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v7/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v7/cf/flags"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
 )
 
 type FakeCommand struct {

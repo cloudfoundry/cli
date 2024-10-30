@@ -3,8 +3,8 @@ package v3action
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 )
 
 type TargetSettings ccv3.TargetSettings
@@ -20,8 +20,8 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	if err != nil {
 		return Warnings(warnings), err
 	}
-	//TODO Remove this condition when earliest supportest CAPI is 1.87.0
-	//We have to do this because the current legacy supported CAPI version as of 2020 does not display the log cache url, this will break if a foundation on legacy CAPI have non-standard logcache urls
+	// TODO Remove this condition when earliest supportest CAPI is 1.87.0
+	// We have to do this because the current legacy supported CAPI version as of 2020 does not display the log cache url, this will break if a foundation on legacy CAPI have non-standard logcache urls
 
 	logCacheUrl := info.LogCache()
 	if logCacheUrl == "" {

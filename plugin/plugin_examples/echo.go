@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v7/plugin"
 )
 
 type PluginDemonstratingParams struct {

@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	sshCmd "code.cloudfoundry.org/cli/cf/ssh"
+	sshCmd "code.cloudfoundry.org/cli/v7/cf/ssh"
 )
 
 type FakeListenerFactory struct {

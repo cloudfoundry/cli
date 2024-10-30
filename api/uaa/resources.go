@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/uaa/internal"
+	"code.cloudfoundry.org/cli/v7/api/uaa/internal"
 )
 
 // SetupResources configures the client to use the specified settings and diescopers the UAA and Authentication resources

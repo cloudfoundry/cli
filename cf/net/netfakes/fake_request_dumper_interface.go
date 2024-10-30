@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v7/cf/net"
 )
 
 type FakeRequestDumperInterface struct {

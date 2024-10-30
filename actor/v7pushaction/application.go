@@ -3,7 +3,7 @@ package v7pushaction
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
 )
 
 type Application struct {

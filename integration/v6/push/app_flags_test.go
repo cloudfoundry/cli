@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -29,7 +29,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 				PushCommandName, appName,
 				"-b", "staticfile_buildpack",
 				"-c", fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
-				"-u", "port", //works if this stuff is commentted out
+				"-u", "port", // works if this stuff is commentted out
 				"-k", "300M",
 				"-i", "2",
 				"-m", "70M",

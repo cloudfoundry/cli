@@ -1,6 +1,6 @@
 package ccv2
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+import "code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 
 // LastOperation is the status of the last operation requested on a service
 // instance.

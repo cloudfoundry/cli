@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v7/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v7/cf/flags"
+	"code.cloudfoundry.org/cli/v7/cf/requirements"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
 )
 
 type FakeCommand2 struct {

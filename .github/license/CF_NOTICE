@@ -14,11 +14,11 @@ Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved
 Copyright (c) 2014-2015 Pivotal Software, Inc.
 and is licensed under the Apache License, Version 2.0.
 
-This product includes software from https://github.com/code.cloudfoundry.org/cli/tree/main/vendor/code.cloudfoundry.org/ykk that is:
+This product includes software from https://github.com/code.cloudfoundry.org/cli/v7/tree/main/vendor/code.cloudfoundry.org/ykk that is:
 Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
 and is licensed under the Apache License, Version 2.0.
 
-This product includes software from https://github.com/code.cloudfoundry.org/cli/tree/main/vendor/code.cloudfoundry.org/cfnetworking-cli-api that is:
+This product includes software from https://github.com/code.cloudfoundry.org/cli/v7/tree/main/vendor/code.cloudfoundry.org/cfnetworking-cli-api that is:
 Copyright (c) 2016-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
 and is licensed under the Apache License, Version 2.0.
 

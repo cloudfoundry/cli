@@ -4,9 +4,9 @@ package v2actionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	"code.cloudfoundry.org/cli/v7/api/uaa/constant"
 )
 
 type FakeUAAClient struct {

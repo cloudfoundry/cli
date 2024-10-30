@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	v7 "code.cloudfoundry.org/cli/v7/command/v7"
+	"code.cloudfoundry.org/cli/v7/util/manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 

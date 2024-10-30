@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v7/cf/util/testhelpers/matchers"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -269,7 +269,7 @@ var _ = Describe("scale command", func() {
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
 
-						//Delay to reduce flakiness
+						// Delay to reduce flakiness
 						time.Sleep(3 * time.Second)
 
 						session := helpers.CFWithStdin(buffer, "scale", appName, "-i", "2", "-k", "512M", "-m", "60M")
@@ -281,7 +281,7 @@ var _ = Describe("scale command", func() {
 
 						helpers.WaitForAppMemoryToTakeEffect(appName, 0, 0, false, "60M")
 
-						//Delay to reduce flakiness
+						// Delay to reduce flakiness
 						time.Sleep(5 * time.Second)
 
 						session = helpers.CF("app", appName)

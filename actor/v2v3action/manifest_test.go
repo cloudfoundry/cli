@@ -7,12 +7,12 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	. "code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/actor/v2v3action/v2v3actionfakes"
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	. "code.cloudfoundry.org/cli/v7/actor/v2v3action"
+	"code.cloudfoundry.org/cli/v7/actor/v2v3action/v2v3actionfakes"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	"code.cloudfoundry.org/cli/v7/types"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 )
 
 var _ = Describe("Manifest", func() {

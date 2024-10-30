@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
 )
 
 // PaginatedResources represents a page of resources returned by the Cloud

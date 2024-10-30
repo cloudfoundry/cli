@@ -4,8 +4,8 @@ package compositefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2action/composite"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2action/composite"
 )
 
 type FakeGetServicePlanActor struct {

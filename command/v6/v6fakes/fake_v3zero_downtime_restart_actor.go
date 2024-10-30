@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeV3ZeroDowntimeRestartActor struct {

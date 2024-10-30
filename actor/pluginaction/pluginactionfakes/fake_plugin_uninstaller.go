@@ -4,7 +4,7 @@ package pluginactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v7/actor/pluginaction"
 )
 
 type FakePluginUninstaller struct {

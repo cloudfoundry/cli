@@ -4,7 +4,7 @@ package commandfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/v7/command"
 )
 
 type FakeSharedActor struct {

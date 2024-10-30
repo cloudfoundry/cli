@@ -92,7 +92,7 @@ import (
 	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
 	"github.com/tedsuo/rata"
 )
 

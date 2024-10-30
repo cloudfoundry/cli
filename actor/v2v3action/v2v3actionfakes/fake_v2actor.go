@@ -4,9 +4,9 @@ package v2v3actionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2v3action"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 )
 
 type FakeV2Actor struct {
