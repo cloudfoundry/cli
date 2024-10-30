@@ -29,7 +29,7 @@ func newRequestLoggerFileWriter(ui *UI, lock *sync.Mutex, filePaths []string) *R
 
 func (display *RequestLoggerFileWriter) DisplayBody([]byte) error {
 	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(RedactedValue)
+		_, err := logFile.WriteString(fmt.Sprintf("%s\n", RedactedValue))
 		if err != nil {
 			return err
 		}
