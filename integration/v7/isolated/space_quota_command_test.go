@@ -49,6 +49,10 @@ var _ = Describe("space-quota command", func() {
 			helpers.TargetOrg(orgName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("the quota does not exist", func() {
 			It("displays quota not found and exits 1", func() {
 				session := helpers.CF("space-quota", quotaName)

@@ -40,6 +40,10 @@ var _ = Describe("org-users command", func() {
 			helpers.CreateOrg(orgName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("the target org has multiple users with different roles", func() {
 			var (
 				orgManagerUser     string

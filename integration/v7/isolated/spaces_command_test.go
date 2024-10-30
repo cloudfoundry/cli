@@ -60,6 +60,10 @@ var _ = Describe("spaces command", func() {
 			helpers.CreateSpace(spaceName6)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("the --labels flag is given", func() {
 
 			BeforeEach(func() {

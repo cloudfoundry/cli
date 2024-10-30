@@ -152,6 +152,7 @@ var _ = Describe("unshare route command", func() {
 
 					AfterEach(func() {
 						domain.Delete()
+						helpers.QuickDeleteOrg(targetOrgName)
 					})
 
 					It("unshared the route from the intended space", func() {

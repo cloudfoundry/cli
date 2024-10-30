@@ -147,6 +147,7 @@ var _ = Describe("share route command", func() {
 
 					AfterEach(func() {
 						domain.Delete()
+						helpers.QuickDeleteOrg(targetOrgName)
 					})
 
 					It("shared the route to the destination space", func() {
