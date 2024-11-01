@@ -202,13 +202,13 @@ units-plugin: install-test-deps
 
 ifeq ($(OS),Windows_NT)
 units-non-plugin: install-test-deps
-	@rm -f $(wildcard fixtures/plugins/*.exe)
+	@rm -f $(wildcard fixtures/plugins/*/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skip-package integration,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
 else
 units-non-plugin: install-test-deps
-	@rm -f $(wildcard fixtures/plugins/*.exe)
+	@rm -f $(wildcard fixtures/plugins/*/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skip-package integration,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword

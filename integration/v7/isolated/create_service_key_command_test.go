@@ -192,11 +192,11 @@ var _ = Describe("create-service-key command", func() {
 					var receiver struct {
 						Resources []resources.ServiceCredentialBinding `json:"resources"`
 					}
-					helpers.Curl(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
+					helpers.Curlf(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
 					Expect(receiver.Resources).To(HaveLen(1))
 
 					var parametersReceiver map[string]interface{}
-					helpers.Curl(&parametersReceiver, `/v3/service_credential_bindings/%s/parameters`, receiver.Resources[0].GUID)
+					helpers.Curlf(&parametersReceiver, `/v3/service_credential_bindings/%s/parameters`, receiver.Resources[0].GUID)
 					Expect(parametersReceiver).To(Equal(params))
 				}
 

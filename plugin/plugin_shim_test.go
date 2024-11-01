@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Command", func() {
 	var (
-		validPluginPath = filepath.Join("..", "fixtures", "plugins", "test_1.exe")
+		validPluginPath = filepath.Join("..", "fixtures", "plugins", "test_1", "test_1.exe")
 	)
 
 	Describe(".Start", func() {

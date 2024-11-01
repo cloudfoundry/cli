@@ -101,17 +101,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
       - name: Set Up Go
         uses: actions/setup-go@v5
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         run: make units
 
   claim-env:
@@ -298,7 +298,7 @@ jobs:
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
       lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-      nodes: ${{ inputs.nodes }}
+      nodes: ${{ inputs.nodes || '16'}}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
@@ -316,6 +316,7 @@ jobs:
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
       lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+      nodes: ${{ inputs.nodes || '16'}}
     secrets: inherit
 
   run-cats-cf-env:

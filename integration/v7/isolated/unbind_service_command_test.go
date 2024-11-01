@@ -85,7 +85,7 @@ var _ = Describe("unbind-service command", func() {
 			var receiver struct {
 				Resources []resources.ServiceCredentialBinding `json:"resources"`
 			}
-			helpers.Curl(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
+			helpers.Curlf(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
 			return len(receiver.Resources)
 		}
 

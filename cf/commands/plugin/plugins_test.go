@@ -48,7 +48,7 @@ var _ = Describe("Plugins", func() {
 		It("computes and prints the sha1 checksum of the binary", func() {
 			config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
 				"Test1": {
-					Location: "../../../fixtures/plugins/test_1.go",
+					Location: "../../../fixtures/plugins/test_1/test_1.go",
 					Version:  plugin.VersionType{Major: 1, Minor: 2, Build: 3},
 					Commands: []plugin.Command{
 						{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"},
@@ -157,7 +157,7 @@ var _ = Describe("Plugins", func() {
 
 	It("does not list the plugin when it provides no available commands", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"EmptyPlugin": {Location: "../../../fixtures/plugins/empty_plugin.exe"},
+			"EmptyPlugin": {Location: "../../../fixtures/plugins/empty_plugin/empty_plugin.exe"},
 		})
 
 		runCommand()

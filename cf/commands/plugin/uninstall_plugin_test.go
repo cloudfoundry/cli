@@ -1,7 +1,6 @@
 package plugin_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -41,7 +40,7 @@ var _ = Describe("Uninstall", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 
 		var err error
-		fakePluginRepoDir, err = ioutil.TempDir("", "plugins")
+		fakePluginRepoDir, err = os.MkdirTemp("", "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
 		fixtureDir := filepath.Join("..", "..", "..", "fixtures", "plugins")
@@ -50,8 +49,8 @@ var _ = Describe("Uninstall", func() {
 		err = os.MkdirAll(pluginDir, 0700)
 		Expect(err).NotTo(HaveOccurred())
 
-		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_1.exe"), filepath.Join(pluginDir, "test_1.exe"))
-		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_2.exe"), filepath.Join(pluginDir, "test_2.exe"))
+		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_1", "test_1.exe"), filepath.Join(pluginDir, "test_1.exe"))
+		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_2", "test_2.exe"), filepath.Join(pluginDir, "test_2.exe"))
 
 		confighelpers.PluginRepoDir = func() string {
 			return fakePluginRepoDir

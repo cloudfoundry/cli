@@ -11,6 +11,6 @@ import (
 
 func TestPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_1")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins", "test_1"), "test_1")
 	RunSpecs(t, "Plugin Suite")
 }

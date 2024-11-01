@@ -181,7 +181,7 @@ func SkipIfNoRoutingAPI() {
 	var response struct {
 		RoutingEndpoint string `json:"routing_endpoint"`
 	}
-	Curl(&response, "/v2/info")
+	Curlf(&response, "/v2/info")
 
 	if response.RoutingEndpoint == "" {
 		Skip("Test requires routing endpoint on /v2/info")

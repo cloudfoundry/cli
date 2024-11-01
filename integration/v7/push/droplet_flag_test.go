@@ -93,9 +93,9 @@ var _ = Describe("--droplet flag", func() {
 					GUID string `json:"guid"`
 				}
 
-				currentDropletEndpoint := fmt.Sprintf("v3/apps/%s/droplets/current", originalAppGUID)
+				const droppletEndpointFormat = "v3/apps/%s/droplets/current"
 
-				helpers.Curl(&routeResponse, currentDropletEndpoint)
+				helpers.Curlf(&routeResponse, droppletEndpointFormat, originalAppGUID)
 				preUploadDropletGUID := routeResponse.GUID
 
 				session := helpers.CF(PushCommandName, originalApp, "--droplet", dropletPath, "--no-start")
@@ -104,7 +104,7 @@ var _ = Describe("--droplet flag", func() {
 				Eventually(session).Should(Say(`requested state:\s+stopped`))
 				Eventually(session).Should(Exit(0))
 
-				helpers.Curl(&routeResponse, currentDropletEndpoint)
+				helpers.Curlf(&routeResponse, droppletEndpointFormat, originalAppGUID)
 				postUploadDropletGUID := routeResponse.GUID
 
 				Expect(preUploadDropletGUID).To(Not(Equal(postUploadDropletGUID)))

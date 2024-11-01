@@ -74,7 +74,7 @@ func setFlag(cmd interface{}, flag string, values ...interface{}) {
 				case value.Type().ConvertibleTo(field.Type):
 					val.Field(i).Set(value.Convert(field.Type))
 					return
-				case reflect.PtrTo(field.Type).Implements(reflect.TypeOf((*interface{ UnmarshalFlag(string) error })(nil)).Elem()):
+				case reflect.PointerTo(field.Type).Implements(reflect.TypeOf((*interface{ UnmarshalFlag(string) error })(nil)).Elem()):
 					elem := reflect.New(field.Type)
 					e := elem.MethodByName("UnmarshalFlag").Call([]reflect.Value{value})
 					if !e[0].IsNil() {

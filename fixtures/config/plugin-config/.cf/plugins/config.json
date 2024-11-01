@@ -1,14 +1,14 @@
 {
   "Plugins": {
     "Test1":{
-      "Location":"../../../fixtures/plugins/test_1.exe",
+      "Location":"../../../fixtures/plugins/test_1/test_1.exe",
       "Commands":[
         {"Name":"test_1_cmd1","HelpText":"help text for test1 cmd1"},
         {"Name":"test_1_cmd2","HelpText":"help text for test1 cmd2"}
       ]
     },
     "Test2":{
-      "Location":"../../../fixtures/plugins/test_2.exe",
+      "Location":"../../../fixtures/plugins/test_2/test_2.exe",
       "Commands":[
         {"Name":"test_2_cmd1","HelpText":"help text for test2 cmd1"},
         {"Name":"test_2_cmd2","HelpText":"help text for test2 cmd2"}
