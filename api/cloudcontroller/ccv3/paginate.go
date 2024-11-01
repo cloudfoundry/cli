@@ -2,9 +2,14 @@ package ccv3
 
 import (
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
+
+const MaxResultsPerPage int = 5000
 
 func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error, specificPage bool) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
@@ -68,4 +73,25 @@ func (requester RealRequester) wrapFirstPage(request *cloudcontroller.Request, o
 	}
 
 	return wrapper, warnings, nil
+}
+
+func (requester RealRequester) bulkRetrieval(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
+	wrapper, warnings, err := requester.wrapFirstPage(request, obj, func(_ interface{}) error { return nil })
+	if err != nil {
+		return IncludedResources{}, warnings, err
+	}
+
+	newQuery := url.Values{}
+	for name, value := range request.URL.Query() {
+		if name != "" && name != string(PerPage) {
+			newQuery.Add(name, strings.Join(value, ","))
+		}
+	}
+	resultsPerPage := strconv.Itoa(wrapper.Pagination.TotalResults)
+	if wrapper.Pagination.TotalResults > MaxResultsPerPage {
+		resultsPerPage = strconv.Itoa(MaxResultsPerPage)
+	}
+	newQuery.Add(string(PerPage), resultsPerPage)
+	request.URL.RawQuery = newQuery.Encode()
+	return requester.paginate(request, obj, appendToExternalList, false)
 }
