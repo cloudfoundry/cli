@@ -96,17 +96,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
       - name: Set Up Go
         uses: actions/setup-go@v5
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests }}
         with:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
-        if: ${{ inputs.run_unit_tests == 'true' }}
+        if: ${{ inputs.run_unit_tests }}
         run: make units
 
   claim-env:
