@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo/pluginrepofakes"

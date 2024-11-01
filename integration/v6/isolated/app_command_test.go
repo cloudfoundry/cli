@@ -269,7 +269,7 @@ applications:
 						} `json:"resources"`
 					}
 
-					helpers.Curl(&AppInfo, "/v3/apps?names=%s", appName)
+					helpers.Curlf(&AppInfo, "/v3/apps?names=%s", appName)
 					appGUID = AppInfo.Resources[0].GUID
 				})
 
