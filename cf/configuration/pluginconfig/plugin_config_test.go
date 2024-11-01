@@ -83,7 +83,7 @@ var _ = Describe("PluginConfig", func() {
 			}
 
 			metadata = PluginMetadata{
-				Location: "../../../fixtures/plugins/test_1.exe",
+				Location: "../../../fixtures/plugins/test_1/test_1.exe",
 				Commands: commands1,
 			}
 		})
@@ -110,9 +110,9 @@ var _ = Describe("PluginConfig", func() {
 			})
 
 			It("returns a list of plugin executables and their location", func() {
-				Expect(plugins["Test1"].Location).To(Equal("../../../fixtures/plugins/test_1.exe"))
+				Expect(plugins["Test1"].Location).To(Equal("../../../fixtures/plugins/test_1/test_1.exe"))
 				Expect(plugins["Test1"].Commands).To(Equal(commands1))
-				Expect(plugins["Test2"].Location).To(Equal("../../../fixtures/plugins/test_2.exe"))
+				Expect(plugins["Test2"].Location).To(Equal("../../../fixtures/plugins/test_2/test_2.exe"))
 				Expect(plugins["Test2"].Commands).To(Equal(commands2))
 			})
 		})
