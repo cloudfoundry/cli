@@ -15,13 +15,14 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester
 
 type RequestParams struct {
-	RequestName  string
-	URIParams    internal.Params
-	Query        []Query
-	RequestBody  interface{}
-	ResponseBody interface{}
-	URL          string
-	AppendToList func(item interface{}) error
+	RequestName    string
+	URIParams      internal.Params
+	Query          []Query
+	RequestBody    interface{}
+	ResponseBody   interface{}
+	URL            string
+	AppendToList   func(item interface{}) error
+	BulkIfPossible bool
 }
 
 type Requester interface {
@@ -93,6 +94,10 @@ func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (In
 	request, err := requester.buildRequest(requestParams)
 	if err != nil {
 		return IncludedResources{}, nil, err
+	}
+
+	if requestParams.BulkIfPossible {
+		return requester.bulkRetrieval(request, requestParams.ResponseBody, requestParams.AppendToList)
 	}
 
 	specificPage := false

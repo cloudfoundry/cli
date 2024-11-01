@@ -23,6 +23,8 @@ type PaginatedResources struct {
 			// HREF is the HREF of the next page.
 			HREF string `json:"href"`
 		} `json:"next"`
+		TotalResults int `json:"total_results"`
+		TotalPages   int `json:"total_pages"`
 	} `json:"pagination"`
 	// ResourceBytes is the list of resources for the current page.
 	ResourcesBytes    json.RawMessage `json:"resources"`

@@ -34,6 +34,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]res
 			tasks = append(tasks, item.(resources.Task))
 			return nil
 		},
+		BulkIfPossible: true,
 	})
 
 	return tasks, warnings, err
