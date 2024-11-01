@@ -82,7 +82,7 @@ Plugin names with spaces must be enclosed in quotes when installed and uninstall
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface.
 
-This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/basic_plugin.go).<br>
+This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/basic_plugin/basic_plugin.go).<br>
 To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/).
 
 ### Uninstalling A Plugin
@@ -96,7 +96,7 @@ An example which was developed using TDD is available:
 
 The `Run(...)` method accepts the command line arguments and flags that you define for a plugin.
 
-  See the [command line arguments example] (https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/echo.go) included in this repo.
+  See the [command line arguments example] (https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/echo/echo.go) included in this repo.
 
 #### Global Flags
 There are several global flags that will not be passed to the plugin. These are:
@@ -113,11 +113,11 @@ See the [test plugin example](https://github.com/cloudfoundry/cli/blob/main/inte
 
 ### Creating Interactive Plugins
 
-Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/interactive.go) included in this repo.
+Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/interactive/interactive.go) included in this repo.
 
 ### Creating Plugins with multiple commands
 
-A single plugin binary can have more than one command, and each command can have it's own help text defined. For an example of multi-command plugins, see the [multiple commands example](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/multiple_commands.go)
+A single plugin binary can have more than one command, and each command can have it's own help text defined. For an example of multi-command plugins, see the [multiple commands example](https://github.com/cloudfoundry/cli/blob/main/plugin/plugin_examples/multiple_commands/multiple_commands.go)
 
 ### Enforcing a minimum CLI version required for the plugin.
 
