@@ -104,8 +104,7 @@ jobs:
         if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
-      - name: Fetch all tags
-        run: git fetch --tags origin --force
+          fetch-depth: 0
       - name: Set Up Go
         uses: actions/setup-go@v5
         if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
