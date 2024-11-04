@@ -6,6 +6,8 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
 )
@@ -47,6 +49,11 @@ func (cmd CreateAppCommand) Execute(args []string) error {
 	}
 
 	if constant.AppLifecycleType(cmd.AppType) == constant.AppLifecycleTypeCNB {
+		err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCNB)
+		if err != nil {
+			return err
+		}
+
 		if len(cmd.Buildpacks) == 0 {
 			return errors.New("buildpack(s) must be provided when using --app-type cnb")
 		}

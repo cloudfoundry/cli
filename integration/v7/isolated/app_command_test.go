@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
@@ -409,6 +410,7 @@ applications:
 
 				When("the app is a CNB app", func() {
 					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionCNB)
 						helpers.WithJSHelloWorld(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://gcr.io/paketo-buildpacks/nodejs:latest")).Should(Exit())
 						})

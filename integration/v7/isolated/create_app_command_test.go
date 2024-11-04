@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
@@ -107,6 +108,7 @@ var _ = Describe("create-app command", func() {
 				})
 
 				It("creates the app with the cnb app type", func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionCNB)
 					session := helpers.CF("create-app", appName, "--app-type", "cnb", "-b", "docker://foobar.test")
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Creating app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))

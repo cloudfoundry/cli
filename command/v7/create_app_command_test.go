@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -132,6 +133,7 @@ var _ = Describe("create-app Command", func() {
 					fakeConfig.CNBCredentialsReturns(map[string]interface{}{
 						"foo": "bar",
 					}, nil)
+					fakeConfig.APIVersionReturns(ccversion.MinVersionCNB)
 				})
 
 				It("creates an app with app type: cnb", func() {
@@ -198,6 +200,7 @@ var _ = Describe("create-app Command", func() {
 			Context("due to missing buildpacks when AppType is cnb", func() {
 				BeforeEach(func() {
 					cmd.AppType = "cnb"
+					fakeConfig.APIVersionReturns(ccversion.MinVersionCNB)
 				})
 
 				It("displays the header and error", func() {
