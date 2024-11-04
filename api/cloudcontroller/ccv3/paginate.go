@@ -3,13 +3,10 @@ package ccv3
 import (
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
-
-const MaxResultsPerPage int = 5000
 
 func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error, specificPage bool) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
@@ -22,14 +19,7 @@ func (requester RealRequester) paginate(request *cloudcontroller.Request, obj in
 			return IncludedResources{}, fullWarningsList, err
 		}
 
-		includes.Apps = append(includes.Apps, wrapper.IncludedResources.Apps...)
-		includes.Users = append(includes.Users, wrapper.IncludedResources.Users...)
-		includes.Organizations = append(includes.Organizations, wrapper.IncludedResources.Organizations...)
-		includes.Spaces = append(includes.Spaces, wrapper.IncludedResources.Spaces...)
-		includes.ServiceBrokers = append(includes.ServiceBrokers, wrapper.IncludedResources.ServiceBrokers...)
-		includes.ServiceInstances = append(includes.ServiceInstances, wrapper.IncludedResources.ServiceInstances...)
-		includes.ServiceOfferings = append(includes.ServiceOfferings, wrapper.IncludedResources.ServiceOfferings...)
-		includes.ServicePlans = append(includes.ServicePlans, wrapper.IncludedResources.ServicePlans...)
+		includes.Merge(wrapper.IncludedResources)
 
 		if specificPage || wrapper.NextPage() == "" {
 			break
@@ -81,17 +71,18 @@ func (requester RealRequester) bulkRetrieval(request *cloudcontroller.Request, o
 		return IncludedResources{}, warnings, err
 	}
 
+	if wrapper.Pagination.Next.HREF == "" {
+		return wrapper.IncludedResources, warnings, nil
+	}
+
 	newQuery := url.Values{}
 	for name, value := range request.URL.Query() {
 		if name != "" && name != string(PerPage) {
 			newQuery.Add(name, strings.Join(value, ","))
 		}
 	}
-	resultsPerPage := strconv.Itoa(wrapper.Pagination.TotalResults)
-	if wrapper.Pagination.TotalResults > MaxResultsPerPage {
-		resultsPerPage = strconv.Itoa(MaxResultsPerPage)
-	}
-	newQuery.Add(string(PerPage), resultsPerPage)
+
+	newQuery.Add(string(PerPage), MaxPerPage)
 	request.URL.RawQuery = newQuery.Encode()
 	return requester.paginate(request, obj, appendToExternalList, false)
 }
