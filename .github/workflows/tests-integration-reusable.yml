@@ -50,6 +50,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{inputs.gitRef}}
+        fetch-tags: true
 
     - name: Checkout cf-acceptance-tests
       if: ${{ inputs.name == 'cats' }}
