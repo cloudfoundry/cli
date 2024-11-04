@@ -51,6 +51,10 @@ jobs:
       with:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
+        fetch-tags: true
+
+    - name: Fetch all tags
+      run: git fetch --tags origin --force
 
     - name: Checkout cf-acceptance-tests
       if: ${{ inputs.name == 'cats' }}
