@@ -37,6 +37,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{inputs.gitRef}}
+        fetch-depth: 0
 
     - name: Checkout CF deployment tasks
       uses: actions/checkout@v4
