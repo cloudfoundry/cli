@@ -66,7 +66,7 @@ func (requester RealRequester) wrapFirstPage(request *cloudcontroller.Request, o
 }
 
 func (requester RealRequester) bulkRetrieval(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
-	wrapper, warnings, err := requester.wrapFirstPage(request, obj, func(_ interface{}) error { return nil })
+	wrapper, warnings, err := requester.wrapFirstPage(request, obj, appendToExternalList)
 	if err != nil {
 		return IncludedResources{}, warnings, err
 	}
