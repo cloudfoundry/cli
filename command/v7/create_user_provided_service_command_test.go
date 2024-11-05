@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -213,6 +214,21 @@ var _ = Describe("create-user-provided-service Command", func() {
 					Say("be warned"),
 					Say("take care"),
 				))
+			})
+		})
+
+		When("the service instance name is taken", func() {
+			BeforeEach(func() {
+				fakeActor.CreateUserProvidedServiceInstanceReturns(
+					nil,
+					ccerror.ServiceInstanceNameTakenError{},
+				)
+			})
+
+			It("succeeds, displaying warnings, 'OK' and an informative message", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say("Service instance %s already exists", fakeServiceInstanceName))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 	})
