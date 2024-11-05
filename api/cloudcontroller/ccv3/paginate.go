@@ -66,12 +66,22 @@ func (requester RealRequester) wrapFirstPage(request *cloudcontroller.Request, o
 }
 
 func (requester RealRequester) bulkRetrieval(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
-	wrapper, warnings, err := requester.wrapFirstPage(request, obj, appendToExternalList)
+	wrapper, warnings, err := requester.wrapFirstPage(request, obj, func(i interface{}) error { return nil })
 	if err != nil {
 		return IncludedResources{}, warnings, err
 	}
 
 	if wrapper.Pagination.Next.HREF == "" {
+		list, err := wrapper.Resources()
+		if err != nil {
+			return IncludedResources{}, warnings, err
+		}
+		for _, item := range list {
+			err = appendToExternalList(item)
+			if err != nil {
+				return IncludedResources{}, warnings, err
+			}
+		}
 		return wrapper.IncludedResources, warnings, nil
 	}
 
