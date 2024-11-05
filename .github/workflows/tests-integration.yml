@@ -293,7 +293,7 @@ jobs:
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
       lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-      nodes: ${{ inputs.nodes }}
+      nodes: ${{ inputs.nodes || '16' }}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
