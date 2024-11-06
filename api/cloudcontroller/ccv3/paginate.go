@@ -2,8 +2,6 @@ package ccv3
 
 import (
 	"net/http"
-	"net/url"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
@@ -63,36 +61,4 @@ func (requester RealRequester) wrapFirstPage(request *cloudcontroller.Request, o
 	}
 
 	return wrapper, warnings, nil
-}
-
-func (requester RealRequester) bulkRetrieval(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
-	wrapper, warnings, err := requester.wrapFirstPage(request, obj, func(i interface{}) error { return nil })
-	if err != nil {
-		return IncludedResources{}, warnings, err
-	}
-
-	if wrapper.Pagination.Next.HREF == "" {
-		list, err := wrapper.Resources()
-		if err != nil {
-			return IncludedResources{}, warnings, err
-		}
-		for _, item := range list {
-			err = appendToExternalList(item)
-			if err != nil {
-				return IncludedResources{}, warnings, err
-			}
-		}
-		return wrapper.IncludedResources, warnings, nil
-	}
-
-	newQuery := url.Values{}
-	for name, value := range request.URL.Query() {
-		if name != "" && name != string(PerPage) {
-			newQuery.Add(name, strings.Join(value, ","))
-		}
-	}
-
-	newQuery.Add(string(PerPage), MaxPerPage)
-	request.URL.RawQuery = newQuery.Encode()
-	return requester.paginate(request, obj, appendToExternalList, false)
 }
