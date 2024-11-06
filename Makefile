@@ -4,6 +4,7 @@ FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
+CF_BUILD_VERSION ?= $$(git describe --tags --abbrev=0)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
