@@ -54,6 +54,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
+          fetch-depth: 0
       - name: Set Up Go
         uses: actions/setup-go@v5
         with:
