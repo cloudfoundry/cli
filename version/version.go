@@ -1,6 +1,10 @@
 package version
 
-import "github.com/blang/semver/v4"
+import (
+	"strings"
+
+	"github.com/blang/semver/v4"
+)
 
 const DefaultVersion = "0.0.0-unknown-version"
 
@@ -11,6 +15,8 @@ var (
 )
 
 func VersionString() string {
+	// Remove the "v" prefix from the binary in case it is present
+	binaryVersion = strings.TrimPrefix(binaryVersion, "v")
 	versionString, err := semver.Make(binaryVersion)
 	if err != nil {
 		versionString = semver.MustParse(DefaultVersion)
