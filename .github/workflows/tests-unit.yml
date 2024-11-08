@@ -21,13 +21,9 @@ on:
 permissions:
   contents: read
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   units:
-    name: Units
+    name: Units (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
@@ -36,9 +32,13 @@ jobs:
           - ubuntu-20.04
           - macos-latest
           - macos-13
+          - windows-latest
     runs-on: ${{ matrix.os }}
-    steps:
+    defaults:
+      run:
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
 
+    steps:
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -47,40 +47,13 @@ jobs:
       with:
         go-version-file: go.mod
         check-latest: true
+        cache: true
+
+    - name: Install Windows Dependencies
+      if: matrix.os == 'windows-latest'
+      run: choco install --no-progress --limit-output -y make
 
     - name: Run Units
       run: make units
 
-  units-windows:
-    name: Units Windows
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - windows-latest
-          - windows-2019
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set Up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: go.mod
-        check-latest: true
-
-    - name: Get build-time dependencies
-      run: |
-        choco install --no-progress --limit-output -y make
-
-    - name: Run Windows Units
-      run: |
-        Get-Command make
-        Get-Item Makefile
-        make units
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:
