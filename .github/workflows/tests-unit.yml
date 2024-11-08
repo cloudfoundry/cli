@@ -33,6 +33,7 @@ jobs:
           - macos-latest
           - macos-13
           - windows-latest
+          - windows-2019
     runs-on: ${{ matrix.os }}
     defaults:
       run:
