@@ -305,7 +305,10 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
-    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     needs:
     - setup
     - update-deb
