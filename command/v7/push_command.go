@@ -88,6 +88,7 @@ type PushCommand struct {
 	HealthCheckHTTPEndpoint string                              `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	HealthCheckType         flag.HealthCheckType                `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
+	Lifecycle               constant.AppLifecycleType           `long:"lifecycle" description:"App lifecycle type to stage and run the app" default:""`
 	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	MaxInFlight             *int                                `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
