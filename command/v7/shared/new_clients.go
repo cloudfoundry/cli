@@ -47,6 +47,7 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI, extra
 	}
 
 	ccWrappers = append(ccWrappers, extraWrappers...)
+	ccWrappers = append(ccWrappers, ccWrapper.NewCCTraceHeaderRequest(config.B3TraceID(), config.B3SpanID()))
 	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	return ccv3.NewClient(ccv3.Config{
@@ -85,6 +86,7 @@ func newWrappedUAAClient(config command.Config, ui command.UI) (*uaa.Client, err
 
 	uaaAuthWrapper := uaaWrapper.NewUAAAuthentication(uaaClient, config)
 	uaaClient.WrapConnection(uaaAuthWrapper)
+	uaaClient.WrapConnection(uaaWrapper.NewUAATraceHeaderRequest(config.B3TraceID(), config.B3SpanID()))
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	err = uaaClient.SetupResources(config.UAAEndpoint(), config.AuthorizationEndpoint())
