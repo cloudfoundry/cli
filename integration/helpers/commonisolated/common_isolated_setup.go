@@ -41,6 +41,7 @@ func CommonGinkgoSetup(
 
 		helpers.SetupSynchronizedSuite(func() {
 			helpers.EnableFeatureFlag("diego_docker")
+			helpers.EnableFeatureFlag("diego_cnb")
 			helpers.EnableFeatureFlag("service_instance_sharing")
 			if helpers.IsVersionMet(ccversion.MinVersionHTTP2RoutingV3) {
 				helpers.EnableFeatureFlag("route_sharing")
