@@ -3,7 +3,8 @@ package ccv3
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -12,7 +13,7 @@ func (client *Client) CreateServiceBroker(serviceBroker resources.ServiceBroker)
 	serviceBroker.CredentialsType = resources.ServiceBrokerBasicCredentials
 
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostServiceBrokerRequest,
+		RequestName: ccv3internal.PostServiceBrokerRequest,
 		RequestBody: serviceBroker,
 	})
 
@@ -22,7 +23,7 @@ func (client *Client) CreateServiceBroker(serviceBroker resources.ServiceBroker)
 // DeleteServiceBroker deletes a named service broker
 func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceBrokerRequest,
+		RequestName: ccv3internal.DeleteServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 	})
 
@@ -34,7 +35,7 @@ func (client *Client) GetServiceBrokers(query ...Query) ([]resources.ServiceBrok
 	var result []resources.ServiceBroker
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetServiceBrokersRequest,
+		RequestName:  ccv3internal.GetServiceBrokersRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceBroker{},
 		AppendToList: func(item interface{}) error {
@@ -57,7 +58,7 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 	}
 
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PatchServiceBrokerRequest,
+		RequestName: ccv3internal.PatchServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 		RequestBody: serviceBroker,
 	})

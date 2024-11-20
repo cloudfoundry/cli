@@ -2,7 +2,8 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -14,7 +15,7 @@ func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVari
 	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetEnvironmentVariableGroupRequest,
+		RequestName:  ccv3internal.GetEnvironmentVariableGroupRequest,
 		URIParams:    internal.Params{"group_name": string(group)},
 		ResponseBody: &responseBody,
 	})
@@ -29,7 +30,7 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchApplicationEnvironmentVariablesRequest,
+		RequestName:  ccv3internal.PatchApplicationEnvironmentVariablesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  envVars,
 		ResponseBody: &responseBody,
@@ -42,7 +43,7 @@ func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentV
 	var responseBody resources.EnvironmentVariables
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchEnvironmentVariableGroupRequest,
+		RequestName:  ccv3internal.PatchEnvironmentVariableGroupRequest,
 		URIParams:    internal.Params{"group_name": string(group)},
 		RequestBody:  envVars,
 		ResponseBody: &responseBody,

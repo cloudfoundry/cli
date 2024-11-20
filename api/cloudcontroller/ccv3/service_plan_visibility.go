@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) GetServicePlanVisibility(servicePlanGUID string) (resource
 	var result resources.ServicePlanVisibility
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServicePlanVisibilityRequest,
+		RequestName:  ccv3internal.GetServicePlanVisibilityRequest,
 		URIParams:    internal.Params{"service_plan_guid": servicePlanGUID},
 		ResponseBody: &result,
 	})
@@ -21,7 +22,7 @@ func (client *Client) UpdateServicePlanVisibility(servicePlanGUID string, planVi
 	var result resources.ServicePlanVisibility
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostServicePlanVisibilityRequest,
+		RequestName:  ccv3internal.PostServicePlanVisibilityRequest,
 		URIParams:    internal.Params{"service_plan_guid": servicePlanGUID},
 		RequestBody:  planVisibility,
 		ResponseBody: &result,
@@ -33,7 +34,7 @@ func (client *Client) UpdateServicePlanVisibility(servicePlanGUID string, planVi
 func (client *Client) DeleteServicePlanVisibility(servicePlanGUID, organizationGUID string) (Warnings, error) {
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServicePlanVisibilityRequest,
+		RequestName: ccv3internal.DeleteServicePlanVisibilityRequest,
 		URIParams:   internal.Params{"service_plan_guid": servicePlanGUID, "organization_guid": organizationGUID},
 	})
 

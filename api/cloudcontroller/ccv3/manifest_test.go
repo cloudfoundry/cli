@@ -8,7 +8,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
@@ -54,7 +55,7 @@ var _ = Describe("Application Manifest", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestReceiveRawCallCount()).To(Equal(1))
 				requestName, uriParams, responseBody := requester.MakeRequestReceiveRawArgsForCall(0)
-				Expect(requestName).To(Equal(internal.GetApplicationManifestRequest))
+				Expect(requestName).To(Equal(ccv3internal.GetApplicationManifestRequest))
 				Expect(uriParams).To(Equal(internal.Params{"app_guid": appGUID}))
 				Expect(responseBody).To(Equal("application/x-yaml"))
 			})

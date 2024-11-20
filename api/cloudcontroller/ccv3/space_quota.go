@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (resour
 	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostSpaceQuotaRelationshipsRequest,
+		RequestName:  ccv3internal.PostSpaceQuotaRelationshipsRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGUID},
 		RequestBody:  resources.RelationshipList{GUIDs: []string{spaceGUID}},
 		ResponseBody: &responseBody,
@@ -22,7 +23,7 @@ func (client Client) CreateSpaceQuota(spaceQuota resources.SpaceQuota) (resource
 	var responseBody resources.SpaceQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostSpaceQuotaRequest,
+		RequestName:  ccv3internal.PostSpaceQuotaRequest,
 		RequestBody:  spaceQuota,
 		ResponseBody: &responseBody,
 	})
@@ -32,7 +33,7 @@ func (client Client) CreateSpaceQuota(spaceQuota resources.SpaceQuota) (resource
 
 func (client Client) DeleteSpaceQuota(spaceQuotaGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSpaceQuotaRequest,
+		RequestName: ccv3internal.DeleteSpaceQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
 	})
 
@@ -43,7 +44,7 @@ func (client Client) GetSpaceQuota(spaceQuotaGUID string) (resources.SpaceQuota,
 	var responseBody resources.SpaceQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetSpaceQuotaRequest,
+		RequestName:  ccv3internal.GetSpaceQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
 		ResponseBody: &responseBody,
 	})
@@ -55,7 +56,7 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]resources.SpaceQuota, Wa
 	var spaceQuotas []resources.SpaceQuota
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetSpaceQuotasRequest,
+		RequestName:  ccv3internal.GetSpaceQuotasRequest,
 		Query:        query,
 		ResponseBody: resources.SpaceQuota{},
 		AppendToList: func(item interface{}) error {
@@ -69,7 +70,7 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]resources.SpaceQuota, Wa
 
 func (client *Client) UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSpaceQuotaFromSpaceRequest,
+		RequestName: ccv3internal.DeleteSpaceQuotaFromSpaceRequest,
 		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID, "space_guid": spaceGUID},
 	})
 
@@ -83,7 +84,7 @@ func (client *Client) UpdateSpaceQuota(spaceQuota resources.SpaceQuota) (resourc
 	var responseBody resources.SpaceQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchSpaceQuotaRequest,
+		RequestName:  ccv3internal.PatchSpaceQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
 		RequestBody:  spaceQuota,
 		ResponseBody: &responseBody,

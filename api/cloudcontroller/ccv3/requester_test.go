@@ -11,7 +11,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	. "code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
@@ -51,7 +52,7 @@ var _ = Describe("shared request helpers", func() {
 
 			BeforeEach(func() {
 				requestParams = RequestParams{
-					RequestName:  internal.GetOrganizationRequest,
+					RequestName:  ccv3internal.GetOrganizationRequest,
 					URIParams:    internal.Params{"organization_guid": "some-org-guid"},
 					ResponseBody: &responseBody,
 				}
@@ -148,7 +149,7 @@ var _ = Describe("shared request helpers", func() {
 				}
 
 				requestParams = RequestParams{
-					RequestName:  internal.PostBuildpackRequest,
+					RequestName:  ccv3internal.PostBuildpackRequest,
 					RequestBody:  requestBody,
 					ResponseBody: &responseBody,
 				}
@@ -269,7 +270,7 @@ var _ = Describe("shared request helpers", func() {
 		Context("DELETE resource", func() {
 			BeforeEach(func() {
 				requestParams = RequestParams{
-					RequestName: internal.DeleteSpaceRequest,
+					RequestName: ccv3internal.DeleteSpaceRequest,
 					URIParams:   internal.Params{"space_guid": "space-guid"},
 				}
 			})
@@ -333,7 +334,7 @@ var _ = Describe("shared request helpers", func() {
 					SpaceGUID:           "some-space-guid",
 				}
 				requestParams = RequestParams{
-					RequestName:  internal.PatchApplicationRequest,
+					RequestName:  ccv3internal.PatchApplicationRequest,
 					URIParams:    internal.Params{"app_guid": requestBody.GUID},
 					RequestBody:  requestBody,
 					ResponseBody: &responseBody,
@@ -565,7 +566,7 @@ var _ = Describe("shared request helpers", func() {
 					},
 				}
 				requestParams = RequestParams{
-					RequestName:  internal.GetRolesRequest,
+					RequestName:  ccv3internal.GetRolesRequest,
 					Query:        query,
 					ResponseBody: resources.Role{},
 					AppendToList: func(item interface{}) error {
@@ -873,7 +874,7 @@ var _ = Describe("shared request helpers", func() {
 					)
 
 					requestParams = RequestParams{
-						RequestName:  internal.GetApplicationProcessesRequest,
+						RequestName:  ccv3internal.GetApplicationProcessesRequest,
 						URIParams:    internal.Params{"app_guid": appGUID},
 						ResponseBody: Process{},
 						AppendToList: func(item interface{}) error {
@@ -954,7 +955,7 @@ var _ = Describe("shared request helpers", func() {
 					},
 				}
 				requestParams = RequestParams{
-					RequestName:  internal.GetStacksRequest,
+					RequestName:  ccv3internal.GetStacksRequest,
 					Query:        query,
 					ResponseBody: resources.Stack{},
 					AppendToList: func(item interface{}) error {
@@ -1055,7 +1056,7 @@ var _ = Describe("shared request helpers", func() {
 			)
 
 			BeforeEach(func() {
-				requestName = internal.GetApplicationManifestRequest
+				requestName = ccv3internal.GetApplicationManifestRequest
 				responseBodyMimeType = "application/x-yaml"
 				uriParams = internal.Params{"app_guid": "some-app-guid"}
 			})
@@ -1140,7 +1141,7 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("Download a droplet", func() {
 			BeforeEach(func() {
-				requestName = internal.GetDropletBitsRequest
+				requestName = ccv3internal.GetDropletBitsRequest
 				uriParams = internal.Params{"droplet_guid": "some-droplet-guid"}
 			})
 
@@ -1187,7 +1188,7 @@ var _ = Describe("shared request helpers", func() {
 			expectedJobURL = "apply-manifest-job-url"
 			responseBody = Package{}
 
-			requestName = internal.PostPackageBitsRequest
+			requestName = ccv3internal.PostPackageBitsRequest
 			uriParams = internal.Params{"package_guid": "package-guid"}
 			requestBodyMimeType = "multipart/form-data"
 		})
@@ -1323,7 +1324,7 @@ var _ = Describe("shared request helpers", func() {
 		})
 		JustBeforeEach(func() {
 			responseBody = Package{}
-			requestName = internal.PostPackageBitsRequest
+			requestName = ccv3internal.PostPackageBitsRequest
 			requestBodyMimeType = "multipart/form-data"
 			uriParams = internal.Params{"package_guid": "package-guid"}
 

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -11,7 +12,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostIsolationSegmentRelationshipOrganizationsRequest,
+		RequestName:  ccv3internal.PostIsolationSegmentRelationshipOrganizationsRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
 		RequestBody:  resources.RelationshipList{GUIDs: organizationGUIDs},
 		ResponseBody: &responseBody,

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/tedsuo/rata"
+	"code.cloudfoundry.org/cli/api/internal"
 )
 
 // Request represents the request of the router
@@ -56,7 +56,7 @@ type requestOptions struct {
 func (client Client) newHTTPRequest(passedRequest requestOptions) (*Request, error) {
 	request, err := client.router.CreateRequest(
 		passedRequest.RequestName,
-		rata.Params(passedRequest.URIParams),
+		internal.Params(passedRequest.URIParams),
 		passedRequest.Body,
 	)
 
