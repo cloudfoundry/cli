@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ import (
 // underlying processes.
 func (client *Client) GetApplicationManifest(appGUID string) ([]byte, Warnings, error) {
 	bytes, warnings, err := client.MakeRequestReceiveRaw(
-		internal.GetApplicationManifestRequest,
+		ccv3internal.GetApplicationManifestRequest,
 		internal.Params{"app_guid": appGUID},
 		"application/x-yaml",
 	)
@@ -21,7 +22,7 @@ func (client *Client) GetSpaceManifestDiff(spaceGUID string, rawManifest []byte)
 	var responseBody resources.ManifestDiff
 
 	_, warnings, err := client.MakeRequestSendRaw(
-		internal.PostSpaceDiffManifestRequest,
+		ccv3internal.PostSpaceDiffManifestRequest,
 		internal.Params{"space_guid": spaceGUID},
 		rawManifest,
 		"application/x-yaml",

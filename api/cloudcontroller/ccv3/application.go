@@ -2,7 +2,8 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -11,7 +12,7 @@ func (client *Client) CreateApplication(app resources.Application) (resources.Ap
 	var responseBody resources.Application
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationRequest,
+		RequestName:  ccv3internal.PostApplicationRequest,
 		RequestBody:  app,
 		ResponseBody: &responseBody,
 	})
@@ -42,7 +43,7 @@ func (client *Client) GetApplications(query ...Query) ([]resources.Application, 
 	var apps []resources.Application
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationsRequest,
+		RequestName:  ccv3internal.GetApplicationsRequest,
 		Query:        query,
 		ResponseBody: resources.Application{},
 		AppendToList: func(item interface{}) error {
@@ -59,7 +60,7 @@ func (client *Client) UpdateApplication(app resources.Application) (resources.Ap
 	var responseBody resources.Application
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchApplicationRequest,
+		RequestName:  ccv3internal.PatchApplicationRequest,
 		URIParams:    internal.Params{"app_guid": app.GUID},
 		RequestBody:  app,
 		ResponseBody: &responseBody,
@@ -72,7 +73,7 @@ func (client *Client) UpdateApplication(app resources.Application) (resources.Ap
 func (client *Client) UpdateApplicationName(newAppName string, appGUID string) (resources.Application, Warnings, error) {
 	var responseBody resources.Application
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchApplicationRequest,
+		RequestName:  ccv3internal.PatchApplicationRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  resources.ApplicationNameOnly{Name: newAppName},
 		ResponseBody: &responseBody,
@@ -86,7 +87,7 @@ func (client *Client) UpdateApplicationRestart(appGUID string) (resources.Applic
 	var responseBody resources.Application
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationActionRestartRequest,
+		RequestName:  ccv3internal.PostApplicationActionRestartRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})
@@ -99,7 +100,7 @@ func (client *Client) UpdateApplicationStart(appGUID string) (resources.Applicat
 	var responseBody resources.Application
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationActionStartRequest,
+		RequestName:  ccv3internal.PostApplicationActionStartRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})
@@ -112,7 +113,7 @@ func (client *Client) UpdateApplicationStop(appGUID string) (resources.Applicati
 	var responseBody resources.Application
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationActionStopRequest,
+		RequestName:  ccv3internal.PostApplicationActionStopRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})

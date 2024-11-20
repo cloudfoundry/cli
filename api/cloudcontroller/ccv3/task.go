@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -11,7 +12,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task resources.Task)
 	var responseBody resources.Task
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationTasksRequest,
+		RequestName:  ccv3internal.PostApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  task,
 		ResponseBody: &responseBody,
@@ -36,7 +37,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]res
 	}
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationTasksRequest,
+		RequestName:  ccv3internal.GetApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		Query:        query,
 		ResponseBody: resources.Task{},
@@ -54,7 +55,7 @@ func (client *Client) UpdateTaskCancel(taskGUID string) (resources.Task, Warning
 	var responseBody resources.Task
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PutTaskCancelRequest,
+		RequestName: ccv3internal.PutTaskCancelRequest,
 		URIParams: internal.Params{
 			"task_guid": taskGUID,
 		},
@@ -68,7 +69,7 @@ func (client *Client) GetTask(guid string) (resources.Task, Warnings, error) {
 	var responseBody resources.Task
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.GetTaskRequest,
+		RequestName: ccv3internal.GetTaskRequest,
 		URIParams: internal.Params{
 			"task_guid": guid,
 		},

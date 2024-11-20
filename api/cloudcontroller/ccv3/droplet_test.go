@@ -13,8 +13,9 @@ import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -53,7 +54,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.PostDropletRequest))
 			Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
 				Relationships: resources.Relationships{
 					constant.RelationshipTypeApplication: resources.Relationship{GUID: "app-guid"},
@@ -91,7 +92,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetApplicationDropletCurrentRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetApplicationDropletCurrentRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 			_, ok := actualParams.ResponseBody.(*resources.Droplet)
 			Expect(ok).To(BeTrue())
@@ -129,7 +130,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetPackageDropletsRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetPackageDropletsRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"package_guid": "package-guid"}))
 			_, ok := actualParams.ResponseBody.(resources.Droplet)
 			Expect(ok).To(BeTrue())
@@ -163,7 +164,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetDropletRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetDropletRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"droplet_guid": "some-guid"}))
 			_, ok := actualParams.ResponseBody.(*resources.Droplet)
 			Expect(ok).To(BeTrue())
@@ -201,7 +202,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetDropletsRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetDropletsRequest))
 			Expect(actualParams.Query).To(Equal([]Query{
 				{Key: AppGUIDFilter, Values: []string{"some-app-guid"}},
 				{Key: PerPage, Values: []string{"2"}},
@@ -441,7 +442,7 @@ var _ = Describe("Droplet", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeRequestReceiveRawCallCount()).To(Equal(1))
 			requestType, requestParams, responseType := requester.MakeRequestReceiveRawArgsForCall(0)
-			Expect(requestType).To(Equal(internal.GetDropletBitsRequest))
+			Expect(requestType).To(Equal(ccv3internal.GetDropletBitsRequest))
 			Expect(requestParams).To(Equal(internal.Params{"droplet_guid": "some-droplet-guid"}))
 			Expect(responseType).To(Equal("application/json"))
 		})

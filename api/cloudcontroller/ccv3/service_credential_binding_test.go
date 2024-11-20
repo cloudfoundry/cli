@@ -9,7 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -45,7 +46,7 @@ var _ = Describe("Service Credential Bindings", func() {
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-					RequestName: internal.PostServiceCredentialBindingRequest,
+					RequestName: ccv3internal.PostServiceCredentialBindingRequest,
 					RequestBody: binding,
 				}))
 			})
@@ -102,7 +103,7 @@ var _ = Describe("Service Credential Bindings", func() {
 		It("makes the correct call", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetServiceCredentialBindingsRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetServiceCredentialBindingsRequest))
 			Expect(actualParams.Query).To(ConsistOf(Query{Key: ServiceInstanceGUIDFilter, Values: []string{"si-1-guid", "si-2-guid", "si-3-guid", "si-4-guid"}}))
 			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceCredentialBinding{}))
 		})
@@ -214,7 +215,7 @@ var _ = Describe("Service Credential Bindings", func() {
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-				RequestName: internal.DeleteServiceCredentialBindingRequest,
+				RequestName: ccv3internal.DeleteServiceCredentialBindingRequest,
 				URIParams:   internal.Params{"service_credential_binding_guid": guid},
 			}))
 		})
@@ -271,7 +272,7 @@ var _ = Describe("Service Credential Bindings", func() {
 		It("makes the correct call", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetServiceCredentialBindingDetailsRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetServiceCredentialBindingDetailsRequest))
 			Expect(actualParams.URIParams).To(HaveKeyWithValue("service_credential_binding_guid", guid))
 			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(&resources.ServiceCredentialBindingDetails{}))
 		})

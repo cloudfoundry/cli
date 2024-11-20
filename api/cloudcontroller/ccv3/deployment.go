@@ -1,13 +1,14 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
 func (client *Client) ContinueDeployment(deploymentGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostApplicationDeploymentActionContinueRequest,
+		RequestName: ccv3internal.PostApplicationDeploymentActionContinueRequest,
 		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
 	})
 
@@ -16,7 +17,7 @@ func (client *Client) ContinueDeployment(deploymentGUID string) (Warnings, error
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostApplicationDeploymentActionCancelRequest,
+		RequestName: ccv3internal.PostApplicationDeploymentActionCancelRequest,
 		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
 	})
 
@@ -28,7 +29,7 @@ func (client *Client) CreateApplicationDeployment(dep resources.Deployment) (str
 	var responseBody resources.Deployment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationDeploymentRequest,
+		RequestName:  ccv3internal.PostApplicationDeploymentRequest,
 		RequestBody:  dep,
 		ResponseBody: &responseBody,
 	})
@@ -40,7 +41,7 @@ func (client *Client) GetDeployment(deploymentGUID string) (resources.Deployment
 	var responseBody resources.Deployment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetDeploymentRequest,
+		RequestName:  ccv3internal.GetDeploymentRequest,
 		URIParams:    internal.Params{"deployment_guid": deploymentGUID},
 		ResponseBody: &responseBody,
 	})
@@ -52,7 +53,7 @@ func (client *Client) GetDeployments(query ...Query) ([]resources.Deployment, Wa
 	var deployments []resources.Deployment
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetDeploymentsRequest,
+		RequestName:  ccv3internal.GetDeploymentsRequest,
 		Query:        query,
 		ResponseBody: resources.Deployment{},
 		AppendToList: func(item interface{}) error {

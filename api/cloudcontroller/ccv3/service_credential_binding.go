@@ -1,14 +1,15 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 )
 
 func (client *Client) CreateServiceCredentialBinding(binding resources.ServiceCredentialBinding) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
-		RequestName: internal.PostServiceCredentialBindingRequest,
+		RequestName: ccv3internal.PostServiceCredentialBindingRequest,
 		RequestBody: binding,
 	})
 }
@@ -21,7 +22,7 @@ func (client *Client) GetServiceCredentialBindings(query ...Query) ([]resources.
 	var result []resources.ServiceCredentialBinding
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetServiceCredentialBindingsRequest,
+		RequestName:  ccv3internal.GetServiceCredentialBindingsRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceCredentialBinding{},
 		AppendToList: func(item interface{}) error {
@@ -44,14 +45,14 @@ func (client *Client) GetServiceCredentialBindings(query ...Query) ([]resources.
 
 func (client *Client) DeleteServiceCredentialBinding(guid string) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceCredentialBindingRequest,
+		RequestName: ccv3internal.DeleteServiceCredentialBindingRequest,
 		URIParams:   internal.Params{"service_credential_binding_guid": guid},
 	})
 }
 
 func (client *Client) GetServiceCredentialBindingDetails(guid string) (details resources.ServiceCredentialBindingDetails, warnings Warnings, err error) {
 	_, warnings, err = client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServiceCredentialBindingDetailsRequest,
+		RequestName:  ccv3internal.GetServiceCredentialBindingDetailsRequest,
 		URIParams:    internal.Params{"service_credential_binding_guid": guid},
 		ResponseBody: &details,
 	})

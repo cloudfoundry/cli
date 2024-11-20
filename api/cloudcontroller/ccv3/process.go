@@ -2,7 +2,8 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -11,7 +12,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process reso
 	var responseBody resources.Process
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostApplicationProcessActionScaleRequest,
+		RequestName:  ccv3internal.PostApplicationProcessActionScaleRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "type": process.Type},
 		RequestBody:  process,
 		ResponseBody: &responseBody,
@@ -25,7 +26,7 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 	var responseBody resources.Process
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetApplicationProcessRequest,
+		RequestName:  ccv3internal.GetApplicationProcessRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "type": processType},
 		ResponseBody: &responseBody,
 	})
@@ -39,7 +40,7 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]resources.Proce
 	var processes []resources.Process
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationProcessesRequest,
+		RequestName:  ccv3internal.GetApplicationProcessesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: resources.Process{},
 		AppendToList: func(item interface{}) error {
@@ -95,7 +96,7 @@ func (client *Client) GetProcess(processGUID string) (resources.Process, Warning
 	var responseBody resources.Process
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetProcessRequest,
+		RequestName:  ccv3internal.GetProcessRequest,
 		URIParams:    internal.Params{"process_guid": processGUID},
 		ResponseBody: &responseBody,
 	})
@@ -107,7 +108,7 @@ func (client Client) GetProcesses(query ...Query) ([]resources.Process, Warnings
 	var processes []resources.Process
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetProcessesRequest,
+		RequestName:  ccv3internal.GetProcessesRequest,
 		Query:        query,
 		ResponseBody: resources.Process{},
 		AppendToList: func(item interface{}) error {
@@ -126,7 +127,7 @@ func (client *Client) UpdateProcess(process resources.Process) (resources.Proces
 	var responseBody resources.Process
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PatchProcessRequest,
+		RequestName: ccv3internal.PatchProcessRequest,
 		URIParams:   internal.Params{"process_guid": process.GUID},
 		RequestBody: resources.Process{
 			Command:                      process.Command,

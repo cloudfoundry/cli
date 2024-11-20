@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -14,7 +15,7 @@ func (client *Client) GetAppFeature(appGUID string, featureName string) (resourc
 	var responseBody resources.ApplicationFeature
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetApplicationFeaturesRequest,
+		RequestName:  ccv3internal.GetApplicationFeaturesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "name": featureName},
 		ResponseBody: &responseBody,
 	})
@@ -26,7 +27,7 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 	var responseBody SSHEnabled
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetSSHEnabled,
+		RequestName:  ccv3internal.GetSSHEnabled,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})
@@ -37,7 +38,7 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 // UpdateAppFeature enables/disables the ability to ssh for a given application.
 func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PatchApplicationFeaturesRequest,
+		RequestName: ccv3internal.PatchApplicationFeaturesRequest,
 		RequestBody: struct {
 			Enabled bool `json:"enabled"`
 		}{Enabled: enabled},

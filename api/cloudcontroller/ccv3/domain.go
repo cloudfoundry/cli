@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -79,7 +80,7 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string,
 	}
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetDomainRouteReservationsRequest,
+		RequestName:  ccv3internal.GetDomainRouteReservationsRequest,
 		URIParams:    internal.Params{"domain_guid": domainGUID},
 		Query:        query,
 		ResponseBody: &responseBody,
@@ -92,7 +93,7 @@ func (client Client) CreateDomain(domain resources.Domain) (resources.Domain, Wa
 	var responseBody resources.Domain
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostDomainRequest,
+		RequestName:  ccv3internal.PostDomainRequest,
 		RequestBody:  domain,
 		ResponseBody: &responseBody,
 	})
@@ -102,7 +103,7 @@ func (client Client) CreateDomain(domain resources.Domain) (resources.Domain, Wa
 
 func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteDomainRequest,
+		RequestName: ccv3internal.DeleteDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGUID},
 	})
 
@@ -114,7 +115,7 @@ func (client *Client) GetDomain(domainGUID string) (resources.Domain, Warnings, 
 	var responseBody resources.Domain
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetDomainRequest,
+		RequestName:  ccv3internal.GetDomainRequest,
 		URIParams:    internal.Params{"domain_guid": domainGUID},
 		ResponseBody: &responseBody,
 	})
@@ -126,7 +127,7 @@ func (client Client) GetDomains(query ...Query) ([]resources.Domain, Warnings, e
 	var domains []resources.Domain
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetDomainsRequest,
+		RequestName:  ccv3internal.GetDomainsRequest,
 		Query:        query,
 		ResponseBody: resources.Domain{},
 		AppendToList: func(item interface{}) error {
@@ -143,7 +144,7 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]r
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		URIParams:    internal.Params{"organization_guid": orgGUID},
-		RequestName:  internal.GetOrganizationDomainsRequest,
+		RequestName:  ccv3internal.GetOrganizationDomainsRequest,
 		Query:        query,
 		ResponseBody: resources.Domain{},
 		AppendToList: func(item interface{}) error {
@@ -157,7 +158,7 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]r
 
 func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.SharePrivateDomainRequest,
+		RequestName: ccv3internal.SharePrivateDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGuid},
 		RequestBody: sharedOrgs,
 	})
@@ -167,7 +168,7 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 
 func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSharedOrgFromDomainRequest,
+		RequestName: ccv3internal.DeleteSharedOrgFromDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
 	})
 

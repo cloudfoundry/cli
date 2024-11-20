@@ -3,8 +3,9 @@ package ccv3
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -14,7 +15,7 @@ func (client *Client) CreateBuildpack(bp resources.Buildpack) (resources.Buildpa
 	var responseBody resources.Buildpack
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostBuildpackRequest,
+		RequestName:  ccv3internal.PostBuildpackRequest,
 		RequestBody:  bp,
 		ResponseBody: &responseBody,
 	})
@@ -25,7 +26,7 @@ func (client *Client) CreateBuildpack(bp resources.Buildpack) (resources.Buildpa
 // DeleteBuildpack deletes the buildpack with the provided guid.
 func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteBuildpackRequest,
+		RequestName: ccv3internal.DeleteBuildpackRequest,
 		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
 	})
 
@@ -37,7 +38,7 @@ func (client *Client) GetBuildpacks(query ...Query) ([]resources.Buildpack, Warn
 	var buildpacks []resources.Buildpack
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetBuildpacksRequest,
+		RequestName:  ccv3internal.GetBuildpacksRequest,
 		Query:        query,
 		ResponseBody: resources.Buildpack{},
 		AppendToList: func(item interface{}) error {
@@ -53,7 +54,7 @@ func (client Client) UpdateBuildpack(buildpack resources.Buildpack) (resources.B
 	var responseBody resources.Buildpack
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchBuildpackRequest,
+		RequestName:  ccv3internal.PatchBuildpackRequest,
 		URIParams:    internal.Params{"buildpack_guid": buildpack.GUID},
 		RequestBody:  buildpack,
 		ResponseBody: &responseBody,
@@ -73,7 +74,7 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
 
 	responseLocation, warnings, err := client.MakeRequestUploadAsync(
-		internal.PostBuildpackBitsRequest,
+		ccv3internal.PostBuildpackBitsRequest,
 		internal.Params{"buildpack_guid": buildpackGUID},
 		contentType,
 		body,
