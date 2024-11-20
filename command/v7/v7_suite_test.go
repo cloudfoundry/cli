@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	uuid "github.com/nu7hatch/gouuid"
+	uuid "github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
@@ -23,11 +23,7 @@ var _ = BeforeEach(func() {
 
 // RandomString provides a random string
 func RandomString(prefix string) string {
-	guid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
-
+	guid := uuid.New()
 	return prefix + "-" + guid.String()
 }
 
