@@ -1,3 +1,14 @@
+# GitHub repo level Secrets and Variables
+
+# secrets.CLIENT_SECRET
+# secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
+# vars.CAPI_RELEASE_VERSION
+# vars.SHEPHERD_LEASE_DURATION
+# vars.SHEPHERD_LEASE_NAMESPACE
+# vars.SHEPHERD_TEMPLATE_ARGUMENT
+# vars.SHEPHERD_TEMPLATE_NAME
+# vars.SHEPHERD_TEMPLATE_NAMESPACE
+
 name: "Tests: Integration"
 
 run-name: "Integration [${{ github.event_name }}: ${{ github.event.pull_request.head.sha || github.event.push.after || github.event.workflow_run.head_sha}}]: ${{ github.event.workflow_run.head_commit.message }}"
@@ -14,6 +25,34 @@ on:
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
           - run-cats-cf-env
+      nodes:
+        description: Number of test nodes
+        required: false
+        type: string
+        default: "12"
+      lease_id:
+        description: Pre-provisioned environment lease-id to use in tests
+        required: false
+        type: string
+      lease_namespace:
+        description: Pre-provisioned environment lease namespace to use in tests
+        required: false
+        type: string
+      cfd_version:
+        description: Use specific version of CFD. Leave empty to use latest.
+        default: ""
+        type: string
+      run_unit_tests:
+        description: Run unit tests
+        required: false
+        type: boolean
+        default: true
+      reinstall_cfd:
+        description: Force re-installation of CFD
+        required: false
+        type: boolean
+        default: true
+
   push:
     tags:
       - "v8.*"
@@ -31,7 +70,12 @@ on:
       - ".grype.yaml"
       - ".git*"
       - ".golangci.json"
+
+env:
+  SHEPHERD_LEASE_ID: ${{ inputs.lease_id }}
+
 jobs:
+
   get-sha:
     runs-on: ubuntu-latest
     outputs:
@@ -57,14 +101,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
+          fetch-depth: 0
       - name: Set Up Go
         uses: actions/setup-go@v5
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
+        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         run: make units
 
   claim-env:
@@ -88,23 +136,63 @@ jobs:
       - name: claim
         id: claim
         env:
-          account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          pool_name: ${{ vars.SHEPHERD_POOL_NAME }}
-          pool_namespace: official
+          account_token:       ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          template_argument:   ${{ vars.SHEPHERD_TEMPLATE_ARGUMENT        }}
+          template_name:       ${{ vars.SHEPHERD_TEMPLATE_NAME       || 'cfd-bosh-lite@1.0' }}
+          template_namespace:  ${{ vars.SHEPHERD_TEMPLATE_NAMESPACE  || 'official'          }}
+          lease_duration:      ${{ vars.SHEPHERD_LEASE_DURATION      || '8h'                }}
+          lease_namespace:     ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+          cfd_version:         ${{ inputs.cfd_version      || vars.CFD_VERSION              || '' }}
         run: |
           shepherd login service-account ${account_token}
 
-          echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --description 'CLI GHA'"
-          lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
-          
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
+
+            if [ -z "$template_argument" ]; then
+              export template_argument=$(cat <<EOF
+          {
+            "gcp_region": "us-west2",
+            "vm_type": "n1-standard-8",
+            "root_disk_gb": 32,
+            "disk_pool_gb": 150,
+            "cfd_version": "${cfd_version}",
+            "additional_opsfiles_b64": ""
+          }
+          EOF
+              )
+            fi
+
+            lease_id=$( shepherd create lease                           \
+                          --template-argument  "$template_argument"     \
+                          --template-namespace "${template_namespace}"  \
+                          --template           "${template_name}"       \
+                          --namespace          "${lease_namespace}"     \
+                          --duration           "${lease_duration}"      \
+                          --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
+                          --json \
+                        | jq -r .id
+                      )
+          else
+            lease_id=$SHEPHERD_LEASE_ID
+          fi
+
+          echo "Shepherd lease ID: ${lease_id}"
+
           # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
           # if the pool is empty.
           count=0
           while [ $count -lt 360 ] ; do
             sleep 30
-            status=$(shepherd get lease ${lease_id} --namespace tas-devex --json | jq -r .status)
+            status=$( shepherd get lease ${lease_id} \
+                        --namespace ${lease_namespace} \
+                        --json \
+                      | jq -r .status
+                    )
             if [ $status == "LEASED" ] ; then
-              shepherd get lease ${lease_id} --namespace tas-devex --json | jq .output > metadata.json
+              shepherd get lease ${lease_id} \
+                --namespace ${lease_namespace} \
+                --json \
+              | jq .output > metadata.json
               break
             elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
               echo "There was an error obtaining the lease. Lease status is ${status}."
@@ -119,7 +207,7 @@ jobs:
           echo "env name is ${env_name}"
           echo "leaseid=${lease_id}" >> "${GITHUB_OUTPUT}"
 
-          cf_deployment_version=$(jq -r '."cf-deployment_version"' metadata.json)
+          cf_deployment_version=$(jq -r '."cf_deployment_version"' metadata.json)
           echo "cf_deployment_version is ${cf_deployment_version}"
           echo "cf_deployment_version=${cf_deployment_version}" >> "${GITHUB_OUTPUT}"
 
@@ -130,6 +218,7 @@ jobs:
           check-latest: true
         
       - name: Install Tools
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         run: |
           go version
 
@@ -149,11 +238,11 @@ jobs:
           apt-get install -y build-essential unzip
 
       - name: Upload latest CAPI release
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         env:
           capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
         run: |
-          if [ -z "$capi_release_version" ]
-          then
+          if [ -z "$capi_release_version" ]; then
             capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
           fi
           
@@ -166,6 +255,7 @@ jobs:
           bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
 
       - name: Checkout cf-deployment
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         uses: actions/checkout@v4
         with:
           repository: cloudfoundry/cf-deployment
@@ -173,12 +263,12 @@ jobs:
           ref: ${{steps.claim.outputs.cf_deployment_version}}    
   
       - name: Deploy Isolation Segment and OIDC Provider
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         run: |
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
           eval "$(bbl print-env --metadata-file metadata.json)"
 
-          # deploy
           bosh -d cf manifest > /tmp/manifest.yml
           bosh interpolate /tmp/manifest.yml \
             -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
@@ -208,6 +298,8 @@ jobs:
       name: Integration
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+      nodes: ${{ inputs.nodes || '16'}}
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
@@ -224,6 +316,8 @@ jobs:
       name: Integration client creds
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+      nodes: ${{ inputs.nodes || '16'}}
     secrets: inherit
 
   run-cats-cf-env:
@@ -241,21 +335,24 @@ jobs:
       name: cats
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
     secrets: inherit
 
   unclaim-env:
     name: Unclaim environment
+    if: ${{ inputs.lease_id == '' }}
     runs-on: ubuntu-latest
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     needs:
       - claim-env
       - run-cats-cf-env
-    if: always()
     steps:
       - name: unclaim
         env:
-          account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          lease_namespace:  ${{ inputs.lease_namespace || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
         run: |
           shepherd login service-account ${account_token}
           set -x
-          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} --namespace tas-devex
+          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
+            --namespace ${lease_namespace}

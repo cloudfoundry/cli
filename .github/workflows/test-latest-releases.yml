@@ -1,0 +1,146 @@
+name: "Check: Check release on package managers"
+run-name: "Check: Check release on package managers [${{ github.ref_name }}]"
+
+on:
+  workflow_dispatch:
+    inputs:
+      major-version:
+        description: Major version to retrieve
+        required: true
+        type: choice
+        options:
+          - '8'
+          - '7'
+      version:
+        description: Version of CLI to check if it is present
+        type: string
+        required: true
+      claw-url:
+        description: Location of CLAW
+        type: string
+        required: true
+        default: https://packages.cloudfoundry.org
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test-homebrew:
+    name: Test Homebrew Repository
+    runs-on: macos-latest
+    env:
+      CLAW_URL: ${{ inputs.claw-url }}
+      VERSION_BUILD: ${{ inputs.version }}
+      VERSION_MAJOR: ${{ inputs.major-version }}
+    steps:
+
+      - name: Install CF CLI via Homebrew
+        run: |
+          set -evx
+          
+          brew install cloudfoundry/tap/cf-cli@${VERSION_MAJOR}
+          installed_cf_version=$(cf${VERSION_MAJOR} version)
+          
+          cf_location=$(which cf)
+          
+          echo $cf_location
+          echo $installed_cf_version
+          echo ${VERSION_BUILD}
+          
+          codesign --verify $cf_location || echo ---
+          
+          cf -v | grep "${VERSION_BUILD}"
+
+  test-deb:
+    name: Test Debian Repository
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CLAW_URL: ${{ inputs.claw-url }}
+      VERSION_BUILD: ${{ inputs.version }}
+      VERSION_MAJOR: ${{ inputs.major-version }}
+    steps:
+
+      - name: Install CF CLI via apt
+        run: |
+          set -o pipefail -e
+          
+          sudo apt update
+          sudo apt install -y wget gnupg
+          
+          wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+          echo "deb ${CLAW_URL}/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          
+          sudo apt update
+          sudo apt install -y cf${VERSION_MAJOR}-cli
+          
+          which cf
+          
+          set -x
+          
+          cf  -v
+          cf${VERSION_MAJOR} -v
+          
+          cf -v | grep "${VERSION_BUILD}"
+
+
+  test-rpm-repo:
+    name: Test RPM Repository
+    runs-on: ubuntu-latest
+    container:
+      image: fedora
+    env:
+      CLAW_URL: ${{ inputs.claw-url }}
+      VERSION_BUILD: ${{ inputs.version }}
+      VERSION_MAJOR: ${{ inputs.major-version }}
+    steps:
+
+      - name: Configure Custom CF Repository
+        run: |
+          curl -sL -o /etc/yum.repos.d/cloudfoundry-cli.repo  \
+          ${CLAW_URL}/fedora/cloudfoundry-cli.repo
+
+      - name: Install cf cli package
+        run: dnf install -y cf${VERSION_MAJOR}-cli
+
+      - name: Print CF CLI Versions
+        run: |
+          cf -v
+          cf${VERSION_MAJOR} -v
+
+      - name: Test Version Match
+        run: cf -v | grep -q "${VERSION_BUILD}"
+
+  test-windows:
+    name: Test Windows Chocolatey Package
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      VERSION_BUILD: ${{ inputs.version }}
+      VERSION_MAJOR: ${{ inputs.major-version }}
+    steps:
+
+      - name: Install cf cli package
+        run: choco install cloudfoundry-cli --version $env:VERSION_BUILD
+
+      - name: Print Chocolatey CF CLI Versions
+        run: |
+          cd 'C:/ProgramData/chocolatey/lib/cloudfoundry-cli/tools'
+          ./cf -v
+          Invoke-Expression "./cf$env:VERSION_MAJOR -v"
+
+      - name: Test Chocolatey Version Match
+        run: |
+          cd 'C:/ProgramData/chocolatey/lib/cloudfoundry-cli/tools'
+          $found = (./cf -v | Select-String "$env:VERSION_BUILD")
+          if ($null -eq $found) {
+            Write-Error "CF CLI version $env:VERSION_BUILD was not found" -ErrorAction Stop
+          }
+
+
+# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

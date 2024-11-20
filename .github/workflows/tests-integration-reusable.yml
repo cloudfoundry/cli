@@ -3,7 +3,7 @@
 # secrets.CLIENT_SECRET
 # secrets.GITHUB_TOKEN
 # secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
-# vars.SHEPHERD_POOL_NAME
+# vars.TEST_FLAKE_ATTEMPTS
 
 name: "pvt: run integration tests"
 
@@ -22,22 +22,35 @@ on:
       lease-id:
         required: true
         type: string
+      lease-namespace:
+        required: false
+        type: string
+        default: 'tas-devex'
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
-        
+      nodes:
+        type: string
+        default: "16"
+
+env:
+  NODES: ${{ inputs.nodes }}
+  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '4' }}
+
 jobs:
   run-integration-tests:
     defaults:
       run:
         shell: bash
-    runs-on: ${{ inputs.os }} 
+    runs-on: ${{ inputs.os }}
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
+    timeout-minutes: 120
     steps:
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
         ref: ${{inputs.gitRef}}
+        fetch-depth: 0
 
     - name: Checkout cf-acceptance-tests
       if: ${{ inputs.name == 'cats' }}
@@ -61,7 +74,9 @@ jobs:
 
     - name: Install Tools
       env:
-        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        lease_namespace:  ${{ inputs.lease-namespace }}
+        lease_id:         ${{ inputs.lease-id }}
       run: |
         go version
 
@@ -95,23 +110,23 @@ jobs:
         apt-get install -y build-essential unzip
 
         shepherd login service-account ${account_token}
-        shepherd get lease ${{ inputs.lease-id }} --namespace tas-devex --json | jq .output > metadata.json
+        shepherd get lease ${lease_id} --namespace ${lease_namespace} --json | jq .output > metadata.json
 
     - name: Add CATS config
       if: ${{ inputs.name == 'cats' }}
       run: |
         set -eu
         
-        ENV=$(jq -r .name metadata.json)
+        env_name=$(jq -r .name metadata.json)
         API="$(jq -r .cf.api_url metadata.json)"
         DOMAIN=$(echo $API | sed "s/^api\.//")
         CF_INT_USERNAME="admin"
 
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
 
         credhub login
-        CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+        CF_INT_PASSWORD=$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)
 
         cat << EOF | jq -S . > cats_config.json
         {
@@ -185,26 +200,24 @@ jobs:
           --keep-going \
           --randomize-all \
           --skip-package=helpers \
-          --nodes="12" \
-          --flake-attempts=2 \
+          --nodes="${NODES}" \
+          --flake-attempts=${FLAKE_ATTEMPTS} \
           --timeout="2h" \
           --no-color
 
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
@@ -224,18 +237,16 @@ jobs:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
@@ -247,4 +258,4 @@ jobs:
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
-        make integration-tests-full-ci
+        make integration-tests-ci-client-creds

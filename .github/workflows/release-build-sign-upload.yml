@@ -38,9 +38,18 @@ run-name: "Release: Build Sign Upload [${{ github.ref_name }}]"
 
 on:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - minor
+          - patch
 
 permissions:
-  contents: read
+  contents: write
 
 defaults:
   run:
@@ -50,39 +59,56 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-
+    env:
+      VERSION_MAJOR: 8
     outputs:
-      aws-s3-bucket:       "v${{ steps.parse-semver.outputs.version-major }}-cf-cli-releases"
+      aws-s3-bucket:       "v${{ steps.bump-version.outputs.version-major }}-cf-cli-releases"
 
-      version-build: ${{ steps.parse-semver.outputs.version-build }}
-      version-major: ${{ steps.parse-semver.outputs.version-major }}
-      version-minor: ${{ steps.parse-semver.outputs.version-minor }}
-      version-patch: ${{ steps.parse-semver.outputs.version-patch }}
+      version-build: ${{ steps.bump-version.outputs.version-build }}
+      version-major: ${{ env.VERSION_MAJOR }}
+      version-minor: ${{ steps.bump-version.outputs.version-minor }}
+      version-patch: ${{ steps.bump-version.outputs.version-patch }}
 
     steps:
     - name: Checkout cli
       uses: actions/checkout@v4
-
-    - name: Check if VERSION_BUILD matches tag ${{ github.ref }}
+      
+    - name: Bump version
+      id: bump-version
       run: |
-        echo "Git Ref: ${{ github.ref }}"
-        echo "VERSION_BUILD: $(cat BUILD_VERSION)"
+        set -x
+        git fetch --tags --quiet
+        latest_tag="$(git tag | sort -V | grep v${VERSION_MAJOR} | tail -1)"
+        echo "Latest tag is ${latest_tag}"
 
-        exit 0
+        version="${latest_tag#[vV]}"
 
-    - name: Parse semver
-      id: parse-semver
+        version_minor="${version#*.}"
+        version_minor="${version_minor%.*}"
+        version_patch=${version##*.}
+
+        if [ "${{ inputs.release_version }}" == "minor" ]; then
+          version_minor=$(($version_minor + 1))
+          version_patch=0
+        else
+          version_patch=$(($version_patch + 1))
+        fi
+
+        new_version="${VERSION_MAJOR}.${version_minor}.${version_patch}"
+        echo "new version is ${new_version}"
+
+        echo "version-build=${new_version}"   >> "${GITHUB_OUTPUT}"
+        echo "version-minor=${version_minor}" >> "${GITHUB_OUTPUT}"
+        echo "version-patch=${version_patch}" >> "${GITHUB_OUTPUT}"
+
+    - name: Publish Tag
       run: |
-        VERSION=$(cat BUILD_VERSION)
-        VERSION="${VERSION#[vV]}"
-
-        VERSION_MINOR="${VERSION#*.}"
-        VERSION_MINOR="${VERSION_MINOR%.*}"
-
-        echo "version-build=${VERSION}"       >> "${GITHUB_OUTPUT}"
-        echo "version-major=${VERSION%%\.*}"  >> "${GITHUB_OUTPUT}"
-        echo "version-minor=${VERSION_MINOR}" >> "${GITHUB_OUTPUT}"
-        echo "version-patch=${VERSION##*.}"   >> "${GITHUB_OUTPUT}"
+        new_tag="v${{ steps.bump-version.outputs.version-build }}"
+        echo "new version is $new_tag"
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git tag -am "Bump cli version ${new_tag}" ${new_tag}
+        git push origin $new_tag
 
   build-linux:
     name: Build Linux
@@ -135,6 +161,8 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Build Linux
+      env: 
+        CF_BUILD_VERSION: ${VERSION_BUILD}
       run: |
         make out/cf-cli_linux_i686
         make out/cf-cli_linux_x86-64
@@ -251,7 +279,6 @@ jobs:
         if-no-files-found: error
         name: cf-cli-linux-rpm-packages
         path: signed-redhat-installer/*.rpm
-
 
     - name: Build Debian Packages
       env:
@@ -431,6 +458,8 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Build macOS Binaries
+      env: 
+        CF_BUILD_VERSION: ${VERSION_BUILD}
       run: |
         make out/cf-cli_osx
         make out/cf-cli_macosarm
@@ -610,6 +639,8 @@ jobs:
           go install github.com/akavel/rsrc@v0.10.2
 
       - name: Build CF CLI for Windows
+        env: 
+          CF_BUILD_VERSION: ${VERSION_BUILD}
         run: |
           Get-Command make
           Get-Item Makefile
@@ -694,14 +725,12 @@ jobs:
 
       - name: Zip Windows artifact
         run: |
-          # strip leading v to go from tag -> semver
-          $installer_release_version="$(cat BUILD_VERSION)".Replace("v", "")
           pushd "${env:RUNNER_TEMP}\win32"
-            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${installer_release_version}_win32.zip"
+            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${env:VERSION_BUILD}_win32.zip"
             Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
           popd
           pushd "${env:RUNNER_TEMP}\winx64"
-            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${installer_release_version}_winx64.zip"
+            $installer_zip_filename="${env:RUNNER_TEMP}\cf${env:VERSION_MAJOR}-cli-installer_${env:VERSION_BUILD}_winx64.zip"
             Compress-Archive -DestinationPath "$installer_zip_filename" -Path *
           popd
           Get-ChildItem "${env:RUNNER_TEMP}"
