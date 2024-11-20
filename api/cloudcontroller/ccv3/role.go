@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) CreateRole(roleSpec resources.Role) (resources.Role, Warni
 	var responseBody resources.Role
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostRoleRequest,
+		RequestName:  ccv3internal.PostRoleRequest,
 		RequestBody:  roleSpec,
 		ResponseBody: &responseBody,
 	})
@@ -19,7 +20,7 @@ func (client *Client) CreateRole(roleSpec resources.Role) (resources.Role, Warni
 
 func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteRoleRequest,
+		RequestName: ccv3internal.DeleteRoleRequest,
 		URIParams:   internal.Params{"role_guid": roleGUID},
 	})
 
@@ -31,7 +32,7 @@ func (client *Client) GetRoles(query ...Query) ([]resources.Role, IncludedResour
 	var roles []resources.Role
 
 	includedResources, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetRolesRequest,
+		RequestName:  ccv3internal.GetRolesRequest,
 		Query:        query,
 		ResponseBody: resources.Role{},
 		AppendToList: func(item interface{}) error {

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -16,7 +17,7 @@ func (client *Client) CreateUser(uaaUserID string) (resources.User, Warnings, er
 	var responseBody resources.User
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostUserRequest,
+		RequestName:  ccv3internal.PostUserRequest,
 		RequestBody:  user,
 		ResponseBody: &responseBody,
 	})
@@ -26,7 +27,7 @@ func (client *Client) CreateUser(uaaUserID string) (resources.User, Warnings, er
 
 func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteUserRequest,
+		RequestName: ccv3internal.DeleteUserRequest,
 		URIParams:   internal.Params{"user_guid": uaaUserID},
 	})
 
@@ -37,7 +38,7 @@ func (client *Client) GetUser(userGUID string) (resources.User, Warnings, error)
 	var responseBody resources.User
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetUserRequest,
+		RequestName:  ccv3internal.GetUserRequest,
 		URIParams:    internal.Params{"user_guid": userGUID},
 		ResponseBody: &responseBody,
 	})
@@ -49,7 +50,7 @@ func (client *Client) GetUsers(query ...Query) ([]resources.User, Warnings, erro
 	var users []resources.User
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetUsersRequest,
+		RequestName:  ccv3internal.GetUsersRequest,
 		Query:        query,
 		ResponseBody: resources.User{},
 		AppendToList: func(item interface{}) error {
@@ -65,7 +66,7 @@ func (client *Client) WhoAmI() (resources.K8sUser, Warnings, error) {
 	var user resources.K8sUser
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.WhoAmI,
+		RequestName:  ccv3internal.WhoAmI,
 		ResponseBody: &user,
 	})
 

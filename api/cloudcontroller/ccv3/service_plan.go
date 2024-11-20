@@ -3,7 +3,8 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 )
@@ -16,7 +17,7 @@ func (client *Client) GetServicePlanByGUID(guid string) (resources.ServicePlan, 
 	var result resources.ServicePlan
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServicePlanRequest,
+		RequestName:  ccv3internal.GetServicePlanRequest,
 		URIParams:    internal.Params{"service_plan_guid": guid},
 		ResponseBody: &result,
 	})
@@ -34,7 +35,7 @@ func (client *Client) getServicePlans(query ...Query) ([]resources.ServicePlan, 
 	var plans []resources.ServicePlan
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetServicePlansRequest,
+		RequestName:  ccv3internal.GetServicePlansRequest,
 		Query:        query,
 		ResponseBody: resources.ServicePlan{},
 		AppendToList: func(item interface{}) error {

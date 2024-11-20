@@ -8,7 +8,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -43,7 +44,7 @@ var _ = Describe("RouteBinding", func() {
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-					RequestName: internal.PostRouteBindingRequest,
+					RequestName: ccv3internal.PostRouteBindingRequest,
 					RequestBody: binding,
 				}))
 			})
@@ -94,7 +95,7 @@ var _ = Describe("RouteBinding", func() {
 		It("makes the correct call", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetRouteBindingsRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetRouteBindingsRequest))
 			Expect(actualParams.Query).To(ConsistOf(Query{Key: ServiceInstanceGUIDFilter, Values: []string{"si-1-guid", "si-2-guid", "si-3-guid", "si-4-guid"}}))
 			Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.RouteBinding{}))
 		})
@@ -198,7 +199,7 @@ var _ = Describe("RouteBinding", func() {
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-				RequestName: internal.DeleteRouteBindingRequest,
+				RequestName: ccv3internal.DeleteRouteBindingRequest,
 				URIParams:   internal.Params{"route_binding_guid": guid},
 			}))
 		})
