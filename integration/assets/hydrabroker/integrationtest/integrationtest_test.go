@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
-	uuid2 "github.com/nu7hatch/gouuid"
+	"github.com/google/uuid"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
@@ -654,9 +654,7 @@ func randomConfiguration() config.BrokerConfiguration {
 }
 
 func randomString() string {
-	uuid, err := uuid2.NewV4()
-	Expect(err).NotTo(HaveOccurred())
-	return uuid.String()
+	return uuid.New().String()
 }
 
 func toJSON(input interface{}) io.Reader {

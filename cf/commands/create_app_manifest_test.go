@@ -3,7 +3,10 @@ package commands_test
 import (
 	"errors"
 	"fmt"
+	"os"
 
+	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/cf/api/stacks/stacksfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/commands"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -12,16 +15,10 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/api/stacks/stacksfakes"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-
-	"os"
-
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	uuid "github.com/nu7hatch/gouuid"
+	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	uuid "github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -47,8 +44,7 @@ var _ = Describe("CreateAppManifest", func() {
 	)
 
 	BeforeEach(func() {
-		rand, err := uuid.NewV4()
-		Expect(err).ToNot(HaveOccurred())
+		rand := uuid.New()
 		appName = fmt.Sprintf("app-name-%s", rand)
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()

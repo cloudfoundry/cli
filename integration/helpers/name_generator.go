@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/google/uuid"
 )
 
 // TODO: Is this working???
@@ -162,12 +162,7 @@ func PrefixedRandomName(namePrefix string) string {
 
 // RandomName provides a random string
 func RandomName() string {
-	guid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
-
-	return guid.String()
+	return uuid.New().String()
 }
 
 func RandomURL() string {

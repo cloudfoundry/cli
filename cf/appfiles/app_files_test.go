@@ -8,10 +8,9 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/appfiles"
-	uuid "github.com/nu7hatch/gouuid"
-
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/gofileutils/fileutils"
+	"github.com/google/uuid"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -215,9 +214,7 @@ var _ = Describe("AppFiles", func() {
 				tmpDir, err = ioutil.TempDir("", "untraversable-test")
 				Expect(err).NotTo(HaveOccurred())
 
-				guid, err := uuid.NewV4()
-				Expect(err).NotTo(HaveOccurred())
-
+				guid := uuid.New()
 				untraversableDirName = guid.String()
 				untraversableDirPath := filepath.Join(tmpDir, untraversableDirName)
 
