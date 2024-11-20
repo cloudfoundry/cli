@@ -4,8 +4,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/cheggaaa/pb/v3"
 	log "github.com/sirupsen/logrus"
-	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 type ProgressBar struct {
@@ -34,8 +34,8 @@ func (p *ProgressBar) NewProgressBarWrapper(reader io.Reader, sizeOfFile int64) 
 	}
 
 	log.Debug("progress bar ready")
-	p.bar = pb.New(int(sizeOfFile)).SetUnits(pb.U_BYTES)
-	p.bar.ShowTimeLeft = false
+	p.bar = pb.New(int(sizeOfFile))
+	p.bar.Set(pb.Bytes, true)
 	p.bar.Start()
 	return p.bar.NewProxyReader(reader)
 }

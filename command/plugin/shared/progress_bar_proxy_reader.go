@@ -3,7 +3,7 @@ package shared
 import (
 	"io"
 
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"github.com/cheggaaa/pb/v3"
 )
 
 // ProgressBarProxyReader wraps a progress bar in a ProxyReader interface.
@@ -17,8 +17,9 @@ func (p ProgressBarProxyReader) Wrap(reader io.Reader) io.ReadCloser {
 }
 
 func (p *ProgressBarProxyReader) Start(size int64) {
-	p.bar = pb.New(int(size)).SetUnits(pb.U_BYTES)
-	p.bar.Output = p.writer
+	p.bar = pb.New(int(size))
+	p.bar.Set(pb.Bytes, true)
+	p.bar.SetWriter(p.writer)
 	p.bar.Start()
 }
 
