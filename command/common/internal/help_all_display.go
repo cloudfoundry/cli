@@ -15,7 +15,7 @@ var HelpCategoryList = []HelpCategory{
 			{"push", "scale", "delete", "rename"},
 			{"cancel-deployment", "continue-deployment"},
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
-			{"run-task", "tasks", "terminate-task"},
+			{"run-task", "task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
 			{"revisions", "rollback"},
 			{"droplets", "set-droplet", "download-droplet"},
