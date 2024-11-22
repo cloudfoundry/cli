@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("tasks command", func() {
+var _ = Describe("task command", func() {
 	var (
 		appName string
 	)
@@ -21,20 +21,20 @@ var _ = Describe("tasks command", func() {
 
 	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
-			session := helpers.CF("tasks", "--help")
+			session := helpers.CF("task", "--help")
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("   tasks - List tasks of an app"))
+			Eventually(session).Should(Say("   task - Display a task of an app"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("   cf tasks APP_NAME"))
+			Eventually(session).Should(Say("   cf task APP_NAME TASK_ID"))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("   apps, logs, run-task, task, terminate-task"))
+			Eventually(session).Should(Say("   apps, logs, run-task, tasks, terminate-task"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "tasks", "app-name")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "task", "app-name", "1")
 		})
 	})
 
@@ -58,7 +58,7 @@ var _ = Describe("tasks command", func() {
 
 		When("the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
-				session := helpers.CF("tasks", appName)
+				session := helpers.CF("task", appName, "1")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say(fmt.Sprintf("App '%s' not found", appName)))
 				Eventually(session).Should(Exit(1))
@@ -72,28 +72,29 @@ var _ = Describe("tasks command", func() {
 				})
 			})
 
-			When("the application does not have associated tasks", func() {
-				It("displays an empty table", func() {
-					session := helpers.CF("tasks", appName)
-					Eventually(session).Should(Say(`No tasks found for application\.`))
-					Consistently(session).ShouldNot(Say("1"))
-					Eventually(session).Should(Exit(0))
+			When("the application does not have the associated task", func() {
+				It("displays an erro", func() {
+					session := helpers.CF("task", appName, "1000")
+					Eventually(session.Err).Should(Say(`Task sequence ID 1000 not found`))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 
 			When("the application has associated tasks", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("run-task", appName, "--command", "echo hello world")).Should(Exit(0))
-					Eventually(helpers.CF("run-task", appName, "--command", "echo foo bar")).Should(Exit(0))
 				})
 
-				It("displays all the tasks in descending order", func() {
-					session := helpers.CF("tasks", appName)
+				It("displays the task", func() {
+					session := helpers.CF("task", appName, "1")
 					userName, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Eventually(session).Should(Say(`id\s+name\s+state\s+start time\s+command
-2\s+[a-zA-Z-0-9 ,:]+echo foo bar
-1\s+[a-zA-Z-0-9 ,:]+echo hello world`))
+					Eventually(session).Should(Say(fmt.Sprintf("Getting task 1 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+
+					Eventually(session).Should(Say(`id:\s+1`))
+					Eventually(session).Should(Say(`name:\s+`))
+					Eventually(session).Should(Say(`state:\s+`))
+					Eventually(session).Should(Say(`command:\s+echo hello world`))
+
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -114,10 +115,9 @@ var _ = Describe("tasks command", func() {
 						Eventually(helpers.CF("target", "-o", orgName, "-s", spaceName)).Should(Exit(0))
 					})
 
-					It("does not display task commands", func() {
-						session := helpers.CF("tasks", appName)
-						Eventually(session).Should(Say(`2\s+[a-zA-Z-0-9 ,:]+\[hidden\]`))
-						Eventually(session).Should(Say(`1\s+[a-zA-Z-0-9 ,:]+\[hidden\]`))
+					It("displays [hidden] as tasks command", func() {
+						session := helpers.CF("task", appName, "1")
+						Eventually(session).Should(Say(`.*command:\s+\[hidden\]`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

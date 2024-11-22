@@ -408,3 +408,8 @@ type RemoveNetworkPolicyArgsV7 struct {
 	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
 	DestApp   string `positional-arg-name:"DESTINATION_APP" required:"true" description:"The destination app"`
 }
+
+type TaskArgs struct {
+	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	TaskID  int    `positional-arg-name:"TASK_ID" required:"true" description:"The Task ID for the application"`
+}
