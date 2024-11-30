@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) GetFeatureFlag(flagName string) (resources.FeatureFlag, Wa
 	var responseBody resources.FeatureFlag
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetFeatureFlagRequest,
+		RequestName:  ccv3internal.GetFeatureFlagRequest,
 		URIParams:    internal.Params{"name": flagName},
 		ResponseBody: &responseBody,
 	})
@@ -22,7 +23,7 @@ func (client *Client) GetFeatureFlags() ([]resources.FeatureFlag, Warnings, erro
 	var featureFlags []resources.FeatureFlag
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetFeatureFlagsRequest,
+		RequestName:  ccv3internal.GetFeatureFlagsRequest,
 		ResponseBody: resources.FeatureFlag{},
 		AppendToList: func(item interface{}) error {
 			featureFlags = append(featureFlags, item.(resources.FeatureFlag))
@@ -37,7 +38,7 @@ func (client *Client) UpdateFeatureFlag(flag resources.FeatureFlag) (resources.F
 	var responseBody resources.FeatureFlag
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchFeatureFlagRequest,
+		RequestName:  ccv3internal.PatchFeatureFlagRequest,
 		URIParams:    internal.Params{"name": flag.Name},
 		RequestBody:  flag,
 		ResponseBody: &responseBody,

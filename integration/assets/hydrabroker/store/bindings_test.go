@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/google/uuid"
 )
 
 var _ = Describe("Bindings", func() {
@@ -17,11 +17,7 @@ var _ = Describe("Bindings", func() {
 	)
 
 	randomID := func() store.BindingID {
-		rawGUID, err := uuid.NewV4()
-		if err != nil {
-			panic(err)
-		}
-
+		rawGUID := uuid.New()
 		return store.BindingID(rawGUID.String())
 	}
 

@@ -9,7 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/jsonry"
@@ -81,7 +82,7 @@ var _ = Describe("Service Instance", func() {
 
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.GetServiceInstancesRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.GetServiceInstancesRequest))
 				Expect(actualParams.Query).To(ConsistOf(query))
 				Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(resources.ServiceInstance{}))
 			})
@@ -154,7 +155,7 @@ var _ = Describe("Service Instance", func() {
 		It("makes the correct API request", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeListRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.GetServiceInstancesRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.GetServiceInstancesRequest))
 			Expect(actualParams.Query).To(ConsistOf(
 				Query{Key: NameFilter, Values: []string{name}},
 				Query{Key: SpaceGUIDFilter, Values: []string{spaceGUID}},
@@ -296,7 +297,7 @@ var _ = Describe("Service Instance", func() {
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualRequest := requester.MakeRequestArgsForCall(0)
-			Expect(actualRequest.RequestName).To(Equal(internal.GetServiceInstanceParametersRequest))
+			Expect(actualRequest.RequestName).To(Equal(ccv3internal.GetServiceInstanceParametersRequest))
 			Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": guid}))
 		})
 
@@ -348,7 +349,7 @@ var _ = Describe("Service Instance", func() {
 
 					Expect(requester.MakeRequestCallCount()).To(Equal(1))
 					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-						RequestName: internal.PostServiceInstanceRequest,
+						RequestName: ccv3internal.PostServiceInstanceRequest,
 						RequestBody: si,
 					}))
 				})
@@ -418,7 +419,7 @@ var _ = Describe("Service Instance", func() {
 
 					Expect(requester.MakeRequestCallCount()).To(Equal(1))
 					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-						RequestName: internal.PatchServiceInstanceRequest,
+						RequestName: ccv3internal.PatchServiceInstanceRequest,
 						URIParams:   internal.Params{"service_instance_guid": guid},
 						RequestBody: serviceInstance,
 					}))
@@ -450,7 +451,7 @@ var _ = Describe("Service Instance", func() {
 
 					Expect(requester.MakeRequestCallCount()).To(Equal(1))
 					Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-						RequestName: internal.PatchServiceInstanceRequest,
+						RequestName: ccv3internal.PatchServiceInstanceRequest,
 						URIParams:   internal.Params{"service_instance_guid": guid},
 						RequestBody: serviceInstance,
 					}))
@@ -485,7 +486,7 @@ var _ = Describe("Service Instance", func() {
 
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-				RequestName: internal.DeleteServiceInstanceRequest,
+				RequestName: ccv3internal.DeleteServiceInstanceRequest,
 				URIParams:   internal.Params{"service_instance_guid": guid},
 			}))
 		})
@@ -548,7 +549,7 @@ var _ = Describe("Service Instance", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
 				actualRequest := requester.MakeRequestArgsForCall(0)
-				Expect(actualRequest.RequestName).To(Equal(internal.PostServiceInstanceRelationshipsSharedSpacesRequest))
+				Expect(actualRequest.RequestName).To(Equal(ccv3internal.PostServiceInstanceRelationshipsSharedSpacesRequest))
 				Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": serviceInstanceGUID}))
 				Expect(actualRequest.RequestBody).To(Equal(resources.RelationshipList{
 					GUIDs: spaceGUIDs,
@@ -603,7 +604,7 @@ var _ = Describe("Service Instance", func() {
 
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeRequestArgsForCall(0)).To(Equal(RequestParams{
-					RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
+					RequestName: ccv3internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
 					URIParams: internal.Params{
 						"service_instance_guid": serviceInstanceGUID,
 						"space_guid":            spaceGUID},
@@ -653,7 +654,7 @@ var _ = Describe("Service Instance", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
 				actualRequest := requester.MakeRequestArgsForCall(0)
-				Expect(actualRequest.RequestName).To(Equal(internal.GetServiceInstanceRelationshipsSharedSpacesRequest))
+				Expect(actualRequest.RequestName).To(Equal(ccv3internal.GetServiceInstanceRelationshipsSharedSpacesRequest))
 				Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": serviceInstanceGUID}))
 				Expect(actualRequest.Query).To(ConsistOf(
 					Query{
@@ -766,7 +767,7 @@ var _ = Describe("Service Instance", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 
 				actualRequest := requester.MakeRequestArgsForCall(0)
-				Expect(actualRequest.RequestName).To(Equal(internal.GetServiceInstanceSharedSpacesUsageSummaryRequest))
+				Expect(actualRequest.RequestName).To(Equal(ccv3internal.GetServiceInstanceSharedSpacesUsageSummaryRequest))
 				Expect(actualRequest.URIParams).To(Equal(internal.Params{"service_instance_guid": serviceInstanceGUID}))
 			})
 

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) CreateSpace(space resources.Space) (resources.Space, Warni
 	var responseBody resources.Space
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostSpaceRequest,
+		RequestName:  ccv3internal.PostSpaceRequest,
 		RequestBody:  space,
 		ResponseBody: &responseBody,
 	})
@@ -19,7 +20,7 @@ func (client *Client) CreateSpace(space resources.Space) (resources.Space, Warni
 
 func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSpaceRequest,
+		RequestName: ccv3internal.DeleteSpaceRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
 
@@ -31,7 +32,7 @@ func (client *Client) GetSpaces(query ...Query) ([]resources.Space, IncludedReso
 	var returnedResources []resources.Space
 
 	includedResources, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetSpacesRequest,
+		RequestName:  ccv3internal.GetSpacesRequest,
 		Query:        query,
 		ResponseBody: resources.Space{},
 		AppendToList: func(item interface{}) error {
@@ -51,7 +52,7 @@ func (client *Client) UpdateSpace(space resources.Space) (resources.Space, Warni
 	var responseBody resources.Space
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchSpaceRequest,
+		RequestName:  ccv3internal.PatchSpaceRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		RequestBody:  space,
 		ResponseBody: &responseBody,

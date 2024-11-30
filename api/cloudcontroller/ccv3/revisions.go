@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) GetApplicationRevisions(appGUID string, query ...Query) ([
 	var revisions []resources.Revision
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationRevisionsRequest,
+		RequestName:  ccv3internal.GetApplicationRevisionsRequest,
 		Query:        query,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: resources.Revision{},
@@ -25,7 +26,7 @@ func (client *Client) GetApplicationRevisionsDeployed(appGUID string) ([]resourc
 	var revisions []resources.Revision
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationRevisionsDeployedRequest,
+		RequestName:  ccv3internal.GetApplicationRevisionsDeployedRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: resources.Revision{},
 		AppendToList: func(item interface{}) error {

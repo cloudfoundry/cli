@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 )
 
 // Environment variables that will be provided to an app at runtime. It will
@@ -30,7 +31,7 @@ func (client *Client) GetApplicationEnvironment(appGUID string) (Environment, Wa
 	var responseBody Environment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetApplicationEnvRequest,
+		RequestName:  ccv3internal.GetApplicationEnvRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})

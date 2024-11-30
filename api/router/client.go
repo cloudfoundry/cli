@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"runtime"
 
-	"code.cloudfoundry.org/cli/api/router/internal"
-
-	"github.com/tedsuo/rata"
+	"code.cloudfoundry.org/cli/api/internal"
+	rinternal "code.cloudfoundry.org/cli/api/router/internal"
 )
 
 // Client is a client that can be used to talk to a Cloud Controller's V2
 // Endpoints.
 type Client struct {
 	connection Connection
-	router     *rata.RequestGenerator
+	router     *internal.Router
 	userAgent  string
 }
 
@@ -48,7 +47,7 @@ func NewClient(config Config) *Client {
 
 	client := Client{
 		userAgent:  userAgent,
-		router:     rata.NewRequestGenerator(config.RoutingEndpoint, internal.APIRoutes),
+		router:     internal.NewRouter(rinternal.APIRoutes, config.RoutingEndpoint),
 		connection: NewConnection(config.ConnectionConfig),
 	}
 
