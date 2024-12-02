@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"code.cloudfoundry.org/cli/util/random"
 )
 
 // EnvOverride represents all the environment variables read by the CF CLI
@@ -20,6 +22,7 @@ type EnvOverride struct {
 	CFStartupTimeout string
 	CFTrace          string
 	CFUsername       string
+	CFB3TraceID      string
 	DockerPassword   string
 	CNBCredentials   string
 	Experimental     string
@@ -159,4 +162,11 @@ func (config *Config) StartupTimeout() time.Duration {
 	}
 
 	return DefaultStartupTimeout
+}
+
+func (config *Config) B3TraceID() string {
+	if config.ENV.CFB3TraceID == "" {
+		config.ENV.CFB3TraceID = random.GenerateHex(32)
+	}
+	return config.ENV.CFB3TraceID
 }
