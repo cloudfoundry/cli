@@ -128,7 +128,6 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		CFTrace:          os.Getenv("CF_TRACE"),
 		CFUsername:       os.Getenv("CF_USERNAME"),
 		CFB3TraceID:      os.Getenv("CF_B3_TRACE_ID"),
-		CFB3SpanID:       os.Getenv("CF_B3_SPAN_ID"),
 		DockerPassword:   os.Getenv("CF_DOCKER_PASSWORD"),
 		CNBCredentials:   os.Getenv("CF_CNB_REGISTRY_CREDS"),
 		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),

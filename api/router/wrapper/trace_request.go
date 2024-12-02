@@ -12,9 +12,9 @@ type RoutingTraceHeaderRequest struct {
 }
 
 // NewRoutingTraceHeaderRequest returns a pointer to a RoutingTraceHeaderRequest wrapper.
-func NewRoutingTraceHeaderRequest(trace, span string) *RoutingTraceHeaderRequest {
+func NewRoutingTraceHeaderRequest(trace string) *RoutingTraceHeaderRequest {
 	return &RoutingTraceHeaderRequest{
-		headers: shared.NewTraceHeaders(trace, span),
+		headers: shared.NewTraceHeaders(trace),
 	}
 }
 
