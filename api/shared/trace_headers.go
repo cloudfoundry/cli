@@ -2,6 +2,8 @@ package shared
 
 import (
 	"net/http"
+
+	"code.cloudfoundry.org/cli/util/trace"
 )
 
 const (
@@ -12,14 +14,12 @@ const (
 // TraceHeaders sets b3 trace headers to requests.
 type TraceHeaders struct {
 	b3trace string
-	b3span  string
 }
 
 // NewTraceHeaders returns a pointer to a TraceHeaderRequest.
-func NewTraceHeaders(trace, span string) *TraceHeaders {
+func NewTraceHeaders(trace string) *TraceHeaders {
 	return &TraceHeaders{
 		b3trace: trace,
-		b3span:  span,
 	}
 }
 
@@ -30,6 +30,8 @@ func (t *TraceHeaders) SetHeaders(request *http.Request) {
 		request.Header.Add(B3TraceIDHeader, t.b3trace)
 	}
 	if request.Header.Get(B3SpanIDHeader) == "" {
-		request.Header.Add(B3SpanIDHeader, t.b3span)
+		request.Header.Add(B3SpanIDHeader, trace.GenerateRandomTraceID(16))
 	}
+
+	// request.Header.Add(("B3", request.Header.Get(B3TraceIDHeader)+request.Header.Get(B3SpanIDHeader)))
 }

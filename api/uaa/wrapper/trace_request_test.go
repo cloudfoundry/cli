@@ -23,16 +23,14 @@ var _ = Describe("CCTraceHeaderRequest", func() {
 		makeErr  error
 
 		traceHeader string
-		spanHeader  string
 	)
 
 	BeforeEach(func() {
 		fakeConnection = new(uaafakes.FakeConnection)
 
 		traceHeader = "trace-id"
-		spanHeader = "span-id"
 
-		wrapper = NewUAATraceHeaderRequest(traceHeader, spanHeader).Wrap(fakeConnection)
+		wrapper = NewUAATraceHeaderRequest(traceHeader).Wrap(fakeConnection)
 
 		body := bytes.NewReader([]byte("foo"))
 
@@ -54,7 +52,7 @@ var _ = Describe("CCTraceHeaderRequest", func() {
 		It("Adds the request headers", func() {
 			Expect(makeErr).NotTo(HaveOccurred())
 			Expect(request.Header.Get("X-B3-TraceId")).To(Equal(traceHeader))
-			Expect(request.Header.Get("X-B3-SpanId")).To(Equal(spanHeader))
+			Expect(request.Header.Get("X-B3-SpanId")).ToNot(BeEmpty())
 		})
 
 		It("Calls the inner connection", func() {

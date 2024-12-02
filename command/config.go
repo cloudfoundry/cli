@@ -16,7 +16,6 @@ type Config interface {
 	AuthorizationEndpoint() string
 	APIVersion() string
 	B3TraceID() string
-	B3SpanID() string
 	BinaryName() string
 	BinaryVersion() string
 	CFPassword() string
