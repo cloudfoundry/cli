@@ -12,9 +12,9 @@ type CCTraceHeaderRequest struct {
 }
 
 // NewCCTraceHeaderRequest returns a pointer to a CCTraceHeaderRequest wrapper.
-func NewCCTraceHeaderRequest(trace, span string) *CCTraceHeaderRequest {
+func NewCCTraceHeaderRequest(trace string) *CCTraceHeaderRequest {
 	return &CCTraceHeaderRequest{
-		headers: shared.NewTraceHeaders(trace, span),
+		headers: shared.NewTraceHeaders(trace),
 	}
 }
 

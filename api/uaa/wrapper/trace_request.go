@@ -14,9 +14,9 @@ type UAATraceHeaderRequest struct {
 }
 
 // NewUAATraceHeaderRequest returns a pointer to a UAATraceHeaderRequest wrapper.
-func NewUAATraceHeaderRequest(trace, span string) *UAATraceHeaderRequest {
+func NewUAATraceHeaderRequest(trace string) *UAATraceHeaderRequest {
 	return &UAATraceHeaderRequest{
-		headers: shared.NewTraceHeaders(trace, span),
+		headers: shared.NewTraceHeaders(trace),
 	}
 }
 

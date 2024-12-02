@@ -13,7 +13,7 @@ var _ = Describe("B3 Trace Headers", func() {
 	Describe("SetHeaders", func() {
 		Context("when there are already headers set", func() {
 			It("does not add the headers", func() {
-				traceHeaders := NewTraceHeaders("new_trace_id", "new_span_id")
+				traceHeaders := NewTraceHeaders("new_trace_id")
 				request := &http.Request{
 					Header: http.Header{},
 				}
@@ -28,14 +28,14 @@ var _ = Describe("B3 Trace Headers", func() {
 
 		Context("when there are no headers set", func() {
 			It("adds the headers", func() {
-				traceHeaders := NewTraceHeaders("new_trace_id", "new_span_id")
+				traceHeaders := NewTraceHeaders("new_trace_id")
 				request := &http.Request{
 					Header: http.Header{},
 				}
 				traceHeaders.SetHeaders(request)
 
 				Expect(request.Header.Get("X-B3-TraceId")).To(Equal("new_trace_id"))
-				Expect(request.Header.Get("X-B3-SpanId")).To(Equal("new_span_id"))
+				Expect(request.Header.Get("X-B3-SpanId")).ToNot(BeEmpty())
 			})
 		})
 	})

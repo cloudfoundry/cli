@@ -23,7 +23,6 @@ type EnvOverride struct {
 	CFTrace          string
 	CFUsername       string
 	CFB3TraceID      string
-	CFB3SpanID       string
 	DockerPassword   string
 	CNBCredentials   string
 	Experimental     string
@@ -170,11 +169,4 @@ func (config *Config) B3TraceID() string {
 		config.ENV.CFB3TraceID = random.GenerateHex(32)
 	}
 	return config.ENV.CFB3TraceID
-}
-
-func (config *Config) B3SpanID() string {
-	if config.ENV.CFB3SpanID == "" {
-		config.ENV.CFB3SpanID = random.GenerateHex(16)
-	}
-	return config.ENV.CFB3SpanID
 }
