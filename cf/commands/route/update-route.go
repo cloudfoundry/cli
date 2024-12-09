@@ -118,8 +118,13 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 				"Option": terminal.EntityNameColor(key),
 				"URL":    terminal.EntityNameColor(url)}))
 			route.Options[key] = value
+		} else {
+			cmd.ui.Say(T("Wrong route option format {{.Option}} for {{.URL}}...", map[string]interface{}{
+				"Option": terminal.FailureColor(option),
+				"URL":    terminal.EntityNameColor(url)}))
 		}
 	}
+
 	if c.IsSet("r") {
 		cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
 			"Option": terminal.EntityNameColor(removeOption),
