@@ -49,17 +49,9 @@ func (r *RoutePresenter) URL() string {
 		host = fmt.Sprintf("%s:%d", host, r.Port)
 	}
 
-	/*var options string
-	if len(r.Options) > 0 {
-		for key, value := range r.Options {
-			options += fmt.Sprintf("%s:%s", key, value)
-		}
-	}*/
-
 	u := url.URL{
 		Host: host,
 		Path: r.Path,
-		//Options: options,
 	}
 
 	return strings.TrimPrefix(u.String(), "//") // remove the empty scheme
