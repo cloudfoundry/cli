@@ -163,11 +163,11 @@ var _ = Describe("services command", func() {
 
 	Context("has shared service instances", func() {
 		var (
-			managedService, appNameOnSpaceA, appNameOnSpaceB string
+			managedService, appNameOnSpaceA, appNameOnSpaceB, orgName string
 		)
 
 		BeforeEach(func() {
-			orgName := helpers.NewOrgName()
+			orgName = helpers.NewOrgName()
 			spaceA := helpers.NewSpaceName()
 			spaceB := helpers.NewSpaceName()
 			managedService = helpers.PrefixedRandomName("MANAGED1")
@@ -191,6 +191,10 @@ var _ = Describe("services command", func() {
 			})
 			Eventually(helpers.CF("bind-service", appNameOnSpaceB, managedService)).Should(Exit(0))
 			helpers.TargetOrgAndSpace(orgName, spaceA)
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		It("should not output bound apps in the shared spaces", func() {

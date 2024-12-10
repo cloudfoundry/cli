@@ -96,6 +96,17 @@ var _ = Describe("Application", func() {
 					})
 				})
 
+				When("lifecycle type cnb is provided", func() {
+					BeforeEach(func() {
+						app.LifecycleType = constant.AppLifecycleTypeCNB
+						app.LifecycleBuildpacks = []string{"docker://nodejs"}
+					})
+
+					It("sets the lifecycle buildpack to be empty in the JSON", func() {
+						Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"data":{"buildpacks":["docker://nodejs"]},"type":"cnb"}}`))
+					})
+				})
+
 				When("null buildpack is provided", func() {
 					BeforeEach(func() {
 						app.LifecycleBuildpacks = []string{"null"}

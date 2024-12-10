@@ -3,7 +3,7 @@
 # secrets.CLIENT_SECRET
 # secrets.GITHUB_TOKEN
 # secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
-# vars.SHEPHERD_POOL_NAME
+# vars.TEST_FLAKE_ATTEMPTS
 
 name: "pvt: run integration tests"
 
@@ -19,28 +19,38 @@ on:
       name:
         required: true
         type: string
-      pool-name:
+      lease-id:
+        required: true
         type: string
-        default: ${{ vars.SHEPHERD_POOL_NAME }}
-      pool-namespace:
+      lease-namespace:
+        required: false
         type: string
-        default: 'official'
+        default: 'tas-devex'
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
-        
+      nodes:
+        type: string
+        default: "16"
+
+env:
+  NODES: ${{ inputs.nodes }}
+  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '4' }}
+
 jobs:
   run-integration-tests:
     defaults:
       run:
         shell: bash
-    runs-on: ${{ inputs.os }} 
+    runs-on: ${{ inputs.os }}
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
+    timeout-minutes: 120
     steps:
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
         ref: ${{inputs.gitRef}}
+        fetch-depth: 0
 
     - name: Checkout cf-acceptance-tests
       if: ${{ inputs.name == 'cats' }}
@@ -50,50 +60,11 @@ jobs:
         ref: release-candidate
         path: cf-acceptance-tests
 
-    - name: Checkout cf-deployment
-      uses: actions/checkout@v4
-      with:
-        repository: cloudfoundry/cf-deployment
-        path: cf-deployment
-
     - name: Checkout CF deployment tasks
       uses: actions/checkout@v4
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
-
-    - id: claim-env
-      name: Claim Environment
-      env:
-        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-        pool_name: ${{ inputs.pool-name }}
-        pool_namespace: ${{ inputs.pool-namespace }}
-      run: |
-        shepherd login service-account ${account_token}
-
-        echo "shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --description 'CLI GHA'"
-        lease_id=$(shepherd create lease --duration 8h --pool ${pool_name} --pool-namespace ${pool_namespace} --namespace tas-devex --json | jq -r .id)
-        # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
-        # if the pool is empty.
-        count=0
-        while [ $count -lt 360 ] ; do
-          sleep 30
-          status=$(shepherd get lease ${lease_id} --namespace tas-devex --json | jq -r .status)
-          if [ $status == "LEASED" ] ; then
-            shepherd get lease ${lease_id} --namespace tas-devex --json | jq .output > metadata.json
-            break
-          elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
-            echo "There was an error obtaining the lease. Lease status is ${status}."
-            exit 1
-          else
-            echo "Waiting for environment to be ready. Lease status is ${status}."
-          fi
-          count=$(($count+1))
-        done
-
-        env_name=$(jq -r .name metadata.json)
-        cat metadata.json | jq -r '.name'
-        echo "lease-id=$lease_id" >> "${GITHUB_OUTPUT}"
 
     - name: Set Up Go
       uses: actions/setup-go@v5
@@ -102,6 +73,10 @@ jobs:
         check-latest: true
 
     - name: Install Tools
+      env:
+        account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        lease_namespace:  ${{ inputs.lease-namespace }}
+        lease_id:         ${{ inputs.lease-id }}
       run: |
         go version
 
@@ -109,19 +84,19 @@ jobs:
         then
           install_location=/usr/bin
           bbl_artifact=bbl-v8.4.110_windows.exe
-          bosh_cli_artifact=bosh-cli-7.0.1-windows-amd64.exe
+          bosh_cli_artifact=bosh-cli-7.7.2-windows-amd64.exe
           credhub_artifact=credhub-windows-2.9.4.tgz
         else
           install_location=/usr/local/bin
           bbl_artifact=bbl-v8.4.110_linux_x86-64
-          bosh_cli_artifact=bosh-cli-7.0.1-linux-amd64
+          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
           credhub_artifact=credhub-linux-2.9.4.tgz
         fi
         curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
         chmod +x $install_location/bbl
         bbl --version
 
-        curl https://s3.amazonaws.com/bosh-cli-artifacts/$bosh_cli_artifact --silent --output $install_location/bosh --location
+        curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
         chmod +x $install_location/bosh
         bosh --version
 
@@ -134,61 +109,24 @@ jobs:
         apt-get update
         apt-get install -y build-essential unzip
 
-    - name: Upload latest CAPI release
-      env:
-        capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
-      run: |
-        if [ -z "$capi_release_version" ]
-        then
-          capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
-        fi
-        
-        echo "Latest CAPI release is $capi_release_version"
-        
-        eval "$(bbl print-env --metadata-file metadata.json)"
-        env_name=$(jq -r .name metadata.json)
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-
-        bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
-
-    - name: Deploy Isolation Segment and OIDC Provider
-      run: |
-        env_name=$(jq -r .name metadata.json)
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-        eval "$(bbl print-env --metadata-file metadata.json)"
-
-        # deploy
-        bosh -d cf manifest > /tmp/manifest.yml
-        bosh interpolate /tmp/manifest.yml \
-          -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
-          -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
-          -o .github/ops-files/replace-redis.yml \
-          -o .github/ops-files/use-latest-capi.yml \
-          -o .github/ops-files/add-oidc-provider.yml \
-          -o .github/ops-files/add-uaa-client-credentials.yml \
-          -o .github/ops-files/diego-cell-instances.yml \
-          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
-          > ./director.yml
-
-        bosh -d cf deploy director.yml -n
-        echo "Deployed CAPI version:"
-        bosh -d cf releases | grep capi
+        shepherd login service-account ${account_token}
+        shepherd get lease ${lease_id} --namespace ${lease_namespace} --json | jq .output > metadata.json
 
     - name: Add CATS config
       if: ${{ inputs.name == 'cats' }}
       run: |
         set -eu
-
-        ENV=$(jq -r .name metadata.json)
+        
+        env_name=$(jq -r .name metadata.json)
         API="$(jq -r .cf.api_url metadata.json)"
         DOMAIN=$(echo $API | sed "s/^api\.//")
         CF_INT_USERNAME="admin"
 
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
 
         credhub login
-        CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+        CF_INT_PASSWORD=$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)
 
         cat << EOF | jq -S . > cats_config.json
         {
@@ -208,6 +146,7 @@ jobs:
           "include_container_networking": true,
           "include_detect": true,
           "include_docker": true,
+          "include_cnb": true,
           "include_internet_dependent": true,
           "include_isolation_segments": true,
           "isolation_segment_name": "persistent_isolation_segment",
@@ -238,6 +177,7 @@ jobs:
         cf api ${API} --skip-ssl-validation
         cf auth
         cf enable-feature-flag diego_docker
+        cf enable-feature-flag diego_cnb
         cf enable-feature-flag service_instance_sharing
 
     - name: Run CATS Tests
@@ -260,29 +200,28 @@ jobs:
           --keep-going \
           --randomize-all \
           --skip-package=helpers \
-          --nodes="12" \
-          --flake-attempts=2 \
+          --nodes="${NODES}" \
+          --flake-attempts=${FLAKE_ATTEMPTS} \
           --timeout="2h" \
           --no-color
 
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
+        export CF_INT_TEST_NAME="int"
 
         make build
 
@@ -298,21 +237,20 @@ jobs:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
-        ENV=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
+        env_name=$(cat metadata.json | jq -r '.name')
+        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)"
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         API_URL="$(jq -r .cf.api_url metadata.json)"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
-        export FLAKE_ATTEMPTS=2
-        export NODES=16
         export GOPATH=$PWD/go
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
+        export CF_INT_TEST_NAME="cc"
 
         make build
 
@@ -320,13 +258,4 @@ jobs:
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
-        make integration-tests-full-ci
-
-    - name: Unclaim environment
-      if: always()
-      env:
-        account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-      run: |
-        shepherd login service-account ${account_token}
-        set -x
-        shepherd delete lease ${{ steps.claim-env.outputs.lease-id }} --namespace tas-devex
+        make integration-tests-ci-client-creds

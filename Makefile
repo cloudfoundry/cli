@@ -1,9 +1,12 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
+FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
-CF_BUILD_VERSION ?= $$(cat BUILD_VERSION) # TODO: version specific
+## TODO: Change when new version is released
+CF_BUILD_VERSION ?= v9.0.0
+#CF_BUILD_VERSION ?= $$(git describe --tags --abbrev=0)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
@@ -131,6 +134,7 @@ integration-selfcontained: build install-test-deps
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
 
+integration-tests-ci-client-creds: build integration-cleanup integration-push integration-global integration-selfcontained
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
@@ -201,13 +205,13 @@ units-plugin: install-test-deps
 
 ifeq ($(OS),Windows_NT)
 units-non-plugin: install-test-deps
-	@rm -f $(wildcard fixtures/plugins/*.exe)
+	@rm -f $(wildcard fixtures/plugins/*/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skip-package integration,plugin,cf\actors\plugin,cf\commands\plugin,cf\actors\plugin,util\randomword
 else
 units-non-plugin: install-test-deps
-	@rm -f $(wildcard fixtures/plugins/*.exe)
+	@rm -f $(wildcard fixtures/plugins/*/*.exe)
 	@ginkgo version
 	CF_HOME=$(CURDIR)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skip-package integration,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin,util/randomword

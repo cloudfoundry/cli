@@ -1,6 +1,9 @@
 package v7
 
 import (
+	"errors"
+	"fmt"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -11,8 +14,9 @@ type CreateAppCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
-	AppType         flag.AppType `long:"app-type" choice:"buildpack" choice:"docker" description:"App lifecycle type to stage and run the app" default:"buildpack"`
-	usage           interface{}  `usage:"CF_NAME create-app APP_NAME [--app-type (buildpack | docker)]"`
+	AppType         flag.AppType `long:"app-type" choice:"buildpack" choice:"docker" choice:"cnb" description:"App lifecycle type to stage and run the app" default:"buildpack"`
+	Buildpacks      []string     `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack), Docker image (e.g. docker://registry/image:tag), Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	usage           interface{}  `usage:"CF_NAME create-app APP_NAME [--app-type (buildpack | docker | cnb)]"`
 	relatedCommands interface{}  `related_commands:"app, apps, push"`
 }
 
@@ -34,11 +38,29 @@ func (cmd CreateAppCommand) Execute(args []string) error {
 		"CurrentUser":  user.Name,
 	})
 
+	cmd.UI.DisplayText(fmt.Sprintf("Using app type %q", constant.AppLifecycleType(cmd.AppType)))
+
+	app := resources.Application{
+		Name:                cmd.RequiredArgs.AppName,
+		LifecycleType:       constant.AppLifecycleType(cmd.AppType),
+		LifecycleBuildpacks: cmd.Buildpacks,
+	}
+
+	if constant.AppLifecycleType(cmd.AppType) == constant.AppLifecycleTypeCNB {
+		if len(cmd.Buildpacks) == 0 {
+			return errors.New("buildpack(s) must be provided when using --app-type cnb")
+		}
+
+		creds, err := cmd.Config.CNBCredentials()
+		if err != nil {
+			return err
+		}
+
+		app.Credentials = creds
+	}
+
 	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
-		resources.Application{
-			Name:          cmd.RequiredArgs.AppName,
-			LifecycleType: constant.AppLifecycleType(cmd.AppType),
-		},
+		app,
 		cmd.Config.TargetedSpace().GUID,
 	)
 	cmd.UI.DisplayWarnings(warnings)

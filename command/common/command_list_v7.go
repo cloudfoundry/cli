@@ -172,6 +172,7 @@ type commandList struct {
 	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
 	Stop                               v7.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
 	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
+	Task                               v7.TaskCommand                               `command:"task" description:"Display a task of an app"`
 	Tasks                              v7.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
 	TerminateTask                      v7.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
 	MoveRoute                          v7.MoveRouteCommand                          `command:"move-route" description:"Assign a route to a different space"`

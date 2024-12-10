@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -119,7 +120,7 @@ func (r Route) GUID() string {
 	var domainReceiver struct {
 		Domains []resources.Domain `json:"resources"`
 	}
-	Curl(&domainReceiver, "/v3/domains?names=%s", r.Domain)
+	Curlf(&domainReceiver, "/v3/domains?names=%s", r.Domain)
 	Expect(domainReceiver.Domains).To(HaveLen(1))
 
 	query := []string{fmt.Sprintf("domain_guids=%s", domainReceiver.Domains[0].GUID)}
@@ -140,8 +141,17 @@ func (r Route) GUID() string {
 	var routeReceiver struct {
 		Routes []resources.Route `json:"resources"`
 	}
-	Curl(&routeReceiver, "/v3/routes?%s", strings.Join(query, "&"))
+	Curlf(&routeReceiver, "/v3/routes?%s", strings.Join(query, "&"))
 	Expect(routeReceiver.Routes).To(HaveLen(1))
 
 	return routeReceiver.Routes[0].GUID
+}
+
+func GetPort() int {
+	port := 1024
+	testName := os.Getenv("CF_INT_TEST_NAME")
+	if testName == "cc" {
+		port = 1025
+	}
+	return port
 }
