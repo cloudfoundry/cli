@@ -66,6 +66,12 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+func NewOptions() map[string]string {
+	return map[string]string{
+		"loadbalancing": "round-robin",
+	}
+}
+
 // NewServiceOfferingName provides a random name prefixed with INTEGRATION-SERVICE
 func NewServiceOfferingName() string {
 	return PrefixedRandomName("INTEGRATION-SERVICE")

@@ -71,6 +71,7 @@ var _ = Describe("unmap-route command", func() {
 			tcpRoute   helpers.Route
 			port       int
 			tcpDomain  helpers.Domain
+			options    map[string]string
 		)
 
 		BeforeEach(func() {
@@ -82,12 +83,13 @@ var _ = Describe("unmap-route command", func() {
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
 			domainName = helpers.DefaultSharedDomain()
+			options = helpers.NewOptions()
 
 			routerGroupName := helpers.FindOrCreateTCPRouterGroup(4)
 			tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("TCP-DOMAIN"))
 			tcpDomain.CreateWithRouterGroup(routerGroupName)
 
-			route = helpers.NewRoute(spaceName, domainName, hostName, path)
+			route = helpers.NewRoute(spaceName, domainName, hostName, path, options)
 			route.V7Create()
 
 			helpers.WithHelloWorldApp(func(dir string) {
@@ -118,7 +120,7 @@ var _ = Describe("unmap-route command", func() {
 			When("it's a TCP route", func() {
 				BeforeEach(func() {
 					port = 1024
-					tcpRoute = helpers.NewTCPRoute(spaceName, tcpDomain.Name, port)
+					tcpRoute = helpers.NewTCPRoute(spaceName, tcpDomain.Name, port, options)
 					session := helpers.CF("map-route", appName, tcpDomain.Name, "--port", fmt.Sprintf("%d", tcpRoute.Port))
 					Eventually(session).Should(Exit(0))
 				})
