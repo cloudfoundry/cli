@@ -211,12 +211,13 @@ var _ = Describe("CreateRoute", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			hostname, path, domain, space, port, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
+			hostname, path, domain, space, port, randomPort, option := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal(""))
 			Expect(path).To(Equal(""))
 			Expect(domain).To(Equal("domain-guid"))
 			Expect(space).To(Equal("space-guid"))
 			Expect(port).To(Equal(0))
+			Expect(option).To(Equal("loadbalancing:round-robin"))
 			Expect(randomPort).To(BeFalse())
 		})
 
@@ -230,7 +231,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-				_, path, _, _, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
+				_, path, _, _, _, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
 				Expect(path).To(Equal("some-path"))
 			})
 		})
@@ -245,7 +246,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-				_, _, _, _, _, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
+				_, _, _, _, _, randomPort, _ := routeRepo.CreateInSpaceArgsForCall(0)
 				Expect(randomPort).To(BeTrue())
 			})
 		})
@@ -260,7 +261,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-				_, _, _, _, port, _ := routeRepo.CreateInSpaceArgsForCall(0)
+				_, _, _, _, port, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
 				Expect(port).To(Equal(9090))
 			})
 		})
@@ -275,7 +276,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-				host, _, _, _, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
+				host, _, _, _, _, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
 				Expect(host).To(Equal("host"))
 			})
 		})
@@ -372,12 +373,13 @@ var _ = Describe("CreateRoute", func() {
 			rc.CreateRoute("hostname", "path", 9090, true, domainFields, spaceFields, "loadbalancing=round-robin")
 
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			hostname, path, domain, space, port, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
+			hostname, path, domain, space, port, randomPort, option := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal("hostname"))
 			Expect(path).To(Equal("path"))
 			Expect(domain).To(Equal(domainFields.GUID))
 			Expect(space).To(Equal(spaceFields.GUID))
 			Expect(port).To(Equal(9090))
+			Expect(option).To(Equal("loadbalancing:round-robin"))
 			Expect(randomPort).To(BeTrue())
 		})
 

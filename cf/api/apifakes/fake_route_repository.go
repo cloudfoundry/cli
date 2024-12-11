@@ -299,11 +299,11 @@ func (fake *FakeRouteRepository) CreateCalls(stub func(string, models.DomainFiel
 	fake.CreateStub = stub
 }
 
-func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, int, bool) {
+func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, int, bool, string) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
 	argsForCall := fake.createArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeRouteRepository) CreateReturns(result1 models.Route, result2 error) {
@@ -368,11 +368,11 @@ func (fake *FakeRouteRepository) CreateInSpaceCalls(stub func(string, string, st
 	fake.CreateInSpaceStub = stub
 }
 
-func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool) {
+func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool, string) {
 	fake.createInSpaceMutex.RLock()
 	defer fake.createInSpaceMutex.RUnlock()
 	argsForCall := fake.createInSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
 }
 
 func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, result2 error) {
