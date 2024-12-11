@@ -173,7 +173,7 @@ var _ = Describe("Routes", func() {
 					Expect(path).To(Equal(""))
 					Expect(port).To(Equal(1337))
 					Expect(randomPort).To(BeFalse())
-					Expect(option).To(Equal("loadbalancing:least-connection"))
+					Expect(option).To(BeEmpty())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
 					output, _ := fakeUI.SayArgsForCall(0)
@@ -198,7 +198,7 @@ var _ = Describe("Routes", func() {
 					Expect(path).To(Equal(expectedPath))
 					Expect(port).To(Equal(0))
 					Expect(randomPort).To(BeFalse())
-					Expect(option).To(Equal(expectedOption))
+					Expect(option).To(BeEmpty())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
 					output, _ := fakeUI.SayArgsForCall(0)
