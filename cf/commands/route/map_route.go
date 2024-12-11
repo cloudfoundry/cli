@@ -44,7 +44,7 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("%s ", T("APP_NAME")),
 			fmt.Sprintf("%s ", T("DOMAIN")),
 			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
-			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
+			fmt.Sprintf("[--path %s] ", T("PATH")),
 			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
 			fmt.Sprintf("   %s:\n", T("Map a TCP route")),
 			"      CF_NAME map-route ",
