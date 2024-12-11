@@ -54,11 +54,11 @@ var _ = Describe("Request Logger File Writer", func() {
 
 				contents, err := os.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+				Expect(string(contents)).To(Equal(RedactedValue + "\n\n"))
 
 				contents, err = os.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+				Expect(string(contents)).To(Equal(RedactedValue + "\n\n"))
 			})
 		})
 
