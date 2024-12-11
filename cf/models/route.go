@@ -13,11 +13,16 @@ type Route struct {
 	Path    string
 	Port    int
 	Options map[string]string
-
+	//Options         RouteOptions
 	Space           SpaceFields
 	Apps            []ApplicationFields
 	ServiceInstance ServiceInstanceFields
 }
+
+/*type RouteOptions struct {
+	LoadBalancing string `json:"load_balancing"`
+	SessionCookie string `json:"session_cookie"`
+}*/
 
 func (r Route) URL() string {
 	return (&RoutePresenter{

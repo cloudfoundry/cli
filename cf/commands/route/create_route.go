@@ -1,9 +1,6 @@
 package route
 
 import (
-	"fmt"
-	"strings"
-
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -12,12 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"fmt"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Creator
 
 type Creator interface {
-	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
@@ -58,11 +56,11 @@ func (cmd *CreateRoute) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
 		},
 		Examples: []string{
-			"CF_NAME create-route my-space example.com                                              # example.com",
-			"CF_NAME create-route my-space example.com --hostname myapp                             # myapp.example.com",
-			"CF_NAME create-route my-space example.com --hostname myapp --path foo                  # myapp.example.com/foo",
-			"CF_NAME create-route my-space example.com --port 50000                                 # example.com:50000",
-			"CF_NAME create-route my-space example.com --hostname myapp -o loadbalancing=round-robin",
+			"CF_NAME create-route my-space example.com                                # example.com",
+			"CF_NAME create-route my-space example.com --hostname myapp               # myapp.example.com",
+			"CF_NAME create-route my-space example.com --hostname myapp --path foo    # myapp.example.com/foo",
+			"CF_NAME create-route my-space example.com --port 50000                   # example.com:50000",
+			"CF_NAME create-route my-space example.com -o loadbalancing=round-robin",
 		},
 		Flags: fs,
 	}
@@ -114,27 +112,15 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
 	option := c.String("o")
-	route, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields)
+	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields, option)
 	if err != nil {
 		return err
-	}
-
-	if c.IsSet("o") {
-		key, value, found := strings.Cut(option, "=")
-		if found {
-			cmd.ui.Say(T("Setting route option {{.Option}} ...", map[string]interface{}{
-				"Option": terminal.EntityNameColor(key)}))
-			route.Options[key] = value
-		} else {
-			cmd.ui.Say(T("Wrong route option format {{.Option}}.", map[string]interface{}{
-				"Option": terminal.FailureColor(option)}))
-		}
 	}
 
 	return nil
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (models.Route, error) {
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.URLForHostAndPath(hostName, path, port)),
@@ -142,7 +128,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.GUID, space.GUID, port, randomPort)
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.GUID, space.GUID, port, randomPort, option)
 	if err != nil {
 		var findErr error
 		route, findErr = cmd.routeRepo.Find(hostName, domain, path, port)

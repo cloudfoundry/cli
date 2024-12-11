@@ -369,7 +369,7 @@ var _ = Describe("CreateRoute", func() {
 		})
 
 		It("attempts to create a route in the space", func() {
-			rc.CreateRoute("hostname", "path", 9090, true, domainFields, spaceFields)
+			rc.CreateRoute("hostname", "path", 9090, true, domainFields, spaceFields, "loadbalancing=round-robin")
 
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
 			hostname, path, domain, space, port, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
@@ -387,7 +387,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("attempts to find the route", func() {
-				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 			})
 
@@ -397,7 +397,7 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("returns the original error", func() {
-					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -405,7 +405,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same space guid, but different domain guid is found", func() {
 				It("returns the original error", func() {
-					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -413,7 +413,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same domain guid, but different space guid is found", func() {
 				It("returns the original error", func() {
-					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+					_, err := rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -435,7 +435,7 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("prints a message that it already exists", func() {
-					rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+					rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route hostname.domain-name/path already exists"}))
@@ -451,7 +451,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("prints a success message", func() {
-				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
+				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields, "loadbalancing=round-robin")
 				Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 			})
 
@@ -465,7 +465,7 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("print a success message with created route", func() {
-					rc.CreateRoute("hostname", "path", 0, true, domainFields, spaceFields)
+					rc.CreateRoute("hostname", "path", 0, true, domainFields, spaceFields, "loadbalancing=round-robin")
 					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route domain-name:9090 has been created"},
