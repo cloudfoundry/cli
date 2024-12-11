@@ -91,7 +91,7 @@ var _ = Describe("Routes", func() {
 		BeforeEach(func() {
 			expectedHostname = "hostname"
 			expectedPath = "path"
-			expectedOption = "loadbalancing:least-connection"
+			expectedOption = ""
 
 			expectedDomain = models.DomainFields{
 				Name:            "foo.com",
@@ -102,6 +102,7 @@ var _ = Describe("Routes", func() {
 				Domain: expectedDomain,
 				Host:   expectedHostname,
 				Path:   expectedPath,
+				//Options: map[string]string{},
 			}
 		})
 
@@ -162,7 +163,7 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("creates a route ", func() {
-					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, "", 1337, false, "loadbalancing:least-connection")
+					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, "", 1337, false, "")
 					Expect(route).To(Equal(expectedRoute))
 					Expect(err).ToNot(HaveOccurred())
 
@@ -719,7 +720,7 @@ var _ = Describe("Routes", func() {
 					var option string
 					BeforeEach(func() {
 						routeName = "hostname.old-domain.com/path"
-						option = "loadbalancing:least-connection"
+						option = ""
 					})
 
 					It("replace the domain from manifest", func() {
@@ -746,7 +747,7 @@ var _ = Describe("Routes", func() {
 							Domains: []string{"shared-domain.com"},
 							Hosts:   []string{"hostname"},
 						}
-						option = "loadbalancing:least-connection"
+						option = ""
 					})
 
 					It("replace the domain from manifest", func() {
@@ -774,7 +775,7 @@ var _ = Describe("Routes", func() {
 							Domains:   []string{"shared-domain.com"},
 							RoutePath: &path,
 						}
-						option = "loadbalancing:least-connection"
+						option = ""
 					})
 
 					It("replace the domain and path from manifest", func() {
@@ -810,7 +811,7 @@ var _ = Describe("Routes", func() {
 					appParamsFromContext = models.AppParams{
 						Domains: []string{"private-domain.com"},
 					}
-					option = "loadbalancing:least-connection"
+					option = ""
 				})
 
 				It("replace the domain from manifest", func() {
@@ -861,7 +862,7 @@ var _ = Describe("Routes", func() {
 				Context("the route does not have a hostname", func() {
 					BeforeEach(func() {
 						routeName = "domain.com/path"
-						option = "loadbalancing:least-connection"
+						option = ""
 					})
 					It("should append a random name ", func() {
 						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
