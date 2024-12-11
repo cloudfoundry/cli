@@ -115,10 +115,10 @@ var _ = Describe("MapRoute", func() {
 
 		It("shows the usage", func() {
 			Expect(usage).To(ContainElement("   Map an HTTP route:"))
-			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"))
+			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--option OPTION=VALUE]"))
 
 			Expect(usage).To(ContainElement("   Map a TCP route:"))
-			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN (--port PORT | --random-port)"))
+			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN (--port PORT | --random-port) [--option OPTION=VALUE]"))
 		})
 	})
 
