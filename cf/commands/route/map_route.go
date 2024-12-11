@@ -50,7 +50,7 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 			"      CF_NAME map-route ",
 			fmt.Sprintf("%s ", T("APP_NAME")),
 			fmt.Sprintf("%s ", T("DOMAIN")),
-			fmt.Sprintf("(--port %s | --random-port)", T("PORT")),
+			fmt.Sprintf("(--port %s | --random-port) ", T("PORT")),
 			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
 		},
 		Examples: []string{
