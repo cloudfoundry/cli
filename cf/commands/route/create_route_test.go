@@ -217,7 +217,7 @@ var _ = Describe("CreateRoute", func() {
 			Expect(domain).To(Equal("domain-guid"))
 			Expect(space).To(Equal("space-guid"))
 			Expect(port).To(Equal(0))
-			Expect(option).To(Equal("loadbalancing:round-robin"))
+			Expect(option).To(BeEmpty())
 			Expect(randomPort).To(BeFalse())
 		})
 
@@ -379,7 +379,7 @@ var _ = Describe("CreateRoute", func() {
 			Expect(domain).To(Equal(domainFields.GUID))
 			Expect(space).To(Equal(spaceFields.GUID))
 			Expect(port).To(Equal(9090))
-			Expect(option).To(Equal("loadbalancing:round-robin"))
+			Expect(option).To(Equal("loadbalancing=round-robin"))
 			Expect(randomPort).To(BeTrue())
 		})
 
