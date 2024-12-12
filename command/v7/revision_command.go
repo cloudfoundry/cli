@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type RevisionCommand struct {
@@ -19,8 +19,6 @@ type RevisionCommand struct {
 }
 
 func (cmd RevisionCommand) Execute(_ []string) error {
-	cmd.UI.DisplayWarning(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -49,12 +47,30 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	)
 	isDeployed := revisionDeployed(revision, deployedRevisions)
 
-	envVars, isPresent, warnings, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
-	cmd.UI.DisplayWarnings(warnings)
-
 	cmd.displayBasicRevisionInfo(revision, isDeployed)
 	cmd.UI.DisplayNewline()
 
+	cmd.UI.DisplayHeader("labels:")
+	labels, warnings, err := cmd.Actor.GetRevisionLabels(revision.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+
+	if len(labels) > 0 {
+		cmd.displayMetaData(labels)
+		cmd.UI.DisplayNewline()
+	}
+
+	cmd.UI.DisplayHeader("annotations:")
+	annotations, warnings, err := cmd.Actor.GetRevisionAnnotations(revision.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+
+	if len(annotations) > 0 {
+		cmd.displayMetaData(annotations)
+		cmd.UI.DisplayNewline()
+	}
+
+	cmd.UI.DisplayHeader("application environment variables:")
+	envVars, isPresent, warnings, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
+	cmd.UI.DisplayWarnings(warnings)
 	if isPresent {
 		cmd.displayEnvVarGroup(envVars)
 		cmd.UI.DisplayNewline()
@@ -81,8 +97,16 @@ func (cmd RevisionCommand) displayEnvVarGroup(envVarGroup v7action.EnvironmentVa
 	for k, v := range envVarGroup {
 		envVarTable = append(envVarTable, []string{fmt.Sprintf("%s:", k), v.Value})
 	}
-	cmd.UI.DisplayText("application environment variables:")
 	cmd.UI.DisplayKeyValueTable("", envVarTable, 3)
+}
+
+func (cmd RevisionCommand) displayMetaData(data map[string]types.NullString) {
+	tableData := [][]string{}
+	for k, v := range data {
+		tableData = append(tableData, []string{fmt.Sprintf("%s:", k), v.Value})
+	}
+	cmd.UI.DisplayKeyValueTable("", tableData, 3)
+
 }
 
 func revisionDeployed(revision resources.Revision, deployedRevisions []resources.Revision) bool {

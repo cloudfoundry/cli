@@ -55,11 +55,7 @@ var _ = Describe("revision Command", func() {
 	})
 
 	JustBeforeEach(func() {
-		Expect(cmd.Execute(nil)).To(Succeed())
-	})
-
-	It("displays the experimental warning", func() {
-		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		executeErr = cmd.Execute(nil)
 	})
 
 	When("checking target fails", func() {
@@ -121,6 +117,14 @@ var _ = Describe("revision Command", func() {
 								HREF: "revision-environment-variables-link-3",
 							},
 						},
+						Metadata: &resources.Metadata{
+							Labels: map[string]types.NullString{
+								"label": types.NewNullString("foo3"),
+							},
+							Annotations: map[string]types.NullString{
+								"annotation": types.NewNullString("foo3"),
+							},
+						},
 					}
 					fakeActor.GetRevisionByApplicationAndVersionReturns(revision, nil, nil)
 					fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "app-guid"}, nil, nil)
@@ -129,6 +133,12 @@ var _ = Describe("revision Command", func() {
 					environmentVariableGroup := v7action.EnvironmentVariableGroup{
 						"foo": *types.NewFilteredString("bar3"),
 					}
+					labels := map[string]types.NullString{
+						"label": types.NewNullString("foo3"),
+					}
+					annotations := map[string]types.NullString{
+						"annotation": types.NewNullString("foo3"),
+					}
 					fakeActor.GetEnvironmentVariableGroupByRevisionReturns(
 						environmentVariableGroup,
 						true,
@@ -136,6 +146,8 @@ var _ = Describe("revision Command", func() {
 						nil,
 					)
 
+					fakeActor.GetRevisionLabelsReturns(labels, nil, nil)
+					fakeActor.GetRevisionAnnotationsReturns(annotations, nil, nil)
 					cmd.Version = flag.Revision{NullInt: types.NullInt{Value: 3, IsSet: true}}
 				})
 
@@ -177,17 +189,18 @@ var _ = Describe("revision Command", func() {
 					Expect(testUI.Out).To(Say(`droplet GUID:    droplet-guid`))
 					Expect(testUI.Out).To(Say(`created on:      2020-03-10T17:11:58Z`))
 
+					Expect(testUI.Out).To(Say(`labels:`))
+					Expect(testUI.Out).To(Say(`label:   foo3`))
+
+					Expect(testUI.Out).To(Say(`annotations:`))
+					Expect(testUI.Out).To(Say(`annotation:   foo3`))
+
 					Expect(testUI.Out).To(Say(`application environment variables:`))
 					Expect(testUI.Out).To(Say(`foo:   bar3`))
 
-					// Expect(testUI.Out).To(Say(`labels:`))
-					// Expect(testUI.Out).To(Say(`label: foo3`))
-
-					// Expect(testUI.Out).To(Say(`annotations:`))
-					// Expect(testUI.Out).To(Say(`annotation: foo3`))
 				})
 
-				When("there is not a environment_variables link provided", func() {
+				When("there are no environment_variables link and metadata provided", func() {
 					BeforeEach(func() {
 						revision = resources.Revision{
 							Version:     3,
@@ -208,7 +221,9 @@ var _ = Describe("revision Command", func() {
 					It("warns the user it will not display env vars ", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Err).To(Say("warn-env-var"))
-						Expect(testUI.Out).ToNot(Say("application environment variables:"))
+						Expect(testUI.Out).To(Say("labels:"))
+						Expect(testUI.Out).To(Say("annotations:"))
+						Expect(testUI.Out).To(Say("application environment variables:"))
 					})
 				})
 

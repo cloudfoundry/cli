@@ -137,6 +137,8 @@ type Actor interface {
 	GetRootResponse() (v7action.Info, v7action.Warnings, error)
 	GetRevisionByApplicationAndVersion(appGUID string, revisionVersion int) (resources.Revision, v7action.Warnings, error)
 	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) ([]resources.Revision, v7action.Warnings, error)
+	GetRevisionLabels(revisionGUID string) (map[string]types.NullString, v7action.Warnings, error)
+	GetRevisionAnnotations(revisionGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetRouteByAttributes(domain resources.Domain, hostname string, path string, port int) (resources.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error)
 	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)

@@ -77,6 +77,7 @@ const (
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessesRequest                                         = "GetProcesses"
+	GetRevisionRequest                                          = "GetRevision"
 	GetRolesRequest                                             = "GetRoles"
 	GetRouteBindingsRequest                                     = "GetRouteBindings"
 	GetRouteDestinationsRequest                                 = "GetRouteDestinations"
@@ -272,6 +273,7 @@ var APIRoutes = map[string]Route{
 	GetProcessStatsRequest:                                      {Path: "/v3/processes/:process_guid/stats", Method: http.MethodGet},
 	GetProcessSidecarsRequest:                                   {Path: "/v3/processes/:process_guid/sidecars", Method: http.MethodGet},
 	PostResourceMatchesRequest:                                  {Path: "/v3/resource_matches", Method: http.MethodPost},
+	GetRevisionRequest:                                          {Path: "/v3/revisions/:revision_guid", Method: http.MethodGet},
 	GetRolesRequest:                                             {Path: "/v3/roles", Method: http.MethodGet},
 	PostRoleRequest:                                             {Path: "/v3/roles", Method: http.MethodPost},
 	DeleteRoleRequest:                                           {Path: "/v3/roles/:role_guid", Method: http.MethodDelete},

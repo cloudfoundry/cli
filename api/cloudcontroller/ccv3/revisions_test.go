@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -140,7 +139,7 @@ var _ = Describe("Revisions", func() {
 		var (
 			warnings             Warnings
 			executeErr           error
-			environmentVariables ccv3.EnvironmentVariables
+			environmentVariables resources.EnvironmentVariables
 		)
 
 		JustBeforeEach(func() {
@@ -192,7 +191,7 @@ var _ = Describe("Revisions", func() {
 		When("revision exist", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					(*requestParams.ResponseBody.(*ccv3.EnvironmentVariables))["foo"] = *types.NewFilteredString("bar")
+					(*requestParams.ResponseBody.(*resources.EnvironmentVariables))["foo"] = *types.NewFilteredString("bar")
 					return "url", Warnings{"this is a warning"}, nil
 				})
 			})

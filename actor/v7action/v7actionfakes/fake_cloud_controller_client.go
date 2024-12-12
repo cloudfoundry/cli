@@ -14,6 +14,26 @@ import (
 )
 
 type FakeCloudControllerClient struct {
+	AppSSHEndpointStub        func() string
+	appSSHEndpointMutex       sync.RWMutex
+	appSSHEndpointArgsForCall []struct {
+	}
+	appSSHEndpointReturns struct {
+		result1 string
+	}
+	appSSHEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	AppSSHHostKeyFingerprintStub        func() string
+	appSSHHostKeyFingerprintMutex       sync.RWMutex
+	appSSHHostKeyFingerprintArgsForCall []struct {
+	}
+	appSSHHostKeyFingerprintReturns struct {
+		result1 string
+	}
+	appSSHHostKeyFingerprintReturnsOnCall map[int]struct {
+		result1 string
+	}
 	ApplyOrganizationQuotaStub        func(string, string) (resources.RelationshipList, ccv3.Warnings, error)
 	applyOrganizationQuotaMutex       sync.RWMutex
 	applyOrganizationQuotaArgsForCall []struct {
@@ -1101,18 +1121,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetEnvironmentVariablesByURLStub        func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	GetEnvironmentVariablesByURLStub        func(string) (resources.EnvironmentVariables, ccv3.Warnings, error)
 	getEnvironmentVariablesByURLMutex       sync.RWMutex
 	getEnvironmentVariablesByURLArgsForCall []struct {
 		arg1 string
 	}
 	getEnvironmentVariablesByURLReturns struct {
-		result1 ccv3.EnvironmentVariables
+		result1 resources.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getEnvironmentVariablesByURLReturnsOnCall map[int]struct {
-		result1 ccv3.EnvironmentVariables
+		result1 resources.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1429,6 +1449,21 @@ type FakeCloudControllerClient struct {
 	}
 	getProcessesReturnsOnCall map[int]struct {
 		result1 []resources.Process
+		result2 ccv3.Warnings
+		result3 error
+	}
+	GetRevisionStub        func(string) (resources.Revision, ccv3.Warnings, error)
+	getRevisionMutex       sync.RWMutex
+	getRevisionArgsForCall []struct {
+		arg1 string
+	}
+	getRevisionReturns struct {
+		result1 resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getRevisionReturnsOnCall map[int]struct {
+		result1 resources.Revision
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2780,6 +2815,112 @@ type FakeCloudControllerClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpoint() string {
+	fake.appSSHEndpointMutex.Lock()
+	ret, specificReturn := fake.appSSHEndpointReturnsOnCall[len(fake.appSSHEndpointArgsForCall)]
+	fake.appSSHEndpointArgsForCall = append(fake.appSSHEndpointArgsForCall, struct {
+	}{})
+	stub := fake.AppSSHEndpointStub
+	fakeReturns := fake.appSSHEndpointReturns
+	fake.recordInvocation("AppSSHEndpoint", []interface{}{})
+	fake.appSSHEndpointMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointCallCount() int {
+	fake.appSSHEndpointMutex.RLock()
+	defer fake.appSSHEndpointMutex.RUnlock()
+	return len(fake.appSSHEndpointArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointCalls(stub func() string) {
+	fake.appSSHEndpointMutex.Lock()
+	defer fake.appSSHEndpointMutex.Unlock()
+	fake.AppSSHEndpointStub = stub
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointReturns(result1 string) {
+	fake.appSSHEndpointMutex.Lock()
+	defer fake.appSSHEndpointMutex.Unlock()
+	fake.AppSSHEndpointStub = nil
+	fake.appSSHEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointReturnsOnCall(i int, result1 string) {
+	fake.appSSHEndpointMutex.Lock()
+	defer fake.appSSHEndpointMutex.Unlock()
+	fake.AppSSHEndpointStub = nil
+	if fake.appSSHEndpointReturnsOnCall == nil {
+		fake.appSSHEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.appSSHEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprint() string {
+	fake.appSSHHostKeyFingerprintMutex.Lock()
+	ret, specificReturn := fake.appSSHHostKeyFingerprintReturnsOnCall[len(fake.appSSHHostKeyFingerprintArgsForCall)]
+	fake.appSSHHostKeyFingerprintArgsForCall = append(fake.appSSHHostKeyFingerprintArgsForCall, struct {
+	}{})
+	stub := fake.AppSSHHostKeyFingerprintStub
+	fakeReturns := fake.appSSHHostKeyFingerprintReturns
+	fake.recordInvocation("AppSSHHostKeyFingerprint", []interface{}{})
+	fake.appSSHHostKeyFingerprintMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintCallCount() int {
+	fake.appSSHHostKeyFingerprintMutex.RLock()
+	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
+	return len(fake.appSSHHostKeyFingerprintArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintCalls(stub func() string) {
+	fake.appSSHHostKeyFingerprintMutex.Lock()
+	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
+	fake.AppSSHHostKeyFingerprintStub = stub
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturns(result1 string) {
+	fake.appSSHHostKeyFingerprintMutex.Lock()
+	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
+	fake.AppSSHHostKeyFingerprintStub = nil
+	fake.appSSHHostKeyFingerprintReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturnsOnCall(i int, result1 string) {
+	fake.appSSHHostKeyFingerprintMutex.Lock()
+	defer fake.appSSHHostKeyFingerprintMutex.Unlock()
+	fake.AppSSHHostKeyFingerprintStub = nil
+	if fake.appSSHHostKeyFingerprintReturnsOnCall == nil {
+		fake.appSSHHostKeyFingerprintReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.appSSHHostKeyFingerprintReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeCloudControllerClient) ApplyOrganizationQuota(arg1 string, arg2 string) (resources.RelationshipList, ccv3.Warnings, error) {
@@ -7612,21 +7753,22 @@ func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupReturnsOnCall(
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURL(arg1 string) (ccv3.EnvironmentVariables, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURL(arg1 string) (resources.EnvironmentVariables, ccv3.Warnings, error) {
 	fake.getEnvironmentVariablesByURLMutex.Lock()
 	ret, specificReturn := fake.getEnvironmentVariablesByURLReturnsOnCall[len(fake.getEnvironmentVariablesByURLArgsForCall)]
 	fake.getEnvironmentVariablesByURLArgsForCall = append(fake.getEnvironmentVariablesByURLArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetEnvironmentVariablesByURLStub
+	fakeReturns := fake.getEnvironmentVariablesByURLReturns
 	fake.recordInvocation("GetEnvironmentVariablesByURL", []interface{}{arg1})
 	fake.getEnvironmentVariablesByURLMutex.Unlock()
-	if fake.GetEnvironmentVariablesByURLStub != nil {
-		return fake.GetEnvironmentVariablesByURLStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getEnvironmentVariablesByURLReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -7636,7 +7778,7 @@ func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLCallCount() i
 	return len(fake.getEnvironmentVariablesByURLArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLCalls(stub func(string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLCalls(stub func(string) (resources.EnvironmentVariables, ccv3.Warnings, error)) {
 	fake.getEnvironmentVariablesByURLMutex.Lock()
 	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
 	fake.GetEnvironmentVariablesByURLStub = stub
@@ -7649,30 +7791,30 @@ func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLArgsForCall(i
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturns(result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturns(result1 resources.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
 	fake.getEnvironmentVariablesByURLMutex.Lock()
 	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
 	fake.GetEnvironmentVariablesByURLStub = nil
 	fake.getEnvironmentVariablesByURLReturns = struct {
-		result1 ccv3.EnvironmentVariables
+		result1 resources.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturnsOnCall(i int, result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetEnvironmentVariablesByURLReturnsOnCall(i int, result1 resources.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
 	fake.getEnvironmentVariablesByURLMutex.Lock()
 	defer fake.getEnvironmentVariablesByURLMutex.Unlock()
 	fake.GetEnvironmentVariablesByURLStub = nil
 	if fake.getEnvironmentVariablesByURLReturnsOnCall == nil {
 		fake.getEnvironmentVariablesByURLReturnsOnCall = make(map[int]struct {
-			result1 ccv3.EnvironmentVariables
+			result1 resources.EnvironmentVariables
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getEnvironmentVariablesByURLReturnsOnCall[i] = struct {
-		result1 ccv3.EnvironmentVariables
+		result1 resources.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9067,6 +9209,73 @@ func (fake *FakeCloudControllerClient) GetProcessesReturnsOnCall(i int, result1 
 	}
 	fake.getProcessesReturnsOnCall[i] = struct {
 		result1 []resources.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetRevision(arg1 string) (resources.Revision, ccv3.Warnings, error) {
+	fake.getRevisionMutex.Lock()
+	ret, specificReturn := fake.getRevisionReturnsOnCall[len(fake.getRevisionArgsForCall)]
+	fake.getRevisionArgsForCall = append(fake.getRevisionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetRevisionStub
+	fakeReturns := fake.getRevisionReturns
+	fake.recordInvocation("GetRevision", []interface{}{arg1})
+	fake.getRevisionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetRevisionCallCount() int {
+	fake.getRevisionMutex.RLock()
+	defer fake.getRevisionMutex.RUnlock()
+	return len(fake.getRevisionArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetRevisionCalls(stub func(string) (resources.Revision, ccv3.Warnings, error)) {
+	fake.getRevisionMutex.Lock()
+	defer fake.getRevisionMutex.Unlock()
+	fake.GetRevisionStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetRevisionArgsForCall(i int) string {
+	fake.getRevisionMutex.RLock()
+	defer fake.getRevisionMutex.RUnlock()
+	argsForCall := fake.getRevisionArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetRevisionReturns(result1 resources.Revision, result2 ccv3.Warnings, result3 error) {
+	fake.getRevisionMutex.Lock()
+	defer fake.getRevisionMutex.Unlock()
+	fake.GetRevisionStub = nil
+	fake.getRevisionReturns = struct {
+		result1 resources.Revision
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetRevisionReturnsOnCall(i int, result1 resources.Revision, result2 ccv3.Warnings, result3 error) {
+	fake.getRevisionMutex.Lock()
+	defer fake.getRevisionMutex.Unlock()
+	fake.GetRevisionStub = nil
+	if fake.getRevisionReturnsOnCall == nil {
+		fake.getRevisionReturnsOnCall = make(map[int]struct {
+			result1 resources.Revision
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getRevisionReturnsOnCall[i] = struct {
+		result1 resources.Revision
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -15039,6 +15248,10 @@ func (fake *FakeCloudControllerClient) WhoAmIReturnsOnCall(i int, result1 resour
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.appSSHEndpointMutex.RLock()
+	defer fake.appSSHEndpointMutex.RUnlock()
+	fake.appSSHHostKeyFingerprintMutex.RLock()
+	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
 	fake.applyOrganizationQuotaMutex.RLock()
 	defer fake.applyOrganizationQuotaMutex.RUnlock()
 	fake.applySpaceQuotaMutex.RLock()
@@ -15227,6 +15440,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getProcessSidecarsMutex.RUnlock()
 	fake.getProcessesMutex.RLock()
 	defer fake.getProcessesMutex.RUnlock()
+	fake.getRevisionMutex.RLock()
+	defer fake.getRevisionMutex.RUnlock()
 	fake.getRolesMutex.RLock()
 	defer fake.getRolesMutex.RUnlock()
 	fake.getRouteBindingsMutex.RLock()

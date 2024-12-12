@@ -460,7 +460,7 @@ var _ = Describe("Revisions Actions", func() {
 		When("finding the environment variables succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetEnvironmentVariablesByURLReturns(
-					ccv3.EnvironmentVariables{"foo": *types.NewFilteredString("bar")},
+					resources.EnvironmentVariables{"foo": *types.NewFilteredString("bar")},
 					ccv3.Warnings{"get-env-vars-warning-1"},
 					nil,
 				)

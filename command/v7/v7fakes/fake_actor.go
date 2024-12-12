@@ -1720,6 +1720,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRevisionAnnotationsStub        func(string) (map[string]types.NullString, v7action.Warnings, error)
+	getRevisionAnnotationsMutex       sync.RWMutex
+	getRevisionAnnotationsArgsForCall []struct {
+		arg1 string
+	}
+	getRevisionAnnotationsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRevisionAnnotationsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetRevisionByApplicationAndVersionStub        func(string, int) (resources.Revision, v7action.Warnings, error)
 	getRevisionByApplicationAndVersionMutex       sync.RWMutex
 	getRevisionByApplicationAndVersionArgsForCall []struct {
@@ -1733,6 +1748,21 @@ type FakeActor struct {
 	}
 	getRevisionByApplicationAndVersionReturnsOnCall map[int]struct {
 		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetRevisionLabelsStub        func(string) (map[string]types.NullString, v7action.Warnings, error)
+	getRevisionLabelsMutex       sync.RWMutex
+	getRevisionLabelsArgsForCall []struct {
+		arg1 string
+	}
+	getRevisionLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRevisionLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -9424,15 +9454,16 @@ func (fake *FakeActor) GetEnvironmentVariableGroupByRevision(arg1 resources.Revi
 	fake.getEnvironmentVariableGroupByRevisionArgsForCall = append(fake.getEnvironmentVariableGroupByRevisionArgsForCall, struct {
 		arg1 resources.Revision
 	}{arg1})
+	stub := fake.GetEnvironmentVariableGroupByRevisionStub
+	fakeReturns := fake.getEnvironmentVariableGroupByRevisionReturns
 	fake.recordInvocation("GetEnvironmentVariableGroupByRevision", []interface{}{arg1})
 	fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
-	if fake.GetEnvironmentVariableGroupByRevisionStub != nil {
-		return fake.GetEnvironmentVariableGroupByRevisionStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
 	}
-	fakeReturns := fake.getEnvironmentVariableGroupByRevisionReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
 }
 
@@ -11119,6 +11150,73 @@ func (fake *FakeActor) GetRecentLogsForApplicationByNameAndSpaceReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetRevisionAnnotations(arg1 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getRevisionAnnotationsMutex.Lock()
+	ret, specificReturn := fake.getRevisionAnnotationsReturnsOnCall[len(fake.getRevisionAnnotationsArgsForCall)]
+	fake.getRevisionAnnotationsArgsForCall = append(fake.getRevisionAnnotationsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetRevisionAnnotationsStub
+	fakeReturns := fake.getRevisionAnnotationsReturns
+	fake.recordInvocation("GetRevisionAnnotations", []interface{}{arg1})
+	fake.getRevisionAnnotationsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRevisionAnnotationsCallCount() int {
+	fake.getRevisionAnnotationsMutex.RLock()
+	defer fake.getRevisionAnnotationsMutex.RUnlock()
+	return len(fake.getRevisionAnnotationsArgsForCall)
+}
+
+func (fake *FakeActor) GetRevisionAnnotationsCalls(stub func(string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getRevisionAnnotationsMutex.Lock()
+	defer fake.getRevisionAnnotationsMutex.Unlock()
+	fake.GetRevisionAnnotationsStub = stub
+}
+
+func (fake *FakeActor) GetRevisionAnnotationsArgsForCall(i int) string {
+	fake.getRevisionAnnotationsMutex.RLock()
+	defer fake.getRevisionAnnotationsMutex.RUnlock()
+	argsForCall := fake.getRevisionAnnotationsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetRevisionAnnotationsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionAnnotationsMutex.Lock()
+	defer fake.getRevisionAnnotationsMutex.Unlock()
+	fake.GetRevisionAnnotationsStub = nil
+	fake.getRevisionAnnotationsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionAnnotationsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionAnnotationsMutex.Lock()
+	defer fake.getRevisionAnnotationsMutex.Unlock()
+	fake.GetRevisionAnnotationsStub = nil
+	if fake.getRevisionAnnotationsReturnsOnCall == nil {
+		fake.getRevisionAnnotationsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRevisionAnnotationsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetRevisionByApplicationAndVersion(arg1 string, arg2 int) (resources.Revision, v7action.Warnings, error) {
 	fake.getRevisionByApplicationAndVersionMutex.Lock()
 	ret, specificReturn := fake.getRevisionByApplicationAndVersionReturnsOnCall[len(fake.getRevisionByApplicationAndVersionArgsForCall)]
@@ -11182,6 +11280,73 @@ func (fake *FakeActor) GetRevisionByApplicationAndVersionReturnsOnCall(i int, re
 	}
 	fake.getRevisionByApplicationAndVersionReturnsOnCall[i] = struct {
 		result1 resources.Revision
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionLabels(arg1 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getRevisionLabelsMutex.Lock()
+	ret, specificReturn := fake.getRevisionLabelsReturnsOnCall[len(fake.getRevisionLabelsArgsForCall)]
+	fake.getRevisionLabelsArgsForCall = append(fake.getRevisionLabelsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetRevisionLabelsStub
+	fakeReturns := fake.getRevisionLabelsReturns
+	fake.recordInvocation("GetRevisionLabels", []interface{}{arg1})
+	fake.getRevisionLabelsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRevisionLabelsCallCount() int {
+	fake.getRevisionLabelsMutex.RLock()
+	defer fake.getRevisionLabelsMutex.RUnlock()
+	return len(fake.getRevisionLabelsArgsForCall)
+}
+
+func (fake *FakeActor) GetRevisionLabelsCalls(stub func(string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getRevisionLabelsMutex.Lock()
+	defer fake.getRevisionLabelsMutex.Unlock()
+	fake.GetRevisionLabelsStub = stub
+}
+
+func (fake *FakeActor) GetRevisionLabelsArgsForCall(i int) string {
+	fake.getRevisionLabelsMutex.RLock()
+	defer fake.getRevisionLabelsMutex.RUnlock()
+	argsForCall := fake.getRevisionLabelsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetRevisionLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionLabelsMutex.Lock()
+	defer fake.getRevisionLabelsMutex.Unlock()
+	fake.GetRevisionLabelsStub = nil
+	fake.getRevisionLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionLabelsMutex.Lock()
+	defer fake.getRevisionLabelsMutex.Unlock()
+	fake.GetRevisionLabelsStub = nil
+	if fake.getRevisionLabelsReturnsOnCall == nil {
+		fake.getRevisionLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRevisionLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -19788,8 +19953,12 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getRecentEventsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getRevisionAnnotationsMutex.RLock()
+	defer fake.getRevisionAnnotationsMutex.RUnlock()
 	fake.getRevisionByApplicationAndVersionMutex.RLock()
 	defer fake.getRevisionByApplicationAndVersionMutex.RUnlock()
+	fake.getRevisionLabelsMutex.RLock()
+	defer fake.getRevisionLabelsMutex.RUnlock()
 	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
 	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRootResponseMutex.RLock()

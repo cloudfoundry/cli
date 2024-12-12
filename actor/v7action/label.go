@@ -61,6 +61,11 @@ func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack stri
 	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
+func (actor *Actor) GetRevisionLabels(revisionGUID string) (map[string]types.NullString, Warnings, error) {
+	resource, warnings, err := actor.GetRevisionByGUID(revisionGUID)
+	return actor.extractLabels(resource.Metadata, warnings, err)
+}
+
 func (actor *Actor) extractLabels(metadata *resources.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
 	var labels map[string]types.NullString
 

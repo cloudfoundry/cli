@@ -3,7 +3,8 @@ package resources
 import "code.cloudfoundry.org/cli/types"
 
 type Metadata struct {
-	Labels map[string]types.NullString `json:"labels,omitempty"`
+	Annotations map[string]types.NullString `json:"annotations,omitempty"`
+	Labels      map[string]types.NullString `json:"labels,omitempty"`
 }
 
 type ResourceMetadata struct {

@@ -1,7 +1,11 @@
 package isolated
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -57,7 +61,7 @@ var _ = Describe("revision command", func() {
 		})
 
 		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
+			// helpers.QuickDeleteOrg(orgName)
 		})
 
 		// TODO: #173456870 when app not provided, app does not exist, revision doesn't exist cases
@@ -72,7 +76,28 @@ var _ = Describe("revision command", func() {
 				})
 			})
 
-			FIt("shows details about the revision", func() {
+			It("shows details about the revision", func() {
+				cmd := exec.Command("bash", "-c", "cf revision "+appName+" --version 1 | grep \"revision GUID\" | sed -e 's/.*:\\s*//' -e 's/^[ \\t]*//'")
+				var stdout bytes.Buffer
+				cmd.Stdout = &stdout
+				cmd.Run()
+				revisionGUID := strings.TrimSpace(stdout.String())
+				data := map[string]interface{}{
+					"metadata": map[string]interface{}{
+						"labels": map[string]string{
+							"label": "foo3",
+						},
+						"annotations": map[string]string{
+							"annotation": "foo3",
+						},
+					},
+				}
+				metadata, err := json.Marshal(data)
+				Expect(err).NotTo(HaveOccurred())
+
+				url := "/v3/revisions/" + string(revisionGUID)
+				Eventually(helpers.CF("curl", "-X", "PATCH", url, "-d", string(metadata))).Should(Exit(0))
+
 				session := helpers.CF("revision", appName, "--version", "1")
 				Eventually(session).Should(Exit(0))
 
@@ -87,11 +112,11 @@ var _ = Describe("revision command", func() {
 				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
 				Expect(session).Should(Say(`created on:      \S+\n`))
 
-				// Expect(session).Should(Say(`labels:`))
-				// Expect(session).Should(Say(`label: foo1`))
+				Expect(session).Should(Say(`labels:`))
+				Expect(session).Should(Say(`label:   foo3`))
 
-				// Expect(session).Should(Say(`annotations:`))
-				// Expect(session).Should(Say(`annotation: foo1`))
+				Expect(session).Should(Say(`annotations:`))
+				Expect(session).Should(Say(`annotation:   foo3`))
 
 				Expect(session).Should(Say(`application environment variables:`))
 				Expect(session).Should(Say(`foo:   bar1`))
@@ -109,14 +134,11 @@ var _ = Describe("revision command", func() {
 				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
 				Expect(session).Should(Say(`created on:      \S+\n`))
 
+				Expect(session).Should(Say(`labels:`))
+				Expect(session).Should(Say(`annotations:`))
+
 				Expect(session).Should(Say(`application environment variables:`))
 				Expect(session).Should(Say(`foo:   bar1`))
-
-				// Expect(session).Should(Say(`labels:`))
-				// Expect(session).Should(Say(`label: foo2`))
-
-				// Expect(session).Should(Say(`annotations:`))
-				// Expect(session).Should(Say(`annotation: foo2`))
 			})
 		})
 	})
