@@ -103,3 +103,17 @@ func (actor Actor) GetApplicationRevisionsDeployed(appGUID string) ([]resources.
 
 	return revisions, Warnings(warnings), nil
 }
+
+func (actor Actor) GetEnvironmentVariableGroupByRevision(revision resources.Revision) (EnvironmentVariableGroup, bool, Warnings, error) {
+	envVarApiLink, isPresent := revision.Links["environment_variables"]
+	if !isPresent {
+		return EnvironmentVariableGroup{}, isPresent, Warnings{"Unable to retrieve environment variables for revision."}, nil
+	}
+
+	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByURL(envVarApiLink.HREF)
+	if err != nil {
+		return EnvironmentVariableGroup{}, false, Warnings(warnings), err
+	}
+
+	return EnvironmentVariableGroup(environmentVariables), true, Warnings(warnings), nil
+}
