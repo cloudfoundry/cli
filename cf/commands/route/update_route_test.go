@@ -169,7 +169,7 @@ var _ = Describe("UpdateRoute", func() {
 
 		Context("when a hostname and a path are passed", func() {
 			BeforeEach(func() {
-				err := flagContext.Parse("domain-name", "--hostname", "the-hostname", "the-path", "--path", "the-path")
+				err := flagContext.Parse("domain-name", "--hostname", "the-hostname", "--path", "the-path")
 				Expect(err).NotTo(HaveOccurred())
 				cmd.Requirements(factory, flagContext)
 			})
@@ -183,9 +183,44 @@ var _ = Describe("UpdateRoute", func() {
 			})
 		})
 
-		Context("when the route can be found", func() {
+		Context("when the route can be found an option is passed", func() {
 			BeforeEach(func() {
 				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
+				err := flagContext.Parse("domain-name", "--option", "loadbalancing=round-robin")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to set the given route option", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Setting route option loadbalancing", "for"},
+				))
+			})
+		})
+
+		Context("when the route can be found a remove option is passed", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
+				err := flagContext.Parse("domain-name", "--remove-option", "loadbalancing")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to remove the given route option", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Removing route option loadbalancing", "for"},
+				))
+			})
+		})
+
+		Context("when the route cannot be found", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
+			})
+
+			It("returns an error", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("find-by-host-and-domain-err"))
 			})
 
 			It("tells the user a route with the given domain does not exist", func() {
@@ -193,17 +228,6 @@ var _ = Describe("UpdateRoute", func() {
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Route with domain", "does not exist"},
 				))
-			})
-
-			Context("when the route cannot be found", func() {
-				BeforeEach(func() {
-					routeRepo.FindReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
-				})
-
-				It("returns an error", func() {
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(Equal("find-by-host-and-domain-err"))
-				})
 			})
 		})
 	})
