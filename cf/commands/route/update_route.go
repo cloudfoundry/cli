@@ -1,7 +1,6 @@
 package route
 
 import (
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
 	"fmt"
 	"strings"
@@ -31,26 +30,26 @@ func (cmd *UpdateRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
-	fs["option"] = &flags.StringSliceFlag{Name: "option", ShortName: "o", Usage: T("Set the value of a per-route option")}
-	fs["remove-option"] = &flags.BoolFlag{Name: "remove-option", ShortName: "r", Usage: T("Remove an option with the given name")}
+	fs["option"] = &flags.StringFlag{Name: "option", ShortName: "o", Usage: T("Set the value of a per-route option")}
+	fs["remove-option"] = &flags.StringFlag{Name: "remove-option", ShortName: "r", Usage: T("Remove an option with the given name")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "update-route",
-		Description: T("Update an existing route"),
+		Description: T("Update an existing HTTP route"),
 		Usage: []string{
-			fmt.Sprintf("%s:\n", T("Update an existing route")),
+			fmt.Sprintf("%s:\n", T("Update an existing HTTP route")),
 			"      CF_NAME update-route ",
 			fmt.Sprintf("%s ", T("DOMAIN")),
 			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
-			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
-			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
-			fmt.Sprintf("[--remove-option %s]\n\n", T("OPTION‚")),
+			fmt.Sprintf("[--path %s] ", T("PATH")),
+			fmt.Sprintf("[--option %s=%s] ", T("OPTION"), T("VALUE")),
+			fmt.Sprintf("[--remove-option %s]\n\n", T("OPTION")),
 		},
 		Examples: []string{
 			"CF_NAME update-route example.com -o loadbalancing=round-robin",
 			"CF_NAME update-route example.com -o loadbalancing=least-connection",
 			"CF_NAME update-route example.com -r loadbalancing",
-			"CF_NAME map-route my-app example.com --hostname myhost --path foo -o loadbalancing=round-robin",
+			"CF_NAME update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin",
 		},
 		Flags: fs,
 	}
@@ -103,20 +102,21 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 
 	route, err := cmd.routeRepo.Find(host, domainFields, path, 0)
 	if err != nil {
-		if _, ok := err.(*errors.ModelNotFoundError); ok {
-			cmd.ui.Failed(T("Route with domain '{{.URL}}' does not exist.",
-				map[string]interface{}{"URL": url}))
-			return nil
-		}
+		cmd.ui.Failed(T("Route with domain '{{.URL}}' does not exist.",
+			map[string]interface{}{"URL": url}))
 		return err
 	}
 
 	if c.IsSet("o") {
 		key, value, found := strings.Cut(option, "=")
 		if found {
-			cmd.ui.Say(T("Setting route option {{.Option}} for {{.URL}}...", map[string]interface{}{
+			cmd.ui.Say(T("Setting route option {{.Option}} for {{.URL}} to {{.Value}}...", map[string]interface{}{
 				"Option": terminal.EntityNameColor(key),
+				"Value":  terminal.EntityNameColor(value),
 				"URL":    terminal.EntityNameColor(url)}))
+			if route.Options == nil {
+				route.Options = make(map[string]string)
+			}
 			route.Options[key] = value
 		} else {
 			cmd.ui.Say(T("Wrong route option format {{.Option}} for {{.URL}}", map[string]interface{}{
@@ -126,10 +126,17 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	}
 
 	if c.IsSet("r") {
-		cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
-			"Option": terminal.EntityNameColor(removeOption),
-			"URL":    terminal.EntityNameColor(url)}))
-		delete(route.Options, removeOption)
+		if _, ok := route.Options[removeOption]; ok {
+			cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
+				"Option": terminal.EntityNameColor(removeOption),
+				"URL":    terminal.EntityNameColor(url)}))
+
+			delete(route.Options, removeOption)
+		} else {
+			cmd.ui.Say(T("No route option {{.Option}} for {{.URL}}", map[string]interface{}{
+				"Option": terminal.EntityNameColor(removeOption),
+				"URL":    terminal.EntityNameColor(url)}))
+		}
 	}
 
 	cmd.ui.Ok()

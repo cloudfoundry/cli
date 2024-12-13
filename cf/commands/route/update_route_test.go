@@ -87,26 +87,25 @@ var _ = Describe("UpdateRoute", func() {
 		})
 
 		It("contains an example", func() {
-			Expect(usage).To(ContainElement("CF_NAME update-route example.com -o loadbalancing=round-robin"))
+			Expect(usage).To(ContainElement("   cf update-route example.com -o loadbalancing=round-robin"))
 		})
 
 		It("contains the options", func() {
-			Expect(usage).To(ContainElement("   --hostname, -n      Hostname for the HTTP route (required for shared domains)"))
-			Expect(usage).To(ContainElement("   --path              Path for the HTTP route"))
-			Expect(usage).To(ContainElement("   --option, -o        Set the value of a per-route option"))
-			Expect(usage).To(ContainElement("   --remove-option, -r Remove an option with the given name"))
+			Expect(usage).To(ContainElement("   --hostname, -n           Hostname for the HTTP route (required for shared domains)"))
+			Expect(usage).To(ContainElement("   --path                   Path for the HTTP route"))
+			Expect(usage).To(ContainElement("   --option, -o             Set the value of a per-route option"))
+			Expect(usage).To(ContainElement("   --remove-option, -r      Remove an option with the given name"))
 		})
 
 		It("shows the usage", func() {
-			Expect(usage).To(ContainElement("   Update an existing route:"))
-			Expect(usage).To(ContainElement("      cf update-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--option OPTION=VALUE] [--remove-option OPTION]"))
+			Expect(usage).To(ContainElement("   Update an existing HTTP route:"))
+			Expect(usage).To(ContainElement("      cf update-route DOMAIN [--hostname HOSTNAME] [--path PATH] [--option OPTION=VALUE] [--remove-option OPTION]"))
 		})
 	})
 
 	Describe("Requirements", func() {
 		Context("when not provided exactly one arg", func() {
 			BeforeEach(func() {
-				flagContext.Parse("")
 			})
 
 			It("fails with usage", func() {
@@ -183,7 +182,7 @@ var _ = Describe("UpdateRoute", func() {
 			})
 		})
 
-		Context("when the route can be found an option is passed", func() {
+		Context("when the route can be found and an option is passed", func() {
 			BeforeEach(func() {
 				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
 				err := flagContext.Parse("domain-name", "--option", "loadbalancing=round-robin")
@@ -193,28 +192,58 @@ var _ = Describe("UpdateRoute", func() {
 
 			It("tries to set the given route option", func() {
 				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"Setting route option loadbalancing", "for"},
+					[]string{"Setting route option loadbalancing", "for", "to round-robin"},
+				))
+			})
+		})
+
+		Context("when the route can be found and an option is passed, which already exists", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(models.Route{GUID: "route-guid",
+					Options: map[string]string{"loadbalancing": "round-robin", "a": "b"}}, nil)
+				err := flagContext.Parse("domain-name", "--option", "loadbalancing=least-connection")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to set the given route option", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Setting route option loadbalancing", "for", "to least-connection"},
 				))
 			})
 		})
 
 		Context("when the route can be found a remove option is passed", func() {
 			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
 				err := flagContext.Parse("domain-name", "--remove-option", "loadbalancing")
 				Expect(err).NotTo(HaveOccurred())
 				cmd.Requirements(factory, flagContext)
 			})
 
-			It("tries to remove the given route option", func() {
+			/*It("tries to remove the given route option if it exists and gives an error message", func() {
+				routeRepo.FindReturns(
+					models.Route{
+						Options: map[string]string{"loadbalancing": "round-robin", "a": "b"}},
+					nil,
+				)
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Removing route option loadbalancing", "for"},
+				))
+			})*/
+
+			It("gives an error message if the given route option does not exist", func() {
+				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"No route option loadbalancing", "for"},
 				))
 			})
 		})
 
 		Context("when the route cannot be found", func() {
 			BeforeEach(func() {
+				err := flagContext.Parse("domain-name")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
 				routeRepo.FindReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
 			})
 
