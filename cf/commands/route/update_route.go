@@ -38,7 +38,7 @@ func (cmd *UpdateRoute) MetaData() commandregistry.CommandMetadata {
 		Name:        "update-route",
 		Description: T("Update an existing route"),
 		Usage: []string{
-			fmt.Sprintf("%s:\n", T("Update an existing HTTP route")),
+			fmt.Sprintf("%s:\n", T("Update an existing route")),
 			"      CF_NAME update-route ",
 			fmt.Sprintf("%s ", T("DOMAIN")),
 			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
@@ -104,7 +104,7 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	route, err := cmd.routeRepo.Find(host, domainFields, path, 0)
 	if err != nil {
 		if _, ok := err.(*errors.ModelNotFoundError); ok {
-			cmd.ui.Warn(T("Route with domain '{{.URL}}' does not exist.",
+			cmd.ui.Failed(T("Route with domain '{{.URL}}' does not exist.",
 				map[string]interface{}{"URL": url}))
 			return nil
 		}
