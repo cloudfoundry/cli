@@ -257,6 +257,23 @@ var _ = Describe("revision Command", func() {
 					})
 				})
 			})
+
+			When("there are no revisions available", func() {
+				BeforeEach(func() {
+					revision := resources.Revision{
+						Version: 120,
+					}
+					fakeActor.GetRevisionByApplicationAndVersionReturns(
+						revision,
+						nil,
+						errors.New("Revision 120 not found"),
+					)
+				})
+
+				It("returns 'revision not found'", func() {
+					Expect(executeErr).To(MatchError("Revision 120 not found"))
+				})
+			})
 		})
 	})
 })

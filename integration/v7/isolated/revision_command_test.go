@@ -63,7 +63,24 @@ var _ = Describe("revision command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		// TODO: #173456870 when app not provided, app does not exist, revision doesn't exist cases
+		When("the requested revision version does not exist", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+					Eventually(helpers.CF("set-env", appName, "foo", "bar1")).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+				})
+			})
+			It("displays revision not found", func() {
+				session := helpers.CF("revision", appName, "--version", "125")
+				Eventually(session).Should(Exit(1))
+
+				Expect(session).Should(Say(
+					fmt.Sprintf("Showing revision 125 for app %s in org %s / space %s as %s...", appName, orgName, spaceName, username),
+				))
+				Expect(session.Err).Should(Say("Revision '125' not found"))
+			})
+		})
 
 		When("the requested app and revision both exist", func() {
 			BeforeEach(func() {
