@@ -39,12 +39,26 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	app, _, _ := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
-	deployedRevisions, _, _ := cmd.Actor.GetApplicationRevisionsDeployed(app.GUID)
-	revision, _, _ := cmd.Actor.GetRevisionByApplicationAndVersion(
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	deployedRevisions, warnings, err := cmd.Actor.GetApplicationRevisionsDeployed(app.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(
 		app.GUID,
 		cmd.Version.Value,
 	)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
 	isDeployed := revisionDeployed(revision, deployedRevisions)
 
 	cmd.displayBasicRevisionInfo(revision, isDeployed)
