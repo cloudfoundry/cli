@@ -18,11 +18,6 @@ type RouteEntity struct {
 	Options         map[string]string       `json:"options"`
 }
 
-/*type RouteOptions struct {
-	LoadBalancing string `json:"load_balancing"`
-	SessionCookie string `json:"session_cookie"`
-}*/
-
 func (resource RouteResource) ToFields() (fields models.Route) {
 	fields.GUID = resource.Metadata.GUID
 	fields.Host = resource.Entity.Host
