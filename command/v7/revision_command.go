@@ -67,6 +67,9 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	cmd.UI.DisplayHeader("labels:")
 	labels, warnings, err := cmd.Actor.GetRevisionLabels(revision.GUID)
 	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
 
 	if len(labels) > 0 {
 		cmd.displayMetaData(labels)
@@ -76,6 +79,9 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	cmd.UI.DisplayHeader("annotations:")
 	annotations, warnings, err := cmd.Actor.GetRevisionAnnotations(revision.GUID)
 	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
 
 	if len(annotations) > 0 {
 		cmd.displayMetaData(annotations)
