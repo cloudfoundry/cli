@@ -97,7 +97,10 @@ var _ = Describe("revision command", func() {
 				cmd := exec.Command("bash", "-c", "cf revision "+appName+" --version 1 | grep \"revision GUID\" | sed -e 's/.*:\\s*//' -e 's/^[ \\t]*//'")
 				var stdout bytes.Buffer
 				cmd.Stdout = &stdout
-				cmd.Run()
+				err := cmd.Run()
+				if err != nil {
+					return
+				}
 				revisionGUID := strings.TrimSpace(stdout.String())
 				data := map[string]interface{}{
 					"metadata": map[string]interface{}{
