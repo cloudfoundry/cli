@@ -19,7 +19,7 @@ const tcp = "tcp"
 
 type RouteActor interface {
 	CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error)
-	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error)
+	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, option string) (models.Route, error)
 	BindRoute(app models.Application, route models.Route) error
 	UnbindAll(app models.Application) error
 	FindDomain(routeName string) (string, models.DomainFields, error)
@@ -47,7 +47,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 		"Domain": terminal.EntityNameColor(domain.Name),
 	}) + "...")
 
-	route, err := routeActor.routeRepo.Create("", domain, "", 0, true)
+	route, err := routeActor.routeRepo.Create("", domain, "", 0, true, "")
 	if err != nil {
 		return models.Route{}, err
 	}
@@ -55,7 +55,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 	return route, nil
 }
 
-func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error) {
+func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, option string) (models.Route, error) {
 	var route models.Route
 	var err error
 	//if tcp route use random port should skip route lookup
@@ -84,7 +84,7 @@ func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.Do
 					}),
 			)
 
-			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, false)
+			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, false, option)
 		}
 
 		routeActor.ui.Ok()
@@ -223,7 +223,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 		return err
 	}
 
-	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute)
+	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute, "")
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 type FakeCreator struct {
-	CreateRouteStub        func(string, string, int, bool, models.DomainFields, models.SpaceFields) (models.Route, error)
+	CreateRouteStub        func(string, string, int, bool, models.DomainFields, models.SpaceFields, string) (models.Route, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
@@ -18,6 +18,7 @@ type FakeCreator struct {
 		arg4 bool
 		arg5 models.DomainFields
 		arg6 models.SpaceFields
+		arg7 string
 	}
 	createRouteReturns struct {
 		result1 models.Route
@@ -31,7 +32,7 @@ type FakeCreator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bool, arg5 models.DomainFields, arg6 models.SpaceFields) (models.Route, error) {
+func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bool, arg5 models.DomainFields, arg6 models.SpaceFields, arg7 string) (models.Route, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -41,11 +42,12 @@ func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bo
 		arg4 bool
 		arg5 models.DomainFields
 		arg6 models.SpaceFields
-	}{arg1, arg2, arg3, arg4, arg5, arg6})
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+		arg7 string
+	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -60,7 +62,7 @@ func (fake *FakeCreator) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeCreator) CreateRouteCalls(stub func(string, string, int, bool, models.DomainFields, models.SpaceFields) (models.Route, error)) {
+func (fake *FakeCreator) CreateRouteCalls(stub func(string, string, int, bool, models.DomainFields, models.SpaceFields, string) (models.Route, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
