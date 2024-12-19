@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
 )
@@ -37,6 +38,8 @@ func NewRepositoryWithDefaults() coreconfig.Repository {
 		Name: "my-org",
 		GUID: "my-org-guid",
 	})
+
+	configRepo.SetAPIVersion(ccversion.MinVersionPerRouteOpts)
 
 	return configRepo
 }
