@@ -95,6 +95,17 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	removeOption := c.String("r")
 	port := 0
 
+	if option != "" {
+		err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
+		if err != nil {
+			cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
+				"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
+				"APIVersion":          cmd.config.APIVersion(),
+				"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
+			}))
+		}
+	}
+
 	url := (&models.RoutePresenter{
 		Host:   host,
 		Domain: domain,

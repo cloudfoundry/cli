@@ -1,6 +1,7 @@
 package route
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -9,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/command"
 	"fmt"
 )
 
@@ -112,6 +114,17 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
 	option := c.String("o")
+
+	if option != "" {
+		err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
+		if err != nil {
+			cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
+				"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
+				"APIVersion":          cmd.config.APIVersion(),
+				"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
+			}))
+		}
+	}
 	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields, option)
 	if err != nil {
 		return err
