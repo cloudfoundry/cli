@@ -136,8 +136,6 @@ func (cmd HelpCommand) displayHelpFooter(cmdInfo map[string]sharedaction.Command
 	cmd.UI.DisplayNonWrappingTable(sharedaction.AllCommandsIndent, cmd.globalOptionsTableData(), 25)
 
 	cmd.UI.DisplayNewline()
-
-	cmd.displayCommandGroups(internal.ExperimentalHelpCategoryList, cmdInfo, 34)
 }
 
 func (cmd HelpCommand) displayCommonCommands() {
