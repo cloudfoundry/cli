@@ -91,6 +91,18 @@ type FakeConfig struct {
 	cFUsernameReturnsOnCall map[int]struct {
 		result1 string
 	}
+	CNBCredentialsStub        func() (map[string]interface{}, error)
+	cNBCredentialsMutex       sync.RWMutex
+	cNBCredentialsArgsForCall []struct {
+	}
+	cNBCredentialsReturns struct {
+		result1 map[string]interface{}
+		result2 error
+	}
+	cNBCredentialsReturnsOnCall map[int]struct {
+		result1 map[string]interface{}
+		result2 error
+	}
 	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct {
@@ -1065,6 +1077,62 @@ func (fake *FakeConfig) CFUsernameReturnsOnCall(i int, result1 string) {
 	fake.cFUsernameReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeConfig) CNBCredentials() (map[string]interface{}, error) {
+	fake.cNBCredentialsMutex.Lock()
+	ret, specificReturn := fake.cNBCredentialsReturnsOnCall[len(fake.cNBCredentialsArgsForCall)]
+	fake.cNBCredentialsArgsForCall = append(fake.cNBCredentialsArgsForCall, struct {
+	}{})
+	stub := fake.CNBCredentialsStub
+	fakeReturns := fake.cNBCredentialsReturns
+	fake.recordInvocation("CNBCredentials", []interface{}{})
+	fake.cNBCredentialsMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeConfig) CNBCredentialsCallCount() int {
+	fake.cNBCredentialsMutex.RLock()
+	defer fake.cNBCredentialsMutex.RUnlock()
+	return len(fake.cNBCredentialsArgsForCall)
+}
+
+func (fake *FakeConfig) CNBCredentialsCalls(stub func() (map[string]interface{}, error)) {
+	fake.cNBCredentialsMutex.Lock()
+	defer fake.cNBCredentialsMutex.Unlock()
+	fake.CNBCredentialsStub = stub
+}
+
+func (fake *FakeConfig) CNBCredentialsReturns(result1 map[string]interface{}, result2 error) {
+	fake.cNBCredentialsMutex.Lock()
+	defer fake.cNBCredentialsMutex.Unlock()
+	fake.CNBCredentialsStub = nil
+	fake.cNBCredentialsReturns = struct {
+		result1 map[string]interface{}
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeConfig) CNBCredentialsReturnsOnCall(i int, result1 map[string]interface{}, result2 error) {
+	fake.cNBCredentialsMutex.Lock()
+	defer fake.cNBCredentialsMutex.Unlock()
+	fake.CNBCredentialsStub = nil
+	if fake.cNBCredentialsReturnsOnCall == nil {
+		fake.cNBCredentialsReturnsOnCall = make(map[int]struct {
+			result1 map[string]interface{}
+			result2 error
+		})
+	}
+	fake.cNBCredentialsReturnsOnCall[i] = struct {
+		result1 map[string]interface{}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
@@ -3968,6 +4036,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.cFPasswordMutex.RUnlock()
 	fake.cFUsernameMutex.RLock()
 	defer fake.cFUsernameMutex.RUnlock()
+	fake.cNBCredentialsMutex.RLock()
+	defer fake.cNBCredentialsMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()

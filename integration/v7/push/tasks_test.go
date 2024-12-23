@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("push with --task", func() {
@@ -19,7 +18,7 @@ var _ = Describe("push with --task", func() {
 		appName = helpers.NewAppName()
 		helpers.WithHelloWorldApp(func(dir string) {
 			session := helpers.CF("push", appName, "-p", dir, "--task")
-			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(gexec.Exit(0))
 		})
 	})
 
@@ -28,7 +27,7 @@ var _ = Describe("push with --task", func() {
 
 		BeforeEach(func() {
 			session = helpers.CF("app", appName)
-			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(gexec.Exit(0))
 		})
 
 		It("pushes the app without starting it", func() {

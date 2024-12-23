@@ -25,6 +25,16 @@ func (client *Client) CreateApplicationTask(appGUID string, task resources.Task)
 func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]resources.Task, Warnings, error) {
 	var tasks []resources.Task
 
+	foundPerPageQuery := false
+	for _, keyVal := range query {
+		if keyVal.Key == PerPage {
+			foundPerPageQuery = true
+		}
+	}
+	if !foundPerPageQuery {
+		query = append(query, Query{Key: PerPage, Values: []string{MaxPerPage}})
+	}
+
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},

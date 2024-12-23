@@ -16,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/api/logcache"
 	"code.cloudfoundry.org/cli/v8/cf/errors"
 	"code.cloudfoundry.org/cli/v8/command"
@@ -88,6 +89,7 @@ type PushCommand struct {
 	HealthCheckHTTPEndpoint string                              `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	HealthCheckType         flag.HealthCheckType                `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
+	Lifecycle               constant.AppLifecycleType           `long:"lifecycle" description:"App lifecycle type to stage and run the app" default:""`
 	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	MaxInFlight             *int                                `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
@@ -106,7 +108,7 @@ type PushCommand struct {
 	Vars                    []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	dockerPassword          interface{}                         `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
-	usage                   interface{}                         `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n \n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route ]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]..."`
+	usage                   interface{}                         `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--lifecycle (buildpack | docker | cnb)] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n \n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start] [--no-wait] [-i NUM_INSTANCES]\n   [-k DISK] [-m MEMORY] [-l LOG_RATE_LIMIT] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [--task TASK]\n   [-u (process | port | http)] [--no-route | --random-route ]\n   [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]..."`
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
@@ -164,12 +166,22 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCNB)
+	if flagOverrides.Lifecycle != "" && err != nil {
+		return err
+	}
+
 	err = cmd.ValidateFlags()
 	if err != nil {
 		return err
 	}
 
 	baseManifest, err := cmd.GetBaseManifest(flagOverrides)
+	if err != nil {
+		return err
+	}
+
+	flagOverrides.CNBCredentials, err = cmd.Config.CNBCredentials()
 	if err != nil {
 		return err
 	}
@@ -238,6 +250,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		transformedManifest,
 		flagOverrides,
 	)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -363,11 +376,70 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		NoManifest:          cmd.NoManifest,
 		Task:                cmd.Task,
 		LogRateLimit:        cmd.LogRateLimit,
+		Lifecycle:           cmd.Lifecycle,
 	}, nil
 }
 
 func (cmd PushCommand) ValidateFlags() error {
 	switch {
+	// Lifecycle buildpack requested
+	case cmd.Lifecycle == constant.AppLifecycleTypeBuildpack && cmd.DockerImage.Path != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle buildpack",
+				"--docker-image, -o",
+			},
+		}
+
+	case cmd.Lifecycle == constant.AppLifecycleTypeBuildpack && cmd.DockerUsername != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle buildpack",
+				"--docker-username",
+			},
+		}
+
+	// Lifecycle docker requested
+	case cmd.Lifecycle == constant.AppLifecycleTypeDocker && cmd.Buildpacks != nil:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle docker",
+				"--buildpack, -b",
+			},
+		}
+
+	case cmd.Lifecycle == constant.AppLifecycleTypeDocker && cmd.Stack != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle docker",
+				"--stack, -s",
+			},
+		}
+	case cmd.Lifecycle == constant.AppLifecycleTypeDocker && cmd.DropletPath != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle docker",
+				"--droplet",
+			},
+		}
+
+	// Lifecycle cnb requested
+	case cmd.Lifecycle == constant.AppLifecycleTypeCNB && cmd.DockerImage.Path != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle cnb",
+				"--docker-image, -o",
+			},
+		}
+
+	case cmd.Lifecycle == constant.AppLifecycleTypeCNB && cmd.DockerUsername != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--lifecycle cnb",
+				"--docker-username",
+			},
+		}
+
 	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
 		return translatableerror.RequiredFlagsError{
 			Arg1: "--docker-image, -o",

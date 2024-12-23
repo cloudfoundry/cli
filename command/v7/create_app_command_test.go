@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/command/commandfakes"
 	"code.cloudfoundry.org/cli/v8/command/flag"
+    "code.cloudfoundry.org/cli/v8/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/v8/command/v7"
 	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v8/resources"
@@ -124,6 +125,33 @@ var _ = Describe("create-app Command", func() {
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
 			})
+
+			When("app type is cnb", func() {
+				BeforeEach(func() {
+					cmd.AppType = "cnb"
+					cmd.Buildpacks = []string{"foo"}
+					fakeConfig.CNBCredentialsReturns(map[string]interface{}{
+						"foo": "bar",
+					}, nil)
+					fakeConfig.APIVersionReturns(ccversion.MinVersionCNB)
+				})
+
+				It("creates an app with app type: cnb", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
+					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+					Expect(createApp).To(Equal(resources.Application{
+						Name:                app,
+						LifecycleType:       constant.AppLifecycleTypeCNB,
+						LifecycleBuildpacks: []string{"foo"},
+						Credentials: map[string]interface{}{
+							"foo": "bar",
+						},
+					}))
+					Expect(createSpaceGUID).To(Equal("some-space-guid"))
+				})
+			})
 		})
 
 		When("the create is unsuccessful", func() {
@@ -166,6 +194,19 @@ var _ = Describe("create-app Command", func() {
 
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
+				})
+			})
+
+			Context("due to missing buildpacks when AppType is cnb", func() {
+				BeforeEach(func() {
+					cmd.AppType = "cnb"
+					fakeConfig.APIVersionReturns(ccversion.MinVersionCNB)
+				})
+
+				It("displays the header and error", func() {
+					Expect(executeErr).To(MatchError("buildpack(s) must be provided when using --app-type cnb"))
+
+					Expect(testUI.Out).To(Say("Creating app some-app in org some-org / space some-space as banana..."))
 				})
 			})
 		})

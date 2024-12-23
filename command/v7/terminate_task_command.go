@@ -10,7 +10,7 @@ type TerminateTaskCommand struct {
 
 	RequiredArgs    flag.TerminateTaskArgs `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`
-	relatedCommands interface{}            `related_commands:"tasks"`
+	relatedCommands interface{}            `related_commands:"tasks, task"`
 }
 
 func (cmd TerminateTaskCommand) Execute(args []string) error {

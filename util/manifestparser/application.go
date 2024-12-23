@@ -16,22 +16,23 @@ type Docker struct {
 // add a field for the CLI to extract from the manifest, just add it to this
 // struct.
 type Application struct {
-	Name                    string                   `yaml:"name"`
-	DiskQuota               string                   `yaml:"disk-quota,omitempty"`
-	Docker                  *Docker                  `yaml:"docker,omitempty"`
-	HealthCheckType         constant.HealthCheckType `yaml:"health-check-type,omitempty"`
-	HealthCheckEndpoint     string                   `yaml:"health-check-http-endpoint,omitempty"`
-	HealthCheckTimeout      int64                    `yaml:"timeout,omitempty"`
-	Instances               *int                     `yaml:"instances,omitempty"`
-	Path                    string                   `yaml:"path,omitempty"`
-	Processes               []Process                `yaml:"processes,omitempty"`
-	Memory                  string                   `yaml:"memory,omitempty"`
-	NoRoute                 bool                     `yaml:"no-route,omitempty"`
-	RandomRoute             bool                     `yaml:"random-route,omitempty"`
-	DefaultRoute            bool                     `yaml:"default-route,omitempty"`
-	Stack                   string                   `yaml:"stack,omitempty"`
-	LogRateLimit            string                   `yaml:"log-rate-limit-per-second,omitempty"`
-	RemainingManifestFields map[string]interface{}   `yaml:"-,inline"`
+	Name                    string                    `yaml:"name"`
+	DiskQuota               string                    `yaml:"disk-quota,omitempty"`
+	Docker                  *Docker                   `yaml:"docker,omitempty"`
+	HealthCheckType         constant.HealthCheckType  `yaml:"health-check-type,omitempty"`
+	HealthCheckEndpoint     string                    `yaml:"health-check-http-endpoint,omitempty"`
+	HealthCheckTimeout      int64                     `yaml:"timeout,omitempty"`
+	Instances               *int                      `yaml:"instances,omitempty"`
+	Path                    string                    `yaml:"path,omitempty"`
+	Processes               []Process                 `yaml:"processes,omitempty"`
+	Memory                  string                    `yaml:"memory,omitempty"`
+	NoRoute                 bool                      `yaml:"no-route,omitempty"`
+	RandomRoute             bool                      `yaml:"random-route,omitempty"`
+	DefaultRoute            bool                      `yaml:"default-route,omitempty"`
+	Stack                   string                    `yaml:"stack,omitempty"`
+	LogRateLimit            string                    `yaml:"log-rate-limit-per-second,omitempty"`
+	Lifecycle               constant.AppLifecycleType `yaml:"lifecycle,omitempty"`
+	RemainingManifestFields map[string]interface{}    `yaml:"-,inline"`
 }
 
 func (application Application) HasBuildpacks() bool {

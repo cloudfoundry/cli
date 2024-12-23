@@ -162,6 +162,7 @@ func (actor Actor) CreateApplicationInSpace(app resources.Application, spaceGUID
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
 			StackName:           app.StackName,
 			Name:                app.Name,
+			Credentials:         app.Credentials,
 			SpaceGUID:           spaceGUID,
 		})
 

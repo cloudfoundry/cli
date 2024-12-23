@@ -1,6 +1,7 @@
 package v7
 
 import (
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	"code.cloudfoundry.org/cli/v8/resources"
@@ -43,7 +44,16 @@ func (cmd CreateUserProvidedServiceCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.CreateUserProvidedServiceInstance(serviceInstance)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+	case ccerror.ServiceInstanceNameTakenError:
+		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} already exists",
+			map[string]interface{}{
+				"ServiceInstanceName": serviceInstance.Name,
+			})
+		cmd.UI.DisplayOK()
+		return nil
+	default:
 		return err
 	}
 

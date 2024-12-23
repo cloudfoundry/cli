@@ -87,7 +87,7 @@ var _ = Describe("unbind-route-service command", func() {
 			var receiver struct {
 				Resources []resources.RouteBinding `json:"resources"`
 			}
-			helpers.Curl(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
+			helpers.Curlf(&receiver, "/v3/service_route_bindings?service_instance_names=%s", serviceInstanceName)
 			return len(receiver.Resources)
 		}
 

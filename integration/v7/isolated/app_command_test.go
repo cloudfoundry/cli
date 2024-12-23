@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/v8/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
@@ -215,7 +216,7 @@ applications:
 						} `json:"resources"`
 					}
 
-					helpers.Curl(&AppInfo, "/v3/apps?names=%s", appName)
+					helpers.Curlf(&AppInfo, "/v3/apps?names=%s", appName)
 					appGUID = AppInfo.Resources[0].GUID
 				})
 
@@ -403,6 +404,21 @@ applications:
 					It("does not display buildpack", func() {
 						session := helpers.CF("app", appName)
 						Consistently(session).ShouldNot(Say("buildpacks?:"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the app is a CNB app", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionCNB)
+						helpers.WithJSHelloWorld(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://gcr.io/paketo-buildpacks/nodejs:latest")).Should(Exit())
+						})
+					})
+
+					It("displays the app buildpacks", func() {
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say(`paketo-buildpacks\/nodejs`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

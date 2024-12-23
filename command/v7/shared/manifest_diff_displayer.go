@@ -183,10 +183,20 @@ func redactDiff(diff resources.Diff) resources.Diff {
 	return diff
 }
 
+func redactCNBCredentials(diff resources.Diff) resources.Diff {
+	if strings.HasSuffix(diff.Path, "cnb-credentials") {
+		diff.Value = "[PRIVATE DATA HIDDEN]"
+	}
+
+	return diff
+}
+
 func (display *ManifestDiffDisplayer) formatDiff(field string, diff resources.Diff, depth int, addHyphen bool) {
 	if display.RedactEnv {
 		diff = redactDiff(diff)
 	}
+
+	diff = redactCNBCredentials(diff)
 	addHyphen = isInt(field) || addHyphen
 	switch diff.Op {
 	case resources.AddOperation:

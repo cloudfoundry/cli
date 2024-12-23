@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/v8/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
@@ -59,7 +60,7 @@ var _ = Describe("create-app command", func() {
 		It("tells the user that the app type is incorrect, prints help text, and exits 1", func() {
 			session := helpers.CF("create-app", appName, "--app-type", "unknown-app-type")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `unknown-app-type' for option `--app-type'. Allowed values are: buildpack or docker"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `unknown-app-type' for option `--app-type'. Allowed values are: buildpack, docker or cnb"))
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
@@ -103,6 +104,19 @@ var _ = Describe("create-app command", func() {
 
 					session = helpers.CF("app", appName)
 					Eventually(session).Should(Say("docker image:"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("creates the app with the cnb app type", func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionCNB)
+					session := helpers.CF("create-app", appName, "--app-type", "cnb", "-b", "docker://foobar.test")
+					userName, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Creating app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("app", appName)
+					Eventually(session).ShouldNot(Say("docker image:"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
