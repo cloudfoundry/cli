@@ -2,13 +2,11 @@ package plugin_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/v7/cf/actors/pluginrepo/pluginrepofakes"
@@ -81,15 +79,15 @@ var _ = Describe("Install", func() {
 		if err != nil {
 			panic(err)
 		}
-		test_1 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe")
-		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
+		test_1 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1", "test_1.exe")
+		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2", "test_2.exe")
 		test_curDir = filepath.Join("test_1.exe")
-		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
-		test_with_orgs = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs.exe")
-		test_with_orgs_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs_short_name.exe")
-		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts.exe")
+		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help", "test_with_help.exe")
+		test_with_orgs = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs", "test_with_orgs.exe")
+		test_with_orgs_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs_short_name", "test_with_orgs_short_name.exe")
+		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts", "alias_conflicts.exe")
 
-		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")
+		homeDir, err = os.MkdirTemp(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
 		pluginDir = filepath.Join(homeDir, ".cf", "plugins")
@@ -97,7 +95,7 @@ var _ = Describe("Install", func() {
 
 		curDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
-		pluginFile, err = ioutil.TempFile("./", "test_plugin")
+		pluginFile, err = os.CreateTemp("./", "test_plugin")
 		Expect(err).ToNot(HaveOccurred())
 
 		if runtime.GOOS != "windows" {
@@ -542,7 +540,7 @@ var _ = Describe("Install", func() {
 				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Installing plugin"},
-					[]string{"The file ", strings.Trim(pluginFile.Name(), "./"), "already exists"},
+					[]string{"The file", filepath.Clean(pluginFile.Name()), "already exists"},
 					[]string{"FAILED"},
 				))
 			})
@@ -560,7 +558,7 @@ var _ = Describe("Install", func() {
 			curDir, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
 
-			err = os.Chdir("../../../fixtures/plugins")
+			err = os.Chdir("../../../fixtures/plugins/test_1")
 			Expect(err).ToNot(HaveOccurred())
 
 			runCommand(test_curDir, "-f")

@@ -57,9 +57,9 @@ tmp/
 fixtures/.cf
 
 #Compiled Plugins
-fixtures/plugins/test_1
-fixtures/plugins/test_2
-fixtures/plugins/empty_plugin
+fixtures/plugins/test_1/test_1
+fixtures/plugins/test_2/test_2
+fixtures/plugins/empty_plugin/empty_plugin
 fixtures/config/plugin-config/.cf/plugins/test_1
 fixtures/config/plugin-config/.cf/plugins/test_2
 fixtures/config/plugin-config/.cf/plugins/empty_plugin

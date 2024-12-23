@@ -114,7 +114,7 @@ var _ = Describe("create-shared-domain command", func() {
 							}
 						}
 
-						helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
+						helpers.Curlf(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
 						Expect(sharedDomainResponse.Resources).To(HaveLen(1))
 						isInternal := sharedDomainResponse.Resources[0].Entity.Internal
 						Expect(isInternal).To(BeTrue())
@@ -162,13 +162,13 @@ var _ = Describe("create-shared-domain command", func() {
 						}
 					}
 
-					helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
+					helpers.Curlf(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
 					Expect(sharedDomainResponse.Resources).To(HaveLen(1))
 					currentRouterGroupGUID := sharedDomainResponse.Resources[0].Entity.RouterGroupGUID
 
 					var routerGroupListResponse []struct{ GUID string }
 
-					helpers.Curl(&routerGroupListResponse, "/routing/v1/router_groups?name=%s", routerGroupName)
+					helpers.Curlf(&routerGroupListResponse, "/routing/v1/router_groups?name=%s", routerGroupName)
 					Expect(routerGroupListResponse).To(HaveLen(1))
 					expectedRouterGroupGUID := routerGroupListResponse[0].GUID
 					Expect(currentRouterGroupGUID).Should(Equal(expectedRouterGroupGUID))
