@@ -3,8 +3,8 @@ package v7
 import (
 	"strconv"
 
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
 type TaskCommand struct {

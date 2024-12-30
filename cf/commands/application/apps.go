@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/flags"
 	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 	"code.cloudfoundry.org/cli/v8/cf/models"
-    plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"

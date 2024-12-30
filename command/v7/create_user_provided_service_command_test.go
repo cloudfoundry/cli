@@ -3,7 +3,7 @@ package v7_test
 import (
 	"errors"
 
-    "code.cloudfoundry.org/cli/v8api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/types"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"

@@ -25,7 +25,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/util/utilfakes"
 	"code.cloudfoundry.org/cli/v8/plugin"
 
-	clipr "code.cloudfoundry.org/cli/v8-plugin-repo/web"
+	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
 
 	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
