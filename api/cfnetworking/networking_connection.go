@@ -70,9 +70,10 @@ func (*NetworkingConnection) processRequestErrors(request *http.Request, err err
 				URL: request.URL.String(),
 			}
 		}
-		if errors.As(err, &x509.HostnameError{}) {
+		hostnameError := x509.HostnameError{}
+		if errors.As(err, &hostnameError) {
 			return networkerror.SSLValidationHostnameError{
-				Message: err.Error(),
+				Message: hostnameError.Error(),
 			}
 		}
 		return networkerror.RequestError{Err: err}
