@@ -1,8 +1,8 @@
 package cfnetworkingaction
 
 import (
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"

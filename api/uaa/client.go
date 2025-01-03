@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"runtime"
 
-	legacy "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/v9/api/uaa/internal"
 )
 
@@ -22,8 +21,6 @@ type Client struct {
 	connection Connection
 	router     *internal.Router
 	userAgent  string
-
-	legacyClient *legacy.Client
 }
 
 // NewClient returns a new UAA Client with the provided configuration
@@ -41,14 +38,8 @@ func NewClient(config Config) *Client {
 
 		connection: NewConnection(config.SkipSSLValidation(), config.UAADisableKeepAlives(), config.DialTimeout()),
 		userAgent:  userAgent,
-
-		legacyClient: legacy.NewClient(config),
 	}
 	client.WrapConnection(NewErrorWrapper())
 
 	return &client
-}
-
-func (c Client) LegacyClient() *legacy.Client {
-	return c.legacyClient
 }

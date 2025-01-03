@@ -9,10 +9,10 @@ import (
 	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/util/batcher"
 
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	. "code.cloudfoundry.org/cli/v9/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/v9/actor/cfnetworkingaction/cfnetworkingactionfakes"
+	"code.cloudfoundry.org/cli/v9/api/cfnetworking/cfnetv1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

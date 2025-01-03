@@ -1,6 +1,6 @@
 package cfnetworkingaction
 
-import "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+import "code.cloudfoundry.org/cli/v9/api/cfnetworking/cfnetv1"
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NetworkingClient
 
