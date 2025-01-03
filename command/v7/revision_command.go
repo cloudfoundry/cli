@@ -59,34 +59,22 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
-	isDeployed := revisionDeployed(revision, deployedRevisions)
+	isDeployed := cmd.revisionDeployed(revision, deployedRevisions)
 
 	cmd.displayBasicRevisionInfo(revision, isDeployed)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("labels:")
-	labels := revision.Metadata.Labels
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.displayMetaData(revision.Metadata.Labels)
+
+	cmd.UI.DisplayHeader("annotations:")
+	cmd.displayMetaData(revision.Metadata.Annotations)
+
+	cmd.UI.DisplayHeader("application environment variables:")
+	envVars, isPresent, warnings, err := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
 	if err != nil {
 		return err
 	}
-
-	if len(labels) > 0 {
-		cmd.displayMetaData(labels)
-		cmd.UI.DisplayNewline()
-	}
-
-	cmd.UI.DisplayHeader("annotations:")
-	annotations := revision.Metadata.Annotations
-	cmd.UI.DisplayWarnings(warnings)
-
-	if len(annotations) > 0 {
-		cmd.displayMetaData(annotations)
-		cmd.UI.DisplayNewline()
-	}
-
-	cmd.UI.DisplayHeader("application environment variables:")
-	envVars, isPresent, warnings, _ := cmd.Actor.GetEnvironmentVariableGroupByRevision(revision)
 	cmd.UI.DisplayWarnings(warnings)
 	if isPresent {
 		cmd.displayEnvVarGroup(envVars)
@@ -118,15 +106,17 @@ func (cmd RevisionCommand) displayEnvVarGroup(envVarGroup v7action.EnvironmentVa
 }
 
 func (cmd RevisionCommand) displayMetaData(data map[string]types.NullString) {
-	tableData := [][]string{}
-	for k, v := range data {
-		tableData = append(tableData, []string{fmt.Sprintf("%s:", k), v.Value})
+	if len(data) > 0 {
+		tableData := [][]string{}
+		for k, v := range data {
+			tableData = append(tableData, []string{fmt.Sprintf("%s:", k), v.Value})
+		}
+		cmd.UI.DisplayKeyValueTable("", tableData, 3)
+		cmd.UI.DisplayNewline()
 	}
-	cmd.UI.DisplayKeyValueTable("", tableData, 3)
-
 }
 
-func revisionDeployed(revision resources.Revision, deployedRevisions []resources.Revision) bool {
+func (cmd RevisionCommand) revisionDeployed(revision resources.Revision, deployedRevisions []resources.Revision) bool {
 	for _, deployedRevision := range deployedRevisions {
 		if revision.GUID == deployedRevision.GUID {
 			return true
