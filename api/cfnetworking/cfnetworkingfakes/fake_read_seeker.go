@@ -8,10 +8,10 @@ import (
 )
 
 type FakeReadSeeker struct {
-	ReadStub        func(p []byte) (n int, err error)
+	ReadStub        func([]byte) (int, error)
 	readMutex       sync.RWMutex
 	readArgsForCall []struct {
-		p []byte
+		arg1 []byte
 	}
 	readReturns struct {
 		result1 int
@@ -21,11 +21,11 @@ type FakeReadSeeker struct {
 		result1 int
 		result2 error
 	}
-	SeekStub        func(offset int64, whence int) (int64, error)
+	SeekStub        func(int64, int) (int64, error)
 	seekMutex       sync.RWMutex
 	seekArgsForCall []struct {
-		offset int64
-		whence int
+		arg1 int64
+		arg2 int
 	}
 	seekReturns struct {
 		result1 int64
@@ -39,26 +39,28 @@ type FakeReadSeeker struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeReadSeeker) Read(p []byte) (n int, err error) {
-	var pCopy []byte
-	if p != nil {
-		pCopy = make([]byte, len(p))
-		copy(pCopy, p)
+func (fake *FakeReadSeeker) Read(arg1 []byte) (int, error) {
+	var arg1Copy []byte
+	if arg1 != nil {
+		arg1Copy = make([]byte, len(arg1))
+		copy(arg1Copy, arg1)
 	}
 	fake.readMutex.Lock()
 	ret, specificReturn := fake.readReturnsOnCall[len(fake.readArgsForCall)]
 	fake.readArgsForCall = append(fake.readArgsForCall, struct {
-		p []byte
-	}{pCopy})
-	fake.recordInvocation("Read", []interface{}{pCopy})
+		arg1 []byte
+	}{arg1Copy})
+	stub := fake.ReadStub
+	fakeReturns := fake.readReturns
+	fake.recordInvocation("Read", []interface{}{arg1Copy})
 	fake.readMutex.Unlock()
-	if fake.ReadStub != nil {
-		return fake.ReadStub(p)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.readReturns.result1, fake.readReturns.result2
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeReadSeeker) ReadCallCount() int {
@@ -67,13 +69,22 @@ func (fake *FakeReadSeeker) ReadCallCount() int {
 	return len(fake.readArgsForCall)
 }
 
+func (fake *FakeReadSeeker) ReadCalls(stub func([]byte) (int, error)) {
+	fake.readMutex.Lock()
+	defer fake.readMutex.Unlock()
+	fake.ReadStub = stub
+}
+
 func (fake *FakeReadSeeker) ReadArgsForCall(i int) []byte {
 	fake.readMutex.RLock()
 	defer fake.readMutex.RUnlock()
-	return fake.readArgsForCall[i].p
+	argsForCall := fake.readArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeReadSeeker) ReadReturns(result1 int, result2 error) {
+	fake.readMutex.Lock()
+	defer fake.readMutex.Unlock()
 	fake.ReadStub = nil
 	fake.readReturns = struct {
 		result1 int
@@ -82,6 +93,8 @@ func (fake *FakeReadSeeker) ReadReturns(result1 int, result2 error) {
 }
 
 func (fake *FakeReadSeeker) ReadReturnsOnCall(i int, result1 int, result2 error) {
+	fake.readMutex.Lock()
+	defer fake.readMutex.Unlock()
 	fake.ReadStub = nil
 	if fake.readReturnsOnCall == nil {
 		fake.readReturnsOnCall = make(map[int]struct {
@@ -95,22 +108,24 @@ func (fake *FakeReadSeeker) ReadReturnsOnCall(i int, result1 int, result2 error)
 	}{result1, result2}
 }
 
-func (fake *FakeReadSeeker) Seek(offset int64, whence int) (int64, error) {
+func (fake *FakeReadSeeker) Seek(arg1 int64, arg2 int) (int64, error) {
 	fake.seekMutex.Lock()
 	ret, specificReturn := fake.seekReturnsOnCall[len(fake.seekArgsForCall)]
 	fake.seekArgsForCall = append(fake.seekArgsForCall, struct {
-		offset int64
-		whence int
-	}{offset, whence})
-	fake.recordInvocation("Seek", []interface{}{offset, whence})
+		arg1 int64
+		arg2 int
+	}{arg1, arg2})
+	stub := fake.SeekStub
+	fakeReturns := fake.seekReturns
+	fake.recordInvocation("Seek", []interface{}{arg1, arg2})
 	fake.seekMutex.Unlock()
-	if fake.SeekStub != nil {
-		return fake.SeekStub(offset, whence)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.seekReturns.result1, fake.seekReturns.result2
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeReadSeeker) SeekCallCount() int {
@@ -119,13 +134,22 @@ func (fake *FakeReadSeeker) SeekCallCount() int {
 	return len(fake.seekArgsForCall)
 }
 
+func (fake *FakeReadSeeker) SeekCalls(stub func(int64, int) (int64, error)) {
+	fake.seekMutex.Lock()
+	defer fake.seekMutex.Unlock()
+	fake.SeekStub = stub
+}
+
 func (fake *FakeReadSeeker) SeekArgsForCall(i int) (int64, int) {
 	fake.seekMutex.RLock()
 	defer fake.seekMutex.RUnlock()
-	return fake.seekArgsForCall[i].offset, fake.seekArgsForCall[i].whence
+	argsForCall := fake.seekArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeReadSeeker) SeekReturns(result1 int64, result2 error) {
+	fake.seekMutex.Lock()
+	defer fake.seekMutex.Unlock()
 	fake.SeekStub = nil
 	fake.seekReturns = struct {
 		result1 int64
@@ -134,6 +158,8 @@ func (fake *FakeReadSeeker) SeekReturns(result1 int64, result2 error) {
 }
 
 func (fake *FakeReadSeeker) SeekReturnsOnCall(i int, result1 int64, result2 error) {
+	fake.seekMutex.Lock()
+	defer fake.seekMutex.Unlock()
 	fake.SeekStub = nil
 	if fake.seekReturnsOnCall == nil {
 		fake.seekReturnsOnCall = make(map[int]struct {
