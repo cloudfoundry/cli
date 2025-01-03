@@ -1,8 +1,8 @@
 package cfnetworking
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Connection
-
 // Connection creates and executes http requests
+//
+//counterfeiter:generate . Connection
 type Connection interface {
-    Make(request *Request, passedResponse *Response) error
+	Make(request *Request, passedResponse *Response) error
 }

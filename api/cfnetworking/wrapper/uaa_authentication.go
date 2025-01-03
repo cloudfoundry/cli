@@ -6,16 +6,16 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/uaa"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient
-
 // UAAClient is the interface for getting a valid access token
+//
+//counterfeiter:generate . UAAClient
 type UAAClient interface {
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TokenCache
-
 // TokenCache is where the UAA token information is stored.
+//
+//counterfeiter:generate . TokenCache
 type TokenCache interface {
 	AccessToken() string
 	RefreshToken() string

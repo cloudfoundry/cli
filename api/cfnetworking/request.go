@@ -1,35 +1,34 @@
 package cfnetworking
 
 import (
-    "io"
-    "net/http"
+	"io"
+	"net/http"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ReadSeeker
-
+//counterfeiter:generate . ReadSeeker
 type ReadSeeker interface {
-    io.ReadSeeker
+	io.ReadSeeker
 }
 
 // Request represents the request of the cloud controller.
 type Request struct {
-    *http.Request
+	*http.Request
 
-    body io.ReadSeeker
+	body io.ReadSeeker
 }
 
 func (r *Request) ResetBody() error {
-    if r.body == nil {
-        return nil
-    }
+	if r.body == nil {
+		return nil
+	}
 
-    _, err := r.body.Seek(0, 0)
-    return err
+	_, err := r.body.Seek(0, 0)
+	return err
 }
 
 func NewRequest(request *http.Request, body io.ReadSeeker) *Request {
-    return &Request{
-        Request: request,
-        body:    body,
-    }
+	return &Request{
+		Request: request,
+		body:    body,
+	}
 }
