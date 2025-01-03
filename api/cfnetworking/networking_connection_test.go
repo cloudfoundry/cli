@@ -3,7 +3,6 @@ package cfnetworking_test
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"runtime"
 	"strings"
 
@@ -154,7 +153,6 @@ var _ = Describe("CF Networking Connection", func() {
 					Expect(err).To(HaveOccurred())
 
 					requestErr, ok := err.(networkerror.RequestError)
-					fmt.Println("type of requestErr: ", reflect.TypeOf(err))
 					Expect(ok).To(BeTrue())
 					Expect(requestErr.Error()).To(MatchRegexp(".*http://garbledyguk.com/v2/foo.*[nN]o such host"))
 				})

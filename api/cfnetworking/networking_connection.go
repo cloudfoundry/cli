@@ -65,12 +65,12 @@ func (connection *NetworkingConnection) Make(request *Request, passedResponse *R
 func (*NetworkingConnection) processRequestErrors(request *http.Request, err error) error {
 	switch err.(type) {
 	case *url.Error:
-		if errors.Is(err, x509.UnknownAuthorityError{}) {
+		if errors.As(err, &x509.UnknownAuthorityError{}) {
 			return networkerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
 		}
-		if errors.Is(err, x509.HostnameError{}) {
+		if errors.As(err, &x509.HostnameError{}) {
 			return networkerror.SSLValidationHostnameError{
 				Message: err.Error(),
 			}
