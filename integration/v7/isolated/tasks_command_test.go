@@ -27,7 +27,7 @@ var _ = Describe("tasks command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("   cf tasks APP_NAME"))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("   apps, logs, run-task, terminate-task"))
+			Eventually(session).Should(Say("   apps, logs, run-task, task, terminate-task"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

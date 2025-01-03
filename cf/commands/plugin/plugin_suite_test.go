@@ -21,15 +21,15 @@ func TestPlugin(t *testing.T) {
 
 	RegisterFailHandler(Fail)
 
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_help")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_orgs")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_orgs_short_name")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push_short_name")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_1")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_2")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "empty_plugin")
-	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "alias_conflicts")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_with_help"), "test_with_help")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_with_orgs"), "test_with_orgs")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_with_orgs_short_name"), "test_with_orgs_short_name")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_with_push"), "test_with_push")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_with_push_short_name"), "test_with_push_short_name")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_1"), "test_1")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_2"), "test_2")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "empty_plugin"), "empty_plugin")
+	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins", "alias_conflicts"), "alias_conflicts")
 
 	RunSpecs(t, "Plugin Suite")
 }

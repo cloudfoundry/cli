@@ -1,2 +1,3 @@
 exclude:
   - './integration/assets'
+  - './fixtures/applications'

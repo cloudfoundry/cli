@@ -253,6 +253,28 @@ var _ = Describe("CLI SSH", Serial, FlakeAttempts(9), func() {
 				})
 			})
 
+			Context("when the sha256 fingerprint matches", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "b29fe3acbba3ebaafecab2c350a65d254e6d773b789aafd469288d063a60afef"
+				})
+
+				It("does not return an error", func() {
+					Expect(callback("", addr, TestHostKey.PublicKey())).ToNot(HaveOccurred())
+				})
+			})
+
+			When("the SHA256 fingerprint does not match", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "0000000000000000000000000000000000000000000000000000000000000000"
+				})
+
+				It("returns an error'", func() {
+					err := callback("", addr, TestHostKey.PublicKey())
+					Expect(err).To(MatchError(MatchRegexp(`Host key verification failed\.`)))
+					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
+				})
+			})
+
 			When("the base64 SHA256 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "0000000000000000000000000000000000000000000"

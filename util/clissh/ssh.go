@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -28,6 +29,7 @@ const (
 	md5FingerprintLength          = 47 // inclusive of space between bytes
 	hexSha1FingerprintLength      = 59 // inclusive of space between bytes
 	base64Sha256FingerprintLength = 43
+	sha256FingerprintLength       = 64
 
 	DefaultKeepAliveInterval = 30 * time.Second
 )
@@ -331,9 +333,12 @@ func (c *SecureShell) terminalType() string {
 	return term
 }
 
-func base64Sha256Fingerprint(key ssh.PublicKey) string {
+func sha256Fingerprint(key ssh.PublicKey, encode bool) string {
 	sum := sha256.Sum256(key.Marshal())
-	return base64.RawStdEncoding.EncodeToString(sum[:])
+	if encode {
+		return base64.RawStdEncoding.EncodeToString(sum[:])
+	}
+	return hex.EncodeToString(sum[:])
 }
 
 func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
@@ -364,8 +369,10 @@ func fingerprintCallback(skipHostValidation bool, expectedFingerprint string) ss
 		var fingerprint string
 
 		switch len(expectedFingerprint) {
+		case sha256FingerprintLength:
+			fingerprint = sha256Fingerprint(key, false)
 		case base64Sha256FingerprintLength:
-			fingerprint = base64Sha256Fingerprint(key)
+			fingerprint = sha256Fingerprint(key, true)
 		case hexSha1FingerprintLength:
 			fingerprint = hexSha1Fingerprint(key)
 		case md5FingerprintLength:

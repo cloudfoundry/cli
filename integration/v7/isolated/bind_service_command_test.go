@@ -147,14 +147,14 @@ var _ = Describe("bind-service command", func() {
 			var receiver struct {
 				Resources []resources.ServiceCredentialBinding `json:"resources"`
 			}
-			helpers.Curl(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
+			helpers.Curlf(&receiver, "/v3/service_credential_bindings?service_instance_names=%s", serviceInstanceName)
 			Expect(receiver.Resources).To(HaveLen(1))
 			return receiver.Resources[0]
 		}
 
 		getParameters := func(serviceInstanceName string) (receiver map[string]interface{}) {
 			binding := getBinding(serviceInstanceName)
-			helpers.Curl(&receiver, "/v3/service_credential_bindings/%s/parameters", binding.GUID)
+			helpers.Curlf(&receiver, "/v3/service_credential_bindings/%s/parameters", binding.GUID)
 			return
 		}
 

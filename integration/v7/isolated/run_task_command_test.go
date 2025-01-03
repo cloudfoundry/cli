@@ -35,7 +35,7 @@ var _ = Describe("run-task command", func() {
 			Expect(session).To(Say(`   --name             Name to give the task \(generated if omitted\)`))
 			Expect(session).To(Say(`   --process          Process type to use as a template for command, memory, and disk for the created task`))
 			Expect(session).To(Say("SEE ALSO:"))
-			Expect(session).To(Say("   logs, tasks, terminate-task"))
+			Expect(session).To(Say("   logs, tasks, task, terminate-task"))
 		})
 	})
 

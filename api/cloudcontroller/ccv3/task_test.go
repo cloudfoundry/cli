@@ -190,9 +190,18 @@ var _ = Describe("Task", func() {
 			warnings   Warnings
 			executeErr error
 		)
+		BeforeEach(func() {
+			// This is required because ginkgo does not instantiate variable per test context so the tests pollute the
+			// variables for the next tests.
+			submitQuery = Query{}
+		})
 
 		JustBeforeEach(func() {
-			tasks, warnings, executeErr = client.GetApplicationTasks("some-app-guid", submitQuery)
+			if submitQuery.Key == "" {
+				tasks, warnings, executeErr = client.GetApplicationTasks("some-app-guid")
+			} else {
+				tasks, warnings, executeErr = client.GetApplicationTasks("some-app-guid", submitQuery)
+			}
 		})
 
 		When("the application exists", func() {
@@ -201,7 +210,8 @@ var _ = Describe("Task", func() {
 					"pagination": {
 						"next": {
 							"href": "%s/v3/apps/some-app-guid/tasks?per_page=2&page=2"
-						}
+						},
+						"total_results": 3
 					},
 					"resources": [
 						{
@@ -245,7 +255,7 @@ var _ = Describe("Task", func() {
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "per_page=2&page=2"),
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "page=2&per_page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 					),
 				)
@@ -351,6 +361,154 @@ var _ = Describe("Task", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+
+		When("the application has 10000 tasks", func() {
+			BeforeEach(func() {
+				response2 := fmt.Sprintf(`{
+					"pagination": {
+						"next": {
+							"href": "%s/v3/apps/some-app-guid/tasks?per_page=5000&page=2"
+						},
+						"total_results": 10000
+					},
+					"resources": [
+						{
+							"guid": "task-1-guid",
+							"sequence_id": 1,
+							"name": "task-1",
+							"command": "some-command",
+							"state": "SUCCEEDED",
+							"created_at": "2016-11-07T05:59:01Z"
+						},
+						{
+							"guid": "task-2-guid",
+							"sequence_id": 2,
+							"name": "task-2",
+							"command": "some-command",
+							"state": "FAILED",
+							"created_at": "2016-11-07T06:59:01Z"
+						}
+					]
+				}`, server.URL())
+				response3 := fmt.Sprintf(`{
+					"pagination": {
+						"total_results": 10000
+					},
+					"resources": [
+						{
+							"guid": "task-1-guid",
+							"sequence_id": 1,
+							"name": "task-1",
+							"command": "some-command",
+							"state": "SUCCEEDED",
+							"created_at": "2016-11-07T05:59:01Z"
+						},
+						{
+							"guid": "task-2-guid",
+							"sequence_id": 2,
+							"name": "task-2",
+							"command": "some-command",
+							"state": "FAILED",
+							"created_at": "2016-11-07T06:59:01Z"
+						}
+					]
+				}`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "per_page=5000"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "page=2&per_page=5000"),
+						RespondWith(http.StatusOK, response3, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+			})
+
+			It("calls CAPI 2 times", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+
+		When("the application has 4999 tasks", func() {
+			BeforeEach(func() {
+				response2 := fmt.Sprintf(`{
+					"pagination": {
+						"total_results": 4999
+					},
+					"resources": [
+						{
+							"guid": "task-1-guid",
+							"sequence_id": 1,
+							"name": "task-1",
+							"command": "some-command",
+							"state": "SUCCEEDED",
+							"created_at": "2016-11-07T05:59:01Z"
+						},
+						{
+							"guid": "task-2-guid",
+							"sequence_id": 2,
+							"name": "task-2",
+							"command": "some-command",
+							"state": "FAILED",
+							"created_at": "2016-11-07T06:59:01Z"
+						}
+					]
+				}`)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "per_page=5000"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+			})
+
+			It("calls CAPI 2 times", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+
+		When("the application has 2 tasks", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+					"pagination": {
+						"total_results": 2
+					},
+					"resources": [
+						{
+							"guid": "task-1-guid",
+							"sequence_id": 1,
+							"name": "task-1",
+							"command": "some-command",
+							"state": "SUCCEEDED",
+							"created_at": "2016-11-07T05:59:01Z"
+						},
+						{
+							"guid": "task-2-guid",
+							"sequence_id": 2,
+							"name": "task-2",
+							"command": "some-command",
+							"state": "FAILED",
+							"created_at": "2016-11-07T06:59:01Z"
+						}
+					]
+				}`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks"),
+						RespondWith(http.StatusAccepted, response1, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+
+			It("calls CAPI 1 time", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 			})
 		})
 	})
