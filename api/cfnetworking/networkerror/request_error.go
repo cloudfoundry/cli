@@ -1,7 +1,7 @@
 package networkerror
 
 // RequestError represents a generic error encountered while performing the
-// HTTP request. This generic error occurs before a HTTP response is obtained.
+// HTTP request. This generic error occurs before an HTTP response is obtained.
 type RequestError struct {
 	Err error
 }

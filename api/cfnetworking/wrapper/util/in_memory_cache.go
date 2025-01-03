@@ -5,11 +5,11 @@ type InMemoryCache struct {
 	refreshToken string
 }
 
-func (c InMemoryCache) AccessToken() string {
+func (c *InMemoryCache) AccessToken() string {
 	return c.accessToken
 }
 
-func (c InMemoryCache) RefreshToken() string {
+func (c *InMemoryCache) RefreshToken() string {
 	return c.refreshToken
 }
 
