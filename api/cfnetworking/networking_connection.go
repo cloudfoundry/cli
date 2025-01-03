@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -62,20 +63,19 @@ func (connection *NetworkingConnection) Make(request *Request, passedResponse *R
 }
 
 func (*NetworkingConnection) processRequestErrors(request *http.Request, err error) error {
-	switch e := err.(type) {
+	switch err.(type) {
 	case *url.Error:
-		switch urlErr := e.Err.(type) {
-		case x509.UnknownAuthorityError:
+		if errors.Is(err, x509.UnknownAuthorityError{}) {
 			return networkerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
-		case x509.HostnameError:
-			return networkerror.SSLValidationHostnameError{
-				Message: urlErr.Error(),
-			}
-		default:
-			return networkerror.RequestError{Err: e}
 		}
+		if errors.Is(err, x509.HostnameError{}) {
+			return networkerror.SSLValidationHostnameError{
+				Message: err.Error(),
+			}
+		}
+		return networkerror.RequestError{Err: err}
 	default:
 		return err
 	}

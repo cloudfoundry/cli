@@ -3,6 +3,7 @@ package cfnetworking_test
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"runtime"
 	"strings"
 
@@ -48,7 +49,7 @@ var _ = Describe("CF Networking Connection", func() {
 				request = &Request{Request: req}
 			})
 
-			Context("when passed a response with a result set", func() {
+			When("passed a response with a result set", func() {
 				It("unmarshals the data into a struct", func() {
 					var body DummyResponse
 					response := Response{
@@ -74,7 +75,7 @@ var _ = Describe("CF Networking Connection", func() {
 				})
 			})
 
-			Context("when passed an empty response", func() {
+			When("passed an empty response", func() {
 				It("skips the unmarshalling step", func() {
 					var response Response
 					err := connection.Make(request, &response)
@@ -138,7 +139,7 @@ var _ = Describe("CF Networking Connection", func() {
 		})
 
 		Describe("Errors", func() {
-			Context("when the server does not exist", func() {
+			When("the server does not exist", func() {
 				BeforeEach(func() {
 					connection = NewConnection(Config{})
 				})
@@ -153,12 +154,13 @@ var _ = Describe("CF Networking Connection", func() {
 					Expect(err).To(HaveOccurred())
 
 					requestErr, ok := err.(networkerror.RequestError)
+					fmt.Println("type of requestErr: ", reflect.TypeOf(err))
 					Expect(ok).To(BeTrue())
 					Expect(requestErr.Error()).To(MatchRegexp(".*http://garbledyguk.com/v2/foo.*[nN]o such host"))
 				})
 			})
 
-			Context("when the server does not have a verified certificate", func() {
+			When("the server does not have a verified certificate", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
 						if runtime.GOOS == "darwin" {
