@@ -2,7 +2,7 @@ package wrapper_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -10,8 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/cfnetworkingfakes"
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/networkerror"
 	. "code.cloudfoundry.org/cli/v8/api/cfnetworking/wrapper"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -37,7 +36,7 @@ var _ = Describe("Retry Request", func() {
 			}
 			fakeConnection.MakeStub = func(req *cfnetworking.Request, passedResponse *cfnetworking.Response) error {
 				defer req.Body.Close()
-				body, readBodyErr := ioutil.ReadAll(request.Body)
+				body, readBodyErr := io.ReadAll(request.Body)
 				Expect(readBodyErr).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal(rawRequestBody))
 				return expectedErr

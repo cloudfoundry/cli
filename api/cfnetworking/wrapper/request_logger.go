@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"strings"
@@ -11,9 +11,9 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking"
 )
 
-//go:generate counterfeiter . RequestLoggerOutput
-
 // RequestLoggerOutput is the interface for displaying logs
+//
+//counterfeiter:generate . RequestLoggerOutput
 type RequestLoggerOutput interface {
 	DisplayHeader(name string, value string) error
 	DisplayHost(name string) error
@@ -93,7 +93,7 @@ func (logger *RequestLogger) displayRequest(request *cfnetworking.Request) error
 	contentType := request.Header.Get("Content-Type")
 	if request.Body != nil {
 		if strings.Contains(contentType, "json") {
-			rawRequestBody, err := ioutil.ReadAll(request.Body)
+			rawRequestBody, err := io.ReadAll(request.Body)
 			if err != nil {
 				return err
 			}
@@ -131,8 +131,8 @@ func (logger *RequestLogger) displayResponse(passedResponse *cfnetworking.Respon
 }
 
 func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {
-	keys := []string{}
-	for key, _ := range headers {
+	keys := make([]string, 0)
+	for key := range headers {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)

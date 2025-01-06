@@ -8,8 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/cfnetworkingfakes"
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/networkerror"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

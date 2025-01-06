@@ -3,7 +3,7 @@ package wrapper_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,7 +13,7 @@ import (
 	. "code.cloudfoundry.org/cli/v8/api/cfnetworking/wrapper"
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/wrapper/wrapperfakes"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -121,7 +121,7 @@ var _ = Describe("Request Logger", func() {
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
 
-					bytes, err := ioutil.ReadAll(request.Body)
+					bytes, err := io.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(bytes).To(Equal([]byte("foo")))
 				})

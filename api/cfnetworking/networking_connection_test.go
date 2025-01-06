@@ -8,7 +8,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/v8/api/cfnetworking"
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/networkerror"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
 )
@@ -48,7 +48,7 @@ var _ = Describe("CF Networking Connection", func() {
 				request = &Request{Request: req}
 			})
 
-			Context("when passed a response with a result set", func() {
+			When("passed a response with a result set", func() {
 				It("unmarshals the data into a struct", func() {
 					var body DummyResponse
 					response := Response{
@@ -74,7 +74,7 @@ var _ = Describe("CF Networking Connection", func() {
 				})
 			})
 
-			Context("when passed an empty response", func() {
+			When("passed an empty response", func() {
 				It("skips the unmarshalling step", func() {
 					var response Response
 					err := connection.Make(request, &response)
@@ -138,7 +138,7 @@ var _ = Describe("CF Networking Connection", func() {
 		})
 
 		Describe("Errors", func() {
-			Context("when the server does not exist", func() {
+			When("the server does not exist", func() {
 				BeforeEach(func() {
 					connection = NewConnection(Config{})
 				})
@@ -158,7 +158,7 @@ var _ = Describe("CF Networking Connection", func() {
 				})
 			})
 
-			Context("when the server does not have a verified certificate", func() {
+			When("the server does not have a verified certificate", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
@@ -182,11 +182,11 @@ var _ = Describe("CF Networking Connection", func() {
 				})
 			})
 
-			Context("when the server's certificate does not match the hostname", func() {
+			When("the server's certificate does not match the hostname", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
-						if runtime.GOOS == "windows" {
-							Skip("ssl validation has a different order on windows, will not be returned properly")
+						if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+							Skip("ssl validation has a different order on windows/darwin, will not be returned properly")
 						}
 						server.AppendHandlers(
 							CombineHandlers(
@@ -197,9 +197,9 @@ var _ = Describe("CF Networking Connection", func() {
 						connection = NewConnection(Config{})
 					})
 
-					// loopback.cli.ci.cf-app.com is a custom DNS record setup to point to 127.0.0.1
+					// loopback.cli.fun is a custom DNS record setup to point to 127.0.0.1
 					It("returns a SSLValidationHostnameError", func() {
-						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "loopback.cli.ci.cf-app.com", -1)
+						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "loopback.cli.fun", -1)
 						req, err := http.NewRequest(http.MethodGet, altHostURL, nil)
 						Expect(err).ToNot(HaveOccurred())
 						request := &Request{Request: req}
@@ -207,7 +207,7 @@ var _ = Describe("CF Networking Connection", func() {
 						var response Response
 						err = connection.Make(request, &response)
 						Expect(err).To(MatchError(networkerror.SSLValidationHostnameError{
-							Message: "x509: certificate is valid for example.com, not loopback.cli.ci.cf-app.com",
+							Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
 						}))
 					})
 				})

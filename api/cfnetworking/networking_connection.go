@@ -5,7 +5,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
+	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -50,7 +51,7 @@ func NewConnection(config Config) *NetworkingConnection {
 func (connection *NetworkingConnection) Make(request *Request, passedResponse *Response) error {
 	// In case this function is called from a retry, passedResponse may already
 	// be populated with a previous response. We reset in case there's an HTTP
-	// error and we don't repopulate it in populateResponse.
+	// error, and we don't repopulate it in populateResponse.
 	passedResponse.reset()
 
 	response, err := connection.HTTPClient.Do(request.Request)
@@ -62,20 +63,20 @@ func (connection *NetworkingConnection) Make(request *Request, passedResponse *R
 }
 
 func (*NetworkingConnection) processRequestErrors(request *http.Request, err error) error {
-	switch e := err.(type) {
+	switch err.(type) {
 	case *url.Error:
-		switch urlErr := e.Err.(type) {
-		case x509.UnknownAuthorityError:
+		if errors.As(err, &x509.UnknownAuthorityError{}) {
 			return networkerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
-		case x509.HostnameError:
-			return networkerror.SSLValidationHostnameError{
-				Message: urlErr.Error(),
-			}
-		default:
-			return networkerror.RequestError{Err: e}
 		}
+		hostnameError := x509.HostnameError{}
+		if errors.As(err, &hostnameError) {
+			return networkerror.SSLValidationHostnameError{
+				Message: hostnameError.Error(),
+			}
+		}
+		return networkerror.RequestError{Err: err}
 	default:
 		return err
 	}
@@ -88,7 +89,7 @@ func (connection *NetworkingConnection) populateResponse(response *http.Response
 		passedResponse.ResourceLocationURL = resourceLocationURL
 	}
 
-	rawBytes, err := ioutil.ReadAll(response.Body)
+	rawBytes, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
 		return err

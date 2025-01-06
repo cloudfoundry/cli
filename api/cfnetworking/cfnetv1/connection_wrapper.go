@@ -2,10 +2,10 @@ package cfnetv1
 
 import "code.cloudfoundry.org/cli/v8/api/cfnetworking"
 
-//go:generate counterfeiter . ConnectionWrapper
-
 // ConnectionWrapper can wrap a given connection allowing the wrapper to modify
 // all requests going in and out of the given connection.
+//
+//counterfeiter:generate . ConnectionWrapper
 type ConnectionWrapper interface {
 	cfnetworking.Connection
 	Wrap(innerconnection cfnetworking.Connection) cfnetworking.Connection

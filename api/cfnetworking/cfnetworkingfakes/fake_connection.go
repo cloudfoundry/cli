@@ -8,11 +8,11 @@ import (
 )
 
 type FakeConnection struct {
-	MakeStub        func(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error
+	MakeStub        func(*cfnetworking.Request, *cfnetworking.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		request        *cfnetworking.Request
-		passedResponse *cfnetworking.Response
+		arg1 *cfnetworking.Request
+		arg2 *cfnetworking.Response
 	}
 	makeReturns struct {
 		result1 error
@@ -24,22 +24,24 @@ type FakeConnection struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnection) Make(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error {
+func (fake *FakeConnection) Make(arg1 *cfnetworking.Request, arg2 *cfnetworking.Response) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		request        *cfnetworking.Request
-		passedResponse *cfnetworking.Response
-	}{request, passedResponse})
-	fake.recordInvocation("Make", []interface{}{request, passedResponse})
+		arg1 *cfnetworking.Request
+		arg2 *cfnetworking.Response
+	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
+	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(request, passedResponse)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.makeReturns.result1
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnection) MakeCallCount() int {
@@ -48,13 +50,22 @@ func (fake *FakeConnection) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
+func (fake *FakeConnection) MakeCalls(stub func(*cfnetworking.Request, *cfnetworking.Response) error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
+	fake.MakeStub = stub
+}
+
 func (fake *FakeConnection) MakeArgsForCall(i int) (*cfnetworking.Request, *cfnetworking.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse
+	argsForCall := fake.makeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeConnection) MakeReturns(result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	fake.makeReturns = struct {
 		result1 error
@@ -62,6 +73,8 @@ func (fake *FakeConnection) MakeReturns(result1 error) {
 }
 
 func (fake *FakeConnection) MakeReturnsOnCall(i int, result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	if fake.makeReturnsOnCall == nil {
 		fake.makeReturnsOnCall = make(map[int]struct {

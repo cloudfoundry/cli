@@ -9,11 +9,11 @@ import (
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error
+	MakeStub        func(*cfnetworking.Request, *cfnetworking.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		request        *cfnetworking.Request
-		passedResponse *cfnetworking.Response
+		arg1 *cfnetworking.Request
+		arg2 *cfnetworking.Response
 	}
 	makeReturns struct {
 		result1 error
@@ -21,10 +21,10 @@ type FakeConnectionWrapper struct {
 	makeReturnsOnCall map[int]struct {
 		result1 error
 	}
-	WrapStub        func(innerconnection cfnetworking.Connection) cfnetworking.Connection
+	WrapStub        func(cfnetworking.Connection) cfnetworking.Connection
 	wrapMutex       sync.RWMutex
 	wrapArgsForCall []struct {
-		innerconnection cfnetworking.Connection
+		arg1 cfnetworking.Connection
 	}
 	wrapReturns struct {
 		result1 cfnetworking.Connection
@@ -36,22 +36,24 @@ type FakeConnectionWrapper struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error {
+func (fake *FakeConnectionWrapper) Make(arg1 *cfnetworking.Request, arg2 *cfnetworking.Response) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		request        *cfnetworking.Request
-		passedResponse *cfnetworking.Response
-	}{request, passedResponse})
-	fake.recordInvocation("Make", []interface{}{request, passedResponse})
+		arg1 *cfnetworking.Request
+		arg2 *cfnetworking.Response
+	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
+	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(request, passedResponse)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.makeReturns.result1
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) MakeCallCount() int {
@@ -60,13 +62,22 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
+func (fake *FakeConnectionWrapper) MakeCalls(stub func(*cfnetworking.Request, *cfnetworking.Response) error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
+	fake.MakeStub = stub
+}
+
 func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*cfnetworking.Request, *cfnetworking.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse
+	argsForCall := fake.makeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	fake.makeReturns = struct {
 		result1 error
@@ -74,6 +85,8 @@ func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
 }
 
 func (fake *FakeConnectionWrapper) MakeReturnsOnCall(i int, result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	if fake.makeReturnsOnCall == nil {
 		fake.makeReturnsOnCall = make(map[int]struct {
@@ -85,21 +98,23 @@ func (fake *FakeConnectionWrapper) MakeReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeConnectionWrapper) Wrap(innerconnection cfnetworking.Connection) cfnetworking.Connection {
+func (fake *FakeConnectionWrapper) Wrap(arg1 cfnetworking.Connection) cfnetworking.Connection {
 	fake.wrapMutex.Lock()
 	ret, specificReturn := fake.wrapReturnsOnCall[len(fake.wrapArgsForCall)]
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
-		innerconnection cfnetworking.Connection
-	}{innerconnection})
-	fake.recordInvocation("Wrap", []interface{}{innerconnection})
+		arg1 cfnetworking.Connection
+	}{arg1})
+	stub := fake.WrapStub
+	fakeReturns := fake.wrapReturns
+	fake.recordInvocation("Wrap", []interface{}{arg1})
 	fake.wrapMutex.Unlock()
-	if fake.WrapStub != nil {
-		return fake.WrapStub(innerconnection)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.wrapReturns.result1
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) WrapCallCount() int {
@@ -108,13 +123,22 @@ func (fake *FakeConnectionWrapper) WrapCallCount() int {
 	return len(fake.wrapArgsForCall)
 }
 
+func (fake *FakeConnectionWrapper) WrapCalls(stub func(cfnetworking.Connection) cfnetworking.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
+	fake.WrapStub = stub
+}
+
 func (fake *FakeConnectionWrapper) WrapArgsForCall(i int) cfnetworking.Connection {
 	fake.wrapMutex.RLock()
 	defer fake.wrapMutex.RUnlock()
-	return fake.wrapArgsForCall[i].innerconnection
+	argsForCall := fake.wrapArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConnectionWrapper) WrapReturns(result1 cfnetworking.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
 	fake.WrapStub = nil
 	fake.wrapReturns = struct {
 		result1 cfnetworking.Connection
@@ -122,6 +146,8 @@ func (fake *FakeConnectionWrapper) WrapReturns(result1 cfnetworking.Connection) 
 }
 
 func (fake *FakeConnectionWrapper) WrapReturnsOnCall(i int, result1 cfnetworking.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
 	fake.WrapStub = nil
 	if fake.wrapReturnsOnCall == nil {
 		fake.wrapReturnsOnCall = make(map[int]struct {

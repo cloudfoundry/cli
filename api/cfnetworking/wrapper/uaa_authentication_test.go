@@ -2,7 +2,7 @@ package wrapper_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/uaa"
 
 	"code.cloudfoundry.org/cli/v8/api/cfnetworking/networkerror"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -102,12 +102,12 @@ var _ = Describe("UAA Authentication", func() {
 				body := strings.NewReader(expectedBody)
 				request = cfnetworking.NewRequest(&http.Request{
 					Header: http.Header{},
-					Body:   ioutil.NopCloser(body),
+					Body:   io.NopCloser(body),
 				}, body)
 
 				makeCount := 0
 				fakeConnection.MakeStub = func(request *cfnetworking.Request, response *cfnetworking.Response) error {
-					body, err := ioutil.ReadAll(request.Body)
+					body, err := io.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(string(body)).To(Equal(expectedBody))
 

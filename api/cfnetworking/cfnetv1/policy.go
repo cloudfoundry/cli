@@ -37,7 +37,7 @@ type PolicyDestination struct {
 }
 
 // CreatePolicies will create the network policy with the given parameters.
-func (client Client) CreatePolicies(policies []Policy) error {
+func (client *Client) CreatePolicies(policies []Policy) error {
 	rawJSON, err := json.Marshal(PolicyList{Policies: policies})
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (client Client) CreatePolicies(policies []Policy) error {
 }
 
 // ListPolicies will list the policies with the app guids in either the source or destination.
-func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
+func (client *Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 	var request *cfnetworking.Request
 	var err error
 	if len(appGUIDs) == 0 {
@@ -91,7 +91,7 @@ func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 }
 
 // RemovePolicies will remove the network policy with the given parameters.
-func (client Client) RemovePolicies(policies []Policy) error {
+func (client *Client) RemovePolicies(policies []Policy) error {
 	rawJSON, err := json.Marshal(PolicyList{Policies: policies})
 	if err != nil {
 		return err

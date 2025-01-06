@@ -5,8 +5,7 @@ import (
 	"net/http"
 )
 
-//go:generate counterfeiter . ReadSeeker
-
+//counterfeiter:generate . ReadSeeker
 type ReadSeeker interface {
 	io.ReadSeeker
 }
