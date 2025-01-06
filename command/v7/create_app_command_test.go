@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/command/commandfakes"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	v7 "code.cloudfoundry.org/cli/v8/command/v7"
