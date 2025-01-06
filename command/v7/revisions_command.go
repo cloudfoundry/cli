@@ -21,7 +21,7 @@ type RevisionsCommand struct {
 	usage        interface{}          `usage:"CF_NAME revisions APP_NAME"`
 
 	BaseCommand
-	relatedCommands interface{} `related_commands:"rollback"`
+	relatedCommands interface{} `related_commands:"revision, rollback"`
 }
 
 func (cmd RevisionsCommand) Execute(_ []string) error {
@@ -88,6 +88,11 @@ func (cmd RevisionsCommand) Execute(_ []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	if len(revisionsDeployed) > 1 {
+		cmd.UI.DisplayText("Info: this app is in the middle of a rolling deployment. More than one revision is deployed.")
+		cmd.UI.DisplayNewline()
 	}
 
 	table := [][]string{{

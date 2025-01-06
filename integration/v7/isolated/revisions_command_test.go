@@ -43,7 +43,7 @@ var _ = Describe("revisions command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf revisions APP_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("rollback"))
+				Eventually(session).Should(Say("revision, rollback"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
