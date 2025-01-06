@@ -38,15 +38,16 @@ func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpace(arg1 stri
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetApplicationSummaryByNameAndSpaceStub
+	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

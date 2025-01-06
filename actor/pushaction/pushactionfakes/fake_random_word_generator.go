@@ -47,15 +47,16 @@ func (fake *FakeRandomWordGenerator) RandomAdjective() string {
 	ret, specificReturn := fake.randomAdjectiveReturnsOnCall[len(fake.randomAdjectiveArgsForCall)]
 	fake.randomAdjectiveArgsForCall = append(fake.randomAdjectiveArgsForCall, struct {
 	}{})
+	stub := fake.RandomAdjectiveStub
+	fakeReturns := fake.randomAdjectiveReturns
 	fake.recordInvocation("RandomAdjective", []interface{}{})
 	fake.randomAdjectiveMutex.Unlock()
-	if fake.RandomAdjectiveStub != nil {
-		return fake.RandomAdjectiveStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.randomAdjectiveReturns
 	return fakeReturns.result1
 }
 
@@ -99,15 +100,16 @@ func (fake *FakeRandomWordGenerator) RandomNoun() string {
 	ret, specificReturn := fake.randomNounReturnsOnCall[len(fake.randomNounArgsForCall)]
 	fake.randomNounArgsForCall = append(fake.randomNounArgsForCall, struct {
 	}{})
+	stub := fake.RandomNounStub
+	fakeReturns := fake.randomNounReturns
 	fake.recordInvocation("RandomNoun", []interface{}{})
 	fake.randomNounMutex.Unlock()
-	if fake.RandomNounStub != nil {
-		return fake.RandomNounStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.randomNounReturns
 	return fakeReturns.result1
 }
 
@@ -151,15 +153,16 @@ func (fake *FakeRandomWordGenerator) RandomTwoLetters() string {
 	ret, specificReturn := fake.randomTwoLettersReturnsOnCall[len(fake.randomTwoLettersArgsForCall)]
 	fake.randomTwoLettersArgsForCall = append(fake.randomTwoLettersArgsForCall, struct {
 	}{})
+	stub := fake.RandomTwoLettersStub
+	fakeReturns := fake.randomTwoLettersReturns
 	fake.recordInvocation("RandomTwoLetters", []interface{}{})
 	fake.randomTwoLettersMutex.Unlock()
-	if fake.RandomTwoLettersStub != nil {
-		return fake.RandomTwoLettersStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.randomTwoLettersReturns
 	return fakeReturns.result1
 }
 

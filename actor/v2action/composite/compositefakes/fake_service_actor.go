@@ -49,15 +49,16 @@ func (fake *FakeServiceActor) GetServicesWithPlans(arg1 ...v2action.Filter) (v2a
 	fake.getServicesWithPlansArgsForCall = append(fake.getServicesWithPlansArgsForCall, struct {
 		arg1 []v2action.Filter
 	}{arg1})
+	stub := fake.GetServicesWithPlansStub
+	fakeReturns := fake.getServicesWithPlansReturns
 	fake.recordInvocation("GetServicesWithPlans", []interface{}{arg1})
 	fake.getServicesWithPlansMutex.Unlock()
-	if fake.GetServicesWithPlansStub != nil {
-		return fake.GetServicesWithPlansStub(arg1...)
+	if stub != nil {
+		return stub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicesWithPlansReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -115,15 +116,16 @@ func (fake *FakeServiceActor) ServiceExistsWithName(arg1 string) (bool, v2action
 	fake.serviceExistsWithNameArgsForCall = append(fake.serviceExistsWithNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ServiceExistsWithNameStub
+	fakeReturns := fake.serviceExistsWithNameReturns
 	fake.recordInvocation("ServiceExistsWithName", []interface{}{arg1})
 	fake.serviceExistsWithNameMutex.Unlock()
-	if fake.ServiceExistsWithNameStub != nil {
-		return fake.ServiceExistsWithNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.serviceExistsWithNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

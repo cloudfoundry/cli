@@ -34,15 +34,16 @@ func (fake *FakeGetServicePlanActor) GetServicePlan(arg1 string) (v2action.Servi
 	fake.getServicePlanArgsForCall = append(fake.getServicePlanArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServicePlanStub
+	fakeReturns := fake.getServicePlanReturns
 	fake.recordInvocation("GetServicePlan", []interface{}{arg1})
 	fake.getServicePlanMutex.Unlock()
-	if fake.GetServicePlanStub != nil {
-		return fake.GetServicePlanStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicePlanReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

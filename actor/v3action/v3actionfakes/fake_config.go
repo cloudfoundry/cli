@@ -136,15 +136,16 @@ func (fake *FakeConfig) AccessToken() string {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
+	stub := fake.AccessTokenStub
+	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -188,15 +189,16 @@ func (fake *FakeConfig) DialTimeout() time.Duration {
 	ret, specificReturn := fake.dialTimeoutReturnsOnCall[len(fake.dialTimeoutArgsForCall)]
 	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct {
 	}{})
+	stub := fake.DialTimeoutStub
+	fakeReturns := fake.dialTimeoutReturns
 	fake.recordInvocation("DialTimeout", []interface{}{})
 	fake.dialTimeoutMutex.Unlock()
-	if fake.DialTimeoutStub != nil {
-		return fake.DialTimeoutStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.dialTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -240,15 +242,16 @@ func (fake *FakeConfig) PollingInterval() time.Duration {
 	ret, specificReturn := fake.pollingIntervalReturnsOnCall[len(fake.pollingIntervalArgsForCall)]
 	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct {
 	}{})
+	stub := fake.PollingIntervalStub
+	fakeReturns := fake.pollingIntervalReturns
 	fake.recordInvocation("PollingInterval", []interface{}{})
 	fake.pollingIntervalMutex.Unlock()
-	if fake.PollingIntervalStub != nil {
-		return fake.PollingIntervalStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pollingIntervalReturns
 	return fakeReturns.result1
 }
 
@@ -292,15 +295,16 @@ func (fake *FakeConfig) SSHOAuthClient() string {
 	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
 	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct {
 	}{})
+	stub := fake.SSHOAuthClientStub
+	fakeReturns := fake.sSHOAuthClientReturns
 	fake.recordInvocation("SSHOAuthClient", []interface{}{})
 	fake.sSHOAuthClientMutex.Unlock()
-	if fake.SSHOAuthClientStub != nil {
-		return fake.SSHOAuthClientStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sSHOAuthClientReturns
 	return fakeReturns.result1
 }
 
@@ -344,9 +348,10 @@ func (fake *FakeConfig) SetTargetInformation(arg1 configv3.TargetInformationArgs
 	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
 		arg1 configv3.TargetInformationArgs
 	}{arg1})
+	stub := fake.SetTargetInformationStub
 	fake.recordInvocation("SetTargetInformation", []interface{}{arg1})
 	fake.setTargetInformationMutex.Unlock()
-	if fake.SetTargetInformationStub != nil {
+	if stub != nil {
 		fake.SetTargetInformationStub(arg1)
 	}
 }
@@ -377,9 +382,10 @@ func (fake *FakeConfig) SetTokenInformation(arg1 string, arg2 string, arg3 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.SetTokenInformationStub
 	fake.recordInvocation("SetTokenInformation", []interface{}{arg1, arg2, arg3})
 	fake.setTokenInformationMutex.Unlock()
-	if fake.SetTokenInformationStub != nil {
+	if stub != nil {
 		fake.SetTokenInformationStub(arg1, arg2, arg3)
 	}
 }
@@ -409,9 +415,10 @@ func (fake *FakeConfig) SetUAAClientCredentials(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SetUAAClientCredentialsStub
 	fake.recordInvocation("SetUAAClientCredentials", []interface{}{arg1, arg2})
 	fake.setUAAClientCredentialsMutex.Unlock()
-	if fake.SetUAAClientCredentialsStub != nil {
+	if stub != nil {
 		fake.SetUAAClientCredentialsStub(arg1, arg2)
 	}
 }
@@ -440,9 +447,10 @@ func (fake *FakeConfig) SetUAAGrantType(arg1 string) {
 	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetUAAGrantTypeStub
 	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
 	fake.setUAAGrantTypeMutex.Unlock()
-	if fake.SetUAAGrantTypeStub != nil {
+	if stub != nil {
 		fake.SetUAAGrantTypeStub(arg1)
 	}
 }
@@ -471,15 +479,16 @@ func (fake *FakeConfig) SkipSSLValidation() bool {
 	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
 	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct {
 	}{})
+	stub := fake.SkipSSLValidationStub
+	fakeReturns := fake.skipSSLValidationReturns
 	fake.recordInvocation("SkipSSLValidation", []interface{}{})
 	fake.skipSSLValidationMutex.Unlock()
-	if fake.SkipSSLValidationStub != nil {
-		return fake.SkipSSLValidationStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.skipSSLValidationReturns
 	return fakeReturns.result1
 }
 
@@ -523,15 +532,16 @@ func (fake *FakeConfig) StagingTimeout() time.Duration {
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
 	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct {
 	}{})
+	stub := fake.StagingTimeoutStub
+	fakeReturns := fake.stagingTimeoutReturns
 	fake.recordInvocation("StagingTimeout", []interface{}{})
 	fake.stagingTimeoutMutex.Unlock()
-	if fake.StagingTimeoutStub != nil {
-		return fake.StagingTimeoutStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.stagingTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -575,15 +585,16 @@ func (fake *FakeConfig) StartupTimeout() time.Duration {
 	ret, specificReturn := fake.startupTimeoutReturnsOnCall[len(fake.startupTimeoutArgsForCall)]
 	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct {
 	}{})
+	stub := fake.StartupTimeoutStub
+	fakeReturns := fake.startupTimeoutReturns
 	fake.recordInvocation("StartupTimeout", []interface{}{})
 	fake.startupTimeoutMutex.Unlock()
-	if fake.StartupTimeoutStub != nil {
-		return fake.StartupTimeoutStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.startupTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -627,15 +638,16 @@ func (fake *FakeConfig) Target() string {
 	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
 	fake.targetArgsForCall = append(fake.targetArgsForCall, struct {
 	}{})
+	stub := fake.TargetStub
+	fakeReturns := fake.targetReturns
 	fake.recordInvocation("Target", []interface{}{})
 	fake.targetMutex.Unlock()
-	if fake.TargetStub != nil {
-		return fake.TargetStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.targetReturns
 	return fakeReturns.result1
 }
 
@@ -679,15 +691,16 @@ func (fake *FakeConfig) UAAGrantType() string {
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
 	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
 	}{})
+	stub := fake.UAAGrantTypeStub
+	fakeReturns := fake.uAAGrantTypeReturns
 	fake.recordInvocation("UAAGrantType", []interface{}{})
 	fake.uAAGrantTypeMutex.Unlock()
-	if fake.UAAGrantTypeStub != nil {
-		return fake.UAAGrantTypeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uAAGrantTypeReturns
 	return fakeReturns.result1
 }
 
@@ -730,9 +743,10 @@ func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
 	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
 	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct {
 	}{})
+	stub := fake.UnsetOrganizationAndSpaceInformationStub
 	fake.recordInvocation("UnsetOrganizationAndSpaceInformation", []interface{}{})
 	fake.unsetOrganizationAndSpaceInformationMutex.Unlock()
-	if fake.UnsetOrganizationAndSpaceInformationStub != nil {
+	if stub != nil {
 		fake.UnsetOrganizationAndSpaceInformationStub()
 	}
 }

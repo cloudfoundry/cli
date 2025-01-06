@@ -61,15 +61,16 @@ func (fake *FakeNOAAClient) Close() error {
 	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
+	stub := fake.CloseStub
+	fakeReturns := fake.closeReturns
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		return fake.CloseStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.closeReturns
 	return fakeReturns.result1
 }
 
@@ -115,15 +116,16 @@ func (fake *FakeNOAAClient) RecentLogs(arg1 string, arg2 string) ([]*events.LogM
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.RecentLogsStub
+	fakeReturns := fake.recentLogsReturns
 	fake.recordInvocation("RecentLogs", []interface{}{arg1, arg2})
 	fake.recentLogsMutex.Unlock()
-	if fake.RecentLogsStub != nil {
-		return fake.RecentLogsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.recentLogsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -177,9 +179,10 @@ func (fake *FakeNOAAClient) SetOnConnectCallback(arg1 func()) {
 	fake.setOnConnectCallbackArgsForCall = append(fake.setOnConnectCallbackArgsForCall, struct {
 		arg1 func()
 	}{arg1})
+	stub := fake.SetOnConnectCallbackStub
 	fake.recordInvocation("SetOnConnectCallback", []interface{}{arg1})
 	fake.setOnConnectCallbackMutex.Unlock()
-	if fake.SetOnConnectCallbackStub != nil {
+	if stub != nil {
 		fake.SetOnConnectCallbackStub(arg1)
 	}
 }
@@ -210,15 +213,16 @@ func (fake *FakeNOAAClient) TailingLogs(arg1 string, arg2 string) (<-chan *event
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.TailingLogsStub
+	fakeReturns := fake.tailingLogsReturns
 	fake.recordInvocation("TailingLogs", []interface{}{arg1, arg2})
 	fake.tailingLogsMutex.Unlock()
-	if fake.TailingLogsStub != nil {
-		return fake.TailingLogsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.tailingLogsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

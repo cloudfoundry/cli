@@ -60,15 +60,16 @@ func (fake *FakeServiceActor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -114,15 +115,16 @@ func (fake *FakeServiceActor) GetServiceInstanceByNameAndSpace(arg1 string, arg2
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceByNameAndSpaceStub
+	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
-	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -181,15 +183,16 @@ func (fake *FakeServiceActor) GetServiceInstanceSummaryByNameAndSpace(arg1 strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceSummaryByNameAndSpaceStub
+	fakeReturns := fake.getServiceInstanceSummaryByNameAndSpaceReturns
 	fake.recordInvocation("GetServiceInstanceSummaryByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceSummaryByNameAndSpaceMutex.Unlock()
-	if fake.GetServiceInstanceSummaryByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceSummaryByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceSummaryByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

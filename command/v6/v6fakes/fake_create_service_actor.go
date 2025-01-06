@@ -51,15 +51,16 @@ func (fake *FakeCreateServiceActor) CreateServiceInstance(arg1 string, arg2 stri
 		arg6 map[string]interface{}
 		arg7 []string
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
+	stub := fake.CreateServiceInstanceStub
+	fakeReturns := fake.createServiceInstanceReturns
 	fake.recordInvocation("CreateServiceInstance", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
 	fake.createServiceInstanceMutex.Unlock()
-	if fake.CreateServiceInstanceStub != nil {
-		return fake.CreateServiceInstanceStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

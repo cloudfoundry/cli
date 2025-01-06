@@ -107,15 +107,16 @@ func (fake *FakeV3Actor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -161,15 +162,16 @@ func (fake *FakeV3Actor) GetApplicationByNameAndSpace(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -229,15 +231,16 @@ func (fake *FakeV3Actor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 s
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetApplicationSummaryByNameAndSpaceStub
+	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -295,15 +298,16 @@ func (fake *FakeV3Actor) GetOrganizationByName(arg1 string) (v3action.Organizati
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationByNameStub
+	fakeReturns := fake.getOrganizationByNameReturns
 	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
 	fake.getOrganizationByNameMutex.Unlock()
-	if fake.GetOrganizationByNameStub != nil {
-		return fake.GetOrganizationByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -367,15 +371,16 @@ func (fake *FakeV3Actor) ShareServiceInstanceToSpaces(arg1 string, arg2 []string
 		arg1 string
 		arg2 []string
 	}{arg1, arg2Copy})
+	stub := fake.ShareServiceInstanceToSpacesStub
+	fakeReturns := fake.shareServiceInstanceToSpacesReturns
 	fake.recordInvocation("ShareServiceInstanceToSpaces", []interface{}{arg1, arg2Copy})
 	fake.shareServiceInstanceToSpacesMutex.Unlock()
-	if fake.ShareServiceInstanceToSpacesStub != nil {
-		return fake.ShareServiceInstanceToSpacesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.shareServiceInstanceToSpacesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -434,15 +439,16 @@ func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpace(arg1 st
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub
+	fakeReturns := fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns
 	fake.recordInvocation("UnshareServiceInstanceByServiceInstanceAndSpace", []interface{}{arg1, arg2})
 	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
-	if fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub != nil {
-		return fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

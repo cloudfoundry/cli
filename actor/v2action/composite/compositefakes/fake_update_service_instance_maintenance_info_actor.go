@@ -34,15 +34,16 @@ func (fake *FakeUpdateServiceInstanceMaintenanceInfoActor) UpdateServiceInstance
 		arg1 string
 		arg2 v2action.MaintenanceInfo
 	}{arg1, arg2})
+	stub := fake.UpdateServiceInstanceMaintenanceInfoStub
+	fakeReturns := fake.updateServiceInstanceMaintenanceInfoReturns
 	fake.recordInvocation("UpdateServiceInstanceMaintenanceInfo", []interface{}{arg1, arg2})
 	fake.updateServiceInstanceMaintenanceInfoMutex.Unlock()
-	if fake.UpdateServiceInstanceMaintenanceInfoStub != nil {
-		return fake.UpdateServiceInstanceMaintenanceInfoStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateServiceInstanceMaintenanceInfoReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

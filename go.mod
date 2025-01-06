@@ -4,7 +4,6 @@ go 1.23.1
 
 require (
 	code.cloudfoundry.org/bytefmt v0.21.0
-	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.24.0
@@ -50,7 +49,6 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/cli v7.1.0+incompatible // indirect
 	code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect

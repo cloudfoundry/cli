@@ -44,15 +44,16 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicy(arg1 string, arg2 
 		arg6 int
 		arg7 int
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	stub := fake.RemoveNetworkPolicyStub
+	fakeReturns := fake.removeNetworkPolicyReturns
 	fake.recordInvocation("RemoveNetworkPolicy", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.removeNetworkPolicyMutex.Unlock()
-	if fake.RemoveNetworkPolicyStub != nil {
-		return fake.RemoveNetworkPolicyStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.removeNetworkPolicyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

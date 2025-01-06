@@ -32,15 +32,16 @@ func (fake *FakeSharedSSHActor) ExecuteSecureShell(arg1 sharedaction.SecureShell
 		arg1 sharedaction.SecureShellClient
 		arg2 sharedaction.SSHOptions
 	}{arg1, arg2})
+	stub := fake.ExecuteSecureShellStub
+	fakeReturns := fake.executeSecureShellReturns
 	fake.recordInvocation("ExecuteSecureShell", []interface{}{arg1, arg2})
 	fake.executeSecureShellMutex.Unlock()
-	if fake.ExecuteSecureShellStub != nil {
-		return fake.ExecuteSecureShellStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeSecureShellReturns
 	return fakeReturns.result1
 }
 

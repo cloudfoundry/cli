@@ -95,15 +95,16 @@ func (fake *FakeV2Actor) CreateRoute(arg1 v2action.Route, arg2 bool) (v2action.R
 		arg1 v2action.Route
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.CreateRouteStub
+	fakeReturns := fake.createRouteReturns
 	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2})
 	fake.createRouteMutex.Unlock()
-	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createRouteReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -161,15 +162,16 @@ func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettings(arg1 v2action.Route) 
 	fake.findRouteBoundToSpaceWithSettingsArgsForCall = append(fake.findRouteBoundToSpaceWithSettingsArgsForCall, struct {
 		arg1 v2action.Route
 	}{arg1})
+	stub := fake.FindRouteBoundToSpaceWithSettingsStub
+	fakeReturns := fake.findRouteBoundToSpaceWithSettingsReturns
 	fake.recordInvocation("FindRouteBoundToSpaceWithSettings", []interface{}{arg1})
 	fake.findRouteBoundToSpaceWithSettingsMutex.Unlock()
-	if fake.FindRouteBoundToSpaceWithSettingsStub != nil {
-		return fake.FindRouteBoundToSpaceWithSettingsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.findRouteBoundToSpaceWithSettingsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -227,15 +229,16 @@ func (fake *FakeV2Actor) GetApplicationRoutes(arg1 string) (v2action.Routes, v2a
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationRoutesStub
+	fakeReturns := fake.getApplicationRoutesReturns
 	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
 	fake.getApplicationRoutesMutex.Unlock()
-	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -293,15 +296,16 @@ func (fake *FakeV2Actor) GetOrganizationDomains(arg1 string) ([]v2action.Domain,
 	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationDomainsStub
+	fakeReturns := fake.getOrganizationDomainsReturns
 	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1})
 	fake.getOrganizationDomainsMutex.Unlock()
-	if fake.GetOrganizationDomainsStub != nil {
-		return fake.GetOrganizationDomainsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationDomainsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -360,15 +364,16 @@ func (fake *FakeV2Actor) MapRouteToApplication(arg1 string, arg2 string) (v2acti
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.MapRouteToApplicationStub
+	fakeReturns := fake.mapRouteToApplicationReturns
 	fake.recordInvocation("MapRouteToApplication", []interface{}{arg1, arg2})
 	fake.mapRouteToApplicationMutex.Unlock()
-	if fake.MapRouteToApplicationStub != nil {
-		return fake.MapRouteToApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.mapRouteToApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

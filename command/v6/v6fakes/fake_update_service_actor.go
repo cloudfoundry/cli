@@ -57,15 +57,16 @@ func (fake *FakeUpdateServiceActor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -111,15 +112,16 @@ func (fake *FakeUpdateServiceActor) GetServiceInstanceByNameAndSpace(arg1 string
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceByNameAndSpaceStub
+	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
-	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -177,15 +179,16 @@ func (fake *FakeUpdateServiceActor) UpgradeServiceInstance(arg1 v2action.Service
 	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
 		arg1 v2action.ServiceInstance
 	}{arg1})
+	stub := fake.UpgradeServiceInstanceStub
+	fakeReturns := fake.upgradeServiceInstanceReturns
 	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1})
 	fake.upgradeServiceInstanceMutex.Unlock()
-	if fake.UpgradeServiceInstanceStub != nil {
-		return fake.UpgradeServiceInstanceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.upgradeServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

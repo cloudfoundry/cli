@@ -40,15 +40,16 @@ func (fake *FakeCreateServiceKeyActor) CreateServiceKey(arg1 string, arg2 string
 		arg3 string
 		arg4 map[string]interface{}
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.CreateServiceKeyStub
+	fakeReturns := fake.createServiceKeyReturns
 	fake.recordInvocation("CreateServiceKey", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createServiceKeyMutex.Unlock()
-	if fake.CreateServiceKeyStub != nil {
-		return fake.CreateServiceKeyStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createServiceKeyReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

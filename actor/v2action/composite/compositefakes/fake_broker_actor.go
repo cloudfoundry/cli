@@ -48,15 +48,16 @@ func (fake *FakeBrokerActor) GetServiceBrokerByName(arg1 string) (v2action.Servi
 	fake.getServiceBrokerByNameArgsForCall = append(fake.getServiceBrokerByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServiceBrokerByNameStub
+	fakeReturns := fake.getServiceBrokerByNameReturns
 	fake.recordInvocation("GetServiceBrokerByName", []interface{}{arg1})
 	fake.getServiceBrokerByNameMutex.Unlock()
-	if fake.GetServiceBrokerByNameStub != nil {
-		return fake.GetServiceBrokerByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceBrokerByNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -113,15 +114,16 @@ func (fake *FakeBrokerActor) GetServiceBrokers() ([]v2action.ServiceBroker, v2ac
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
 	fake.getServiceBrokersArgsForCall = append(fake.getServiceBrokersArgsForCall, struct {
 	}{})
+	stub := fake.GetServiceBrokersStub
+	fakeReturns := fake.getServiceBrokersReturns
 	fake.recordInvocation("GetServiceBrokers", []interface{}{})
 	fake.getServiceBrokersMutex.Unlock()
-	if fake.GetServiceBrokersStub != nil {
-		return fake.GetServiceBrokersStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceBrokersReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

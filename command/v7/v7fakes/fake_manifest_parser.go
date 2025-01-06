@@ -60,15 +60,16 @@ func (fake *FakeManifestParser) InterpolateAndParse(arg1 string, arg2 []string, 
 		arg2 []string
 		arg3 []template.VarKV
 	}{arg1, arg2Copy, arg3Copy})
+	stub := fake.InterpolateAndParseStub
+	fakeReturns := fake.interpolateAndParseReturns
 	fake.recordInvocation("InterpolateAndParse", []interface{}{arg1, arg2Copy, arg3Copy})
 	fake.interpolateAndParseMutex.Unlock()
-	if fake.InterpolateAndParseStub != nil {
-		return fake.InterpolateAndParseStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.interpolateAndParseReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -123,15 +124,16 @@ func (fake *FakeManifestParser) MarshalManifest(arg1 manifestparser.Manifest) ([
 	fake.marshalManifestArgsForCall = append(fake.marshalManifestArgsForCall, struct {
 		arg1 manifestparser.Manifest
 	}{arg1})
+	stub := fake.MarshalManifestStub
+	fakeReturns := fake.marshalManifestReturns
 	fake.recordInvocation("MarshalManifest", []interface{}{arg1})
 	fake.marshalManifestMutex.Unlock()
-	if fake.MarshalManifestStub != nil {
-		return fake.MarshalManifestStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.marshalManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -170,15 +170,16 @@ func (fake *FakeV3Actor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -224,15 +225,16 @@ func (fake *FakeV3Actor) CreateApplicationInSpace(arg1 v3action.Application, arg
 		arg1 v3action.Application
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateApplicationInSpaceStub
+	fakeReturns := fake.createApplicationInSpaceReturns
 	fake.recordInvocation("CreateApplicationInSpace", []interface{}{arg1, arg2})
 	fake.createApplicationInSpaceMutex.Unlock()
-	if fake.CreateApplicationInSpaceStub != nil {
-		return fake.CreateApplicationInSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createApplicationInSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -290,15 +292,16 @@ func (fake *FakeV3Actor) CreateBitsPackageByApplication(arg1 string) (v3action.P
 	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateBitsPackageByApplicationStub
+	fakeReturns := fake.createBitsPackageByApplicationReturns
 	fake.recordInvocation("CreateBitsPackageByApplication", []interface{}{arg1})
 	fake.createBitsPackageByApplicationMutex.Unlock()
-	if fake.CreateBitsPackageByApplicationStub != nil {
-		return fake.CreateBitsPackageByApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createBitsPackageByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -357,15 +360,16 @@ func (fake *FakeV3Actor) GetApplicationByNameAndSpace(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -424,15 +428,16 @@ func (fake *FakeV3Actor) PollBuild(arg1 string, arg2 string) (v3action.Droplet, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.PollBuildStub
+	fakeReturns := fake.pollBuildReturns
 	fake.recordInvocation("PollBuild", []interface{}{arg1, arg2})
 	fake.pollBuildMutex.Unlock()
-	if fake.PollBuildStub != nil {
-		return fake.PollBuildStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollBuildReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -490,15 +495,16 @@ func (fake *FakeV3Actor) PollPackage(arg1 v3action.Package) (v3action.Package, v
 	fake.pollPackageArgsForCall = append(fake.pollPackageArgsForCall, struct {
 		arg1 v3action.Package
 	}{arg1})
+	stub := fake.PollPackageStub
+	fakeReturns := fake.pollPackageReturns
 	fake.recordInvocation("PollPackage", []interface{}{arg1})
 	fake.pollPackageMutex.Unlock()
-	if fake.PollPackageStub != nil {
-		return fake.PollPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pollPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -557,15 +563,16 @@ func (fake *FakeV3Actor) SetApplicationDroplet(arg1 string, arg2 string) (v3acti
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.SetApplicationDropletStub
+	fakeReturns := fake.setApplicationDropletReturns
 	fake.recordInvocation("SetApplicationDroplet", []interface{}{arg1, arg2})
 	fake.setApplicationDropletMutex.Unlock()
-	if fake.SetApplicationDropletStub != nil {
-		return fake.SetApplicationDropletStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setApplicationDropletReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -620,15 +627,16 @@ func (fake *FakeV3Actor) StageApplicationPackage(arg1 string) (v3action.Build, v
 	fake.stageApplicationPackageArgsForCall = append(fake.stageApplicationPackageArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StageApplicationPackageStub
+	fakeReturns := fake.stageApplicationPackageReturns
 	fake.recordInvocation("StageApplicationPackage", []interface{}{arg1})
 	fake.stageApplicationPackageMutex.Unlock()
-	if fake.StageApplicationPackageStub != nil {
-		return fake.StageApplicationPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.stageApplicationPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -686,15 +694,16 @@ func (fake *FakeV3Actor) UpdateApplication(arg1 v3action.Application) (v3action.
 	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
 		arg1 v3action.Application
 	}{arg1})
+	stub := fake.UpdateApplicationStub
+	fakeReturns := fake.updateApplicationReturns
 	fake.recordInvocation("UpdateApplication", []interface{}{arg1})
 	fake.updateApplicationMutex.Unlock()
-	if fake.UpdateApplicationStub != nil {
-		return fake.UpdateApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.updateApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -760,15 +769,16 @@ func (fake *FakeV3Actor) UploadBitsPackage(arg1 v3action.Package, arg2 []shareda
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2Copy, arg3, arg4})
+	stub := fake.UploadBitsPackageStub
+	fakeReturns := fake.uploadBitsPackageReturns
 	fake.recordInvocation("UploadBitsPackage", []interface{}{arg1, arg2Copy, arg3, arg4})
 	fake.uploadBitsPackageMutex.Unlock()
-	if fake.UploadBitsPackageStub != nil {
-		return fake.UploadBitsPackageStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.uploadBitsPackageReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

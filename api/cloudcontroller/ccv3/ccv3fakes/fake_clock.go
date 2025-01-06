@@ -28,15 +28,16 @@ func (fake *FakeClock) Now() time.Time {
 	ret, specificReturn := fake.nowReturnsOnCall[len(fake.nowArgsForCall)]
 	fake.nowArgsForCall = append(fake.nowArgsForCall, struct {
 	}{})
+	stub := fake.NowStub
+	fakeReturns := fake.nowReturns
 	fake.recordInvocation("Now", []interface{}{})
 	fake.nowMutex.Unlock()
-	if fake.NowStub != nil {
-		return fake.NowStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.nowReturns
 	return fakeReturns.result1
 }
 

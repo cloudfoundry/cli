@@ -98,15 +98,16 @@ func (fake *FakeUAAClient) APIVersion() string {
 	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
 	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.APIVersionStub
+	fakeReturns := fake.aPIVersionReturns
 	fake.recordInvocation("APIVersion", []interface{}{})
 	fake.aPIVersionMutex.Unlock()
-	if fake.APIVersionStub != nil {
-		return fake.APIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.aPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -153,15 +154,16 @@ func (fake *FakeUAAClient) Authenticate(arg1 map[string]string, arg2 string, arg
 		arg2 string
 		arg3 constant.GrantType
 	}{arg1, arg2, arg3})
+	stub := fake.AuthenticateStub
+	fakeReturns := fake.authenticateReturns
 	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3})
 	fake.authenticateMutex.Unlock()
-	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.authenticateReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -221,15 +223,16 @@ func (fake *FakeUAAClient) CreateUser(arg1 string, arg2 string, arg3 string) (ua
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.CreateUserStub
+	fakeReturns := fake.createUserReturns
 	fake.recordInvocation("CreateUser", []interface{}{arg1, arg2, arg3})
 	fake.createUserMutex.Unlock()
-	if fake.CreateUserStub != nil {
-		return fake.CreateUserStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -285,15 +288,16 @@ func (fake *FakeUAAClient) GetSSHPasscode(arg1 string, arg2 string) (string, err
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetSSHPasscodeStub
+	fakeReturns := fake.getSSHPasscodeReturns
 	fake.recordInvocation("GetSSHPasscode", []interface{}{arg1, arg2})
 	fake.getSSHPasscodeMutex.Unlock()
-	if fake.GetSSHPasscodeStub != nil {
-		return fake.GetSSHPasscodeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSSHPasscodeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -347,15 +351,16 @@ func (fake *FakeUAAClient) LoginPrompts() map[string][]string {
 	ret, specificReturn := fake.loginPromptsReturnsOnCall[len(fake.loginPromptsArgsForCall)]
 	fake.loginPromptsArgsForCall = append(fake.loginPromptsArgsForCall, struct {
 	}{})
+	stub := fake.LoginPromptsStub
+	fakeReturns := fake.loginPromptsReturns
 	fake.recordInvocation("LoginPrompts", []interface{}{})
 	fake.loginPromptsMutex.Unlock()
-	if fake.LoginPromptsStub != nil {
-		return fake.LoginPromptsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.loginPromptsReturns
 	return fakeReturns.result1
 }
 
@@ -400,15 +405,16 @@ func (fake *FakeUAAClient) RefreshAccessToken(arg1 string) (uaa.RefreshedTokens,
 	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RefreshAccessTokenStub
+	fakeReturns := fake.refreshAccessTokenReturns
 	fake.recordInvocation("RefreshAccessToken", []interface{}{arg1})
 	fake.refreshAccessTokenMutex.Unlock()
-	if fake.RefreshAccessTokenStub != nil {
-		return fake.RefreshAccessTokenStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshAccessTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

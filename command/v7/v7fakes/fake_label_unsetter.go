@@ -32,15 +32,16 @@ func (fake *FakeLabelUnsetter) Execute(arg1 v7.TargetResource, arg2 map[string]t
 		arg1 v7.TargetResource
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1, arg2})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 

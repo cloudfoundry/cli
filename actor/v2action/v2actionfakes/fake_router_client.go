@@ -32,15 +32,16 @@ func (fake *FakeRouterClient) GetRouterGroupByName(arg1 string) (router.RouterGr
 	fake.getRouterGroupByNameArgsForCall = append(fake.getRouterGroupByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetRouterGroupByNameStub
+	fakeReturns := fake.getRouterGroupByNameReturns
 	fake.recordInvocation("GetRouterGroupByName", []interface{}{arg1})
 	fake.getRouterGroupByNameMutex.Unlock()
-	if fake.GetRouterGroupByNameStub != nil {
-		return fake.GetRouterGroupByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getRouterGroupByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

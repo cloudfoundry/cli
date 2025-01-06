@@ -85,15 +85,16 @@ func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -139,15 +140,16 @@ func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeployment(arg1 string, arg2 s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateDeploymentStub
+	fakeReturns := fake.createDeploymentReturns
 	fake.recordInvocation("CreateDeployment", []interface{}{arg1, arg2})
 	fake.createDeploymentMutex.Unlock()
-	if fake.CreateDeploymentStub != nil {
-		return fake.CreateDeploymentStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createDeploymentReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -206,15 +208,16 @@ func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpace(arg1 st
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -272,15 +275,16 @@ func (fake *FakeV3ZeroDowntimeRestartActor) StartApplication(arg1 string) (v3act
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StartApplicationStub
+	fakeReturns := fake.startApplicationReturns
 	fake.recordInvocation("StartApplication", []interface{}{arg1})
 	fake.startApplicationMutex.Unlock()
-	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.startApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -336,15 +340,16 @@ func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStart(arg1 string, a
 		arg1 string
 		arg2 chan<- v3action.Warnings
 	}{arg1, arg2})
+	stub := fake.ZeroDowntimePollStartStub
+	fakeReturns := fake.zeroDowntimePollStartReturns
 	fake.recordInvocation("ZeroDowntimePollStart", []interface{}{arg1, arg2})
 	fake.zeroDowntimePollStartMutex.Unlock()
-	if fake.ZeroDowntimePollStartStub != nil {
-		return fake.ZeroDowntimePollStartStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.zeroDowntimePollStartReturns
 	return fakeReturns.result1
 }
 

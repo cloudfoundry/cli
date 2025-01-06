@@ -76,15 +76,16 @@ func (fake *FakeAppStager) StageAndStart(arg1 resources.Application, arg2 config
 		arg6 bool
 		arg7 constant.ApplicationAction
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	stub := fake.StageAndStartStub
+	fakeReturns := fake.stageAndStartReturns
 	fake.recordInvocation("StageAndStart", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.stageAndStartMutex.Unlock()
-	if fake.StageAndStartStub != nil {
-		return fake.StageAndStartStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.stageAndStartReturns
 	return fakeReturns.result1
 }
 
@@ -138,15 +139,16 @@ func (fake *FakeAppStager) StageApp(arg1 resources.Application, arg2 string, arg
 		arg2 string
 		arg3 configv3.Space
 	}{arg1, arg2, arg3})
+	stub := fake.StageAppStub
+	fakeReturns := fake.stageAppReturns
 	fake.recordInvocation("StageApp", []interface{}{arg1, arg2, arg3})
 	fake.stageAppMutex.Unlock()
-	if fake.StageAppStub != nil {
-		return fake.StageAppStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stageAppReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -207,15 +209,16 @@ func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 string, arg
 		arg6 configv3.Organization
 		arg7 constant.ApplicationAction
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	stub := fake.StartAppStub
+	fakeReturns := fake.startAppReturns
 	fake.recordInvocation("StartApp", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.startAppMutex.Unlock()
-	if fake.StartAppStub != nil {
-		return fake.StartAppStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.startAppReturns
 	return fakeReturns.result1
 }
 

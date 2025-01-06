@@ -49,15 +49,16 @@ func (fake *FakeOrganizationActor) GetOrganization(arg1 string) (v2action.Organi
 	fake.getOrganizationArgsForCall = append(fake.getOrganizationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetOrganizationStub
+	fakeReturns := fake.getOrganizationReturns
 	fake.recordInvocation("GetOrganization", []interface{}{arg1})
 	fake.getOrganizationMutex.Unlock()
-	if fake.GetOrganizationStub != nil {
-		return fake.GetOrganizationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -115,15 +116,16 @@ func (fake *FakeOrganizationActor) OrganizationExistsWithName(arg1 string) (bool
 	fake.organizationExistsWithNameArgsForCall = append(fake.organizationExistsWithNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.OrganizationExistsWithNameStub
+	fakeReturns := fake.organizationExistsWithNameReturns
 	fake.recordInvocation("OrganizationExistsWithName", []interface{}{arg1})
 	fake.organizationExistsWithNameMutex.Unlock()
-	if fake.OrganizationExistsWithNameStub != nil {
-		return fake.OrganizationExistsWithNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.organizationExistsWithNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

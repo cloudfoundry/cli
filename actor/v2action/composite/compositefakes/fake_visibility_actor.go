@@ -34,15 +34,16 @@ func (fake *FakeVisibilityActor) GetServicePlanVisibilities(arg1 string) ([]v2ac
 	fake.getServicePlanVisibilitiesArgsForCall = append(fake.getServicePlanVisibilitiesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServicePlanVisibilitiesStub
+	fakeReturns := fake.getServicePlanVisibilitiesReturns
 	fake.recordInvocation("GetServicePlanVisibilities", []interface{}{arg1})
 	fake.getServicePlanVisibilitiesMutex.Unlock()
-	if fake.GetServicePlanVisibilitiesStub != nil {
-		return fake.GetServicePlanVisibilitiesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicePlanVisibilitiesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

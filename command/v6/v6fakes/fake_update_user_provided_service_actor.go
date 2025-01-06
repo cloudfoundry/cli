@@ -50,15 +50,16 @@ func (fake *FakeUpdateUserProvidedServiceActor) GetServiceInstanceByNameAndSpace
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetServiceInstanceByNameAndSpaceStub
+	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
-	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -117,15 +118,16 @@ func (fake *FakeUpdateUserProvidedServiceActor) UpdateUserProvidedServiceInstanc
 		arg1 string
 		arg2 v2action.UserProvidedServiceInstance
 	}{arg1, arg2})
+	stub := fake.UpdateUserProvidedServiceInstanceStub
+	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
 	fake.recordInvocation("UpdateUserProvidedServiceInstance", []interface{}{arg1, arg2})
 	fake.updateUserProvidedServiceInstanceMutex.Unlock()
-	if fake.UpdateUserProvidedServiceInstanceStub != nil {
-		return fake.UpdateUserProvidedServiceInstanceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
