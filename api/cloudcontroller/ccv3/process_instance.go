@@ -40,6 +40,8 @@ type ProcessInstance struct {
 	LogRate uint64
 	// State is the state of the instance.
 	State constant.ProcessInstanceState
+	// Routeable is the readiness state of the instance, can be true, false or null.
+	Routable *bool
 	// Type is the process type for the instance.
 	Type string
 	// Uptime is the duration that the instance has been running.
@@ -56,6 +58,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 		MemQuota         uint64 `json:"mem_quota"`
 		LogRateLimit     int64  `json:"log_rate_limit"`
 		State            string `json:"state"`
+		Routable         *bool  `json:"routable"`
 		Type             string `json:"type"`
 		Uptime           int64  `json:"uptime"`
 		Usage            struct {
@@ -84,6 +87,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	instance.LogRateLimit = inputInstance.LogRateLimit
 	instance.LogRate = inputInstance.Usage.LogRate
 	instance.State = constant.ProcessInstanceState(inputInstance.State)
+	instance.Routable = inputInstance.Routable
 	instance.Type = inputInstance.Type
 	instance.Uptime, err = time.ParseDuration(fmt.Sprintf("%ds", inputInstance.Uptime))
 	if err != nil {
