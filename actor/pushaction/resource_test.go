@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
-	"code.cloudfoundry.org/cli/actor/v2action"
+	. "code.cloudfoundry.org/cli/v7/actor/pushaction"
+	"code.cloudfoundry.org/cli/v7/actor/pushaction/pushactionfakes"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

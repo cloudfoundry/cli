@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
-	. "code.cloudfoundry.org/cli/actor/v2action/composite"
-	"code.cloudfoundry.org/cli/actor/v2action/composite/compositefakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	. "code.cloudfoundry.org/cli/v7/actor/v2action/composite"
+	"code.cloudfoundry.org/cli/v7/actor/v2action/composite/compositefakes"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

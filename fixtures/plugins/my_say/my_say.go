@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v7/plugin"
 )
 
 type MySay struct {

@@ -4,8 +4,8 @@ package sharedfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/v7/actor/v2v3action"
+	"code.cloudfoundry.org/cli/v7/command/v6/shared"
 )
 
 type FakeApplicationSummaryActor struct {
@@ -45,15 +45,16 @@ func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersion() string {
 	ret, specificReturn := fake.cloudControllerV3APIVersionReturnsOnCall[len(fake.cloudControllerV3APIVersionArgsForCall)]
 	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerV3APIVersionStub
+	fakeReturns := fake.cloudControllerV3APIVersionReturns
 	fake.recordInvocation("CloudControllerV3APIVersion", []interface{}{})
 	fake.cloudControllerV3APIVersionMutex.Unlock()
-	if fake.CloudControllerV3APIVersionStub != nil {
-		return fake.CloudControllerV3APIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerV3APIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -100,15 +101,16 @@ func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpace(arg
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetApplicationSummaryByNameAndSpaceStub
+	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	. "code.cloudfoundry.org/cli/util/manifestparser"
+	. "code.cloudfoundry.org/cli/v7/util/manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo/v2"

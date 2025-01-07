@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/types"
+	"code.cloudfoundry.org/cli/v7/util"
+	"code.cloudfoundry.org/cli/v7/util/download"
 
 	"gopkg.in/cheggaaa/pb.v1"
 )

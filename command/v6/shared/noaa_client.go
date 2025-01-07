@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	"code.cloudfoundry.org/cli/v7/api/uaa/noaabridge"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/util"
 	"github.com/cloudfoundry/noaa/v2/consumer"
 )
 

@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -230,7 +230,7 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /oauth/token"))
 				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
-				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) //This is required to test the previous line. If it fails, the previous matcher went too far.
+				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) // This is required to test the previous line. If it fails, the previous matcher went too far.
 				Eventually(session).Should(Say("RESPONSE:"))
 				// actual request
 				Eventually(session).Should(Say("REQUEST:"))

@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	. "code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

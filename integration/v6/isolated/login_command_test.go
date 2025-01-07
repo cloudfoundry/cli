@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -251,8 +251,8 @@ var _ = Describe("login command", func() {
 					}
 					Eventually(session).Should(Say("API endpoint: %s", apiURL))
 					// TODO https://www.pivotaltracker.com/story/show/166938709/comments/204492216
-					//Consistently(session).ShouldNot(Say("API endpoint:"))
-					//session.Interrupt()
+					// Consistently(session).ShouldNot(Say("API endpoint:"))
+					// session.Interrupt()
 					Eventually(session).Should(Exit())
 
 				})
@@ -478,7 +478,7 @@ var _ = Describe("login command", func() {
 
 				It("doesn't complain about an invalid cert when we specify --skip-ssl-validation", func() {
 					session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
-					//session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
+					// session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
 					Expect(session).Should(Say("API endpoint:\\s+" + server.URL()))
 					Expect(session).Should(Say(`Authenticating\.\.\.`))
@@ -552,7 +552,7 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 
-					//And I am still logged in
+					// And I am still logged in
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
 				})

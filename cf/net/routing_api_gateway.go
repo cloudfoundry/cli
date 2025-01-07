@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/v7/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v7/cf/errors"
+	"code.cloudfoundry.org/cli/v7/cf/terminal"
+	"code.cloudfoundry.org/cli/v7/cf/trace"
 )
 
 type errorResponse struct {

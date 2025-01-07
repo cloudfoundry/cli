@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeBindServiceActor struct {
@@ -52,15 +52,16 @@ func (fake *FakeBindServiceActor) BindServiceBySpace(arg1 string, arg2 string, a
 		arg4 string
 		arg5 map[string]interface{}
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.BindServiceBySpaceStub
+	fakeReturns := fake.bindServiceBySpaceReturns
 	fake.recordInvocation("BindServiceBySpace", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.bindServiceBySpaceMutex.Unlock()
-	if fake.BindServiceBySpaceStub != nil {
-		return fake.BindServiceBySpaceStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.bindServiceBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -117,15 +118,16 @@ func (fake *FakeBindServiceActor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 

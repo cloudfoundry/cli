@@ -8,7 +8,7 @@ import (
 
 	"github.com/SermoDigital/jose/jws"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v7/actor/sharedaction"
 )
 
 func (actor Actor) GetStreamingLogs(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {

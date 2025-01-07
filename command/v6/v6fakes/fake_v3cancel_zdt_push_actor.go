@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeV3CancelZdtPushActor struct {
@@ -34,15 +34,16 @@ func (fake *FakeV3CancelZdtPushActor) CancelDeploymentByAppNameAndSpace(arg1 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CancelDeploymentByAppNameAndSpaceStub
+	fakeReturns := fake.cancelDeploymentByAppNameAndSpaceReturns
 	fake.recordInvocation("CancelDeploymentByAppNameAndSpace", []interface{}{arg1, arg2})
 	fake.cancelDeploymentByAppNameAndSpaceMutex.Unlock()
-	if fake.CancelDeploymentByAppNameAndSpaceStub != nil {
-		return fake.CancelDeploymentByAppNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.cancelDeploymentByAppNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

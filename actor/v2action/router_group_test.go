@@ -3,10 +3,10 @@ package v2action_test
 import (
 	"fmt"
 
-	. "code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/router"
-	routererror "code.cloudfoundry.org/cli/api/router/routererror"
+	. "code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/v7/api/router"
+	routererror "code.cloudfoundry.org/cli/v7/api/router/routererror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

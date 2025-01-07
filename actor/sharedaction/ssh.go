@@ -1,6 +1,6 @@
 package sharedaction
 
-import "code.cloudfoundry.org/cli/util/clissh"
+import "code.cloudfoundry.org/cli/v7/util/clissh"
 
 type TTYOption clissh.TTYRequest
 

@@ -1,9 +1,9 @@
 package wrapper
 
 import (
-	"code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/router/routererror"
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v7/api/router"
+	"code.cloudfoundry.org/cli/v7/api/router/routererror"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient

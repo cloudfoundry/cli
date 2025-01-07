@@ -4,7 +4,7 @@ package uifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 )
 
 type FakeExiter struct {
@@ -22,9 +22,10 @@ func (fake *FakeExiter) Exit(arg1 int) {
 	fake.exitArgsForCall = append(fake.exitArgsForCall, struct {
 		arg1 int
 	}{arg1})
+	stub := fake.ExitStub
 	fake.recordInvocation("Exit", []interface{}{arg1})
 	fake.exitMutex.Unlock()
-	if fake.ExitStub != nil {
+	if stub != nil {
 		fake.ExitStub(arg1)
 	}
 }

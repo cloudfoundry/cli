@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeUnbindServiceActor struct {
@@ -38,15 +38,16 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(arg1 string, arg2 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.UnbindServiceBySpaceStub
+	fakeReturns := fake.unbindServiceBySpaceReturns
 	fake.recordInvocation("UnbindServiceBySpace", []interface{}{arg1, arg2, arg3})
 	fake.unbindServiceBySpaceMutex.Unlock()
-	if fake.UnbindServiceBySpaceStub != nil {
-		return fake.UnbindServiceBySpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.unbindServiceBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

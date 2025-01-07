@@ -1,9 +1,9 @@
 package v3action
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (resources.ServiceInstance, Warnings, error) {
@@ -20,7 +20,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 		return resources.ServiceInstance{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName}
 	}
 
-	//Handle multiple serviceInstances being returned as GetServiceInstances arnt filtered by space
+	// Handle multiple serviceInstances being returned as GetServiceInstances arnt filtered by space
 	return serviceInstances[0], Warnings(warnings), nil
 }
 

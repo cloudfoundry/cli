@@ -1,14 +1,14 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/router"
-	routerWrapper "code.cloudfoundry.org/cli/api/router/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
-	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
+	ccWrapper "code.cloudfoundry.org/cli/v7/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v7/api/router"
+	routerWrapper "code.cloudfoundry.org/cli/v7/api/router/wrapper"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	uaaWrapper "code.cloudfoundry.org/cli/v7/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v7/command"
+	"code.cloudfoundry.org/cli/v7/command/translatableerror"
 )
 
 func NewRouterClient(config command.Config, ui command.UI, uaaClient *uaa.Client) (*router.Client, error) {

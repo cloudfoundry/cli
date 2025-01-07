@@ -3,9 +3,9 @@ package common
 import (
 	"reflect"
 
-	"code.cloudfoundry.org/cli/command/plugin"
-	v6 "code.cloudfoundry.org/cli/command/v6"
-	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/v7/command/plugin"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
+	v7 "code.cloudfoundry.org/cli/v7/command/v7"
 )
 
 var Commands commandList

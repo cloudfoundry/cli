@@ -1,9 +1,9 @@
 package v7pushaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/v7/actor/v7action"
+	"code.cloudfoundry.org/cli/v7/resources"
+	"code.cloudfoundry.org/cli/v7/util/manifestparser"
 )
 
 // CreatePushPlans returns a set of PushPlan objects based off the inputs

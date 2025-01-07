@@ -1,7 +1,7 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v7/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -49,7 +49,7 @@ var _ = Describe("update-space-quota command", func() {
 		Eventually(session).Should(Say(`instance memory limit\s+%s`, instanceMemory))
 		Eventually(session).Should(Say(`routes\s+%s`, "8"))
 		Eventually(session).Should(Say(`services\s+%s`, serviceInstances))
-		//TODO: Uncomment when #134821331 is complete
+		// TODO: Uncomment when #134821331 is complete
 		// Eventually(session).Should(Say(`Paid service plans\s+%s`, "allowed"))
 		Eventually(session).Should(Say(`app instance limit\s+%s`, appInstances))
 		Eventually(session).Should(Say(`reserved route ports\s+%s`, reservedRoutePorts))
