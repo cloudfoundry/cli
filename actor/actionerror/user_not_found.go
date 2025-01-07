@@ -3,7 +3,7 @@ package actionerror
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 // UserNotFoundError is an error wrapper that represents the case

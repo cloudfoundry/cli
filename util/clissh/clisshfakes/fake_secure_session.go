@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/v9/util/clissh"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -125,15 +125,16 @@ func (fake *FakeSecureSession) Close() error {
 	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
+	stub := fake.CloseStub
+	fakeReturns := fake.closeReturns
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		return fake.CloseStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.closeReturns
 	return fakeReturns.result1
 }
 
@@ -181,15 +182,16 @@ func (fake *FakeSecureSession) RequestPty(arg1 string, arg2 int, arg3 int, arg4 
 		arg3 int
 		arg4 ssh.TerminalModes
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.RequestPtyStub
+	fakeReturns := fake.requestPtyReturns
 	fake.recordInvocation("RequestPty", []interface{}{arg1, arg2, arg3, arg4})
 	fake.requestPtyMutex.Unlock()
-	if fake.RequestPtyStub != nil {
-		return fake.RequestPtyStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.requestPtyReturns
 	return fakeReturns.result1
 }
 
@@ -248,15 +250,16 @@ func (fake *FakeSecureSession) SendRequest(arg1 string, arg2 bool, arg3 []byte) 
 		arg2 bool
 		arg3 []byte
 	}{arg1, arg2, arg3Copy})
+	stub := fake.SendRequestStub
+	fakeReturns := fake.sendRequestReturns
 	fake.recordInvocation("SendRequest", []interface{}{arg1, arg2, arg3Copy})
 	fake.sendRequestMutex.Unlock()
-	if fake.SendRequestStub != nil {
-		return fake.SendRequestStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.sendRequestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -310,15 +313,16 @@ func (fake *FakeSecureSession) Shell() error {
 	ret, specificReturn := fake.shellReturnsOnCall[len(fake.shellArgsForCall)]
 	fake.shellArgsForCall = append(fake.shellArgsForCall, struct {
 	}{})
+	stub := fake.ShellStub
+	fakeReturns := fake.shellReturns
 	fake.recordInvocation("Shell", []interface{}{})
 	fake.shellMutex.Unlock()
-	if fake.ShellStub != nil {
-		return fake.ShellStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.shellReturns
 	return fakeReturns.result1
 }
 
@@ -363,15 +367,16 @@ func (fake *FakeSecureSession) Start(arg1 string) error {
 	fake.startArgsForCall = append(fake.startArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.StartStub
+	fakeReturns := fake.startReturns
 	fake.recordInvocation("Start", []interface{}{arg1})
 	fake.startMutex.Unlock()
-	if fake.StartStub != nil {
-		return fake.StartStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.startReturns
 	return fakeReturns.result1
 }
 
@@ -422,15 +427,16 @@ func (fake *FakeSecureSession) StderrPipe() (io.Reader, error) {
 	ret, specificReturn := fake.stderrPipeReturnsOnCall[len(fake.stderrPipeArgsForCall)]
 	fake.stderrPipeArgsForCall = append(fake.stderrPipeArgsForCall, struct {
 	}{})
+	stub := fake.StderrPipeStub
+	fakeReturns := fake.stderrPipeReturns
 	fake.recordInvocation("StderrPipe", []interface{}{})
 	fake.stderrPipeMutex.Unlock()
-	if fake.StderrPipeStub != nil {
-		return fake.StderrPipeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stderrPipeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -477,15 +483,16 @@ func (fake *FakeSecureSession) StdinPipe() (io.WriteCloser, error) {
 	ret, specificReturn := fake.stdinPipeReturnsOnCall[len(fake.stdinPipeArgsForCall)]
 	fake.stdinPipeArgsForCall = append(fake.stdinPipeArgsForCall, struct {
 	}{})
+	stub := fake.StdinPipeStub
+	fakeReturns := fake.stdinPipeReturns
 	fake.recordInvocation("StdinPipe", []interface{}{})
 	fake.stdinPipeMutex.Unlock()
-	if fake.StdinPipeStub != nil {
-		return fake.StdinPipeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stdinPipeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -532,15 +539,16 @@ func (fake *FakeSecureSession) StdoutPipe() (io.Reader, error) {
 	ret, specificReturn := fake.stdoutPipeReturnsOnCall[len(fake.stdoutPipeArgsForCall)]
 	fake.stdoutPipeArgsForCall = append(fake.stdoutPipeArgsForCall, struct {
 	}{})
+	stub := fake.StdoutPipeStub
+	fakeReturns := fake.stdoutPipeReturns
 	fake.recordInvocation("StdoutPipe", []interface{}{})
 	fake.stdoutPipeMutex.Unlock()
-	if fake.StdoutPipeStub != nil {
-		return fake.StdoutPipeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.stdoutPipeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -587,15 +595,16 @@ func (fake *FakeSecureSession) Wait() error {
 	ret, specificReturn := fake.waitReturnsOnCall[len(fake.waitArgsForCall)]
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct {
 	}{})
+	stub := fake.WaitStub
+	fakeReturns := fake.waitReturns
 	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
-	if fake.WaitStub != nil {
-		return fake.WaitStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.waitReturns
 	return fakeReturns.result1
 }
 

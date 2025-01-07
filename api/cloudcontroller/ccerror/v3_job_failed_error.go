@@ -3,7 +3,7 @@ package ccerror
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 // V3JobFailedError represents a failed Cloud Controller Job. It wraps the error

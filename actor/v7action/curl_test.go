@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

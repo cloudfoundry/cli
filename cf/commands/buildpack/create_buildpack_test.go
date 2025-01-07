@@ -3,16 +3,16 @@ package buildpack_test
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf"
+	"code.cloudfoundry.org/cli/v9/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

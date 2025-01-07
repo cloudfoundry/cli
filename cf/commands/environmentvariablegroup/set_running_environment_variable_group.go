@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/api/environmentvariablegroups"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	cf_errors "code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/environmentvariablegroups"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	cf_errors "code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type SetRunningEnvironmentVariableGroup struct {

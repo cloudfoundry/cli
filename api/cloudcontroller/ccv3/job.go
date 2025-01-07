@@ -3,8 +3,8 @@ package ccv3
 import (
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 // Job represents a Cloud Controller Job.

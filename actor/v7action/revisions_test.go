@@ -4,14 +4,13 @@ import (
 	"errors"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -403,7 +402,7 @@ var _ = Describe("Revisions Actions", func() {
 	Describe("GetEnvironmentVariableGroupByRevision", func() {
 		var (
 			actor                     *Actor
-			environmentVariablesGroup v7action.EnvironmentVariableGroup
+			environmentVariablesGroup EnvironmentVariableGroup
 			executeErr                error
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeConfig                *v7actionfakes.FakeConfig

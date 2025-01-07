@@ -10,10 +10,10 @@ import (
 
 	logcache "code.cloudfoundry.org/go-log-cache/v2"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/shared"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/shared"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/util"
 )
 
 type RequestLoggerOutput interface {
@@ -34,31 +34,31 @@ type DebugPrinter struct {
 
 func (p DebugPrinter) PrintError(err error) {
 	for _, output := range p.outputs {
-		_ = output.Start()                          //nolint
-		_ = output.DisplayType("ERROR", time.Now()) //nolint
-		_ = output.DisplayDump(err.Error())         //nolint
-		_ = output.Stop()                           //nolint
+		_ = output.Start()                          // nolint
+		_ = output.DisplayType("ERROR", time.Now()) // nolint
+		_ = output.DisplayDump(err.Error())         // nolint
+		_ = output.Stop()                           // nolint
 	}
 }
 
 func (p DebugPrinter) PrintRequest(req *http.Request) {
 	for _, output := range p.outputs {
-		_ = output.Start()                                                           //nolint
-		_ = output.DisplayType("REQUEST", time.Now())                                //nolint
-		_ = output.DisplayRequestHeader(req.Method, req.URL.RequestURI(), req.Proto) //nolint
-		_ = output.DisplayHost(req.URL.Host)                                         //nolint
-		_ = output.DisplayDump(headersString(req.Header))                            //nolint
-		_ = output.Stop()                                                            //nolint
+		_ = output.Start()                                                           // nolint
+		_ = output.DisplayType("REQUEST", time.Now())                                // nolint
+		_ = output.DisplayRequestHeader(req.Method, req.URL.RequestURI(), req.Proto) // nolint
+		_ = output.DisplayHost(req.URL.Host)                                         // nolint
+		_ = output.DisplayDump(headersString(req.Header))                            // nolint
+		_ = output.Stop()                                                            // nolint
 	}
 }
 
 func (p DebugPrinter) PrintResponse(resp *http.Response) {
 	for _, output := range p.outputs {
-		_ = output.Start()                                        //nolint
-		_ = output.DisplayType("RESPONSE", time.Now())            //nolint
-		_ = output.DisplayResponseHeader(resp.Proto, resp.Status) //nolint
-		_ = output.DisplayDump(headersString(resp.Header))        //nolint
-		_ = output.Stop()                                         //nolint
+		_ = output.Start()                                        // nolint
+		_ = output.DisplayType("RESPONSE", time.Now())            // nolint
+		_ = output.DisplayResponseHeader(resp.Proto, resp.Status) // nolint
+		_ = output.DisplayDump(headersString(resp.Header))        // nolint
+		_ = output.Stop()                                         // nolint
 	}
 }
 
@@ -124,7 +124,7 @@ func NewClient(logCacheEndpoint string, config command.Config, ui command.UI, k8
 		}
 	}
 
-	var client logcache.HTTPClient //nolint
+	var client logcache.HTTPClient // nolint
 	client = &userAgentHTTPClient{
 		c:         &http.Client{Transport: tr},
 		userAgent: fmt.Sprintf("%s/%s (%s; %s %s)", config.BinaryName(), config.BinaryVersion(), runtime.Version(), runtime.GOARCH, runtime.GOOS),

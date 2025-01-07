@@ -3,13 +3,13 @@ package v7
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/util/manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	"gopkg.in/yaml.v2"
 )

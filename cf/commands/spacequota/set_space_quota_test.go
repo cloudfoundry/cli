@@ -1,19 +1,19 @@
 package spacequota_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/api/spacequotas/spacequotasfakes"
-	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
-	"code.cloudfoundry.org/cli/cf/commands/spacequota"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/spacequotas/spacequotasfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/spaces/spacesfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/spacequota"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig/coreconfigfakes"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

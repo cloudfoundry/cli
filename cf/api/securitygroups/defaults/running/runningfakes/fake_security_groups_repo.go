@@ -4,8 +4,8 @@ package runningfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/securitygroups/defaults/running"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api/securitygroups/defaults/running"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeSecurityGroupsRepo struct {
@@ -53,15 +53,16 @@ func (fake *FakeSecurityGroupsRepo) BindToRunningSet(arg1 string) error {
 	fake.bindToRunningSetArgsForCall = append(fake.bindToRunningSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.BindToRunningSetStub
+	fakeReturns := fake.bindToRunningSetReturns
 	fake.recordInvocation("BindToRunningSet", []interface{}{arg1})
 	fake.bindToRunningSetMutex.Unlock()
-	if fake.BindToRunningSetStub != nil {
-		return fake.BindToRunningSetStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.bindToRunningSetReturns
 	return fakeReturns.result1
 }
 
@@ -112,15 +113,16 @@ func (fake *FakeSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error)
 	ret, specificReturn := fake.listReturnsOnCall[len(fake.listArgsForCall)]
 	fake.listArgsForCall = append(fake.listArgsForCall, struct {
 	}{})
+	stub := fake.ListStub
+	fakeReturns := fake.listReturns
 	fake.recordInvocation("List", []interface{}{})
 	fake.listMutex.Unlock()
-	if fake.ListStub != nil {
-		return fake.ListStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -168,15 +170,16 @@ func (fake *FakeSecurityGroupsRepo) UnbindFromRunningSet(arg1 string) error {
 	fake.unbindFromRunningSetArgsForCall = append(fake.unbindFromRunningSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.UnbindFromRunningSetStub
+	fakeReturns := fake.unbindFromRunningSetReturns
 	fake.recordInvocation("UnbindFromRunningSet", []interface{}{arg1})
 	fake.unbindFromRunningSetMutex.Unlock()
-	if fake.UnbindFromRunningSetStub != nil {
-		return fake.UnbindFromRunningSetStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unbindFromRunningSetReturns
 	return fakeReturns.result1
 }
 

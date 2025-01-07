@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/formatters"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/formatters"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type ProgressReader struct {
@@ -67,8 +67,8 @@ func (progressReader *ProgressReader) printProgress(quit chan bool) {
 	for {
 		select {
 		case <-quit:
-			//The spaces are there to ensure we overwrite the entire line
-			//before using the terminal printer to output Done Uploading
+			// The spaces are there to ensure we overwrite the entire line
+			// before using the terminal printer to output Done Uploading
 			progressReader.ui.PrintCapturingNoOutput("\r                             ")
 			progressReader.ui.Say("\rDone uploading")
 			return

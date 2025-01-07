@@ -4,14 +4,14 @@ import (
 	"os"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/util/download"
 )
 
 type CreateBuildpackCommand struct {

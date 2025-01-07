@@ -1,7 +1,7 @@
 package types_test
 
 import (
-	. "code.cloudfoundry.org/cli/types"
+	. "code.cloudfoundry.org/cli/v9/types"
 	"github.com/jessevdk/go-flags"
 
 	. "github.com/onsi/ginkgo/v2"

@@ -3,20 +3,20 @@ package space
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/api/organizations"
-	"code.cloudfoundry.org/cli/cf/api/spacequotas"
-	"code.cloudfoundry.org/cli/cf/api/spaces"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/user"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v9/cf/api/spacequotas"
+	"code.cloudfoundry.org/cli/v9/cf/api/spaces"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commands/user"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type CreateSpace struct {
@@ -73,7 +73,7 @@ func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 
-	//get command from registry for dependency
+	// get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("set-space-role")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.spaceRoleSetter = commandDep.(user.SpaceRoleSetter)

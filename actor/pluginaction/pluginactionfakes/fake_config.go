@@ -4,8 +4,8 @@ package pluginactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v9/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 type FakeConfig struct {
@@ -97,9 +97,10 @@ func (fake *FakeConfig) AddPlugin(arg1 configv3.Plugin) {
 	fake.addPluginArgsForCall = append(fake.addPluginArgsForCall, struct {
 		arg1 configv3.Plugin
 	}{arg1})
+	stub := fake.AddPluginStub
 	fake.recordInvocation("AddPlugin", []interface{}{arg1})
 	fake.addPluginMutex.Unlock()
-	if fake.AddPluginStub != nil {
+	if stub != nil {
 		fake.AddPluginStub(arg1)
 	}
 }
@@ -129,9 +130,10 @@ func (fake *FakeConfig) AddPluginRepository(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.AddPluginRepositoryStub
 	fake.recordInvocation("AddPluginRepository", []interface{}{arg1, arg2})
 	fake.addPluginRepositoryMutex.Unlock()
-	if fake.AddPluginRepositoryStub != nil {
+	if stub != nil {
 		fake.AddPluginRepositoryStub(arg1, arg2)
 	}
 }
@@ -160,15 +162,16 @@ func (fake *FakeConfig) BinaryVersion() string {
 	ret, specificReturn := fake.binaryVersionReturnsOnCall[len(fake.binaryVersionArgsForCall)]
 	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct {
 	}{})
+	stub := fake.BinaryVersionStub
+	fakeReturns := fake.binaryVersionReturns
 	fake.recordInvocation("BinaryVersion", []interface{}{})
 	fake.binaryVersionMutex.Unlock()
-	if fake.BinaryVersionStub != nil {
-		return fake.BinaryVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.binaryVersionReturns
 	return fakeReturns.result1
 }
 
@@ -213,15 +216,16 @@ func (fake *FakeConfig) GetPlugin(arg1 string) (configv3.Plugin, bool) {
 	fake.getPluginArgsForCall = append(fake.getPluginArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetPluginStub
+	fakeReturns := fake.getPluginReturns
 	fake.recordInvocation("GetPlugin", []interface{}{arg1})
 	fake.getPluginMutex.Unlock()
-	if fake.GetPluginStub != nil {
-		return fake.GetPluginStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPluginReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -275,15 +279,16 @@ func (fake *FakeConfig) PluginHome() string {
 	ret, specificReturn := fake.pluginHomeReturnsOnCall[len(fake.pluginHomeArgsForCall)]
 	fake.pluginHomeArgsForCall = append(fake.pluginHomeArgsForCall, struct {
 	}{})
+	stub := fake.PluginHomeStub
+	fakeReturns := fake.pluginHomeReturns
 	fake.recordInvocation("PluginHome", []interface{}{})
 	fake.pluginHomeMutex.Unlock()
-	if fake.PluginHomeStub != nil {
-		return fake.PluginHomeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginHomeReturns
 	return fakeReturns.result1
 }
 
@@ -327,15 +332,16 @@ func (fake *FakeConfig) PluginRepositories() []configv3.PluginRepository {
 	ret, specificReturn := fake.pluginRepositoriesReturnsOnCall[len(fake.pluginRepositoriesArgsForCall)]
 	fake.pluginRepositoriesArgsForCall = append(fake.pluginRepositoriesArgsForCall, struct {
 	}{})
+	stub := fake.PluginRepositoriesStub
+	fakeReturns := fake.pluginRepositoriesReturns
 	fake.recordInvocation("PluginRepositories", []interface{}{})
 	fake.pluginRepositoriesMutex.Unlock()
-	if fake.PluginRepositoriesStub != nil {
-		return fake.PluginRepositoriesStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginRepositoriesReturns
 	return fakeReturns.result1
 }
 
@@ -379,15 +385,16 @@ func (fake *FakeConfig) Plugins() []configv3.Plugin {
 	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
 	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct {
 	}{})
+	stub := fake.PluginsStub
+	fakeReturns := fake.pluginsReturns
 	fake.recordInvocation("Plugins", []interface{}{})
 	fake.pluginsMutex.Unlock()
-	if fake.PluginsStub != nil {
-		return fake.PluginsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginsReturns
 	return fakeReturns.result1
 }
 
@@ -431,9 +438,10 @@ func (fake *FakeConfig) RemovePlugin(arg1 string) {
 	fake.removePluginArgsForCall = append(fake.removePluginArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RemovePluginStub
 	fake.recordInvocation("RemovePlugin", []interface{}{arg1})
 	fake.removePluginMutex.Unlock()
-	if fake.RemovePluginStub != nil {
+	if stub != nil {
 		fake.RemovePluginStub(arg1)
 	}
 }
@@ -462,15 +470,16 @@ func (fake *FakeConfig) WritePluginConfig() error {
 	ret, specificReturn := fake.writePluginConfigReturnsOnCall[len(fake.writePluginConfigArgsForCall)]
 	fake.writePluginConfigArgsForCall = append(fake.writePluginConfigArgsForCall, struct {
 	}{})
+	stub := fake.WritePluginConfigStub
+	fakeReturns := fake.writePluginConfigReturns
 	fake.recordInvocation("WritePluginConfig", []interface{}{})
 	fake.writePluginConfigMutex.Unlock()
-	if fake.WritePluginConfigStub != nil {
-		return fake.WritePluginConfigStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.writePluginConfigReturns
 	return fakeReturns.result1
 }
 
