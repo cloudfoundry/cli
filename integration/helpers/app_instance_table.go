@@ -10,6 +10,7 @@ import (
 type AppInstanceRow struct {
 	Index          string
 	State          string
+	Ready          string
 	Since          string
 	CPU            string
 	Memory         string
@@ -57,7 +58,7 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 
 		switch {
 		case strings.HasPrefix(row, "#"):
-			const columnCount = 9
+			const columnCount = 10
 
 			// instance row
 			columns := splitColumns(row)
@@ -73,10 +74,11 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 				Index:          columns[0],
 				State:          columns[1],
 				Since:          columns[2],
-				CPU:            columns[3],
-				Memory:         columns[4],
-				Disk:           columns[5],
-				LogRate:        columns[6],
+				Ready:          columns[3],
+				CPU:            columns[4],
+				Memory:         columns[5],
+				Disk:           columns[6],
+				LogRate:        columns[7],
 				CPUEntitlement: cpuEntitlement,
 				Details:        details,
 			}
