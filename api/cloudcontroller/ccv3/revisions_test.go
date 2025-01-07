@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -130,6 +131,81 @@ var _ = Describe("Revisions", func() {
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 
 				Expect(revisions).To(ConsistOf([]resources.Revision{{GUID: "app-guid-1"}}))
+			})
+		})
+	})
+
+	Describe("GetEnvironmentVariablesByURL", func() {
+		var (
+			warnings             Warnings
+			executeErr           error
+			environmentVariables resources.EnvironmentVariables
+		)
+
+		JustBeforeEach(func() {
+			environmentVariables, warnings, executeErr = client.GetEnvironmentVariablesByURL("url")
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				errors := []ccerror.V3Error{
+					{
+						Code:   10008,
+						Detail: "The request is semantically invalid: command presence",
+						Title:  "CF-UnprocessableEntity",
+					},
+					{
+						Code:   10010,
+						Detail: "App not found",
+						Title:  "CF-ResourceNotFound",
+					},
+				}
+
+				requester.MakeRequestReturns(
+					"url",
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("revision exist", func() {
+			BeforeEach(func() {
+				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+					(*requestParams.ResponseBody.(*resources.EnvironmentVariables))["foo"] = *types.NewFilteredString("bar")
+					return "url", Warnings{"this is a warning"}, nil
+				})
+			})
+
+			It("returns the environment variables and all warnings", func() {
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				actualParams := requester.MakeRequestArgsForCall(0)
+				Expect(actualParams.URL).To(Equal("url"))
+
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(len(environmentVariables)).To(Equal(1))
+				Expect(environmentVariables["foo"].Value).To(Equal("bar"))
 			})
 		})
 	})

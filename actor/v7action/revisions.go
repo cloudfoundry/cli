@@ -76,6 +76,20 @@ func (actor Actor) GetRevisionByApplicationAndVersion(appGUID string, revisionVe
 	return revisions[0], Warnings(warnings), nil
 }
 
+func (actor Actor) GetEnvironmentVariableGroupByRevision(revision resources.Revision) (EnvironmentVariableGroup, bool, Warnings, error) {
+	envVarApiLink, isPresent := revision.Links["environment_variables"]
+	if !isPresent {
+		return EnvironmentVariableGroup{}, isPresent, Warnings{"Unable to retrieve environment variables for revision."}, nil
+	}
+
+	environmentVariables, warnings, err := actor.CloudControllerClient.GetEnvironmentVariablesByURL(envVarApiLink.HREF)
+	if err != nil {
+		return EnvironmentVariableGroup{}, false, Warnings(warnings), err
+	}
+
+	return EnvironmentVariableGroup(environmentVariables), true, Warnings(warnings), nil
+}
+
 func (actor Actor) setRevisionsDeployableByDropletStateForApp(appGUID string, revisions []resources.Revision) ([]resources.Revision, Warnings, error) {
 	droplets, warnings, err := actor.CloudControllerClient.GetDroplets(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
