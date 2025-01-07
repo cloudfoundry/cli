@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("app summary displayer", func() {
 
-	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+cpu entitlement\s+details`
+	const instanceStatsTitles = `state\s+since\s+ready\s+cpu\s+memory\s+disk\s+logging\s+cpu entitlement\s+details`
 
 	var (
 		appSummaryDisplayer *AppSummaryDisplayer
@@ -48,6 +48,10 @@ var _ = Describe("app summary displayer", func() {
 
 				BeforeEach(func() {
 					uptime = time.Since(time.Unix(267321600, 0))
+					var (
+						bTrue  = true
+						bFalse = false
+					)
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
 							Application: resources.Application{
@@ -67,6 +71,7 @@ var _ = Describe("app summary displayer", func() {
 										v7action.ProcessInstance{
 											Index:          0,
 											State:          constant.ProcessInstanceRunning,
+											Routable:       nil,
 											CPUEntitlement: types.NullFloat64{Value: 0, IsSet: true},
 											MemoryUsage:    1000000,
 											DiskUsage:      1000000,
@@ -80,6 +85,7 @@ var _ = Describe("app summary displayer", func() {
 										v7action.ProcessInstance{
 											Index:          1,
 											State:          constant.ProcessInstanceRunning,
+											Routable:       &bTrue,
 											CPUEntitlement: types.NullFloat64{Value: 0, IsSet: false},
 											MemoryUsage:    2000000,
 											DiskUsage:      2000000,
@@ -93,6 +99,7 @@ var _ = Describe("app summary displayer", func() {
 										v7action.ProcessInstance{
 											Index:          2,
 											State:          constant.ProcessInstanceRunning,
+											Routable:       &bFalse,
 											CPUEntitlement: types.NullFloat64{Value: 0.03, IsSet: true},
 											MemoryUsage:    3000000,
 											DiskUsage:      3000000,
@@ -116,6 +123,7 @@ var _ = Describe("app summary displayer", func() {
 										v7action.ProcessInstance{
 											Index:        0,
 											State:        constant.ProcessInstanceRunning,
+											Routable:     &bTrue,
 											MemoryUsage:  1000000,
 											DiskUsage:    1000000,
 											LogRate:      128,

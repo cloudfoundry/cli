@@ -80,12 +80,21 @@ func formatCPUEntitlement(cpuEntitlement types.NullFloat64) string {
 	return fmt.Sprintf("%.1f%%", cpuEntitlement.Value*100)
 }
 
+func formatRoutable(b *bool) string {
+	if b == nil {
+		return "-"
+	}
+
+	return fmt.Sprintf("%t", *b)
+}
+
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
 			"",
 			display.UI.TranslateText("state"),
 			display.UI.TranslateText("since"),
+			display.UI.TranslateText("ready"),
 			display.UI.TranslateText("cpu"),
 			display.UI.TranslateText("memory"),
 			display.UI.TranslateText("disk"),
@@ -100,6 +109,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			fmt.Sprintf("#%d", instance.Index),
 			display.UI.TranslateText(strings.ToLower(string(instance.State))),
 			display.appInstanceDate(instance.StartTime()),
+			formatRoutable(instance.Routable),
 			fmt.Sprintf("%.1f%%", instance.CPU*100),
 			display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
 				"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
