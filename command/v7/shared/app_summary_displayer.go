@@ -79,6 +79,14 @@ func formatCPU(instance v7action.ProcessInstance) string {
 	return fmt.Sprintf("%.1f%%", instance.CPUEntitlement.Value*100)
 }
 
+func formatRoutable(b *bool) string {
+	if b == nil {
+		return "-"
+	}
+
+	return fmt.Sprintf("%t", *b)
+}
+
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
@@ -90,6 +98,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			display.UI.TranslateText("disk"),
 			display.UI.TranslateText("logging"),
 			display.UI.TranslateText("details"),
+			display.UI.TranslateText("ready"),
 		},
 	}
 
@@ -112,6 +121,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 				"LogRateLimit": formatLogRateLimit(instance.LogRateLimit),
 			}),
 			instance.Details,
+			formatRoutable(instance.Routable),
 		})
 	}
 
