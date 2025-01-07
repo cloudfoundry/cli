@@ -20,6 +20,7 @@ on:
       - "doc/**"
       - ".gitpod.yml"
       - "README.md"
+  workflow_dispatch:
 
 jobs:
   golangci:
