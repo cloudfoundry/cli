@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/cf/formatters"
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/formatters"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 )
 
 type SpaceQuota struct {
@@ -36,7 +36,7 @@ func (q SpaceQuota) FormattedInstanceMemoryLimit() string {
 
 func (q SpaceQuota) FormattedAppInstanceLimit() string {
 	appInstanceLimit := T(UnlimitedDisplay)
-	if q.AppInstanceLimit != -1 { //TODO - figure out how to use resources.UnlimitedAppInstances
+	if q.AppInstanceLimit != -1 { // TODO - figure out how to use resources.UnlimitedAppInstances
 		appInstanceLimit = strconv.Itoa(q.AppInstanceLimit)
 	}
 

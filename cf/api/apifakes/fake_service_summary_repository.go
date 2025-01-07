@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeServiceSummaryRepository struct {
@@ -30,15 +30,16 @@ func (fake *FakeServiceSummaryRepository) GetSummariesInCurrentSpace() ([]models
 	ret, specificReturn := fake.getSummariesInCurrentSpaceReturnsOnCall[len(fake.getSummariesInCurrentSpaceArgsForCall)]
 	fake.getSummariesInCurrentSpaceArgsForCall = append(fake.getSummariesInCurrentSpaceArgsForCall, struct {
 	}{})
+	stub := fake.GetSummariesInCurrentSpaceStub
+	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	fake.recordInvocation("GetSummariesInCurrentSpace", []interface{}{})
 	fake.getSummariesInCurrentSpaceMutex.Unlock()
-	if fake.GetSummariesInCurrentSpaceStub != nil {
-		return fake.GetSummariesInCurrentSpaceStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

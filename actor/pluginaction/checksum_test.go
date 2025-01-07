@@ -3,8 +3,8 @@ package pluginaction_test
 import (
 	"os"
 
-	. "code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
+	. "code.cloudfoundry.org/cli/v8/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v8/actor/pluginaction/pluginactionfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

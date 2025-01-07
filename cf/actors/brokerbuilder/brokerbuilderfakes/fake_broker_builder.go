@@ -4,8 +4,8 @@ package brokerbuilderfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors/brokerbuilder"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/actors/brokerbuilder"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeBrokerBuilder struct {
@@ -89,15 +89,16 @@ func (fake *FakeBrokerBuilder) AttachBrokersToServices(arg1 []models.ServiceOffe
 	fake.attachBrokersToServicesArgsForCall = append(fake.attachBrokersToServicesArgsForCall, struct {
 		arg1 []models.ServiceOffering
 	}{arg1Copy})
+	stub := fake.AttachBrokersToServicesStub
+	fakeReturns := fake.attachBrokersToServicesReturns
 	fake.recordInvocation("AttachBrokersToServices", []interface{}{arg1Copy})
 	fake.attachBrokersToServicesMutex.Unlock()
-	if fake.AttachBrokersToServicesStub != nil {
-		return fake.AttachBrokersToServicesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.attachBrokersToServicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -158,15 +159,16 @@ func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServices(arg1 string, arg2 
 		arg1 string
 		arg2 []models.ServiceOffering
 	}{arg1, arg2Copy})
+	stub := fake.AttachSpecificBrokerToServicesStub
+	fakeReturns := fake.attachSpecificBrokerToServicesReturns
 	fake.recordInvocation("AttachSpecificBrokerToServices", []interface{}{arg1, arg2Copy})
 	fake.attachSpecificBrokerToServicesMutex.Unlock()
-	if fake.AttachSpecificBrokerToServicesStub != nil {
-		return fake.AttachSpecificBrokerToServicesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.attachSpecificBrokerToServicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -220,15 +222,16 @@ func (fake *FakeBrokerBuilder) GetAllServiceBrokers() ([]models.ServiceBroker, e
 	ret, specificReturn := fake.getAllServiceBrokersReturnsOnCall[len(fake.getAllServiceBrokersArgsForCall)]
 	fake.getAllServiceBrokersArgsForCall = append(fake.getAllServiceBrokersArgsForCall, struct {
 	}{})
+	stub := fake.GetAllServiceBrokersStub
+	fakeReturns := fake.getAllServiceBrokersReturns
 	fake.recordInvocation("GetAllServiceBrokers", []interface{}{})
 	fake.getAllServiceBrokersMutex.Unlock()
-	if fake.GetAllServiceBrokersStub != nil {
-		return fake.GetAllServiceBrokersStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAllServiceBrokersReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -276,15 +279,16 @@ func (fake *FakeBrokerBuilder) GetBrokerWithAllServices(arg1 string) (models.Ser
 	fake.getBrokerWithAllServicesArgsForCall = append(fake.getBrokerWithAllServicesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetBrokerWithAllServicesStub
+	fakeReturns := fake.getBrokerWithAllServicesReturns
 	fake.recordInvocation("GetBrokerWithAllServices", []interface{}{arg1})
 	fake.getBrokerWithAllServicesMutex.Unlock()
-	if fake.GetBrokerWithAllServicesStub != nil {
-		return fake.GetBrokerWithAllServicesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getBrokerWithAllServicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -339,15 +343,16 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedService(arg1 string) (model
 	fake.getBrokerWithSpecifiedServiceArgsForCall = append(fake.getBrokerWithSpecifiedServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetBrokerWithSpecifiedServiceStub
+	fakeReturns := fake.getBrokerWithSpecifiedServiceReturns
 	fake.recordInvocation("GetBrokerWithSpecifiedService", []interface{}{arg1})
 	fake.getBrokerWithSpecifiedServiceMutex.Unlock()
-	if fake.GetBrokerWithSpecifiedServiceStub != nil {
-		return fake.GetBrokerWithSpecifiedServiceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getBrokerWithSpecifiedServiceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

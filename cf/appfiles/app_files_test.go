@@ -7,10 +7,10 @@ import (
 	"runtime"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/appfiles"
+	"code.cloudfoundry.org/cli/v8/cf/appfiles"
 	uuid "github.com/nu7hatch/gouuid"
 
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo/v2"

@@ -1,6 +1,6 @@
 package resources
 
-import "code.cloudfoundry.org/cli/types"
+import "code.cloudfoundry.org/cli/v8/types"
 
 type Metadata struct {
 	Annotations map[string]types.NullString `json:"annotations,omitempty"`

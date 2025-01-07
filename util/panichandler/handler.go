@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v8/version"
 )
 
 const maxStackSizeLimit = 1024 * 1024
@@ -26,9 +26,9 @@ func HandlePanic() {
 		variable CF_TRACE set to true.
 
 		Also, please update to the latest cli and try the command again:
-		https://code.cloudfoundry.org/cli/releases
+		https://code.cloudfoundry.org/cli/v8/releases
 
-		Please create an issue at: https://code.cloudfoundry.org/cli/issues
+		Please create an issue at: https://code.cloudfoundry.org/cli/v8/issues
 
 		Include the below information when creating the issue:
 

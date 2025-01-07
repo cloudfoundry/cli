@@ -11,7 +11,7 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v8/integration/helpers"
 	. "github.com/onsi/gomega"
 )
 

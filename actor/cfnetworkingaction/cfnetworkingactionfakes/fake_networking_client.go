@@ -4,8 +4,8 @@ package cfnetworkingactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/v8/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/v8/api/cfnetworking/cfnetv1"
 )
 
 type FakeNetworkingClient struct {
@@ -59,15 +59,16 @@ func (fake *FakeNetworkingClient) CreatePolicies(arg1 []cfnetv1.Policy) error {
 	fake.createPoliciesArgsForCall = append(fake.createPoliciesArgsForCall, struct {
 		arg1 []cfnetv1.Policy
 	}{arg1Copy})
+	stub := fake.CreatePoliciesStub
+	fakeReturns := fake.createPoliciesReturns
 	fake.recordInvocation("CreatePolicies", []interface{}{arg1Copy})
 	fake.createPoliciesMutex.Unlock()
-	if fake.CreatePoliciesStub != nil {
-		return fake.CreatePoliciesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createPoliciesReturns
 	return fakeReturns.result1
 }
 
@@ -119,15 +120,16 @@ func (fake *FakeNetworkingClient) ListPolicies(arg1 ...string) ([]cfnetv1.Policy
 	fake.listPoliciesArgsForCall = append(fake.listPoliciesArgsForCall, struct {
 		arg1 []string
 	}{arg1})
+	stub := fake.ListPoliciesStub
+	fakeReturns := fake.listPoliciesReturns
 	fake.recordInvocation("ListPolicies", []interface{}{arg1})
 	fake.listPoliciesMutex.Unlock()
-	if fake.ListPoliciesStub != nil {
-		return fake.ListPoliciesStub(arg1...)
+	if stub != nil {
+		return stub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listPoliciesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -187,15 +189,16 @@ func (fake *FakeNetworkingClient) RemovePolicies(arg1 []cfnetv1.Policy) error {
 	fake.removePoliciesArgsForCall = append(fake.removePoliciesArgsForCall, struct {
 		arg1 []cfnetv1.Policy
 	}{arg1Copy})
+	stub := fake.RemovePoliciesStub
+	fakeReturns := fake.removePoliciesReturns
 	fake.recordInvocation("RemovePolicies", []interface{}{arg1Copy})
 	fake.removePoliciesMutex.Unlock()
-	if fake.RemovePoliciesStub != nil {
-		return fake.RemovePoliciesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.removePoliciesReturns
 	return fakeReturns.result1
 }
 

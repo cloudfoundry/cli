@@ -3,8 +3,8 @@ package resources_test
 import (
 	"encoding/json"
 
-	. "code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
+	. "code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -4,7 +4,7 @@ package v7actionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
 )
 
 type FakeManifestParser struct {
@@ -40,15 +40,16 @@ func (fake *FakeManifestParser) AppNames() []string {
 	ret, specificReturn := fake.appNamesReturnsOnCall[len(fake.appNamesArgsForCall)]
 	fake.appNamesArgsForCall = append(fake.appNamesArgsForCall, struct {
 	}{})
+	stub := fake.AppNamesStub
+	fakeReturns := fake.appNamesReturns
 	fake.recordInvocation("AppNames", []interface{}{})
 	fake.appNamesMutex.Unlock()
-	if fake.AppNamesStub != nil {
-		return fake.AppNamesStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.appNamesReturns
 	return fakeReturns.result1
 }
 
@@ -93,15 +94,16 @@ func (fake *FakeManifestParser) RawAppManifest(arg1 string) ([]byte, error) {
 	fake.rawAppManifestArgsForCall = append(fake.rawAppManifestArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RawAppManifestStub
+	fakeReturns := fake.rawAppManifestReturns
 	fake.recordInvocation("RawAppManifest", []interface{}{arg1})
 	fake.rawAppManifestMutex.Unlock()
-	if fake.RawAppManifestStub != nil {
-		return fake.RawAppManifestStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.rawAppManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

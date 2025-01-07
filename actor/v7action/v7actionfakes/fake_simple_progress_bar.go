@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
 )
 
 type FakeSimpleProgressBar struct {
@@ -38,15 +38,16 @@ func (fake *FakeSimpleProgressBar) Initialize(arg1 string) (io.Reader, int64, er
 	fake.initializeArgsForCall = append(fake.initializeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.InitializeStub
+	fakeReturns := fake.initializeReturns
 	fake.recordInvocation("Initialize", []interface{}{arg1})
 	fake.initializeMutex.Unlock()
-	if fake.InitializeStub != nil {
-		return fake.InitializeStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.initializeReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -102,9 +103,10 @@ func (fake *FakeSimpleProgressBar) Terminate() {
 	fake.terminateMutex.Lock()
 	fake.terminateArgsForCall = append(fake.terminateArgsForCall, struct {
 	}{})
+	stub := fake.TerminateStub
 	fake.recordInvocation("Terminate", []interface{}{})
 	fake.terminateMutex.Unlock()
-	if fake.TerminateStub != nil {
+	if stub != nil {
 		fake.TerminateStub()
 	}
 }

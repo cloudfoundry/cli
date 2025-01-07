@@ -3,7 +3,7 @@ package isolated
 import (
 	"testing"
 
-	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
+	"code.cloudfoundry.org/cli/v8/integration/helpers/commonisolated"
 )
 
 var (

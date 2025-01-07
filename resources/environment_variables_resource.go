@@ -3,8 +3,8 @@ package resources
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 type EnvironmentVariables map[string]types.FilteredString

@@ -1,7 +1,7 @@
 package uaa
 
 import (
-	"code.cloudfoundry.org/cli/api/uaa/internal"
+	"code.cloudfoundry.org/cli/v8/api/uaa/internal"
 )
 
 // SetupResources configures the client to use the specified settings and diescopers the UAA and Authentication resources

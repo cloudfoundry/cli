@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/types"
+	v7 "code.cloudfoundry.org/cli/v8/command/v7"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 type FakeLabelSetter struct {
@@ -32,15 +32,16 @@ func (fake *FakeLabelSetter) Execute(arg1 v7.TargetResource, arg2 map[string]typ
 		arg1 v7.TargetResource
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1, arg2})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 

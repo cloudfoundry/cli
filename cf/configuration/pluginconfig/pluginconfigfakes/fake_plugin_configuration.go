@@ -4,7 +4,7 @@ package pluginconfigfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/pluginconfig"
 )
 
 type FakePluginConfiguration struct {
@@ -58,15 +58,16 @@ func (fake *FakePluginConfiguration) GetPluginPath() string {
 	ret, specificReturn := fake.getPluginPathReturnsOnCall[len(fake.getPluginPathArgsForCall)]
 	fake.getPluginPathArgsForCall = append(fake.getPluginPathArgsForCall, struct {
 	}{})
+	stub := fake.GetPluginPathStub
+	fakeReturns := fake.getPluginPathReturns
 	fake.recordInvocation("GetPluginPath", []interface{}{})
 	fake.getPluginPathMutex.Unlock()
-	if fake.GetPluginPathStub != nil {
-		return fake.GetPluginPathStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getPluginPathReturns
 	return fakeReturns.result1
 }
 
@@ -110,15 +111,16 @@ func (fake *FakePluginConfiguration) ListCommands() []string {
 	ret, specificReturn := fake.listCommandsReturnsOnCall[len(fake.listCommandsArgsForCall)]
 	fake.listCommandsArgsForCall = append(fake.listCommandsArgsForCall, struct {
 	}{})
+	stub := fake.ListCommandsStub
+	fakeReturns := fake.listCommandsReturns
 	fake.recordInvocation("ListCommands", []interface{}{})
 	fake.listCommandsMutex.Unlock()
-	if fake.ListCommandsStub != nil {
-		return fake.ListCommandsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listCommandsReturns
 	return fakeReturns.result1
 }
 
@@ -162,15 +164,16 @@ func (fake *FakePluginConfiguration) Plugins() map[string]pluginconfig.PluginMet
 	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
 	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct {
 	}{})
+	stub := fake.PluginsStub
+	fakeReturns := fake.pluginsReturns
 	fake.recordInvocation("Plugins", []interface{}{})
 	fake.pluginsMutex.Unlock()
-	if fake.PluginsStub != nil {
-		return fake.PluginsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginsReturns
 	return fakeReturns.result1
 }
 
@@ -214,9 +217,10 @@ func (fake *FakePluginConfiguration) RemovePlugin(arg1 string) {
 	fake.removePluginArgsForCall = append(fake.removePluginArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RemovePluginStub
 	fake.recordInvocation("RemovePlugin", []interface{}{arg1})
 	fake.removePluginMutex.Unlock()
-	if fake.RemovePluginStub != nil {
+	if stub != nil {
 		fake.RemovePluginStub(arg1)
 	}
 }
@@ -246,9 +250,10 @@ func (fake *FakePluginConfiguration) SetPlugin(arg1 string, arg2 pluginconfig.Pl
 		arg1 string
 		arg2 pluginconfig.PluginMetadata
 	}{arg1, arg2})
+	stub := fake.SetPluginStub
 	fake.recordInvocation("SetPlugin", []interface{}{arg1, arg2})
 	fake.setPluginMutex.Unlock()
-	if fake.SetPluginStub != nil {
+	if stub != nil {
 		fake.SetPluginStub(arg1, arg2)
 	}
 }

@@ -97,6 +97,6 @@ information follow:
 * [The CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples)
 * [The official plugins repository](https://plugins.cloudfoundry.org/)
 
-When importing the plugin code use `import "code.cloudfoundry.org/cli/plugin"`.
+When importing the plugin code use `import "code.cloudfoundry.org/cli/v8/plugin"`.
 Older plugins that import `github.com/cloudfoundry/cli/plugin` will still work
 as long they vendor the plugins directory.

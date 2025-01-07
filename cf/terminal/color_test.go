@@ -3,7 +3,7 @@ package terminal_test
 import (
 	"os"
 
-	. "code.cloudfoundry.org/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/v8/cf/terminal"
 	"github.com/fatih/color"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

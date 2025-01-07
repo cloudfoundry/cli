@@ -4,7 +4,7 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/api"
 )
 
 type FakeRouteServiceBindingRepository struct {
@@ -48,15 +48,16 @@ func (fake *FakeRouteServiceBindingRepository) Bind(arg1 string, arg2 string, ar
 		arg3 bool
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.BindStub
+	fakeReturns := fake.bindReturns
 	fake.recordInvocation("Bind", []interface{}{arg1, arg2, arg3, arg4})
 	fake.bindMutex.Unlock()
-	if fake.BindStub != nil {
-		return fake.BindStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.bindReturns
 	return fakeReturns.result1
 }
 
@@ -110,15 +111,16 @@ func (fake *FakeRouteServiceBindingRepository) Unbind(arg1 string, arg2 string, 
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.UnbindStub
+	fakeReturns := fake.unbindReturns
 	fake.recordInvocation("Unbind", []interface{}{arg1, arg2, arg3})
 	fake.unbindMutex.Unlock()
-	if fake.UnbindStub != nil {
-		return fake.UnbindStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unbindReturns
 	return fakeReturns.result1
 }
 
