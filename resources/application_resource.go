@@ -27,6 +27,8 @@ type Application struct {
 	State constant.ApplicationState
 	// Credentials are used by Cloud Native Buildpacks lifecycle to pull buildpacks
 	Credentials map[string]interface{}
+	// CurrentDropletGUID is the unique identifier of the droplet currently attached to the application.
+	CurrentDropletGUID string
 }
 
 // ApplicationNameOnly represents only the name field of a Cloud Controller V3 Application
@@ -42,10 +44,18 @@ func (a Application) MarshalJSON() ([]byte, error) {
 		Metadata: a.Metadata,
 	}
 
+	relationShips := Relationships{}
+
 	if a.SpaceGUID != "" {
-		ccApp.Relationships = Relationships{
-			constant.RelationshipTypeSpace: Relationship{GUID: a.SpaceGUID},
-		}
+		relationShips[constant.RelationshipTypeSpace] = Relationship{GUID: a.SpaceGUID}
+	}
+
+	if a.CurrentDropletGUID != "" {
+		relationShips[constant.RelationshipTypeCurrentDroplet] = Relationship{GUID: a.CurrentDropletGUID}
+	}
+
+	if len(relationShips) > 0 {
+		ccApp.Relationships = relationShips
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
@@ -81,6 +91,9 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	a.LifecycleType = lifecycle.Type
 	a.Name = ccApp.Name
 	a.SpaceGUID = ccApp.Relationships[constant.RelationshipTypeSpace].GUID
+	if _, ok := ccApp.Relationships[constant.RelationshipTypeCurrentDroplet]; ok {
+		a.CurrentDropletGUID = ccApp.Relationships[constant.RelationshipTypeCurrentDroplet].GUID
+	}
 	a.State = ccApp.State
 	a.Metadata = ccApp.Metadata
 
