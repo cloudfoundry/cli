@@ -91,21 +91,7 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	host := strings.ToLower(rawHostNameFromFlag)
 	path := c.String("path")
 	domainFields := cmd.domainReq.GetDomain()
-	option := c.String("o")
-	removeOption := c.String("r")
 	port := 0
-
-	if option != "" {
-		err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
-		if err != nil {
-			cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
-				"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
-				"APIVersion":          cmd.config.APIVersion(),
-				"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
-			}))
-			return err
-		}
-	}
 
 	url := (&models.RoutePresenter{
 		Host:   host,
@@ -121,7 +107,40 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 		return err
 	}
 
+	if c.IsSet("o") || c.IsSet("r") {
+		err := cmd.validateAPIVersionForPerRouteOptions(c)
+		if err != nil {
+			return err
+		}
+	}
+
 	if c.IsSet("o") {
+		cmd.setPerRouteOptions(c, route, url)
+	}
+
+	if c.IsSet("r") {
+		cmd.removePerRouteOptions(c, route, url)
+	}
+
+	cmd.ui.Ok()
+	return nil
+}
+
+func (cmd *UpdateRoute) validateAPIVersionForPerRouteOptions(c flags.FlagContext) error {
+	err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
+	if err != nil {
+		cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
+			"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
+			"APIVersion":          cmd.config.APIVersion(),
+			"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
+		}))
+	}
+	return err
+}
+
+func (cmd *UpdateRoute) setPerRouteOptions(c flags.FlagContext, route models.Route, url string) {
+	if c.IsSet("o") {
+		option := c.String("o")
 		key, value, found := strings.Cut(option, "=")
 		if found {
 			cmd.ui.Say(T("Setting route option {{.Option}} for {{.URL}} to {{.Value}}...", map[string]interface{}{
@@ -138,8 +157,11 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 				"URL":    terminal.EntityNameColor(url)}))
 		}
 	}
+}
 
+func (cmd *UpdateRoute) removePerRouteOptions(c flags.FlagContext, route models.Route, url string) {
 	if c.IsSet("r") {
+		removeOption := c.String("r")
 		if _, ok := route.Options[removeOption]; ok {
 			cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
 				"Option": terminal.EntityNameColor(removeOption),
@@ -152,7 +174,4 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 				"URL":    terminal.EntityNameColor(url)}))
 		}
 	}
-
-	cmd.ui.Ok()
-	return nil
 }
