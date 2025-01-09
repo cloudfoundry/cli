@@ -66,7 +66,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "ROUTES:",
 		CommandList: [][]string{
 			{"routes", "route"},
-			{"create-route", "check-route", "map-route", "unmap-route", "delete-route"},
+			{"create-route", "update-route", "check-route", "map-route", "unmap-route", "delete-route"},
 			{"delete-orphaned-routes"},
 			{"update-destination"},
 			{"share-route", "unshare-route"},

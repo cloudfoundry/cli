@@ -11,7 +11,7 @@ import (
 )
 
 type OldFakeRouteCreator struct {
-	CreateRouteStub        func(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRouteStub        func(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (route models.Route, apiErr error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		hostName   string
@@ -20,6 +20,7 @@ type OldFakeRouteCreator struct {
 		randomPort bool
 		domain     models.DomainFields
 		space      models.SpaceFields
+		option     string
 	}
 	createRouteReturns struct {
 		result1 models.Route
@@ -27,7 +28,7 @@ type OldFakeRouteCreator struct {
 	}
 }
 
-func (fake *OldFakeRouteCreator) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+func (fake *OldFakeRouteCreator) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (route models.Route, apiErr error) {
 	fake.createRouteMutex.Lock()
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
 		hostName   string
@@ -36,10 +37,11 @@ func (fake *OldFakeRouteCreator) CreateRoute(hostName string, path string, port 
 		randomPort bool
 		domain     models.DomainFields
 		space      models.SpaceFields
-	}{hostName, path, port, randomPort, domain, space})
+		option     string
+	}{hostName, path, port, randomPort, domain, space, option})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(hostName, path, port, randomPort, domain, space)
+		return fake.CreateRouteStub(hostName, path, port, randomPort, domain, space, option)
 	} else {
 		return fake.createRouteReturns.result1, fake.createRouteReturns.result2
 	}
@@ -51,10 +53,10 @@ func (fake *OldFakeRouteCreator) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *OldFakeRouteCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields) {
+func (fake *OldFakeRouteCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields, string) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
-	return fake.createRouteArgsForCall[i].hostName, fake.createRouteArgsForCall[i].path, fake.createRouteArgsForCall[i].port, fake.createRouteArgsForCall[i].randomPort, fake.createRouteArgsForCall[i].domain, fake.createRouteArgsForCall[i].space
+	return fake.createRouteArgsForCall[i].hostName, fake.createRouteArgsForCall[i].path, fake.createRouteArgsForCall[i].port, fake.createRouteArgsForCall[i].randomPort, fake.createRouteArgsForCall[i].domain, fake.createRouteArgsForCall[i].space, fake.createRouteArgsForCall[i].option
 }
 
 func (fake *OldFakeRouteCreator) CreateRouteReturns(result1 models.Route, result2 error) {

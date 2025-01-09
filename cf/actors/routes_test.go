@@ -22,6 +22,7 @@ var _ = Describe("Routes", func() {
 
 		expectedRoute  models.Route
 		expectedDomain models.DomainFields
+		option         string
 	)
 
 	BeforeEach(func() {
@@ -47,10 +48,11 @@ var _ = Describe("Routes", func() {
 		It("calls Create on the route repo", func() {
 			routeActor.CreateRandomTCPRoute(expectedDomain)
 
-			host, d, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+			host, d, path, port, randomPort, option := fakeRouteRepository.CreateArgsForCall(0)
 			Expect(host).To(BeEmpty())
 			Expect(d).To(Equal(expectedDomain))
 			Expect(path).To(BeEmpty())
+			Expect(option).To(BeEmpty())
 			Expect(port).To(Equal(0))
 			Expect(randomPort).To(BeTrue())
 		})
@@ -83,11 +85,13 @@ var _ = Describe("Routes", func() {
 		var (
 			expectedHostname string
 			expectedPath     string
+			expectedOption   string
 		)
 
 		BeforeEach(func() {
 			expectedHostname = "hostname"
 			expectedPath = "path"
+			expectedOption = ""
 
 			expectedDomain = models.DomainFields{
 				Name:            "foo.com",
@@ -98,6 +102,7 @@ var _ = Describe("Routes", func() {
 				Domain: expectedDomain,
 				Host:   expectedHostname,
 				Path:   expectedPath,
+				//Options: map[string]string{},
 			}
 		})
 
@@ -107,7 +112,7 @@ var _ = Describe("Routes", func() {
 			})
 
 			It("does not create a route", func() {
-				route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false)
+				route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false, "")
 				Expect(route).To(Equal(expectedRoute))
 				Expect(err).ToNot(HaveOccurred())
 
@@ -133,17 +138,18 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("creates a route with a TCP Route", func() {
-					route, err := routeActor.FindOrCreateRoute("", expectedDomain, "", 0, true)
+					route, err := routeActor.FindOrCreateRoute("", expectedDomain, "", 0, true, "")
 					Expect(route).To(Equal(tcpRoute))
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					hostname, domain, path, port, randomPort, option := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(hostname).To(BeEmpty())
 					Expect(domain).To(Equal(expectedDomain))
 					Expect(path).To(BeEmpty())
 					Expect(port).To(Equal(0))
 					Expect(randomPort).To(BeTrue())
+					Expect(option).To(BeEmpty())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
 					output, _ := fakeUI.SayArgsForCall(0)
@@ -157,17 +163,18 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("creates a route ", func() {
-					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, "", 1337, false)
+					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, "", 1337, false, "")
 					Expect(route).To(Equal(expectedRoute))
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					hostname, domain, path, port, randomPort, option := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(hostname).To(Equal(expectedHostname))
 					Expect(domain).To(Equal(expectedDomain))
 					Expect(path).To(Equal(""))
 					Expect(port).To(Equal(1337))
 					Expect(randomPort).To(BeFalse())
+					Expect(option).To(BeEmpty())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
 					output, _ := fakeUI.SayArgsForCall(0)
@@ -181,17 +188,18 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("creates a route ", func() {
-					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false)
+					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false, expectedOption)
 					Expect(route).To(Equal(expectedRoute))
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					hostname, domain, path, port, randomPort, option := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(hostname).To(Equal(expectedHostname))
 					Expect(domain).To(Equal(expectedDomain))
 					Expect(path).To(Equal(expectedPath))
 					Expect(port).To(Equal(0))
 					Expect(randomPort).To(BeFalse())
+					Expect(option).To(BeEmpty())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
 					output, _ := fakeUI.SayArgsForCall(0)
@@ -537,6 +545,7 @@ var _ = Describe("Routes", func() {
 
 		Context("when the route is a HTTP route", func() {
 			var httpDomain models.DomainFields
+			var option string
 
 			BeforeEach(func() {
 				httpDomain = models.DomainFields{
@@ -593,12 +602,13 @@ var _ = Describe("Routes", func() {
 					Expect(actualPath).To(Equal(""))
 					Expect(actualPort).To(Equal(0))
 
-					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(actualHost).To(Equal("host"))
 					Expect(actualDomain).To(Equal(httpDomain))
 					Expect(actualPath).To(Equal(""))
 					Expect(actualPort).To(Equal(0))
 					Expect(actualUseRandomPort).To(BeFalse())
+					Expect(actualOption).To(Equal(option))
 
 					routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
 					Expect(routeGUID).To(Equal("route-guid"))
@@ -622,12 +632,13 @@ var _ = Describe("Routes", func() {
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 
-						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 						Expect(actualHost).To(Equal("host"))
 						Expect(actualDomain).To(Equal(httpDomain))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 						Expect(actualUseRandomPort).To(BeFalse())
+						Expect(actualOption).To(Equal(option))
 
 						routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
 						Expect(routeGUID).To(Equal("route-guid"))
@@ -706,8 +717,10 @@ var _ = Describe("Routes", func() {
 				})
 
 				Context("when the hostname is present in the original route", func() {
+					var option string
 					BeforeEach(func() {
 						routeName = "hostname.old-domain.com/path"
+						option = ""
 					})
 
 					It("replace the domain from manifest", func() {
@@ -716,22 +729,25 @@ var _ = Describe("Routes", func() {
 						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
 
 						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 						Expect(actualHost).To(Equal("hostname"))
 						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 						Expect(actualUseRandomPort).To(BeFalse())
+						Expect(actualOption).To(Equal(option))
 					})
 				})
 
 				Context("when the hostname is provided as a flag", func() {
+					var option string
 					BeforeEach(func() {
 						routeName = "old-domain.com/path"
 						appParamsFromContext = models.AppParams{
 							Domains: []string{"shared-domain.com"},
 							Hosts:   []string{"hostname"},
 						}
+						option = ""
 					})
 
 					It("replace the domain from manifest", func() {
@@ -740,16 +756,18 @@ var _ = Describe("Routes", func() {
 						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
 
 						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 						Expect(actualHost).To(Equal("hostname"))
 						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 						Expect(actualUseRandomPort).To(BeFalse())
+						Expect(actualOption).To(Equal(option))
 					})
 				})
 
 				Context("when the path is provided as a flag", func() {
+					var option string
 					BeforeEach(func() {
 						routeName = "hostname.old-domain.com/oldpath"
 						path := "path"
@@ -757,6 +775,7 @@ var _ = Describe("Routes", func() {
 							Domains:   []string{"shared-domain.com"},
 							RoutePath: &path,
 						}
+						option = ""
 					})
 
 					It("replace the domain and path from manifest", func() {
@@ -765,17 +784,19 @@ var _ = Describe("Routes", func() {
 						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
 
 						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 						Expect(actualHost).To(Equal("hostname"))
 						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 						Expect(actualUseRandomPort).To(BeFalse())
+						Expect(actualOption).To(Equal(option))
 					})
 				})
 			})
 
 			Context("when it is a private domain", func() {
+				var option string
 				BeforeEach(func() {
 					httpDomain := models.DomainFields{
 						Name:            "private-domain.com",
@@ -790,6 +811,7 @@ var _ = Describe("Routes", func() {
 					appParamsFromContext = models.AppParams{
 						Domains: []string{"private-domain.com"},
 					}
+					option = ""
 				})
 
 				It("replace the domain from manifest", func() {
@@ -798,12 +820,13 @@ var _ = Describe("Routes", func() {
 					Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(actualHost).To(BeEmpty())
 					Expect(actualDomain.Name).To(Equal("private-domain.com"))
 					Expect(actualPath).To(Equal("path"))
 					Expect(actualPort).To(BeZero())
 					Expect(actualUseRandomPort).To(BeFalse())
+					Expect(actualOption).To(Equal(option))
 				})
 			})
 		})
@@ -839,6 +862,7 @@ var _ = Describe("Routes", func() {
 				Context("the route does not have a hostname", func() {
 					BeforeEach(func() {
 						routeName = "domain.com/path"
+						option = ""
 					})
 					It("should append a random name ", func() {
 						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
@@ -848,12 +872,13 @@ var _ = Describe("Routes", func() {
 						Expect(actualDomain.Name).To(Equal("domain.com"))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
-						actualHost, actualDomain, actualPath, actualPort, useRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						actualHost, actualDomain, actualPath, actualPort, useRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 						Expect(actualHost).To(MatchRegexp("[a-z]-[a-z]"))
 						Expect(actualDomain.Name).To(Equal("domain.com"))
 						Expect(actualPath).To(Equal("path"))
 						Expect(actualPort).To(Equal(0))
 						Expect(useRandomPort).To(BeFalse())
+						Expect(actualOption).To(Equal(option))
 					})
 				})
 
@@ -920,12 +945,13 @@ var _ = Describe("Routes", func() {
 					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
 					Expect(fakeRouteRepository.FindCallCount()).To(Equal(0))
 
-					actualHost, actualDomain, actualPath, actualPort, useRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					actualHost, actualDomain, actualPath, actualPort, useRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(actualHost).To(Equal(""))
 					Expect(actualDomain.Name).To(Equal("tcp-domain.com"))
 					Expect(actualPath).To(Equal(""))
 					Expect(actualPort).To(Equal(0))
 					Expect(useRandomPort).To(Equal(true))
+					Expect(actualOption).To(Equal(option))
 				})
 			})
 		})
@@ -1084,12 +1110,13 @@ var _ = Describe("Routes", func() {
 					Expect(actualPath).To(Equal(""))
 					Expect(actualPort).To(Equal(3333))
 
-					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort, actualOption := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(actualHost).To(Equal(""))
 					Expect(actualDomain).To(Equal(tcpDomain))
 					Expect(actualPath).To(Equal(""))
 					Expect(actualPort).To(Equal(3333))
 					Expect(actualUseRandomPort).To(BeFalse())
+					Expect(actualOption).To(Equal(option))
 
 					routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
 					Expect(routeGUID).To(Equal("route-guid"))
