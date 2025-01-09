@@ -108,7 +108,7 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	}
 
 	if c.IsSet("o") || c.IsSet("r") {
-		err := cmd.validateAPIVersionForPerRouteOptions(c)
+		err := cmd.validateAPIVersionForPerRouteOptions()
 		if err != nil {
 			return err
 		}
@@ -126,7 +126,7 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 	return nil
 }
 
-func (cmd *UpdateRoute) validateAPIVersionForPerRouteOptions(c flags.FlagContext) error {
+func (cmd *UpdateRoute) validateAPIVersionForPerRouteOptions() error {
 	err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
 	if err != nil {
 		cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
