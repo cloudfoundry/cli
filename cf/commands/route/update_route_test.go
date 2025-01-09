@@ -253,6 +253,46 @@ var _ = Describe("UpdateRoute", func() {
 			})
 		})
 
+		Context("when the route can be found and multiple options are passed", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(
+					models.Route{GUID: "route-guid",
+						Options: map[string]string{"a": "b", "c": "d"}},
+					nil,
+				)
+				err := flagContext.Parse("domain-name", "--option", "a=b", "--option", "c=d")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to set the given route options", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Setting route option a for domain-name to b"},
+					[]string{"Setting route option c for domain-name to d"},
+				))
+			})
+		})
+
+		Context("when the route can be found and multiple remove options are passed", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(
+					models.Route{GUID: "route-guid",
+						Options: map[string]string{"a": "b", "c": "d"}},
+					nil,
+				)
+				err := flagContext.Parse("domain-name", "--remove-option", "a", "--remove-option", "c")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to set the given route options", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Removing route option a"},
+					[]string{"Removing route option c"},
+				))
+			})
+		})
+
 		Context("when the route cannot be found", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("domain-name")

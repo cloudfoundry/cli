@@ -32,8 +32,8 @@ func (cmd *UpdateRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
-	fs["option"] = &flags.StringFlag{Name: "option", ShortName: "o", Usage: T("Set the value of a per-route option")}
-	fs["remove-option"] = &flags.StringFlag{Name: "remove-option", ShortName: "r", Usage: T("Remove an option with the given name")}
+	fs["option"] = &flags.StringSliceFlag{Name: "option", ShortName: "o", Usage: T("Set the value of a per-route option")}
+	fs["remove-option"] = &flags.StringSliceFlag{Name: "remove-option", ShortName: "r", Usage: T("Remove an option with the given name")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "update-route",
@@ -140,38 +140,43 @@ func (cmd *UpdateRoute) validateAPIVersionForPerRouteOptions() error {
 
 func (cmd *UpdateRoute) setPerRouteOptions(c flags.FlagContext, route models.Route, url string) {
 	if c.IsSet("o") {
-		option := c.String("o")
-		key, value, found := strings.Cut(option, "=")
-		if found {
-			cmd.ui.Say(T("Setting route option {{.Option}} for {{.URL}} to {{.Value}}...", map[string]interface{}{
-				"Option": terminal.EntityNameColor(key),
-				"Value":  terminal.EntityNameColor(value),
-				"URL":    terminal.EntityNameColor(url)}))
-			if route.Options == nil {
-				route.Options = make(map[string]string)
+		options := c.StringSlice("o")
+		for _, option := range options {
+			key, value, found := strings.Cut(option, "=")
+			if found {
+				cmd.ui.Say(T("Setting route option {{.Option}} for {{.URL}} to {{.Value}}...", map[string]interface{}{
+					"Option": terminal.EntityNameColor(key),
+					"Value":  terminal.EntityNameColor(value),
+					"URL":    terminal.EntityNameColor(url)}))
+				if route.Options == nil {
+					route.Options = make(map[string]string)
+				}
+				route.Options[key] = value
+			} else {
+				cmd.ui.Say(T("Wrong route option format {{.Option}} for {{.URL}}", map[string]interface{}{
+					"Option": terminal.FailureColor(option),
+					"URL":    terminal.EntityNameColor(url)}))
 			}
-			route.Options[key] = value
-		} else {
-			cmd.ui.Say(T("Wrong route option format {{.Option}} for {{.URL}}", map[string]interface{}{
-				"Option": terminal.FailureColor(option),
-				"URL":    terminal.EntityNameColor(url)}))
 		}
+
 	}
 }
 
 func (cmd *UpdateRoute) removePerRouteOptions(c flags.FlagContext, route models.Route, url string) {
 	if c.IsSet("r") {
-		removeOption := c.String("r")
-		if _, ok := route.Options[removeOption]; ok {
-			cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
-				"Option": terminal.EntityNameColor(removeOption),
-				"URL":    terminal.EntityNameColor(url)}))
+		removeOptions := c.StringSlice("r")
+		for _, removeOption := range removeOptions {
+			if _, ok := route.Options[removeOption]; ok {
+				cmd.ui.Say(T("Removing route option {{.Option}} for {{.URL}}...", map[string]interface{}{
+					"Option": terminal.EntityNameColor(removeOption),
+					"URL":    terminal.EntityNameColor(url)}))
 
-			delete(route.Options, removeOption)
-		} else {
-			cmd.ui.Say(T("No route option {{.Option}} for {{.URL}}", map[string]interface{}{
-				"Option": terminal.EntityNameColor(removeOption),
-				"URL":    terminal.EntityNameColor(url)}))
+				delete(route.Options, removeOption)
+			} else {
+				cmd.ui.Say(T("No route option {{.Option}} for {{.URL}}", map[string]interface{}{
+					"Option": terminal.EntityNameColor(removeOption),
+					"URL":    terminal.EntityNameColor(url)}))
+			}
 		}
 	}
 }
