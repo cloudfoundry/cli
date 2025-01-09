@@ -215,23 +215,37 @@ var _ = Describe("UpdateRoute", func() {
 
 		Context("when the route can be found a remove option is passed", func() {
 			BeforeEach(func() {
+				routeRepo.FindReturns(
+					models.Route{GUID: "route-guid",
+						Options: map[string]string{"loadbalancing": "round-robin", "a": "b"}},
+					nil,
+				)
+				err := flagContext.Parse("domain-name", "--option", "a=b", "--remove-option", "loadbalancing")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to remove the given route option if it exists and gives an error message", func() {
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Removing route option loadbalancing", "for"},
+				))
+			})
+
+		})
+
+		Context("when the route can be found a remove option for non existent option is passed", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(
+					models.Route{GUID: "route-guid",
+						Options: map[string]string{"a": "b"}},
+					nil,
+				)
 				err := flagContext.Parse("domain-name", "--remove-option", "loadbalancing")
 				Expect(err).NotTo(HaveOccurred())
 				cmd.Requirements(factory, flagContext)
 			})
 
-			/*It("tries to remove the given route option if it exists and gives an error message", func() {
-				routeRepo.FindReturns(
-					models.Route{
-						Options: map[string]string{"loadbalancing": "round-robin", "a": "b"}},
-					nil,
-				)
-				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"Removing route option loadbalancing", "for"},
-				))
-			})*/
-
-			It("gives an error message if the given route option does not exist", func() {
+			It("gives an error message that the given route option does not exist", func() {
 				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No route option loadbalancing", "for"},
