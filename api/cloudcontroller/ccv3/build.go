@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	apiinternal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -11,7 +12,7 @@ func (client *Client) CreateBuild(build resources.Build) (resources.Build, Warni
 	var responseBody resources.Build
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostBuildRequest,
+		RequestName:  apiinternal.PostBuildRequest,
 		RequestBody:  build,
 		ResponseBody: &responseBody,
 	})
@@ -24,7 +25,7 @@ func (client *Client) GetBuild(guid string) (resources.Build, Warnings, error) {
 	var responseBody resources.Build
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetBuildRequest,
+		RequestName:  apiinternal.GetBuildRequest,
 		URIParams:    internal.Params{"build_guid": guid},
 		ResponseBody: &responseBody,
 	})

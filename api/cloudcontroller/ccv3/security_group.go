@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) CreateSecurityGroup(securityGroup resources.SecurityGroup)
 	var responseBody resources.SecurityGroup
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostSecurityGroupRequest,
+		RequestName:  ccv3internal.PostSecurityGroupRequest,
 		RequestBody:  securityGroup,
 		ResponseBody: &responseBody,
 	})
@@ -21,7 +22,7 @@ func (client *Client) GetSecurityGroups(queries ...Query) ([]resources.SecurityG
 	var securityGroups []resources.SecurityGroup
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetSecurityGroupsRequest,
+		RequestName:  ccv3internal.GetSecurityGroupsRequest,
 		Query:        queries,
 		ResponseBody: resources.SecurityGroup{},
 		AppendToList: func(item interface{}) error {
@@ -37,7 +38,7 @@ func (client *Client) GetRunningSecurityGroups(spaceGUID string, queries ...Quer
 	var securityGroups []resources.SecurityGroup
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetSpaceRunningSecurityGroupsRequest,
+		RequestName:  ccv3internal.GetSpaceRunningSecurityGroupsRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		Query:        queries,
 		ResponseBody: resources.SecurityGroup{},
@@ -54,7 +55,7 @@ func (client *Client) GetStagingSecurityGroups(spaceGUID string, queries ...Quer
 	var securityGroups []resources.SecurityGroup
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetSpaceStagingSecurityGroupsRequest,
+		RequestName:  ccv3internal.GetSpaceStagingSecurityGroupsRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		Query:        queries,
 		ResponseBody: resources.SecurityGroup{},
@@ -69,7 +70,7 @@ func (client *Client) GetStagingSecurityGroups(spaceGUID string, queries ...Quer
 
 func (client *Client) UnbindSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSecurityGroupRunningSpaceRequest,
+		RequestName: ccv3internal.DeleteSecurityGroupRunningSpaceRequest,
 		URIParams: internal.Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -81,7 +82,7 @@ func (client *Client) UnbindSecurityGroupRunningSpace(securityGroupGUID string, 
 
 func (client *Client) UnbindSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSecurityGroupStagingSpaceRequest,
+		RequestName: ccv3internal.DeleteSecurityGroupStagingSpaceRequest,
 		URIParams: internal.Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -93,7 +94,7 @@ func (client *Client) UnbindSecurityGroupStagingSpace(securityGroupGUID string, 
 
 func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, spaceGUIDs []string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostSecurityGroupRunningSpaceRequest,
+		RequestName: ccv3internal.PostSecurityGroupRunningSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 		RequestBody: resources.RelationshipList{
 			GUIDs: spaceGUIDs,
@@ -105,7 +106,7 @@ func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, 
 
 func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUIDs []string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostSecurityGroupStagingSpaceRequest,
+		RequestName: ccv3internal.PostSecurityGroupStagingSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 		RequestBody: resources.RelationshipList{
 			GUIDs: spaceGUIDs,
@@ -123,7 +124,7 @@ func (client *Client) UpdateSecurityGroup(securityGroup resources.SecurityGroup)
 	securityGroup.Name = ""
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchSecurityGroupRequest,
+		RequestName:  ccv3internal.PatchSecurityGroupRequest,
 		URIParams:    internal.Params{"security_group_guid": securityGroupGUID},
 		RequestBody:  securityGroup,
 		ResponseBody: &responseBody,
@@ -134,7 +135,7 @@ func (client *Client) UpdateSecurityGroup(securityGroup resources.SecurityGroup)
 
 func (client *Client) DeleteSecurityGroup(securityGroupGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteSecurityGroupRequest,
+		RequestName: ccv3internal.DeleteSecurityGroupRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 	})
 

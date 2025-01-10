@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	uuid "github.com/google/uuid"
 	"github.com/gorilla/mux"
-	uuid "github.com/nu7hatch/gouuid"
 )
 
 func respondWithJSON(w http.ResponseWriter, data interface{}) error {
@@ -41,9 +41,6 @@ func readGUIDs(r *http.Request) (requestGUIDs, error) {
 }
 
 func mustGUID() string {
-	rawGUID, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	rawGUID := uuid.New()
 	return rawGUID.String()
 }

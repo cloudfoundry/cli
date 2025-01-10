@@ -3,26 +3,25 @@ package internal_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-
+	"code.cloudfoundry.org/cli/api/internal"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Routing", func() {
 	Describe("Route", func() {
-		var route Route
+		var route internal.Route
 
 		Describe("CreatePath", func() {
 			BeforeEach(func() {
-				route = Route{
+				route = internal.Route{
 					Method: "GET",
 					Path:   "/a/path/:param/with/:many_things/:many/in/:it",
 				}
 			})
 
 			It("should return a url with all :entries populated by the passed in hash", func() {
-				Expect(route.CreatePath(Params{
+				Expect(route.CreatePath(internal.Params{
 					"param":       "1",
 					"many_things": "2",
 					"many":        "a space",
@@ -32,7 +31,7 @@ var _ = Describe("Routing", func() {
 
 			When("the hash is missing params", func() {
 				It("should error", func() {
-					_, err := route.CreatePath(Params{
+					_, err := route.CreatePath(internal.Params{
 						"param": "1",
 						"many":  "2",
 						"it":    "4",
@@ -43,7 +42,7 @@ var _ = Describe("Routing", func() {
 
 			When("the hash has extra params", func() {
 				It("should totally not care", func() {
-					Expect(route.CreatePath(Params{
+					Expect(route.CreatePath(internal.Params{
 						"param":       "1",
 						"many_things": "2",
 						"many":        "a space",
@@ -55,11 +54,11 @@ var _ = Describe("Routing", func() {
 
 			Context("with a trailing slash", func() {
 				It("should work", func() {
-					route = Route{
+					route = internal.Route{
 						Method: "GET",
 						Path:   "/a/path/:param/",
 					}
-					Expect(route.CreatePath(Params{
+					Expect(route.CreatePath(internal.Params{
 						"param": "1",
 					})).Should(Equal(`/a/path/1/`))
 				})
@@ -69,13 +68,13 @@ var _ = Describe("Routing", func() {
 
 	Describe("Router", func() {
 		var (
-			router  *Router
-			routes  map[string]Route
+			router  *internal.Router
+			routes  map[string]internal.Route
 			baseURL string
 		)
 
 		JustBeforeEach(func() {
-			router = NewRouter(routes, baseURL)
+			router = internal.NewRouter(routes, baseURL)
 		})
 
 		Describe("CreateRequest", func() {
@@ -86,14 +85,14 @@ var _ = Describe("Routing", func() {
 					badRouteName = "orange"
 					baseURL = "https://foo.bar.baz/this/is"
 
-					routes = map[string]Route{
+					routes = map[string]internal.Route{
 						routeName:    {Path: "/very/good/:name", Method: http.MethodGet},
 						badRouteName: {Path: "/very/bad", Method: http.MethodGet},
 					}
 				})
 
 				It("returns a request", func() {
-					request, err := router.CreateRequest(routeName, Params{"name": "Henry the 8th"}, nil)
+					request, err := router.CreateRequest(routeName, internal.Params{"name": "Henry the 8th"}, nil)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(request.URL.String()).To(Equal("https://foo.bar.baz/this/is/very/good/Henry%2520the%25208th"))
 				})

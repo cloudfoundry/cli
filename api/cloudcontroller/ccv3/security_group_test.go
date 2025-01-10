@@ -5,7 +5,8 @@ import (
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/resources"
 
@@ -57,7 +58,7 @@ var _ = Describe("SecurityGroup", func() {
 		It("makes the correct request", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			actualParams := requester.MakeRequestArgsForCall(0)
-			Expect(actualParams.RequestName).To(Equal(internal.PostSecurityGroupRequest))
+			Expect(actualParams.RequestName).To(Equal(ccv3internal.PostSecurityGroupRequest))
 			Expect(actualParams.RequestBody).To(Equal(securityGroupParams))
 			Expect(actualParams.ResponseBody).To(HaveTypeOf(&resources.SecurityGroup{}))
 		})
@@ -93,7 +94,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			params := requester.MakeListRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.GetSecurityGroupsRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.GetSecurityGroupsRequest))
 			Expect(params.Query).To(Equal([]Query{query}))
 			Expect(params.ResponseBody).To(Equal(resources.SecurityGroup{}))
 		})
@@ -133,7 +134,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			params := requester.MakeListRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.GetSpaceRunningSecurityGroupsRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.GetSpaceRunningSecurityGroupsRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"space_guid": spaceGUID}))
 			Expect(params.Query).To(Equal([]Query{query}))
 			Expect(params.ResponseBody).To(Equal(resources.SecurityGroup{}))
@@ -174,7 +175,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 			params := requester.MakeListRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.GetSpaceStagingSecurityGroupsRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.GetSpaceStagingSecurityGroupsRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"space_guid": spaceGUID}))
 			Expect(params.Query).To(Equal([]Query{query}))
 			Expect(params.ResponseBody).To(Equal(resources.SecurityGroup{}))
@@ -210,7 +211,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.DeleteSecurityGroupRunningSpaceRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.DeleteSecurityGroupRunningSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{
 				"security_group_guid": securityGroupGUID, "space_guid": spaceGUID,
 			}))
@@ -242,7 +243,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.DeleteSecurityGroupStagingSpaceRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.DeleteSecurityGroupStagingSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{
 				"security_group_guid": securityGroupGUID, "space_guid": spaceGUID,
 			}))
@@ -274,7 +275,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupRunningSpaceRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.PostSecurityGroupRunningSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
 				GUIDs: spaceGUIDs,
@@ -307,7 +308,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupStagingSpaceRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.PostSecurityGroupStagingSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
 				GUIDs: spaceGUIDs,
@@ -350,7 +351,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.PatchSecurityGroupRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.PatchSecurityGroupRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroup.GUID}))
 			Expect(params.RequestBody).To(Equal(resources.SecurityGroup{
 				StagingGloballyEnabled: &trueValue,
@@ -386,7 +387,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(requester.MakeRequestCallCount()).To(Equal(1))
 			params := requester.MakeRequestArgsForCall(0)
 
-			Expect(params.RequestName).To(Equal(internal.DeleteSecurityGroupRequest))
+			Expect(params.RequestName).To(Equal(ccv3internal.DeleteSecurityGroupRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 		})
 

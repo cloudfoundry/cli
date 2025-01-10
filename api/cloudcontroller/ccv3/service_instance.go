@@ -3,7 +3,8 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/lookuptable"
@@ -20,7 +21,7 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 	var result []resources.ServiceInstance
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetServiceInstancesRequest,
+		RequestName:  ccv3internal.GetServiceInstancesRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceInstance{},
 		AppendToList: func(item interface{}) error {
@@ -61,7 +62,7 @@ func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, q
 
 func (client *Client) GetServiceInstanceParameters(serviceInstanceGUID string) (parameters types.JSONObject, warnings Warnings, err error) {
 	_, warnings, err = client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServiceInstanceParametersRequest,
+		RequestName:  ccv3internal.GetServiceInstanceParametersRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
 		ResponseBody: &parameters,
 	})
@@ -71,14 +72,14 @@ func (client *Client) GetServiceInstanceParameters(serviceInstanceGUID string) (
 
 func (client *Client) CreateServiceInstance(serviceInstance resources.ServiceInstance) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
-		RequestName: internal.PostServiceInstanceRequest,
+		RequestName: ccv3internal.PostServiceInstanceRequest,
 		RequestBody: serviceInstance,
 	})
 }
 
 func (client *Client) UpdateServiceInstance(serviceInstanceGUID string, serviceInstanceUpdates resources.ServiceInstance) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
-		RequestName: internal.PatchServiceInstanceRequest,
+		RequestName: ccv3internal.PatchServiceInstanceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
 		RequestBody: serviceInstanceUpdates,
 	})
@@ -86,7 +87,7 @@ func (client *Client) UpdateServiceInstance(serviceInstanceGUID string, serviceI
 
 func (client *Client) DeleteServiceInstance(serviceInstanceGUID string, query ...Query) (JobURL, Warnings, error) {
 	return client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceInstanceRequest,
+		RequestName: ccv3internal.DeleteServiceInstanceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
 		Query:       query,
 	})
@@ -98,7 +99,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
+		RequestName:  ccv3internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
 		RequestBody:  resources.RelationshipList{GUIDs: spaceGUIDs},
 		ResponseBody: &responseBody,
@@ -111,7 +112,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 // between the service instance and the shared-to space provided.
 func (client *Client) UnshareServiceInstanceFromSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
+		RequestName: ccv3internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID, "space_guid": spaceGUID},
 	})
 
@@ -133,7 +134,7 @@ func (client *Client) GetServiceInstanceSharedSpaces(serviceInstanceGUID string)
 		},
 	}
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServiceInstanceRelationshipsSharedSpacesRequest,
+		RequestName:  ccv3internal.GetServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
 		Query:        query,
 		ResponseBody: &responseBody,
@@ -145,7 +146,7 @@ func (client *Client) GetServiceInstanceUsageSummary(serviceInstanceGUID string)
 	var result resources.ServiceInstanceUsageSummaryList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServiceInstanceSharedSpacesUsageSummaryRequest,
+		RequestName:  ccv3internal.GetServiceInstanceSharedSpacesUsageSummaryRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
 		ResponseBody: &result,
 	})

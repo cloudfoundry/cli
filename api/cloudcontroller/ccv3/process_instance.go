@@ -7,7 +7,8 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -93,7 +94,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 // process instance.
 func (client *Client) DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteApplicationProcessInstanceRequest,
+		RequestName: ccv3internal.DeleteApplicationProcessInstanceRequest,
 		URIParams: internal.Params{
 			"app_guid": appGUID,
 			"type":     processType,
@@ -109,7 +110,7 @@ func (client *Client) GetProcessInstances(processGUID string) ([]ProcessInstance
 	var resources []ProcessInstance
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetProcessStatsRequest,
+		RequestName:  ccv3internal.GetProcessStatsRequest,
 		URIParams:    internal.Params{"process_guid": processGUID},
 		ResponseBody: ProcessInstance{},
 		AppendToList: func(item interface{}) error {
