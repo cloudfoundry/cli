@@ -3,9 +3,9 @@ package net_test
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/net/netfakes"
-	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/net/netfakes"
+	"code.cloudfoundry.org/cli/v9/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

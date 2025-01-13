@@ -4,10 +4,10 @@ package commandsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commands"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
 )
 
 type FakeSSHCodeGetter struct {
@@ -80,15 +80,16 @@ func (fake *FakeSSHCodeGetter) Execute(arg1 flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		arg1 flags.FlagContext
 	}{arg1})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -139,15 +140,16 @@ func (fake *FakeSSHCodeGetter) Get() (string, error) {
 	ret, specificReturn := fake.getReturnsOnCall[len(fake.getArgsForCall)]
 	fake.getArgsForCall = append(fake.getArgsForCall, struct {
 	}{})
+	stub := fake.GetStub
+	fakeReturns := fake.getReturns
 	fake.recordInvocation("Get", []interface{}{})
 	fake.getMutex.Unlock()
-	if fake.GetStub != nil {
-		return fake.GetStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -194,15 +196,16 @@ func (fake *FakeSSHCodeGetter) MetaData() commandregistry.CommandMetadata {
 	ret, specificReturn := fake.metaDataReturnsOnCall[len(fake.metaDataArgsForCall)]
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct {
 	}{})
+	stub := fake.MetaDataStub
+	fakeReturns := fake.metaDataReturns
 	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
-	if fake.MetaDataStub != nil {
-		return fake.MetaDataStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.metaDataReturns
 	return fakeReturns.result1
 }
 
@@ -248,15 +251,16 @@ func (fake *FakeSSHCodeGetter) Requirements(arg1 requirements.Factory, arg2 flag
 		arg1 requirements.Factory
 		arg2 flags.FlagContext
 	}{arg1, arg2})
+	stub := fake.RequirementsStub
+	fakeReturns := fake.requirementsReturns
 	fake.recordInvocation("Requirements", []interface{}{arg1, arg2})
 	fake.requirementsMutex.Unlock()
-	if fake.RequirementsStub != nil {
-		return fake.RequirementsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requirementsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -312,15 +316,16 @@ func (fake *FakeSSHCodeGetter) SetDependency(arg1 commandregistry.Dependency, ar
 		arg1 commandregistry.Dependency
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.SetDependencyStub
+	fakeReturns := fake.setDependencyReturns
 	fake.recordInvocation("SetDependency", []interface{}{arg1, arg2})
 	fake.setDependencyMutex.Unlock()
-	if fake.SetDependencyStub != nil {
-		return fake.SetDependencyStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setDependencyReturns
 	return fakeReturns.result1
 }
 

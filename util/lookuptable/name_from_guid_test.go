@@ -1,7 +1,7 @@
 package lookuptable_test
 
 import (
-	"code.cloudfoundry.org/cli/util/lookuptable"
+	"code.cloudfoundry.org/cli/v9/util/lookuptable"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

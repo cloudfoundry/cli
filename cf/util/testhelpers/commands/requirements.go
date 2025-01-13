@@ -1,6 +1,6 @@
 package commands
 
-import "code.cloudfoundry.org/cli/cf/requirements"
+import "code.cloudfoundry.org/cli/v9/cf/requirements"
 
 func RunRequirements(reqs []requirements.Requirement) error {
 	var retErr error

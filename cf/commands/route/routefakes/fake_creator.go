@@ -4,8 +4,8 @@ package routefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commands/route"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/commands/route"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeCreator struct {
@@ -42,15 +42,16 @@ func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bo
 		arg5 models.DomainFields
 		arg6 models.SpaceFields
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	stub := fake.CreateRouteStub
+	fakeReturns := fake.createRouteReturns
 	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createRouteMutex.Unlock()
-	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

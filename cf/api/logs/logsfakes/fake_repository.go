@@ -4,7 +4,7 @@ package logsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/v9/cf/api/logs"
 )
 
 type FakeRepository struct {
@@ -41,9 +41,10 @@ func (fake *FakeRepository) Close() {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
+	stub := fake.CloseStub
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
+	if stub != nil {
 		fake.CloseStub()
 	}
 }
@@ -66,15 +67,16 @@ func (fake *FakeRepository) RecentLogsFor(arg1 string) ([]logs.Loggable, error) 
 	fake.recentLogsForArgsForCall = append(fake.recentLogsForArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RecentLogsForStub
+	fakeReturns := fake.recentLogsForReturns
 	fake.recordInvocation("RecentLogsFor", []interface{}{arg1})
 	fake.recentLogsForMutex.Unlock()
-	if fake.RecentLogsForStub != nil {
-		return fake.RecentLogsForStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.recentLogsForReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -131,9 +133,10 @@ func (fake *FakeRepository) TailLogsFor(arg1 string, arg2 func(), arg3 chan<- lo
 		arg3 chan<- logs.Loggable
 		arg4 chan<- error
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.TailLogsForStub
 	fake.recordInvocation("TailLogsFor", []interface{}{arg1, arg2, arg3, arg4})
 	fake.tailLogsForMutex.Unlock()
-	if fake.TailLogsForStub != nil {
+	if stub != nil {
 		fake.TailLogsForStub(arg1, arg2, arg3, arg4)
 	}
 }

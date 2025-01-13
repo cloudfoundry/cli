@@ -1,7 +1,7 @@
 package pluginaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"github.com/blang/semver/v4"
 )
 
