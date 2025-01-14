@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -12,7 +13,7 @@ func (client *Client) CreateIsolationSegment(isolationSegment resources.Isolatio
 	var responseBody resources.IsolationSegment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostIsolationSegmentsRequest,
+		RequestName:  ccv3internal.PostIsolationSegmentsRequest,
 		RequestBody:  isolationSegment,
 		ResponseBody: &responseBody,
 	})
@@ -25,7 +26,7 @@ func (client *Client) CreateIsolationSegment(isolationSegment resources.Isolatio
 // database. It will not remove it from diego.
 func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteIsolationSegmentRequest,
+		RequestName: ccv3internal.DeleteIsolationSegmentRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": guid},
 	})
 
@@ -38,7 +39,7 @@ func (client *Client) GetIsolationSegment(guid string) (resources.IsolationSegme
 	var responseBody resources.IsolationSegment
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetIsolationSegmentRequest,
+		RequestName:  ccv3internal.GetIsolationSegmentRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": guid},
 		ResponseBody: &responseBody,
 	})
@@ -51,7 +52,7 @@ func (client *Client) GetIsolationSegments(query ...Query) ([]resources.Isolatio
 	var isolationSegments []resources.IsolationSegment
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetIsolationSegmentsRequest,
+		RequestName:  ccv3internal.GetIsolationSegmentsRequest,
 		Query:        query,
 		ResponseBody: resources.IsolationSegment{},
 		AppendToList: func(item interface{}) error {

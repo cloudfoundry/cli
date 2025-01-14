@@ -8,7 +8,8 @@ import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -279,7 +280,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PostApplicationRequest))
 				Expect(actualParams.RequestBody).To(Equal(appToCreate))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
@@ -365,7 +366,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationsRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.GetApplicationsRequest))
 				Expect(actualParams.Query).To(Equal([]Query{
 					{Key: NameFilter, Values: []string{"some-app-name"}},
 					{Key: SpaceGUIDFilter, Values: []string{"some-space-guid"}},
@@ -467,7 +468,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeListRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationsRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.GetApplicationsRequest))
 				Expect(actualParams.Query).To(Equal(filters))
 				_, ok := actualParams.ResponseBody.(resources.Application)
 				Expect(ok).To(BeTrue())
@@ -562,7 +563,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PatchApplicationRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PatchApplicationRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				Expect(actualParams.RequestBody).To(Equal(appToUpdate))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
@@ -660,7 +661,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PatchApplicationRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PatchApplicationRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				Expect(actualParams.RequestBody).To(Equal(resources.ApplicationNameOnly{Name: newAppName}))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
@@ -749,7 +750,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionStopRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PostApplicationActionStopRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
@@ -832,7 +833,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionStartRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PostApplicationActionStartRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
@@ -915,7 +916,7 @@ var _ = Describe("Application", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeRequestCallCount()).To(Equal(1))
 				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionRestartRequest))
+				Expect(actualParams.RequestName).To(Equal(ccv3internal.PostApplicationActionRestartRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())

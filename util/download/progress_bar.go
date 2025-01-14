@@ -3,7 +3,7 @@ package download
 import (
 	"io"
 
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"github.com/cheggaaa/pb/v3"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ProgressBar

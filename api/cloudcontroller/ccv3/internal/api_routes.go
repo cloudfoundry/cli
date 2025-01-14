@@ -1,6 +1,10 @@
 package internal
 
-import "net/http"
+import (
+	"net/http"
+
+	"code.cloudfoundry.org/cli/api/internal"
+)
 
 // Naming convention:
 //
@@ -182,7 +186,7 @@ const (
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
-var APIRoutes = map[string]Route{
+var APIRoutes = map[string]internal.Route{
 	GetApplicationsRequest:                                      {Path: "/v3/apps", Method: http.MethodGet},
 	PostApplicationRequest:                                      {Path: "/v3/apps", Method: http.MethodPost},
 	DeleteApplicationRequest:                                    {Path: "/v3/apps/:app_guid", Method: http.MethodDelete},

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (resourc
 	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostOrganizationQuotaApplyRequest,
+		RequestName:  ccv3internal.PostOrganizationQuotaApplyRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGuid},
 		RequestBody:  resources.RelationshipList{GUIDs: []string{orgGuid}},
 		ResponseBody: &responseBody,
@@ -22,7 +23,7 @@ func (client *Client) CreateOrganizationQuota(orgQuota resources.OrganizationQuo
 	var responseOrgQuota resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostOrganizationQuotaRequest,
+		RequestName:  ccv3internal.PostOrganizationQuotaRequest,
 		RequestBody:  orgQuota,
 		ResponseBody: &responseOrgQuota,
 	})
@@ -32,7 +33,7 @@ func (client *Client) CreateOrganizationQuota(orgQuota resources.OrganizationQuo
 
 func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteOrganizationQuotaRequest,
+		RequestName: ccv3internal.DeleteOrganizationQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": quotaGUID},
 	})
 
@@ -43,7 +44,7 @@ func (client *Client) GetOrganizationQuota(quotaGUID string) (resources.Organiza
 	var responseBody resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetOrganizationQuotaRequest,
+		RequestName:  ccv3internal.GetOrganizationQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGUID},
 		ResponseBody: &responseBody,
 	})
@@ -55,7 +56,7 @@ func (client *Client) GetOrganizationQuotas(query ...Query) ([]resources.Organiz
 	var organizationQuotas []resources.OrganizationQuota
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetOrganizationQuotasRequest,
+		RequestName:  ccv3internal.GetOrganizationQuotasRequest,
 		Query:        query,
 		ResponseBody: resources.OrganizationQuota{},
 		AppendToList: func(item interface{}) error {
@@ -74,7 +75,7 @@ func (client *Client) UpdateOrganizationQuota(orgQuota resources.OrganizationQuo
 	var responseBody resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchOrganizationQuotaRequest,
+		RequestName:  ccv3internal.PatchOrganizationQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": orgQuotaGUID},
 		RequestBody:  orgQuota,
 		ResponseBody: &responseBody,

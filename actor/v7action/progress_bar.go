@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"gopkg.in/cheggaaa/pb.v1"
+	"github.com/cheggaaa/pb/v3"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SimpleProgressBar
@@ -34,8 +34,7 @@ func (p *ProgressBar) Initialize(path string) (io.Reader, int64, error) {
 		return nil, 0, err
 	}
 
-	p.bar = pb.New(int(fileInfo.Size())).SetUnits(pb.U_BYTES)
-	p.bar.ShowTimeLeft = false
+	p.bar = pb.New(int(fileInfo.Size())).Set(pb.Bytes, true)
 	p.bar.Start()
 	return p.bar.NewProxyReader(file), fileInfo.Size(), nil
 

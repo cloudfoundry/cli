@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	uuid "github.com/nu7hatch/gouuid"
+	uuid "github.com/google/uuid"
 )
 
 type ID string
@@ -15,10 +15,7 @@ type Database struct {
 }
 
 func NewID() ID {
-	rawGUID, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	rawGUID := uuid.New()
 
 	return ID(rawGUID.String())
 }

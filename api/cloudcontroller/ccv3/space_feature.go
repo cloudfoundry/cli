@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client *Client) GetSpaceFeature(spaceGUID string, featureName string) (boo
 	var responseBody resources.SpaceFeature
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetSpaceFeatureRequest,
+		RequestName:  ccv3internal.GetSpaceFeatureRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID, "feature": featureName},
 		ResponseBody: &responseBody,
 	})
@@ -19,7 +20,7 @@ func (client *Client) GetSpaceFeature(spaceGUID string, featureName string) (boo
 
 func (client *Client) UpdateSpaceFeature(spaceGUID string, enabled bool, featureName string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PatchSpaceFeaturesRequest,
+		RequestName: ccv3internal.PatchSpaceFeaturesRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID, "feature": featureName},
 		RequestBody: struct {
 			Enabled bool `json:"enabled"`

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ import (
 // the isolation segment and the organization provided.
 func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
+		RequestName: ccv3internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
 	})
 
@@ -22,7 +23,7 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (re
 	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
+		RequestName:  ccv3internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		ResponseBody: &responseBody,
 	})
@@ -36,7 +37,7 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (resources.Rela
 	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetSpaceRelationshipIsolationSegmentRequest,
+		RequestName:  ccv3internal.GetSpaceRelationshipIsolationSegmentRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		ResponseBody: &responseBody,
 	})
@@ -49,7 +50,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchApplicationCurrentDropletRequest,
+		RequestName:  ccv3internal.PatchApplicationCurrentDropletRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  resources.Relationship{GUID: dropletGUID},
 		ResponseBody: &responseBody,
@@ -65,7 +66,7 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
+		RequestName:  ccv3internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		RequestBody:  resources.Relationship{GUID: isoSegGUID},
 		ResponseBody: &responseBody,
@@ -80,7 +81,7 @@ func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, 
 	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchSpaceRelationshipIsolationSegmentRequest,
+		RequestName:  ccv3internal.PatchSpaceRelationshipIsolationSegmentRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		RequestBody:  resources.Relationship{GUID: isolationSegmentGUID},
 		ResponseBody: &responseBody,

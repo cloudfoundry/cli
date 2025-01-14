@@ -4,8 +4,9 @@ import (
 	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -25,7 +26,7 @@ func (client *Client) CreateDroplet(appGUID string) (resources.Droplet, Warnings
 	var responseBody resources.Droplet
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostDropletRequest,
+		RequestName:  ccv3internal.PostDropletRequest,
 		RequestBody:  requestBody,
 		ResponseBody: &responseBody,
 	})
@@ -39,7 +40,7 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (resources.Dr
 	var responseBody resources.Droplet
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetApplicationDropletCurrentRequest,
+		RequestName:  ccv3internal.GetApplicationDropletCurrentRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
 	})
@@ -52,7 +53,7 @@ func (client *Client) GetDroplet(dropletGUID string) (resources.Droplet, Warning
 	var responseBody resources.Droplet
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetDropletRequest,
+		RequestName:  ccv3internal.GetDropletRequest,
 		URIParams:    internal.Params{"droplet_guid": dropletGUID},
 		ResponseBody: &responseBody,
 	})
@@ -65,7 +66,7 @@ func (client *Client) GetDroplets(query ...Query) ([]resources.Droplet, Warnings
 	var droplets []resources.Droplet
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetDropletsRequest,
+		RequestName:  ccv3internal.GetDropletsRequest,
 		Query:        query,
 		ResponseBody: resources.Droplet{},
 		AppendToList: func(item interface{}) error {
@@ -82,7 +83,7 @@ func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]
 	var droplets []resources.Droplet
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetPackageDropletsRequest,
+		RequestName:  ccv3internal.GetPackageDropletsRequest,
 		URIParams:    internal.Params{"package_guid": packageGUID},
 		Query:        query,
 		ResponseBody: resources.Droplet{},
@@ -106,7 +107,7 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(droplet, dropletPath, "bits")
 
 	responseLocation, warnings, err := client.MakeRequestUploadAsync(
-		internal.PostDropletBitsRequest,
+		ccv3internal.PostDropletBitsRequest,
 		internal.Params{"droplet_guid": dropletGUID},
 		contentType,
 		body,
@@ -120,7 +121,7 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 
 func (client *Client) DownloadDroplet(dropletGUID string) ([]byte, Warnings, error) {
 	bytes, warnings, err := client.MakeRequestReceiveRaw(
-		internal.GetDropletBitsRequest,
+		ccv3internal.GetDropletBitsRequest,
 		internal.Params{"droplet_guid": dropletGUID},
 		"application/json",
 	)

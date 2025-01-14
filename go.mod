@@ -18,32 +18,30 @@ require (
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver/v4 v4.0.0
+	github.com/cheggaaa/pb/v3 v3.1.6-0.20241030110445-d0803d4621f5
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 	github.com/creack/pty v1.1.24
 	github.com/cyphar/filepath-securejoin v0.3.5
 	github.com/distribution/reference v0.6.0
 	github.com/fatih/color v1.18.0
 	github.com/google/go-querystring v1.1.0
+	github.com/google/uuid v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/lunixbochs/vtclean v1.0.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.10.0
 	github.com/moby/term v0.5.0
-	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.36.1
-	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.31.0
 	golang.org/x/net v0.32.0
 	golang.org/x/term v0.27.0
 	golang.org/x/text v0.21.0
-	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.32.0
 	k8s.io/client-go v0.32.0
@@ -52,6 +50,7 @@ require (
 require (
 	code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40 // indirect
 	github.com/charlievieth/fs v0.0.3 // indirect
@@ -77,6 +76,7 @@ require (
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/tedsuo/rata v1.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect

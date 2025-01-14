@@ -11,7 +11,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -23,7 +24,7 @@ func (client *Client) CreatePackage(pkg resources.Package) (resources.Package, W
 	var responseBody resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostPackageRequest,
+		RequestName:  ccv3internal.PostPackageRequest,
 		RequestBody:  pkg,
 		ResponseBody: &responseBody,
 	})
@@ -36,7 +37,7 @@ func (client *Client) GetPackage(packageGUID string) (resources.Package, Warning
 	var responseBody resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetPackageRequest,
+		RequestName:  ccv3internal.GetPackageRequest,
 		URIParams:    internal.Params{"package_guid": packageGUID},
 		ResponseBody: &responseBody,
 	})
@@ -49,7 +50,7 @@ func (client *Client) GetPackages(query ...Query) ([]resources.Package, Warnings
 	var packages []resources.Package
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetPackagesRequest,
+		RequestName:  ccv3internal.GetPackagesRequest,
 		Query:        query,
 		ResponseBody: resources.Package{},
 		AppendToList: func(item interface{}) error {
@@ -92,7 +93,7 @@ func (client *Client) UploadPackage(pkg resources.Package, fileToUpload string) 
 
 	responsePackage := resources.Package{}
 	_, warnings, err := client.MakeRequestSendRaw(
-		internal.PostPackageBitsRequest,
+		ccv3internal.PostPackageBitsRequest,
 		internal.Params{"package_guid": pkg.GUID},
 		body.Bytes(),
 		contentType,
@@ -108,7 +109,7 @@ func (client *Client) CopyPackage(sourcePkgGUID string, targetAppGUID string) (r
 	var targetPackage resources.Package
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.PostPackageRequest,
+		RequestName: ccv3internal.PostPackageRequest,
 		Query:       []Query{{Key: SourceGUID, Values: []string{sourcePkgGUID}}},
 		RequestBody: map[string]resources.Relationships{
 			"relationships": {
@@ -234,7 +235,7 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 	responsePackage := resources.Package{}
 
 	_, warnings, err := client.MakeRequestSendRaw(
-		internal.PostPackageBitsRequest,
+		ccv3internal.PostPackageBitsRequest,
 		internal.Params{"package_guid": packageGUID},
 		body.Bytes(),
 		form.FormDataContentType(),
@@ -254,7 +255,7 @@ func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedR
 
 	responseBody := resources.Package{}
 	_, warnings, err := client.MakeRequestUploadAsync(
-		internal.PostPackageBitsRequest,
+		ccv3internal.PostPackageBitsRequest,
 		internal.Params{"package_guid": packageGUID},
 		contentType,
 		body,

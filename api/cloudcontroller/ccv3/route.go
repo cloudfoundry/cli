@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -9,7 +10,7 @@ func (client Client) CreateRoute(route resources.Route) (resources.Route, Warnin
 	var responseBody resources.Route
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PostRouteRequest,
+		RequestName:  ccv3internal.PostRouteRequest,
 		RequestBody:  route,
 		ResponseBody: &responseBody,
 	})
@@ -19,7 +20,7 @@ func (client Client) CreateRoute(route resources.Route) (resources.Route, Warnin
 
 func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteOrphanedRoutesRequest,
+		RequestName: ccv3internal.DeleteOrphanedRoutesRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Query:       []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
 	})
@@ -29,7 +30,7 @@ func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, e
 
 func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteRouteRequest,
+		RequestName: ccv3internal.DeleteRouteRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
 	})
 
@@ -40,7 +41,7 @@ func (client Client) GetApplicationRoutes(appGUID string) ([]resources.Route, Wa
 	var routes []resources.Route
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetApplicationRoutesRequest,
+		RequestName:  ccv3internal.GetApplicationRoutesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: resources.Route{},
 		AppendToList: func(item interface{}) error {
@@ -58,7 +59,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]resources.RouteDe
 	}
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetRouteDestinationsRequest,
+		RequestName:  ccv3internal.GetRouteDestinationsRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID},
 		ResponseBody: &responseBody,
 	})
@@ -70,7 +71,7 @@ func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, err
 	var routes []resources.Route
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetRoutesRequest,
+		RequestName:  ccv3internal.GetRoutesRequest,
 		Query:        query,
 		ResponseBody: resources.Route{},
 		AppendToList: func(item interface{}) error {
@@ -112,7 +113,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string, destinationProto
 	}
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.MapRouteRequest,
+		RequestName: ccv3internal.MapRouteRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
 		RequestBody: &requestBody,
 	})
@@ -124,7 +125,7 @@ func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warni
 	var responseBody resources.Build
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.UnmapRouteRequest,
+		RequestName:  ccv3internal.UnmapRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID, "destination_guid": destinationGUID},
 		ResponseBody: &responseBody,
 	})
@@ -136,7 +137,7 @@ func (client Client) UnshareRoute(routeGUID string, spaceGUID string) (Warnings,
 	var responseBody resources.Build
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.UnshareRouteRequest,
+		RequestName:  ccv3internal.UnshareRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID, "space_guid": spaceGUID},
 		ResponseBody: &responseBody,
 	})
@@ -152,7 +153,7 @@ func (client Client) UpdateDestination(routeGUID string, destinationGUID string,
 	}
 	var responseBody resources.Build
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchDestinationRequest,
+		RequestName:  ccv3internal.PatchDestinationRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID, "destination_guid": destinationGUID},
 		RequestBody:  &requestBody,
 		ResponseBody: &responseBody,
@@ -177,7 +178,7 @@ func (client Client) ShareRoute(routeGUID string, spaceGUID string) (Warnings, e
 
 	var responseBody resources.Build
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.ShareRouteRequest,
+		RequestName:  ccv3internal.ShareRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID},
 		RequestBody:  &requestBody,
 		ResponseBody: &responseBody,
@@ -202,7 +203,7 @@ func (client Client) MoveRoute(routeGUID string, spaceGUID string) (Warnings, er
 
 	var responseBody resources.Build
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.PatchMoveRouteRequest,
+		RequestName:  ccv3internal.PatchMoveRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID},
 		RequestBody:  &requestBody,
 		ResponseBody: &responseBody,

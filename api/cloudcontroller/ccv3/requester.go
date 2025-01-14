@@ -9,7 +9,8 @@ import (
 	"runtime"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester
@@ -86,7 +87,7 @@ func (requester *RealRequester) InitializeConnection(settings TargetSettings) {
 }
 
 func (requester *RealRequester) InitializeRouter(baseURL string) {
-	requester.router = internal.NewRouter(internal.APIRoutes, baseURL)
+	requester.router = internal.NewRouter(ccv3internal.APIRoutes, baseURL)
 }
 
 func (requester *RealRequester) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {

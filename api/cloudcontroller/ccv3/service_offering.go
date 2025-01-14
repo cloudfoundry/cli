@@ -2,7 +2,8 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/lookuptable"
 )
@@ -14,7 +15,7 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]resources.ServiceOf
 	query = append(query, Query{Key: FieldsServiceBroker, Values: []string{"name", "guid"}})
 
 	included, warnings, err := client.MakeListRequest(RequestParams{
-		RequestName:  internal.GetServiceOfferingsRequest,
+		RequestName:  ccv3internal.GetServiceOfferingsRequest,
 		Query:        query,
 		ResponseBody: resources.ServiceOffering{},
 		AppendToList: func(item interface{}) error {
@@ -40,7 +41,7 @@ func (client *Client) GetServiceOfferingByGUID(guid string) (resources.ServiceOf
 	var result resources.ServiceOffering
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName:  internal.GetServiceOfferingRequest,
+		RequestName:  ccv3internal.GetServiceOfferingRequest,
 		URIParams:    internal.Params{"service_offering_guid": guid},
 		ResponseBody: &result,
 	})
@@ -81,7 +82,7 @@ func (client *Client) GetServiceOfferingByNameAndBroker(serviceOfferingName, ser
 
 func (client *Client) PurgeServiceOffering(serviceOfferingGUID string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteServiceOfferingRequest,
+		RequestName: ccv3internal.DeleteServiceOfferingRequest,
 		URIParams:   internal.Params{"service_offering_guid": serviceOfferingGUID},
 		Query:       []Query{{Key: Purge, Values: []string{"true"}}},
 	})

@@ -1,7 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 )
 
 // JobURL is the URL to a given Job.
@@ -11,7 +12,7 @@ type JobURL string
 // resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error) {
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
-		RequestName: internal.DeleteApplicationRequest,
+		RequestName: ccv3internal.DeleteApplicationRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
 
@@ -22,7 +23,7 @@ func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error
 // application. Returns back a resulting job URL to poll.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (JobURL, Warnings, error) {
 	responseLocation, warnings, err := client.MakeRequestSendRaw(
-		internal.PostApplicationActionApplyManifest,
+		ccv3internal.PostApplicationActionApplyManifest,
 		internal.Params{"app_guid": appGUID},
 		rawManifest,
 		"application/x-yaml",
@@ -44,7 +45,7 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 
 func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (JobURL, Warnings, error) {
 	responseLocation, warnings, err := client.MakeRequestSendRaw(
-		internal.PostSpaceActionApplyManifestRequest,
+		ccv3internal.PostSpaceActionApplyManifestRequest,
 		internal.Params{"space_guid": spaceGUID},
 		rawManifest,
 		"application/x-yaml",

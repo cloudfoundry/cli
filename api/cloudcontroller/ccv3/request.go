@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	ccv3internal "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/internal"
 )
 
 // requestOptions contains all the options to create an HTTP request.
@@ -81,5 +82,5 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 }
 
 func isDownloadDroplet(URL string, requestName string) bool {
-	return (strings.Contains(URL, "droplet") && strings.Contains(URL, "download")) || (requestName == internal.GetDropletBitsRequest)
+	return (strings.Contains(URL, "droplet") && strings.Contains(URL, "download")) || (requestName == ccv3internal.GetDropletBitsRequest)
 }
