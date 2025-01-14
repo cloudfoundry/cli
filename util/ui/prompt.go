@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/vito/go-interact/interact"
-	"github.com/vito/go-interact/interact/terminal"
 )
 
 const sigIntExitCode = 130
@@ -146,5 +145,5 @@ func contains(s []string, v string) bool {
 }
 
 func isInterrupt(err error) bool {
-	return err == interact.ErrKeyboardInterrupt || err == terminal.ErrKeyboardInterrupt
+	return errors.As(err, &interact.ErrNotBoolean) && errors.As(err, &interact.ErrNotANumber)
 }
