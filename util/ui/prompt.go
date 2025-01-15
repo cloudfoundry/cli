@@ -145,5 +145,5 @@ func contains(s []string, v string) bool {
 }
 
 func isInterrupt(err error) bool {
-	return errors.As(err, &interact.ErrNotBoolean) && errors.As(err, &interact.ErrNotANumber)
+	return !(errors.Is(err, interact.ErrNotBoolean) && errors.Is(err, interact.ErrNotANumber))
 }

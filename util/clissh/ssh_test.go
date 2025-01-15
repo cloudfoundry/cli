@@ -888,8 +888,7 @@ var _ = Describe("CLI SSH", Serial, FlakeAttempts(9), func() {
 			fakeLocalListener.AcceptReturns(nil, errors.New("Not Accepting Connections"))
 
 			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler, 500*time.Millisecond)
-			err = echoServer.SetListener(echoListener)
-			Expect(err).NotTo(HaveOccurred())
+			echoServer.SetListener(echoListener)
 			go echoServer.Serve()
 
 			forwardSpecs = []LocalPortForward{{

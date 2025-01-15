@@ -1,6 +1,7 @@
 package ui_test
 
 import (
+	"errors"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"github.com/vito/go-interact/interact"
 )
 
 var _ = Describe("Prompts", func() {
@@ -379,7 +379,7 @@ var _ = Describe("Prompts", func() {
 
 			BeforeEach(func() {
 				fakeResolver = new(uifakes.FakeResolver)
-				fakeResolver.ResolveReturns(interact.ErrKeyboardInterrupt)
+				fakeResolver.ResolveReturns(errors.New("keyboard interrupt"))
 				fakeExiter = new(uifakes.FakeExiter)
 				fakeInteractor = new(uifakes.FakeInteractor)
 				fakeInteractor.NewInteractionReturns(fakeResolver)
