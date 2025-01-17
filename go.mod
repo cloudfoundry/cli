@@ -3,18 +3,18 @@ module code.cloudfoundry.org/cli
 go 1.23.1
 
 require (
-	code.cloudfoundry.org/bytefmt v0.24.0
+	code.cloudfoundry.org/bytefmt v0.25.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20240701140235-0ab1c0e216c8
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.27.0
+	code.cloudfoundry.org/clock v1.28.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.21.0
-	code.cloudfoundry.org/tlsconfig v0.14.0
+	code.cloudfoundry.org/lager/v3 v3.22.0
+	code.cloudfoundry.org/tlsconfig v0.15.0
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver/v4 v4.0.0
@@ -22,13 +22,13 @@ require (
 	github.com/cloudfoundry/noaa/v2 v2.5.0
 	github.com/cloudfoundry/sonde-go v0.0.0-20230710164515-a0a43d1dbbf8
 	github.com/creack/pty v1.1.24
-	github.com/cyphar/filepath-securejoin v0.3.6
+	github.com/cyphar/filepath-securejoin v0.4.0
 	github.com/distribution/reference v0.6.0
 	github.com/fatih/color v1.18.0
 	github.com/google/go-querystring v1.1.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/lunixbochs/vtclean v1.0.0
-	github.com/mattn/go-colorable v0.1.13
+	github.com/mattn/go-colorable v0.1.14
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2
 	github.com/moby/term v0.5.2
@@ -41,8 +41,8 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.33.0
+	golang.org/x/crypto v0.32.0
+	golang.org/x/net v0.34.0
 	golang.org/x/term v0.28.0
 	golang.org/x/text v0.21.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -75,7 +75,7 @@ require (
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/tools v0.28.0 // indirect
+	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
