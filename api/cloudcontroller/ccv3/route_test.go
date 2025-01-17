@@ -70,15 +70,16 @@ var _ = Describe("Route", func() {
 
 					expectedBody := `{
   "relationships": {
-  	"space": {
-      "data": { "guid": "space-guid" }
+    "space": {
+	  "data": { "guid": "space-guid" }
     },
     "domain": {
 	  "data": { "guid": "domain-guid" }
-    },
-    "options": {
-      "loadbalancing": "least-connections"
-    }  
+    }
+  },
+  "options": {
+    "loadbalancing": "least-connections"
+  }
 }`
 
 					server.AppendHandlers(
@@ -98,6 +99,7 @@ var _ = Describe("Route", func() {
 						GUID:       "some-route-guid",
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
+						Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
 					}))
 				})
 			})
