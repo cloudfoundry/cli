@@ -34,6 +34,7 @@ var _ = Describe("map-route Command", func() {
 		path            string
 		orgGUID         string
 		spaceGUID       string
+		options         []string
 	)
 
 	BeforeEach(func() {
@@ -51,12 +52,14 @@ var _ = Describe("map-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
+		options = []string{"loadbalancing=least-connections"}
 
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
 			AppProtocol:  "http2",
+			Options:      options,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -250,12 +253,13 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort := fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort, actualOptions := fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(cmd.Port))
+						Expect(actualOptions).To(Equal(cmd.Options))
 					})
 				})
 

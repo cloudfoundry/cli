@@ -33,15 +33,16 @@ func (fake *FakeWhoAmIer) WhoAmI() (resources.K8sUser, ccv3.Warnings, error) {
 	ret, specificReturn := fake.whoAmIReturnsOnCall[len(fake.whoAmIArgsForCall)]
 	fake.whoAmIArgsForCall = append(fake.whoAmIArgsForCall, struct {
 	}{})
+	stub := fake.WhoAmIStub
+	fakeReturns := fake.whoAmIReturns
 	fake.recordInvocation("WhoAmI", []interface{}{})
 	fake.whoAmIMutex.Unlock()
-	if fake.WhoAmIStub != nil {
-		return fake.WhoAmIStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.whoAmIReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

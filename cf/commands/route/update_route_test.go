@@ -267,8 +267,8 @@ var _ = Describe("UpdateRoute", func() {
 
 			It("tries to set the given route options", func() {
 				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"Setting route option a for domain-name to b"},
-					[]string{"Setting route option c for domain-name to d"},
+					[]string{"Setting route option a for", "to b"},
+					[]string{"Setting route option c for", "to d"},
 				))
 			})
 		})

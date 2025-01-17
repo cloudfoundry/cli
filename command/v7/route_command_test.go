@@ -192,7 +192,9 @@ var _ = Describe("route Command", func() {
 			destinationB := resources.RouteDestination{App: destAppB, Port: 1337, Protocol: "http2"}
 
 			destinations := []resources.RouteDestination{destinationA, destinationB}
-			route := resources.Route{GUID: "route-guid", Host: cmd.Hostname, Path: cmd.Path.Path, Protocol: "http", Destinations: destinations}
+
+			options := &resources.RouteOption{LoadBalancing: "least-connections"}
+			route := resources.Route{GUID: "route-guid", Host: cmd.Hostname, Path: cmd.Path.Path, Protocol: "http", Destinations: destinations, Options: options}
 
 			fakeActor.GetRouteByAttributesReturns(
 				route,

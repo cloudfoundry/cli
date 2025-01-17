@@ -19,13 +19,13 @@ const tcp = "tcp"
 
 type RouteActor interface {
 	CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error)
-	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, option string) (models.Route, error)
+	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, options []string) (models.Route, error)
 	BindRoute(app models.Application, route models.Route) error
 	UnbindAll(app models.Application) error
 	FindDomain(routeName string) (string, models.DomainFields, error)
 	FindPath(routeName string) (string, string)
 	FindPort(routeName string) (string, int, error)
-	FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error
+	FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams, options []string) error
 }
 
 type routeActor struct {
@@ -47,7 +47,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 		"Domain": terminal.EntityNameColor(domain.Name),
 	}) + "...")
 
-	route, err := routeActor.routeRepo.Create("", domain, "", 0, true, "")
+	route, err := routeActor.routeRepo.Create("", domain, "", 0, true, []string{})
 	if err != nil {
 		return models.Route{}, err
 	}
@@ -55,7 +55,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 	return route, nil
 }
 
-func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, option string) (models.Route, error) {
+func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool, options []string) (models.Route, error) {
 	var route models.Route
 	var err error
 	//if tcp route use random port should skip route lookup
@@ -84,7 +84,7 @@ func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.Do
 					}),
 			)
 
-			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, false, option)
+			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, false, options)
 		}
 
 		routeActor.ui.Ok()
@@ -188,7 +188,7 @@ func (routeActor routeActor) replaceDomain(routeWithoutPathAndPort string, domai
 	return routeWithoutPathAndPort, nil
 }
 
-func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error {
+func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams, options []string) error {
 	routeWithoutPath, path := routeActor.FindPath(routeName)
 
 	routeWithoutPathAndPort, port, err := routeActor.FindPort(routeWithoutPath)
@@ -223,7 +223,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 		return err
 	}
 
-	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute, "")
+	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute, options)
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Creator
 
 type Creator interface {
-	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (route models.Route, apiErr error)
+	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, options []string) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
@@ -26,6 +26,7 @@ type CreateRoute struct {
 	routeRepo api.RouteRepository
 	spaceReq  requirements.SpaceRequirement
 	domainReq requirements.DomainRequirement
+	options   []string
 }
 
 func init() {
@@ -113,9 +114,9 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 	path := c.String("path")
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
-	option := c.String("o")
+	options := c.StringSlice("o")
 
-	if option != "" {
+	if options != nil {
 		err := command.MinimumCCAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinVersionPerRouteOpts)
 		if err != nil {
 			cmd.ui.Say(T("Your CC API version ({{.APIVersion}}) does not support per route options."+
@@ -125,7 +126,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 			}))
 		}
 	}
-	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields, option)
+	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields, options)
 	if err != nil {
 		return err
 	}
@@ -133,7 +134,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 	return nil
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, option string) (models.Route, error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields, options []string) (models.Route, error) {
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.URLForHostAndPath(hostName, path, port)),
@@ -141,7 +142,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.GUID, space.GUID, port, randomPort, option)
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.GUID, space.GUID, port, randomPort, options)
 	if err != nil {
 		var findErr error
 		route, findErr = cmd.routeRepo.Find(hostName, domain, path, port)

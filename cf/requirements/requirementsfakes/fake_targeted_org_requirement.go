@@ -38,15 +38,16 @@ func (fake *FakeTargetedOrgRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -90,15 +91,16 @@ func (fake *FakeTargetedOrgRequirement) GetOrganizationFields() models.Organizat
 	ret, specificReturn := fake.getOrganizationFieldsReturnsOnCall[len(fake.getOrganizationFieldsArgsForCall)]
 	fake.getOrganizationFieldsArgsForCall = append(fake.getOrganizationFieldsArgsForCall, struct {
 	}{})
+	stub := fake.GetOrganizationFieldsStub
+	fakeReturns := fake.getOrganizationFieldsReturns
 	fake.recordInvocation("GetOrganizationFields", []interface{}{})
 	fake.getOrganizationFieldsMutex.Unlock()
-	if fake.GetOrganizationFieldsStub != nil {
-		return fake.GetOrganizationFieldsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getOrganizationFieldsReturns
 	return fakeReturns.result1
 }
 

@@ -16,7 +16,7 @@ type V7Actor interface {
 	CreateBitsPackageByApplication(appGUID string) (resources.Package, v7action.Warnings, error)
 	CreateDeployment(dep resources.Deployment) (string, v7action.Warnings, error)
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error)
-	CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
+	CreateRoute(spaceGUID, domainName, hostname, path string, port int, options *resources.RouteOption) (resources.Route, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, v7action.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)
@@ -41,6 +41,7 @@ type V7Actor interface {
 	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 	UpdateApplication(app resources.Application) (resources.Application, v7action.Warnings, error)
 	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess resources.Process) (v7action.Warnings, error)
+	UpdateRoute(routeGUID string, options *resources.RouteOption) (resources.Route, v7action.Warnings, error)
 	UploadBitsPackage(pkg resources.Package, matchedResources []sharedaction.V3Resource, newResources io.Reader, newResourcesLength int64) (resources.Package, v7action.Warnings, error)
 	UploadDroplet(dropletGUID string, dropletPath string, progressReader io.Reader, fileSize int64) (v7action.Warnings, error)
 }

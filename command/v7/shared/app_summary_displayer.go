@@ -59,8 +59,12 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 
 func routeSummary(rs []resources.Route) string {
 	formattedRoutes := []string{}
+	var routeOpts = ""
 	for _, route := range rs {
-		formattedRoutes = append(formattedRoutes, route.URL)
+		if route.Options != nil && route.Options.LoadBalancing != "" {
+			routeOpts = " {loadbalancing=" + route.Options.LoadBalancing + "}"
+		}
+		formattedRoutes = append(formattedRoutes, route.URL+routeOpts)
 	}
 	return strings.Join(formattedRoutes, ", ")
 }

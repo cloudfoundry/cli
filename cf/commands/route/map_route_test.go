@@ -275,7 +275,7 @@ var _ = Describe("MapRoute", func() {
 			Expect(port).To(Equal(0))
 			Expect(randomPort).To(BeFalse())
 			Expect(domain).To(Equal(fakeDomain))
-			Expect(option).To(Equal(""))
+			Expect(option).To(Equal([]string{}))
 			Expect(space).To(Equal(models.SpaceFields{
 				Name: "my-space",
 				GUID: "my-space-guid",

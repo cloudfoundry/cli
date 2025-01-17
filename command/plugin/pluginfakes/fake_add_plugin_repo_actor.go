@@ -31,15 +31,16 @@ func (fake *FakeAddPluginRepoActor) AddPluginRepository(arg1 string, arg2 string
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.AddPluginRepositoryStub
+	fakeReturns := fake.addPluginRepositoryReturns
 	fake.recordInvocation("AddPluginRepository", []interface{}{arg1, arg2})
 	fake.addPluginRepositoryMutex.Unlock()
-	if fake.AddPluginRepositoryStub != nil {
-		return fake.AddPluginRepositoryStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.addPluginRepositoryReturns
 	return fakeReturns.result1
 }
 

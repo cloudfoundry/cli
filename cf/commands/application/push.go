@@ -449,9 +449,9 @@ func (cmd *Push) createAndBindRoute(
 	var route models.Route
 	var err error
 	if routePath != nil {
-		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, *routePath, 0, UseRandomPort, "")
+		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, *routePath, 0, UseRandomPort, []string{})
 	} else {
-		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, "", 0, UseRandomPort, "")
+		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, "", 0, UseRandomPort, []string{})
 	}
 	if err != nil {
 		return err

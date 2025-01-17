@@ -44,6 +44,7 @@ func Load() {
 	_ = pluginrepo.RepoPlugins{}
 	_ = quota.CreateQuota{}
 	_ = route.CreateRoute{}
+	_ = route.UpdateRoute{}
 	_ = routergroups.RouterGroups{}
 	_ = securitygroup.ShowSecurityGroup{}
 	_ = service.ShowService{}

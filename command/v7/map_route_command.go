@@ -2,37 +2,41 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type MapRouteCommand struct {
 	BaseCommand
 
-	RequiredArgs flag.AppDomain   `positional-args:"yes"`
-	Hostname     string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
-	Path         flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
-	Port         int              `long:"port" description:"Port for the TCP route (default: random port)"`
-	AppProtocol  string           `long:"app-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
-
-	relatedCommands interface{} `related_commands:"create-route, routes, unmap-route"`
+	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
+	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
+	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
+	AppProtocol     string           `long:"app-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
+	Options         []string         `long:"option" short:"o" description:"Set the value of a per-route option"`
+	relatedCommands interface{}      `related_commands:"create-route, update-route, routes, unmap-route"`
 }
 
 func (cmd MapRouteCommand) Usage() string {
 	return `
 Map an HTTP route:
-   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--app-protocol PROTOCOL]
+   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--app-protocol PROTOCOL] [--option OPTION=VALUE]
 
 Map a TCP route:
-   CF_NAME map-route APP_NAME DOMAIN [--port PORT]`
+   CF_NAME map-route APP_NAME DOMAIN [--port PORT] [--option OPTION=VALUE]`
 }
 
 func (cmd MapRouteCommand) Examples() string {
 	return `
-CF_NAME map-route my-app example.com                                                # example.com
-CF_NAME map-route my-app example.com --hostname myhost                              # myhost.example.com
-CF_NAME map-route my-app example.com --hostname myhost --path foo                   # myhost.example.com/foo
-CF_NAME map-route my-app example.com --hostname myhost --app-protocol http2 # myhost.example.com
-CF_NAME map-route my-app example.com --port 5000                                    # example.com:5000`
+CF_NAME map-route my-app example.com                                                      # example.com
+CF_NAME map-route my-app example.com --hostname myhost                                    # myhost.example.com
+CF_NAME map-route my-app example.com --hostname myhost -o loadbalancing=least-connections # myhost.example.com with a per-route option
+CF_NAME map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo
+CF_NAME map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com
+CF_NAME map-route my-app example.com --port 5000                                          # example.com:5000`
 }
 
 func (cmd MapRouteCommand) Execute(args []string) error {
@@ -74,12 +78,28 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 				"SpaceName": cmd.Config.TargetedSpace().Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
 			})
+
+		if cmd.Options != nil && len(cmd.Options) > 0 {
+			err := cmd.validateAPIVersionForPerRouteOptions()
+			if err != nil {
+				return err
+			}
+		}
+
+		routeOptions := &resources.RouteOption{}
+		if cmd.Options != nil && len(cmd.Options) > 0 {
+			err = cmd.validateAPIVersionForPerRouteOptions()
+			if err == nil {
+				routeOptions = resources.NewRouteOptions(cmd.Options)
+			}
+		}
 		route, warnings, err = cmd.Actor.CreateRoute(
 			cmd.Config.TargetedSpace().GUID,
 			domain.Name,
 			cmd.Hostname,
 			path,
 			cmd.Port,
+			routeOptions,
 		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -121,6 +141,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
+
 	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.AppProtocol)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -129,4 +150,16 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+func (cmd MapRouteCommand) validateAPIVersionForPerRouteOptions() error {
+	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionPerRouteOpts)
+	if err != nil {
+		cmd.UI.DisplayText("Your CC API version ({{.APIVersion}}) does not support per route options."+
+			"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
+			"APIVersion":          cmd.Config.APIVersion(),
+			"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
+		})
+	}
+	return err
 }

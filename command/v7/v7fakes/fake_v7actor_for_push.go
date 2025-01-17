@@ -105,15 +105,16 @@ func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpace(arg1 string, arg2 s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetApplicationByNameAndSpaceStub
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -173,15 +174,16 @@ func (fake *FakeV7ActorForPush) GetDetailedAppSummary(arg1 string, arg2 string, 
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	stub := fake.GetDetailedAppSummaryStub
+	fakeReturns := fake.getDetailedAppSummaryReturns
 	fake.recordInvocation("GetDetailedAppSummary", []interface{}{arg1, arg2, arg3})
 	fake.getDetailedAppSummaryMutex.Unlock()
-	if fake.GetDetailedAppSummaryStub != nil {
-		return fake.GetDetailedAppSummaryStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDetailedAppSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -241,15 +243,16 @@ func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpace(arg
 		arg2 string
 		arg3 sharedaction.LogCacheClient
 	}{arg1, arg2, arg3})
+	stub := fake.GetStreamingLogsForApplicationByNameAndSpaceStub
+	fakeReturns := fake.getStreamingLogsForApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
-	if fake.GetStreamingLogsForApplicationByNameAndSpaceStub != nil {
-		return fake.GetStreamingLogsForApplicationByNameAndSpaceStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4, ret.result5
 	}
-	fakeReturns := fake.getStreamingLogsForApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4, fakeReturns.result5
 }
 
@@ -314,15 +317,16 @@ func (fake *FakeV7ActorForPush) RestartApplication(arg1 string, arg2 bool) (v7ac
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.RestartApplicationStub
+	fakeReturns := fake.restartApplicationReturns
 	fake.recordInvocation("RestartApplication", []interface{}{arg1, arg2})
 	fake.restartApplicationMutex.Unlock()
-	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.restartApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -383,15 +387,16 @@ func (fake *FakeV7ActorForPush) SetSpaceManifest(arg1 string, arg2 []byte) (v7ac
 		arg1 string
 		arg2 []byte
 	}{arg1, arg2Copy})
+	stub := fake.SetSpaceManifestStub
+	fakeReturns := fake.setSpaceManifestReturns
 	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
 	fake.setSpaceManifestMutex.Unlock()
-	if fake.SetSpaceManifestStub != nil {
-		return fake.SetSpaceManifestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setSpaceManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

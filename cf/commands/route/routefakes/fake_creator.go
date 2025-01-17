@@ -9,7 +9,7 @@ import (
 )
 
 type FakeCreator struct {
-	CreateRouteStub        func(string, string, int, bool, models.DomainFields, models.SpaceFields, string) (models.Route, error)
+	CreateRouteStub        func(string, string, int, bool, models.DomainFields, models.SpaceFields, []string) (models.Route, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
@@ -18,7 +18,7 @@ type FakeCreator struct {
 		arg4 bool
 		arg5 models.DomainFields
 		arg6 models.SpaceFields
-		arg7 string
+		arg7 []string
 	}
 	createRouteReturns struct {
 		result1 models.Route
@@ -32,7 +32,12 @@ type FakeCreator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bool, arg5 models.DomainFields, arg6 models.SpaceFields, arg7 string) (models.Route, error) {
+func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bool, arg5 models.DomainFields, arg6 models.SpaceFields, arg7 []string) (models.Route, error) {
+	var arg7Copy []string
+	if arg7 != nil {
+		arg7Copy = make([]string, len(arg7))
+		copy(arg7Copy, arg7)
+	}
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -42,17 +47,18 @@ func (fake *FakeCreator) CreateRoute(arg1 string, arg2 string, arg3 int, arg4 bo
 		arg4 bool
 		arg5 models.DomainFields
 		arg6 models.SpaceFields
-		arg7 string
-	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+		arg7 []string
+	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
+	stub := fake.CreateRouteStub
+	fakeReturns := fake.createRouteReturns
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
 	fake.createRouteMutex.Unlock()
-	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -62,17 +68,17 @@ func (fake *FakeCreator) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeCreator) CreateRouteCalls(stub func(string, string, int, bool, models.DomainFields, models.SpaceFields, string) (models.Route, error)) {
+func (fake *FakeCreator) CreateRouteCalls(stub func(string, string, int, bool, models.DomainFields, models.SpaceFields, []string) (models.Route, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields) {
+func (fake *FakeCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields, []string) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
 }
 
 func (fake *FakeCreator) CreateRouteReturns(result1 models.Route, result2 error) {

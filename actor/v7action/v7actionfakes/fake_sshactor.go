@@ -30,15 +30,16 @@ func (fake *FakeSSHActor) ExecuteSecureShell(arg1 sharedaction.SSHOptions) error
 	fake.executeSecureShellArgsForCall = append(fake.executeSecureShellArgsForCall, struct {
 		arg1 sharedaction.SSHOptions
 	}{arg1})
+	stub := fake.ExecuteSecureShellStub
+	fakeReturns := fake.executeSecureShellReturns
 	fake.recordInvocation("ExecuteSecureShell", []interface{}{arg1})
 	fake.executeSecureShellMutex.Unlock()
-	if fake.ExecuteSecureShellStub != nil {
-		return fake.ExecuteSecureShellStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeSecureShellReturns
 	return fakeReturns.result1
 }
 

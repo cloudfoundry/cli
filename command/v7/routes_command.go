@@ -85,6 +85,7 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			cmd.UI.TranslateText("app-protocol"),
 			cmd.UI.TranslateText("apps"),
 			cmd.UI.TranslateText("service instance"),
+			cmd.UI.TranslateText("options"),
 		},
 	}
 
@@ -93,6 +94,15 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 		if routeSummary.Port != 0 {
 			port = strconv.Itoa(routeSummary.Port)
 		}
+		loadBalancingOption := routeSummary.Route.Options.LoadBalancing
+		if loadBalancingOption != "" {
+			loadBalancingOption = "loadbalancing=" + loadBalancingOption
+		}
+		/*opts := []string{}
+		for key, value := range routeSummary.Options {
+			opts = append(opts, strings.Join([]string{key, value}, "="))
+		}*/
+
 		routesTable = append(routesTable, []string{
 			routeSummary.SpaceName,
 			routeSummary.Host,
@@ -103,6 +113,8 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			strings.Join(routeSummary.AppProtocols, ", "),
 			strings.Join(routeSummary.AppNames, ", "),
 			routeSummary.ServiceInstanceName,
+			loadBalancingOption,
+			//strings.Join(opts, ", "),
 		})
 	}
 

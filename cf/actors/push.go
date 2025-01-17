@@ -220,5 +220,5 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 }
 
 func (actor PushActorImpl) MapManifestRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error {
-	return actor.routeActor.FindAndBindRoute(routeName, app, appParamsFromContext)
+	return actor.routeActor.FindAndBindRoute(routeName, app, appParamsFromContext, []string{})
 }

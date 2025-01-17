@@ -291,7 +291,7 @@ var _ = Describe("route repository", func() {
 			})
 
 			It("tries to create a route", func() {
-				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, false, "")
+				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, false, []string{})
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
@@ -310,7 +310,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns the created route", func() {
-					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, false, "")
+					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, false, []string{})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(createdRoute.GUID).To(Equal("my-route-guid"))
 				})
@@ -337,7 +337,7 @@ var _ = Describe("route repository", func() {
 			})
 
 			It("tries to create a route", func() {
-				repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid", 0, false, "")
+				repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid", 0, false, []string{})
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
@@ -356,7 +356,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns the created route", func() {
-					createdRoute, err := repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid", 0, false, "")
+					createdRoute, err := repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid", 0, false, []string{})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(createdRoute.Host).To(Equal("the-host"))
 				})
@@ -383,7 +383,7 @@ var _ = Describe("route repository", func() {
 			})
 
 			It("tries to create a route", func() {
-				repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, "")
+				repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, []string{})
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
@@ -402,7 +402,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns the created route", func() {
-					createdRoute, err := repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, "")
+					createdRoute, err := repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, []string{})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(createdRoute.Path).To(Equal("the-path"))
 				})
@@ -415,7 +415,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns an error", func() {
-					_, err := repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, "")
+					_, err := repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid", 0, false, []string{})
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -441,7 +441,7 @@ var _ = Describe("route repository", func() {
 			})
 
 			It("tries to create a route", func() {
-				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 9090, false, "")
+				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 9090, false, []string{})
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
@@ -460,7 +460,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns the created route", func() {
-					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 9090, false, "")
+					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 9090, false, []string{})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(createdRoute.Port).To(Equal(9090))
 				})
@@ -486,7 +486,7 @@ var _ = Describe("route repository", func() {
 			})
 
 			It("tries to create a route", func() {
-				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, true, "")
+				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, true, []string{})
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
@@ -505,7 +505,7 @@ var _ = Describe("route repository", func() {
 				})
 
 				It("returns the created route", func() {
-					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, true, "")
+					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, true, []string{})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(createdRoute.Port).To(Equal(50321))
 				})

@@ -86,7 +86,7 @@ func (cmd *UpdateRoute) SetDependency(deps commandregistry.Dependency, pluginCal
 }
 
 func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
-	domain := c.Args()[0]
+	domain := cmd.domainReq.GetDomain()
 	rawHostNameFromFlag := c.String("n")
 	host := strings.ToLower(rawHostNameFromFlag)
 	path := c.String("path")
@@ -95,7 +95,7 @@ func (cmd *UpdateRoute) Execute(c flags.FlagContext) error {
 
 	url := (&models.RoutePresenter{
 		Host:   host,
-		Domain: domain,
+		Domain: domain.Name,
 		Path:   path,
 		Port:   port,
 	}).URL()

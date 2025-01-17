@@ -27,15 +27,16 @@ func (fake *FakeRandomWordGenerator) Babble() string {
 	ret, specificReturn := fake.babbleReturnsOnCall[len(fake.babbleArgsForCall)]
 	fake.babbleArgsForCall = append(fake.babbleArgsForCall, struct {
 	}{})
+	stub := fake.BabbleStub
+	fakeReturns := fake.babbleReturns
 	fake.recordInvocation("Babble", []interface{}{})
 	fake.babbleMutex.Unlock()
-	if fake.BabbleStub != nil {
-		return fake.BabbleStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.babbleReturns
 	return fakeReturns.result1
 }
 

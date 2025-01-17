@@ -464,7 +464,7 @@ var _ = Describe("Push Command", func() {
 							}),
 						}
 						manifestRepo.ReadManifestReturns(m, nil)
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ string) (models.Route, error) {
+						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ []string) (models.Route, error) {
 							return models.Route{
 								GUID:   "my-route-guid",
 								Host:   host,
@@ -487,7 +487,7 @@ var _ = Describe("Push Command", func() {
 						}
 
 						callCount := 0
-						routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ string) (models.Route, error) {
+						routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ []string) (models.Route, error) {
 							callCount = callCount + 1
 							switch callCount {
 							case 1:
@@ -553,7 +553,7 @@ var _ = Describe("Push Command", func() {
 							}
 
 							callCount := 0
-							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ string) (models.Route, error) {
+							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ []string) (models.Route, error) {
 								callCount = callCount + 1
 								switch callCount {
 								case 1:
@@ -593,7 +593,7 @@ var _ = Describe("Push Command", func() {
 				Context("when pushing an app", func() {
 					BeforeEach(func() {
 						deps.UI = uiWithContents
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ string) (models.Route, error) {
+						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ []string) (models.Route, error) {
 							return models.Route{
 								GUID:   "my-route-guid",
 								Host:   host,

@@ -118,11 +118,11 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) error {
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
-	option := c.String("o")
+	options := c.StringSlice("o")
 
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
-	route, err := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields(), option)
+	route, err := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields(), options)
 	if err != nil {
 		return errors.New(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}

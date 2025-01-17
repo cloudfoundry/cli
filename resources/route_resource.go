@@ -31,6 +31,7 @@ type Route struct {
 	URL          string
 	Destinations []RouteDestination
 	Metadata     *Metadata
+	Options      *RouteOption
 }
 
 func (r Route) MarshalJSON() ([]byte, error) {
@@ -55,6 +56,8 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		Protocol      string         `json:"protocol,omitempty"`
 		Port          int            `json:"port,omitempty"`
 		Relationships *Relationships `json:"relationships,omitempty"`
+		Options       *RouteOption   `json:"options,omitempty"`
+		//Options map[string]string `json:"options,omitempty"`
 	}
 
 	ccR := ccRoute{
@@ -63,6 +66,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		Path:     r.Path,
 		Protocol: r.Protocol,
 		Port:     r.Port,
+		Options:  r.Options,
 	}
 
 	if r.SpaceGUID != "" {
@@ -85,6 +89,8 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 		URL          string             `json:"url,omitempty"`
 		Destinations []RouteDestination `json:"destinations,omitempty"`
 		Metadata     *Metadata          `json:"metadata,omitempty"`
+		Options      *RouteOption       `json:"options,omitempty"`
+		//Options map[string]string `json:"options,omitempty"`
 
 		Relationships struct {
 			Space struct {
@@ -115,6 +121,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	r.URL = alias.URL
 	r.Destinations = alias.Destinations
 	r.Metadata = alias.Metadata
+	r.Options = alias.Options
 
 	return nil
 }
