@@ -91,13 +91,17 @@ func (cmd RouteCommand) Execute(args []string) error {
 		return err
 	}
 
+	routeOptionLB := ""
+	if route.Options != nil && route.Options.LoadBalancing != "" {
+		routeOptionLB = "loadbalancing=" + route.Options.LoadBalancing
+	}
 	table := [][]string{
 		{cmd.UI.TranslateText("domain:"), domain.Name},
 		{cmd.UI.TranslateText("host:"), route.Host},
 		{cmd.UI.TranslateText("port:"), port},
 		{cmd.UI.TranslateText("path:"), route.Path},
 		{cmd.UI.TranslateText("protocol:"), route.Protocol},
-		{cmd.UI.TranslateText("options:"), "loadbalancing=" + route.Options.LoadBalancing},
+		{cmd.UI.TranslateText("options:"), routeOptionLB},
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

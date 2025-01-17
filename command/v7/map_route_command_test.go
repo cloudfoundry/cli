@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -43,6 +44,7 @@ var _ = Describe("map-route Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
+		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -259,7 +261,7 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(cmd.Port))
-						Expect(actualOptions).To(Equal(cmd.Options))
+						Expect(actualOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
 					})
 				})
 

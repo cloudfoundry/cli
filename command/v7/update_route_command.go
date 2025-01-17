@@ -70,7 +70,6 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 			map[string]interface{}{
 				"URL": route.URL,
 			})
-		cmd.UI.DisplayOK()
 		return nil
 	}
 
@@ -94,9 +93,10 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 	}
 
 	if cmd.RemoveOptions != nil {
+		inputRouteOptions := resources.NewRouteOptions(cmd.RemoveOptions)
 		route, warnings, err = cmd.Actor.UpdateRoute(
 			route.GUID,
-			resources.NewRouteOptions(cmd.RemoveOptions),
+			inputRouteOptions,
 		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {

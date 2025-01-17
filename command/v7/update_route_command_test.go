@@ -1,7 +1,9 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -34,6 +36,8 @@ var _ = Describe("update-route Command", func() {
 		orgGUID         string
 		spaceGUID       string
 		options         []string
+		cCAPIOldVersion string
+		routeGuid       string
 	)
 
 	BeforeEach(func() {
@@ -42,6 +46,7 @@ var _ = Describe("update-route Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
+		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -51,6 +56,7 @@ var _ = Describe("update-route Command", func() {
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
 		options = []string{"loadbalancing=least-connections"}
+		routeGuid = "route-guid"
 
 		cmd = UpdateRouteCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
@@ -76,6 +82,12 @@ var _ = Describe("update-route Command", func() {
 		})
 
 		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
+
+		fakeActor.GetRouteByAttributesReturns(
+			resources.Route{GUID: routeGuid, URL: domain},
+			v7action.Warnings{"get-route-warnings"},
+			nil,
+		)
 	})
 
 	JustBeforeEach(func() {
@@ -140,12 +152,70 @@ var _ = Describe("update-route Command", func() {
 					v7action.Warnings{"get-domain-warnings"},
 					nil,
 				)
+				fakeActor.UpdateRouteReturns(
+					resources.Route{GUID: routeGuid, URL: domain, Options: &resources.RouteOption{LoadBalancing: "least-connections"}},
+					nil,
+					nil,
+				)
+			})
+			When("updating the route fails when the CC API version is too old for route options", func() {
+				BeforeEach(func() {
+					cmd.Options = []string{}
+					cCAPIOldVersion = strconv.Itoa(1)
+					fakeConfig.APIVersionReturns(cCAPIOldVersion)
+				})
+
+				It("does not update a route giving the error message", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
+					Expect(testUI.Out).To(Say("CC API version"))
+					Expect(testUI.Out).To(Say("does not support per route options"))
+				})
+			})
+
+			/*When("the route options are not specified", func() {
+				BeforeEach(func() {
+					cmd.Options = []string{}
+				})
+
+				It("does not update a route giving the error message", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
+					Expect(testUI.Out).To(Say("No options were specified for the update of the Route"))
+				})
+			})*/
+
+			When("removing the options of the route succeeds", func() {
+				BeforeEach(func() {
+					cmd.RemoveOptions = []string{"loadbalancing"}
+					fakeActor.GetRouteByAttributesReturns(
+						resources.Route{GUID: routeGuid, URL: domain, Options: &resources.RouteOption{LoadBalancing: "least-connections"}},
+						nil,
+						nil,
+					)
+				})
+
+				It("updates a given route", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					expectedRouteGuid, expectedOptions := fakeActor.UpdateRouteArgsForCall(0)
+					Expect(expectedRouteGuid).To(Equal(routeGuid))
+					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+
+					expectedRouteGuid, expectedOptions = fakeActor.UpdateRouteArgsForCall(1)
+					Expect(expectedRouteGuid).To(Equal(routeGuid))
+					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: ""}))
+					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(2))
+
+					Expect(testUI.Out).To(Say("Updating route"))
+					Expect(testUI.Out).To(Say("has been updated"))
+					Expect(testUI.Out).To(Say("OK"))
+				})
 			})
 
 			When("a requested route exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetRouteByAttributesReturns(
-						resources.Route{GUID: "route-guid"},
+						resources.Route{GUID: "route-guid", URL: domain},
 						nil,
 						nil,
 					)
@@ -168,10 +238,25 @@ var _ = Describe("update-route Command", func() {
 						Expect(fakeActor.UpdateRouteCallCount()).To(Equal(1))
 						actualRouteGUID, actualOptions := fakeActor.UpdateRouteArgsForCall(0)
 						Expect(actualRouteGUID).To(Equal("route-guid"))
-						Expect(actualOptions).To(Equal([]string{"loadbalancing=round-robin"}))
+						Expect(actualOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
 					})
 				})
 			})
 		})
 	})
+	When("getting the route errors", func() {
+		BeforeEach(func() {
+			fakeActor.GetRouteByAttributesReturns(
+				resources.Route{},
+				v7action.Warnings{"get-route-warnings"},
+				errors.New("get-route-error"),
+			)
+		})
+
+		It("returns the error and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-route-warnings"))
+			Expect(executeErr).To(MatchError(errors.New("get-route-error")))
+		})
+	})
+
 })
