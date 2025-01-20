@@ -21,9 +21,9 @@ type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error)
-	Create(host string, domain models.DomainFields, path string, port int, useRandomPort bool, options []string) (createdRoute models.Route, apiErr error)
+	Create(host string, domain models.DomainFields, path string, port int, useRandomPort bool) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
-	CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool, options []string) (createdRoute models.Route, apiErr error)
+	CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
 	Bind(routeGUID, appGUID string) (apiErr error)
 	Unbind(routeGUID, appGUID string) (apiErr error)
 	Delete(routeGUID string) (apiErr error)
@@ -123,8 +123,8 @@ func doesNotMatchVersionSpecificAttributes(route models.Route, path string, port
 	return normalizedPath(route.Path) != normalizedPath(path) || route.Port != port
 }
 
-func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string, port int, useRandomPort bool, options []string) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, path, domain.GUID, repo.config.SpaceFields().GUID, port, useRandomPort, options)
+func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string, port int, useRandomPort bool) (createdRoute models.Route, apiErr error) {
+	return repo.CreateInSpace(host, path, domain.GUID, repo.config.SpaceFields().GUID, port, useRandomPort)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
@@ -154,7 +154,7 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return true, nil
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool, options []string) (models.Route, error) {
+func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool) (models.Route, error) {
 	path = normalizedPath(path)
 
 	body := struct {
@@ -180,12 +180,12 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID,
 
 	resource := new(resources.RouteResource)
 
-	for _, option := range options {
+	/*for _, option := range options {
 		key, value, found := strings.Cut(option, "=")
 		if found {
 			resource.Entity.Options[key] = value
 		}
-	}
+	}*/
 
 	err = repo.gateway.CreateResource(
 		repo.config.APIEndpoint(),

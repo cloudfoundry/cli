@@ -34,13 +34,12 @@ type FakeRouteActor struct {
 		result1 models.Route
 		result2 error
 	}
-	FindAndBindRouteStub        func(string, models.Application, models.AppParams, []string) error
+	FindAndBindRouteStub        func(string, models.Application, models.AppParams) error
 	findAndBindRouteMutex       sync.RWMutex
 	findAndBindRouteArgsForCall []struct {
 		arg1 string
 		arg2 models.Application
 		arg3 models.AppParams
-		arg4 []string
 	}
 	findAndBindRouteReturns struct {
 		result1 error
@@ -63,7 +62,7 @@ type FakeRouteActor struct {
 		result2 models.DomainFields
 		result3 error
 	}
-	FindOrCreateRouteStub        func(string, models.DomainFields, string, int, bool, []string) (models.Route, error)
+	FindOrCreateRouteStub        func(string, models.DomainFields, string, int, bool) (models.Route, error)
 	findOrCreateRouteMutex       sync.RWMutex
 	findOrCreateRouteArgsForCall []struct {
 		arg1 string
@@ -71,7 +70,6 @@ type FakeRouteActor struct {
 		arg3 string
 		arg4 int
 		arg5 bool
-		arg6 []string
 	}
 	findOrCreateRouteReturns struct {
 		result1 models.Route
@@ -250,26 +248,20 @@ func (fake *FakeRouteActor) CreateRandomTCPRouteReturnsOnCall(i int, result1 mod
 	}{result1, result2}
 }
 
-func (fake *FakeRouteActor) FindAndBindRoute(arg1 string, arg2 models.Application, arg3 models.AppParams, arg4 []string) error {
-	var arg4Copy []string
-	if arg4 != nil {
-		arg4Copy = make([]string, len(arg4))
-		copy(arg4Copy, arg4)
-	}
+func (fake *FakeRouteActor) FindAndBindRoute(arg1 string, arg2 models.Application, arg3 models.AppParams) error {
 	fake.findAndBindRouteMutex.Lock()
 	ret, specificReturn := fake.findAndBindRouteReturnsOnCall[len(fake.findAndBindRouteArgsForCall)]
 	fake.findAndBindRouteArgsForCall = append(fake.findAndBindRouteArgsForCall, struct {
 		arg1 string
 		arg2 models.Application
 		arg3 models.AppParams
-		arg4 []string
-	}{arg1, arg2, arg3, arg4Copy})
+	}{arg1, arg2, arg3})
 	stub := fake.FindAndBindRouteStub
 	fakeReturns := fake.findAndBindRouteReturns
-	fake.recordInvocation("FindAndBindRoute", []interface{}{arg1, arg2, arg3, arg4Copy})
+	fake.recordInvocation("FindAndBindRoute", []interface{}{arg1, arg2, arg3})
 	fake.findAndBindRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
@@ -283,17 +275,17 @@ func (fake *FakeRouteActor) FindAndBindRouteCallCount() int {
 	return len(fake.findAndBindRouteArgsForCall)
 }
 
-func (fake *FakeRouteActor) FindAndBindRouteCalls(stub func(string, models.Application, models.AppParams, []string) error) {
+func (fake *FakeRouteActor) FindAndBindRouteCalls(stub func(string, models.Application, models.AppParams) error) {
 	fake.findAndBindRouteMutex.Lock()
 	defer fake.findAndBindRouteMutex.Unlock()
 	fake.FindAndBindRouteStub = stub
 }
 
-func (fake *FakeRouteActor) FindAndBindRouteArgsForCall(i int) (string, models.Application, models.AppParams, []string) {
+func (fake *FakeRouteActor) FindAndBindRouteArgsForCall(i int) (string, models.Application, models.AppParams) {
 	fake.findAndBindRouteMutex.RLock()
 	defer fake.findAndBindRouteMutex.RUnlock()
 	argsForCall := fake.findAndBindRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeRouteActor) FindAndBindRouteReturns(result1 error) {
@@ -386,12 +378,7 @@ func (fake *FakeRouteActor) FindDomainReturnsOnCall(i int, result1 string, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRouteActor) FindOrCreateRoute(arg1 string, arg2 models.DomainFields, arg3 string, arg4 int, arg5 bool, arg6 []string) (models.Route, error) {
-	var arg6Copy []string
-	if arg6 != nil {
-		arg6Copy = make([]string, len(arg6))
-		copy(arg6Copy, arg6)
-	}
+func (fake *FakeRouteActor) FindOrCreateRoute(arg1 string, arg2 models.DomainFields, arg3 string, arg4 int, arg5 bool) (models.Route, error) {
 	fake.findOrCreateRouteMutex.Lock()
 	ret, specificReturn := fake.findOrCreateRouteReturnsOnCall[len(fake.findOrCreateRouteArgsForCall)]
 	fake.findOrCreateRouteArgsForCall = append(fake.findOrCreateRouteArgsForCall, struct {
@@ -400,14 +387,13 @@ func (fake *FakeRouteActor) FindOrCreateRoute(arg1 string, arg2 models.DomainFie
 		arg3 string
 		arg4 int
 		arg5 bool
-		arg6 []string
-	}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+	}{arg1, arg2, arg3, arg4, arg5})
 	stub := fake.FindOrCreateRouteStub
 	fakeReturns := fake.findOrCreateRouteReturns
-	fake.recordInvocation("FindOrCreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+	fake.recordInvocation("FindOrCreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.findOrCreateRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -421,17 +407,17 @@ func (fake *FakeRouteActor) FindOrCreateRouteCallCount() int {
 	return len(fake.findOrCreateRouteArgsForCall)
 }
 
-func (fake *FakeRouteActor) FindOrCreateRouteCalls(stub func(string, models.DomainFields, string, int, bool, []string) (models.Route, error)) {
+func (fake *FakeRouteActor) FindOrCreateRouteCalls(stub func(string, models.DomainFields, string, int, bool) (models.Route, error)) {
 	fake.findOrCreateRouteMutex.Lock()
 	defer fake.findOrCreateRouteMutex.Unlock()
 	fake.FindOrCreateRouteStub = stub
 }
 
-func (fake *FakeRouteActor) FindOrCreateRouteArgsForCall(i int) (string, models.DomainFields, string, int, bool, []string) {
+func (fake *FakeRouteActor) FindOrCreateRouteArgsForCall(i int) (string, models.DomainFields, string, int, bool) {
 	fake.findOrCreateRouteMutex.RLock()
 	defer fake.findOrCreateRouteMutex.RUnlock()
 	argsForCall := fake.findOrCreateRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeRouteActor) FindOrCreateRouteReturns(result1 models.Route, result2 error) {

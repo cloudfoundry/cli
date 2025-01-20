@@ -12,7 +12,6 @@ type Route struct {
 	Domain          DomainFields
 	Path            string
 	Port            int
-	Options         map[string]string
 	Space           SpaceFields
 	Apps            []ApplicationFields
 	ServiceInstance ServiceInstanceFields
@@ -20,20 +19,18 @@ type Route struct {
 
 func (r Route) URL() string {
 	return (&RoutePresenter{
-		Host:    r.Host,
-		Domain:  r.Domain.Name,
-		Path:    r.Path,
-		Port:    r.Port,
-		Options: r.Options,
+		Host:   r.Host,
+		Domain: r.Domain.Name,
+		Path:   r.Path,
+		Port:   r.Port,
 	}).URL()
 }
 
 type RoutePresenter struct {
-	Host    string
-	Domain  string
-	Path    string
-	Port    int
-	Options map[string]string
+	Host   string
+	Domain string
+	Path   string
+	Port   int
 }
 
 func (r *RoutePresenter) URL() string {

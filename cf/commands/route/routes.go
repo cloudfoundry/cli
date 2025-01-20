@@ -89,7 +89,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) error {
 			}))
 	}
 
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service"), T("options")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
 	d := make(map[string]models.DomainFields)
 	err := cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().GUID, func(domain models.DomainFields) bool {
@@ -113,11 +113,6 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) error {
 			appNames = append(appNames, app.Name)
 		}
 
-		options := []string{}
-		for optionKey, optionValue := range route.Options {
-			options = append(options, fmt.Sprintf("%s: %s", optionKey, optionValue))
-		}
-
 		var port string
 		if route.Port != 0 {
 			port = fmt.Sprintf("%d", route.Port)
@@ -134,7 +129,6 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) error {
 			domain.RouterGroupType,
 			strings.Join(appNames, ","),
 			route.ServiceInstance.Name,
-			strings.Join(options, ","),
 		)
 		return true
 	}

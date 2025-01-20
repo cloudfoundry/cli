@@ -71,7 +71,7 @@ var _ = Describe("unmap-route command", func() {
 			tcpRoute   helpers.Route
 			port       int
 			tcpDomain  helpers.Domain
-			options    map[string]string
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {

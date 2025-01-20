@@ -36,7 +36,7 @@ type FakeRouteRepository struct {
 		result1 bool
 		result2 error
 	}
-	CreateStub        func(string, models.DomainFields, string, int, bool, []string) (models.Route, error)
+	CreateStub        func(string, models.DomainFields, string, int, bool) (models.Route, error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		arg1 string
@@ -44,7 +44,6 @@ type FakeRouteRepository struct {
 		arg3 string
 		arg4 int
 		arg5 bool
-		arg6 []string
 	}
 	createReturns struct {
 		result1 models.Route
@@ -54,7 +53,7 @@ type FakeRouteRepository struct {
 		result1 models.Route
 		result2 error
 	}
-	CreateInSpaceStub        func(string, string, string, string, int, bool, []string) (models.Route, error)
+	CreateInSpaceStub        func(string, string, string, string, int, bool) (models.Route, error)
 	createInSpaceMutex       sync.RWMutex
 	createInSpaceArgsForCall []struct {
 		arg1 string
@@ -63,7 +62,6 @@ type FakeRouteRepository struct {
 		arg4 string
 		arg5 int
 		arg6 bool
-		arg7 []string
 	}
 	createInSpaceReturns struct {
 		result1 models.Route
@@ -266,12 +264,7 @@ func (fake *FakeRouteRepository) CheckIfExistsReturnsOnCall(i int, result1 bool,
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) Create(arg1 string, arg2 models.DomainFields, arg3 string, arg4 int, arg5 bool, arg6 []string) (models.Route, error) {
-	var arg6Copy []string
-	if arg6 != nil {
-		arg6Copy = make([]string, len(arg6))
-		copy(arg6Copy, arg6)
-	}
+func (fake *FakeRouteRepository) Create(arg1 string, arg2 models.DomainFields, arg3 string, arg4 int, arg5 bool) (models.Route, error) {
 	fake.createMutex.Lock()
 	ret, specificReturn := fake.createReturnsOnCall[len(fake.createArgsForCall)]
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
@@ -280,14 +273,13 @@ func (fake *FakeRouteRepository) Create(arg1 string, arg2 models.DomainFields, a
 		arg3 string
 		arg4 int
 		arg5 bool
-		arg6 []string
-	}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+	}{arg1, arg2, arg3, arg4, arg5})
 	stub := fake.CreateStub
 	fakeReturns := fake.createReturns
-	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -301,17 +293,17 @@ func (fake *FakeRouteRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateCalls(stub func(string, models.DomainFields, string, int, bool, []string) (models.Route, error)) {
+func (fake *FakeRouteRepository) CreateCalls(stub func(string, models.DomainFields, string, int, bool) (models.Route, error)) {
 	fake.createMutex.Lock()
 	defer fake.createMutex.Unlock()
 	fake.CreateStub = stub
 }
 
-func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, int, bool, []string) {
+func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, int, bool) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
 	argsForCall := fake.createArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeRouteRepository) CreateReturns(result1 models.Route, result2 error) {
@@ -340,12 +332,7 @@ func (fake *FakeRouteRepository) CreateReturnsOnCall(i int, result1 models.Route
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) CreateInSpace(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 bool, arg7 []string) (models.Route, error) {
-	var arg7Copy []string
-	if arg7 != nil {
-		arg7Copy = make([]string, len(arg7))
-		copy(arg7Copy, arg7)
-	}
+func (fake *FakeRouteRepository) CreateInSpace(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 bool) (models.Route, error) {
 	fake.createInSpaceMutex.Lock()
 	ret, specificReturn := fake.createInSpaceReturnsOnCall[len(fake.createInSpaceArgsForCall)]
 	fake.createInSpaceArgsForCall = append(fake.createInSpaceArgsForCall, struct {
@@ -355,14 +342,13 @@ func (fake *FakeRouteRepository) CreateInSpace(arg1 string, arg2 string, arg3 st
 		arg4 string
 		arg5 int
 		arg6 bool
-		arg7 []string
-	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
 	stub := fake.CreateInSpaceStub
 	fakeReturns := fake.createInSpaceReturns
-	fake.recordInvocation("CreateInSpace", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
+	fake.recordInvocation("CreateInSpace", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createInSpaceMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -376,17 +362,17 @@ func (fake *FakeRouteRepository) CreateInSpaceCallCount() int {
 	return len(fake.createInSpaceArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateInSpaceCalls(stub func(string, string, string, string, int, bool, []string) (models.Route, error)) {
+func (fake *FakeRouteRepository) CreateInSpaceCalls(stub func(string, string, string, string, int, bool) (models.Route, error)) {
 	fake.createInSpaceMutex.Lock()
 	defer fake.createInSpaceMutex.Unlock()
 	fake.CreateInSpaceStub = stub
 }
 
-func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool, []string) {
+func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool) {
 	fake.createInSpaceMutex.RLock()
 	defer fake.createInSpaceMutex.RUnlock()
 	argsForCall := fake.createInSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, result2 error) {

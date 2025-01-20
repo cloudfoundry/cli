@@ -72,7 +72,7 @@ var _ = Describe("map-route command", func() {
 			path       string
 			userName   string
 			appName    string
-			options    map[string]string
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {

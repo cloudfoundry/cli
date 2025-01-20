@@ -46,11 +46,11 @@ type Route struct {
 	Path    string
 	Port    int
 	Space   string
-	Options map[string]string
+	Options map[string]*string
 }
 
 // NewRoute constructs a route with given space, domain, hostname, and path.
-func NewRoute(space string, domain string, hostname string, path string, options map[string]string) Route {
+func NewRoute(space string, domain string, hostname string, path string, options map[string]*string) Route {
 	return Route{
 		Space:   space,
 		Domain:  domain,
@@ -61,7 +61,7 @@ func NewRoute(space string, domain string, hostname string, path string, options
 }
 
 // NewTCPRoute constructs a TCP route with given space, domain, and port.
-func NewTCPRoute(space string, domain string, port int, options map[string]string) Route {
+func NewTCPRoute(space string, domain string, port int, options map[string]*string) Route {
 	return Route{
 		Space:   space,
 		Domain:  domain,
@@ -72,7 +72,7 @@ func NewTCPRoute(space string, domain string, port int, options map[string]strin
 
 // Create creates a route using the 'cf create-route' command.
 func (r Route) Create() {
-	r.Options = make(map[string]string)
+	r.Options = make(map[string]*string)
 	if r.Port != 0 {
 		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port), "--option", fmt.Sprint(r.Options))).Should(Exit(0))
 	} else {

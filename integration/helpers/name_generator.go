@@ -67,9 +67,10 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
-func NewOptions() map[string]string {
-	return map[string]string{
-		"loadbalancing": "round-robin",
+func NewOptions() map[string]*string {
+	lbRR := "round-robin"
+	return map[string]*string{
+		"loadbalancing": &lbRR,
 	}
 }
 

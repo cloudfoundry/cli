@@ -33,7 +33,6 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
 	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
 	fs["random-port"] = &flags.BoolFlag{Name: "random-port", Usage: T("Create a random port for the TCP route")}
-	fs["option"] = &flags.StringSliceFlag{Name: "option", ShortName: "o", Usage: T("Set the value of a per-route option")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "map-route",
@@ -44,21 +43,18 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("%s ", T("APP_NAME")),
 			fmt.Sprintf("%s ", T("DOMAIN")),
 			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
-			fmt.Sprintf("[--path %s] ", T("PATH")),
-			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
+			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
 			fmt.Sprintf("   %s:\n", T("Map a TCP route")),
 			"      CF_NAME map-route ",
 			fmt.Sprintf("%s ", T("APP_NAME")),
 			fmt.Sprintf("%s ", T("DOMAIN")),
-			fmt.Sprintf("(--port %s | --random-port) ", T("PORT")),
-			fmt.Sprintf("[--option %s=%s]\n\n", T("OPTION"), T("VALUE")),
+			fmt.Sprintf("(--port %s | --random-port)", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME map-route my-app example.com                              # example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
 			"CF_NAME map-route my-app example.com --port 50000                 # example.com:50000",
-			"CF_NAME map-route my-app example.com -o loadbalancing=round-robin",
 		},
 		Flags: fs,
 	}
@@ -118,11 +114,10 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) error {
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
-	options := c.StringSlice("o")
 
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
-	route, err := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields(), options)
+	route, err := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields())
 	if err != nil {
 		return errors.New(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
