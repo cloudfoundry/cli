@@ -180,13 +180,6 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID,
 
 	resource := new(resources.RouteResource)
 
-	/*for _, option := range options {
-		key, value, found := strings.Cut(option, "=")
-		if found {
-			resource.Entity.Options[key] = value
-		}
-	}*/
-
 	err = repo.gateway.CreateResource(
 		repo.config.APIEndpoint(),
 		uriFragment,

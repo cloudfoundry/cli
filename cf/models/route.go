@@ -7,11 +7,12 @@ import (
 )
 
 type Route struct {
-	GUID            string
-	Host            string
-	Domain          DomainFields
-	Path            string
-	Port            int
+	GUID   string
+	Host   string
+	Domain DomainFields
+	Path   string
+	Port   int
+
 	Space           SpaceFields
 	Apps            []ApplicationFields
 	ServiceInstance ServiceInstanceFields

@@ -553,8 +553,7 @@ var _ = Describe("Push Command", func() {
 							}
 
 							callCount := 0
-							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool,
-							) (models.Route, error) {
+							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool) (models.Route, error) {
 								callCount = callCount + 1
 								switch callCount {
 								case 1:
