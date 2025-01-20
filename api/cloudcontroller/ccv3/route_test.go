@@ -31,7 +31,7 @@ var _ = Describe("Route", func() {
 			path       string
 			port       int
 			ccv3Route  resources.Route
-			options    *resources.RouteOption
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {
@@ -43,7 +43,11 @@ var _ = Describe("Route", func() {
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			options = &resources.RouteOption{LoadBalancing: "least-connections"}
+
+			lbLCVal := "least-connections"
+			lbLeastConnections := &lbLCVal
+			options = map[string]*string{"loadbalancing": lbLeastConnections}
+
 			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path, Port: port, Options: options}
 			route, warnings, executeErr = client.CreateRoute(ccv3Route)
 		})
@@ -99,7 +103,7 @@ var _ = Describe("Route", func() {
 						GUID:       "some-route-guid",
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
-						Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+						Options:    options,
 					}))
 				})
 			})
@@ -157,7 +161,7 @@ var _ = Describe("Route", func() {
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
 						Host:       "cheesecake",
-						Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+						Options:    options,
 					}))
 				})
 			})
@@ -222,7 +226,7 @@ var _ = Describe("Route", func() {
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
 							Path:       "lion",
-							Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+							Options:    options,
 						}))
 					})
 				})
@@ -288,7 +292,7 @@ var _ = Describe("Route", func() {
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
 							Port:       1234,
-							Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+							Options:    options,
 						}))
 					})
 				})

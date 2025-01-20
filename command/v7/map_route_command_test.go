@@ -36,6 +36,7 @@ var _ = Describe("map-route Command", func() {
 		orgGUID         string
 		spaceGUID       string
 		options         []string
+		expectedOptions map[string]*string
 	)
 
 	BeforeEach(func() {
@@ -45,6 +46,10 @@ var _ = Describe("map-route Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
+
+		lbLCVal := "least-connections"
+		lbLeastConnections := &lbLCVal
+		expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -261,7 +266,7 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(cmd.Port))
-						Expect(actualOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+						Expect(actualOptions).To(Equal(expectedOptions))
 					})
 				})
 

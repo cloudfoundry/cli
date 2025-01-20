@@ -33,16 +33,20 @@ var _ = Describe("Route Actions", func() {
 			hostname   string
 			path       string
 			port       int
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {
 			hostname = ""
 			path = ""
 			port = 0
+			lbLCVal := "least-connections"
+			lbLeastConnections := &lbLCVal
+			options = map[string]*string{"loadbalancing": lbLeastConnections}
 		})
 
 		JustBeforeEach(func() {
-			_, warnings, executeErr = actor.CreateRoute("space-guid", "domain-name", hostname, path, port, &resources.RouteOption{LoadBalancing: "least-connections"})
+			_, warnings, executeErr = actor.CreateRoute("space-guid", "domain-name", hostname, path, port, options)
 		})
 
 		When("the API layer calls are successful", func() {
@@ -56,7 +60,7 @@ var _ = Describe("Route Actions", func() {
 				)
 
 				fakeCloudControllerClient.CreateRouteReturns(
-					resources.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname", Path: "path-name", Options: &resources.RouteOption{LoadBalancing: "least-connections"}},
+					resources.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname", Path: "path-name", Options: options},
 					ccv3.Warnings{"create-warning-1", "create-warning-2"},
 					nil)
 			})
@@ -80,7 +84,7 @@ var _ = Describe("Route Actions", func() {
 							DomainGUID: "domain-guid",
 							Host:       hostname,
 							Path:       path,
-							Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+							Options:    options,
 						},
 					))
 				})
@@ -103,7 +107,7 @@ var _ = Describe("Route Actions", func() {
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
 							Port:       1234,
-							Options:    &resources.RouteOption{LoadBalancing: "least-connections"},
+							Options:    options,
 						},
 					))
 				})

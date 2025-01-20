@@ -39,7 +39,8 @@ var _ = Describe("create-route Command", func() {
 		hostname        string
 		path            string
 		port            int
-		options         []string
+		cmdOptions      []string
+		options         map[string]*string
 		cCAPIOldVersion string
 	)
 
@@ -57,7 +58,10 @@ var _ = Describe("create-route Command", func() {
 		hostname = ""
 		path = ""
 		port = 0
-		options = []string{"loadbalancing=least-connections"}
+		cmdOptions = []string{"loadbalancing=least-connections"}
+		lbLCVal := "least-connections"
+		lbLeastConnections := &lbLCVal
+		options = map[string]*string{"loadbalancing": lbLeastConnections}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -71,7 +75,7 @@ var _ = Describe("create-route Command", func() {
 			Hostname: hostname,
 			Path:     flag.V7RoutePath{Path: path},
 			Port:     port,
-			Options:  options,
+			Options:  cmdOptions,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -164,7 +168,7 @@ var _ = Describe("create-route Command", func() {
 				fakeConfig.APIVersionReturns(cCAPIOldVersion)
 				fakeActor.CreateRouteReturns(resources.Route{
 					URL:     domainName,
-					Options: &resources.RouteOption{LoadBalancing: ""},
+					Options: map[string]*string{},
 				}, nil, nil)
 			})
 
@@ -175,7 +179,7 @@ var _ = Describe("create-route Command", func() {
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedHostname).To(Equal(hostname))
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: ""}))
+				Expect(expectedOptions).To(Equal(map[string]*string{}))
 				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
 				Expect(testUI.Out).To(Say("Your CC API"))
 				Expect(testUI.Out).To(Say("does not support per route options"))
@@ -188,7 +192,7 @@ var _ = Describe("create-route Command", func() {
 			BeforeEach(func() {
 				fakeActor.CreateRouteReturns(resources.Route{
 					URL:     domainName,
-					Options: &resources.RouteOption{LoadBalancing: "least-connections"},
+					Options: options,
 				}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
@@ -206,7 +210,7 @@ var _ = Describe("create-route Command", func() {
 				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedHostname).To(Equal(hostname))
-				Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+				Expect(expectedOptions).To(Equal(options))
 			})
 
 			When("passing in a hostname", func() {
@@ -232,7 +236,7 @@ var _ = Describe("create-route Command", func() {
 					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedHostname).To(Equal(hostname))
-					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+					Expect(expectedOptions).To(Equal(options))
 				})
 			})
 
@@ -260,7 +264,7 @@ var _ = Describe("create-route Command", func() {
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedHostname).To(Equal(hostname))
 					Expect(expectedPort).To(Equal(port))
-					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+					Expect(expectedOptions).To(Equal(options))
 				})
 			})
 		})

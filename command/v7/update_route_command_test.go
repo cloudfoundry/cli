@@ -35,7 +35,8 @@ var _ = Describe("update-route Command", func() {
 		path            string
 		orgGUID         string
 		spaceGUID       string
-		options         []string
+		commandOptions  []string
+		options         map[string]*string
 		cCAPIOldVersion string
 		routeGuid       string
 	)
@@ -55,14 +56,17 @@ var _ = Describe("update-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
-		options = []string{"loadbalancing=least-connections"}
+		commandOptions = []string{"loadbalancing=least-connections"}
+		lbLCVal := "least-connections"
+		lbLeastConnections := &lbLCVal
+		options = map[string]*string{"loadbalancing": lbLeastConnections}
 		routeGuid = "route-guid"
 
 		cmd = UpdateRouteCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			Options:      options,
+			Options:      commandOptions,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -153,7 +157,7 @@ var _ = Describe("update-route Command", func() {
 					nil,
 				)
 				fakeActor.UpdateRouteReturns(
-					resources.Route{GUID: routeGuid, URL: domain, Options: &resources.RouteOption{LoadBalancing: "least-connections"}},
+					resources.Route{GUID: routeGuid, URL: domain, Options: options},
 					nil,
 					nil,
 				)
@@ -189,7 +193,7 @@ var _ = Describe("update-route Command", func() {
 				BeforeEach(func() {
 					cmd.RemoveOptions = []string{"loadbalancing"}
 					fakeActor.GetRouteByAttributesReturns(
-						resources.Route{GUID: routeGuid, URL: domain, Options: &resources.RouteOption{LoadBalancing: "least-connections"}},
+						resources.Route{GUID: routeGuid, URL: domain, Options: options},
 						nil,
 						nil,
 					)
@@ -199,11 +203,11 @@ var _ = Describe("update-route Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					expectedRouteGuid, expectedOptions := fakeActor.UpdateRouteArgsForCall(0)
 					Expect(expectedRouteGuid).To(Equal(routeGuid))
-					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+					Expect(expectedOptions).To(Equal(options))
 
 					expectedRouteGuid, expectedOptions = fakeActor.UpdateRouteArgsForCall(1)
 					Expect(expectedRouteGuid).To(Equal(routeGuid))
-					Expect(expectedOptions).To(Equal(&resources.RouteOption{LoadBalancing: ""}))
+					Expect(expectedOptions).To(Equal(map[string]*string{"loadbalancing": nil}))
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(2))
 
 					Expect(testUI.Out).To(Say("Updating route"))
@@ -238,7 +242,7 @@ var _ = Describe("update-route Command", func() {
 						Expect(fakeActor.UpdateRouteCallCount()).To(Equal(1))
 						actualRouteGUID, actualOptions := fakeActor.UpdateRouteArgsForCall(0)
 						Expect(actualRouteGUID).To(Equal("route-guid"))
-						Expect(actualOptions).To(Equal(&resources.RouteOption{LoadBalancing: "least-connections"}))
+						Expect(actualOptions).To(Equal(options))
 					})
 				})
 			})

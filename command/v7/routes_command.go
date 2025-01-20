@@ -94,10 +94,6 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 		if routeSummary.Port != 0 {
 			port = strconv.Itoa(routeSummary.Port)
 		}
-		loadBalancingOption := ""
-		if routeSummary.Route.Options != nil && routeSummary.Route.Options.LoadBalancing != "" {
-			loadBalancingOption = "loadbalancing=" + routeSummary.Route.Options.LoadBalancing
-		}
 
 		routesTable = append(routesTable, []string{
 			routeSummary.SpaceName,
@@ -109,8 +105,7 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			strings.Join(routeSummary.AppProtocols, ", "),
 			strings.Join(routeSummary.AppNames, ", "),
 			routeSummary.ServiceInstanceName,
-			loadBalancingOption,
-			//strings.Join(opts, ", "),
+			routeSummary.Route.FormattedOptions(),
 		})
 	}
 

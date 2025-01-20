@@ -2511,11 +2511,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateRouteStub        func(string, *resources.RouteOption) (resources.Route, ccv3.Warnings, error)
+	UpdateRouteStub        func(string, map[string]*string) (resources.Route, ccv3.Warnings, error)
 	updateRouteMutex       sync.RWMutex
 	updateRouteArgsForCall []struct {
 		arg1 string
-		arg2 *resources.RouteOption
+		arg2 map[string]*string
 	}
 	updateRouteReturns struct {
 		result1 resources.Route
@@ -13892,12 +13892,12 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateRoute(arg1 string, arg2 *resources.RouteOption) (resources.Route, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateRoute(arg1 string, arg2 map[string]*string) (resources.Route, ccv3.Warnings, error) {
 	fake.updateRouteMutex.Lock()
 	ret, specificReturn := fake.updateRouteReturnsOnCall[len(fake.updateRouteArgsForCall)]
 	fake.updateRouteArgsForCall = append(fake.updateRouteArgsForCall, struct {
 		arg1 string
-		arg2 *resources.RouteOption
+		arg2 map[string]*string
 	}{arg1, arg2})
 	stub := fake.UpdateRouteStub
 	fakeReturns := fake.updateRouteReturns
@@ -13918,13 +13918,13 @@ func (fake *FakeCloudControllerClient) UpdateRouteCallCount() int {
 	return len(fake.updateRouteArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateRouteCalls(stub func(string, *resources.RouteOption) (resources.Route, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateRouteCalls(stub func(string, map[string]*string) (resources.Route, ccv3.Warnings, error)) {
 	fake.updateRouteMutex.Lock()
 	defer fake.updateRouteMutex.Unlock()
 	fake.UpdateRouteStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateRouteArgsForCall(i int) (string, *resources.RouteOption) {
+func (fake *FakeCloudControllerClient) UpdateRouteArgsForCall(i int) (string, map[string]*string) {
 	fake.updateRouteMutex.RLock()
 	defer fake.updateRouteMutex.RUnlock()
 	argsForCall := fake.updateRouteArgsForCall[i]

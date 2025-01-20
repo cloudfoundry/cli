@@ -78,12 +78,8 @@ func (cmd AppsCommand) Execute(args []string) error {
 
 func getURLs(routes []resources.Route) string {
 	var routeURLs []string
-	var routeOpts = ""
 	for _, route := range routes {
-		if route.Options != nil && route.Options.LoadBalancing != "" {
-			routeOpts = " {loadbalancing=" + route.Options.LoadBalancing + "}"
-		}
-		routeURLs = append(routeURLs, route.URL+routeOpts)
+		routeURLs = append(routeURLs, route.URL+route.FormattedOptions())
 	}
 
 	return strings.Join(routeURLs, ", ")

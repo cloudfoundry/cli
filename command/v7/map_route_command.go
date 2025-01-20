@@ -86,7 +86,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			}
 		}
 
-		routeOptions := &resources.RouteOption{}
+		routeOptions := map[string]*string{}
 		if cmd.Options != nil && len(cmd.Options) > 0 {
 			err = cmd.validateAPIVersionForPerRouteOptions()
 			if err == nil {

@@ -82,7 +82,7 @@ func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, err
 	return routes, warnings, err
 }
 
-func (client Client) UpdateRoute(routeGUID string, options *resources.RouteOption) (resources.Route, Warnings, error) {
+func (client Client) UpdateRoute(routeGUID string, options map[string]*string) (resources.Route, Warnings, error) {
 	var responseBody resources.Route
 	var route = resources.Route{}
 	var uriParams = internal.Params{"route_guid": routeGUID}
