@@ -1,8 +1,10 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -29,19 +31,23 @@ var _ = Describe("create-route Command", func() {
 
 		executeErr error
 
-		binaryName string
-		domainName string
-		spaceName  string
-		spaceGUID  string
-		orgName    string
-		hostname   string
-		path       string
-		port       int
+		binaryName      string
+		domainName      string
+		spaceName       string
+		spaceGUID       string
+		orgName         string
+		hostname        string
+		path            string
+		port            int
+		cmdOptions      []string
+		options         map[string]*string
+		cCAPIOldVersion string
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 
@@ -52,6 +58,11 @@ var _ = Describe("create-route Command", func() {
 		hostname = ""
 		path = ""
 		port = 0
+
+		cmdOptions = []string{"loadbalancing=least-connections"}
+		lbLCVal := "least-connections"
+		lbLeastConnections := &lbLCVal
+		options = map[string]*string{"loadbalancing": lbLeastConnections}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -65,6 +76,7 @@ var _ = Describe("create-route Command", func() {
 			Hostname: hostname,
 			Path:     flag.V7RoutePath{Path: path},
 			Port:     port,
+			Options:  cmdOptions,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -152,10 +164,37 @@ var _ = Describe("create-route Command", func() {
 			})
 		})
 
+		When("creating the route with default route options is successful when the CC API version is too old for route options", func() {
+			BeforeEach(func() {
+				cCAPIOldVersion = strconv.Itoa(1)
+				fakeConfig.APIVersionReturns(cCAPIOldVersion)
+				fakeActor.CreateRouteReturns(resources.Route{
+					URL:     domainName,
+					Options: map[string]*string{},
+				}, nil, nil)
+			})
+
+			It("creates a route with default route options", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
+				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
+				Expect(expectedDomainName).To(Equal(domainName))
+				Expect(expectedHostname).To(Equal(hostname))
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
+				Expect(expectedOptions).To(Equal(map[string]*string{}))
+				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
+				Expect(testUI.Out).To(Say("Your CC API"))
+				Expect(testUI.Out).To(Say("does not support per route options"))
+				Expect(testUI.Out).To(Say(`Route %s has been created.`, domainName))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
 		When("creating the route is successful", func() {
 			BeforeEach(func() {
 				fakeActor.CreateRouteReturns(resources.Route{
-					URL: domainName,
+					URL:     domainName,
+					Options: options,
 				}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
@@ -169,10 +208,11 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _ := fakeActor.CreateRouteArgsForCall(0)
+				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
 				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedHostname).To(Equal(hostname))
+				Expect(expectedOptions).To(Equal(options))
 			})
 
 			When("passing in a hostname", func() {
@@ -220,11 +260,12 @@ var _ = Describe("create-route Command", func() {
 
 				It("calls the actor with the correct arguments", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedSpaceGUID, expectedDomainName, expectedHostname, _, expectedPort := fakeActor.CreateRouteArgsForCall(0)
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _, expectedPort, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedHostname).To(Equal(hostname))
 					Expect(expectedPort).To(Equal(port))
+					Expect(expectedOptions).To(Equal(options))
 				})
 			})
 		})

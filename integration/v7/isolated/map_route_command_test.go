@@ -72,12 +72,14 @@ var _ = Describe("map-route command", func() {
 			path       string
 			userName   string
 			appName    string
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {
 			appName = helpers.NewAppName()
 			hostName = helpers.NewHostName()
 			path = helpers.NewPath()
+			options = helpers.NewOptions()
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
@@ -96,7 +98,7 @@ var _ = Describe("map-route command", func() {
 
 			BeforeEach(func() {
 				domainName = helpers.DefaultSharedDomain()
-				route = helpers.NewRoute(spaceName, domainName, hostName, path)
+				route = helpers.NewRoute(spaceName, domainName, hostName, path, options)
 				route.V7Create()
 			})
 
@@ -160,7 +162,7 @@ var _ = Describe("map-route command", func() {
 
 				routerGroup.Create()
 				domain.CreateWithRouterGroup(routerGroup.Name)
-				route = helpers.NewTCPRoute(spaceName, domainName, 1082)
+				route = helpers.NewTCPRoute(spaceName, domainName, 1082, options)
 			})
 
 			AfterEach(func() {

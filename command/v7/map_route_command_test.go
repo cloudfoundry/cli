@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -34,6 +35,8 @@ var _ = Describe("map-route Command", func() {
 		path            string
 		orgGUID         string
 		spaceGUID       string
+		options         []string
+		expectedOptions map[string]*string
 	)
 
 	BeforeEach(func() {
@@ -42,6 +45,11 @@ var _ = Describe("map-route Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
+		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
+
+		lbLCVal := "least-connections"
+		lbLeastConnections := &lbLCVal
+		expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -51,12 +59,14 @@ var _ = Describe("map-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
+		options = []string{"loadbalancing=least-connections"}
 
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
 			AppProtocol:  "http2",
+			Options:      options,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -250,12 +260,13 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort := fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort, actualOptions := fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(cmd.Port))
+						Expect(actualOptions).To(Equal(expectedOptions))
 					})
 				})
 
