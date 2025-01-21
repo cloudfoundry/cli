@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
