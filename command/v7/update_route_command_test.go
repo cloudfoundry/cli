@@ -237,7 +237,6 @@ var _ = Describe("update-route Command", func() {
 						Expect(actualHostname).To(Equal("host"))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(0))
-						Expect(actualPort).To(Equal(0))
 
 						Expect(fakeActor.UpdateRouteCallCount()).To(Equal(1))
 						actualRouteGUID, actualOptions := fakeActor.UpdateRouteArgsForCall(0)
