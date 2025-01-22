@@ -72,15 +72,20 @@ var _ = Describe("Route", func() {
 }`
 
 					expectedBody := `{
-  "relationships": {
-  	"space": {
-      "data": { "guid": "space-guid" }
-    },
-    "domain": {
-	  "data": { "guid": "domain-guid" }
+    "relationships": {
+        "space": {
+            "data": {
+                "guid": "space-guid"
+            }
+        },
+        "domain": {
+            "data": {
+                "guid": "domain-guid"
+            }
+        }
     },
     "options": {
-      "loadbalancing": "least-connections"
+        "loadbalancing": "least-connections"
     }
 }`
 
