@@ -201,7 +201,10 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
-	"path": "lion"
+    "path": "lion",
+    "options": {
+      "loadbalancing": "least-connections"
+    }  
 }`
 
 					server.AppendHandlers(
