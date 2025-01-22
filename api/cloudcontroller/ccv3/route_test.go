@@ -82,7 +82,6 @@ var _ = Describe("Route", func() {
     "options": {
       "loadbalancing": "least-connections"
     }
-  }
 }`
 
 					server.AppendHandlers(
