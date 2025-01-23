@@ -30,16 +30,15 @@ func (fake *FakePluginsActor) GetOutdatedPlugins() ([]pluginaction.OutdatedPlugi
 	ret, specificReturn := fake.getOutdatedPluginsReturnsOnCall[len(fake.getOutdatedPluginsArgsForCall)]
 	fake.getOutdatedPluginsArgsForCall = append(fake.getOutdatedPluginsArgsForCall, struct {
 	}{})
-	stub := fake.GetOutdatedPluginsStub
-	fakeReturns := fake.getOutdatedPluginsReturns
 	fake.recordInvocation("GetOutdatedPlugins", []interface{}{})
 	fake.getOutdatedPluginsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetOutdatedPluginsStub != nil {
+		return fake.GetOutdatedPluginsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getOutdatedPluginsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -194,16 +194,15 @@ func (fake *FakeSetLabelActor) GetCurrentUser() (configv3.User, error) {
 	ret, specificReturn := fake.getCurrentUserReturnsOnCall[len(fake.getCurrentUserArgsForCall)]
 	fake.getCurrentUserArgsForCall = append(fake.getCurrentUserArgsForCall, struct {
 	}{})
-	stub := fake.GetCurrentUserStub
-	fakeReturns := fake.getCurrentUserReturns
 	fake.recordInvocation("GetCurrentUser", []interface{}{})
 	fake.getCurrentUserMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetCurrentUserStub != nil {
+		return fake.GetCurrentUserStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getCurrentUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -253,16 +252,15 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationName(arg1 str
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateApplicationLabelsByApplicationNameStub
-	fakeReturns := fake.updateApplicationLabelsByApplicationNameReturns
 	fake.recordInvocation("UpdateApplicationLabelsByApplicationName", []interface{}{arg1, arg2, arg3})
 	fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateApplicationLabelsByApplicationNameStub != nil {
+		return fake.UpdateApplicationLabelsByApplicationNameStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateApplicationLabelsByApplicationNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -319,16 +317,15 @@ func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStack(arg1
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub
-	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackReturns
 	fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStack", []interface{}{arg1, arg2, arg3})
 	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub != nil {
+		return fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -384,16 +381,15 @@ func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainName(arg1 string, arg2 
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
-	stub := fake.UpdateDomainLabelsByDomainNameStub
-	fakeReturns := fake.updateDomainLabelsByDomainNameReturns
 	fake.recordInvocation("UpdateDomainLabelsByDomainName", []interface{}{arg1, arg2})
 	fake.updateDomainLabelsByDomainNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UpdateDomainLabelsByDomainNameStub != nil {
+		return fake.UpdateDomainLabelsByDomainNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateDomainLabelsByDomainNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -449,16 +445,15 @@ func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationName(arg1 s
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
-	stub := fake.UpdateOrganizationLabelsByOrganizationNameStub
-	fakeReturns := fake.updateOrganizationLabelsByOrganizationNameReturns
 	fake.recordInvocation("UpdateOrganizationLabelsByOrganizationName", []interface{}{arg1, arg2})
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UpdateOrganizationLabelsByOrganizationNameStub != nil {
+		return fake.UpdateOrganizationLabelsByOrganizationNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateOrganizationLabelsByOrganizationNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -515,16 +510,15 @@ func (fake *FakeSetLabelActor) UpdateRouteLabels(arg1 string, arg2 string, arg3 
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateRouteLabelsStub
-	fakeReturns := fake.updateRouteLabelsReturns
 	fake.recordInvocation("UpdateRouteLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateRouteLabelsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateRouteLabelsStub != nil {
+		return fake.UpdateRouteLabelsStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateRouteLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -580,16 +574,15 @@ func (fake *FakeSetLabelActor) UpdateServiceBrokerLabelsByServiceBrokerName(arg1
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
-	stub := fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub
-	fakeReturns := fake.updateServiceBrokerLabelsByServiceBrokerNameReturns
 	fake.recordInvocation("UpdateServiceBrokerLabelsByServiceBrokerName", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub != nil {
+		return fake.UpdateServiceBrokerLabelsByServiceBrokerNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateServiceBrokerLabelsByServiceBrokerNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -646,16 +639,15 @@ func (fake *FakeSetLabelActor) UpdateServiceInstanceLabels(arg1 string, arg2 str
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateServiceInstanceLabelsStub
-	fakeReturns := fake.updateServiceInstanceLabelsReturns
 	fake.recordInvocation("UpdateServiceInstanceLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateServiceInstanceLabelsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateServiceInstanceLabelsStub != nil {
+		return fake.UpdateServiceInstanceLabelsStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateServiceInstanceLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -712,16 +704,15 @@ func (fake *FakeSetLabelActor) UpdateServiceOfferingLabels(arg1 string, arg2 str
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateServiceOfferingLabelsStub
-	fakeReturns := fake.updateServiceOfferingLabelsReturns
 	fake.recordInvocation("UpdateServiceOfferingLabels", []interface{}{arg1, arg2, arg3})
 	fake.updateServiceOfferingLabelsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateServiceOfferingLabelsStub != nil {
+		return fake.UpdateServiceOfferingLabelsStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateServiceOfferingLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -779,16 +770,15 @@ func (fake *FakeSetLabelActor) UpdateServicePlanLabels(arg1 string, arg2 string,
 		arg3 string
 		arg4 map[string]types.NullString
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.UpdateServicePlanLabelsStub
-	fakeReturns := fake.updateServicePlanLabelsReturns
 	fake.recordInvocation("UpdateServicePlanLabels", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updateServicePlanLabelsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.UpdateServicePlanLabelsStub != nil {
+		return fake.UpdateServicePlanLabelsStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateServicePlanLabelsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -845,16 +835,15 @@ func (fake *FakeSetLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 st
 		arg2 string
 		arg3 map[string]types.NullString
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateSpaceLabelsBySpaceNameStub
-	fakeReturns := fake.updateSpaceLabelsBySpaceNameReturns
 	fake.recordInvocation("UpdateSpaceLabelsBySpaceName", []interface{}{arg1, arg2, arg3})
 	fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateSpaceLabelsBySpaceNameStub != nil {
+		return fake.UpdateSpaceLabelsBySpaceNameStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateSpaceLabelsBySpaceNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -910,16 +899,15 @@ func (fake *FakeSetLabelActor) UpdateStackLabelsByStackName(arg1 string, arg2 ma
 		arg1 string
 		arg2 map[string]types.NullString
 	}{arg1, arg2})
-	stub := fake.UpdateStackLabelsByStackNameStub
-	fakeReturns := fake.updateStackLabelsByStackNameReturns
 	fake.recordInvocation("UpdateStackLabelsByStackName", []interface{}{arg1, arg2})
 	fake.updateStackLabelsByStackNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UpdateStackLabelsByStackNameStub != nil {
+		return fake.UpdateStackLabelsByStackNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateStackLabelsByStackNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

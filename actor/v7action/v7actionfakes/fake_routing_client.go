@@ -44,16 +44,15 @@ func (fake *FakeRoutingClient) GetRouterGroupByName(arg1 string) (router.RouterG
 	fake.getRouterGroupByNameArgsForCall = append(fake.getRouterGroupByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetRouterGroupByNameStub
-	fakeReturns := fake.getRouterGroupByNameReturns
 	fake.recordInvocation("GetRouterGroupByName", []interface{}{arg1})
 	fake.getRouterGroupByNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetRouterGroupByNameStub != nil {
+		return fake.GetRouterGroupByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getRouterGroupByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -107,16 +106,15 @@ func (fake *FakeRoutingClient) GetRouterGroups() ([]router.RouterGroup, error) {
 	ret, specificReturn := fake.getRouterGroupsReturnsOnCall[len(fake.getRouterGroupsArgsForCall)]
 	fake.getRouterGroupsArgsForCall = append(fake.getRouterGroupsArgsForCall, struct {
 	}{})
-	stub := fake.GetRouterGroupsStub
-	fakeReturns := fake.getRouterGroupsReturns
 	fake.recordInvocation("GetRouterGroups", []interface{}{})
 	fake.getRouterGroupsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetRouterGroupsStub != nil {
+		return fake.GetRouterGroupsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getRouterGroupsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

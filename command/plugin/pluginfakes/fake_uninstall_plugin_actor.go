@@ -32,16 +32,15 @@ func (fake *FakeUninstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUn
 		arg1 pluginaction.PluginUninstaller
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UninstallPluginStub
-	fakeReturns := fake.uninstallPluginReturns
 	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
 	fake.uninstallPluginMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UninstallPluginStub != nil {
+		return fake.UninstallPluginStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uninstallPluginReturns
 	return fakeReturns.result1
 }
 

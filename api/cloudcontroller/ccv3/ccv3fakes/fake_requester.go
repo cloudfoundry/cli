@@ -140,10 +140,9 @@ func (fake *FakeRequester) InitializeConnection(arg1 ccv3.TargetSettings) {
 	fake.initializeConnectionArgsForCall = append(fake.initializeConnectionArgsForCall, struct {
 		arg1 ccv3.TargetSettings
 	}{arg1})
-	stub := fake.InitializeConnectionStub
 	fake.recordInvocation("InitializeConnection", []interface{}{arg1})
 	fake.initializeConnectionMutex.Unlock()
-	if stub != nil {
+	if fake.InitializeConnectionStub != nil {
 		fake.InitializeConnectionStub(arg1)
 	}
 }
@@ -172,10 +171,9 @@ func (fake *FakeRequester) InitializeRouter(arg1 string) {
 	fake.initializeRouterArgsForCall = append(fake.initializeRouterArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.InitializeRouterStub
 	fake.recordInvocation("InitializeRouter", []interface{}{arg1})
 	fake.initializeRouterMutex.Unlock()
-	if stub != nil {
+	if fake.InitializeRouterStub != nil {
 		fake.InitializeRouterStub(arg1)
 	}
 }
@@ -205,16 +203,15 @@ func (fake *FakeRequester) MakeListRequest(arg1 ccv3.RequestParams) (ccv3.Includ
 	fake.makeListRequestArgsForCall = append(fake.makeListRequestArgsForCall, struct {
 		arg1 ccv3.RequestParams
 	}{arg1})
-	stub := fake.MakeListRequestStub
-	fakeReturns := fake.makeListRequestReturns
 	fake.recordInvocation("MakeListRequest", []interface{}{arg1})
 	fake.makeListRequestMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.MakeListRequestStub != nil {
+		return fake.MakeListRequestStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeListRequestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -272,16 +269,15 @@ func (fake *FakeRequester) MakeRequest(arg1 ccv3.RequestParams) (ccv3.JobURL, cc
 	fake.makeRequestArgsForCall = append(fake.makeRequestArgsForCall, struct {
 		arg1 ccv3.RequestParams
 	}{arg1})
-	stub := fake.MakeRequestStub
-	fakeReturns := fake.makeRequestReturns
 	fake.recordInvocation("MakeRequest", []interface{}{arg1})
 	fake.makeRequestMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.MakeRequestStub != nil {
+		return fake.MakeRequestStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeRequestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -341,16 +337,15 @@ func (fake *FakeRequester) MakeRequestReceiveRaw(arg1 string, arg2 internal.Para
 		arg2 internal.Params
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.MakeRequestReceiveRawStub
-	fakeReturns := fake.makeRequestReceiveRawReturns
 	fake.recordInvocation("MakeRequestReceiveRaw", []interface{}{arg1, arg2, arg3})
 	fake.makeRequestReceiveRawMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.MakeRequestReceiveRawStub != nil {
+		return fake.MakeRequestReceiveRawStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeRequestReceiveRawReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -417,16 +412,15 @@ func (fake *FakeRequester) MakeRequestSendRaw(arg1 string, arg2 internal.Params,
 		arg4 string
 		arg5 interface{}
 	}{arg1, arg2, arg3Copy, arg4, arg5})
-	stub := fake.MakeRequestSendRawStub
-	fakeReturns := fake.makeRequestSendRawReturns
 	fake.recordInvocation("MakeRequestSendRaw", []interface{}{arg1, arg2, arg3Copy, arg4, arg5})
 	fake.makeRequestSendRawMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+	if fake.MakeRequestSendRawStub != nil {
+		return fake.MakeRequestSendRawStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeRequestSendRawReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -492,16 +486,15 @@ func (fake *FakeRequester) MakeRequestSendReceiveRaw(arg1 string, arg2 string, a
 		arg3 http.Header
 		arg4 []byte
 	}{arg1, arg2, arg3, arg4Copy})
-	stub := fake.MakeRequestSendReceiveRawStub
-	fakeReturns := fake.makeRequestSendReceiveRawReturns
 	fake.recordInvocation("MakeRequestSendReceiveRaw", []interface{}{arg1, arg2, arg3, arg4Copy})
 	fake.makeRequestSendReceiveRawMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.MakeRequestSendReceiveRawStub != nil {
+		return fake.MakeRequestSendReceiveRawStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeRequestSendReceiveRawReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -565,16 +558,15 @@ func (fake *FakeRequester) MakeRequestUploadAsync(arg1 string, arg2 internal.Par
 		arg6 interface{}
 		arg7 <-chan error
 	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
-	stub := fake.MakeRequestUploadAsyncStub
-	fakeReturns := fake.makeRequestUploadAsyncReturns
 	fake.recordInvocation("MakeRequestUploadAsync", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
 	fake.makeRequestUploadAsyncMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	if fake.MakeRequestUploadAsyncStub != nil {
+		return fake.MakeRequestUploadAsyncStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.makeRequestUploadAsyncReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -631,10 +623,9 @@ func (fake *FakeRequester) WrapConnection(arg1 ccv3.ConnectionWrapper) {
 	fake.wrapConnectionArgsForCall = append(fake.wrapConnectionArgsForCall, struct {
 		arg1 ccv3.ConnectionWrapper
 	}{arg1})
-	stub := fake.WrapConnectionStub
 	fake.recordInvocation("WrapConnection", []interface{}{arg1})
 	fake.wrapConnectionMutex.Unlock()
-	if stub != nil {
+	if fake.WrapConnectionStub != nil {
 		fake.WrapConnectionStub(arg1)
 	}
 }
