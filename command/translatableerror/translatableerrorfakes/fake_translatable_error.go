@@ -38,16 +38,15 @@ func (fake *FakeTranslatableError) Error() string {
 	ret, specificReturn := fake.errorReturnsOnCall[len(fake.errorArgsForCall)]
 	fake.errorArgsForCall = append(fake.errorArgsForCall, struct {
 	}{})
-	stub := fake.ErrorStub
-	fakeReturns := fake.errorReturns
 	fake.recordInvocation("Error", []interface{}{})
 	fake.errorMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ErrorStub != nil {
+		return fake.ErrorStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.errorReturns
 	return fakeReturns.result1
 }
 
@@ -92,16 +91,15 @@ func (fake *FakeTranslatableError) Translate(arg1 func(string, ...interface{}) s
 	fake.translateArgsForCall = append(fake.translateArgsForCall, struct {
 		arg1 func(string, ...interface{}) string
 	}{arg1})
-	stub := fake.TranslateStub
-	fakeReturns := fake.translateReturns
 	fake.recordInvocation("Translate", []interface{}{arg1})
 	fake.translateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.TranslateStub != nil {
+		return fake.TranslateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.translateReturns
 	return fakeReturns.result1
 }
 
