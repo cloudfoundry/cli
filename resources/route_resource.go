@@ -1,9 +1,10 @@
 package resources
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"encoding/json"
 	"strings"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
 type RouteDestinationApp struct {
