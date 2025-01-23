@@ -308,7 +308,6 @@
     "color",
     "delete-domain",
     "create-route",
-    "update-route",
     "plugins",
     "oauth-token",
     "Service key",

@@ -179,7 +179,6 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID,
 	uriFragment := "/v2/routes?" + opt.Encode()
 
 	resource := new(resources.RouteResource)
-
 	err = repo.gateway.CreateResource(
 		repo.config.APIEndpoint(),
 		uriFragment,
