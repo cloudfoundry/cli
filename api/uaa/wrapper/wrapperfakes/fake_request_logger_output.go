@@ -131,16 +131,15 @@ func (fake *FakeRequestLoggerOutput) DisplayBody(arg1 []byte) error {
 	fake.displayBodyArgsForCall = append(fake.displayBodyArgsForCall, struct {
 		arg1 []byte
 	}{arg1Copy})
-	stub := fake.DisplayBodyStub
-	fakeReturns := fake.displayBodyReturns
 	fake.recordInvocation("DisplayBody", []interface{}{arg1Copy})
 	fake.displayBodyMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DisplayBodyStub != nil {
+		return fake.DisplayBodyStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayBodyReturns
 	return fakeReturns.result1
 }
 
@@ -193,16 +192,15 @@ func (fake *FakeRequestLoggerOutput) DisplayHeader(arg1 string, arg2 string) err
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.DisplayHeaderStub
-	fakeReturns := fake.displayHeaderReturns
 	fake.recordInvocation("DisplayHeader", []interface{}{arg1, arg2})
 	fake.displayHeaderMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DisplayHeaderStub != nil {
+		return fake.DisplayHeaderStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayHeaderReturns
 	return fakeReturns.result1
 }
 
@@ -254,16 +252,15 @@ func (fake *FakeRequestLoggerOutput) DisplayHost(arg1 string) error {
 	fake.displayHostArgsForCall = append(fake.displayHostArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DisplayHostStub
-	fakeReturns := fake.displayHostReturns
 	fake.recordInvocation("DisplayHost", []interface{}{arg1})
 	fake.displayHostMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DisplayHostStub != nil {
+		return fake.DisplayHostStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayHostReturns
 	return fakeReturns.result1
 }
 
@@ -320,16 +317,15 @@ func (fake *FakeRequestLoggerOutput) DisplayJSONBody(arg1 []byte) error {
 	fake.displayJSONBodyArgsForCall = append(fake.displayJSONBodyArgsForCall, struct {
 		arg1 []byte
 	}{arg1Copy})
-	stub := fake.DisplayJSONBodyStub
-	fakeReturns := fake.displayJSONBodyReturns
 	fake.recordInvocation("DisplayJSONBody", []interface{}{arg1Copy})
 	fake.displayJSONBodyMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DisplayJSONBodyStub != nil {
+		return fake.DisplayJSONBodyStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayJSONBodyReturns
 	return fakeReturns.result1
 }
 
@@ -383,16 +379,15 @@ func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(arg1 string, arg2 stri
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.DisplayRequestHeaderStub
-	fakeReturns := fake.displayRequestHeaderReturns
 	fake.recordInvocation("DisplayRequestHeader", []interface{}{arg1, arg2, arg3})
 	fake.displayRequestHeaderMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.DisplayRequestHeaderStub != nil {
+		return fake.DisplayRequestHeaderStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayRequestHeaderReturns
 	return fakeReturns.result1
 }
 
@@ -445,16 +440,15 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(arg1 string, arg2 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.DisplayResponseHeaderStub
-	fakeReturns := fake.displayResponseHeaderReturns
 	fake.recordInvocation("DisplayResponseHeader", []interface{}{arg1, arg2})
 	fake.displayResponseHeaderMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DisplayResponseHeaderStub != nil {
+		return fake.DisplayResponseHeaderStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayResponseHeaderReturns
 	return fakeReturns.result1
 }
 
@@ -507,16 +501,15 @@ func (fake *FakeRequestLoggerOutput) DisplayType(arg1 string, arg2 time.Time) er
 		arg1 string
 		arg2 time.Time
 	}{arg1, arg2})
-	stub := fake.DisplayTypeStub
-	fakeReturns := fake.displayTypeReturns
 	fake.recordInvocation("DisplayType", []interface{}{arg1, arg2})
 	fake.displayTypeMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DisplayTypeStub != nil {
+		return fake.DisplayTypeStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.displayTypeReturns
 	return fakeReturns.result1
 }
 
@@ -567,10 +560,9 @@ func (fake *FakeRequestLoggerOutput) HandleInternalError(arg1 error) {
 	fake.handleInternalErrorArgsForCall = append(fake.handleInternalErrorArgsForCall, struct {
 		arg1 error
 	}{arg1})
-	stub := fake.HandleInternalErrorStub
 	fake.recordInvocation("HandleInternalError", []interface{}{arg1})
 	fake.handleInternalErrorMutex.Unlock()
-	if stub != nil {
+	if fake.HandleInternalErrorStub != nil {
 		fake.HandleInternalErrorStub(arg1)
 	}
 }
@@ -599,16 +591,15 @@ func (fake *FakeRequestLoggerOutput) Start() error {
 	ret, specificReturn := fake.startReturnsOnCall[len(fake.startArgsForCall)]
 	fake.startArgsForCall = append(fake.startArgsForCall, struct {
 	}{})
-	stub := fake.StartStub
-	fakeReturns := fake.startReturns
 	fake.recordInvocation("Start", []interface{}{})
 	fake.startMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StartStub != nil {
+		return fake.StartStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.startReturns
 	return fakeReturns.result1
 }
 
@@ -652,16 +643,15 @@ func (fake *FakeRequestLoggerOutput) Stop() error {
 	ret, specificReturn := fake.stopReturnsOnCall[len(fake.stopArgsForCall)]
 	fake.stopArgsForCall = append(fake.stopArgsForCall, struct {
 	}{})
-	stub := fake.StopStub
-	fakeReturns := fake.stopReturns
 	fake.recordInvocation("Stop", []interface{}{})
 	fake.stopMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StopStub != nil {
+		return fake.StopStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.stopReturns
 	return fakeReturns.result1
 }
 

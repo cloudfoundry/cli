@@ -32,16 +32,15 @@ func (fake *FakeConnection) Make(arg1 *http.Request, arg2 *uaa.Response) error {
 		arg1 *http.Request
 		arg2 *uaa.Response
 	}{arg1, arg2})
-	stub := fake.MakeStub
-	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.MakeStub != nil {
+		return fake.MakeStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 
