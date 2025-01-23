@@ -30,16 +30,15 @@ func (fake *FakeServiceSummaryRepository) GetSummariesInCurrentSpace() ([]models
 	ret, specificReturn := fake.getSummariesInCurrentSpaceReturnsOnCall[len(fake.getSummariesInCurrentSpaceArgsForCall)]
 	fake.getSummariesInCurrentSpaceArgsForCall = append(fake.getSummariesInCurrentSpaceArgsForCall, struct {
 	}{})
-	stub := fake.GetSummariesInCurrentSpaceStub
-	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	fake.recordInvocation("GetSummariesInCurrentSpace", []interface{}{})
 	fake.getSummariesInCurrentSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetSummariesInCurrentSpaceStub != nil {
+		return fake.GetSummariesInCurrentSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

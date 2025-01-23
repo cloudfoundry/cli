@@ -43,16 +43,15 @@ func (fake *FakeSpaceRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
-	stub := fake.ExecuteStub
-	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ExecuteStub != nil {
+		return fake.ExecuteStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -96,16 +95,15 @@ func (fake *FakeSpaceRequirement) GetSpace() models.Space {
 	ret, specificReturn := fake.getSpaceReturnsOnCall[len(fake.getSpaceArgsForCall)]
 	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
 	}{})
-	stub := fake.GetSpaceStub
-	fakeReturns := fake.getSpaceReturns
 	fake.recordInvocation("GetSpace", []interface{}{})
 	fake.getSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetSpaceStub != nil {
+		return fake.GetSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -149,10 +147,9 @@ func (fake *FakeSpaceRequirement) SetSpaceName(arg1 string) {
 	fake.setSpaceNameArgsForCall = append(fake.setSpaceNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetSpaceNameStub
 	fake.recordInvocation("SetSpaceName", []interface{}{arg1})
 	fake.setSpaceNameMutex.Unlock()
-	if stub != nil {
+	if fake.SetSpaceNameStub != nil {
 		fake.SetSpaceNameStub(arg1)
 	}
 }

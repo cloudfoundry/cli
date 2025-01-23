@@ -45,16 +45,15 @@ func (fake *FakeRepository) DeleteInstance(arg1 string, arg2 int) error {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
-	stub := fake.DeleteInstanceStub
-	fakeReturns := fake.deleteInstanceReturns
 	fake.recordInvocation("DeleteInstance", []interface{}{arg1, arg2})
 	fake.deleteInstanceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DeleteInstanceStub != nil {
+		return fake.DeleteInstanceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.deleteInstanceReturns
 	return fakeReturns.result1
 }
 
@@ -106,16 +105,15 @@ func (fake *FakeRepository) GetInstances(arg1 string) ([]models.AppInstanceField
 	fake.getInstancesArgsForCall = append(fake.getInstancesArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetInstancesStub
-	fakeReturns := fake.getInstancesReturns
 	fake.recordInvocation("GetInstances", []interface{}{arg1})
 	fake.getInstancesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetInstancesStub != nil {
+		return fake.GetInstancesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getInstancesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

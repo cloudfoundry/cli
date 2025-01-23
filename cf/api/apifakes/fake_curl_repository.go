@@ -41,16 +41,15 @@ func (fake *FakeCurlRepository) Request(arg1 string, arg2 string, arg3 string, a
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
-	stub := fake.RequestStub
-	fakeReturns := fake.requestReturns
 	fake.recordInvocation("Request", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.requestMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+	if fake.RequestStub != nil {
+		return fake.RequestStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.requestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

@@ -85,16 +85,15 @@ func (fake *FakeServicePlanActor) FindServiceAccess(arg1 string, arg2 string) (a
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.FindServiceAccessStub
-	fakeReturns := fake.findServiceAccessReturns
 	fake.recordInvocation("FindServiceAccess", []interface{}{arg1, arg2})
 	fake.findServiceAccessMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.FindServiceAccessStub != nil {
+		return fake.FindServiceAccessStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findServiceAccessReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -150,16 +149,15 @@ func (fake *FakeServicePlanActor) UpdateAllPlansForService(arg1 string, arg2 boo
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
-	stub := fake.UpdateAllPlansForServiceStub
-	fakeReturns := fake.updateAllPlansForServiceReturns
 	fake.recordInvocation("UpdateAllPlansForService", []interface{}{arg1, arg2})
 	fake.updateAllPlansForServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UpdateAllPlansForServiceStub != nil {
+		return fake.UpdateAllPlansForServiceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.updateAllPlansForServiceReturns
 	return fakeReturns.result1
 }
 
@@ -213,16 +211,15 @@ func (fake *FakeServicePlanActor) UpdateOrgForService(arg1 string, arg2 string, 
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateOrgForServiceStub
-	fakeReturns := fake.updateOrgForServiceReturns
 	fake.recordInvocation("UpdateOrgForService", []interface{}{arg1, arg2, arg3})
 	fake.updateOrgForServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateOrgForServiceStub != nil {
+		return fake.UpdateOrgForServiceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.updateOrgForServiceReturns
 	return fakeReturns.result1
 }
 
@@ -277,16 +274,15 @@ func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 s
 		arg3 string
 		arg4 bool
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.UpdatePlanAndOrgForServiceStub
-	fakeReturns := fake.updatePlanAndOrgForServiceReturns
 	fake.recordInvocation("UpdatePlanAndOrgForService", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updatePlanAndOrgForServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.UpdatePlanAndOrgForServiceStub != nil {
+		return fake.UpdatePlanAndOrgForServiceStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.updatePlanAndOrgForServiceReturns
 	return fakeReturns.result1
 }
 
@@ -340,16 +336,15 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 s
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
-	stub := fake.UpdateSinglePlanForServiceStub
-	fakeReturns := fake.updateSinglePlanForServiceReturns
 	fake.recordInvocation("UpdateSinglePlanForService", []interface{}{arg1, arg2, arg3})
 	fake.updateSinglePlanForServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UpdateSinglePlanForServiceStub != nil {
+		return fake.UpdateSinglePlanForServiceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.updateSinglePlanForServiceReturns
 	return fakeReturns.result1
 }
 

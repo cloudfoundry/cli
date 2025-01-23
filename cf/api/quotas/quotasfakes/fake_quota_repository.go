@@ -90,16 +90,15 @@ func (fake *FakeQuotaRepository) AssignQuotaToOrg(arg1 string, arg2 string) erro
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.AssignQuotaToOrgStub
-	fakeReturns := fake.assignQuotaToOrgReturns
 	fake.recordInvocation("AssignQuotaToOrg", []interface{}{arg1, arg2})
 	fake.assignQuotaToOrgMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.AssignQuotaToOrgStub != nil {
+		return fake.AssignQuotaToOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.assignQuotaToOrgReturns
 	return fakeReturns.result1
 }
 
@@ -151,16 +150,15 @@ func (fake *FakeQuotaRepository) Create(arg1 models.QuotaFields) error {
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 models.QuotaFields
 	}{arg1})
-	stub := fake.CreateStub
-	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.CreateStub != nil {
+		return fake.CreateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -212,16 +210,15 @@ func (fake *FakeQuotaRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteStub
-	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -272,16 +269,15 @@ func (fake *FakeQuotaRepository) FindAll() ([]models.QuotaFields, error) {
 	ret, specificReturn := fake.findAllReturnsOnCall[len(fake.findAllArgsForCall)]
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct {
 	}{})
-	stub := fake.FindAllStub
-	fakeReturns := fake.findAllReturns
 	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.FindAllStub != nil {
+		return fake.FindAllStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findAllReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -329,16 +325,15 @@ func (fake *FakeQuotaRepository) FindByName(arg1 string) (models.QuotaFields, er
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FindByNameStub
-	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FindByNameStub != nil {
+		return fake.FindByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -393,16 +388,15 @@ func (fake *FakeQuotaRepository) Update(arg1 models.QuotaFields) error {
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.QuotaFields
 	}{arg1})
-	stub := fake.UpdateStub
-	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.UpdateStub != nil {
+		return fake.UpdateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

@@ -69,16 +69,15 @@ func (fake *FakeSecureShell) Close() error {
 	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
-	stub := fake.CloseStub
-	fakeReturns := fake.closeReturns
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CloseStub != nil {
+		return fake.CloseStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.closeReturns
 	return fakeReturns.result1
 }
 
@@ -123,16 +122,15 @@ func (fake *FakeSecureShell) Connect(arg1 *options.SSHOptions) error {
 	fake.connectArgsForCall = append(fake.connectArgsForCall, struct {
 		arg1 *options.SSHOptions
 	}{arg1})
-	stub := fake.ConnectStub
-	fakeReturns := fake.connectReturns
 	fake.recordInvocation("Connect", []interface{}{arg1})
 	fake.connectMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ConnectStub != nil {
+		return fake.ConnectStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.connectReturns
 	return fakeReturns.result1
 }
 
@@ -183,16 +181,15 @@ func (fake *FakeSecureShell) InteractiveSession() error {
 	ret, specificReturn := fake.interactiveSessionReturnsOnCall[len(fake.interactiveSessionArgsForCall)]
 	fake.interactiveSessionArgsForCall = append(fake.interactiveSessionArgsForCall, struct {
 	}{})
-	stub := fake.InteractiveSessionStub
-	fakeReturns := fake.interactiveSessionReturns
 	fake.recordInvocation("InteractiveSession", []interface{}{})
 	fake.interactiveSessionMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.InteractiveSessionStub != nil {
+		return fake.InteractiveSessionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.interactiveSessionReturns
 	return fakeReturns.result1
 }
 
@@ -236,16 +233,15 @@ func (fake *FakeSecureShell) LocalPortForward() error {
 	ret, specificReturn := fake.localPortForwardReturnsOnCall[len(fake.localPortForwardArgsForCall)]
 	fake.localPortForwardArgsForCall = append(fake.localPortForwardArgsForCall, struct {
 	}{})
-	stub := fake.LocalPortForwardStub
-	fakeReturns := fake.localPortForwardReturns
 	fake.recordInvocation("LocalPortForward", []interface{}{})
 	fake.localPortForwardMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.LocalPortForwardStub != nil {
+		return fake.LocalPortForwardStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.localPortForwardReturns
 	return fakeReturns.result1
 }
 
@@ -289,16 +285,15 @@ func (fake *FakeSecureShell) Wait() error {
 	ret, specificReturn := fake.waitReturnsOnCall[len(fake.waitArgsForCall)]
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct {
 	}{})
-	stub := fake.WaitStub
-	fakeReturns := fake.waitReturns
 	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.WaitStub != nil {
+		return fake.WaitStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.waitReturns
 	return fakeReturns.result1
 }
 

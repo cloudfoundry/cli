@@ -32,16 +32,15 @@ func (fake *FakeRouteServiceUnbinder) UnbindRoute(arg1 models.Route, arg2 models
 		arg1 models.Route
 		arg2 models.ServiceInstance
 	}{arg1, arg2})
-	stub := fake.UnbindRouteStub
-	fakeReturns := fake.unbindRouteReturns
 	fake.recordInvocation("UnbindRoute", []interface{}{arg1, arg2})
 	fake.unbindRouteMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UnbindRouteStub != nil {
+		return fake.UnbindRouteStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unbindRouteReturns
 	return fakeReturns.result1
 }
 

@@ -24,10 +24,9 @@ func (fake *FakeUserPrinter) PrintUsers(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.PrintUsersStub
 	fake.recordInvocation("PrintUsers", []interface{}{arg1, arg2})
 	fake.printUsersMutex.Unlock()
-	if stub != nil {
+	if fake.PrintUsersStub != nil {
 		fake.PrintUsersStub(arg1, arg2)
 	}
 }

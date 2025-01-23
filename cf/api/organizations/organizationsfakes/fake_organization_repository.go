@@ -116,16 +116,15 @@ func (fake *FakeOrganizationRepository) Create(arg1 models.Organization) error {
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 models.Organization
 	}{arg1})
-	stub := fake.CreateStub
-	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.CreateStub != nil {
+		return fake.CreateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -177,16 +176,15 @@ func (fake *FakeOrganizationRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteStub
-	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -238,16 +236,15 @@ func (fake *FakeOrganizationRepository) FindByName(arg1 string) (models.Organiza
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FindByNameStub
-	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FindByNameStub != nil {
+		return fake.FindByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -307,16 +304,15 @@ func (fake *FakeOrganizationRepository) GetManyOrgsByGUID(arg1 []string) ([]mode
 	fake.getManyOrgsByGUIDArgsForCall = append(fake.getManyOrgsByGUIDArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
-	stub := fake.GetManyOrgsByGUIDStub
-	fakeReturns := fake.getManyOrgsByGUIDReturns
 	fake.recordInvocation("GetManyOrgsByGUID", []interface{}{arg1Copy})
 	fake.getManyOrgsByGUIDMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetManyOrgsByGUIDStub != nil {
+		return fake.GetManyOrgsByGUIDStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getManyOrgsByGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -371,16 +367,15 @@ func (fake *FakeOrganizationRepository) ListOrgs(arg1 int) ([]models.Organizatio
 	fake.listOrgsArgsForCall = append(fake.listOrgsArgsForCall, struct {
 		arg1 int
 	}{arg1})
-	stub := fake.ListOrgsStub
-	fakeReturns := fake.listOrgsReturns
 	fake.recordInvocation("ListOrgs", []interface{}{arg1})
 	fake.listOrgsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ListOrgsStub != nil {
+		return fake.ListOrgsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.listOrgsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -436,16 +431,15 @@ func (fake *FakeOrganizationRepository) Rename(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.RenameStub
-	fakeReturns := fake.renameReturns
 	fake.recordInvocation("Rename", []interface{}{arg1, arg2})
 	fake.renameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.RenameStub != nil {
+		return fake.RenameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.renameReturns
 	return fakeReturns.result1
 }
 
@@ -498,16 +492,15 @@ func (fake *FakeOrganizationRepository) SharePrivateDomain(arg1 string, arg2 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.SharePrivateDomainStub
-	fakeReturns := fake.sharePrivateDomainReturns
 	fake.recordInvocation("SharePrivateDomain", []interface{}{arg1, arg2})
 	fake.sharePrivateDomainMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.SharePrivateDomainStub != nil {
+		return fake.SharePrivateDomainStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.sharePrivateDomainReturns
 	return fakeReturns.result1
 }
 
@@ -560,16 +553,15 @@ func (fake *FakeOrganizationRepository) UnsharePrivateDomain(arg1 string, arg2 s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UnsharePrivateDomainStub
-	fakeReturns := fake.unsharePrivateDomainReturns
 	fake.recordInvocation("UnsharePrivateDomain", []interface{}{arg1, arg2})
 	fake.unsharePrivateDomainMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UnsharePrivateDomainStub != nil {
+		return fake.UnsharePrivateDomainStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unsharePrivateDomainReturns
 	return fakeReturns.result1
 }
 

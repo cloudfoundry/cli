@@ -64,16 +64,15 @@ func (fake *FakeRepository) ListRunning() ([]models.EnvironmentVariable, error) 
 	ret, specificReturn := fake.listRunningReturnsOnCall[len(fake.listRunningArgsForCall)]
 	fake.listRunningArgsForCall = append(fake.listRunningArgsForCall, struct {
 	}{})
-	stub := fake.ListRunningStub
-	fakeReturns := fake.listRunningReturns
 	fake.recordInvocation("ListRunning", []interface{}{})
 	fake.listRunningMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ListRunningStub != nil {
+		return fake.ListRunningStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.listRunningReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -120,16 +119,15 @@ func (fake *FakeRepository) ListStaging() ([]models.EnvironmentVariable, error) 
 	ret, specificReturn := fake.listStagingReturnsOnCall[len(fake.listStagingArgsForCall)]
 	fake.listStagingArgsForCall = append(fake.listStagingArgsForCall, struct {
 	}{})
-	stub := fake.ListStagingStub
-	fakeReturns := fake.listStagingReturns
 	fake.recordInvocation("ListStaging", []interface{}{})
 	fake.listStagingMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ListStagingStub != nil {
+		return fake.ListStagingStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.listStagingReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -177,16 +175,15 @@ func (fake *FakeRepository) SetRunning(arg1 string) error {
 	fake.setRunningArgsForCall = append(fake.setRunningArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetRunningStub
-	fakeReturns := fake.setRunningReturns
 	fake.recordInvocation("SetRunning", []interface{}{arg1})
 	fake.setRunningMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.SetRunningStub != nil {
+		return fake.SetRunningStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.setRunningReturns
 	return fakeReturns.result1
 }
 
@@ -238,16 +235,15 @@ func (fake *FakeRepository) SetStaging(arg1 string) error {
 	fake.setStagingArgsForCall = append(fake.setStagingArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetStagingStub
-	fakeReturns := fake.setStagingReturns
 	fake.recordInvocation("SetStaging", []interface{}{arg1})
 	fake.setStagingMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.SetStagingStub != nil {
+		return fake.SetStagingStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.setStagingReturns
 	return fakeReturns.result1
 }
 

@@ -48,16 +48,15 @@ func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFile(arg1 string) (*o
 	fake.createBuildpackZipFileArgsForCall = append(fake.createBuildpackZipFileArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.CreateBuildpackZipFileStub
-	fakeReturns := fake.createBuildpackZipFileReturns
 	fake.recordInvocation("CreateBuildpackZipFile", []interface{}{arg1})
 	fake.createBuildpackZipFileMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.CreateBuildpackZipFileStub != nil {
+		return fake.CreateBuildpackZipFileStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.createBuildpackZipFileReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -117,16 +116,15 @@ func (fake *FakeBuildpackBitsRepository) UploadBuildpack(arg1 models.Buildpack, 
 		arg2 *os.File
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.UploadBuildpackStub
-	fakeReturns := fake.uploadBuildpackReturns
 	fake.recordInvocation("UploadBuildpack", []interface{}{arg1, arg2, arg3})
 	fake.uploadBuildpackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.UploadBuildpackStub != nil {
+		return fake.UploadBuildpackStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uploadBuildpackReturns
 	return fakeReturns.result1
 }
 

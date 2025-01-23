@@ -53,16 +53,15 @@ func (fake *FakeSecurityGroupsRepo) BindToStagingSet(arg1 string) error {
 	fake.bindToStagingSetArgsForCall = append(fake.bindToStagingSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.BindToStagingSetStub
-	fakeReturns := fake.bindToStagingSetReturns
 	fake.recordInvocation("BindToStagingSet", []interface{}{arg1})
 	fake.bindToStagingSetMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.BindToStagingSetStub != nil {
+		return fake.BindToStagingSetStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.bindToStagingSetReturns
 	return fakeReturns.result1
 }
 
@@ -113,16 +112,15 @@ func (fake *FakeSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error)
 	ret, specificReturn := fake.listReturnsOnCall[len(fake.listArgsForCall)]
 	fake.listArgsForCall = append(fake.listArgsForCall, struct {
 	}{})
-	stub := fake.ListStub
-	fakeReturns := fake.listReturns
 	fake.recordInvocation("List", []interface{}{})
 	fake.listMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ListStub != nil {
+		return fake.ListStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.listReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -170,16 +168,15 @@ func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSet(arg1 string) error {
 	fake.unbindFromStagingSetArgsForCall = append(fake.unbindFromStagingSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.UnbindFromStagingSetStub
-	fakeReturns := fake.unbindFromStagingSetReturns
 	fake.recordInvocation("UnbindFromStagingSet", []interface{}{arg1})
 	fake.unbindFromStagingSetMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.UnbindFromStagingSetStub != nil {
+		return fake.UnbindFromStagingSetStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unbindFromStagingSetReturns
 	return fakeReturns.result1
 }
 

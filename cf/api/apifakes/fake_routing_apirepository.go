@@ -30,16 +30,15 @@ func (fake *FakeRoutingAPIRepository) ListRouterGroups(arg1 func(models.RouterGr
 	fake.listRouterGroupsArgsForCall = append(fake.listRouterGroupsArgsForCall, struct {
 		arg1 func(models.RouterGroup) bool
 	}{arg1})
-	stub := fake.ListRouterGroupsStub
-	fakeReturns := fake.listRouterGroupsReturns
 	fake.recordInvocation("ListRouterGroups", []interface{}{arg1})
 	fake.listRouterGroupsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ListRouterGroupsStub != nil {
+		return fake.ListRouterGroupsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.listRouterGroupsReturns
 	return fakeReturns.result1
 }
 

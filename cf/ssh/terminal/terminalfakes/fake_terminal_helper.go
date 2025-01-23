@@ -96,16 +96,15 @@ func (fake *FakeTerminalHelper) GetFdInfo(arg1 interface{}) (uintptr, bool) {
 	fake.getFdInfoArgsForCall = append(fake.getFdInfoArgsForCall, struct {
 		arg1 interface{}
 	}{arg1})
-	stub := fake.GetFdInfoStub
-	fakeReturns := fake.getFdInfoReturns
 	fake.recordInvocation("GetFdInfo", []interface{}{arg1})
 	fake.getFdInfoMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetFdInfoStub != nil {
+		return fake.GetFdInfoStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getFdInfoReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -160,16 +159,15 @@ func (fake *FakeTerminalHelper) GetWinsize(arg1 uintptr) (*term.Winsize, error) 
 	fake.getWinsizeArgsForCall = append(fake.getWinsizeArgsForCall, struct {
 		arg1 uintptr
 	}{arg1})
-	stub := fake.GetWinsizeStub
-	fakeReturns := fake.getWinsizeReturns
 	fake.recordInvocation("GetWinsize", []interface{}{arg1})
 	fake.getWinsizeMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetWinsizeStub != nil {
+		return fake.GetWinsizeStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getWinsizeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -224,16 +222,15 @@ func (fake *FakeTerminalHelper) IsTerminal(arg1 uintptr) bool {
 	fake.isTerminalArgsForCall = append(fake.isTerminalArgsForCall, struct {
 		arg1 uintptr
 	}{arg1})
-	stub := fake.IsTerminalStub
-	fakeReturns := fake.isTerminalReturns
 	fake.recordInvocation("IsTerminal", []interface{}{arg1})
 	fake.isTerminalMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.IsTerminalStub != nil {
+		return fake.IsTerminalStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isTerminalReturns
 	return fakeReturns.result1
 }
 
@@ -286,16 +283,15 @@ func (fake *FakeTerminalHelper) RestoreTerminal(arg1 uintptr, arg2 *term.State) 
 		arg1 uintptr
 		arg2 *term.State
 	}{arg1, arg2})
-	stub := fake.RestoreTerminalStub
-	fakeReturns := fake.restoreTerminalReturns
 	fake.recordInvocation("RestoreTerminal", []interface{}{arg1, arg2})
 	fake.restoreTerminalMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.RestoreTerminalStub != nil {
+		return fake.RestoreTerminalStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.restoreTerminalReturns
 	return fakeReturns.result1
 }
 
@@ -347,16 +343,15 @@ func (fake *FakeTerminalHelper) SetRawTerminal(arg1 uintptr) (*term.State, error
 	fake.setRawTerminalArgsForCall = append(fake.setRawTerminalArgsForCall, struct {
 		arg1 uintptr
 	}{arg1})
-	stub := fake.SetRawTerminalStub
-	fakeReturns := fake.setRawTerminalReturns
 	fake.recordInvocation("SetRawTerminal", []interface{}{arg1})
 	fake.setRawTerminalMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.SetRawTerminalStub != nil {
+		return fake.SetRawTerminalStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.setRawTerminalReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -410,16 +405,15 @@ func (fake *FakeTerminalHelper) StdStreams() (io.ReadCloser, io.Writer, io.Write
 	ret, specificReturn := fake.stdStreamsReturnsOnCall[len(fake.stdStreamsArgsForCall)]
 	fake.stdStreamsArgsForCall = append(fake.stdStreamsArgsForCall, struct {
 	}{})
-	stub := fake.StdStreamsStub
-	fakeReturns := fake.stdStreamsReturns
 	fake.recordInvocation("StdStreams", []interface{}{})
 	fake.stdStreamsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StdStreamsStub != nil {
+		return fake.StdStreamsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.stdStreamsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

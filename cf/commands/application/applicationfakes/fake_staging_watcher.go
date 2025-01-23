@@ -38,16 +38,15 @@ func (fake *FakeStagingWatcher) WatchStaging(arg1 models.Application, arg2 strin
 		arg3 string
 		arg4 func(app models.Application) (models.Application, error)
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.WatchStagingStub
-	fakeReturns := fake.watchStagingReturns
 	fake.recordInvocation("WatchStaging", []interface{}{arg1, arg2, arg3, arg4})
 	fake.watchStagingMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.WatchStagingStub != nil {
+		return fake.WatchStagingStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.watchStagingReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

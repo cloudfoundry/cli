@@ -51,16 +51,15 @@ func (fake *FakeColorLogger) LogStderrColor(arg1 string) string {
 	fake.logStderrColorArgsForCall = append(fake.logStderrColorArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.LogStderrColorStub
-	fakeReturns := fake.logStderrColorReturns
 	fake.recordInvocation("LogStderrColor", []interface{}{arg1})
 	fake.logStderrColorMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.LogStderrColorStub != nil {
+		return fake.LogStderrColorStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.logStderrColorReturns
 	return fakeReturns.result1
 }
 
@@ -112,16 +111,15 @@ func (fake *FakeColorLogger) LogStdoutColor(arg1 string) string {
 	fake.logStdoutColorArgsForCall = append(fake.logStdoutColorArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.LogStdoutColorStub
-	fakeReturns := fake.logStdoutColorReturns
 	fake.recordInvocation("LogStdoutColor", []interface{}{arg1})
 	fake.logStdoutColorMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.LogStdoutColorStub != nil {
+		return fake.LogStdoutColorStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.logStdoutColorReturns
 	return fakeReturns.result1
 }
 
@@ -173,16 +171,15 @@ func (fake *FakeColorLogger) LogSysHeaderColor(arg1 string) string {
 	fake.logSysHeaderColorArgsForCall = append(fake.logSysHeaderColorArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.LogSysHeaderColorStub
-	fakeReturns := fake.logSysHeaderColorReturns
 	fake.recordInvocation("LogSysHeaderColor", []interface{}{arg1})
 	fake.logSysHeaderColorMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.LogSysHeaderColorStub != nil {
+		return fake.LogSysHeaderColorStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.logSysHeaderColorReturns
 	return fakeReturns.result1
 }
 

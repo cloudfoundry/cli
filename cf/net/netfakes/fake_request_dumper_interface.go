@@ -28,10 +28,9 @@ func (fake *FakeRequestDumperInterface) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
-	stub := fake.DumpRequestStub
 	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
-	if stub != nil {
+	if fake.DumpRequestStub != nil {
 		fake.DumpRequestStub(arg1)
 	}
 }
@@ -60,10 +59,9 @@ func (fake *FakeRequestDumperInterface) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
-	stub := fake.DumpResponseStub
 	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
-	if stub != nil {
+	if fake.DumpResponseStub != nil {
 		fake.DumpResponseStub(arg1)
 	}
 }

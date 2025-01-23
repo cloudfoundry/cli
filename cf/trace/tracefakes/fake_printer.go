@@ -43,10 +43,9 @@ func (fake *FakePrinter) Print(arg1 ...interface{}) {
 	fake.printArgsForCall = append(fake.printArgsForCall, struct {
 		arg1 []interface{}
 	}{arg1})
-	stub := fake.PrintStub
 	fake.recordInvocation("Print", []interface{}{arg1})
 	fake.printMutex.Unlock()
-	if stub != nil {
+	if fake.PrintStub != nil {
 		fake.PrintStub(arg1...)
 	}
 }
@@ -76,10 +75,9 @@ func (fake *FakePrinter) Printf(arg1 string, arg2 ...interface{}) {
 		arg1 string
 		arg2 []interface{}
 	}{arg1, arg2})
-	stub := fake.PrintfStub
 	fake.recordInvocation("Printf", []interface{}{arg1, arg2})
 	fake.printfMutex.Unlock()
-	if stub != nil {
+	if fake.PrintfStub != nil {
 		fake.PrintfStub(arg1, arg2...)
 	}
 }
@@ -108,10 +106,9 @@ func (fake *FakePrinter) Println(arg1 ...interface{}) {
 	fake.printlnArgsForCall = append(fake.printlnArgsForCall, struct {
 		arg1 []interface{}
 	}{arg1})
-	stub := fake.PrintlnStub
 	fake.recordInvocation("Println", []interface{}{arg1})
 	fake.printlnMutex.Unlock()
-	if stub != nil {
+	if fake.PrintlnStub != nil {
 		fake.PrintlnStub(arg1...)
 	}
 }
@@ -140,16 +137,15 @@ func (fake *FakePrinter) WritesToConsole() bool {
 	ret, specificReturn := fake.writesToConsoleReturnsOnCall[len(fake.writesToConsoleArgsForCall)]
 	fake.writesToConsoleArgsForCall = append(fake.writesToConsoleArgsForCall, struct {
 	}{})
-	stub := fake.WritesToConsoleStub
-	fakeReturns := fake.writesToConsoleReturns
 	fake.recordInvocation("WritesToConsole", []interface{}{})
 	fake.writesToConsoleMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.WritesToConsoleStub != nil {
+		return fake.WritesToConsoleStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.writesToConsoleReturns
 	return fakeReturns.result1
 }
 

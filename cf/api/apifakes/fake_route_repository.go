@@ -143,16 +143,15 @@ func (fake *FakeRouteRepository) Bind(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.BindStub
-	fakeReturns := fake.bindReturns
 	fake.recordInvocation("Bind", []interface{}{arg1, arg2})
 	fake.bindMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.BindStub != nil {
+		return fake.BindStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.bindReturns
 	return fakeReturns.result1
 }
 
@@ -206,16 +205,15 @@ func (fake *FakeRouteRepository) CheckIfExists(arg1 string, arg2 models.DomainFi
 		arg2 models.DomainFields
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.CheckIfExistsStub
-	fakeReturns := fake.checkIfExistsReturns
 	fake.recordInvocation("CheckIfExists", []interface{}{arg1, arg2, arg3})
 	fake.checkIfExistsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.CheckIfExistsStub != nil {
+		return fake.CheckIfExistsStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.checkIfExistsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -274,16 +272,15 @@ func (fake *FakeRouteRepository) Create(arg1 string, arg2 models.DomainFields, a
 		arg4 int
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
-	stub := fake.CreateStub
-	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+	if fake.CreateStub != nil {
+		return fake.CreateStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.createReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -343,16 +340,15 @@ func (fake *FakeRouteRepository) CreateInSpace(arg1 string, arg2 string, arg3 st
 		arg5 int
 		arg6 bool
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
-	stub := fake.CreateInSpaceStub
-	fakeReturns := fake.createInSpaceReturns
 	fake.recordInvocation("CreateInSpace", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createInSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
+	if fake.CreateInSpaceStub != nil {
+		return fake.CreateInSpaceStub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.createInSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -407,16 +403,15 @@ func (fake *FakeRouteRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteStub
-	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -471,16 +466,15 @@ func (fake *FakeRouteRepository) Find(arg1 string, arg2 models.DomainFields, arg
 		arg3 string
 		arg4 int
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.FindStub
-	fakeReturns := fake.findReturns
 	fake.recordInvocation("Find", []interface{}{arg1, arg2, arg3, arg4})
 	fake.findMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.FindStub != nil {
+		return fake.FindStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -535,16 +529,15 @@ func (fake *FakeRouteRepository) ListAllRoutes(arg1 func(models.Route) bool) err
 	fake.listAllRoutesArgsForCall = append(fake.listAllRoutesArgsForCall, struct {
 		arg1 func(models.Route) bool
 	}{arg1})
-	stub := fake.ListAllRoutesStub
-	fakeReturns := fake.listAllRoutesReturns
 	fake.recordInvocation("ListAllRoutes", []interface{}{arg1})
 	fake.listAllRoutesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ListAllRoutesStub != nil {
+		return fake.ListAllRoutesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.listAllRoutesReturns
 	return fakeReturns.result1
 }
 
@@ -596,16 +589,15 @@ func (fake *FakeRouteRepository) ListRoutes(arg1 func(models.Route) bool) error 
 	fake.listRoutesArgsForCall = append(fake.listRoutesArgsForCall, struct {
 		arg1 func(models.Route) bool
 	}{arg1})
-	stub := fake.ListRoutesStub
-	fakeReturns := fake.listRoutesReturns
 	fake.recordInvocation("ListRoutes", []interface{}{arg1})
 	fake.listRoutesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ListRoutesStub != nil {
+		return fake.ListRoutesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.listRoutesReturns
 	return fakeReturns.result1
 }
 
@@ -658,16 +650,15 @@ func (fake *FakeRouteRepository) Unbind(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UnbindStub
-	fakeReturns := fake.unbindReturns
 	fake.recordInvocation("Unbind", []interface{}{arg1, arg2})
 	fake.unbindMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UnbindStub != nil {
+		return fake.UnbindStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unbindReturns
 	return fakeReturns.result1
 }
 

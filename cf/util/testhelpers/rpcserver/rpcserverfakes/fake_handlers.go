@@ -381,16 +381,15 @@ func (fake *FakeHandlers) AccessToken(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.AccessTokenStub
-	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{arg1, arg2})
 	fake.accessTokenMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -443,16 +442,15 @@ func (fake *FakeHandlers) ApiEndpoint(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.ApiEndpointStub
-	fakeReturns := fake.apiEndpointReturns
 	fake.recordInvocation("ApiEndpoint", []interface{}{arg1, arg2})
 	fake.apiEndpointMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.ApiEndpointStub != nil {
+		return fake.ApiEndpointStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.apiEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -505,16 +503,15 @@ func (fake *FakeHandlers) ApiVersion(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.ApiVersionStub
-	fakeReturns := fake.apiVersionReturns
 	fake.recordInvocation("ApiVersion", []interface{}{arg1, arg2})
 	fake.apiVersionMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.ApiVersionStub != nil {
+		return fake.ApiVersionStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.apiVersionReturns
 	return fakeReturns.result1
 }
 
@@ -572,16 +569,15 @@ func (fake *FakeHandlers) CallCoreCommand(arg1 []string, arg2 *bool) error {
 		arg1 []string
 		arg2 *bool
 	}{arg1Copy, arg2})
-	stub := fake.CallCoreCommandStub
-	fakeReturns := fake.callCoreCommandReturns
 	fake.recordInvocation("CallCoreCommand", []interface{}{arg1Copy, arg2})
 	fake.callCoreCommandMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.CallCoreCommandStub != nil {
+		return fake.CallCoreCommandStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.callCoreCommandReturns
 	return fakeReturns.result1
 }
 
@@ -634,16 +630,15 @@ func (fake *FakeHandlers) DisableTerminalOutput(arg1 bool, arg2 *bool) error {
 		arg1 bool
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.DisableTerminalOutputStub
-	fakeReturns := fake.disableTerminalOutputReturns
 	fake.recordInvocation("DisableTerminalOutput", []interface{}{arg1, arg2})
 	fake.disableTerminalOutputMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DisableTerminalOutputStub != nil {
+		return fake.DisableTerminalOutputStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.disableTerminalOutputReturns
 	return fakeReturns.result1
 }
 
@@ -696,16 +691,15 @@ func (fake *FakeHandlers) DopplerEndpoint(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.DopplerEndpointStub
-	fakeReturns := fake.dopplerEndpointReturns
 	fake.recordInvocation("DopplerEndpoint", []interface{}{arg1, arg2})
 	fake.dopplerEndpointMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.dopplerEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -758,16 +752,15 @@ func (fake *FakeHandlers) GetApp(arg1 string, arg2 *plugin_models.GetAppModel) e
 		arg1 string
 		arg2 *plugin_models.GetAppModel
 	}{arg1, arg2})
-	stub := fake.GetAppStub
-	fakeReturns := fake.getAppReturns
 	fake.recordInvocation("GetApp", []interface{}{arg1, arg2})
 	fake.getAppMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetAppStub != nil {
+		return fake.GetAppStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getAppReturns
 	return fakeReturns.result1
 }
 
@@ -820,16 +813,15 @@ func (fake *FakeHandlers) GetApps(arg1 string, arg2 *[]plugin_models.GetAppsMode
 		arg1 string
 		arg2 *[]plugin_models.GetAppsModel
 	}{arg1, arg2})
-	stub := fake.GetAppsStub
-	fakeReturns := fake.getAppsReturns
 	fake.recordInvocation("GetApps", []interface{}{arg1, arg2})
 	fake.getAppsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetAppsStub != nil {
+		return fake.GetAppsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getAppsReturns
 	return fakeReturns.result1
 }
 
@@ -882,16 +874,15 @@ func (fake *FakeHandlers) GetCurrentOrg(arg1 string, arg2 *plugin_models.Organiz
 		arg1 string
 		arg2 *plugin_models.Organization
 	}{arg1, arg2})
-	stub := fake.GetCurrentOrgStub
-	fakeReturns := fake.getCurrentOrgReturns
 	fake.recordInvocation("GetCurrentOrg", []interface{}{arg1, arg2})
 	fake.getCurrentOrgMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetCurrentOrgStub != nil {
+		return fake.GetCurrentOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getCurrentOrgReturns
 	return fakeReturns.result1
 }
 
@@ -944,16 +935,15 @@ func (fake *FakeHandlers) GetCurrentSpace(arg1 string, arg2 *plugin_models.Space
 		arg1 string
 		arg2 *plugin_models.Space
 	}{arg1, arg2})
-	stub := fake.GetCurrentSpaceStub
-	fakeReturns := fake.getCurrentSpaceReturns
 	fake.recordInvocation("GetCurrentSpace", []interface{}{arg1, arg2})
 	fake.getCurrentSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetCurrentSpaceStub != nil {
+		return fake.GetCurrentSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getCurrentSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -1006,16 +996,15 @@ func (fake *FakeHandlers) GetOrg(arg1 string, arg2 *plugin_models.GetOrg_Model) 
 		arg1 string
 		arg2 *plugin_models.GetOrg_Model
 	}{arg1, arg2})
-	stub := fake.GetOrgStub
-	fakeReturns := fake.getOrgReturns
 	fake.recordInvocation("GetOrg", []interface{}{arg1, arg2})
 	fake.getOrgMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetOrgStub != nil {
+		return fake.GetOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getOrgReturns
 	return fakeReturns.result1
 }
 
@@ -1073,16 +1062,15 @@ func (fake *FakeHandlers) GetOrgUsers(arg1 []string, arg2 *[]plugin_models.GetOr
 		arg1 []string
 		arg2 *[]plugin_models.GetOrgUsers_Model
 	}{arg1Copy, arg2})
-	stub := fake.GetOrgUsersStub
-	fakeReturns := fake.getOrgUsersReturns
 	fake.recordInvocation("GetOrgUsers", []interface{}{arg1Copy, arg2})
 	fake.getOrgUsersMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetOrgUsersStub != nil {
+		return fake.GetOrgUsersStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getOrgUsersReturns
 	return fakeReturns.result1
 }
 
@@ -1135,16 +1123,15 @@ func (fake *FakeHandlers) GetOrgs(arg1 string, arg2 *[]plugin_models.GetOrgs_Mod
 		arg1 string
 		arg2 *[]plugin_models.GetOrgs_Model
 	}{arg1, arg2})
-	stub := fake.GetOrgsStub
-	fakeReturns := fake.getOrgsReturns
 	fake.recordInvocation("GetOrgs", []interface{}{arg1, arg2})
 	fake.getOrgsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetOrgsStub != nil {
+		return fake.GetOrgsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getOrgsReturns
 	return fakeReturns.result1
 }
 
@@ -1197,16 +1184,15 @@ func (fake *FakeHandlers) GetOutputAndReset(arg1 bool, arg2 *[]string) error {
 		arg1 bool
 		arg2 *[]string
 	}{arg1, arg2})
-	stub := fake.GetOutputAndResetStub
-	fakeReturns := fake.getOutputAndResetReturns
 	fake.recordInvocation("GetOutputAndReset", []interface{}{arg1, arg2})
 	fake.getOutputAndResetMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetOutputAndResetStub != nil {
+		return fake.GetOutputAndResetStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getOutputAndResetReturns
 	return fakeReturns.result1
 }
 
@@ -1259,16 +1245,15 @@ func (fake *FakeHandlers) GetService(arg1 string, arg2 *plugin_models.GetService
 		arg1 string
 		arg2 *plugin_models.GetService_Model
 	}{arg1, arg2})
-	stub := fake.GetServiceStub
-	fakeReturns := fake.getServiceReturns
 	fake.recordInvocation("GetService", []interface{}{arg1, arg2})
 	fake.getServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetServiceStub != nil {
+		return fake.GetServiceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getServiceReturns
 	return fakeReturns.result1
 }
 
@@ -1321,16 +1306,15 @@ func (fake *FakeHandlers) GetServices(arg1 string, arg2 *[]plugin_models.GetServ
 		arg1 string
 		arg2 *[]plugin_models.GetServices_Model
 	}{arg1, arg2})
-	stub := fake.GetServicesStub
-	fakeReturns := fake.getServicesReturns
 	fake.recordInvocation("GetServices", []interface{}{arg1, arg2})
 	fake.getServicesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetServicesStub != nil {
+		return fake.GetServicesStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getServicesReturns
 	return fakeReturns.result1
 }
 
@@ -1383,16 +1367,15 @@ func (fake *FakeHandlers) GetSpace(arg1 string, arg2 *plugin_models.GetSpace_Mod
 		arg1 string
 		arg2 *plugin_models.GetSpace_Model
 	}{arg1, arg2})
-	stub := fake.GetSpaceStub
-	fakeReturns := fake.getSpaceReturns
 	fake.recordInvocation("GetSpace", []interface{}{arg1, arg2})
 	fake.getSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetSpaceStub != nil {
+		return fake.GetSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -1450,16 +1433,15 @@ func (fake *FakeHandlers) GetSpaceUsers(arg1 []string, arg2 *[]plugin_models.Get
 		arg1 []string
 		arg2 *[]plugin_models.GetSpaceUsers_Model
 	}{arg1Copy, arg2})
-	stub := fake.GetSpaceUsersStub
-	fakeReturns := fake.getSpaceUsersReturns
 	fake.recordInvocation("GetSpaceUsers", []interface{}{arg1Copy, arg2})
 	fake.getSpaceUsersMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetSpaceUsersStub != nil {
+		return fake.GetSpaceUsersStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getSpaceUsersReturns
 	return fakeReturns.result1
 }
 
@@ -1512,16 +1494,15 @@ func (fake *FakeHandlers) GetSpaces(arg1 string, arg2 *[]plugin_models.GetSpaces
 		arg1 string
 		arg2 *[]plugin_models.GetSpaces_Model
 	}{arg1, arg2})
-	stub := fake.GetSpacesStub
-	fakeReturns := fake.getSpacesReturns
 	fake.recordInvocation("GetSpaces", []interface{}{arg1, arg2})
 	fake.getSpacesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetSpacesStub != nil {
+		return fake.GetSpacesStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getSpacesReturns
 	return fakeReturns.result1
 }
 
@@ -1574,16 +1555,15 @@ func (fake *FakeHandlers) HasAPIEndpoint(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.HasAPIEndpointStub
-	fakeReturns := fake.hasAPIEndpointReturns
 	fake.recordInvocation("HasAPIEndpoint", []interface{}{arg1, arg2})
 	fake.hasAPIEndpointMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.HasAPIEndpointStub != nil {
+		return fake.HasAPIEndpointStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasAPIEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -1636,16 +1616,15 @@ func (fake *FakeHandlers) HasOrganization(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.HasOrganizationStub
-	fakeReturns := fake.hasOrganizationReturns
 	fake.recordInvocation("HasOrganization", []interface{}{arg1, arg2})
 	fake.hasOrganizationMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.HasOrganizationStub != nil {
+		return fake.HasOrganizationStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -1698,16 +1677,15 @@ func (fake *FakeHandlers) HasSpace(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.HasSpaceStub
-	fakeReturns := fake.hasSpaceReturns
 	fake.recordInvocation("HasSpace", []interface{}{arg1, arg2})
 	fake.hasSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.HasSpaceStub != nil {
+		return fake.HasSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -1760,16 +1738,15 @@ func (fake *FakeHandlers) IsLoggedIn(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.IsLoggedInStub
-	fakeReturns := fake.isLoggedInReturns
 	fake.recordInvocation("IsLoggedIn", []interface{}{arg1, arg2})
 	fake.isLoggedInMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.IsLoggedInStub != nil {
+		return fake.IsLoggedInStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isLoggedInReturns
 	return fakeReturns.result1
 }
 
@@ -1822,16 +1799,15 @@ func (fake *FakeHandlers) IsMinCliVersion(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.IsMinCliVersionStub
-	fakeReturns := fake.isMinCliVersionReturns
 	fake.recordInvocation("IsMinCliVersion", []interface{}{arg1, arg2})
 	fake.isMinCliVersionMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.IsMinCliVersionStub != nil {
+		return fake.IsMinCliVersionStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isMinCliVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1884,16 +1860,15 @@ func (fake *FakeHandlers) IsSSLDisabled(arg1 string, arg2 *bool) error {
 		arg1 string
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.IsSSLDisabledStub
-	fakeReturns := fake.isSSLDisabledReturns
 	fake.recordInvocation("IsSSLDisabled", []interface{}{arg1, arg2})
 	fake.isSSLDisabledMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.IsSSLDisabledStub != nil {
+		return fake.IsSSLDisabledStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isSSLDisabledReturns
 	return fakeReturns.result1
 }
 
@@ -1946,16 +1921,15 @@ func (fake *FakeHandlers) LoggregatorEndpoint(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.LoggregatorEndpointStub
-	fakeReturns := fake.loggregatorEndpointReturns
 	fake.recordInvocation("LoggregatorEndpoint", []interface{}{arg1, arg2})
 	fake.loggregatorEndpointMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.LoggregatorEndpointStub != nil {
+		return fake.LoggregatorEndpointStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.loggregatorEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -2008,16 +1982,15 @@ func (fake *FakeHandlers) SetPluginMetadata(arg1 plugin.PluginMetadata, arg2 *bo
 		arg1 plugin.PluginMetadata
 		arg2 *bool
 	}{arg1, arg2})
-	stub := fake.SetPluginMetadataStub
-	fakeReturns := fake.setPluginMetadataReturns
 	fake.recordInvocation("SetPluginMetadata", []interface{}{arg1, arg2})
 	fake.setPluginMetadataMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.SetPluginMetadataStub != nil {
+		return fake.SetPluginMetadataStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.setPluginMetadataReturns
 	return fakeReturns.result1
 }
 
@@ -2070,16 +2043,15 @@ func (fake *FakeHandlers) UserEmail(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.UserEmailStub
-	fakeReturns := fake.userEmailReturns
 	fake.recordInvocation("UserEmail", []interface{}{arg1, arg2})
 	fake.userEmailMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UserEmailStub != nil {
+		return fake.UserEmailStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.userEmailReturns
 	return fakeReturns.result1
 }
 
@@ -2132,16 +2104,15 @@ func (fake *FakeHandlers) UserGuid(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.UserGuidStub
-	fakeReturns := fake.userGuidReturns
 	fake.recordInvocation("UserGuid", []interface{}{arg1, arg2})
 	fake.userGuidMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UserGuidStub != nil {
+		return fake.UserGuidStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.userGuidReturns
 	return fakeReturns.result1
 }
 
@@ -2194,16 +2165,15 @@ func (fake *FakeHandlers) Username(arg1 string, arg2 *string) error {
 		arg1 string
 		arg2 *string
 	}{arg1, arg2})
-	stub := fake.UsernameStub
-	fakeReturns := fake.usernameReturns
 	fake.recordInvocation("Username", []interface{}{arg1, arg2})
 	fake.usernameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UsernameStub != nil {
+		return fake.UsernameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.usernameReturns
 	return fakeReturns.result1
 }
 

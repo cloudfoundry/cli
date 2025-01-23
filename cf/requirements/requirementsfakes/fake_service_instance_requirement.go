@@ -38,16 +38,15 @@ func (fake *FakeServiceInstanceRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
-	stub := fake.ExecuteStub
-	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ExecuteStub != nil {
+		return fake.ExecuteStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -91,16 +90,15 @@ func (fake *FakeServiceInstanceRequirement) GetServiceInstance() models.ServiceI
 	ret, specificReturn := fake.getServiceInstanceReturnsOnCall[len(fake.getServiceInstanceArgsForCall)]
 	fake.getServiceInstanceArgsForCall = append(fake.getServiceInstanceArgsForCall, struct {
 	}{})
-	stub := fake.GetServiceInstanceStub
-	fakeReturns := fake.getServiceInstanceReturns
 	fake.recordInvocation("GetServiceInstance", []interface{}{})
 	fake.getServiceInstanceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetServiceInstanceStub != nil {
+		return fake.GetServiceInstanceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getServiceInstanceReturns
 	return fakeReturns.result1
 }
 

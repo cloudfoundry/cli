@@ -27,16 +27,15 @@ func (fake *FakeRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
-	stub := fake.ExecuteStub
-	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ExecuteStub != nil {
+		return fake.ExecuteStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 

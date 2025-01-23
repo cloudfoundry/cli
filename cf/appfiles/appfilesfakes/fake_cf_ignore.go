@@ -29,16 +29,15 @@ func (fake *FakeCfIgnore) FileShouldBeIgnored(arg1 string) bool {
 	fake.fileShouldBeIgnoredArgsForCall = append(fake.fileShouldBeIgnoredArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FileShouldBeIgnoredStub
-	fakeReturns := fake.fileShouldBeIgnoredReturns
 	fake.recordInvocation("FileShouldBeIgnored", []interface{}{arg1})
 	fake.fileShouldBeIgnoredMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FileShouldBeIgnoredStub != nil {
+		return fake.FileShouldBeIgnoredStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.fileShouldBeIgnoredReturns
 	return fakeReturns.result1
 }
 

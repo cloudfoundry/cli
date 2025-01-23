@@ -43,16 +43,15 @@ func (fake *FakeSecurityGroupSpaceBinder) BindSpace(arg1 string, arg2 string) er
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.BindSpaceStub
-	fakeReturns := fake.bindSpaceReturns
 	fake.recordInvocation("BindSpace", []interface{}{arg1, arg2})
 	fake.bindSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.BindSpaceStub != nil {
+		return fake.BindSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.bindSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -105,16 +104,15 @@ func (fake *FakeSecurityGroupSpaceBinder) UnbindSpace(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UnbindSpaceStub
-	fakeReturns := fake.unbindSpaceReturns
 	fake.recordInvocation("UnbindSpace", []interface{}{arg1, arg2})
 	fake.unbindSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UnbindSpaceStub != nil {
+		return fake.UnbindSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unbindSpaceReturns
 	return fakeReturns.result1
 }
 

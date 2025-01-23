@@ -27,16 +27,15 @@ func (fake *FakeWarningProducer) Warnings() []string {
 	ret, specificReturn := fake.warningsReturnsOnCall[len(fake.warningsArgsForCall)]
 	fake.warningsArgsForCall = append(fake.warningsArgsForCall, struct {
 	}{})
-	stub := fake.WarningsStub
-	fakeReturns := fake.warningsReturns
 	fake.recordInvocation("Warnings", []interface{}{})
 	fake.warningsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.WarningsStub != nil {
+		return fake.WarningsStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.warningsReturns
 	return fakeReturns.result1
 }
 

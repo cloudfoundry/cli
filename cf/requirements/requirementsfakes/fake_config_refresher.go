@@ -30,16 +30,15 @@ func (fake *FakeConfigRefresher) Refresh() (coreconfig.Warning, error) {
 	ret, specificReturn := fake.refreshReturnsOnCall[len(fake.refreshArgsForCall)]
 	fake.refreshArgsForCall = append(fake.refreshArgsForCall, struct {
 	}{})
-	stub := fake.RefreshStub
-	fakeReturns := fake.refreshReturns
 	fake.recordInvocation("Refresh", []interface{}{})
 	fake.refreshMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RefreshStub != nil {
+		return fake.RefreshStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.refreshReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -35,16 +35,15 @@ func (fake *FakeRepository) ListFiles(arg1 string, arg2 int, arg3 string) (strin
 		arg2 int
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.ListFilesStub
-	fakeReturns := fake.listFilesReturns
 	fake.recordInvocation("ListFiles", []interface{}{arg1, arg2, arg3})
 	fake.listFilesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.ListFilesStub != nil {
+		return fake.ListFilesStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.listFilesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

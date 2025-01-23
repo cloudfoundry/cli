@@ -113,16 +113,15 @@ func (fake *FakeBuildpackRepository) Create(arg1 string, arg2 *int, arg3 *bool, 
 		arg3 *bool
 		arg4 *bool
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.CreateStub
-	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.CreateStub != nil {
+		return fake.CreateStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.createReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -177,16 +176,15 @@ func (fake *FakeBuildpackRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteStub
-	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -238,16 +236,15 @@ func (fake *FakeBuildpackRepository) FindByName(arg1 string) (models.Buildpack, 
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FindByNameStub
-	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FindByNameStub != nil {
+		return fake.FindByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -303,16 +300,15 @@ func (fake *FakeBuildpackRepository) FindByNameAndStack(arg1 string, arg2 string
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.FindByNameAndStackStub
-	fakeReturns := fake.findByNameAndStackReturns
 	fake.recordInvocation("FindByNameAndStack", []interface{}{arg1, arg2})
 	fake.findByNameAndStackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.FindByNameAndStackStub != nil {
+		return fake.FindByNameAndStackStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findByNameAndStackReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -367,16 +363,15 @@ func (fake *FakeBuildpackRepository) FindByNameWithNilStack(arg1 string) (models
 	fake.findByNameWithNilStackArgsForCall = append(fake.findByNameWithNilStackArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FindByNameWithNilStackStub
-	fakeReturns := fake.findByNameWithNilStackReturns
 	fake.recordInvocation("FindByNameWithNilStack", []interface{}{arg1})
 	fake.findByNameWithNilStackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FindByNameWithNilStackStub != nil {
+		return fake.FindByNameWithNilStackStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.findByNameWithNilStackReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -431,16 +426,15 @@ func (fake *FakeBuildpackRepository) ListBuildpacks(arg1 func(models.Buildpack) 
 	fake.listBuildpacksArgsForCall = append(fake.listBuildpacksArgsForCall, struct {
 		arg1 func(models.Buildpack) bool
 	}{arg1})
-	stub := fake.ListBuildpacksStub
-	fakeReturns := fake.listBuildpacksReturns
 	fake.recordInvocation("ListBuildpacks", []interface{}{arg1})
 	fake.listBuildpacksMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.ListBuildpacksStub != nil {
+		return fake.ListBuildpacksStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.listBuildpacksReturns
 	return fakeReturns.result1
 }
 
@@ -492,16 +486,15 @@ func (fake *FakeBuildpackRepository) Update(arg1 models.Buildpack) (models.Build
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.Buildpack
 	}{arg1})
-	stub := fake.UpdateStub
-	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.UpdateStub != nil {
+		return fake.UpdateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.updateReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

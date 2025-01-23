@@ -67,16 +67,15 @@ func (fake *FakeZipper) GetZipSize(arg1 *os.File) (int64, error) {
 	fake.getZipSizeArgsForCall = append(fake.getZipSizeArgsForCall, struct {
 		arg1 *os.File
 	}{arg1})
-	stub := fake.GetZipSizeStub
-	fakeReturns := fake.getZipSizeReturns
 	fake.recordInvocation("GetZipSize", []interface{}{arg1})
 	fake.getZipSizeMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetZipSizeStub != nil {
+		return fake.GetZipSizeStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getZipSizeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -131,16 +130,15 @@ func (fake *FakeZipper) IsZipFile(arg1 string) bool {
 	fake.isZipFileArgsForCall = append(fake.isZipFileArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.IsZipFileStub
-	fakeReturns := fake.isZipFileReturns
 	fake.recordInvocation("IsZipFile", []interface{}{arg1})
 	fake.isZipFileMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.IsZipFileStub != nil {
+		return fake.IsZipFileStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isZipFileReturns
 	return fakeReturns.result1
 }
 
@@ -193,16 +191,15 @@ func (fake *FakeZipper) Unzip(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UnzipStub
-	fakeReturns := fake.unzipReturns
 	fake.recordInvocation("Unzip", []interface{}{arg1, arg2})
 	fake.unzipMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UnzipStub != nil {
+		return fake.UnzipStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.unzipReturns
 	return fakeReturns.result1
 }
 
@@ -255,16 +252,15 @@ func (fake *FakeZipper) Zip(arg1 string, arg2 *os.File) error {
 		arg1 string
 		arg2 *os.File
 	}{arg1, arg2})
-	stub := fake.ZipStub
-	fakeReturns := fake.zipReturns
 	fake.recordInvocation("Zip", []interface{}{arg1, arg2})
 	fake.zipMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.ZipStub != nil {
+		return fake.ZipStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.zipReturns
 	return fakeReturns.result1
 }
 
