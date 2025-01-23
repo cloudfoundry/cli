@@ -32,16 +32,15 @@ func (fake *FakePluginMetadata) GetMetadata(arg1 string) (configv3.Plugin, error
 	fake.getMetadataArgsForCall = append(fake.getMetadataArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetMetadataStub
-	fakeReturns := fake.getMetadataReturns
 	fake.recordInvocation("GetMetadata", []interface{}{arg1})
 	fake.getMetadataMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetMetadataStub != nil {
+		return fake.GetMetadataStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getMetadataReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

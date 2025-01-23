@@ -352,16 +352,15 @@ func (fake *FakeCliConnection) AccessToken() (string, error) {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
-	stub := fake.AccessTokenStub
-	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -408,16 +407,15 @@ func (fake *FakeCliConnection) ApiEndpoint() (string, error) {
 	ret, specificReturn := fake.apiEndpointReturnsOnCall[len(fake.apiEndpointArgsForCall)]
 	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct {
 	}{})
-	stub := fake.ApiEndpointStub
-	fakeReturns := fake.apiEndpointReturns
 	fake.recordInvocation("ApiEndpoint", []interface{}{})
 	fake.apiEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ApiEndpointStub != nil {
+		return fake.ApiEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.apiEndpointReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -464,16 +462,15 @@ func (fake *FakeCliConnection) ApiVersion() (string, error) {
 	ret, specificReturn := fake.apiVersionReturnsOnCall[len(fake.apiVersionArgsForCall)]
 	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct {
 	}{})
-	stub := fake.ApiVersionStub
-	fakeReturns := fake.apiVersionReturns
 	fake.recordInvocation("ApiVersion", []interface{}{})
 	fake.apiVersionMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.ApiVersionStub != nil {
+		return fake.ApiVersionStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.apiVersionReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -521,16 +518,15 @@ func (fake *FakeCliConnection) CliCommand(arg1 ...string) ([]string, error) {
 	fake.cliCommandArgsForCall = append(fake.cliCommandArgsForCall, struct {
 		arg1 []string
 	}{arg1})
-	stub := fake.CliCommandStub
-	fakeReturns := fake.cliCommandReturns
 	fake.recordInvocation("CliCommand", []interface{}{arg1})
 	fake.cliCommandMutex.Unlock()
-	if stub != nil {
-		return stub(arg1...)
+	if fake.CliCommandStub != nil {
+		return fake.CliCommandStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.cliCommandReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -585,16 +581,15 @@ func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(arg1 ...string) (
 	fake.cliCommandWithoutTerminalOutputArgsForCall = append(fake.cliCommandWithoutTerminalOutputArgsForCall, struct {
 		arg1 []string
 	}{arg1})
-	stub := fake.CliCommandWithoutTerminalOutputStub
-	fakeReturns := fake.cliCommandWithoutTerminalOutputReturns
 	fake.recordInvocation("CliCommandWithoutTerminalOutput", []interface{}{arg1})
 	fake.cliCommandWithoutTerminalOutputMutex.Unlock()
-	if stub != nil {
-		return stub(arg1...)
+	if fake.CliCommandWithoutTerminalOutputStub != nil {
+		return fake.CliCommandWithoutTerminalOutputStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.cliCommandWithoutTerminalOutputReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -648,16 +643,15 @@ func (fake *FakeCliConnection) DopplerEndpoint() (string, error) {
 	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
 	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct {
 	}{})
-	stub := fake.DopplerEndpointStub
-	fakeReturns := fake.dopplerEndpointReturns
 	fake.recordInvocation("DopplerEndpoint", []interface{}{})
 	fake.dopplerEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.dopplerEndpointReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -705,16 +699,15 @@ func (fake *FakeCliConnection) GetApp(arg1 string) (plugin_models.GetAppModel, e
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetAppStub
-	fakeReturns := fake.getAppReturns
 	fake.recordInvocation("GetApp", []interface{}{arg1})
 	fake.getAppMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetAppStub != nil {
+		return fake.GetAppStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getAppReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -768,16 +761,15 @@ func (fake *FakeCliConnection) GetApps() ([]plugin_models.GetAppsModel, error) {
 	ret, specificReturn := fake.getAppsReturnsOnCall[len(fake.getAppsArgsForCall)]
 	fake.getAppsArgsForCall = append(fake.getAppsArgsForCall, struct {
 	}{})
-	stub := fake.GetAppsStub
-	fakeReturns := fake.getAppsReturns
 	fake.recordInvocation("GetApps", []interface{}{})
 	fake.getAppsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetAppsStub != nil {
+		return fake.GetAppsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getAppsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -824,16 +816,15 @@ func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.Organization, erro
 	ret, specificReturn := fake.getCurrentOrgReturnsOnCall[len(fake.getCurrentOrgArgsForCall)]
 	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct {
 	}{})
-	stub := fake.GetCurrentOrgStub
-	fakeReturns := fake.getCurrentOrgReturns
 	fake.recordInvocation("GetCurrentOrg", []interface{}{})
 	fake.getCurrentOrgMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetCurrentOrgStub != nil {
+		return fake.GetCurrentOrgStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getCurrentOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -880,16 +871,15 @@ func (fake *FakeCliConnection) GetCurrentSpace() (plugin_models.Space, error) {
 	ret, specificReturn := fake.getCurrentSpaceReturnsOnCall[len(fake.getCurrentSpaceArgsForCall)]
 	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct {
 	}{})
-	stub := fake.GetCurrentSpaceStub
-	fakeReturns := fake.getCurrentSpaceReturns
 	fake.recordInvocation("GetCurrentSpace", []interface{}{})
 	fake.getCurrentSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetCurrentSpaceStub != nil {
+		return fake.GetCurrentSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getCurrentSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -937,16 +927,15 @@ func (fake *FakeCliConnection) GetOrg(arg1 string) (plugin_models.GetOrg_Model, 
 	fake.getOrgArgsForCall = append(fake.getOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetOrgStub
-	fakeReturns := fake.getOrgReturns
 	fake.recordInvocation("GetOrg", []interface{}{arg1})
 	fake.getOrgMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetOrgStub != nil {
+		return fake.GetOrgStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1002,16 +991,15 @@ func (fake *FakeCliConnection) GetOrgUsers(arg1 string, arg2 ...string) ([]plugi
 		arg1 string
 		arg2 []string
 	}{arg1, arg2})
-	stub := fake.GetOrgUsersStub
-	fakeReturns := fake.getOrgUsersReturns
 	fake.recordInvocation("GetOrgUsers", []interface{}{arg1, arg2})
 	fake.getOrgUsersMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2...)
+	if fake.GetOrgUsersStub != nil {
+		return fake.GetOrgUsersStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getOrgUsersReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1065,16 +1053,15 @@ func (fake *FakeCliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) 
 	ret, specificReturn := fake.getOrgsReturnsOnCall[len(fake.getOrgsArgsForCall)]
 	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct {
 	}{})
-	stub := fake.GetOrgsStub
-	fakeReturns := fake.getOrgsReturns
 	fake.recordInvocation("GetOrgs", []interface{}{})
 	fake.getOrgsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetOrgsStub != nil {
+		return fake.GetOrgsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getOrgsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1122,16 +1109,15 @@ func (fake *FakeCliConnection) GetService(arg1 string) (plugin_models.GetService
 	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetServiceStub
-	fakeReturns := fake.getServiceReturns
 	fake.recordInvocation("GetService", []interface{}{arg1})
 	fake.getServiceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetServiceStub != nil {
+		return fake.GetServiceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getServiceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1185,16 +1171,15 @@ func (fake *FakeCliConnection) GetServices() ([]plugin_models.GetServices_Model,
 	ret, specificReturn := fake.getServicesReturnsOnCall[len(fake.getServicesArgsForCall)]
 	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct {
 	}{})
-	stub := fake.GetServicesStub
-	fakeReturns := fake.getServicesReturns
 	fake.recordInvocation("GetServices", []interface{}{})
 	fake.getServicesMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetServicesStub != nil {
+		return fake.GetServicesStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getServicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1242,16 +1227,15 @@ func (fake *FakeCliConnection) GetSpace(arg1 string) (plugin_models.GetSpace_Mod
 	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetSpaceStub
-	fakeReturns := fake.getSpaceReturns
 	fake.recordInvocation("GetSpace", []interface{}{arg1})
 	fake.getSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetSpaceStub != nil {
+		return fake.GetSpaceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1307,16 +1291,15 @@ func (fake *FakeCliConnection) GetSpaceUsers(arg1 string, arg2 string) ([]plugin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetSpaceUsersStub
-	fakeReturns := fake.getSpaceUsersReturns
 	fake.recordInvocation("GetSpaceUsers", []interface{}{arg1, arg2})
 	fake.getSpaceUsersMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetSpaceUsersStub != nil {
+		return fake.GetSpaceUsersStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getSpaceUsersReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1370,16 +1353,15 @@ func (fake *FakeCliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, err
 	ret, specificReturn := fake.getSpacesReturnsOnCall[len(fake.getSpacesArgsForCall)]
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
 	}{})
-	stub := fake.GetSpacesStub
-	fakeReturns := fake.getSpacesReturns
 	fake.recordInvocation("GetSpaces", []interface{}{})
 	fake.getSpacesMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetSpacesStub != nil {
+		return fake.GetSpacesStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getSpacesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1426,16 +1408,15 @@ func (fake *FakeCliConnection) HasAPIEndpoint() (bool, error) {
 	ret, specificReturn := fake.hasAPIEndpointReturnsOnCall[len(fake.hasAPIEndpointArgsForCall)]
 	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct {
 	}{})
-	stub := fake.HasAPIEndpointStub
-	fakeReturns := fake.hasAPIEndpointReturns
 	fake.recordInvocation("HasAPIEndpoint", []interface{}{})
 	fake.hasAPIEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasAPIEndpointStub != nil {
+		return fake.HasAPIEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.hasAPIEndpointReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1482,16 +1463,15 @@ func (fake *FakeCliConnection) HasOrganization() (bool, error) {
 	ret, specificReturn := fake.hasOrganizationReturnsOnCall[len(fake.hasOrganizationArgsForCall)]
 	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct {
 	}{})
-	stub := fake.HasOrganizationStub
-	fakeReturns := fake.hasOrganizationReturns
 	fake.recordInvocation("HasOrganization", []interface{}{})
 	fake.hasOrganizationMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasOrganizationStub != nil {
+		return fake.HasOrganizationStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.hasOrganizationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1538,16 +1518,15 @@ func (fake *FakeCliConnection) HasSpace() (bool, error) {
 	ret, specificReturn := fake.hasSpaceReturnsOnCall[len(fake.hasSpaceArgsForCall)]
 	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct {
 	}{})
-	stub := fake.HasSpaceStub
-	fakeReturns := fake.hasSpaceReturns
 	fake.recordInvocation("HasSpace", []interface{}{})
 	fake.hasSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasSpaceStub != nil {
+		return fake.HasSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.hasSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1594,16 +1573,15 @@ func (fake *FakeCliConnection) IsLoggedIn() (bool, error) {
 	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
 	}{})
-	stub := fake.IsLoggedInStub
-	fakeReturns := fake.isLoggedInReturns
 	fake.recordInvocation("IsLoggedIn", []interface{}{})
 	fake.isLoggedInMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.IsLoggedInStub != nil {
+		return fake.IsLoggedInStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.isLoggedInReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1650,16 +1628,15 @@ func (fake *FakeCliConnection) IsSSLDisabled() (bool, error) {
 	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
 	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct {
 	}{})
-	stub := fake.IsSSLDisabledStub
-	fakeReturns := fake.isSSLDisabledReturns
 	fake.recordInvocation("IsSSLDisabled", []interface{}{})
 	fake.isSSLDisabledMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.IsSSLDisabledStub != nil {
+		return fake.IsSSLDisabledStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.isSSLDisabledReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1706,16 +1683,15 @@ func (fake *FakeCliConnection) LoggregatorEndpoint() (string, error) {
 	ret, specificReturn := fake.loggregatorEndpointReturnsOnCall[len(fake.loggregatorEndpointArgsForCall)]
 	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct {
 	}{})
-	stub := fake.LoggregatorEndpointStub
-	fakeReturns := fake.loggregatorEndpointReturns
 	fake.recordInvocation("LoggregatorEndpoint", []interface{}{})
 	fake.loggregatorEndpointMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.LoggregatorEndpointStub != nil {
+		return fake.LoggregatorEndpointStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.loggregatorEndpointReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1762,16 +1738,15 @@ func (fake *FakeCliConnection) UserEmail() (string, error) {
 	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
 	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct {
 	}{})
-	stub := fake.UserEmailStub
-	fakeReturns := fake.userEmailReturns
 	fake.recordInvocation("UserEmail", []interface{}{})
 	fake.userEmailMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UserEmailStub != nil {
+		return fake.UserEmailStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.userEmailReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1818,16 +1793,15 @@ func (fake *FakeCliConnection) UserGuid() (string, error) {
 	ret, specificReturn := fake.userGuidReturnsOnCall[len(fake.userGuidArgsForCall)]
 	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct {
 	}{})
-	stub := fake.UserGuidStub
-	fakeReturns := fake.userGuidReturns
 	fake.recordInvocation("UserGuid", []interface{}{})
 	fake.userGuidMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UserGuidStub != nil {
+		return fake.UserGuidStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.userGuidReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1874,16 +1848,15 @@ func (fake *FakeCliConnection) Username() (string, error) {
 	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
 	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct {
 	}{})
-	stub := fake.UsernameStub
-	fakeReturns := fake.usernameReturns
 	fake.recordInvocation("Username", []interface{}{})
 	fake.usernameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.UsernameStub != nil {
+		return fake.UsernameStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.usernameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

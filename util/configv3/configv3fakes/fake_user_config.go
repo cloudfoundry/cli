@@ -41,16 +41,15 @@ func (fake *FakeUserConfig) CurrentUser() (configv3.User, error) {
 	ret, specificReturn := fake.currentUserReturnsOnCall[len(fake.currentUserArgsForCall)]
 	fake.currentUserArgsForCall = append(fake.currentUserArgsForCall, struct {
 	}{})
-	stub := fake.CurrentUserStub
-	fakeReturns := fake.currentUserReturns
 	fake.recordInvocation("CurrentUser", []interface{}{})
 	fake.currentUserMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CurrentUserStub != nil {
+		return fake.CurrentUserStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.currentUserReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -97,16 +96,15 @@ func (fake *FakeUserConfig) CurrentUserName() (string, error) {
 	ret, specificReturn := fake.currentUserNameReturnsOnCall[len(fake.currentUserNameArgsForCall)]
 	fake.currentUserNameArgsForCall = append(fake.currentUserNameArgsForCall, struct {
 	}{})
-	stub := fake.CurrentUserNameStub
-	fakeReturns := fake.currentUserNameReturns
 	fake.recordInvocation("CurrentUserName", []interface{}{})
 	fake.currentUserNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CurrentUserNameStub != nil {
+		return fake.CurrentUserNameStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.currentUserNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

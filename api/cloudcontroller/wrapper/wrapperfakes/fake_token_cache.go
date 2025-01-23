@@ -47,16 +47,15 @@ func (fake *FakeTokenCache) AccessToken() string {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
-	stub := fake.AccessTokenStub
-	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -100,16 +99,15 @@ func (fake *FakeTokenCache) RefreshToken() string {
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 	}{})
-	stub := fake.RefreshTokenStub
-	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1
 }
 
@@ -153,10 +151,9 @@ func (fake *FakeTokenCache) SetAccessToken(arg1 string) {
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetAccessTokenStub
 	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
 	fake.setAccessTokenMutex.Unlock()
-	if stub != nil {
+	if fake.SetAccessTokenStub != nil {
 		fake.SetAccessTokenStub(arg1)
 	}
 }
@@ -185,10 +182,9 @@ func (fake *FakeTokenCache) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.SetRefreshTokenStub
 	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
 	fake.setRefreshTokenMutex.Unlock()
-	if stub != nil {
+	if fake.SetRefreshTokenStub != nil {
 		fake.SetRefreshTokenStub(arg1)
 	}
 }

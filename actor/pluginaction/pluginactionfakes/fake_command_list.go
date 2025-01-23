@@ -40,16 +40,15 @@ func (fake *FakeCommandList) HasAlias(arg1 string) bool {
 	fake.hasAliasArgsForCall = append(fake.hasAliasArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.HasAliasStub
-	fakeReturns := fake.hasAliasReturns
 	fake.recordInvocation("HasAlias", []interface{}{arg1})
 	fake.hasAliasMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.HasAliasStub != nil {
+		return fake.HasAliasStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasAliasReturns
 	return fakeReturns.result1
 }
 
@@ -101,16 +100,15 @@ func (fake *FakeCommandList) HasCommand(arg1 string) bool {
 	fake.hasCommandArgsForCall = append(fake.hasCommandArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.HasCommandStub
-	fakeReturns := fake.hasCommandReturns
 	fake.recordInvocation("HasCommand", []interface{}{arg1})
 	fake.hasCommandMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.HasCommandStub != nil {
+		return fake.HasCommandStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasCommandReturns
 	return fakeReturns.result1
 }
 

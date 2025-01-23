@@ -54,10 +54,9 @@ func (fake *FakeProgressBar) Finish() {
 	fake.finishMutex.Lock()
 	fake.finishArgsForCall = append(fake.finishArgsForCall, struct {
 	}{})
-	stub := fake.FinishStub
 	fake.recordInvocation("Finish", []interface{}{})
 	fake.finishMutex.Unlock()
-	if stub != nil {
+	if fake.FinishStub != nil {
 		fake.FinishStub()
 	}
 }
@@ -80,16 +79,15 @@ func (fake *FakeProgressBar) NewProxyReader(arg1 io.Reader) *pb.Reader {
 	fake.newProxyReaderArgsForCall = append(fake.newProxyReaderArgsForCall, struct {
 		arg1 io.Reader
 	}{arg1})
-	stub := fake.NewProxyReaderStub
-	fakeReturns := fake.newProxyReaderReturns
 	fake.recordInvocation("NewProxyReader", []interface{}{arg1})
 	fake.newProxyReaderMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.NewProxyReaderStub != nil {
+		return fake.NewProxyReaderStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.newProxyReaderReturns
 	return fakeReturns.result1
 }
 
@@ -141,16 +139,15 @@ func (fake *FakeProgressBar) SetTotal(arg1 int) *pb.ProgressBar {
 	fake.setTotalArgsForCall = append(fake.setTotalArgsForCall, struct {
 		arg1 int
 	}{arg1})
-	stub := fake.SetTotalStub
-	fakeReturns := fake.setTotalReturns
 	fake.recordInvocation("SetTotal", []interface{}{arg1})
 	fake.setTotalMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.SetTotalStub != nil {
+		return fake.SetTotalStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.setTotalReturns
 	return fakeReturns.result1
 }
 
@@ -201,16 +198,15 @@ func (fake *FakeProgressBar) Start() *pb.ProgressBar {
 	ret, specificReturn := fake.startReturnsOnCall[len(fake.startArgsForCall)]
 	fake.startArgsForCall = append(fake.startArgsForCall, struct {
 	}{})
-	stub := fake.StartStub
-	fakeReturns := fake.startReturns
 	fake.recordInvocation("Start", []interface{}{})
 	fake.startMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.StartStub != nil {
+		return fake.StartStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.startReturns
 	return fakeReturns.result1
 }
 

@@ -66,16 +66,15 @@ func (fake *FakePushActor) Actualize(arg1 v7pushaction.PushPlan, arg2 v7pushacti
 		arg1 v7pushaction.PushPlan
 		arg2 v7pushaction.ProgressBar
 	}{arg1, arg2})
-	stub := fake.ActualizeStub
-	fakeReturns := fake.actualizeReturns
 	fake.recordInvocation("Actualize", []interface{}{arg1, arg2})
 	fake.actualizeMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.ActualizeStub != nil {
+		return fake.ActualizeStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.actualizeReturns
 	return fakeReturns.result1
 }
 
@@ -130,16 +129,15 @@ func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 manife
 		arg3 manifestparser.Manifest
 		arg4 v7pushaction.FlagOverrides
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.CreatePushPlansStub
-	fakeReturns := fake.createPushPlansReturns
 	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createPushPlansMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.CreatePushPlansStub != nil {
+		return fake.CreatePushPlansStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.createPushPlansReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -198,16 +196,15 @@ func (fake *FakePushActor) HandleFlagOverrides(arg1 manifestparser.Manifest, arg
 		arg1 manifestparser.Manifest
 		arg2 v7pushaction.FlagOverrides
 	}{arg1, arg2})
-	stub := fake.HandleFlagOverridesStub
-	fakeReturns := fake.handleFlagOverridesReturns
 	fake.recordInvocation("HandleFlagOverrides", []interface{}{arg1, arg2})
 	fake.handleFlagOverridesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.HandleFlagOverridesStub != nil {
+		return fake.HandleFlagOverridesStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.handleFlagOverridesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -84,16 +84,15 @@ func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpace(arg1 string,
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetApplicationByNameAndSpaceStub
-	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetApplicationByNameAndSpaceStub != nil {
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -151,16 +150,15 @@ func (fake *FakeCloudControllerClient) GetApplications(arg1 ...ccv3.Query) ([]re
 	fake.getApplicationsArgsForCall = append(fake.getApplicationsArgsForCall, struct {
 		arg1 []ccv3.Query
 	}{arg1})
-	stub := fake.GetApplicationsStub
-	fakeReturns := fake.getApplicationsReturns
 	fake.recordInvocation("GetApplications", []interface{}{arg1})
 	fake.getApplicationsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1...)
+	if fake.GetApplicationsStub != nil {
+		return fake.GetApplicationsStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.getApplicationsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -218,16 +216,15 @@ func (fake *FakeCloudControllerClient) GetOrganizations(arg1 ...ccv3.Query) ([]r
 	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
 		arg1 []ccv3.Query
 	}{arg1})
-	stub := fake.GetOrganizationsStub
-	fakeReturns := fake.getOrganizationsReturns
 	fake.recordInvocation("GetOrganizations", []interface{}{arg1})
 	fake.getOrganizationsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1...)
+	if fake.GetOrganizationsStub != nil {
+		return fake.GetOrganizationsStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.getOrganizationsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -285,16 +282,15 @@ func (fake *FakeCloudControllerClient) GetSpaces(arg1 ...ccv3.Query) ([]resource
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
 		arg1 []ccv3.Query
 	}{arg1})
-	stub := fake.GetSpacesStub
-	fakeReturns := fake.getSpacesReturns
 	fake.recordInvocation("GetSpaces", []interface{}{arg1})
 	fake.getSpacesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1...)
+	if fake.GetSpacesStub != nil {
+		return fake.GetSpacesStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
 	}
+	fakeReturns := fake.getSpacesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
 }
 

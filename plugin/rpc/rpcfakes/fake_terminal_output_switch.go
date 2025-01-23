@@ -22,10 +22,9 @@ func (fake *FakeTerminalOutputSwitch) DisableTerminalOutput(arg1 bool) {
 	fake.disableTerminalOutputArgsForCall = append(fake.disableTerminalOutputArgsForCall, struct {
 		arg1 bool
 	}{arg1})
-	stub := fake.DisableTerminalOutputStub
 	fake.recordInvocation("DisableTerminalOutput", []interface{}{arg1})
 	fake.disableTerminalOutputMutex.Unlock()
-	if stub != nil {
+	if fake.DisableTerminalOutputStub != nil {
 		fake.DisableTerminalOutputStub(arg1)
 	}
 }

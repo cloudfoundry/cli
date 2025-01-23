@@ -41,16 +41,15 @@ func (fake *FakeLogCacheClient) Read(arg1 context.Context, arg2 string, arg3 tim
 		arg3 time.Time
 		arg4 []client.ReadOption
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.ReadStub
-	fakeReturns := fake.readReturns
 	fake.recordInvocation("Read", []interface{}{arg1, arg2, arg3, arg4})
 	fake.readMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4...)
+	if fake.ReadStub != nil {
+		return fake.ReadStub(arg1, arg2, arg3, arg4...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.readReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -23,10 +23,9 @@ func (fake *FakeOutputCapture) SetOutputBucket(arg1 io.Writer) {
 	fake.setOutputBucketArgsForCall = append(fake.setOutputBucketArgsForCall, struct {
 		arg1 io.Writer
 	}{arg1})
-	stub := fake.SetOutputBucketStub
 	fake.recordInvocation("SetOutputBucket", []interface{}{arg1})
 	fake.setOutputBucketMutex.Unlock()
-	if stub != nil {
+	if fake.SetOutputBucketStub != nil {
 		fake.SetOutputBucketStub(arg1)
 	}
 }

@@ -111,16 +111,15 @@ func (fake *FakeConfig) AccessToken() string {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
-	stub := fake.AccessTokenStub
-	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -164,16 +163,15 @@ func (fake *FakeConfig) BinaryName() string {
 	ret, specificReturn := fake.binaryNameReturnsOnCall[len(fake.binaryNameArgsForCall)]
 	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct {
 	}{})
-	stub := fake.BinaryNameStub
-	fakeReturns := fake.binaryNameReturns
 	fake.recordInvocation("BinaryName", []interface{}{})
 	fake.binaryNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.BinaryNameStub != nil {
+		return fake.BinaryNameStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.binaryNameReturns
 	return fakeReturns.result1
 }
 
@@ -217,16 +215,15 @@ func (fake *FakeConfig) CurrentUserName() (string, error) {
 	ret, specificReturn := fake.currentUserNameReturnsOnCall[len(fake.currentUserNameArgsForCall)]
 	fake.currentUserNameArgsForCall = append(fake.currentUserNameArgsForCall, struct {
 	}{})
-	stub := fake.CurrentUserNameStub
-	fakeReturns := fake.currentUserNameReturns
 	fake.recordInvocation("CurrentUserName", []interface{}{})
 	fake.currentUserNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.CurrentUserNameStub != nil {
+		return fake.CurrentUserNameStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.currentUserNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -273,16 +270,15 @@ func (fake *FakeConfig) HasTargetedOrganization() bool {
 	ret, specificReturn := fake.hasTargetedOrganizationReturnsOnCall[len(fake.hasTargetedOrganizationArgsForCall)]
 	fake.hasTargetedOrganizationArgsForCall = append(fake.hasTargetedOrganizationArgsForCall, struct {
 	}{})
-	stub := fake.HasTargetedOrganizationStub
-	fakeReturns := fake.hasTargetedOrganizationReturns
 	fake.recordInvocation("HasTargetedOrganization", []interface{}{})
 	fake.hasTargetedOrganizationMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasTargetedOrganizationStub != nil {
+		return fake.HasTargetedOrganizationStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasTargetedOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -326,16 +322,15 @@ func (fake *FakeConfig) HasTargetedSpace() bool {
 	ret, specificReturn := fake.hasTargetedSpaceReturnsOnCall[len(fake.hasTargetedSpaceArgsForCall)]
 	fake.hasTargetedSpaceArgsForCall = append(fake.hasTargetedSpaceArgsForCall, struct {
 	}{})
-	stub := fake.HasTargetedSpaceStub
-	fakeReturns := fake.hasTargetedSpaceReturns
 	fake.recordInvocation("HasTargetedSpace", []interface{}{})
 	fake.hasTargetedSpaceMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.HasTargetedSpaceStub != nil {
+		return fake.HasTargetedSpaceStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.hasTargetedSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -379,16 +374,15 @@ func (fake *FakeConfig) IsCFOnK8s() bool {
 	ret, specificReturn := fake.isCFOnK8sReturnsOnCall[len(fake.isCFOnK8sArgsForCall)]
 	fake.isCFOnK8sArgsForCall = append(fake.isCFOnK8sArgsForCall, struct {
 	}{})
-	stub := fake.IsCFOnK8sStub
-	fakeReturns := fake.isCFOnK8sReturns
 	fake.recordInvocation("IsCFOnK8s", []interface{}{})
 	fake.isCFOnK8sMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.IsCFOnK8sStub != nil {
+		return fake.IsCFOnK8sStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.isCFOnK8sReturns
 	return fakeReturns.result1
 }
 
@@ -432,16 +426,15 @@ func (fake *FakeConfig) RefreshToken() string {
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 	}{})
-	stub := fake.RefreshTokenStub
-	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1
 }
 
@@ -485,16 +478,15 @@ func (fake *FakeConfig) TargetedOrganizationName() string {
 	ret, specificReturn := fake.targetedOrganizationNameReturnsOnCall[len(fake.targetedOrganizationNameArgsForCall)]
 	fake.targetedOrganizationNameArgsForCall = append(fake.targetedOrganizationNameArgsForCall, struct {
 	}{})
-	stub := fake.TargetedOrganizationNameStub
-	fakeReturns := fake.targetedOrganizationNameReturns
 	fake.recordInvocation("TargetedOrganizationName", []interface{}{})
 	fake.targetedOrganizationNameMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.TargetedOrganizationNameStub != nil {
+		return fake.TargetedOrganizationNameStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.targetedOrganizationNameReturns
 	return fakeReturns.result1
 }
 
@@ -538,16 +530,15 @@ func (fake *FakeConfig) Verbose() (bool, []string) {
 	ret, specificReturn := fake.verboseReturnsOnCall[len(fake.verboseArgsForCall)]
 	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct {
 	}{})
-	stub := fake.VerboseStub
-	fakeReturns := fake.verboseReturns
 	fake.recordInvocation("Verbose", []interface{}{})
 	fake.verboseMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.VerboseStub != nil {
+		return fake.VerboseStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.verboseReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

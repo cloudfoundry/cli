@@ -155,16 +155,15 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopy(arg1 string, arg2 strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.CreateExecutableCopyStub
-	fakeReturns := fake.createExecutableCopyReturns
 	fake.recordInvocation("CreateExecutableCopy", []interface{}{arg1, arg2})
 	fake.createExecutableCopyMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.CreateExecutableCopyStub != nil {
+		return fake.CreateExecutableCopyStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.createExecutableCopyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -221,16 +220,15 @@ func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(arg1 string,
 		arg2 string
 		arg3 plugin.ProxyReader
 	}{arg1, arg2, arg3})
-	stub := fake.DownloadExecutableBinaryFromURLStub
-	fakeReturns := fake.downloadExecutableBinaryFromURLReturns
 	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{arg1, arg2, arg3})
 	fake.downloadExecutableBinaryFromURLMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.DownloadExecutableBinaryFromURLStub != nil {
+		return fake.DownloadExecutableBinaryFromURLStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.downloadExecutableBinaryFromURLReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -285,16 +283,15 @@ func (fake *FakeInstallPluginActor) FileExists(arg1 string) bool {
 	fake.fileExistsArgsForCall = append(fake.fileExistsArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.FileExistsStub
-	fakeReturns := fake.fileExistsReturns
 	fake.recordInvocation("FileExists", []interface{}{arg1})
 	fake.fileExistsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.FileExistsStub != nil {
+		return fake.FileExistsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.fileExistsReturns
 	return fakeReturns.result1
 }
 
@@ -348,16 +345,15 @@ func (fake *FakeInstallPluginActor) GetAndValidatePlugin(arg1 pluginaction.Plugi
 		arg2 pluginaction.CommandList
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.GetAndValidatePluginStub
-	fakeReturns := fake.getAndValidatePluginReturns
 	fake.recordInvocation("GetAndValidatePlugin", []interface{}{arg1, arg2, arg3})
 	fake.getAndValidatePluginMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.GetAndValidatePluginStub != nil {
+		return fake.GetAndValidatePluginStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getAndValidatePluginReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -413,16 +409,15 @@ func (fake *FakeInstallPluginActor) GetPlatformString(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetPlatformStringStub
-	fakeReturns := fake.getPlatformStringReturns
 	fake.recordInvocation("GetPlatformString", []interface{}{arg1, arg2})
 	fake.getPlatformStringMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetPlatformStringStub != nil {
+		return fake.GetPlatformStringStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.getPlatformStringReturns
 	return fakeReturns.result1
 }
 
@@ -481,16 +476,15 @@ func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatform(arg
 		arg2 []configv3.PluginRepository
 		arg3 string
 	}{arg1, arg2Copy, arg3})
-	stub := fake.GetPluginInfoFromRepositoriesForPlatformStub
-	fakeReturns := fake.getPluginInfoFromRepositoriesForPlatformReturns
 	fake.recordInvocation("GetPluginInfoFromRepositoriesForPlatform", []interface{}{arg1, arg2Copy, arg3})
 	fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.GetPluginInfoFromRepositoriesForPlatformStub != nil {
+		return fake.GetPluginInfoFromRepositoriesForPlatformStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
+	fakeReturns := fake.getPluginInfoFromRepositoriesForPlatformReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -548,16 +542,15 @@ func (fake *FakeInstallPluginActor) GetPluginRepository(arg1 string) (configv3.P
 	fake.getPluginRepositoryArgsForCall = append(fake.getPluginRepositoryArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetPluginRepositoryStub
-	fakeReturns := fake.getPluginRepositoryReturns
 	fake.recordInvocation("GetPluginRepository", []interface{}{arg1})
 	fake.getPluginRepositoryMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetPluginRepositoryStub != nil {
+		return fake.GetPluginRepositoryStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getPluginRepositoryReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -613,16 +606,15 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPath(arg1 string, arg2 conf
 		arg1 string
 		arg2 configv3.Plugin
 	}{arg1, arg2})
-	stub := fake.InstallPluginFromPathStub
-	fakeReturns := fake.installPluginFromPathReturns
 	fake.recordInvocation("InstallPluginFromPath", []interface{}{arg1, arg2})
 	fake.installPluginFromPathMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.InstallPluginFromPathStub != nil {
+		return fake.InstallPluginFromPathStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.installPluginFromPathReturns
 	return fakeReturns.result1
 }
 
@@ -675,16 +667,15 @@ func (fake *FakeInstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUnin
 		arg1 pluginaction.PluginUninstaller
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.UninstallPluginStub
-	fakeReturns := fake.uninstallPluginReturns
 	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
 	fake.uninstallPluginMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.UninstallPluginStub != nil {
+		return fake.UninstallPluginStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.uninstallPluginReturns
 	return fakeReturns.result1
 }
 
@@ -737,16 +728,15 @@ func (fake *FakeInstallPluginActor) ValidateFileChecksum(arg1 string, arg2 strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.ValidateFileChecksumStub
-	fakeReturns := fake.validateFileChecksumReturns
 	fake.recordInvocation("ValidateFileChecksum", []interface{}{arg1, arg2})
 	fake.validateFileChecksumMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.ValidateFileChecksumStub != nil {
+		return fake.ValidateFileChecksumStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.validateFileChecksumReturns
 	return fakeReturns.result1
 }
 
