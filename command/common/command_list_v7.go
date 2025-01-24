@@ -86,6 +86,7 @@ type commandList struct {
 	FeatureFlag                        v7.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
 	FeatureFlags                       v7.FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status"`
 	GetHealthCheck                     v7.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
+	GetReadinessHealthCheck            v7.GetReadinessHealthCheckCommand            `command:"get-readiness-health-check" description:"Show the type of readiness health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
 	IsolationSegments                  v7.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
