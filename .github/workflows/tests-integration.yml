@@ -266,6 +266,7 @@ jobs:
 
           bosh -d cf manifest > /tmp/manifest.yml
           bosh interpolate /tmp/manifest.yml \
+            -o cf-deployment/operations/enable-v2-api.yml \
             -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
             -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
             -o .github/ops-files/use-latest-capi.yml \
