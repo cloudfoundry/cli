@@ -65,19 +65,24 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 
 	path := cmd.Path.Path
 	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain, cmd.Hostname, path, cmd.Port)
+
+	routeOptions, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
+	for _, option := range wrongOptSpecs {
+		cmd.UI.DisplayTextWithFlavor("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
+			map[string]interface{}{
+				"Option": option,
+			})
+	}
+	if len(wrongOptSpecs) > 0 {
+		return nil
+	}
+
 	url := desiredURL(domain.Name, cmd.Hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
 		}
-		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
-			map[string]interface{}{
-				"URL":       url,
-				"User":      user.Name,
-				"SpaceName": cmd.Config.TargetedSpace().Name,
-				"OrgName":   cmd.Config.TargetedOrganization().Name,
-			})
 
 		if cmd.Options != nil && len(cmd.Options) > 0 {
 			err := cmd.validateAPIVersionForPerRouteOptions()
@@ -86,13 +91,14 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			}
 		}
 
-		routeOptions := map[string]*string{}
-		if cmd.Options != nil && len(cmd.Options) > 0 {
-			err = cmd.validateAPIVersionForPerRouteOptions()
-			if err == nil {
-				routeOptions = resources.NewRouteOptions(cmd.Options)
-			}
-		}
+		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
+			map[string]interface{}{
+				"URL":       url,
+				"User":      user.Name,
+				"SpaceName": cmd.Config.TargetedSpace().Name,
+				"OrgName":   cmd.Config.TargetedOrganization().Name,
+			})
+
 		route, warnings, err = cmd.Actor.CreateRoute(
 			cmd.Config.TargetedSpace().GUID,
 			domain.Name,
@@ -106,6 +112,11 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			return err
 		}
 		cmd.UI.DisplayOK()
+	}
+
+	if cmd.Options != nil && len(cmd.Options) > 0 {
+		cmd.UI.DisplayText("Route specific options can only be specified for nonexistent routes.")
+		return nil
 	}
 
 	if cmd.AppProtocol != "" {
@@ -155,7 +166,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 func (cmd MapRouteCommand) validateAPIVersionForPerRouteOptions() error {
 	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionPerRouteOpts)
 	if err != nil {
-		cmd.UI.DisplayText("Your CC API version ({{.APIVersion}}) does not support per route options."+
+		cmd.UI.DisplayTextWithFlavor("Your CC API version ({{.APIVersion}}) does not support per route options."+
 			"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
 			"APIVersion":          cmd.Config.APIVersion(),
 			"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,

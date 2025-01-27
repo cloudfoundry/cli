@@ -69,12 +69,20 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	routeOptions := map[string]*string{}
-	if cmd.Options != nil && len(cmd.Options) > 0 {
-		err = cmd.validateAPIVersionForPerRouteOptions()
-		if err == nil {
-			routeOptions = resources.NewRouteOptions(cmd.Options)
-		}
+	err = cmd.validateAPIVersionForPerRouteOptions()
+	if err != nil {
+		return err
+	}
+
+	routeOptions, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
+	for _, option := range wrongOptSpecs {
+		cmd.UI.DisplayTextWithFlavor("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
+			map[string]interface{}{
+				"Option": option,
+			})
+	}
+	if len(wrongOptSpecs) > 0 {
+		return nil
 	}
 	route, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName, port, routeOptions)
 
