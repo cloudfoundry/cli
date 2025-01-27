@@ -48,9 +48,7 @@ var _ = Describe("map-route Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
 
-		lbLCVal := "least-connections"
-		lbLeastConnections := &lbLCVal
-		expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
+		expectedOptions = map[string]*string{}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -60,7 +58,7 @@ var _ = Describe("map-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
-		options = []string{"loadbalancing=least-connections"}
+		options = []string{}
 
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
@@ -231,11 +229,15 @@ var _ = Describe("map-route Command", func() {
 
 				When("the requested route does not exist", func() {
 					BeforeEach(func() {
+						lbLCVal := "least-connections"
+						lbLeastConnections := &lbLCVal
 						fakeActor.GetRouteByAttributesReturns(
-							resources.Route{},
+							resources.Route{Options: map[string]*string{"loadbalancing": lbLeastConnections}},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
+						cmd.Options = []string{"loadbalancing=least-connections"}
+						expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
 					})
 
 					It("creates the route", func() {
@@ -271,10 +273,29 @@ var _ = Describe("map-route Command", func() {
 					})
 				})
 
+				When("the requested route does not exist and options are specified incorrectly", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							nil,
+							nil,
+						)
+						cmd.Options = []string{"loadbalancing"}
+					})
+
+					It("gives an error message", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+						Expect(executeErr).To(BeNil())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+					})
+				})
+
 				When("the requested route exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							resources.Route{GUID: "route-guid"},
+							resources.Route{GUID: "route-guid", Options: map[string]*string{}},
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
@@ -429,6 +450,28 @@ var _ = Describe("map-route Command", func() {
 									Expect(actualAppProtocol).To(Equal("http2"))
 								})
 							})
+						})
+					})
+				})
+
+				When("the requested route exists and the options are specified", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{GUID: "route-guid", Options: map[string]*string{}},
+							v7action.Warnings{"get-route-warnings"},
+							nil,
+						)
+						cmd.Options = []string{"loadbalancing=least-connections"}
+					})
+
+					When("getting the per route options error", func() {
+						BeforeEach(func() {
+							fakeActor.GetRouteDestinationByAppGUIDReturns(resources.RouteDestination{}, nil)
+						})
+						It("returns the error message", func() {
+							Expect(executeErr).To(BeNil())
+							Expect(testUI.Out).To(Say("Route specific options can only be specified for nonexistent routes."))
+							Expect(fakeActor.MapRouteCallCount()).To(Equal(0))
 						})
 					})
 				})

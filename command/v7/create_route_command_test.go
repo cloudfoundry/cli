@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -59,6 +58,7 @@ var _ = Describe("create-route Command", func() {
 		hostname = ""
 		path = ""
 		port = 0
+
 		cmdOptions = []string{"loadbalancing=least-connections"}
 		lbLCVal := "least-connections"
 		lbLeastConnections := &lbLCVal
@@ -163,29 +163,31 @@ var _ = Describe("create-route Command", func() {
 				Expect(testUI.Err).To(Say("warnings-2"))
 			})
 		})
-		When("creating the route with default route options is successful when the CC API version is too old for route options", func() {
+
+		When("creating the route fails when the CC API version is too old for route options", func() {
 			BeforeEach(func() {
 				cCAPIOldVersion = strconv.Itoa(1)
 				fakeConfig.APIVersionReturns(cCAPIOldVersion)
-				fakeActor.CreateRouteReturns(resources.Route{
-					URL:     domainName,
-					Options: map[string]*string{},
-				}, nil, nil)
 			})
 
-			It("creates a route with default route options", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
-				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
-				Expect(expectedDomainName).To(Equal(domainName))
-				Expect(expectedHostname).To(Equal(hostname))
-				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				Expect(expectedOptions).To(Equal(map[string]*string{}))
+			It("does not create a route and gives error message", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
 				Expect(testUI.Out).To(Say("Your CC API"))
 				Expect(testUI.Out).To(Say("does not support per route options"))
-				Expect(testUI.Out).To(Say(`Route %s has been created.`, domainName))
-				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("creating the route fails when route options are specified incorrectly", func() {
+			BeforeEach(func() {
+				cmdOptions = []string{"loadbalancing"}
+			})
+
+			It("does not create a route and gives an error message", func() {
+				Expect(executeErr).To(BeNil())
+				Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 			})
 		})
 
@@ -233,11 +235,10 @@ var _ = Describe("create-route Command", func() {
 
 				It("creates the route", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, _ := fakeActor.CreateRouteArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedHostname).To(Equal(hostname))
-					Expect(expectedOptions).To(Equal(options))
 				})
 			})
 

@@ -37,6 +37,7 @@ var _ = Describe("update-route Command", func() {
 		orgGUID         string
 		spaceGUID       string
 		commandOptions  []string
+		removeOptions   []string
 		options         map[string]*string
 		cCAPIOldVersion string
 		routeGuid       string
@@ -58,16 +59,18 @@ var _ = Describe("update-route Command", func() {
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
 		commandOptions = []string{"loadbalancing=least-connections"}
+		removeOptions = []string{"loadbalancing"}
 		lbLCVal := "least-connections"
 		lbLeastConnections := &lbLCVal
 		options = map[string]*string{"loadbalancing": lbLeastConnections}
 		routeGuid = "route-guid"
 
 		cmd = UpdateRouteCommand{
-			RequiredArgs: flag.Domain{Domain: domain},
-			Hostname:     hostname,
-			Path:         flag.V7RoutePath{Path: path},
-			Options:      commandOptions,
+			RequiredArgs:  flag.Domain{Domain: domain},
+			Hostname:      hostname,
+			Path:          flag.V7RoutePath{Path: path},
+			Options:       commandOptions,
+			RemoveOptions: removeOptions,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -178,17 +181,29 @@ var _ = Describe("update-route Command", func() {
 				})
 			})
 
-			/*When("the route options are not specified", func() {
+			When("the route options are not specified", func() {
 				BeforeEach(func() {
-					cmd.Options = []string{}
+					cmd.Options = nil
+					cmd.RemoveOptions = nil
 				})
 
 				It("does not update a route giving the error message", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(executeErr).To(BeNil())
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
 					Expect(testUI.Out).To(Say("No options were specified for the update of the Route"))
 				})
-			})*/
+			})
+
+			When("the route options are specified incorrectly", func() {
+				BeforeEach(func() {
+					cmd.Options = []string{"loadbalancing"}
+				})
+				It("does not update a route giving the error message", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
+					Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+				})
+			})
 
 			When("removing the options of the route succeeds", func() {
 				BeforeEach(func() {
@@ -239,9 +254,15 @@ var _ = Describe("update-route Command", func() {
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(0))
 
-						Expect(fakeActor.UpdateRouteCallCount()).To(Equal(1))
+						Expect(fakeActor.UpdateRouteCallCount()).To(Equal(2))
 						actualRouteGUID, actualOptions := fakeActor.UpdateRouteArgsForCall(0)
 						Expect(actualRouteGUID).To(Equal("route-guid"))
+						Expect(actualOptions).To(Equal(options))
+
+						//Second update route call to remove the option
+						actualRouteGUID, actualOptions = fakeActor.UpdateRouteArgsForCall(1)
+						Expect(actualRouteGUID).To(Equal("route-guid"))
+						options["loadbalancing"] = nil
 						Expect(actualOptions).To(Equal(options))
 					})
 				})
