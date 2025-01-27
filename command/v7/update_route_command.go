@@ -73,18 +73,28 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 		return nil
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Updating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
-		map[string]interface{}{
-			"URL":       url,
-			"User":      user.Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-		})
-
 	if cmd.Options != nil {
+		routeOpts, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
+		for _, option := range wrongOptSpecs {
+			cmd.UI.DisplayTextWithFlavor("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
+				map[string]interface{}{
+					"Option": option,
+				})
+		}
+		if len(wrongOptSpecs) > 0 {
+			return nil
+		}
+
+		cmd.UI.DisplayTextWithFlavor("Updating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
+			map[string]interface{}{
+				"URL":       url,
+				"User":      user.Name,
+				"SpaceName": cmd.Config.TargetedSpace().Name,
+				"OrgName":   cmd.Config.TargetedOrganization().Name,
+			})
 		route, warnings, err = cmd.Actor.UpdateRoute(
 			route.GUID,
-			resources.NewRouteOptions(cmd.Options),
+			routeOpts,
 		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -93,7 +103,7 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 	}
 
 	if cmd.RemoveOptions != nil {
-		inputRouteOptions := resources.NewRouteOptions(cmd.RemoveOptions)
+		inputRouteOptions := resources.RemoveRouteOptions(cmd.RemoveOptions)
 		route, warnings, err = cmd.Actor.UpdateRoute(
 			route.GUID,
 			inputRouteOptions,
