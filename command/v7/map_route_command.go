@@ -83,14 +83,6 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
 		}
-
-		if cmd.Options != nil && len(cmd.Options) > 0 {
-			err := cmd.validateAPIVersionForPerRouteOptions()
-			if err != nil {
-				return err
-			}
-		}
-
 		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
 			map[string]interface{}{
 				"URL":       url,
@@ -98,6 +90,13 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 				"SpaceName": cmd.Config.TargetedSpace().Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
 			})
+
+		if cmd.Options != nil && len(cmd.Options) > 0 {
+			err := cmd.validateAPIVersionForPerRouteOptions()
+			if err != nil {
+				return err
+			}
+		}
 
 		route, warnings, err = cmd.Actor.CreateRoute(
 			cmd.Config.TargetedSpace().GUID,

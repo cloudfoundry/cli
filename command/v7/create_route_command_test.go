@@ -164,29 +164,30 @@ var _ = Describe("create-route Command", func() {
 			})
 		})
 
-		When("creating the route with default route options is successful when the CC API version is too old for route options", func() {
+		When("creating the route fails when the CC API version is too old for route options", func() {
 			BeforeEach(func() {
 				cCAPIOldVersion = strconv.Itoa(1)
 				fakeConfig.APIVersionReturns(cCAPIOldVersion)
-				fakeActor.CreateRouteReturns(resources.Route{
-					URL:     domainName,
-					Options: map[string]*string{},
-				}, nil, nil)
 			})
 
-			It("creates a route with default route options", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
-				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
-				Expect(expectedDomainName).To(Equal(domainName))
-				Expect(expectedHostname).To(Equal(hostname))
-				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				Expect(expectedOptions).To(Equal(map[string]*string{}))
+			It("does not create a route and gives error message", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
 				Expect(testUI.Out).To(Say("Your CC API"))
 				Expect(testUI.Out).To(Say("does not support per route options"))
-				Expect(testUI.Out).To(Say(`Route %s has been created.`, domainName))
-				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("creating the route fails when route options are specified incorrectly", func() {
+			BeforeEach(func() {
+				cmdOptions = []string{"loadbalancing"}
+			})
+
+			It("does not create a route and gives an error message", func() {
+				Expect(executeErr).To(BeNil())
+				Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 			})
 		})
 
