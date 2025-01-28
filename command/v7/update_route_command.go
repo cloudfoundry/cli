@@ -74,15 +74,14 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 	}
 
 	if cmd.Options != nil {
-		routeOpts, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
-		for _, option := range wrongOptSpecs {
-			cmd.UI.DisplayWarning("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
-				map[string]interface{}{
-					"Option": option,
-				})
-		}
-		if len(wrongOptSpecs) > 0 {
-			return nil
+		routeOpts, wrongOptSpec := resources.CreateRouteOptions(cmd.Options)
+		if wrongOptSpec != nil {
+			return actionerror.RouteOptionError{
+				Name:       *wrongOptSpec,
+				DomainName: domain.Name,
+				Path:       path,
+				Host:       cmd.Hostname,
+			}
 		}
 
 		cmd.UI.DisplayTextWithFlavor("Updating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",

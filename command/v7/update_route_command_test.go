@@ -198,9 +198,8 @@ var _ = Describe("update-route Command", func() {
 					cmd.Options = []string{"loadbalancing"}
 				})
 				It("does not update a route giving the error message", func() {
-					Expect(executeErr).To(BeNil())
+					Expect(executeErr).To(MatchError(actionerror.RouteOptionError{Name: "loadbalancing", DomainName: domain, Path: path, Host: hostname}))
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
-					Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
 				})
 			})
 

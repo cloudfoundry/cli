@@ -66,22 +66,26 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	path := cmd.Path.Path
 	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain, cmd.Hostname, path, cmd.Port)
 
-	routeOptions, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
-	for _, option := range wrongOptSpecs {
-		cmd.UI.DisplayWarning("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
-			map[string]interface{}{
-				"Option": option,
-			})
-	}
-	if len(wrongOptSpecs) > 0 {
-		return nil
-	}
-
 	url := desiredURL(domain.Name, cmd.Hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
+		}
+		if cmd.Options != nil && len(cmd.Options) > 0 {
+			err := cmd.validateAPIVersionForPerRouteOptions()
+			if err != nil {
+				return err
+			}
+		}
+		routeOptions, wrongOptSpec := resources.CreateRouteOptions(cmd.Options)
+		if wrongOptSpec != nil {
+			return actionerror.RouteOptionError{
+				Name:       *wrongOptSpec,
+				DomainName: domain.Name,
+				Path:       path,
+				Host:       cmd.Hostname,
+			}
 		}
 		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
 			map[string]interface{}{
@@ -90,13 +94,6 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 				"SpaceName": cmd.Config.TargetedSpace().Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
 			})
-
-		if cmd.Options != nil && len(cmd.Options) > 0 {
-			err := cmd.validateAPIVersionForPerRouteOptions()
-			if err != nil {
-				return err
-			}
-		}
 
 		route, warnings, err = cmd.Actor.CreateRoute(
 			cmd.Config.TargetedSpace().GUID,
@@ -111,11 +108,10 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			return err
 		}
 		cmd.UI.DisplayOK()
-	}
-
-	if cmd.Options != nil && len(cmd.Options) > 0 {
-		cmd.UI.DisplayText("Route specific options can only be specified for nonexistent routes.")
-		return nil
+	} else {
+		if cmd.Options != nil && len(cmd.Options) > 0 {
+			return actionerror.RouteOptionSupportError{"Route specific options can only be specified for nonexistent routes."}
+		}
 	}
 
 	if cmd.AppProtocol != "" {
@@ -151,6 +147,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
+
 	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.AppProtocol)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
