@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
@@ -38,6 +39,7 @@ var _ = Describe("map-route Command", func() {
 		spaceGUID       string
 		options         []string
 		expectedOptions map[string]*string
+		cCAPIOldVersion string
 	)
 
 	BeforeEach(func() {
@@ -286,9 +288,51 @@ var _ = Describe("map-route Command", func() {
 					It("gives an error message", func() {
 						Expect(testUI.Err).To(Say("get-domain-warnings"))
 						Expect(testUI.Err).To(Say("get-app-warnings"))
-						Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+						Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
 						Expect(executeErr).To(BeNil())
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+					})
+				})
+
+				When("the requested route does not exist and CC API version is too old for route options", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							v7action.Warnings{"get-route-warnings"},
+							actionerror.RouteNotFoundError{},
+						)
+						cmd.Options = []string{"loadbalancing=round-robin"}
+						cCAPIOldVersion = strconv.Itoa(1)
+						fakeConfig.APIVersionReturns(cCAPIOldVersion)
+					})
+
+					It("gives an error message", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(testUI.Err).To(Say("CC API version"))
+						Expect(testUI.Err).To(Say("does not support per route options"))
+						Expect(executeErr).To(HaveOccurred())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+					})
+				})
+
+				When("the requested route does not exist and CC API version is too old for route options", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							v7action.Warnings{"get-route-warnings"},
+							actionerror.RouteNotFoundError{},
+						)
+						cmd.Options = nil
+						cCAPIOldVersion = strconv.Itoa(1)
+						fakeConfig.APIVersionReturns(cCAPIOldVersion)
+					})
+
+					It("succeeds because the options were not specified", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
 					})
 				})
 
