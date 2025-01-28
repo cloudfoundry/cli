@@ -173,9 +173,8 @@ var _ = Describe("create-route Command", func() {
 			It("does not create a route and gives error message", func() {
 				Expect(executeErr).To(HaveOccurred())
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
-				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
-				Expect(testUI.Out).To(Say("Your CC API"))
-				Expect(testUI.Out).To(Say("does not support per route options"))
+				Expect(testUI.Err).To(Say("Your CC API"))
+				Expect(testUI.Err).To(Say("does not support per route options"))
 			})
 		})
 
@@ -186,7 +185,7 @@ var _ = Describe("create-route Command", func() {
 
 			It("does not create a route and gives an error message", func() {
 				Expect(executeErr).To(BeNil())
-				Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+				Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 			})
 		})

@@ -68,7 +68,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 
 	routeOptions, wrongOptSpecs := resources.CreateRouteOptions(cmd.Options)
 	for _, option := range wrongOptSpecs {
-		cmd.UI.DisplayTextWithFlavor("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
+		cmd.UI.DisplayWarning("Option {{.Option}} is specified incorrectly. Please use key-value pair format key=value.",
 			map[string]interface{}{
 				"Option": option,
 			})
@@ -165,7 +165,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 func (cmd MapRouteCommand) validateAPIVersionForPerRouteOptions() error {
 	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionPerRouteOpts)
 	if err != nil {
-		cmd.UI.DisplayTextWithFlavor("Your CC API version ({{.APIVersion}}) does not support per route options."+
+		cmd.UI.DisplayWarning("Your CC API version ({{.APIVersion}}) does not support per route options."+
 			"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). ", map[string]interface{}{
 			"APIVersion":          cmd.Config.APIVersion(),
 			"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,

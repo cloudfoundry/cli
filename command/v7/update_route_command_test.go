@@ -176,8 +176,8 @@ var _ = Describe("update-route Command", func() {
 				It("does not update a route giving the error message", func() {
 					Expect(executeErr).To(HaveOccurred())
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
-					Expect(testUI.Out).To(Say("CC API version"))
-					Expect(testUI.Out).To(Say("does not support per route options"))
+					Expect(testUI.Err).To(Say("CC API version"))
+					Expect(testUI.Err).To(Say("does not support per route options"))
 				})
 			})
 
@@ -190,7 +190,7 @@ var _ = Describe("update-route Command", func() {
 				It("does not update a route giving the error message", func() {
 					Expect(executeErr).To(BeNil())
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
-					Expect(testUI.Out).To(Say("No options were specified for the update of the Route"))
+					Expect(testUI.Err).To(Say("No options were specified for the update of the Route"))
 				})
 			})
 
@@ -201,7 +201,7 @@ var _ = Describe("update-route Command", func() {
 				It("does not update a route giving the error message", func() {
 					Expect(executeErr).To(BeNil())
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
-					Expect(testUI.Out).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+					Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
 				})
 			})
 
