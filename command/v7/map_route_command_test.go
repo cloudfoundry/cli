@@ -512,7 +512,7 @@ var _ = Describe("map-route Command", func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(resources.RouteDestination{}, nil)
 						})
 						It("returns the error message", func() {
-							Expect(executeErr).To(MatchError(actionerror.RouteOptionSupportError{"Route specific options can only be specified for nonexistent routes."}))
+							Expect(executeErr).To(MatchError(actionerror.RouteOptionSupportError{ErrorText: "Route specific options can only be specified for nonexistent routes."}))
 							Expect(fakeActor.MapRouteCallCount()).To(Equal(0))
 						})
 					})

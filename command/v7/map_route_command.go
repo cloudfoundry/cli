@@ -110,7 +110,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 	} else {
 		if cmd.Options != nil && len(cmd.Options) > 0 {
-			return actionerror.RouteOptionSupportError{"Route specific options can only be specified for nonexistent routes."}
+			return actionerror.RouteOptionSupportError{ErrorText: "Route specific options can only be specified for nonexistent routes."}
 		}
 	}
 
