@@ -184,8 +184,7 @@ var _ = Describe("create-route Command", func() {
 			})
 
 			It("does not create a route and gives an error message", func() {
-				Expect(executeErr).To(BeNil())
-				Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
+				Expect(executeErr).To(MatchError(actionerror.RouteOptionError{Name: "loadbalancing", DomainName: domainName, Path: path, Host: hostname}))
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 			})
 		})

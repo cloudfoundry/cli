@@ -234,7 +234,7 @@ var _ = Describe("map-route Command", func() {
 						lbLCVal := "least-connections"
 						lbLeastConnections := &lbLCVal
 						fakeActor.GetRouteByAttributesReturns(
-							resources.Route{Options: map[string]*string{"loadbalancing": lbLeastConnections}},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
@@ -280,7 +280,7 @@ var _ = Describe("map-route Command", func() {
 						fakeActor.GetRouteByAttributesReturns(
 							resources.Route{},
 							nil,
-							nil,
+							actionerror.RouteNotFoundError{},
 						)
 						cmd.Options = []string{"loadbalancing"}
 					})
@@ -288,8 +288,7 @@ var _ = Describe("map-route Command", func() {
 					It("gives an error message", func() {
 						Expect(testUI.Err).To(Say("get-domain-warnings"))
 						Expect(testUI.Err).To(Say("get-app-warnings"))
-						Expect(testUI.Err).To(Say("Option loadbalancing is specified incorrectly. Please use key-value pair format key=value."))
-						Expect(executeErr).To(BeNil())
+						Expect(executeErr).To(MatchError(actionerror.RouteOptionError{Name: "loadbalancing", DomainName: domain, Path: path, Host: hostname}))
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 					})
 				})
@@ -513,8 +512,7 @@ var _ = Describe("map-route Command", func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(resources.RouteDestination{}, nil)
 						})
 						It("returns the error message", func() {
-							Expect(executeErr).To(BeNil())
-							Expect(testUI.Out).To(Say("Route specific options can only be specified for nonexistent routes."))
+							Expect(executeErr).To(MatchError(actionerror.RouteOptionSupportError{"Route specific options can only be specified for nonexistent routes."}))
 							Expect(fakeActor.MapRouteCallCount()).To(Equal(0))
 						})
 					})
