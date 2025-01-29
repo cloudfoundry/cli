@@ -41,6 +41,10 @@ var _ = Describe("space-users command", func() {
 			helpers.CreateOrgAndSpace(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("the target space has multiple users with different roles", func() {
 			var (
 				spaceManagerUser   string
