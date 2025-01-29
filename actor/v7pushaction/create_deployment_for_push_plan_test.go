@@ -152,6 +152,44 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 		})
+
+		When("canary weights are provided", func() {
+			BeforeEach(func() {
+				fakeV7Actor.PollStartForDeploymentCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+					handleInstanceDetails("Instances starting...")
+					return nil, nil
+				})
+
+				fakeV7Actor.CreateDeploymentReturns(
+					"some-deployment-guid",
+					v7action.Warnings{"some-deployment-warning"},
+					nil,
+				)
+				paramPlan.Strategy = "canary"
+				paramPlan.InstanceSteps = []int64{1, 2, 3, 4}
+			})
+
+			It("creates the correct deployment from the object", func() {
+				Expect(fakeV7Actor.CreateDeploymentCallCount()).To(Equal(1))
+				dep := fakeV7Actor.CreateDeploymentArgsForCall(0)
+				Expect(dep).To(Equal(resources.Deployment{
+					Strategy: "canary",
+					Options: resources.DeploymentOpts{
+						CanaryDeploymentOptions: resources.CanaryDeploymentOptions{
+							Steps: []resources.CanaryStep{
+								{InstanceWeight: 1},
+								{InstanceWeight: 2},
+								{InstanceWeight: 3},
+								{InstanceWeight: 4},
+							},
+						},
+					},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("waiting for app to start", func() {
