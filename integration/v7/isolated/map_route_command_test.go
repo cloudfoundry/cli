@@ -31,7 +31,7 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`Map an HTTP route:\n`))
 			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`Map a TCP route:\n`))
-			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT]\n`))
+			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
