@@ -257,6 +257,14 @@ jobs:
           path: cf-deployment
           ref: ${{steps.claim.outputs.cf_deployment_version}}    
   
+      - name: Checkout cf-deployment-main
+        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
+        uses: actions/checkout@v4
+        with:
+          repository: cloudfoundry/cf-deployment
+          path: cf-deployment-main
+          ref: main          
+
       - name: Deploy Isolation Segment and OIDC Provider
         if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
         run: |
@@ -266,6 +274,7 @@ jobs:
 
           bosh -d cf manifest > /tmp/manifest.yml
           bosh interpolate /tmp/manifest.yml \
+            -o cf-deployment-main/operations/enable-v2-api.yml \
             -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
             -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
             -o .github/ops-files/use-latest-capi.yml \
