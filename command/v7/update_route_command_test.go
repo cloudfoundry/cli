@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -188,9 +189,9 @@ var _ = Describe("update-route Command", func() {
 				})
 
 				It("does not update a route giving the error message", func() {
-					Expect(executeErr).To(BeNil())
+					Expect(executeErr).To(MatchError(actionerror.RouteOptionSupportError{
+						ErrorText: fmt.Sprintf("No options were specified for the update of the Route %s", domain)}))
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
-					Expect(testUI.Err).To(Say("No options were specified for the update of the Route"))
 				})
 			})
 

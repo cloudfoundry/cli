@@ -16,7 +16,7 @@ import (
 var _ = Describe("routes command", func() {
 
 	appProtocolValue := "http1"
-	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance`
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance\s+options`
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
