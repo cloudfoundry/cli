@@ -72,11 +72,10 @@ func NewTCPRoute(space string, domain string, port int, options map[string]*stri
 
 // Create creates a route using the 'cf create-route' command.
 func (r Route) Create() {
-	r.Options = make(map[string]*string)
 	if r.Port != 0 {
-		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port), "--option", fmt.Sprint(r.Options))).Should(Exit(0))
+		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port))).Should(Exit(0))
 	} else {
-		Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path, "--option", fmt.Sprint(r.Options))).Should(Exit(0))
+		Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path)).Should(Exit(0))
 	}
 }
 
