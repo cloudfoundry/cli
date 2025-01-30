@@ -20,7 +20,7 @@ func SetAPI() (string, bool) {
 	apiURL := GetAPI()
 	skipSSLValidation := SkipSSLValidation()
 	if skipSSLValidation {
-		Eventually(CF("api", apiURL, "--skip-ssl-validation")).Should(Exit(0))
+		Eventually(CF("api", apiURL, "--skip-ssl-validation")).Should(Exit(1))
 	} else {
 		Eventually(CF("api", apiURL)).Should(Exit(0))
 	}

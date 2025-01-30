@@ -107,7 +107,7 @@ var _ = Describe("update-route command", func() {
 						option = "loadbalancing=round-robin"
 						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--option", option)
 						Eventually(session).Should(Say(`Updating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Route %s\.%s has been updated\.`, hostname, domainName))
+						Eventually(session).Should(Say(`Route %s\.%s%s has been updated\.`, hostname, domainName, path))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
 					})
@@ -115,8 +115,8 @@ var _ = Describe("update-route command", func() {
 
 				When("route options are not specified", func() {
 					It("gives an error message and fails", func() {
-						session := helpers.CF("update-route", domainName, "--hostname", hostname)
-						Eventually(session).Should(Say(`No options were specified for the update of the Route %s`, domainName))
+						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path)
+						Eventually(session.Err).Should(Say(`Route option support: 'No options were specified for the update of the Route %s\.%s\%s`, hostname, domainName, path))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -152,7 +152,7 @@ var _ = Describe("update-route command", func() {
 					session := helpers.CF("update-route", domainName, "--hostname", hostname, "--option", option)
 					Eventually(session).Should(Say(`Updating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
 					Eventually(session.Err).Should(Say(`API endpoint not found at`))
-					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 
@@ -161,7 +161,7 @@ var _ = Describe("update-route command", func() {
 		When("the domain does not exist", func() {
 			It("gives an error message and exits", func() {
 				session := helpers.CF("update-route", "some-domain")
-				Eventually(session.Err).Should(Say(`Domain %s not found.`, "some-domain"))
+				Eventually(session.Err).Should(Say(`Domain '%s' not found.`, "some-domain"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
