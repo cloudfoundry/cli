@@ -29,17 +29,18 @@ var _ = Describe("map-route command", func() {
 
 			Eventually(session).Should(Say(`USAGE:`))
 			Eventually(session).Should(Say(`Map an HTTP route:\n`))
-			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\]\n`))
+			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`Map a TCP route:\n`))
 			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com                                                # example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost                              # myhost.example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo                   # myhost.example.com/foo`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-protocol http2 # myhost.example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                                    # example.com:5000`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com                                                      # example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost                                    # myhost.example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost -o loadbalancing=least-connections # myhost.example.com with a per-route option`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                                          # example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
@@ -47,11 +48,12 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
 			Eventually(session).Should(Say(`--app-protocol\s+\[Beta flag, subject to change\] Protocol for the route destination \(default: http1\). Only applied to HTTP routes`))
+			Eventually(session).Should(Say(`--option, -o\s+Set the value of a per-route option`))
 
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`create-route, routes, unmap-route`))
+			Eventually(session).Should(Say(`create-route, routes, unmap-route, update-route`))
 
 			Eventually(session).Should(Exit(0))
 		})

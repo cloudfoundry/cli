@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
@@ -66,11 +68,8 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 	}
 
 	if cmd.Options == nil && cmd.RemoveOptions == nil {
-		cmd.UI.DisplayWarning("No options were specified for the update of the Route {{.URL}}",
-			map[string]interface{}{
-				"URL": route.URL,
-			})
-		return nil
+		return actionerror.RouteOptionSupportError{
+			ErrorText: fmt.Sprintf("No options were specified for the update of the Route %s", route.URL)}
 	}
 
 	if cmd.Options != nil {
