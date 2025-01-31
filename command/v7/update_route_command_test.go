@@ -178,7 +178,7 @@ var _ = Describe("update-route Command", func() {
 					Expect(executeErr).To(HaveOccurred())
 					Expect(fakeActor.UpdateRouteCallCount()).To(Equal(0))
 					Expect(testUI.Err).To(Say("CC API version"))
-					Expect(testUI.Err).To(Say("does not support per route options"))
+					Expect(testUI.Err).To(Say("does not support per-route options"))
 				})
 			})
 

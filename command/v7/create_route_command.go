@@ -126,7 +126,7 @@ func desiredURL(domain, hostname, path string, port int) string {
 func (cmd CreateRouteCommand) validateAPIVersionForPerRouteOptions() error {
 	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionPerRouteOpts)
 	if err != nil {
-		cmd.UI.DisplayWarning("Your CC API version ({{.APIVersion}}) does not support per route options. Those will be ignored. Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}).", map[string]interface{}{
+		cmd.UI.DisplayWarning("Your CC API version ({{.APIVersion}}) does not support per-route options. Those will be ignored. Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}).", map[string]interface{}{
 			"APIVersion":          cmd.Config.APIVersion(),
 			"MinSupportedVersion": ccversion.MinVersionPerRouteOpts,
 		})

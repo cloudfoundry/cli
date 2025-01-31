@@ -309,7 +309,7 @@ var _ = Describe("map-route Command", func() {
 						Expect(testUI.Err).To(Say("get-domain-warnings"))
 						Expect(testUI.Err).To(Say("get-app-warnings"))
 						Expect(testUI.Err).To(Say("CC API version"))
-						Expect(testUI.Err).To(Say("does not support per route options"))
+						Expect(testUI.Err).To(Say("does not support per-route options"))
 						Expect(executeErr).To(HaveOccurred())
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 					})
@@ -507,7 +507,7 @@ var _ = Describe("map-route Command", func() {
 						cmd.Options = []string{"loadbalancing=least-connections"}
 					})
 
-					When("getting the per route options error", func() {
+					When("getting the per-route options error", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(resources.RouteDestination{}, nil)
 						})
