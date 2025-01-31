@@ -44,18 +44,14 @@ func (a Application) MarshalJSON() ([]byte, error) {
 		Metadata: a.Metadata,
 	}
 
-	relationShips := Relationships{}
+	ccApp.Relationships = Relationships{}
 
 	if a.SpaceGUID != "" {
-		relationShips[constant.RelationshipTypeSpace] = Relationship{GUID: a.SpaceGUID}
+		ccApp.Relationships[constant.RelationshipTypeSpace] = Relationship{GUID: a.SpaceGUID}
 	}
 
 	if a.CurrentDropletGUID != "" {
-		relationShips[constant.RelationshipTypeCurrentDroplet] = Relationship{GUID: a.CurrentDropletGUID}
-	}
-
-	if len(relationShips) > 0 {
-		ccApp.Relationships = relationShips
+		ccApp.Relationships[constant.RelationshipTypeCurrentDroplet] = Relationship{GUID: a.CurrentDropletGUID}
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
