@@ -106,7 +106,7 @@ var _ = Describe("update-route command", func() {
 					It("updates the route and runs to completion without failing", func() {
 						option = "loadbalancing=round-robin"
 						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", option)
-						Eventually(session).Should(Say(`Updating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Updating route %s\.%s%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Route %s\.%s%s has been updated\.`, hostname, domainName, path))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
@@ -123,7 +123,7 @@ var _ = Describe("update-route command", func() {
 
 				When("route options are specified in the wrong format", func() {
 					It("gives an error message and fails", func() {
-						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "-- option", "loadbalancing")
+						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", "loadbalancing")
 						Eventually(session).Should(Say(`Route option '%s' for route with host '%s', domain '%s', and path '%s' was specified incorrectly. Please use key-value pair format key=value.`, "loadbalancing", hostname, domainName, path))
 						Eventually(session).Should(Exit(1))
 					})
