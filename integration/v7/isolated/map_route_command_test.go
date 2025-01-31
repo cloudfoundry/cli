@@ -48,7 +48,7 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
 			Eventually(session).Should(Say(`--app-protocol\s+\[Beta flag, subject to change\] Protocol for the route destination \(default: http1\). Only applied to HTTP routes`))
-			Eventually(session).Should(Say(`--option, -o\s+Set the value of a per-route option`))
+			Eventually(session).Should(Say(`--option, -o\s+Set the value of a route specific option`))
 
 			Eventually(session).Should(Say(`\n`))
 
