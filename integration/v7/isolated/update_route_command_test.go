@@ -25,7 +25,7 @@ var _ = Describe("update-route command", func() {
 
 			Eventually(session).Should(Say(`USAGE:`))
 			Eventually(session).Should(Say(`Update an existing HTTP route:\n`))
-			Eventually(session).Should(Say(`cf update-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--option OPTION=VALUE\]\n`))
+			Eventually(session).Should(Say(`cf update-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--option OPTION=VALUE\] \[--remove-option OPTION\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
@@ -105,7 +105,7 @@ var _ = Describe("update-route command", func() {
 				When("a route option is specified", func() {
 					It("updates the route and runs to completion without failing", func() {
 						option = "loadbalancing=round-robin"
-						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--option", option)
+						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", option)
 						Eventually(session).Should(Say(`Updating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Route %s\.%s%s has been updated\.`, hostname, domainName, path))
 						Eventually(session).Should(Say(`OK`))
@@ -123,7 +123,7 @@ var _ = Describe("update-route command", func() {
 
 				When("route options are specified in the wrong format", func() {
 					It("gives an error message and fails", func() {
-						session := helpers.CF("update-route", domainName, "--hostname", hostname, "-- option", "loadbalancing")
+						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "-- option", "loadbalancing")
 						Eventually(session).Should(Say(`Route option '%s' for route with host '%s', domain '%s', and path '%s' was specified incorrectly. Please use key-value pair format key=value.`, "loadbalancing", hostname, domainName, path))
 						Eventually(session).Should(Exit(1))
 					})
@@ -162,7 +162,8 @@ var _ = Describe("update-route command", func() {
 			It("gives an error message and exits", func() {
 				session := helpers.CF("update-route", "some-domain")
 				Eventually(session.Err).Should(Say(`Domain '%s' not found.`, "some-domain"))
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 
