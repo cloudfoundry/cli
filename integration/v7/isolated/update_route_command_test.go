@@ -38,8 +38,8 @@ var _ = Describe("update-route command", func() {
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
-			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
 			Eventually(session).Should(Say(`--option, -o\s+Set the value of a per-route option`))
+			Eventually(session).Should(Say(`--remove-option, -r\s+Remove an option with the given name`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -107,7 +107,7 @@ var _ = Describe("update-route command", func() {
 						option = "loadbalancing=round-robin"
 						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", option)
 						Eventually(session).Should(Say(`Updating route %s\.%s%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
-						Eventually(session).Should(Say(`Route %s\.%s%s has been updated\.`, hostname, domainName, path))
+						Eventually(session).Should(Say(`Route %s\.%s%s has been updated`, hostname, domainName, path))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
 					})
@@ -124,7 +124,8 @@ var _ = Describe("update-route command", func() {
 				When("route options are specified in the wrong format", func() {
 					It("gives an error message and fails", func() {
 						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", "loadbalancing")
-						Eventually(session).Should(Say(`Route option '%s' for route with host '%s', domain '%s', and path '%s' was specified incorrectly. Please use key-value pair format key=value.`, "loadbalancing", hostname, domainName, path))
+						Eventually(session.Err).Should(Say(`Route option '%s' for route with host '%s', domain '%s', and path '%s' was specified incorrectly. Please use key-value pair format key=value.`, "loadbalancing", hostname, domainName, path))
+						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
 				})
