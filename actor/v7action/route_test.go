@@ -40,7 +40,7 @@ var _ = Describe("Route Actions", func() {
 			hostname = ""
 			path = ""
 			port = 0
-			lbLCVal := "least-connections"
+			lbLCVal := "least-connection"
 			lbLeastConnections := &lbLCVal
 			options = map[string]*string{"loadbalancing": lbLeastConnections}
 		})

@@ -37,7 +37,7 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com                                                      # example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost                                    # myhost.example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost -o loadbalancing=least-connections # myhost.example.com with a per-route option`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                                          # example.com:5000`))

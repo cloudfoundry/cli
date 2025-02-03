@@ -37,7 +37,7 @@ CF_NAME create-route example.com                                                
 CF_NAME create-route example.com --hostname myapp                                    # myapp.example.com
 CF_NAME create-route example.com --hostname myapp --path foo                         # myapp.example.com/foo
 CF_NAME create-route example.com --port 5000                                         # example.com:5000
-CF_NAME create-route example.com --hostname myapp -o loadbalancing=least-connections # myapp.example.com with a per-route option
+CF_NAME create-route example.com --hostname myapp -o loadbalancing=least-connection  # myapp.example.com with a per-route option
 `
 }
 

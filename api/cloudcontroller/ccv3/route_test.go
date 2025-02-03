@@ -43,8 +43,7 @@ var _ = Describe("Route", func() {
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-
-			lbLCVal := "least-connections"
+			lbLCVal := "least-connection"
 			lbLeastConnections := &lbLCVal
 			options = map[string]*string{"loadbalancing": lbLeastConnections}
 
@@ -67,23 +66,27 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
-  },  
+    "loadbalancing": "least-connection"
+  }, 
   "host": ""
 }`
 
 					expectedBody := `{
-  "relationships": {
-    "space": {
-	  "data": { "guid": "space-guid" }
+    "relationships": {
+        "space": {
+            "data": {
+                "guid": "space-guid"
+            }
+        },
+        "domain": {
+            "data": {
+                "guid": "domain-guid"
+            }
+        }
     },
-    "domain": {
-	  "data": { "guid": "domain-guid" }
+    "options": {
+        "loadbalancing": "least-connection"
     }
-  },
-  "options": {
-    "loadbalancing": "least-connections"
-  }
 }`
 
 					server.AppendHandlers(
@@ -123,7 +126,7 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
+    "loadbalancing": "least-connection"
   },
   "host": "cheesecake"
 }`
@@ -138,7 +141,7 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
+    "loadbalancing": "least-connection"
   },
   "host": "cheesecake"
 }`
@@ -186,7 +189,7 @@ var _ = Describe("Route", func() {
 	},
 	"path": "lion",
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     }  
 }`
 					expectedRequestBody := `{
@@ -202,10 +205,10 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
-	"path": "lion",
+    "path": "lion",
     "options": {
-      "loadbalancing": "least-connections"
-    }
+      "loadbalancing": "least-connection"
+    }  
 }`
 
 					server.AppendHandlers(
@@ -251,7 +254,7 @@ var _ = Describe("Route", func() {
 		}
 	},
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     },
 	"port": 1234
 }`
@@ -269,7 +272,7 @@ var _ = Describe("Route", func() {
 		}
 	},
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     },
 	"port": 1234
 }`
@@ -619,7 +622,7 @@ var _ = Describe("Route", func() {
 				destinationProtocol = ""
 				expectedBody = fmt.Sprintf(`
 					{
- 						"destinations": [
+						"destinations": [
 						 {
 							"app": {
 								"guid": "%s"
