@@ -14,8 +14,15 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: pushPlan.Application.GUID}},
 	}
 
-	if pushPlan.MaxInFlight != 0 {
+	if pushPlan.MaxInFlight > 0 {
 		dep.Options = resources.DeploymentOpts{MaxInFlight: pushPlan.MaxInFlight}
+	}
+
+	if len(pushPlan.InstanceSteps) > 0 {
+		dep.Options.CanaryDeploymentOptions = resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{}}
+		for _, w := range pushPlan.InstanceSteps {
+			dep.Options.CanaryDeploymentOptions.Steps = append(dep.Options.CanaryDeploymentOptions.Steps, resources.CanaryStep{InstanceWeight: w})
+		}
 	}
 
 	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
