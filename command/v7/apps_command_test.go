@@ -144,8 +144,9 @@ var _ = Describe("apps Command", func() {
 	When("the route actor does not return any errors", func() {
 		Context("with existing apps", func() {
 			BeforeEach(func() {
-				lbLCVal := "least-connections"
+				lbLCVal := "least-connection"
 				lbLeastConnections := &lbLCVal
+
 				appSummaries := []v7action.ApplicationSummary{
 					{
 						Application: resources.Application{
