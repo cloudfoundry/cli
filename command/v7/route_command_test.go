@@ -194,7 +194,7 @@ var _ = Describe("route Command", func() {
 
 			destinations := []resources.RouteDestination{destinationA, destinationB}
 
-			lbLCVal := "least-connections"
+			lbLCVal := "least-connection"
 			lbLeastConnections := &lbLCVal
 			options = map[string]*string{"loadbalancing": lbLeastConnections}
 

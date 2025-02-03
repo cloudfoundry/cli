@@ -30,7 +30,7 @@ Update an existing HTTP route:
 func (cmd UpdateRouteCommand) Examples() string {
 	return `
 CF_NAME update-route example.com -o loadbalancing=round-robin,
-CF_NAME update-route example.com -o loadbalancing=least-connections,
+CF_NAME update-route example.com -o loadbalancing=least-connection,
 CF_NAME update-route example.com -r loadbalancing,
 CF_NAME update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin`
 }

@@ -59,9 +59,9 @@ var _ = Describe("update-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
-		commandOptions = []string{"loadbalancing=least-connections"}
+		commandOptions = []string{"loadbalancing=least-connection"}
 		removeOptions = []string{"loadbalancing"}
-		lbLCVal := "least-connections"
+		lbLCVal := "least-connection"
 		lbLeastConnections := &lbLCVal
 		options = map[string]*string{"loadbalancing": lbLeastConnections}
 		routeGuid = "route-guid"

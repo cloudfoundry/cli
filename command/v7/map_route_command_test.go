@@ -231,14 +231,14 @@ var _ = Describe("map-route Command", func() {
 
 				When("the requested route does not exist", func() {
 					BeforeEach(func() {
-						lbLCVal := "least-connections"
+						lbLCVal := "least-connection"
 						lbLeastConnections := &lbLCVal
 						fakeActor.GetRouteByAttributesReturns(
 							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
-						cmd.Options = []string{"loadbalancing=least-connections"}
+						cmd.Options = []string{"loadbalancing=least-connection"}
 						expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
 					})
 
@@ -504,7 +504,7 @@ var _ = Describe("map-route Command", func() {
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
-						cmd.Options = []string{"loadbalancing=least-connections"}
+						cmd.Options = []string{"loadbalancing=least-connection"}
 					})
 
 					When("getting the per-route options error", func() {

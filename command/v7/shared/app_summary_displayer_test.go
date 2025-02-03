@@ -607,7 +607,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the application has routes with options", func() {
 			BeforeEach(func() {
-				lbLCVal := "least-connections"
+				lbLCVal := "least-connection"
 				options := map[string]*string{"loadbalancing": &lbLCVal}
 
 				summary.Routes = []resources.Route{
@@ -617,7 +617,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays routes", func() {
-				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com {loadbalancing=least-connections}", "route2.example.com"))
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com {loadbalancing=least-connection}", "route2.example.com"))
 			})
 		})
 

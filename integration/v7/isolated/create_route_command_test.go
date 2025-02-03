@@ -37,7 +37,7 @@ var _ = Describe("create-route command", func() {
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp\s+# myapp.example.com`))
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp --path foo\s+# myapp.example.com/foo`))
 			Eventually(session).Should(Say(`cf create-route example.com --port 5000\s+# example.com:5000`))
-			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp -o loadbalancing=least-connections\s+# myapp.example.com with a per-route option`))
+			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp -o loadbalancing=least-connection\s+# myapp.example.com with a per-route option`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))

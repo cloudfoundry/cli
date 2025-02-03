@@ -43,7 +43,7 @@ var _ = Describe("Route", func() {
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			lbLCVal := "least-connections"
+			lbLCVal := "least-connection"
 			lbLeastConnections := &lbLCVal
 			options = map[string]*string{"loadbalancing": lbLeastConnections}
 
@@ -66,7 +66,7 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
+    "loadbalancing": "least-connection"
   }, 
   "host": ""
 }`
@@ -85,7 +85,7 @@ var _ = Describe("Route", func() {
         }
     },
     "options": {
-        "loadbalancing": "least-connections"
+        "loadbalancing": "least-connection"
     }
 }`
 
@@ -126,7 +126,7 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
+    "loadbalancing": "least-connection"
   },
   "host": "cheesecake"
 }`
@@ -141,7 +141,7 @@ var _ = Describe("Route", func() {
     }
   },
   "options": {
-    "loadbalancing": "least-connections"
+    "loadbalancing": "least-connection"
   },
   "host": "cheesecake"
 }`
@@ -189,7 +189,7 @@ var _ = Describe("Route", func() {
 	},
 	"path": "lion",
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     }  
 }`
 					expectedRequestBody := `{
@@ -207,7 +207,7 @@ var _ = Describe("Route", func() {
 	},
     "path": "lion",
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     }  
 }`
 
@@ -254,7 +254,7 @@ var _ = Describe("Route", func() {
 		}
 	},
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     },
 	"port": 1234
 }`
@@ -272,7 +272,7 @@ var _ = Describe("Route", func() {
 		}
 	},
     "options": {
-      "loadbalancing": "least-connections"
+      "loadbalancing": "least-connection"
     },
 	"port": 1234
 }`

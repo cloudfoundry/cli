@@ -59,8 +59,8 @@ var _ = Describe("create-route Command", func() {
 		path = ""
 		port = 0
 
-		cmdOptions = []string{"loadbalancing=least-connections"}
-		lbLCVal := "least-connections"
+		cmdOptions = []string{"loadbalancing=least-connection"}
+		lbLCVal := "least-connection"
 		lbLeastConnections := &lbLCVal
 		options = map[string]*string{"loadbalancing": lbLeastConnections}
 

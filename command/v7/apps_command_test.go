@@ -144,7 +144,7 @@ var _ = Describe("apps Command", func() {
 	When("the route actor does not return any errors", func() {
 		Context("with existing apps", func() {
 			BeforeEach(func() {
-				lbLCVal := "least-connections"
+				lbLCVal := "least-connection"
 				lbLeastConnections := &lbLCVal
 				appSummaries := []v7action.ApplicationSummary{
 					{
@@ -239,7 +239,7 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 
 				Expect(testUI.Out).To(Say(`name\s+requested state\s+processes\s+routes`))
-				Expect(testUI.Out).To(Say(`some-app-1\s+started\s+web:2/2, console:0/0, worker:0/1\s+some-app-1.some-other-domain {loadbalancing=least-connections}, some-app-1.some-domain`))
+				Expect(testUI.Out).To(Say(`some-app-1\s+started\s+web:2/2, console:0/0, worker:0/1\s+some-app-1.some-other-domain {loadbalancing=least-connection}, some-app-1.some-domain`))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))

@@ -30,7 +30,7 @@ var _ = Describe("update-route command", func() {
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=round-robin`))
-			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=least-connections`))
+			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=least-connection`))
 			Eventually(session).Should(Say(`cf update-route example.com -r loadbalancing`))
 			Eventually(session).Should(Say(`cf update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin`))
 			Eventually(session).Should(Say(`\n`))
