@@ -21,4 +21,7 @@ const (
 
 	// RelationshipTypeQuota is a relationship with a Cloud Controller quota (org quota or space quota).
 	RelationshipTypeQuota RelationshipType = "quota"
+
+	// RelationshipTypeCurrentDroplet is a relationship with a Droplet.
+	RelationshipTypeCurrentDroplet RelationshipType = "current_droplet"
 )
