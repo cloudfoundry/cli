@@ -464,7 +464,7 @@ var _ = Describe("Push Command", func() {
 							}),
 						}
 						manifestRepo.ReadManifestReturns(m, nil)
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool) (models.Route, error) {
+						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ string) (models.Route, error) {
 							return models.Route{
 								GUID:   "my-route-guid",
 								Host:   host,
@@ -487,7 +487,7 @@ var _ = Describe("Push Command", func() {
 						}
 
 						callCount := 0
-						routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool) (models.Route, error) {
+						routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ string) (models.Route, error) {
 							callCount = callCount + 1
 							switch callCount {
 							case 1:
@@ -553,7 +553,7 @@ var _ = Describe("Push Command", func() {
 							}
 
 							callCount := 0
-							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool) (models.Route, error) {
+							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, _ int, useRandomPort bool, _ string) (models.Route, error) {
 								callCount = callCount + 1
 								switch callCount {
 								case 1:
@@ -593,7 +593,7 @@ var _ = Describe("Push Command", func() {
 				Context("when pushing an app", func() {
 					BeforeEach(func() {
 						deps.UI = uiWithContents
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool) (models.Route, error) {
+						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ int, _ bool, _ string) (models.Route, error) {
 							return models.Route{
 								GUID:   "my-route-guid",
 								Host:   host,
@@ -665,7 +665,7 @@ var _ = Describe("Push Command", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 
 							Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-							host, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+							host, _, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 							Expect(host).To(Equal("manifestapp-nam"))
 						})
 					})
@@ -680,7 +680,7 @@ var _ = Describe("Push Command", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 
 							Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-							host, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+							host, _, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 							Expect(host).To(Equal("appname"))
 						})
 					})
@@ -1043,7 +1043,7 @@ var _ = Describe("Push Command", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
 								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-								host, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+								host, _, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(host).To(Equal("app-name-random-host"))
 							})
 						})
@@ -1058,7 +1058,7 @@ var _ = Describe("Push Command", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
 								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-								host, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+								host, _, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(host).To(Equal("app-name-random-host"))
 							})
 						})
@@ -1100,7 +1100,7 @@ var _ = Describe("Push Command", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
 								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-								_, _, _, _, randomPort := routeActor.FindOrCreateRouteArgsForCall(0)
+								_, _, _, _, randomPort, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(randomPort).To(BeTrue())
 							})
 						})
@@ -1115,7 +1115,7 @@ var _ = Describe("Push Command", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
 								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-								_, _, _, _, randomPort := routeActor.FindOrCreateRouteArgsForCall(0)
+								_, _, _, _, randomPort, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(randomPort).To(BeTrue())
 							})
 						})
@@ -1403,7 +1403,7 @@ var _ = Describe("Push Command", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
 						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-						_, domain, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+						_, domain, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 						Expect(domain.GUID).To(Equal("bar-domain-guid"))
 					})
 
@@ -1768,7 +1768,7 @@ var _ = Describe("Push Command", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
 						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
-						hostname, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+						hostname, _, _, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 						Expect(hostname).To(BeEmpty())
 					})
 				})

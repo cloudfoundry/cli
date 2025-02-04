@@ -238,6 +238,7 @@ func newAppPresenter() appPresenter {
 				{
 					presentCommand("routes"),
 					presentCommand("create-route"),
+					presentCommand("update-route"),
 					presentCommand("check-route"),
 					presentCommand("map-route"),
 					presentCommand("unmap-route"),
