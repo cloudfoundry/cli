@@ -339,7 +339,13 @@ var _ = Describe("Deployment", func() {
 					"strategy": "canary",
 					"status": {
 						"value": "FINALIZED",
-						"reason": "SUPERSEDED"
+						"reason": "SUPERSEDED",
+						"canary": {
+							"steps": {
+								"current": 4,
+								"total": 5
+							}
+   						}
 					},
 					"droplet": {
  					  "guid": "some-droplet-guid"
@@ -374,6 +380,8 @@ var _ = Describe("Deployment", func() {
 				Expect(deployment.StatusValue).To(Equal(constant.DeploymentStatusValueFinalized))
 				Expect(deployment.StatusReason).To(Equal(constant.DeploymentStatusReasonSuperseded))
 				Expect(deployment.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+				Expect(deployment.CanaryStatus.Steps.CurrentStep).To(Equal(4))
+				Expect(deployment.CanaryStatus.Steps.TotalSteps).To(Equal(5))
 			})
 		})
 
