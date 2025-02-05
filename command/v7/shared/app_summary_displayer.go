@@ -60,7 +60,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 func routeSummary(rs []resources.Route) string {
 	formattedRoutes := []string{}
 	for _, route := range rs {
-		formattedRoutes = append(formattedRoutes, route.URL)
+		formattedRoutes = append(formattedRoutes, route.URL+route.FormattedOptions())
 	}
 	return strings.Join(formattedRoutes, ", ")
 }

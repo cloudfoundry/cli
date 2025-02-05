@@ -79,7 +79,7 @@ func (cmd AppsCommand) Execute(args []string) error {
 func getURLs(routes []resources.Route) string {
 	var routeURLs []string
 	for _, route := range routes {
-		routeURLs = append(routeURLs, route.URL)
+		routeURLs = append(routeURLs, route.URL+route.FormattedOptions())
 	}
 
 	return strings.Join(routeURLs, ", ")
