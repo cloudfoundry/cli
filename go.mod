@@ -3,7 +3,7 @@ module code.cloudfoundry.org/cli
 go 1.23.1
 
 require (
-	code.cloudfoundry.org/bytefmt v0.26.0
+	code.cloudfoundry.org/bytefmt v0.28.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
@@ -13,14 +13,14 @@ require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.23.0
-	code.cloudfoundry.org/tlsconfig v0.16.0
+	code.cloudfoundry.org/lager/v3 v3.25.0
+	code.cloudfoundry.org/tlsconfig v0.17.0
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 	github.com/creack/pty v1.1.24
-	github.com/cyphar/filepath-securejoin v0.4.0
+	github.com/cyphar/filepath-securejoin v0.4.1
 	github.com/distribution/reference v0.6.0
 	github.com/fatih/color v1.18.0
 	github.com/google/go-querystring v1.1.0
@@ -39,10 +39,10 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
-	golang.org/x/crypto v0.32.0
+	golang.org/x/crypto v0.33.0
 	golang.org/x/net v0.34.0
-	golang.org/x/term v0.28.0
-	golang.org/x/text v0.21.0
+	golang.org/x/term v0.29.0
+	golang.org/x/text v0.22.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.32.1
@@ -65,7 +65,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/pprof v0.0.0-20250120214715-4e5bb2051dab // indirect
+	github.com/google/pprof v0.0.0-20250202011525-fc3143867406 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/pty v1.1.8 // indirect
@@ -80,8 +80,8 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
