@@ -2,6 +2,7 @@ package resources
 
 import (
 	"encoding/json"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
@@ -31,6 +32,7 @@ type Route struct {
 	URL          string
 	Destinations []RouteDestination
 	Metadata     *Metadata
+	Options      map[string]*string
 }
 
 func (r Route) MarshalJSON() ([]byte, error) {
@@ -49,12 +51,13 @@ func (r Route) MarshalJSON() ([]byte, error) {
 
 	// Building up the request body in ccRoute
 	type ccRoute struct {
-		GUID          string         `json:"guid,omitempty"`
-		Host          string         `json:"host,omitempty"`
-		Path          string         `json:"path,omitempty"`
-		Protocol      string         `json:"protocol,omitempty"`
-		Port          int            `json:"port,omitempty"`
-		Relationships *Relationships `json:"relationships,omitempty"`
+		GUID          string             `json:"guid,omitempty"`
+		Host          string             `json:"host,omitempty"`
+		Path          string             `json:"path,omitempty"`
+		Protocol      string             `json:"protocol,omitempty"`
+		Port          int                `json:"port,omitempty"`
+		Relationships *Relationships     `json:"relationships,omitempty"`
+		Options       map[string]*string `json:"options,omitempty"`
 	}
 
 	ccR := ccRoute{
@@ -63,6 +66,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		Path:     r.Path,
 		Protocol: r.Protocol,
 		Port:     r.Port,
+		Options:  r.Options,
 	}
 
 	if r.SpaceGUID != "" {
@@ -85,6 +89,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 		URL          string             `json:"url,omitempty"`
 		Destinations []RouteDestination `json:"destinations,omitempty"`
 		Metadata     *Metadata          `json:"metadata,omitempty"`
+		Options      map[string]*string `json:"options,omitempty"`
 
 		Relationships struct {
 			Space struct {
@@ -115,6 +120,19 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	r.URL = alias.URL
 	r.Destinations = alias.Destinations
 	r.Metadata = alias.Metadata
+	r.Options = alias.Options
 
 	return nil
+}
+
+func (r *Route) FormattedOptions() string {
+	var routeOpts = []string{}
+	formattedOptions := ""
+	if r.Options != nil && len(r.Options) > 0 {
+		for optKey, optVal := range r.Options {
+			routeOpts = append(routeOpts, optKey+"="+*optVal)
+		}
+		formattedOptions = " {" + strings.Join(routeOpts, ", ") + "}"
+	}
+	return formattedOptions
 }
