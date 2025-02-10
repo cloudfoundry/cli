@@ -41,38 +41,42 @@ func FindOrCreateTCPRouterGroup(node int) string {
 
 // Route represents a route.
 type Route struct {
-	Domain string
-	Host   string
-	Path   string
-	Port   int
-	Space  string
+	Domain  string
+	Host    string
+	Path    string
+	Port    int
+	Space   string
+	Options map[string]*string
 }
 
 // NewRoute constructs a route with given space, domain, hostname, and path.
-func NewRoute(space string, domain string, hostname string, path string) Route {
+func NewRoute(space string, domain string, hostname string, path string, options map[string]*string) Route {
 	return Route{
-		Space:  space,
-		Domain: domain,
-		Host:   hostname,
-		Path:   path,
+		Space:   space,
+		Domain:  domain,
+		Host:    hostname,
+		Path:    path,
+		Options: options,
 	}
 }
 
 // NewTCPRoute constructs a TCP route with given space, domain, and port.
-func NewTCPRoute(space string, domain string, port int) Route {
+func NewTCPRoute(space string, domain string, port int, options map[string]*string) Route {
 	return Route{
-		Space:  space,
-		Domain: domain,
-		Port:   port,
+		Space:   space,
+		Domain:  domain,
+		Port:    port,
+		Options: options,
 	}
 }
 
 // Create creates a route using the 'cf create-route' command.
 func (r Route) Create() {
+	r.Options = make(map[string]*string)
 	if r.Port != 0 {
-		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port))).Should(Exit(0))
+		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port), "--option", fmt.Sprint(r.Options))).Should(Exit(0))
 	} else {
-		Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path)).Should(Exit(0))
+		Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path, "--option", fmt.Sprint(r.Options))).Should(Exit(0))
 	}
 }
 

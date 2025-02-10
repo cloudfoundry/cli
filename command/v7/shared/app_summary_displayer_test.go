@@ -566,6 +566,22 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
+		When("the application has routes with options", func() {
+			BeforeEach(func() {
+				lbLCVal := "least-connection"
+				options := map[string]*string{"loadbalancing": &lbLCVal}
+
+				summary.Routes = []resources.Route{
+					{Host: "route1", URL: "route1.example.com", Options: options},
+					{Host: "route2", URL: "route2.example.com"},
+				}
+			})
+
+			It("displays routes", func() {
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com {loadbalancing=least-connection}", "route2.example.com"))
+			})
+		})
+
 		When("the application has a stack", func() {
 			BeforeEach(func() {
 				summary.CurrentDroplet.Stack = "some-stack"
@@ -655,7 +671,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("there is an active deployment", func() {
 			var LastStatusChangeTimeString = "2024-07-29T17:32:29Z"
-			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3}\s\d{4}`
+			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3,4}\s\d{4}`
 			var maxInFlightDefaultValue = 1
 
 			When("the deployment strategy is rolling", func() {
