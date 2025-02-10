@@ -41,29 +41,32 @@ func FindOrCreateTCPRouterGroup(node int) string {
 
 // Route represents a route.
 type Route struct {
-	Domain string
-	Host   string
-	Path   string
-	Port   int
-	Space  string
+	Domain  string
+	Host    string
+	Path    string
+	Port    int
+	Space   string
+	Options map[string]*string
 }
 
 // NewRoute constructs a route with given space, domain, hostname, and path.
-func NewRoute(space string, domain string, hostname string, path string) Route {
+func NewRoute(space string, domain string, hostname string, path string, options map[string]*string) Route {
 	return Route{
-		Space:  space,
-		Domain: domain,
-		Host:   hostname,
-		Path:   path,
+		Space:   space,
+		Domain:  domain,
+		Host:    hostname,
+		Path:    path,
+		Options: options,
 	}
 }
 
 // NewTCPRoute constructs a TCP route with given space, domain, and port.
-func NewTCPRoute(space string, domain string, port int) Route {
+func NewTCPRoute(space string, domain string, port int, options map[string]*string) Route {
 	return Route{
-		Space:  space,
-		Domain: domain,
-		Port:   port,
+		Space:   space,
+		Domain:  domain,
+		Port:    port,
+		Options: options,
 	}
 }
 

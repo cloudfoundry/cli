@@ -371,7 +371,7 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateRouteStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
+	CreateRouteStub        func(string, string, string, string, int, map[string]*string) (resources.Route, v7action.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
@@ -379,6 +379,7 @@ type FakeActor struct {
 		arg3 string
 		arg4 string
 		arg5 int
+		arg6 map[string]*string
 	}
 	createRouteReturns struct {
 		result1 resources.Route
@@ -1327,6 +1328,23 @@ type FakeActor struct {
 		result1 v7action.EnvironmentVariableGroup
 		result2 v7action.Warnings
 		result3 error
+	}
+	GetEnvironmentVariableGroupByRevisionStub        func(resources.Revision) (v7action.EnvironmentVariableGroup, bool, v7action.Warnings, error)
+	getEnvironmentVariableGroupByRevisionMutex       sync.RWMutex
+	getEnvironmentVariableGroupByRevisionArgsForCall []struct {
+		arg1 resources.Revision
+	}
+	getEnvironmentVariableGroupByRevisionReturns struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 bool
+		result3 v7action.Warnings
+		result4 error
+	}
+	getEnvironmentVariableGroupByRevisionReturnsOnCall map[int]struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 bool
+		result3 v7action.Warnings
+		result4 error
 	}
 	GetEnvironmentVariablesByApplicationNameAndSpaceStub        func(string, string) (v7action.EnvironmentVariableGroups, v7action.Warnings, error)
 	getEnvironmentVariablesByApplicationNameAndSpaceMutex       sync.RWMutex
@@ -3355,6 +3373,22 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateRouteStub        func(string, map[string]*string) (resources.Route, v7action.Warnings, error)
+	updateRouteMutex       sync.RWMutex
+	updateRouteArgsForCall []struct {
+		arg1 string
+		arg2 map[string]*string
+	}
+	updateRouteReturns struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}
+	updateRouteReturnsOnCall map[int]struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}
 	UpdateRouteLabelsStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateRouteLabelsMutex       sync.RWMutex
 	updateRouteLabelsArgsForCall []struct {
@@ -5191,7 +5225,7 @@ func (fake *FakeActor) CreatePrivateDomainReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
+func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 map[string]*string) (resources.Route, v7action.Warnings, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -5200,13 +5234,14 @@ func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 s
 		arg3 string
 		arg4 string
 		arg5 int
-	}{arg1, arg2, arg3, arg4, arg5})
+		arg6 map[string]*string
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
 	stub := fake.CreateRouteStub
 	fakeReturns := fake.createRouteReturns
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -5220,17 +5255,17 @@ func (fake *FakeActor) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string, int, map[string]*string) (resources.Route, v7action.Warnings, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string, int) {
+func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string, int, map[string]*string) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeActor) CreateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
@@ -9399,6 +9434,76 @@ func (fake *FakeActor) GetEnvironmentVariableGroupReturnsOnCall(i int, result1 v
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevision(arg1 resources.Revision) (v7action.EnvironmentVariableGroup, bool, v7action.Warnings, error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	ret, specificReturn := fake.getEnvironmentVariableGroupByRevisionReturnsOnCall[len(fake.getEnvironmentVariableGroupByRevisionArgsForCall)]
+	fake.getEnvironmentVariableGroupByRevisionArgsForCall = append(fake.getEnvironmentVariableGroupByRevisionArgsForCall, struct {
+		arg1 resources.Revision
+	}{arg1})
+	stub := fake.GetEnvironmentVariableGroupByRevisionStub
+	fakeReturns := fake.getEnvironmentVariableGroupByRevisionReturns
+	fake.recordInvocation("GetEnvironmentVariableGroupByRevision", []interface{}{arg1})
+	fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionCallCount() int {
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
+	return len(fake.getEnvironmentVariableGroupByRevisionArgsForCall)
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionCalls(stub func(resources.Revision) (v7action.EnvironmentVariableGroup, bool, v7action.Warnings, error)) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = stub
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionArgsForCall(i int) resources.Revision {
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
+	argsForCall := fake.getEnvironmentVariableGroupByRevisionArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionReturns(result1 v7action.EnvironmentVariableGroup, result2 bool, result3 v7action.Warnings, result4 error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = nil
+	fake.getEnvironmentVariableGroupByRevisionReturns = struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 bool
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeActor) GetEnvironmentVariableGroupByRevisionReturnsOnCall(i int, result1 v7action.EnvironmentVariableGroup, result2 bool, result3 v7action.Warnings, result4 error) {
+	fake.getEnvironmentVariableGroupByRevisionMutex.Lock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.Unlock()
+	fake.GetEnvironmentVariableGroupByRevisionStub = nil
+	if fake.getEnvironmentVariableGroupByRevisionReturnsOnCall == nil {
+		fake.getEnvironmentVariableGroupByRevisionReturnsOnCall = make(map[int]struct {
+			result1 v7action.EnvironmentVariableGroup
+			result2 bool
+			result3 v7action.Warnings
+			result4 error
+		})
+	}
+	fake.getEnvironmentVariableGroupByRevisionReturnsOnCall[i] = struct {
+		result1 v7action.EnvironmentVariableGroup
+		result2 bool
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
 }
 
 func (fake *FakeActor) GetEnvironmentVariablesByApplicationNameAndSpace(arg1 string, arg2 string) (v7action.EnvironmentVariableGroups, v7action.Warnings, error) {
@@ -18274,6 +18379,74 @@ func (fake *FakeActor) UpdateProcessByTypeAndApplicationReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateRoute(arg1 string, arg2 map[string]*string) (resources.Route, v7action.Warnings, error) {
+	fake.updateRouteMutex.Lock()
+	ret, specificReturn := fake.updateRouteReturnsOnCall[len(fake.updateRouteArgsForCall)]
+	fake.updateRouteArgsForCall = append(fake.updateRouteArgsForCall, struct {
+		arg1 string
+		arg2 map[string]*string
+	}{arg1, arg2})
+	stub := fake.UpdateRouteStub
+	fakeReturns := fake.updateRouteReturns
+	fake.recordInvocation("UpdateRoute", []interface{}{arg1, arg2})
+	fake.updateRouteMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) UpdateRouteCallCount() int {
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
+	return len(fake.updateRouteArgsForCall)
+}
+
+func (fake *FakeActor) UpdateRouteCalls(stub func(string, map[string]*string) (resources.Route, v7action.Warnings, error)) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = stub
+}
+
+func (fake *FakeActor) UpdateRouteArgsForCall(i int) (string, map[string]*string) {
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
+	argsForCall := fake.updateRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) UpdateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = nil
+	fake.updateRouteReturns = struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) UpdateRouteReturnsOnCall(i int, result1 resources.Route, result2 v7action.Warnings, result3 error) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = nil
+	if fake.updateRouteReturnsOnCall == nil {
+		fake.updateRouteReturnsOnCall = make(map[int]struct {
+			result1 resources.Route
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.updateRouteReturnsOnCall[i] = struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) UpdateRouteLabels(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateRouteLabelsMutex.Lock()
 	ret, specificReturn := fake.updateRouteLabelsReturnsOnCall[len(fake.updateRouteLabelsArgsForCall)]
@@ -19650,6 +19823,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
 	fake.getEnvironmentVariableGroupMutex.RLock()
 	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
+	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
+	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
 	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
 	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getFeatureFlagByNameMutex.RLock()
@@ -19918,6 +20093,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateOrganizationQuotaMutex.RUnlock()
 	fake.updateProcessByTypeAndApplicationMutex.RLock()
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
 	fake.updateRouteLabelsMutex.RLock()
 	defer fake.updateRouteLabelsMutex.RUnlock()
 	fake.updateSecurityGroupMutex.RLock()

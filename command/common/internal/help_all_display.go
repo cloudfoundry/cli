@@ -15,9 +15,9 @@ var HelpCategoryList = []HelpCategory{
 			{"push", "scale", "delete", "rename"},
 			{"cancel-deployment", "continue-deployment"},
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
-			{"run-task", "tasks", "terminate-task"},
+			{"run-task", "task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
-			{"revisions", "rollback"},
+			{"revision", "revisions", "rollback"},
 			{"droplets", "set-droplet", "download-droplet"},
 			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
@@ -66,7 +66,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "ROUTES:",
 		CommandList: [][]string{
 			{"routes", "route"},
-			{"create-route", "check-route", "map-route", "unmap-route", "delete-route"},
+			{"create-route", "update-route", "check-route", "map-route", "unmap-route", "delete-route"},
 			{"delete-orphaned-routes"},
 			{"update-destination"},
 			{"share-route", "unshare-route"},
@@ -165,15 +165,6 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "ADD/REMOVE PLUGIN:",
 		CommandList: [][]string{
 			{"plugins", "install-plugin", "uninstall-plugin"},
-		},
-	},
-}
-
-var ExperimentalHelpCategoryList = []HelpCategory{
-	{
-		CategoryName: "EXPERIMENTAL COMMANDS:",
-		CommandList: [][]string{
-			{"revision"},
 		},
 	},
 }
