@@ -1,10 +1,10 @@
 package v7
 
 import (
+	"strconv"
+
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/resources"
-
-	"strconv"
 )
 
 type RouteCommand struct {
@@ -97,6 +97,7 @@ func (cmd RouteCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("port:"), port},
 		{cmd.UI.TranslateText("path:"), route.Path},
 		{cmd.UI.TranslateText("protocol:"), route.Protocol},
+		{cmd.UI.TranslateText("options:"), route.FormattedOptions()},
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
