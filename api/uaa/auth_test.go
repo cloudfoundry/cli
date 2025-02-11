@@ -161,6 +161,37 @@ var _ = Describe("Auth", func() {
 					Expect(refreshToken).To(BeEmpty())
 				})
 			})
+
+			When("the grant type is jwt bearer assertion", func() {
+				BeforeEach(func() {
+					response := `{
+						"access_token":"some-access-token"
+					}`
+
+					credentials = map[string]string{
+						"client_id":     "some-client-id",
+						"client_secret": "some-client-secret",
+					}
+					origin = ""
+					grantType = constant.GrantTypeJwtBearer
+					server.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestAuthorizationResource),
+							VerifyRequest(http.MethodPost, "/oauth/token"),
+							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+							VerifyHeaderKV("Authorization", "Basic c29tZS1jbGllbnQtaWQ6c29tZS1jbGllbnQtc2VjcmV0"),
+							VerifyBody([]byte(fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=%s", credentials["client_id"], credentials["client_secret"], url.QueryEscape(string(grantType))))),
+							RespondWith(http.StatusOK, response),
+						))
+				})
+
+				It("authenticates with the assertion provided", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(accessToken).To(Equal("some-access-token"))
+					Expect(refreshToken).To(BeEmpty())
+				})
+			})
 		})
 
 		When("an error occurs", func() {
