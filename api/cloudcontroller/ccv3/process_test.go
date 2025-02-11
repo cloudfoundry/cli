@@ -56,6 +56,14 @@ var _ = Describe("Process", func() {
 							"endpoint": "/health",
 							"invocation_timeout": 42
 						}
+					},
+					"readiness_health_check": {
+						"type": "http",
+						"data": {
+							"interval": 9,
+							"endpoint": "/foo",
+							"invocation_timeout": 2
+						}
 					}
 				}`
 				server.AppendHandlers(
@@ -70,18 +78,22 @@ var _ = Describe("Process", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(process).To(MatchAllFields(Fields{
-					"GUID":                         Equal("process-1-guid"),
-					"Type":                         Equal("some-type"),
-					"AppGUID":                      Equal("some-app-guid"),
-					"Command":                      Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
-					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
-					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
-					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
-					"LogRateLimitInBPS":            Equal(types.NullInt{Value: 512, IsSet: true}),
-					"HealthCheckType":              Equal(constant.HTTP),
-					"HealthCheckEndpoint":          Equal("/health"),
-					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
-					"HealthCheckTimeout":           BeEquivalentTo(90),
+					"GUID":                                  Equal("process-1-guid"),
+					"Type":                                  Equal("some-type"),
+					"AppGUID":                               Equal("some-app-guid"),
+					"Command":                               Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
+					"Instances":                             Equal(types.NullInt{Value: 22, IsSet: true}),
+					"MemoryInMB":                            Equal(types.NullUint64{Value: 32, IsSet: true}),
+					"DiskInMB":                              Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"LogRateLimitInBPS":                     Equal(types.NullInt{Value: 512, IsSet: true}),
+					"HealthCheckType":                       Equal(constant.HTTP),
+					"HealthCheckEndpoint":                   Equal("/health"),
+					"HealthCheckInvocationTimeout":          BeEquivalentTo(42),
+					"HealthCheckTimeout":                    BeEquivalentTo(90),
+					"ReadinessHealthCheckType":              Equal(constant.HTTP),
+					"ReadinessHealthCheckEndpoint":          Equal("/foo"),
+					"ReadinessHealthCheckInvocationTimeout": BeEquivalentTo(2),
+					"ReadinessHealthCheckInterval":          BeEquivalentTo(9),
 				}))
 			})
 		})
@@ -317,6 +329,14 @@ var _ = Describe("Process", func() {
 							"endpoint": "/health",
 							"invocation_timeout": 42
 						}
+					},
+					"readiness_health_check": {
+						"type": "http",
+						"data": {
+							"interval": 9,
+							"endpoint": "/foo",
+							"invocation_timeout": 2
+						}
 					}
 				}`
 				server.AppendHandlers(
@@ -331,18 +351,22 @@ var _ = Describe("Process", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(process).To(MatchAllFields(Fields{
-					"GUID":                         Equal("process-1-guid"),
-					"Type":                         Equal("some-type"),
-					"AppGUID":                      Equal("some-app-guid"),
-					"Command":                      Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
-					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
-					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
-					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
-					"LogRateLimitInBPS":            Equal(types.NullInt{Value: 64, IsSet: true}),
-					"HealthCheckType":              Equal(constant.HTTP),
-					"HealthCheckEndpoint":          Equal("/health"),
-					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
-					"HealthCheckTimeout":           BeEquivalentTo(90),
+					"GUID":                                  Equal("process-1-guid"),
+					"Type":                                  Equal("some-type"),
+					"AppGUID":                               Equal("some-app-guid"),
+					"Command":                               Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
+					"Instances":                             Equal(types.NullInt{Value: 22, IsSet: true}),
+					"MemoryInMB":                            Equal(types.NullUint64{Value: 32, IsSet: true}),
+					"DiskInMB":                              Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"LogRateLimitInBPS":                     Equal(types.NullInt{Value: 64, IsSet: true}),
+					"HealthCheckType":                       Equal(constant.HTTP),
+					"HealthCheckEndpoint":                   Equal("/health"),
+					"HealthCheckInvocationTimeout":          BeEquivalentTo(42),
+					"HealthCheckTimeout":                    BeEquivalentTo(90),
+					"ReadinessHealthCheckType":              Equal(constant.HTTP),
+					"ReadinessHealthCheckEndpoint":          Equal("/foo"),
+					"ReadinessHealthCheckInvocationTimeout": BeEquivalentTo(2),
+					"ReadinessHealthCheckInterval":          BeEquivalentTo(9),
 				}))
 			})
 		})

@@ -94,6 +94,7 @@ type Actor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetApplicationPackages(appName string, spaceGUID string) ([]resources.Package, v7action.Warnings, error)
 	GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]v7action.ProcessHealthCheck, v7action.Warnings, error)
+	GetApplicationProcessReadinessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error)
 	GetApplicationRevisionsDeployed(appGUID string) ([]resources.Revision, v7action.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)
 	GetApplicationTasks(appName string, sortOrder v7action.SortOrder) ([]resources.Task, v7action.Warnings, error)
