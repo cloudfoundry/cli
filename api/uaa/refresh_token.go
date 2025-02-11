@@ -29,7 +29,7 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, 
 	switch client.config.UAAGrantType() {
 	case string(constant.GrantTypeClientCredentials):
 		values = client.clientCredentialRefreshBody()
-	case "", string(constant.GrantTypePassword): // CLI used to write empty string for grant type in the case of password; preserve compatibility with old config.json files
+	case "", string(constant.GrantTypePassword), string(constant.GrantTypeJwtBearer): // CLI used to write empty string for grant type in the case of password; preserve compatibility with old config.json files
 		values = client.refreshTokenBody(refreshToken)
 	}
 
