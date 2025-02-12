@@ -1,6 +1,9 @@
 package v7
 
 import (
+	"strconv"
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/logcache"
@@ -8,11 +11,13 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type RestartCommand struct {
 	BaseCommand
 
+	InstanceSteps       string                  `long:"instance-steps" description:"An array of percentage steps to deploy when using deployment strategy canary. (e.g. 20,40,60)"`
 	MaxInFlight         *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively restarted at any given time. Only applies when --strategy flag is specified."`
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null."`
@@ -89,6 +94,18 @@ func (cmd RestartCommand) Execute(args []string) error {
 		opts.MaxInFlight = *cmd.MaxInFlight
 	}
 
+	if cmd.InstanceSteps != "" {
+		if len(cmd.InstanceSteps) > 0 {
+			for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+				parsedInt, err := strconv.ParseInt(v, 0, 64)
+				if err != nil {
+					return err
+				}
+				opts.CanarySteps = append(opts.CanarySteps, resources.CanaryStep{InstanceWeight: parsedInt})
+			}
+		}
+	}
+
 	if packageGUID != "" {
 		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, opts)
 		if err != nil {
@@ -110,6 +127,10 @@ func (cmd RestartCommand) ValidateFlags() error {
 		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
 	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
+	case cmd.Strategy.Name != constant.DeploymentStrategyCanary && cmd.InstanceSteps != "":
+		return translatableerror.RequiredFlagsError{Arg1: "--instance-steps", Arg2: "--strategy=canary"}
+	case len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps):
+		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
 	}
 
 	return nil
