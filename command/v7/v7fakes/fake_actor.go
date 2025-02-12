@@ -1419,6 +1419,20 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetInfoResponseStub        func() (v7action.Info, v7action.Warnings, error)
+	getInfoResponseMutex       sync.RWMutex
+	getInfoResponseArgsForCall []struct {
+	}
+	getInfoResponseReturns struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}
+	getInfoResponseReturnsOnCall map[int]struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetIsolationSegmentByNameStub        func(string) (resources.IsolationSegment, v7action.Warnings, error)
 	getIsolationSegmentByNameMutex       sync.RWMutex
 	getIsolationSegmentByNameArgsForCall []struct {
@@ -1753,17 +1767,17 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRootResponseStub        func() (v7action.Info, v7action.Warnings, error)
+	GetRootResponseStub        func() (v7action.Root, v7action.Warnings, error)
 	getRootResponseMutex       sync.RWMutex
 	getRootResponseArgsForCall []struct {
 	}
 	getRootResponseReturns struct {
-		result1 v7action.Info
+		result1 v7action.Root
 		result2 v7action.Warnings
 		result3 error
 	}
 	getRootResponseReturnsOnCall map[int]struct {
-		result1 v7action.Info
+		result1 v7action.Root
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -9818,6 +9832,65 @@ func (fake *FakeActor) GetGlobalStagingSecurityGroupsReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetInfoResponse() (v7action.Info, v7action.Warnings, error) {
+	fake.getInfoResponseMutex.Lock()
+	ret, specificReturn := fake.getInfoResponseReturnsOnCall[len(fake.getInfoResponseArgsForCall)]
+	fake.getInfoResponseArgsForCall = append(fake.getInfoResponseArgsForCall, struct {
+	}{})
+	stub := fake.GetInfoResponseStub
+	fakeReturns := fake.getInfoResponseReturns
+	fake.recordInvocation("GetInfoResponse", []interface{}{})
+	fake.getInfoResponseMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetInfoResponseCallCount() int {
+	fake.getInfoResponseMutex.RLock()
+	defer fake.getInfoResponseMutex.RUnlock()
+	return len(fake.getInfoResponseArgsForCall)
+}
+
+func (fake *FakeActor) GetInfoResponseCalls(stub func() (v7action.Info, v7action.Warnings, error)) {
+	fake.getInfoResponseMutex.Lock()
+	defer fake.getInfoResponseMutex.Unlock()
+	fake.GetInfoResponseStub = stub
+}
+
+func (fake *FakeActor) GetInfoResponseReturns(result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+	fake.getInfoResponseMutex.Lock()
+	defer fake.getInfoResponseMutex.Unlock()
+	fake.GetInfoResponseStub = nil
+	fake.getInfoResponseReturns = struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetInfoResponseReturnsOnCall(i int, result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+	fake.getInfoResponseMutex.Lock()
+	defer fake.getInfoResponseMutex.Unlock()
+	fake.GetInfoResponseStub = nil
+	if fake.getInfoResponseReturnsOnCall == nil {
+		fake.getInfoResponseReturnsOnCall = make(map[int]struct {
+			result1 v7action.Info
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getInfoResponseReturnsOnCall[i] = struct {
+		result1 v7action.Info
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetIsolationSegmentByName(arg1 string) (resources.IsolationSegment, v7action.Warnings, error) {
 	fake.getIsolationSegmentByNameMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentByNameReturnsOnCall[len(fake.getIsolationSegmentByNameArgsForCall)]
@@ -11274,7 +11347,7 @@ func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetRootResponse() (v7action.Info, v7action.Warnings, error) {
+func (fake *FakeActor) GetRootResponse() (v7action.Root, v7action.Warnings, error) {
 	fake.getRootResponseMutex.Lock()
 	ret, specificReturn := fake.getRootResponseReturnsOnCall[len(fake.getRootResponseArgsForCall)]
 	fake.getRootResponseArgsForCall = append(fake.getRootResponseArgsForCall, struct {
@@ -11298,36 +11371,36 @@ func (fake *FakeActor) GetRootResponseCallCount() int {
 	return len(fake.getRootResponseArgsForCall)
 }
 
-func (fake *FakeActor) GetRootResponseCalls(stub func() (v7action.Info, v7action.Warnings, error)) {
+func (fake *FakeActor) GetRootResponseCalls(stub func() (v7action.Root, v7action.Warnings, error)) {
 	fake.getRootResponseMutex.Lock()
 	defer fake.getRootResponseMutex.Unlock()
 	fake.GetRootResponseStub = stub
 }
 
-func (fake *FakeActor) GetRootResponseReturns(result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRootResponseReturns(result1 v7action.Root, result2 v7action.Warnings, result3 error) {
 	fake.getRootResponseMutex.Lock()
 	defer fake.getRootResponseMutex.Unlock()
 	fake.GetRootResponseStub = nil
 	fake.getRootResponseReturns = struct {
-		result1 v7action.Info
+		result1 v7action.Root
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetRootResponseReturnsOnCall(i int, result1 v7action.Info, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRootResponseReturnsOnCall(i int, result1 v7action.Root, result2 v7action.Warnings, result3 error) {
 	fake.getRootResponseMutex.Lock()
 	defer fake.getRootResponseMutex.Unlock()
 	fake.GetRootResponseStub = nil
 	if fake.getRootResponseReturnsOnCall == nil {
 		fake.getRootResponseReturnsOnCall = make(map[int]struct {
-			result1 v7action.Info
+			result1 v7action.Root
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getRootResponseReturnsOnCall[i] = struct {
-		result1 v7action.Info
+		result1 v7action.Root
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -19835,6 +19908,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getGlobalRunningSecurityGroupsMutex.RUnlock()
 	fake.getGlobalStagingSecurityGroupsMutex.RLock()
 	defer fake.getGlobalStagingSecurityGroupsMutex.RUnlock()
+	fake.getInfoResponseMutex.RLock()
+	defer fake.getInfoResponseMutex.RUnlock()
 	fake.getIsolationSegmentByNameMutex.RLock()
 	defer fake.getIsolationSegmentByNameMutex.RUnlock()
 	fake.getIsolationSegmentSummariesMutex.RLock()

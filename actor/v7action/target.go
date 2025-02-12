@@ -14,7 +14,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 
 	actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
 
-	rootInfo, warnings, err := actor.CloudControllerClient.GetInfo()
+	rootInfo, warnings, err := actor.CloudControllerClient.GetRoot()
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err

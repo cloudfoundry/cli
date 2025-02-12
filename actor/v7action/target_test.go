@@ -57,8 +57,8 @@ var _ = Describe("Targeting", func() {
 			}
 			meta.Version = expectedAPIVersion
 
-			rootResponse := ccv3.Info{
-				Links: ccv3.InfoLinks{
+			rootResponse := ccv3.Root{
+				Links: ccv3.RootLinks{
 					CCV3: resources.APILink{
 						Meta: meta,
 					},
@@ -76,7 +76,7 @@ var _ = Describe("Targeting", func() {
 					},
 				},
 			}
-			fakeCloudControllerClient.GetInfoReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
+			fakeCloudControllerClient.GetRootReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("Targeting", func() {
 
 		When("getting root info fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("info-error"))
+				fakeCloudControllerClient.GetRootReturns(ccv3.Root{}, ccv3.Warnings{"info-warning"}, errors.New("info-error"))
 			})
 
 			It("returns an error and all warnings", func() {
@@ -145,7 +145,7 @@ var _ = Describe("Targeting", func() {
 
 		When("deployed on Kubernetes", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{CFOnK8s: true}, nil, nil)
+				fakeCloudControllerClient.GetRootReturns(ccv3.Root{CFOnK8s: true}, nil, nil)
 			})
 
 			It("sets the CFOnK8s target information", func() {

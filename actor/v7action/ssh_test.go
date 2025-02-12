@@ -92,8 +92,8 @@ var _ = Describe("SSH Actions", func() {
 
 		When("the app ssh endpoint is empty", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
-					Links: ccv3.InfoLinks{
+				fakeCloudControllerClient.GetRootReturns(ccv3.Root{
+					Links: ccv3.RootLinks{
 						AppSSH: resources.APILink{HREF: ""},
 					},
 				}, nil, nil)
@@ -106,8 +106,8 @@ var _ = Describe("SSH Actions", func() {
 
 		When("the app ssh hostkey fingerprint is empty", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
-					Links: ccv3.InfoLinks{
+				fakeCloudControllerClient.GetRootReturns(ccv3.Root{
+					Links: ccv3.RootLinks{
 						AppSSH: resources.APILink{HREF: "some-app-ssh-endpoint"},
 					},
 				}, nil, nil)
@@ -120,8 +120,8 @@ var _ = Describe("SSH Actions", func() {
 
 		When("ssh endpoint and fingerprint are set", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
-					Links: ccv3.InfoLinks{
+				fakeCloudControllerClient.GetRootReturns(ccv3.Root{
+					Links: ccv3.RootLinks{
 						AppSSH: resources.APILink{
 							HREF: "some-app-ssh-endpoint",
 							Meta: resources.APILinkMeta{HostKeyFingerprint: "some-app-ssh-fingerprint"},
