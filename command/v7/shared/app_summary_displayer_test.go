@@ -566,6 +566,22 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
+		When("the application has routes with options", func() {
+			BeforeEach(func() {
+				lbLCVal := "least-connection"
+				options := map[string]*string{"loadbalancing": &lbLCVal}
+
+				summary.Routes = []resources.Route{
+					{Host: "route1", URL: "route1.example.com", Options: options},
+					{Host: "route2", URL: "route2.example.com"},
+				}
+			})
+
+			It("displays routes without their options", func() {
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com", "route2.example.com"))
+			})
+		})
+
 		When("the application has a stack", func() {
 			BeforeEach(func() {
 				summary.CurrentDroplet.Stack = "some-stack"
