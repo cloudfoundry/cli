@@ -346,5 +346,4 @@ var _ = Describe("apps Command", func() {
 			Expect(omitStats).To(Equal(true))
 		})
 	})
-
 })
