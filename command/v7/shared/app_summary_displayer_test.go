@@ -616,8 +616,8 @@ var _ = Describe("app summary displayer", func() {
 				}
 			})
 
-			It("displays routes", func() {
-				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com {loadbalancing=least-connection}", "route2.example.com"))
+			It("displays routes without their options", func() {
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com", "route2.example.com"))
 			})
 		})
 
