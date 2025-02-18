@@ -171,17 +171,17 @@ var _ = Describe("service command", func() {
 				})
 
 				It("displays the bound apps", func() {
-					//Delay to reduce flakiness
-					time.Sleep(10 * time.Second)
-					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
-					Eventually(session).Should(Exit(0))
-
-					Expect(session).To(SatisfyAll(
-						Say(`Showing bound apps:\n`),
-						Say(`name\s+binding name\s+status\s+message\n`),
-						Say(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
-						Say(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
-					))
+					Eventually(func(g Gomega) {
+						session := helpers.CF(serviceCommand, serviceInstanceName, "-v").Wait()
+						g.Expect(session).Should(Exit(0))
+						output := session.Buffer().Contents()
+						g.Expect(output).Should(SatisfyAll(
+							Say(`Showing bound apps:\n`),
+							Say(`name\s+binding name\s+status\s+message\n`),
+							ContainSubstring(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
+							ContainSubstring(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
+						))
+					}).Should(Succeed())
 				})
 			})
 
