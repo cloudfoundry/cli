@@ -31,6 +31,7 @@ type Data struct {
 	LogCacheEndPoint         string
 	MinCLIVersion            string
 	MinRecommendedCLIVersion string
+	NetworkPolicyV1Endpoint  string
 	OrganizationFields       models.OrganizationFields
 	PluginRepos              []models.PluginRepo
 	RefreshToken             string
