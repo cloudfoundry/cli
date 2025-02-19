@@ -55,7 +55,7 @@ var _ = Describe("V3 Config files", func() {
 		}
 		],
 		"MinCLIVersion": "6.0.0",
-		"MinRecommendedCLIVersion": "6.9.0"
+		"MinRecommendedCLIVersion": "6.9.0",
         "NetworkPolicyV1Endpoint": "the-network-policy-endpoint"
 	}`
 
@@ -105,7 +105,7 @@ var _ = Describe("V3 Config files", func() {
 		}
 		],
 		"MinCLIVersion": "6.0.0",
-		"MinRecommendedCLIVersion": "6.9.0"
+		"MinRecommendedCLIVersion": "6.9.0",
         "NetworkPolicyV1Endpoint": "the-network-policy-endpoint"
 	}`
 
