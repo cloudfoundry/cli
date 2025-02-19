@@ -133,6 +133,7 @@ var _ = Describe("V3 Config files", func() {
 				SSHOAuthClient:           "ssh-oauth-client-id",
 				MinCLIVersion:            "6.0.0",
 				MinRecommendedCLIVersion: "6.9.0",
+				NetworkPolicyV1Endpoint:  "",
 				OrganizationFields: models.OrganizationFields{
 					GUID: "the-org-guid",
 					Name: "the-org",
