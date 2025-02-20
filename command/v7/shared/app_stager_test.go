@@ -539,6 +539,24 @@ var _ = Describe("app stager", func() {
 				})
 			})
 
+			When("the app action is rollback", func() {
+				BeforeEach(func() {
+					appAction = constant.ApplicationRollingBack
+					strategy = constant.DeploymentStrategyCanary
+					canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}
+					app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
+				})
+
+				It("displays output for each step of starting", func() {
+					Expect(executeErr).To(BeNil())
+
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
+					deployment := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(deployment.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+					Expect(deployment.Options.CanaryDeploymentOptions.Steps).To(Equal(canaryWeightSteps))
+				})
+			})
+
 			When("the app action is restarting", func() {
 				It("displays output for each step of restarting", func() {
 					Expect(executeErr).To(BeNil())

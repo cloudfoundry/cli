@@ -122,6 +122,10 @@ func (stager *Stager) StartApp(app resources.Application, space configv3.Space, 
 			Strategy:      opts.Strategy,
 			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}},
 		}
+
+		if opts.Strategy == constant.DeploymentStrategyCanary && len(opts.CanarySteps) > 0 {
+			dep.Options = resources.DeploymentOpts{CanaryDeploymentOptions: resources.CanaryDeploymentOptions{Steps: opts.CanarySteps}}
+		}
 		switch opts.AppAction {
 		case constant.ApplicationRollingBack:
 			dep.RevisionGUID = resourceGuid
@@ -129,9 +133,6 @@ func (stager *Stager) StartApp(app resources.Application, space configv3.Space, 
 			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		default:
 			dep.DropletGUID = resourceGuid
-			if opts.Strategy == constant.DeploymentStrategyCanary && len(opts.CanarySteps) > 0 {
-				dep.Options = resources.DeploymentOpts{CanaryDeploymentOptions: resources.CanaryDeploymentOptions{Steps: opts.CanarySteps}}
-			}
 			dep.Options.MaxInFlight = opts.MaxInFlight
 			deploymentGUID, warnings, err = stager.Actor.CreateDeployment(dep)
 		}
