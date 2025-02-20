@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -154,6 +155,10 @@ func (cmd RollbackCommand) ValidateFlags() error {
 		return translatableerror.RequiredFlagsError{Arg1: "--instance-steps", Arg2: "--strategy=canary"}
 	case len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps):
 		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil

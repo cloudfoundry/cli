@@ -262,12 +262,15 @@ var _ = Describe("rollback Command", func() {
 					cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
 					cmd.InstanceSteps = "1,2,4"
 
+					fakeConfig = &commandfakes.FakeConfig{}
+					fakeConfig.APIVersionReturns("4.0.0")
+					cmd.Config = fakeConfig
+
 					_, err := input.Write([]byte("y\n"))
 					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("starts the app with the current droplet", func() {
-
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
 
@@ -353,6 +356,20 @@ var _ = Describe("rollback Command", func() {
 			translatableerror.ParseArgumentError{
 				ArgumentName: "--instance-steps",
 				ExpectedType: "list of weights",
+			}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.254.0",
 			}),
 	)
 })

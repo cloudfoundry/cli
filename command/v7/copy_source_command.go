@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/api/logcache"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -68,6 +69,10 @@ func (cmd *CopySourceCommand) ValidateFlags() error {
 
 	if len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps) {
 		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil

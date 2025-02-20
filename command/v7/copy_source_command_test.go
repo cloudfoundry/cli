@@ -480,5 +480,19 @@ var _ = Describe("copy-source Command", func() {
 				ArgumentName: "--instance-steps",
 				ExpectedType: "list of weights",
 			}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.254.0",
+			}),
 	)
 })

@@ -154,6 +154,9 @@ var _ = Describe("restart Command", func() {
 			BeforeEach(func() {
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
 				cmd.InstanceSteps = "1,2,4"
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("4.0.0")
+				cmd.Config = fakeConfig
 			})
 
 			It("starts the app with the current droplet", func() {
@@ -209,6 +212,10 @@ var _ = Describe("restart Command", func() {
 			BeforeEach(func() {
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
 				cmd.InstanceSteps = "1,2,4"
+
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("4.0.0")
+				cmd.Config = fakeConfig
 			})
 
 			It("starts the app with the current droplet", func() {
@@ -296,6 +303,20 @@ var _ = Describe("restart Command", func() {
 			translatableerror.ParseArgumentError{
 				ArgumentName: "--instance-steps",
 				ExpectedType: "list of weights",
+			}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.254.0",
 			}),
 	)
 })

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -576,6 +577,10 @@ func (cmd PushCommand) ValidateFlags() error {
 		return translatableerror.ArgumentCombinationError{Args: []string{"--instance-steps", "--strategy=rolling or --strategy not provided"}}
 	case len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps):
 		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil
