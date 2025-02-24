@@ -58,6 +58,10 @@ var _ = Describe("create-space-quota command", func() {
 			spaceQuotaName = helpers.QuotaName()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		When("the quota name is not provided", func() {
 			It("tells the user that the quota name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("create-space-quota")

@@ -26,6 +26,7 @@ var _ = Describe("set-space-role command", func() {
 
 		AfterEach(func() {
 			helpers.EnableFeatureFlag("set_roles_by_username")
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		When("the user does not exist", func() {
