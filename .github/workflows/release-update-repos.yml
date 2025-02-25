@@ -383,11 +383,13 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: >
-        sudo apt update &&
-        sudo apt install --yes --no-install-recommends
+        sudo apt update
+        && sudo apt install --yes --no-install-recommends
         gnupg
         createrepo-c
         awscli
+        python3-pip
+        && pip3 install awscli
 
     - name: Setup aws to upload installers to CLAW S3 bucket
       uses: aws-actions/configure-aws-credentials@v4
