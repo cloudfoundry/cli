@@ -387,7 +387,6 @@ jobs:
         && sudo apt install --yes --no-install-recommends
         gnupg
         createrepo-c
-        awscli
         python3-pip
         && pip3 install awscli
 
