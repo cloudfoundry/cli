@@ -68,18 +68,22 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	err = cmd.validateAPIVersionForPerRouteOptions()
-	if err != nil {
-		return err
-	}
+	var routeOptions map[string]*string
+	if len(cmd.Options) > 0 {
+		err = cmd.validateAPIVersionForPerRouteOptions()
+		if err != nil {
+			return err
+		}
 
-	routeOptions, wrongOptSpec := resources.CreateRouteOptions(cmd.Options)
-	if wrongOptSpec != nil {
-		return actionerror.RouteOptionError{
-			Name:       *wrongOptSpec,
-			DomainName: domain,
-			Path:       pathName,
-			Host:       hostname,
+		var wrongOptSpec *string
+		routeOptions, wrongOptSpec = resources.CreateRouteOptions(cmd.Options)
+		if wrongOptSpec != nil {
+			return actionerror.RouteOptionError{
+				Name:       *wrongOptSpec,
+				DomainName: domain,
+				Path:       pathName,
+				Host:       hostname,
+			}
 		}
 	}
 	route, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName, port, routeOptions)
