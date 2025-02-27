@@ -310,8 +310,8 @@ var _ = Describe("map-route Command", func() {
 						Expect(testUI.Err).To(Say("get-app-warnings"))
 						Expect(testUI.Err).To(Say("CC API version"))
 						Expect(testUI.Err).To(Say("does not support per-route options"))
-						Expect(executeErr).To(HaveOccurred())
-						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
 					})
 				})
 
