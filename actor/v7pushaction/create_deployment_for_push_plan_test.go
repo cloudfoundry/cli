@@ -175,7 +175,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				Expect(dep).To(Equal(resources.Deployment{
 					Strategy: "canary",
 					Options: resources.DeploymentOpts{
-						CanaryDeploymentOptions: resources.CanaryDeploymentOptions{
+						CanaryDeploymentOptions: &resources.CanaryDeploymentOptions{
 							Steps: []resources.CanaryStep{
 								{InstanceWeight: 1},
 								{InstanceWeight: 2},
