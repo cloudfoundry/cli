@@ -72,21 +72,21 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
 		}
-		if cmd.Options != nil && len(cmd.Options) > 0 {
-			err := cmd.validateAPIVersionForPerRouteOptions()
-			if err != nil {
-				return err
+
+		var routeOptions map[string]*string
+		if len(cmd.Options) > 0 && cmd.validateAPIVersionForPerRouteOptions() == nil {
+			var wrongOptSpec *string
+			routeOptions, wrongOptSpec = resources.CreateRouteOptions(cmd.Options)
+			if wrongOptSpec != nil {
+				return actionerror.RouteOptionError{
+					Name:       *wrongOptSpec,
+					DomainName: domain.Name,
+					Path:       path,
+					Host:       cmd.Hostname,
+				}
 			}
 		}
-		routeOptions, wrongOptSpec := resources.CreateRouteOptions(cmd.Options)
-		if wrongOptSpec != nil {
-			return actionerror.RouteOptionError{
-				Name:       *wrongOptSpec,
-				DomainName: domain.Name,
-				Path:       path,
-				Host:       cmd.Hostname,
-			}
-		}
+
 		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
 			map[string]interface{}{
 				"URL":       url,
@@ -109,7 +109,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		}
 		cmd.UI.DisplayOK()
 	} else {
-		if cmd.Options != nil && len(cmd.Options) > 0 {
+		if len(cmd.Options) > 0 {
 			return actionerror.RouteOptionSupportError{ErrorText: "Route specific options can only be specified for nonexistent routes."}
 		}
 	}

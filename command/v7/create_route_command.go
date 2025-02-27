@@ -69,12 +69,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 		})
 
 	var routeOptions map[string]*string
-	if len(cmd.Options) > 0 {
-		err = cmd.validateAPIVersionForPerRouteOptions()
-		if err != nil {
-			return err
-		}
-
+	if len(cmd.Options) > 0 && cmd.validateAPIVersionForPerRouteOptions() == nil {
 		var wrongOptSpec *string
 		routeOptions, wrongOptSpec = resources.CreateRouteOptions(cmd.Options)
 		if wrongOptSpec != nil {
