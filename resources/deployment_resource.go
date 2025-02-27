@@ -12,6 +12,7 @@ type Deployment struct {
 	State            constant.DeploymentState
 	StatusValue      constant.DeploymentStatusValue
 	StatusReason     constant.DeploymentStatusReason
+	CanaryStatus     CanaryStatus
 	LastStatusChange string
 	Options          DeploymentOpts
 	RevisionGUID     string
@@ -78,6 +79,15 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccDeployment)
 }
 
+type CanaryStepStatus struct {
+	CurrentStep int `json:"current"`
+	TotalSteps  int `json:"total"`
+}
+
+type CanaryStatus struct {
+	Steps CanaryStepStatus `json:"steps"`
+}
+
 // UnmarshalJSON helps unmarshal a Cloud Controller Deployment response.
 func (d *Deployment) UnmarshalJSON(data []byte) error {
 	var ccDeployment struct {
@@ -89,8 +99,9 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 			Details struct {
 				LastStatusChange string `json:"last_status_change"`
 			}
-			Value  constant.DeploymentStatusValue  `json:"value"`
-			Reason constant.DeploymentStatusReason `json:"reason"`
+			Value        constant.DeploymentStatusValue  `json:"value"`
+			Reason       constant.DeploymentStatusReason `json:"reason"`
+			CanaryStatus CanaryStatus                    `json:"canary,omitempty"`
 		} `json:"status"`
 		Droplet      Droplet                     `json:"droplet,omitempty"`
 		NewProcesses []Process                   `json:"new_processes,omitempty"`
@@ -109,6 +120,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.State = ccDeployment.State
 	d.StatusValue = ccDeployment.Status.Value
 	d.StatusReason = ccDeployment.Status.Reason
+	d.CanaryStatus = ccDeployment.Status.CanaryStatus
 	d.LastStatusChange = ccDeployment.Status.Details.LastStatusChange
 	d.DropletGUID = ccDeployment.Droplet.GUID
 	d.NewProcesses = ccDeployment.NewProcesses
