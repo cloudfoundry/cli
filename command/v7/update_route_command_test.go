@@ -269,6 +269,7 @@ var _ = Describe("update-route Command", func() {
 			})
 		})
 	})
+
 	When("getting the route errors", func() {
 		BeforeEach(func() {
 			fakeActor.GetRouteByAttributesReturns(
