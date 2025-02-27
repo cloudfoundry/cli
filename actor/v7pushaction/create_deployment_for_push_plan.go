@@ -19,7 +19,7 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 	}
 
 	if len(pushPlan.InstanceSteps) > 0 {
-		dep.Options.CanaryDeploymentOptions = resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{}}
+		dep.Options.CanaryDeploymentOptions = &resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{}}
 		for _, w := range pushPlan.InstanceSteps {
 			dep.Options.CanaryDeploymentOptions.Steps = append(dep.Options.CanaryDeploymentOptions.Steps, resources.CanaryStep{InstanceWeight: w})
 		}
