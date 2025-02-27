@@ -164,15 +164,15 @@ var _ = Describe("create-route Command", func() {
 			})
 		})
 
-		When("creating the route fails when the CC API version is too old for route options", func() {
+		When("creating the route does not fail when the CC API version is too old for route options", func() {
 			BeforeEach(func() {
 				cCAPIOldVersion = strconv.Itoa(1)
 				fakeConfig.APIVersionReturns(cCAPIOldVersion)
 			})
 
-			It("does not create a route and gives error message", func() {
-				Expect(executeErr).To(HaveOccurred())
-				Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+			It("does create a route and gives a warning message", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
 				Expect(testUI.Err).To(Say("Your CC API"))
 				Expect(testUI.Err).To(Say("does not support per-route options"))
 			})
@@ -205,13 +205,24 @@ var _ = Describe("create-route Command", func() {
 				Expect(testUI.Out).To(Say("OK"))
 			})
 
-			It("creates the route", func() {
-				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
-				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
-				Expect(expectedDomainName).To(Equal(domainName))
-				Expect(expectedHostname).To(Equal(hostname))
-				Expect(expectedOptions).To(Equal(options))
+			When("in a version of CAPI that does not support options", func() {
+				BeforeEach(func() {
+					fakeActor.CreateRouteReturns(resources.Route{
+						URL: domainName,
+					}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+					cmdOptions = []string{}
+					cCAPIOldVersion = strconv.Itoa(1)
+					fakeConfig.APIVersionReturns(cCAPIOldVersion)
+				})
+
+				It("creates the route when no options are provided", func() {
+					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _, _, expectedOptions := fakeActor.CreateRouteArgsForCall(0)
+					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
+					Expect(expectedDomainName).To(Equal(domainName))
+					Expect(expectedHostname).To(Equal(hostname))
+					Expect(expectedOptions).To(BeNil())
+				})
 			})
 
 			When("passing in a hostname", func() {
