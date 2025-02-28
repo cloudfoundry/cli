@@ -62,6 +62,9 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 			return err
 		}
 	}
+
+	// Update route only works for per route options. The command will fail instead instead of just
+	// ignoring the per-route options like it is the case for create-route and map-route.
 	err = cmd.validateAPIVersionForPerRouteOptions()
 	if err != nil {
 		return err
@@ -72,7 +75,7 @@ func (cmd UpdateRouteCommand) Execute(args []string) error {
 			ErrorText: fmt.Sprintf("No options were specified for the update of the Route %s", route.URL)}
 	}
 
-	if cmd.Options != nil {
+	if len(cmd.Options) > 0 {
 		routeOpts, wrongOptSpec := resources.CreateRouteOptions(cmd.Options)
 		if wrongOptSpec != nil {
 			return actionerror.RouteOptionError{
