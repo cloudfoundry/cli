@@ -29,7 +29,7 @@ func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (resources.De
 		return resources.Deployment{}, Warnings(warnings), actionerror.ActiveDeploymentNotFoundError{}
 	}
 
-	return resources.Deployment(ccDeployments[0]), Warnings(warnings), nil
+	return ccDeployments[0], Warnings(warnings), nil
 }
 
 func (actor Actor) CancelDeployment(deploymentGUID string) (Warnings, error) {
