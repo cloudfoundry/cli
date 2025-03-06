@@ -238,6 +238,7 @@ jobs:
         VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
         VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
       run: |
+        docker run -i --rm -v ${{ github.workspace }}:/workspace -w /workspace ubuntu:20.04 << EOM
         set -ex
         set -o pipefail
 
@@ -317,14 +318,17 @@ jobs:
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb $root/packaged-deb
           popd
         )
+        EOM
 
     - name: Print DEB Packages Info
       run: |
+        docker run -i --rm -v ${{ github.workspace }}:/workspace -w /workspace ubuntu:20.04 << EOM
         ls -R
         for f in *.deb; do
           echo $f
           dpkg --info $f
         done
+        EOM
       working-directory: packaged-deb
 
     - name: Store Debian Packages
@@ -373,5 +377,7 @@ jobs:
 
     - name: Display structure of downloaded files
       run: |
+        docker run -i --rm -v ${{ github.workspace }}:/workspace -w /workspace ubuntu:20.04 << EOM
         ls -R
         ls *.deb | xargs -n1 dpkg --info
+        EOM
