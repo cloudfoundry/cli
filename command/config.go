@@ -15,6 +15,7 @@ type Config interface {
 	AddPluginRepository(name string, url string)
 	AuthorizationEndpoint() string
 	APIVersion() string
+	B3TraceID() string
 	BinaryName() string
 	BinaryVersion() string
 	CFPassword() string
