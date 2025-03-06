@@ -2,22 +2,376 @@ name: Test legacy ubuntu container wrapper
 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: write
+    inputs:
+      release_version:
+        description: 'Release version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - minor
+          - patch
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  test-container-wrapper:
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
+    env:
+      VERSION_MAJOR: 8
+    outputs:
+      aws-s3-bucket:       "v${{ steps.bump-version.outputs.version-major }}-cf-cli-releases"
+
+      version-build: ${{ steps.bump-version.outputs.version-build }}
+      version-major: ${{ env.VERSION_MAJOR }}
+      version-minor: ${{ steps.bump-version.outputs.version-minor }}
+      version-patch: ${{ steps.bump-version.outputs.version-patch }}
+
     steps:
-    - name: Latest Ubuntu
-      run: cat /etc/os-release
-    - name: Ubuntu 20.04
+    - name: Checkout cli
+      uses: actions/checkout@v4
+      
+    - name: Bump version
+      id: bump-version
       run: |
-        docker run -i --rm -v ${{ github.workspace }}:/workspace -w /workspace ubuntu:20.04 << EOM
-          cat /etc/os-release
-        EOM
+        set -x
+        git fetch --tags --quiet
+        latest_tag="$(git tag | sort -V | grep v${VERSION_MAJOR} | tail -1)"
+        echo "Latest tag is ${latest_tag}"
+
+        version="${latest_tag#[vV]}"
+
+        version_minor="${version#*.}"
+        version_minor="${version_minor%.*}"
+        version_patch=${version##*.}
+
+        if [ "${{ inputs.release_version }}" == "minor" ]; then
+          version_minor=$(($version_minor + 1))
+          version_patch=0
+        else
+          version_patch=$(($version_patch + 1))
+        fi
+
+        new_version="${VERSION_MAJOR}.${version_minor}.${version_patch}"
+        echo "new version is ${new_version}"
+
+        echo "version-build=${new_version}"   >> "${GITHUB_OUTPUT}"
+        echo "version-minor=${version_minor}" >> "${GITHUB_OUTPUT}"
+        echo "version-patch=${version_patch}" >> "${GITHUB_OUTPUT}"
+
+
+  build-linux:
+    name: Build Linux
+    needs:
+    - setup
+    runs-on: ubuntu-latest
+
+    env:
+      VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+      VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
+
+    steps:
+
+    - name: Get Build Version
+      id: get_build_version
+      run: echo "VERSION_BUILD $VERSION_BUILD"
+
+    - name: Checkout cli
+      uses: actions/checkout@v4
+
+    - name: Checkout cli-ci
+      uses: actions/checkout@v4
+      with:
+        repository: cloudfoundry/cli-ci.git
+        path: cli-ci
+        ref: main
+
+    - name: Install Linux Packages
+      run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+
+    - name: Print go environment
+      id: go-cache-paths
+      run: |
+        echo "go-build=$(go env GOCACHE)"  >> "${GITHUB_OUTPUT}"
+        echo "go-mod=$(go env GOMODCACHE)" >> "${GITHUB_OUTPUT}"
+        go env
+
+    - name: Go Assets Cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+          ${{ steps.go-cache-paths.outputs.go-build }}
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Build Linux
+      env: 
+        CF_BUILD_VERSION: ${VERSION_BUILD}
+      run: |
+        make out/cf-cli_linux_i686
+        make out/cf-cli_linux_x86-64
+        make out/cf-cli_linux_arm64
+
+    - name: Store Linux Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-binaries
+        path: out/cf-cli_linux*
+
+    - name: Build RedHat Packages
+      env:
+        SIGNING_KEY_GPG_ID: ${{ secrets.SIGNING_KEY_GPG_ID }}
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        cat<< EOF >~/.rpmmacros
+        $SIGNING_KEY_GPG_ID
+        EOF
+
+        RPM_VERSION=${VERSION_BUILD//-/_}
+
+        mkdir -pv $root/packaged
+
+        echo "Build 32-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_i686 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/i386/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.rpm
+          popd
+        )
+
+        echo "Build 64-bit RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_x86-64 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/x86_64/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.rpm
+          popd
+        )
+
+        echo "Build arm64 RedHat package"
+        (
+          pushd cli-ci/ci/installers/rpm
+          cp $root/out/cf-cli_linux_arm64 cf${VERSION_MAJOR}
+          cp ../../license/NOTICE .
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+          cp ../completion/cf${VERSION_MAJOR} cf${VERSION_MAJOR}.bash
+          echo "Version: ${RPM_VERSION}" > cf-cli.spec
+          cat cf${VERSION_MAJOR}-cli.spec.template >> cf-cli.spec
+          rpmbuild --target aarch64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+          mv build/RPMS/aarch64/cf${VERSION_MAJOR}-cli*.rpm $root/packaged/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_aarch64.rpm
+          popd
+        )
+
+    - name: Load GPG key
+      env:
+        SIGNING_KEY_GPG: ${{ secrets.SIGNING_KEY_GPG }}
+      run: |
+        echo -n "$SIGNING_KEY_GPG" | base64 --decode | gpg --no-tty --batch --pinentry-mode loopback --import
+
+    - name: View GPG keys
+      run: |
+        gpg --list-keys
+
+    - name: Sign RedHat Packages
+      env:
+        SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
+        SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+      run: |
+        set -ex
+        set -o pipefail
+
+        mkdir signed-redhat-installer
+
+        cat<< EOF >~/.rpmmacros
+        %_signature gpg
+        %_gpg_name $SIGNING_KEY_GPG_ID
+        %_gpgbin /usr/bin/gpg2
+        %__gpg_sign_cmd %{__gpg} gpg --force-v3-sigs --batch --verbose --no-armor \
+          --passphrase "$SIGNING_KEY_GPG_PASSPHRASE" --no-secmem-warning -u "%{_gpg_name}" \
+          -sbo %{__signature_filename} --digest-algo sha256 %{__plaintext_filename}
+        EOF
+
+        cp packaged/cf*.rpm   signed-redhat-installer/
+
+        #TODO: consider to add --key-id
+        #TODO: DEV shim
+        rpmsign --addsign signed-redhat-installer/*.rpm
+
+    - name: Print RPM Signature
+      run: rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
+      working-directory: signed-redhat-installer
+
+    - name: Store Signed Linux RPM Packages
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-rpm-packages-test
+        path: signed-redhat-installer/*.rpm
+
+    - name: Build Debian Packages
+      env:
+        VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
+        VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
+      run: |
+        set -ex
+        set -o pipefail
+
+        root=$PWD
+
+        mkdir -pv $root/packaged-deb
+
+        echo "Build 32-bit Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_i686 | cut -f 1)"
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
+            cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
+            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
+            echo "Architecture: i386" >> cf/DEBIAN/control
+            cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
+            cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf${VERSION_MAJOR}
+            ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
+            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
+            mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb $root/packaged-deb
+            rm -rf cf
+          popd
+        )
+
+        echo "Build x86 64-bit Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_x86-64 | cut -f 1)"
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
+            cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
+            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
+            echo "Architecture: amd64" >> cf/DEBIAN/control
+            cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
+            cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf${VERSION_MAJOR}
+            ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
+            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
+            mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb $root/packaged-deb
+          popd
+        )
+
+        echo "Build ARM 64-bit Debian package"
+        (
+          SIZE="$(BLOCKSIZE=1000 du $root/out/cf-cli_linux_arm64 | cut -f 1)"
+          pushd cli-ci/ci/installers/deb
+            mkdir -p cf/usr/bin cf/usr/share/doc/cf${VERSION_MAJOR}-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+            cp copyright_preamble cf/DEBIAN/copyright
+            sed 's/^$/ ./' $root/LICENSE >> cf/DEBIAN/copyright
+            cat copyright_comment_header >> cf/DEBIAN/copyright
+            sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+            cp cf/DEBIAN/copyright cf/usr/share/doc/cf${VERSION_MAJOR}-cli/copyright
+            cp ../../license/NOTICE cf/usr/share/doc/cf${VERSION_MAJOR}-cli
+            cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf${VERSION_MAJOR}-cli/LICENSE
+            cp control_v${VERSION_MAJOR}.template cf/DEBIAN/control
+            echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+            echo "Version: ${VERSION_BUILD}" >> cf/DEBIAN/control
+            echo "Architecture: arm64" >> cf/DEBIAN/control
+            cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
+            cp $root/out/cf-cli_linux_arm64 cf/usr/bin/cf${VERSION_MAJOR}
+            ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
+            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
+            mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb $root/packaged-deb
+          popd
+        )
+
+    - name: Print DEB Packages Info
+      run: |
+        ls -R
+        for f in *.deb; do
+          echo $f
+          dpkg --info $f
+        done
+      working-directory: packaged-deb
+
+    - name: Store Debian Packages
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: cf-cli-linux-deb-packages-test
+        path: packaged-deb/*.deb
+
+  test-rpm-package:
+    name: Test RPM Artifacts
+    needs:
+    - setup
+    - build-linux
+    runs-on: ubuntu-latest
+    container:
+      image: fedora
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v4
+      with:
+        name: cf-cli-linux-rpm-packages-test
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Test RPMs
+      run: |
+        rpm -q --qf 'FN:\t%{FILENAMES}\nNAME:\t%{NAME}\nPGP:\t%{SIGPGP:pgpsig}\nGPG:\t%{SIGGPG:pgpsig}\n' -p *.rpm
+
+  test-deb-package:
+    name: Test Debian Artifacts
+    needs:
+    - setup
+    - build-linux
+    runs-on: ubuntu-20.04
+    container:
+      image: ubuntu:20.04
+    steps:
+
+    - name: Download Signed Linux Packages
+      uses: actions/download-artifact@v4
+      with:
+        name: cf-cli-linux-deb-packages-test
+
+    - name: Display structure of downloaded files
+      run: |
+        ls -R
+        ls *.deb | xargs -n1 dpkg --info
