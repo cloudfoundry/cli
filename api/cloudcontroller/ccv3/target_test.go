@@ -73,7 +73,7 @@ var _ = Describe("Target", func() {
 				fakeWrapper2.WrapReturns(fakeWrapper2)
 
 				fakeWrapper2.MakeStub = func(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-					apiInfo, ok := passedResponse.DecodeJSONResponseInto.(*Info)
+					apiInfo, ok := passedResponse.DecodeJSONResponseInto.(*Root)
 					if ok { // Only caring about the first time Make is called, ignore all others
 						apiInfo.Links.CCV3.HREF = server.URL() + "/v3"
 					}

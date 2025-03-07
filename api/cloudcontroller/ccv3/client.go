@@ -86,7 +86,7 @@ type Warnings []string
 
 // Client can be used to talk to a Cloud Controller's V3 Endpoints.
 type Client struct {
-	Info
+	Root
 	CloudControllerURL string
 
 	Requester

@@ -180,6 +180,7 @@ const (
 	UnmapRouteRequest                                           = "UnmapRoute"
 	UnshareRouteRequest                                         = "UnshareRoute"
 	WhoAmI                                                      = "WhoAmI"
+	Info                                                        = "Info"
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
@@ -355,4 +356,5 @@ var APIRoutes = map[string]Route{
 	PostUserRequest:                                             {Path: "/v3/users", Method: http.MethodPost},
 	DeleteUserRequest:                                           {Path: "/v3/users/:user_guid", Method: http.MethodDelete},
 	WhoAmI:                                                      {Path: "/whoami", Method: http.MethodGet},
+	Info:                                                        {Path: "/v3/info", Method: http.MethodGet},
 }

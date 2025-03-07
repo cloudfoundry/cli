@@ -23,11 +23,11 @@ var _ = Describe("Info Actions", func() {
 	})
 
 	Describe("GetRootResponse", func() {
-		When("getting info is successful", func() {
+		When("getting root is successful", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetInfoReturns(
-					ccv3.Info{
-						Links: ccv3.InfoLinks{
+				fakeCloudControllerClient.GetRootReturns(
+					ccv3.Root{
+						Links: ccv3.RootLinks{
 							LogCache: resources.APILink{HREF: "some-log-cache-url"},
 						},
 					},
@@ -42,8 +42,55 @@ var _ = Describe("Info Actions", func() {
 
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-				Expect(fakeCloudControllerClient.GetInfoCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRootCallCount()).To(Equal(1))
 				Expect(rootInfo.Links.LogCache.HREF).To(Equal("some-log-cache-url"))
+			})
+		})
+
+		When("the cloud controller client returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetRootReturns(
+					ccv3.Root{},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					expectedErr,
+				)
+			})
+
+			It("returns the same error and all warnings", func() {
+				_, warnings, err := actor.GetRootResponse()
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("GetInfoResponse", func() {
+		When("getting info is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetInfoReturns(
+					ccv3.Info{
+						Name:          "test-name",
+						Build:         "test-build",
+						OSBAPIVersion: "1.0",
+					},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns all warnings and info", func() {
+				info, warnings, err := actor.GetInfoResponse()
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetInfoCallCount()).To(Equal(1))
+				Expect(info.Name).To(Equal("test-name"))
+				Expect(info.Build).To(Equal("test-build"))
+				Expect(info.OSBAPIVersion).To(Equal("1.0"))
 			})
 		})
 
@@ -60,7 +107,7 @@ var _ = Describe("Info Actions", func() {
 			})
 
 			It("returns the same error and all warnings", func() {
-				_, warnings, err := actor.GetRootResponse()
+				_, warnings, err := actor.GetInfoResponse()
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})

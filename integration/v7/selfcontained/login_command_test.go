@@ -39,7 +39,7 @@ var _ = Describe("LoginCommand", func() {
 
 			apiConfig = fake.CFAPIConfig{
 				Routes: map[string]fake.Response{
-					"GET /": {Code: http.StatusOK, Body: ccv3.Info{CFOnK8s: true}},
+					"GET /": {Code: http.StatusOK, Body: ccv3.Root{CFOnK8s: true}},
 					"GET /v3/organizations": {
 						Code: http.StatusOK, Body: map[string]interface{}{
 							"pagination": map[string]interface{}{},
