@@ -233,7 +233,7 @@ jobs:
 
   update-deb:
     name: Update Debian Repository
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: setup
     env:
       CLAW_URL:              ${{ needs.setup.outputs.claw-url }}
@@ -305,10 +305,7 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     needs:
     - setup
     - update-deb
