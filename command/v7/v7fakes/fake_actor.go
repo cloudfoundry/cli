@@ -1116,6 +1116,22 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub        func(string, string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error)
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex       sync.RWMutex
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns struct {
+		result1 []v7action.ProcessReadinessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.ProcessReadinessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationRevisionsDeployedStub        func(string) ([]resources.Revision, v7action.Warnings, error)
 	getApplicationRevisionsDeployedMutex       sync.RWMutex
 	getApplicationRevisionsDeployedArgsForCall []struct {
@@ -8507,6 +8523,74 @@ func (fake *FakeActor) GetApplicationProcessHealthChecksByNameAndSpaceReturnsOnC
 	}
 	fake.getApplicationProcessHealthChecksByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 []v7action.ProcessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpace(arg1 string, arg2 string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall[len(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall)]
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall = append(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub
+	fakeReturns := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns
+	fake.recordInvocation("GetApplicationProcessReadinessHealthChecksByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceCallCount() int {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceCalls(stub func(string, string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error)) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceReturns(result1 []v7action.ProcessReadinessHealthCheck, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = nil
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns = struct {
+		result1 []v7action.ProcessReadinessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall(i int, result1 []v7action.ProcessReadinessHealthCheck, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = nil
+	if fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.ProcessReadinessHealthCheck
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.ProcessReadinessHealthCheck
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -19868,6 +19952,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RUnlock()
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRevisionsDeployedMutex.RLock()
 	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()

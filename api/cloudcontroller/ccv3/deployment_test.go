@@ -251,7 +251,7 @@ var _ = Describe("Deployment", func() {
 			dep.Strategy = constant.DeploymentStrategyCanary
 			dep.RevisionGUID = revisionGUID
 			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
-			dep.Options.CanaryDeploymentOptions = resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}}
+			dep.Options.CanaryDeploymentOptions = &resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}}
 			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment(dep)
 		})
 

@@ -108,7 +108,8 @@ var _ = Describe("AppFiles", func() {
 
 	Describe("CopyFiles", func() {
 		It("copies only the files specified", func() {
-			copyDir := filepath.Join(fixturePath, "app-copy-test")
+			copyDir, err := filepath.Abs(filepath.Join(fixturePath, "app-copy-test"))
+			Expect(err).NotTo(HaveOccurred())
 
 			filesToCopy := []models.AppFileFields{
 				{Path: filepath.Join("dir1")},
@@ -117,7 +118,8 @@ var _ = Describe("AppFiles", func() {
 
 			files := []string{}
 
-			fileutils.TempDir("copyToDir", func(tmpDir string, err error) {
+			fileutils.TempDir("copyToDir", func(tmpDir string, tmpErr error) {
+				Expect(tmpErr).NotTo(HaveOccurred())
 				copyErr := appFiles.CopyFiles(filesToCopy, copyDir, tmpDir)
 				Expect(copyErr).ToNot(HaveOccurred())
 
