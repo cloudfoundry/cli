@@ -910,6 +910,14 @@ jobs:
     needs:
     - setup
     - build-linux
+    strategy:
+      matrix:
+        image:
+        - debian:11
+        - debian:12
+        - ubuntu:20.04
+        - ubuntu:22.04
+        - ubuntu
     runs-on: ubuntu-latest
     steps:
 
@@ -918,21 +926,20 @@ jobs:
       with:
         name: cf-cli-linux-deb-packages
 
-    - name: Display structure of downloaded files and test compression
+    - name: Display structure and verify
+      env:
+        IMAGE: ${{ matrix.image }}
       run: |
-        ls -R
-
-        for i in debian:11 debian:12 ubuntu:20.04 ubuntu:22.04 ubuntu; do docker run \
+        docker run \
           --interactive \
           --rm \
           -v .:/workspace \
-          ${i:?} <<EOC
-        printf "${i:?} -> "
+          ${IMAGE} <<EOC
+        printf "${IMAGE} -> "
         grep PRETTY_NAME /etc/os-release | cut -d= -f2-
         cd workspace
         ls *.deb | xargs -n1 dpkg --info
         EOC
-        done
 
   test-macos:
     name: Test macOS Artifacts

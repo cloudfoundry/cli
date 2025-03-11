@@ -305,6 +305,14 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
+    strategy:
+      matrix:
+        image:
+        - debian:11
+        - debian:12
+        - ubuntu:20.04
+        - ubuntu:22.04
+        - ubuntu
     runs-on: ubuntu-latest
     needs:
     - setup
@@ -316,17 +324,23 @@ jobs:
     steps:
 
     - name: Install CF CLI via apt
+      env:
+        IMAGE: ${{ matrix.image }}
       run: |
+        docker run \
+          --interactive \
+          --rm \
+          ${IMAGE} <<EOC
         set -o pipefail -e
 
-        sudo apt update
-        sudo apt install -y wget gnupg
+        apt update
+        apt install -y wget gnupg
 
-        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-        echo "deb ${CLAW_URL}/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | apt-key add -
+        echo "deb ${CLAW_URL}/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 
-        sudo apt update
-        sudo apt install -y cf${VERSION_MAJOR}-cli
+        apt update
+        apt install -y cf${VERSION_MAJOR}-cli
 
         which cf
 
@@ -336,6 +350,7 @@ jobs:
         cf${VERSION_MAJOR} -v
 
         cf -v | grep "${VERSION_BUILD}"
+        EOC
 
   update-rpm:
     name: Update RPM Repository
