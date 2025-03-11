@@ -114,7 +114,7 @@ jobs:
     name: Build Linux
     needs:
     - setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     env:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -311,7 +311,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb $root/packaged-deb
             rm -rf cf
           popd
@@ -336,7 +336,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb $root/packaged-deb
           popd
         )
@@ -360,7 +360,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_arm64 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb $root/packaged-deb
           popd
         )
@@ -910,9 +910,7 @@ jobs:
     needs:
     - setup
     - build-linux
-    runs-on: ubuntu-20.04
-    container:
-      image: ubuntu:20.04
+    runs-on: ubuntu-latest
     steps:
 
     - name: Download Signed Linux Packages
@@ -920,10 +918,21 @@ jobs:
       with:
         name: cf-cli-linux-deb-packages
 
-    - name: Display structure of downloaded files
+    - name: Display structure of downloaded files and test compression
       run: |
         ls -R
+
+        for i in debian:11 debian:12 ubuntu:20.04 ubuntu:22.04 ubuntu; do docker run \
+          --interactive \
+          --rm \
+          -v .:/workspace \
+          ${i:?} <<EOC
+        printf "${i:?} -> "
+        grep PRETTY_NAME /etc/os-release | cut -d= -f2-
+        cd workspace
         ls *.deb | xargs -n1 dpkg --info
+        EOC
+        done
 
   test-macos:
     name: Test macOS Artifacts
