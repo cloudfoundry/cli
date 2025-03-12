@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
