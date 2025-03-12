@@ -82,6 +82,24 @@ func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, err
 	return routes, warnings, err
 }
 
+func (client Client) UpdateRoute(routeGUID string, options map[string]*string) (resources.Route, Warnings, error) {
+	var responseBody resources.Route
+	var route = resources.Route{}
+	var uriParams = internal.Params{"route_guid": routeGUID}
+
+	route.Options = options
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.UpdateRouteRequest,
+		URIParams:    uriParams,
+		RequestBody:  route,
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
+
+}
+
 func (client Client) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
 	type destinationProcess struct {
 		ProcessType string `json:"process_type"`

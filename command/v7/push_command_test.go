@@ -620,6 +620,28 @@ var _ = Describe("push Command", func() {
 												})
 											})
 
+											Describe("canary steps", func() {
+												BeforeEach(func() {
+													cmd.InstanceSteps = "1,2,3,4"
+												})
+
+												When("canary strategy is provided", func() {
+													BeforeEach(func() {
+														cmd.Strategy = flag.DeploymentStrategy{Name: "canary"}
+													})
+
+													It("should succeed", func() {
+														Expect(executeErr).ToNot(HaveOccurred())
+													})
+												})
+
+												When("canary strategy is NOT provided", func() {
+													It("it just fails", func() {
+														Expect(executeErr).To(HaveOccurred())
+													})
+												})
+											})
+
 											When("when getting the application summary succeeds", func() {
 												BeforeEach(func() {
 													summary := v7action.DetailedApplicationSummary{
@@ -1399,5 +1421,24 @@ var _ = Describe("push Command", func() {
 					"--docker-username",
 				},
 			}),
+
+		Entry("instance-steps is not a list of ints",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+				cmd.InstanceSteps = "impossible"
+			},
+			translatableerror.ParseArgumentError{
+				ArgumentName: "--instance-steps",
+				ExpectedType: "list of weights",
+			}),
+
+		Entry("instance-steps can only be used with canary strategy",
+			func() {
+				cmd.InstanceSteps = "impossible"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--instance-steps", "--strategy=canary",
+				}}),
 	)
 })

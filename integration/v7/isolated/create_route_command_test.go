@@ -27,9 +27,9 @@ var _ = Describe("create-route command", func() {
 
 			Eventually(session).Should(Say(`USAGE:`))
 			Eventually(session).Should(Say(`Create an HTTP route:\n`))
-			Eventually(session).Should(Say(`cf create-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`cf create-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`Create a TCP route:\n`))
-			Eventually(session).Should(Say(`cf create-route DOMAIN \[--port PORT\]\n`))
+			Eventually(session).Should(Say(`cf create-route DOMAIN \[--port PORT\] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
@@ -37,16 +37,18 @@ var _ = Describe("create-route command", func() {
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp\s+# myapp.example.com`))
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp --path foo\s+# myapp.example.com/foo`))
 			Eventually(session).Should(Say(`cf create-route example.com --port 5000\s+# example.com:5000`))
+			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp -o loadbalancing=least-connection\s+# myapp.example.com with a per-route option`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
+			Eventually(session).Should(Say(`--option, -o\s+Set the value of a per-route option`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`check-route, domains, map-route, routes, unmap-route`))
+			Eventually(session).Should(Say(`check-route, domains, map-route, routes, unmap-route, update-route`))
 
 			Eventually(session).Should(Exit(0))
 		})

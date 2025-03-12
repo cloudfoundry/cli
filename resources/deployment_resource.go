@@ -24,7 +24,20 @@ type Deployment struct {
 }
 
 type DeploymentOpts struct {
-	MaxInFlight int `json:"max_in_flight"`
+	MaxInFlight             int                      `json:"max_in_flight,omitempty"`
+	CanaryDeploymentOptions *CanaryDeploymentOptions `json:"canary,omitempty"`
+}
+
+func (d DeploymentOpts) IsEmpty() bool {
+	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0)
+}
+
+type CanaryDeploymentOptions struct {
+	Steps []CanaryStep `json:"steps"`
+}
+
+type CanaryStep struct {
+	InstanceWeight int64 `json:"instance_weight"`
 }
 
 // MarshalJSON converts a Deployment into a Cloud Controller Deployment.
@@ -56,12 +69,8 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 		ccDeployment.Strategy = d.Strategy
 	}
 
-	var b DeploymentOpts
-	if d.Options != b {
+	if !d.Options.IsEmpty() {
 		ccDeployment.Options = &d.Options
-		if d.Options.MaxInFlight < 1 {
-			ccDeployment.Options.MaxInFlight = 1
-		}
 	}
 
 	ccDeployment.Relationships = d.Relationships

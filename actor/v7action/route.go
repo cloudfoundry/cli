@@ -26,7 +26,7 @@ type RouteSummary struct {
 	ServiceInstanceName string
 }
 
-func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, Warnings, error) {
+func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string, port int, options map[string]*string) (resources.Route, Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -41,6 +41,7 @@ func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string, por
 		Host:       hostname,
 		Path:       path,
 		Port:       port,
+		Options:    options,
 	})
 
 	actorWarnings := Warnings(apiWarnings)
@@ -399,6 +400,11 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 func (actor Actor) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID, destinationProtocol)
 	return Warnings(warnings), err
+}
+
+func (actor Actor) UpdateRoute(routeGUID string, options map[string]*string) (resources.Route, Warnings, error) {
+	route, warnings, err := actor.CloudControllerClient.UpdateRoute(routeGUID, options)
+	return route, Warnings(warnings), err
 }
 
 func (actor Actor) UpdateDestination(routeGUID string, destinationGUID string, protocol string) (Warnings, error) {

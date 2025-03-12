@@ -70,7 +70,6 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-        check-latest: true
 
     - name: Install Tools
       env:
@@ -144,6 +143,7 @@ jobs:
           "include_apps": true,
           "include_backend_compatibility": false,
           "include_container_networking": true,
+          "include_deployments": true,
           "include_detect": true,
           "include_docker": true,
           "include_cnb": true,

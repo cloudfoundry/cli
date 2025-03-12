@@ -26,6 +26,7 @@ var _ = Describe("route Command", func() {
 		binaryName      string
 		executeErr      error
 		domainName      string
+		options         map[string]*string
 	)
 
 	BeforeEach(func() {
@@ -192,7 +193,12 @@ var _ = Describe("route Command", func() {
 			destinationB := resources.RouteDestination{App: destAppB, Port: 1337, Protocol: "http2"}
 
 			destinations := []resources.RouteDestination{destinationA, destinationB}
-			route := resources.Route{GUID: "route-guid", Host: cmd.Hostname, Path: cmd.Path.Path, Protocol: "http", Destinations: destinations}
+
+			lbLCVal := "least-connection"
+			lbLeastConnections := &lbLCVal
+			options = map[string]*string{"loadbalancing": lbLeastConnections}
+
+			route := resources.Route{GUID: "route-guid", Host: cmd.Hostname, Path: cmd.Path.Path, Protocol: "http", Destinations: destinations, Options: options}
 
 			fakeActor.GetRouteByAttributesReturns(
 				route,
@@ -218,6 +224,7 @@ var _ = Describe("route Command", func() {
 			Expect(testUI.Out).To(Say(`host:\s+%s`, cmd.Hostname))
 			Expect(testUI.Out).To(Say(`path:\s+%s`, cmd.Path.Path))
 			Expect(testUI.Out).To(Say(`protocol:\s+http`))
+			Expect(testUI.Out).To(Say(`options:\s+{loadbalancing=%s}`, *options["loadbalancing"]))
 			Expect(testUI.Out).To(Say(`\n`))
 			Expect(testUI.Out).To(Say(`Destinations:`))
 			Expect(testUI.Out).To(Say(`\s+app\s+process\s+port\s+app-protocol`))

@@ -22,6 +22,7 @@ type PushPlan struct {
 	Strategy            constant.DeploymentStrategy
 	MaxInFlight         int
 	TaskTypeApplication bool
+	InstanceSteps       []int64
 
 	DockerImageCredentials v7action.DockerImageCredentials
 
@@ -48,6 +49,7 @@ type FlagOverrides struct {
 	HealthCheckTimeout  int64
 	HealthCheckType     constant.HealthCheckType
 	Instances           types.NullInt
+	InstanceSteps       []int64
 	Memory              string
 	MaxInFlight         *int
 	NoStart             bool

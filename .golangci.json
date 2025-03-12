@@ -16,7 +16,7 @@
   },
   "linters-settings": {},
   "issues": {
-    "max-same-issue": 0,
+    "max-same-issues": 0,
     "exclude-files":  [
       "integration/helpers/fake_server.go",
       "command/plugin/*.go$"

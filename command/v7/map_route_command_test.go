@@ -2,6 +2,9 @@ package v7_test
 
 import (
 	"errors"
+	"strconv"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
@@ -34,6 +37,9 @@ var _ = Describe("map-route Command", func() {
 		path            string
 		orgGUID         string
 		spaceGUID       string
+		options         []string
+		expectedOptions map[string]*string
+		cCAPIOldVersion string
 	)
 
 	BeforeEach(func() {
@@ -42,6 +48,9 @@ var _ = Describe("map-route Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
+		fakeConfig.APIVersionReturns(ccversion.MinVersionPerRouteOpts)
+
+		expectedOptions = map[string]*string{}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -51,12 +60,14 @@ var _ = Describe("map-route Command", func() {
 		path = `path`
 		orgGUID = "some-org-guid"
 		spaceGUID = "some-space-guid"
+		options = []string{}
 
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
 			AppProtocol:  "http2",
+			Options:      options,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -220,11 +231,15 @@ var _ = Describe("map-route Command", func() {
 
 				When("the requested route does not exist", func() {
 					BeforeEach(func() {
+						lbLCVal := "least-connection"
+						lbLeastConnections := &lbLCVal
 						fakeActor.GetRouteByAttributesReturns(
 							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
+						cmd.Options = []string{"loadbalancing=least-connection"}
+						expectedOptions = map[string]*string{"loadbalancing": lbLeastConnections}
 					})
 
 					It("creates the route", func() {
@@ -250,19 +265,80 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort := fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort, actualOptions := fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
 						Expect(actualPort).To(Equal(cmd.Port))
+						Expect(actualOptions).To(Equal(expectedOptions))
+					})
+				})
+
+				When("the requested route does not exist and options are specified incorrectly", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							nil,
+							actionerror.RouteNotFoundError{},
+						)
+						cmd.Options = []string{"loadbalancing"}
+					})
+
+					It("gives an error message", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(executeErr).To(MatchError(actionerror.RouteOptionError{Name: "loadbalancing", DomainName: domain, Path: path, Host: hostname}))
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
+					})
+				})
+
+				When("the requested route does not exist and CC API version is too old for route options", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							v7action.Warnings{"get-route-warnings"},
+							actionerror.RouteNotFoundError{},
+						)
+						cmd.Options = []string{"loadbalancing=round-robin"}
+						cCAPIOldVersion = strconv.Itoa(1)
+						fakeConfig.APIVersionReturns(cCAPIOldVersion)
+					})
+
+					It("gives an error message", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(testUI.Err).To(Say("CC API version"))
+						Expect(testUI.Err).To(Say("does not support per-route options"))
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
+					})
+				})
+
+				When("the requested route does not exist and CC API version is too old for route options", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{},
+							v7action.Warnings{"get-route-warnings"},
+							actionerror.RouteNotFoundError{},
+						)
+						cmd.Options = nil
+						cCAPIOldVersion = strconv.Itoa(1)
+						fakeConfig.APIVersionReturns(cCAPIOldVersion)
+					})
+
+					It("succeeds because the options were not specified", func() {
+						Expect(testUI.Err).To(Say("get-domain-warnings"))
+						Expect(testUI.Err).To(Say("get-app-warnings"))
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
 					})
 				})
 
 				When("the requested route exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							resources.Route{GUID: "route-guid"},
+							resources.Route{GUID: "route-guid", Options: map[string]*string{}},
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
@@ -417,6 +493,27 @@ var _ = Describe("map-route Command", func() {
 									Expect(actualAppProtocol).To(Equal("http2"))
 								})
 							})
+						})
+					})
+				})
+
+				When("the requested route exists and the options are specified", func() {
+					BeforeEach(func() {
+						fakeActor.GetRouteByAttributesReturns(
+							resources.Route{GUID: "route-guid", Options: map[string]*string{}},
+							v7action.Warnings{"get-route-warnings"},
+							nil,
+						)
+						cmd.Options = []string{"loadbalancing=least-connection"}
+					})
+
+					When("getting the per-route options error", func() {
+						BeforeEach(func() {
+							fakeActor.GetRouteDestinationByAppGUIDReturns(resources.RouteDestination{}, nil)
+						})
+						It("returns the error message", func() {
+							Expect(executeErr).To(MatchError(actionerror.RouteOptionSupportError{ErrorText: "Route specific options can only be specified for nonexistent routes."}))
+							Expect(fakeActor.MapRouteCallCount()).To(Equal(0))
 						})
 					})
 				})
