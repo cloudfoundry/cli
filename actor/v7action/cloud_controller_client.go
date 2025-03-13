@@ -88,6 +88,7 @@ type CloudControllerClient interface {
 	GetEvents(query ...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error)
 	GetFeatureFlag(featureFlagName string) (resources.FeatureFlag, ccv3.Warnings, error)
 	GetFeatureFlags() ([]resources.FeatureFlag, ccv3.Warnings, error)
+	GetRoot() (ccv3.Root, ccv3.Warnings, error)
 	GetInfo() (ccv3.Info, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (resources.IsolationSegment, ccv3.Warnings, error)
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]resources.Organization, ccv3.Warnings, error)
@@ -148,7 +149,7 @@ type CloudControllerClient interface {
 	PollJobToEventStream(jobURL ccv3.JobURL) chan ccv3.PollJobEvent
 	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)
 	ResourceMatch(resources []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
-	RootResponse() (ccv3.Info, ccv3.Warnings, error)
+	RootResponse() (ccv3.Root, ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, ccv3.Warnings, error)
 	SharePrivateDomainToOrgs(domainGuid string, sharedOrgs ccv3.SharedOrgs) (ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)

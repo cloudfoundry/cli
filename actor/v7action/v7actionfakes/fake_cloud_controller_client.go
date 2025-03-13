@@ -1449,6 +1449,20 @@ type FakeCloudControllerClient struct {
 		result3 ccv3.Warnings
 		result4 error
 	}
+	GetRootStub        func() (ccv3.Root, ccv3.Warnings, error)
+	getRootMutex       sync.RWMutex
+	getRootArgsForCall []struct {
+	}
+	getRootReturns struct {
+		result1 ccv3.Root
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getRootReturnsOnCall map[int]struct {
+		result1 ccv3.Root
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetRouteBindingsStub        func(...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error)
 	getRouteBindingsMutex       sync.RWMutex
 	getRouteBindingsArgsForCall []struct {
@@ -2072,17 +2086,17 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	RootResponseStub        func() (ccv3.Info, ccv3.Warnings, error)
+	RootResponseStub        func() (ccv3.Root, ccv3.Warnings, error)
 	rootResponseMutex       sync.RWMutex
 	rootResponseArgsForCall []struct {
 	}
 	rootResponseReturns struct {
-		result1 ccv3.Info
+		result1 ccv3.Root
 		result2 ccv3.Warnings
 		result3 error
 	}
 	rootResponseReturnsOnCall map[int]struct {
-		result1 ccv3.Info
+		result1 ccv3.Root
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -9159,6 +9173,65 @@ func (fake *FakeCloudControllerClient) GetRolesReturnsOnCall(i int, result1 []re
 	}{result1, result2, result3, result4}
 }
 
+func (fake *FakeCloudControllerClient) GetRoot() (ccv3.Root, ccv3.Warnings, error) {
+	fake.getRootMutex.Lock()
+	ret, specificReturn := fake.getRootReturnsOnCall[len(fake.getRootArgsForCall)]
+	fake.getRootArgsForCall = append(fake.getRootArgsForCall, struct {
+	}{})
+	stub := fake.GetRootStub
+	fakeReturns := fake.getRootReturns
+	fake.recordInvocation("GetRoot", []interface{}{})
+	fake.getRootMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetRootCallCount() int {
+	fake.getRootMutex.RLock()
+	defer fake.getRootMutex.RUnlock()
+	return len(fake.getRootArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetRootCalls(stub func() (ccv3.Root, ccv3.Warnings, error)) {
+	fake.getRootMutex.Lock()
+	defer fake.getRootMutex.Unlock()
+	fake.GetRootStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetRootReturns(result1 ccv3.Root, result2 ccv3.Warnings, result3 error) {
+	fake.getRootMutex.Lock()
+	defer fake.getRootMutex.Unlock()
+	fake.GetRootStub = nil
+	fake.getRootReturns = struct {
+		result1 ccv3.Root
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetRootReturnsOnCall(i int, result1 ccv3.Root, result2 ccv3.Warnings, result3 error) {
+	fake.getRootMutex.Lock()
+	defer fake.getRootMutex.Unlock()
+	fake.GetRootStub = nil
+	if fake.getRootReturnsOnCall == nil {
+		fake.getRootReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Root
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getRootReturnsOnCall[i] = struct {
+		result1 ccv3.Root
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetRouteBindings(arg1 ...ccv3.Query) ([]resources.RouteBinding, ccv3.IncludedResources, ccv3.Warnings, error) {
 	fake.getRouteBindingsMutex.Lock()
 	ret, specificReturn := fake.getRouteBindingsReturnsOnCall[len(fake.getRouteBindingsArgsForCall)]
@@ -11926,7 +11999,7 @@ func (fake *FakeCloudControllerClient) ResourceMatchReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) RootResponse() (ccv3.Info, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) RootResponse() (ccv3.Root, ccv3.Warnings, error) {
 	fake.rootResponseMutex.Lock()
 	ret, specificReturn := fake.rootResponseReturnsOnCall[len(fake.rootResponseArgsForCall)]
 	fake.rootResponseArgsForCall = append(fake.rootResponseArgsForCall, struct {
@@ -11950,36 +12023,36 @@ func (fake *FakeCloudControllerClient) RootResponseCallCount() int {
 	return len(fake.rootResponseArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) RootResponseCalls(stub func() (ccv3.Info, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) RootResponseCalls(stub func() (ccv3.Root, ccv3.Warnings, error)) {
 	fake.rootResponseMutex.Lock()
 	defer fake.rootResponseMutex.Unlock()
 	fake.RootResponseStub = stub
 }
 
-func (fake *FakeCloudControllerClient) RootResponseReturns(result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) RootResponseReturns(result1 ccv3.Root, result2 ccv3.Warnings, result3 error) {
 	fake.rootResponseMutex.Lock()
 	defer fake.rootResponseMutex.Unlock()
 	fake.RootResponseStub = nil
 	fake.rootResponseReturns = struct {
-		result1 ccv3.Info
+		result1 ccv3.Root
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) RootResponseReturnsOnCall(i int, result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) RootResponseReturnsOnCall(i int, result1 ccv3.Root, result2 ccv3.Warnings, result3 error) {
 	fake.rootResponseMutex.Lock()
 	defer fake.rootResponseMutex.Unlock()
 	fake.RootResponseStub = nil
 	if fake.rootResponseReturnsOnCall == nil {
 		fake.rootResponseReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Info
+			result1 ccv3.Root
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.rootResponseReturnsOnCall[i] = struct {
-		result1 ccv3.Info
+		result1 ccv3.Root
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -15314,6 +15387,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getProcessesMutex.RUnlock()
 	fake.getRolesMutex.RLock()
 	defer fake.getRolesMutex.RUnlock()
+	fake.getRootMutex.RLock()
+	defer fake.getRootMutex.RUnlock()
 	fake.getRouteBindingsMutex.RLock()
 	defer fake.getRouteBindingsMutex.RUnlock()
 	fake.getRouteDestinationsMutex.RLock()
