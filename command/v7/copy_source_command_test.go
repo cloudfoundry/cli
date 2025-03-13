@@ -329,6 +329,8 @@ var _ = Describe("copy-source Command", func() {
 			BeforeEach(func() {
 				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
 				cmd.InstanceSteps = "1,2,4"
+
+				fakeConfig.APIVersionReturns("3.999.0")
 			})
 
 			It("starts the new app", func() {
