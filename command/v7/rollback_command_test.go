@@ -369,7 +369,7 @@ var _ = Describe("rollback Command", func() {
 			translatableerror.MinimumCFAPIVersionNotMetError{
 				Command:        "--instance-steps",
 				CurrentVersion: "3.0.0",
-				MinimumVersion: "3.254.0",
+				MinimumVersion: "3.189.0",
 			}),
 	)
 })
