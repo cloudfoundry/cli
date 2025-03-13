@@ -25,12 +25,12 @@ type Deployment struct {
 }
 
 type DeploymentOpts struct {
-	MaxInFlight             int                     `json:"max_in_flight,omitempty"`
-	CanaryDeploymentOptions CanaryDeploymentOptions `json:"canary,omitempty"`
+	MaxInFlight             int                      `json:"max_in_flight,omitempty"`
+	CanaryDeploymentOptions *CanaryDeploymentOptions `json:"canary,omitempty"`
 }
 
 func (d DeploymentOpts) IsEmpty() bool {
-	return d.MaxInFlight == 0 && len(d.CanaryDeploymentOptions.Steps) == 0
+	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0)
 }
 
 type CanaryDeploymentOptions struct {

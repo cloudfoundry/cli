@@ -110,7 +110,6 @@ jobs:
         if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           go-version-file: go.mod
-          check-latest: true
       - name: Run Units
         if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         run: make units
