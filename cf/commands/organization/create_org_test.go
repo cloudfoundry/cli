@@ -1,22 +1,22 @@
 package organization_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/commands/user/userfakes"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/user/userfakes"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
 
-	"code.cloudfoundry.org/cli/cf/api/featureflags/featureflagsfakes"
-	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
-	"code.cloudfoundry.org/cli/cf/api/quotas/quotasfakes"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/featureflags/featureflagsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/quotas/quotasfakes"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -41,7 +41,7 @@ var _ = Describe("create-org command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = config
 
-		//inject fake 'command dependency' into registry
+		// inject fake 'command dependency' into registry
 		commandregistry.Register(orgRoleSetter)
 
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-org").SetDependency(deps, pluginCall))
@@ -58,13 +58,13 @@ var _ = Describe("create-org command", func() {
 		config.SetAPIVersion("2.36.9")
 
 		orgRoleSetter = new(userfakes.FakeOrgRoleSetter)
-		//setup fakes to correctly interact with commandregistry
+		// setup fakes to correctly interact with commandregistry
 		orgRoleSetter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return orgRoleSetter
 		}
 		orgRoleSetter.MetaDataReturns(commandregistry.CommandMetadata{Name: "set-org-role"})
 
-		//save original command and restore later
+		// save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("set-org-role")
 	})
 

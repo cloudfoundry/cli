@@ -3,7 +3,7 @@ package servicebrokerstub
 import (
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 )

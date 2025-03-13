@@ -4,7 +4,7 @@ package coreconfigfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
 )
 
 type FakeEndpointRepository struct {
@@ -33,15 +33,16 @@ func (fake *FakeEndpointRepository) GetCCInfo(arg1 string) (*coreconfig.CCInfo, 
 	fake.getCCInfoArgsForCall = append(fake.getCCInfoArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetCCInfoStub
+	fakeReturns := fake.getCCInfoReturns
 	fake.recordInvocation("GetCCInfo", []interface{}{arg1})
 	fake.getCCInfoMutex.Unlock()
-	if fake.GetCCInfoStub != nil {
-		return fake.GetCCInfoStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getCCInfoReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

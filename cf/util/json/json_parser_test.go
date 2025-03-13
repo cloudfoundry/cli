@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/util/json"
+	"code.cloudfoundry.org/cli/v9/cf/util/json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

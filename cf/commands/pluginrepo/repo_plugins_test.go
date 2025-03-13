@@ -1,20 +1,20 @@
 package pluginrepo_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/actors/pluginrepo/pluginrepofakes"
-	"code.cloudfoundry.org/cli/cf/commands/pluginrepo"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/actors/pluginrepo/pluginrepofakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/pluginrepo"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
 	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
 
-	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

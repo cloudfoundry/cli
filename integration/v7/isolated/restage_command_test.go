@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -142,6 +142,22 @@ var _ = Describe("restage command", func() {
 				})
 
 				When("strategy rolling is given", func() {
+					It("fails and displays the deployment failure message", func() {
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CustomCF(helpers.CFEnv{
+							EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
+						}, "restage", appName, "--strategy", "rolling")
+						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
+						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+						Eventually(session.Err).Should(Say(`Cannot cancel a deployment with status: FINALIZED and reason: DEPLOYED`))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("strategy rolling is given with max-in-flight", func() {
 					It("fails and displays the deployment failure message", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CustomCF(helpers.CFEnv{

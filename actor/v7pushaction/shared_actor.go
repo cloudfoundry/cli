@@ -3,7 +3,7 @@ package v7pushaction
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 io.ReadCloser

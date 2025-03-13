@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	sshCmd "code.cloudfoundry.org/cli/cf/ssh"
+	sshCmd "code.cloudfoundry.org/cli/v9/cf/ssh"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -75,15 +75,16 @@ func (fake *FakeSecureClient) Close() error {
 	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
+	stub := fake.CloseStub
+	fakeReturns := fake.closeReturns
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		return fake.CloseStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.closeReturns
 	return fakeReturns.result1
 }
 
@@ -127,15 +128,16 @@ func (fake *FakeSecureClient) Conn() ssh.Conn {
 	ret, specificReturn := fake.connReturnsOnCall[len(fake.connArgsForCall)]
 	fake.connArgsForCall = append(fake.connArgsForCall, struct {
 	}{})
+	stub := fake.ConnStub
+	fakeReturns := fake.connReturns
 	fake.recordInvocation("Conn", []interface{}{})
 	fake.connMutex.Unlock()
-	if fake.ConnStub != nil {
-		return fake.ConnStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.connReturns
 	return fakeReturns.result1
 }
 
@@ -181,15 +183,16 @@ func (fake *FakeSecureClient) Dial(arg1 string, arg2 string) (net.Conn, error) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DialStub
+	fakeReturns := fake.dialReturns
 	fake.recordInvocation("Dial", []interface{}{arg1, arg2})
 	fake.dialMutex.Unlock()
-	if fake.DialStub != nil {
-		return fake.DialStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.dialReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -243,15 +246,16 @@ func (fake *FakeSecureClient) NewSession() (sshCmd.SecureSession, error) {
 	ret, specificReturn := fake.newSessionReturnsOnCall[len(fake.newSessionArgsForCall)]
 	fake.newSessionArgsForCall = append(fake.newSessionArgsForCall, struct {
 	}{})
+	stub := fake.NewSessionStub
+	fakeReturns := fake.newSessionReturns
 	fake.recordInvocation("NewSession", []interface{}{})
 	fake.newSessionMutex.Unlock()
-	if fake.NewSessionStub != nil {
-		return fake.NewSessionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.newSessionReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -298,15 +302,16 @@ func (fake *FakeSecureClient) Wait() error {
 	ret, specificReturn := fake.waitReturnsOnCall[len(fake.waitArgsForCall)]
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct {
 	}{})
+	stub := fake.WaitStub
+	fakeReturns := fake.waitReturns
 	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
-	if fake.WaitStub != nil {
-		return fake.WaitStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.waitReturns
 	return fakeReturns.result1
 }
 

@@ -4,19 +4,19 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/cf/util/testhelpers/net"
+	"code.cloudfoundry.org/cli/v9/cf/terminal/terminalfakes"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/net"
 	"github.com/onsi/gomega/ghttp"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 
-	. "code.cloudfoundry.org/cli/cf/api"
+	. "code.cloudfoundry.org/cli/v9/cf/api"
 
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
+	"code.cloudfoundry.org/cli/v9/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

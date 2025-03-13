@@ -1,9 +1,9 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 // CreateApplicationProcessScale updates process instances count, memory or disk

@@ -4,9 +4,9 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/sorting"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/util/sorting"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type DomainsCommand struct {

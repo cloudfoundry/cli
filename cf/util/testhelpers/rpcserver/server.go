@@ -9,8 +9,8 @@ import (
 	"os"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/v9/plugin"
+	"code.cloudfoundry.org/cli/v9/plugin/models"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Handlers

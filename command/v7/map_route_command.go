@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+    "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+    "code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+    "code.cloudfoundry.org/cli/v9/resources"
 )
 
 type MapRouteCommand struct {

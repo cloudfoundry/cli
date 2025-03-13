@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -171,7 +171,7 @@ var _ = Describe("service command", func() {
 				})
 
 				It("displays the bound apps", func() {
-					//Delay to reduce flakiness
+					// Delay to reduce flakiness
 					time.Sleep(10 * time.Second)
 					session := helpers.CF(serviceCommand, serviceInstanceName, "-v")
 					Eventually(session).Should(Exit(0))
