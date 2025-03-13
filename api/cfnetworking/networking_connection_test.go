@@ -8,7 +8,6 @@ import (
 
 	. "code.cloudfoundry.org/cli/v9/api/cfnetworking"
 	"code.cloudfoundry.org/cli/v9/api/cfnetworking/networkerror"
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -209,10 +208,10 @@ var _ = Describe("CF Networking Connection", func() {
 						err = connection.Make(request, &response)
 						Expect(err).To(
 							SatisfyAny(
-								MatchError(ccerror.SSLValidationHostnameError{
+								MatchError(networkerror.SSLValidationHostnameError{
 									Message: "x509: certificate is valid for example.com, *.example.com, not loopback.cli.fun",
 								}),
-								MatchError(ccerror.SSLValidationHostnameError{
+								MatchError(networkerror.SSLValidationHostnameError{
 									Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
 								})))
 					})
