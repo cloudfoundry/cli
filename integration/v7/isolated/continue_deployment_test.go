@@ -92,11 +92,13 @@ var _ = Describe("Continue Deployment", func() {
 				When("instance steps are provided", func() {
 					It("displays the number of steps", func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
-							helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--instance-steps 10,20,30,70", "-i 5").Wait()
+							helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--instance-steps", "10,20,30,70", "-i", "5").Wait()
 						})
 
-						session := helpers.CF("continue-deployment", appName)
+						session := helpers.CF("app", appName)
 						Eventually(session).Should(Say("canary-steps:    1/4"))
+						session = helpers.CF("continue-deployment", appName)
+						Eventually(session).Should(Say("canary-steps:    2/4"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
