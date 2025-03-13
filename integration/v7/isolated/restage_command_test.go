@@ -247,10 +247,10 @@ applications:
 					})
 				})
 
-				When("strategy canary is given with a non-default max-in-flight value and instance-weights", func() {
+				When("strategy canary is given with a non-default max-in-flight value and instance-steps", func() {
 					It("restages successfully and notes the max-in-flight value", func() {
 						userName, _ := helpers.GetCredentials()
-						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2", "--instance-weights", "1,20")
+						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2", "--instance-steps", "1,20")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))

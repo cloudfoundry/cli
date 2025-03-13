@@ -391,7 +391,7 @@ var _ = Describe("copy-source command", func() {
 			Eventually(session).Should(Say("Active deployment with status PAUSED"))
 			Eventually(session).Should(Say("strategy:        canary"))
 			Eventually(session).Should(Say("max-in-flight:   1"))
-			Eventually(session).Should(Say("canary-steps:   1/2"))
+			Eventually(session).Should(Say("canary-steps:    1/2"))
 			Eventually(session).Should(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", targetAppName, targetAppName))
 			Eventually(session).Should(Exit(0))
 
