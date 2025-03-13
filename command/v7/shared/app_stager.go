@@ -124,7 +124,7 @@ func (stager *Stager) StartApp(app resources.Application, space configv3.Space, 
 		}
 
 		if opts.Strategy == constant.DeploymentStrategyCanary && len(opts.CanarySteps) > 0 {
-			dep.Options = resources.DeploymentOpts{CanaryDeploymentOptions: resources.CanaryDeploymentOptions{Steps: opts.CanarySteps}}
+			dep.Options = resources.DeploymentOpts{CanaryDeploymentOptions: &resources.CanaryDeploymentOptions{Steps: opts.CanarySteps}}
 		}
 		switch opts.AppAction {
 		case constant.ApplicationRollingBack:
