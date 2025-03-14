@@ -25,7 +25,7 @@ func NewDefaultAuthActor(config Config, uaaClient UAAClient) AuthActor {
 }
 
 func (actor defaultAuthActor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
-	if grantType == constant.GrantTypePassword && actor.config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
+	if (grantType == constant.GrantTypePassword || grantType == constant.GrantTypeJwtBearer) && actor.config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 		return actionerror.PasswordGrantTypeLogoutRequiredError{}
 	}
 
@@ -45,7 +45,7 @@ func (actor defaultAuthActor) Authenticate(credentials map[string]string, origin
 		actor.config.SetUAAGrantType(string(grantType))
 	}
 
-	if grantType == constant.GrantTypeClientCredentials {
+	if (grantType == constant.GrantTypeClientCredentials || grantType == constant.GrantTypeJwtBearer) && credentials["client_id"] != "" {
 		actor.config.SetUAAClientCredentials(credentials["client_id"], "")
 	}
 
