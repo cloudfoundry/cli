@@ -141,19 +141,27 @@ var _ = Describe("restage command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 
-				When("strategy rolling is given", func() {
+				When("a deployment strategy is used", func() {
 					It("fails and displays the deployment failure message", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CustomCF(helpers.CFEnv{
 							EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
-						}, "restage", appName, "--strategy", "rolling", "--max-in-flight", "3")
+						}, "restage", appName, "--strategy", "canary", "--max-in-flight", "3")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
-						Eventually(session.Err).Should(Say(`Cannot cancel a deployment with status: FINALIZED and reason: DEPLOYED`))
+						Eventually(session.Err).Should(Say(`Start app timeout`))
+						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\.`))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
+
+						appGUID := helpers.AppGUID(appName)
+						Eventually(func() *Buffer {
+							session_deployment := helpers.CF("curl", fmt.Sprintf("/v3/deployments?app_guids=%s", appGUID))
+							Eventually(session_deployment).Should(Exit(0))
+							return session_deployment.Out
+						}).Should(Say(`"reason":\s*"CANCELED"`))
 					})
 				})
 			})
