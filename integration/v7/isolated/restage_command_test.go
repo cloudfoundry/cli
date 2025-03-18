@@ -152,7 +152,7 @@ var _ = Describe("restage command", func() {
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
 						Eventually(session.Err).Should(Say(`Start app timeout`))
-						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\. Instead of hard coding the port, use the $PORT environment variable\.`))
+						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\. Instead of hard coding the port, use the \$PORT environment variable\.`))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
