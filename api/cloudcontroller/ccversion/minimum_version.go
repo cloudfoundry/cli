@@ -15,4 +15,5 @@ const (
 	MinVersionSpaceSupporterV3 = "3.104.0"
 
 	MinVersionLogRateLimitingV3 = "3.125.0"
+	MinVersionPerRouteOpts      = "3.183.0"
 )

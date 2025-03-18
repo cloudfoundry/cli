@@ -424,7 +424,7 @@ jobs:
     - name: Update Homebrew
       run: |
         brew tap pivotalsoftware/gon
-        brew update --preinstall
+        brew update
         cat "$(brew --repository)/Library/Taps/pivotalsoftware/homebrew-gon/gon.rb" > .github/brew-formulae
 
     - name: Configure Homebrew cache

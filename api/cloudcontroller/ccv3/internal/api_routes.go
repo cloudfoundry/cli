@@ -107,6 +107,7 @@ const (
 	GetUserRequest                                              = "GetUser"
 	GetUsersRequest                                             = "GetUsers"
 	MapRouteRequest                                             = "MapRoute"
+	UpdateRouteRequest                                          = "UpdateRoute"
 	PatchApplicationCurrentDropletRequest                       = "PatchApplicationCurrentDroplet"
 	PatchApplicationEnvironmentVariablesRequest                 = "PatchApplicationEnvironmentVariables"
 	PatchApplicationRequest                                     = "PatchApplication"
@@ -179,6 +180,7 @@ const (
 	UnmapRouteRequest                                           = "UnmapRoute"
 	UnshareRouteRequest                                         = "UnshareRoute"
 	WhoAmI                                                      = "WhoAmI"
+	Info                                                        = "Info"
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
@@ -281,6 +283,7 @@ var APIRoutes = map[string]Route{
 	PatchRouteRequest:                                           {Path: "/v3/routes/:route_guid", Method: http.MethodPatch},
 	GetRouteDestinationsRequest:                                 {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodGet},
 	MapRouteRequest:                                             {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodPost},
+	UpdateRouteRequest:                                          {Path: "/v3/routes/:route_guid", Method: http.MethodPatch},
 	UnmapRouteRequest:                                           {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodDelete},
 	PatchDestinationRequest:                                     {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodPatch},
 	ShareRouteRequest:                                           {Path: "/v3/routes/:route_guid/relationships/shared_spaces", Method: http.MethodPost},
@@ -353,4 +356,5 @@ var APIRoutes = map[string]Route{
 	PostUserRequest:                                             {Path: "/v3/users", Method: http.MethodPost},
 	DeleteUserRequest:                                           {Path: "/v3/users/:user_guid", Method: http.MethodDelete},
 	WhoAmI:                                                      {Path: "/whoami", Method: http.MethodGet},
+	Info:                                                        {Path: "/v3/info", Method: http.MethodGet},
 }

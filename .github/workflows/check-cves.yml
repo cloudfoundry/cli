@@ -13,7 +13,8 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Scan current project
-      uses: anchore/scan-action@v5
+      id: scan
+      uses: anchore/scan-action@v6
       with:
         path: "."
         add-cpes-if-none: true
@@ -21,7 +22,7 @@ jobs:
         output-format: json
 
     - name: Print scan results
-      run: .github/scripts/format-cve-scan-results.sh results.json > $GITHUB_STEP_SUMMARY
+      run: .github/scripts/format-cve-scan-results.sh ${{ steps.scan.outputs.json }} > $GITHUB_STEP_SUMMARY
       if: always()
 
     - name: Archive CVE scan results
@@ -29,4 +30,4 @@ jobs:
       if: always()
       with:
         name: cve-scan-results-${{ github.sha }}-${{ github.run_id }}-${{ github.run_number }}
-        path: results.json
+        path: ${{ steps.scan.outputs.json }}

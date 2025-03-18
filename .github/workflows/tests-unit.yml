@@ -1,4 +1,11 @@
-name: "Tests"
+name: Unit Tests
+
+run-name: >-
+  Unit Tests:
+  ${{ github.event_name == 'pull_request' 
+    && format('PR #{0} - {1}', github.event.pull_request.number, github.event.pull_request.title)
+    || format('{0} to {1}', github.event_name, github.ref_name) 
+  }}
 
 on:
   workflow_dispatch:
@@ -21,13 +28,9 @@ on:
 permissions:
   contents: read
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
-  units:
-    name: Units
+  unit-tests:
+    name: Unit Tests (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
@@ -36,51 +39,28 @@ jobs:
           - ubuntu-20.04
           - macos-latest
           - macos-13
-    runs-on: ${{ matrix.os }}
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set Up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: go.mod
-        check-latest: true
-
-    - name: Run Units
-      run: make units
-
-  units-windows:
-    name: Units Windows
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
           - windows-latest
           - windows-2019
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: pwsh
-    steps:
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
 
-    - name: Checkout
+    steps:
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set Up Go
+    - name: Setup Go Environment
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-        check-latest: true
+        cache: true
 
-    - name: Get build-time dependencies
-      run: |
-        choco install --no-progress --limit-output -y make
+    - name: Install Windows Build Dependencies
+      if: matrix.os == 'windows-latest'
+      run: choco install --no-progress --limit-output -y make
 
-    - name: Run Windows Units
-      run: |
-        Get-Command make
-        Get-Item Makefile
-        make units
+    - name: Execute Unit Tests
+      run: make units
+
 # vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

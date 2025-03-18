@@ -20,6 +20,7 @@ on:
       - "doc/**"
       - ".gitpod.yml"
       - "README.md"
+  workflow_dispatch:
 
 jobs:
   golangci:
@@ -33,7 +34,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-          check-latest: true
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
@@ -51,6 +51,5 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-        check-latest: true
     - name: Run go fmt
       run: make format && git diff --exit-code

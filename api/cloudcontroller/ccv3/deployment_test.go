@@ -251,6 +251,7 @@ var _ = Describe("Deployment", func() {
 			dep.Strategy = constant.DeploymentStrategyCanary
 			dep.RevisionGUID = revisionGUID
 			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
+			dep.Options.CanaryDeploymentOptions = &resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}}
 			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment(dep)
 		})
 
@@ -277,7 +278,7 @@ var _ = Describe("Deployment", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}},"options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]}}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
@@ -306,14 +307,13 @@ var _ = Describe("Deployment", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/deployments"),
-						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary","options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]}}, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 						RespondWith(http.StatusTeapot, response, http.Header{}),
 					),
 				)
 			})
 
 			It("returns an error", func() {
-				fmt.Printf("executeErr: %v\n", executeErr)
 				Expect(executeErr).To(HaveOccurred())
 				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

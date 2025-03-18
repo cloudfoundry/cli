@@ -16,7 +16,7 @@ import (
 )
 
 var _ = Describe("app summary displayer", func() {
-	const instanceStatsTitles = `state\s+since\s+cpu entitlement\s+memory\s+disk\s+logging\s+details`
+	const instanceStatsTitles = `state\s+since\s+cpu entitlement\s+memory\s+disk\s+logging\s+details\s+ready`
 
 	var (
 		output *Buffer
@@ -45,6 +45,10 @@ var _ = Describe("app summary displayer", func() {
 
 				BeforeEach(func() {
 					uptime = time.Since(time.Unix(267321600, 0))
+					var (
+						bTrue  = true
+						bFalse = false
+					)
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
 							Application: resources.Application{
@@ -61,7 +65,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
-										v7action.ProcessInstance{
+										{
 											Index:          0,
 											State:          constant.ProcessInstanceRunning,
 											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
@@ -73,8 +77,9 @@ var _ = Describe("app summary displayer", func() {
 											LogRateLimit:   1024 * 5,
 											Uptime:         uptime,
 											Details:        "Some Details 1",
+											Routable:       &bTrue,
 										},
-										v7action.ProcessInstance{
+										{
 											Index:          1,
 											State:          constant.ProcessInstanceRunning,
 											CPUEntitlement: types.NullFloat64{Value: 1.0, IsSet: true},
@@ -86,8 +91,9 @@ var _ = Describe("app summary displayer", func() {
 											LogRateLimit:   1024 * 5,
 											Uptime:         time.Since(time.Unix(330480000, 0)),
 											Details:        "Some Details 2",
+											Routable:       &bTrue,
 										},
-										v7action.ProcessInstance{
+										{
 											Index:          2,
 											State:          constant.ProcessInstanceRunning,
 											CPUEntitlement: types.NullFloat64{Value: 0.03, IsSet: true},
@@ -98,6 +104,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskQuota:      6000000,
 											LogRateLimit:   1024 * 5,
 											Uptime:         time.Since(time.Unix(1277164800, 0)),
+											Routable:       &bFalse,
 										},
 									},
 								},
@@ -110,7 +117,7 @@ var _ = Describe("app summary displayer", func() {
 									},
 									Sidecars: []resources.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
-										v7action.ProcessInstance{
+										{
 											Index:          0,
 											State:          constant.ProcessInstanceRunning,
 											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
@@ -121,6 +128,8 @@ var _ = Describe("app summary displayer", func() {
 											DiskQuota:      8000000,
 											LogRateLimit:   256,
 											Uptime:         time.Since(time.Unix(167572800, 0)),
+											Details:        "",
+											Routable:       &bTrue,
 										},
 									},
 								},
@@ -605,6 +614,22 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
+		When("the application has routes with options", func() {
+			BeforeEach(func() {
+				lbLCVal := "least-connection"
+				options := map[string]*string{"loadbalancing": &lbLCVal}
+
+				summary.Routes = []resources.Route{
+					{Host: "route1", URL: "route1.example.com", Options: options},
+					{Host: "route2", URL: "route2.example.com"},
+				}
+			})
+
+			It("displays routes without their options", func() {
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com", "route2.example.com"))
+			})
+		})
+
 		When("the application has a stack", func() {
 			BeforeEach(func() {
 				summary.CurrentDroplet.Stack = "some-stack"
@@ -694,7 +719,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("there is an active deployment", func() {
 			var LastStatusChangeTimeString = "2024-07-29T17:32:29Z"
-			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3}\s\d{4}`
+			var dateTimeRegexPattern = `[a-zA-Z]{3}\s\d{2}\s[a-zA-Z]{3}\s\d{2}\:\d{2}\:\d{2}\s[A-Z]{3,4}\s\d{4}`
 			var maxInFlightDefaultValue = 1
 
 			When("the deployment strategy is rolling", func() {

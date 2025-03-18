@@ -39,7 +39,7 @@ var _ = Describe("rollback command", func() {
 				Expect(session).To(Say(`--strategy\s+Deployment strategy can be canary or rolling. When not specified, it defaults to rolling.`))
 				Expect(session).To(Say(`--version\s+Roll back to the specified revision`))
 				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("revisions"))
+				Expect(session).To(Say("revision, revisions"))
 			})
 		})
 	})
