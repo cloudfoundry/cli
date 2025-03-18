@@ -25,7 +25,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 ) (SSHAuthentication, Warnings, error) {
 	var allWarnings Warnings
 
-	rootInfo, warnings, err := actor.CloudControllerClient.GetInfo()
+	rootInfo, warnings, err := actor.CloudControllerClient.GetRoot()
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return SSHAuthentication{}, allWarnings, err
