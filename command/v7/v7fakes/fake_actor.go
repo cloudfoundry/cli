@@ -371,7 +371,7 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateRouteStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
+	CreateRouteStub        func(string, string, string, string, int, map[string]*string) (resources.Route, v7action.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
@@ -379,6 +379,7 @@ type FakeActor struct {
 		arg3 string
 		arg4 string
 		arg5 int
+		arg6 map[string]*string
 	}
 	createRouteReturns struct {
 		result1 resources.Route
@@ -1112,6 +1113,22 @@ type FakeActor struct {
 	}
 	getApplicationProcessHealthChecksByNameAndSpaceReturnsOnCall map[int]struct {
 		result1 []v7action.ProcessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub        func(string, string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error)
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex       sync.RWMutex
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns struct {
+		result1 []v7action.ProcessReadinessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.ProcessReadinessHealthCheck
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -3372,6 +3389,22 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateRouteStub        func(string, map[string]*string) (resources.Route, v7action.Warnings, error)
+	updateRouteMutex       sync.RWMutex
+	updateRouteArgsForCall []struct {
+		arg1 string
+		arg2 map[string]*string
+	}
+	updateRouteReturns struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}
+	updateRouteReturnsOnCall map[int]struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}
 	UpdateRouteLabelsStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateRouteLabelsMutex       sync.RWMutex
 	updateRouteLabelsArgsForCall []struct {
@@ -5208,7 +5241,7 @@ func (fake *FakeActor) CreatePrivateDomainReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
+func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 map[string]*string) (resources.Route, v7action.Warnings, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -5217,13 +5250,14 @@ func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 s
 		arg3 string
 		arg4 string
 		arg5 int
-	}{arg1, arg2, arg3, arg4, arg5})
+		arg6 map[string]*string
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
 	stub := fake.CreateRouteStub
 	fakeReturns := fake.createRouteReturns
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.createRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -5237,17 +5271,17 @@ func (fake *FakeActor) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string, int, map[string]*string) (resources.Route, v7action.Warnings, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string, int) {
+func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string, int, map[string]*string) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeActor) CreateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
@@ -8475,6 +8509,74 @@ func (fake *FakeActor) GetApplicationProcessHealthChecksByNameAndSpaceReturnsOnC
 	}
 	fake.getApplicationProcessHealthChecksByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 []v7action.ProcessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpace(arg1 string, arg2 string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall[len(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall)]
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall = append(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub
+	fakeReturns := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns
+	fake.recordInvocation("GetApplicationProcessReadinessHealthChecksByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceCallCount() int {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceCalls(stub func(string, string) ([]v7action.ProcessReadinessHealthCheck, v7action.Warnings, error)) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceReturns(result1 []v7action.ProcessReadinessHealthCheck, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = nil
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturns = struct {
+		result1 []v7action.ProcessReadinessHealthCheck
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall(i int, result1 []v7action.ProcessReadinessHealthCheck, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationProcessReadinessHealthChecksByNameAndSpaceStub = nil
+	if fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.ProcessReadinessHealthCheck
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.ProcessReadinessHealthCheck
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -18361,6 +18463,74 @@ func (fake *FakeActor) UpdateProcessByTypeAndApplicationReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateRoute(arg1 string, arg2 map[string]*string) (resources.Route, v7action.Warnings, error) {
+	fake.updateRouteMutex.Lock()
+	ret, specificReturn := fake.updateRouteReturnsOnCall[len(fake.updateRouteArgsForCall)]
+	fake.updateRouteArgsForCall = append(fake.updateRouteArgsForCall, struct {
+		arg1 string
+		arg2 map[string]*string
+	}{arg1, arg2})
+	stub := fake.UpdateRouteStub
+	fakeReturns := fake.updateRouteReturns
+	fake.recordInvocation("UpdateRoute", []interface{}{arg1, arg2})
+	fake.updateRouteMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) UpdateRouteCallCount() int {
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
+	return len(fake.updateRouteArgsForCall)
+}
+
+func (fake *FakeActor) UpdateRouteCalls(stub func(string, map[string]*string) (resources.Route, v7action.Warnings, error)) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = stub
+}
+
+func (fake *FakeActor) UpdateRouteArgsForCall(i int) (string, map[string]*string) {
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
+	argsForCall := fake.updateRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) UpdateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = nil
+	fake.updateRouteReturns = struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) UpdateRouteReturnsOnCall(i int, result1 resources.Route, result2 v7action.Warnings, result3 error) {
+	fake.updateRouteMutex.Lock()
+	defer fake.updateRouteMutex.Unlock()
+	fake.UpdateRouteStub = nil
+	if fake.updateRouteReturnsOnCall == nil {
+		fake.updateRouteReturnsOnCall = make(map[int]struct {
+			result1 resources.Route
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.updateRouteReturnsOnCall[i] = struct {
+		result1 resources.Route
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) UpdateRouteLabels(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateRouteLabelsMutex.Lock()
 	ret, specificReturn := fake.updateRouteLabelsReturnsOnCall[len(fake.updateRouteLabelsArgsForCall)]
@@ -19709,6 +19879,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RUnlock()
+	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRevisionsDeployedMutex.RLock()
 	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
@@ -20007,6 +20179,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateOrganizationQuotaMutex.RUnlock()
 	fake.updateProcessByTypeAndApplicationMutex.RLock()
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
+	fake.updateRouteMutex.RLock()
+	defer fake.updateRouteMutex.RUnlock()
 	fake.updateRouteLabelsMutex.RLock()
 	defer fake.updateRouteLabelsMutex.RUnlock()
 	fake.updateSecurityGroupMutex.RLock()

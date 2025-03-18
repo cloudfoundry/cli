@@ -251,11 +251,101 @@ var _ = Describe("revision Command", func() {
 				})
 			})
 
+			When("no revision version is provided", func() {
+				BeforeEach(func() {
+					deployedRevisions := []resources.Revision{
+						{
+							Version:     3,
+							GUID:        "A68F13F7-7E5E-4411-88E8-1FAC54F73F50",
+							Description: "On a different note",
+							CreatedAt:   "2020-03-10T17:11:58Z",
+							Deployable:  true,
+							Droplet: resources.Droplet{
+								GUID: "droplet-guid",
+							},
+							Links: resources.APILinks{
+								"environment_variables": resources.APILink{
+									HREF: "revision-environment-variables-link-3",
+								},
+							},
+							Metadata: &resources.Metadata{
+								Labels: map[string]types.NullString{
+									"label": types.NewNullString("foo3"),
+								},
+								Annotations: map[string]types.NullString{
+									"annotation": types.NewNullString("foo3"),
+								},
+							},
+						},
+						{
+							Version:     2,
+							GUID:        "A89F8259-D32B-491A-ABD6-F100AC42D74C",
+							Description: "Something else",
+							CreatedAt:   "2020-03-08T12:43:30Z",
+							Deployable:  true,
+							Droplet: resources.Droplet{
+								GUID: "droplet-guid2",
+							},
+							Metadata: &resources.Metadata{},
+						},
+					}
+					fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "app-guid"}, nil, nil)
+					fakeActor.GetApplicationRevisionsDeployedReturns(deployedRevisions, nil, nil)
+
+					environmentVariableGroup := v7action.EnvironmentVariableGroup{
+						"foo": *types.NewFilteredString("bar3"),
+					}
+					fakeActor.GetEnvironmentVariableGroupByRevisionReturns(
+						environmentVariableGroup,
+						true,
+						nil,
+						nil,
+					)
+					cmd.Version = flag.Revision{NullInt: types.NullInt{Value: 0, IsSet: false}}
+				})
+
+				It("displays all deployed revisions", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say(`Showing revisions for app some-app in org some-org / space some-space as banana...`))
+					Expect(testUI.Out).To(Say(`revision:        3`))
+					Expect(testUI.Out).To(Say(`deployed:        true`))
+					Expect(testUI.Out).To(Say(`description:     On a different note`))
+					Expect(testUI.Out).To(Say(`deployable:      true`))
+					Expect(testUI.Out).To(Say(`revision GUID:   A68F13F7-7E5E-4411-88E8-1FAC54F73F50`))
+					Expect(testUI.Out).To(Say(`droplet GUID:    droplet-guid`))
+					Expect(testUI.Out).To(Say(`created on:      2020-03-10T17:11:58Z`))
+
+					Expect(testUI.Out).To(Say(`labels:`))
+					Expect(testUI.Out).To(Say(`label:   foo3`))
+
+					Expect(testUI.Out).To(Say(`annotations:`))
+					Expect(testUI.Out).To(Say(`annotation:   foo3`))
+
+					Expect(testUI.Out).To(Say(`application environment variables:`))
+					Expect(testUI.Out).To(Say(`foo:   bar3`))
+
+					Expect(testUI.Out).To(Say(`revision:        2`))
+					Expect(testUI.Out).To(Say(`deployed:        true`))
+					Expect(testUI.Out).To(Say(`description:     Something else`))
+					Expect(testUI.Out).To(Say(`deployable:      true`))
+					Expect(testUI.Out).To(Say(`revision GUID:   A89F8259-D32B-491A-ABD6-F100AC42D74C`))
+					Expect(testUI.Out).To(Say(`droplet GUID:    droplet-guid2`))
+					Expect(testUI.Out).To(Say(`created on:      2020-03-08T12:43:30Z`))
+
+					Expect(testUI.Out).To(Say(`labels:`))
+					Expect(testUI.Out).To(Say(`annotations:`))
+					Expect(testUI.Out).To(Say(`application environment variables:`))
+					Expect(testUI.Out).To(Say(`foo:   bar3`))
+				})
+			})
+
 			When("there are no revisions available", func() {
 				BeforeEach(func() {
 					revision := resources.Revision{
 						Version: 120,
 					}
+					cmd.Version = flag.Revision{NullInt: types.NullInt{Value: 120, IsSet: true}}
 					fakeActor.GetRevisionByApplicationAndVersionReturns(
 						revision,
 						nil,

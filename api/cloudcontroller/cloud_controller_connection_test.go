@@ -301,9 +301,14 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 						var response Response
 						err = connection.Make(request, &response)
-						Expect(err).To(MatchError(ccerror.SSLValidationHostnameError{
-							Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
-						}))
+						Expect(err).To(
+							SatisfyAny(
+								MatchError(ccerror.SSLValidationHostnameError{
+									Message: "x509: certificate is valid for example.com, *.example.com, not loopback.cli.fun",
+								}),
+								MatchError(ccerror.SSLValidationHostnameError{
+									Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
+								})))
 					})
 				})
 			})

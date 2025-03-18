@@ -31,6 +31,7 @@ var _ = Describe("Route", func() {
 			path       string
 			port       int
 			ccv3Route  resources.Route
+			options    map[string]*string
 		)
 
 		BeforeEach(func() {
@@ -42,7 +43,11 @@ var _ = Describe("Route", func() {
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path, Port: port}
+			lbLCVal := "least-connection"
+			lbLeastConnections := &lbLCVal
+			options = map[string]*string{"loadbalancing": lbLeastConnections}
+
+			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path, Port: port, Options: options}
 			route, warnings, executeErr = client.CreateRoute(ccv3Route)
 		})
 
@@ -60,18 +65,28 @@ var _ = Describe("Route", func() {
 	  "data": { "guid": "domain-guid" }
     }
   },
-	"host": ""
+  "options": {
+    "loadbalancing": "least-connection"
+  }, 
+  "host": ""
 }`
 
 					expectedBody := `{
-  "relationships": {
-  	"space": {
-      "data": { "guid": "space-guid" }
+    "relationships": {
+        "space": {
+            "data": {
+                "guid": "space-guid"
+            }
+        },
+        "domain": {
+            "data": {
+                "guid": "domain-guid"
+            }
+        }
     },
-    "domain": {
-	  "data": { "guid": "domain-guid" }
+    "options": {
+        "loadbalancing": "least-connection"
     }
-  }
 }`
 
 					server.AppendHandlers(
@@ -91,6 +106,7 @@ var _ = Describe("Route", func() {
 						GUID:       "some-route-guid",
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
+						Options:    options,
 					}))
 				})
 			})
@@ -109,7 +125,10 @@ var _ = Describe("Route", func() {
 			"data": { "guid": "domain-guid" }
     }
   },
-	"host": "cheesecake"
+  "options": {
+    "loadbalancing": "least-connection"
+  },
+  "host": "cheesecake"
 }`
 
 					expectedBody := `{
@@ -121,7 +140,10 @@ var _ = Describe("Route", func() {
 			"data": { "guid": "domain-guid" }
     }
   },
-	"host": "cheesecake"
+  "options": {
+    "loadbalancing": "least-connection"
+  },
+  "host": "cheesecake"
 }`
 
 					server.AppendHandlers(
@@ -142,6 +164,7 @@ var _ = Describe("Route", func() {
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
 						Host:       "cheesecake",
+						Options:    options,
 					}))
 				})
 			})
@@ -164,7 +187,10 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
-	"path": "lion"
+	"path": "lion",
+    "options": {
+      "loadbalancing": "least-connection"
+    }  
 }`
 					expectedRequestBody := `{
 	"relationships": {
@@ -179,7 +205,10 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
-	"path": "lion"
+    "path": "lion",
+    "options": {
+      "loadbalancing": "least-connection"
+    }  
 }`
 
 					server.AppendHandlers(
@@ -200,6 +229,7 @@ var _ = Describe("Route", func() {
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
 							Path:       "lion",
+							Options:    options,
 						}))
 					})
 				})
@@ -223,6 +253,9 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
+    "options": {
+      "loadbalancing": "least-connection"
+    },
 	"port": 1234
 }`
 					expectedRequestBody := `{
@@ -238,6 +271,9 @@ var _ = Describe("Route", func() {
 			}
 		}
 	},
+    "options": {
+      "loadbalancing": "least-connection"
+    },
 	"port": 1234
 }`
 
@@ -259,6 +295,7 @@ var _ = Describe("Route", func() {
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
 							Port:       1234,
+							Options:    options,
 						}))
 					})
 				})

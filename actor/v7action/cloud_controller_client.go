@@ -177,6 +177,7 @@ type CloudControllerClient interface {
 	UpdateOrganizationQuota(orgQuota resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error)
 	UpdateProcess(process resources.Process) (resources.Process, ccv3.Warnings, error)
 	UpdateResourceMetadata(resource string, resourceGUID string, metadata resources.Metadata) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateRoute(routeGUID string, options map[string]*string) (resources.Route, ccv3.Warnings, error)
 	UpdateSecurityGroupRunningSpace(securityGroupGUID string, spaceGUIDs []string) (ccv3.Warnings, error)
 	UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUIDs []string) (ccv3.Warnings, error)
 	UpdateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)

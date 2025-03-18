@@ -9,5 +9,9 @@ func SetupDeploymentInformationForPushPlan(pushPlan PushPlan, overrides FlagOver
 		pushPlan.MaxInFlight = *overrides.MaxInFlight
 	}
 
+	if overrides.Strategy == constant.DeploymentStrategyCanary && overrides.InstanceSteps != nil {
+		pushPlan.InstanceSteps = overrides.InstanceSteps
+	}
+
 	return pushPlan, nil
 }

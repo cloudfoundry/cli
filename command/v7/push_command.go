@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -89,6 +90,7 @@ type PushCommand struct {
 	HealthCheckHTTPEndpoint string                              `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	HealthCheckType         flag.HealthCheckType                `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
+	InstanceSteps           string                              `long:"instance-steps" description:"An array of percentage steps to deploy when using deployment strategy canary. (e.g. 20,40,60)"`
 	Lifecycle               constant.AppLifecycleType           `long:"lifecycle" description:"App lifecycle type to stage and run the app" default:""`
 	LogRateLimit            string                              `long:"log-rate-limit" short:"l" description:"Log rate limit per second, in bytes (e.g. 128B, 4K, 1M). -l=-1 represents unlimited"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
@@ -349,6 +351,17 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varFilePath))
 	}
 
+	var instanceSteps []int64
+	if len(cmd.InstanceSteps) > 0 {
+		for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+			parsedInt, err := strconv.ParseInt(v, 0, 64)
+			if err != nil {
+				return v7pushaction.FlagOverrides{}, err
+			}
+			instanceSteps = append(instanceSteps, parsedInt)
+		}
+	}
+
 	return v7pushaction.FlagOverrides{
 		AppName:             cmd.OptionalArgs.AppName,
 		Buildpacks:          cmd.Buildpacks,
@@ -361,6 +374,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		HealthCheckType:     cmd.HealthCheckType.Type,
 		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value,
 		Instances:           cmd.Instances.NullInt,
+		InstanceSteps:       instanceSteps,
 		MaxInFlight:         cmd.MaxInFlight,
 		Memory:              cmd.Memory,
 		NoStart:             cmd.NoStart,
@@ -564,9 +578,23 @@ func (cmd PushCommand) ValidateFlags() error {
 		return translatableerror.RequiredFlagsError{Arg1: "--max-in-flight", Arg2: "--strategy"}
 	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
+	case len(cmd.InstanceSteps) > 0 && cmd.Strategy.Name != constant.DeploymentStrategyCanary:
+		return translatableerror.ArgumentCombinationError{Args: []string{"--instance-steps", "--strategy=canary"}}
+	case len(cmd.InstanceSteps) > 0 && !cmd.validateInstanceSteps():
+		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
 	}
 
 	return nil
+}
+
+func (cmd PushCommand) validateInstanceSteps() bool {
+	for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+		_, err := strconv.ParseInt(v, 0, 64)
+		if err != nil {
+			return false
+		}
+	}
+	return true
 }
 
 func (cmd PushCommand) validBuildpacks() bool {

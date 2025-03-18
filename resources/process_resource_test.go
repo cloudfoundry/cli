@@ -75,6 +75,7 @@ var _ = Describe("Process", func() {
 				Expect(string(processBytes)).To(MatchJSON(`{"log_rate_limit_in_bytes_per_second": 1024}`))
 			})
 		})
+
 		When("health check type http is provided", func() {
 			BeforeEach(func() {
 				process = resources.Process{
@@ -109,6 +110,43 @@ var _ = Describe("Process", func() {
 
 			It("sets the health check type to process", func() {
 				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {}}}`))
+			})
+		})
+
+		When("readiness health check type http is provided", func() {
+			BeforeEach(func() {
+				process = resources.Process{
+					ReadinessHealthCheckType:     constant.HTTP,
+					ReadinessHealthCheckEndpoint: "some-endpoint",
+				}
+			})
+
+			It("sets the readiness health check type to http and has an endpoint", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"readiness_health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`))
+			})
+		})
+
+		When("readiness health check type port is provided", func() {
+			BeforeEach(func() {
+				process = resources.Process{
+					ReadinessHealthCheckType: constant.Port,
+				}
+			})
+
+			It("sets the readiness health check type to port", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"readiness_health_check":{"type":"port", "data": {}}}`))
+			})
+		})
+
+		When("readiness health check type process is provided", func() {
+			BeforeEach(func() {
+				process = resources.Process{
+					ReadinessHealthCheckType: constant.Process,
+				}
+			})
+
+			It("sets the readiness health check type to process", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"readiness_health_check":{"type":"process", "data": {}}}`))
 			})
 		})
 
@@ -181,6 +219,43 @@ var _ = Describe("Process", func() {
 			It("sets the health check type to process", func() {
 				Expect(process).To(MatchFields(IgnoreExtras, Fields{
 					"HealthCheckType": Equal(constant.Process),
+				}))
+			})
+		})
+
+		When("readiness health check type http is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"readiness_health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`)
+			})
+
+			It("sets the readiness health check type to http and has an endpoint", func() {
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{
+					"ReadinessHealthCheckType":     Equal(constant.HTTP),
+					"ReadinessHealthCheckEndpoint": Equal("some-endpoint"),
+				}))
+			})
+		})
+
+		When("readiness health check type port is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"readiness_health_check":{"type":"port", "data": {"endpoint": null}}}`)
+			})
+
+			It("sets the readiness health check type to port", func() {
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{
+					"ReadinessHealthCheckType": Equal(constant.Port),
+				}))
+			})
+		})
+
+		When("readiness health check type process is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"readiness_health_check":{"type":"process", "data": {"endpoint": null}}}`)
+			})
+
+			It("sets the readiness health check type to process", func() {
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{
+					"ReadinessHealthCheckType": Equal(constant.Process),
 				}))
 			})
 		})

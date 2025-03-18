@@ -16,7 +16,7 @@ import (
 var _ = Describe("routes command", func() {
 
 	appProtocolValue := "http1"
-	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance`
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+app-protocol\s+apps\s+service instance\s+options`
 	Context("Help", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -122,7 +122,7 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Expect(session).To(Say(tableHeaders))
-				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
+				Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
 				Expect(session).To(Say(`%s\s+route1a\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
 				Expect(session).To(Say(`%s\s+route1b\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1))
 				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+http\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName2))
@@ -145,7 +145,7 @@ var _ = Describe("routes command", func() {
 					Eventually(session).Should(Exit(0))
 					Expect(session).To(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
 					Expect(session).To(Say(tableHeaders))
-					Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
+					Expect(session).To(Say(`%s\s+route1\s+%s\s+http\s+%s\s+%s\s+%s\s+\n`, spaceName, domainName, appProtocolValue, appName1, serviceInstanceName))
 					Expect(session).To(Say(`%s\s+route2\s+%s\s+\/dodo\s+http\s+%s\s+%s\s+\n`, otherSpaceName, domainName, appProtocolValue, appName2))
 				})
 			})

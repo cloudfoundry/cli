@@ -161,5 +161,50 @@ var _ = Describe("revision command", func() {
 				Expect(session).Should(Say(`foo:   bar1`))
 			})
 		})
+
+		When("the revision version is not mentioned", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy", "canary")).Should(Exit(0))
+				})
+			})
+
+			It("shows all the deployed revisions", func() {
+				session := helpers.CF("revision", appName)
+				Eventually(session).Should(Exit(0))
+
+				Expect(session).Should(Say(
+					fmt.Sprintf("Showing revisions for app %s in org %s / space %s as %s...", appName, orgName, spaceName, username),
+				))
+				Expect(session).Should(Say(`revision:        2`))
+				Expect(session).Should(Say(`deployed:        true`))
+				Expect(session).Should(Say(`description:     New droplet deployed`))
+				Expect(session).Should(Say(`deployable:      true`))
+				Expect(session).Should(Say(`revision GUID:   \S+\n`))
+				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
+				Expect(session).Should(Say(`created on:      \S+\n`))
+
+				Expect(session).Should(Say(`labels:`))
+				Expect(session).Should(Say(`annotations:`))
+				Expect(session).Should(Say(`application environment variables:`))
+
+				Expect(session).Should(Say(`revision:        3`))
+				Expect(session).Should(Say(`deployed:        true`))
+				Expect(session).Should(Say(`description:     New droplet deployed`))
+				Expect(session).Should(Say(`deployable:      true`))
+				Expect(session).Should(Say(`revision GUID:   \S+\n`))
+				Expect(session).Should(Say(`droplet GUID:    \S+\n`))
+				Expect(session).Should(Say(`created on:      \S+\n`))
+
+				Expect(session).Should(Say(`labels:`))
+				Expect(session).Should(Say(`annotations:`))
+				Expect(session).Should(Say(`application environment variables:`))
+
+				Expect(session).ShouldNot(Say(`revision:        1`))
+			})
+		})
 	})
 })

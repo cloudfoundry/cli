@@ -200,9 +200,14 @@ var _ = Describe("Plugin Connection", func() {
 
 						var response Response
 						err = connection.Make(request, &response, nil)
-						Expect(err).To(MatchError(pluginerror.SSLValidationHostnameError{
-							Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
-						}))
+						Expect(err).To(
+							SatisfyAny(
+								MatchError(pluginerror.SSLValidationHostnameError{
+									Message: "x509: certificate is valid for example.com, *.example.com, not loopback.cli.fun",
+								}),
+								MatchError(pluginerror.SSLValidationHostnameError{
+									Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
+								})))
 					})
 				})
 			})

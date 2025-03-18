@@ -179,6 +179,7 @@ const (
 	ShareRouteRequest                                           = "ShareRouteRequest"
 	UnmapRouteRequest                                           = "UnmapRoute"
 	UnshareRouteRequest                                         = "UnshareRoute"
+	UpdateRouteRequest                                          = "UpdateRoute"
 	WhoAmI                                                      = "WhoAmI"
 )
 
@@ -282,6 +283,7 @@ var APIRoutes = map[string]Route{
 	PatchRouteRequest:                                           {Path: "/v3/routes/:route_guid", Method: http.MethodPatch},
 	GetRouteDestinationsRequest:                                 {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodGet},
 	MapRouteRequest:                                             {Path: "/v3/routes/:route_guid/destinations", Method: http.MethodPost},
+	UpdateRouteRequest:                                          {Path: "/v3/routes/:route_guid", Method: http.MethodPatch},
 	UnmapRouteRequest:                                           {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodDelete},
 	PatchDestinationRequest:                                     {Path: "/v3/routes/:route_guid/destinations/:destination_guid", Method: http.MethodPatch},
 	ShareRouteRequest:                                           {Path: "/v3/routes/:route_guid/relationships/shared_spaces", Method: http.MethodPost},

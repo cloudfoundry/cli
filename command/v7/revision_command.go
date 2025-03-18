@@ -14,7 +14,7 @@ type RevisionCommand struct {
 	BaseCommand
 	usage           interface{}   `usage:"CF_NAME revision APP_NAME [--version VERSION]"`
 	RequiredArgs    flag.AppName  `positional-args:"yes"`
-	Version         flag.Revision `long:"version" required:"true" description:"The integer representing the specific revision to show"`
+	Version         flag.Revision `long:"version" description:"The integer representing the specific revision to show"`
 	relatedCommands interface{}   `related_commands:"revisions, rollback"`
 }
 
@@ -30,13 +30,23 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 	}
 
 	appName := cmd.RequiredArgs.AppName
-	cmd.UI.DisplayTextWithFlavor("Showing revision {{.Version}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   appName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-		"Version":   cmd.Version.Value,
-	})
+	if cmd.Version.Value > 0 {
+		cmd.UI.DisplayTextWithFlavor("Showing revision {{.Version}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   appName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+			"Version":   cmd.Version.Value,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Showing revisions for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   appName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
+	}
+
 	cmd.UI.DisplayNewline()
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID)
@@ -51,16 +61,33 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 		return err
 	}
 
-	revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(
-		app.GUID,
-		cmd.Version.Value,
-	)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-	isDeployed := cmd.revisionDeployed(revision, deployedRevisions)
+	if cmd.Version.Value > 0 {
+		revision, warnings, err := cmd.Actor.GetRevisionByApplicationAndVersion(
+			app.GUID,
+			cmd.Version.Value,
+		)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+		isDeployed := cmd.revisionDeployed(revision, deployedRevisions)
 
+		err = cmd.displayRevisionInfo(revision, isDeployed)
+		if err != nil {
+			return err
+		}
+	} else {
+		for _, deployedRevision := range deployedRevisions {
+			err = cmd.displayRevisionInfo(deployedRevision, true)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (cmd RevisionCommand) displayRevisionInfo(revision resources.Revision, isDeployed bool) error {
 	cmd.displayBasicRevisionInfo(revision, isDeployed)
 	cmd.UI.DisplayNewline()
 
@@ -80,13 +107,12 @@ func (cmd RevisionCommand) Execute(_ []string) error {
 		cmd.displayEnvVarGroup(envVars)
 		cmd.UI.DisplayNewline()
 	}
-
 	return nil
 }
 
 func (cmd RevisionCommand) displayBasicRevisionInfo(revision resources.Revision, isDeployed bool) {
 	keyValueTable := [][]string{
-		{"revision:", fmt.Sprintf("%d", cmd.Version.Value)},
+		{"revision:", fmt.Sprintf("%d", revision.Version)},
 		{"deployed:", strconv.FormatBool(isDeployed)},
 		{"description:", revision.Description},
 		{"deployable:", strconv.FormatBool(revision.Deployable)},
