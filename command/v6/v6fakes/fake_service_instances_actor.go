@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeServiceInstancesActor struct {
@@ -43,15 +43,16 @@ func (fake *FakeServiceInstancesActor) CloudControllerAPIVersion() string {
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerAPIVersionStub
+	fakeReturns := fake.cloudControllerAPIVersionReturns
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -96,15 +97,16 @@ func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpace(arg1 st
 	fake.getServiceInstancesSummaryBySpaceArgsForCall = append(fake.getServiceInstancesSummaryBySpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetServiceInstancesSummaryBySpaceStub
+	fakeReturns := fake.getServiceInstancesSummaryBySpaceReturns
 	fake.recordInvocation("GetServiceInstancesSummaryBySpace", []interface{}{arg1})
 	fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
-	if fake.GetServiceInstancesSummaryBySpaceStub != nil {
-		return fake.GetServiceInstancesSummaryBySpaceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServiceInstancesSummaryBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

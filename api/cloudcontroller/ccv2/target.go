@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/internal"
 	"github.com/tedsuo/rata"
 )
 
@@ -57,8 +57,8 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	client.authorizationEndpoint = info.AuthorizationEndpoint
 	client.cloudControllerAPIVersion = info.APIVersion
 	client.dopplerEndpoint = info.DopplerEndpoint
-	//TODO Remove this condition when earliest supportest CAPI is 1.87.0
-	//We have to do this because the current legacy supported CAPI version as of 2020 does not display the log cache url, this will break if a foundation on legacy CAPI have non-standard logcache urls
+	// TODO Remove this condition when earliest supportest CAPI is 1.87.0
+	// We have to do this because the current legacy supported CAPI version as of 2020 does not display the log cache url, this will break if a foundation on legacy CAPI have non-standard logcache urls
 	if rootInfo.Links.LogCache.HREF != "" {
 		client.logCacheEndpoint = rootInfo.Links.LogCache.HREF
 	} else {

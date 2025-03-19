@@ -1,9 +1,9 @@
 package composite
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/actor/actionerror"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ServiceActor

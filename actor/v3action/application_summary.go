@@ -1,6 +1,6 @@
 package v3action
 
-import "code.cloudfoundry.org/cli/actor/actionerror"
+import "code.cloudfoundry.org/cli/v7/actor/actionerror"
 
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {

@@ -3,10 +3,10 @@ package shared_test
 import (
 	"reflect"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/v7/api/uaa"
+	"code.cloudfoundry.org/cli/v7/command/commandfakes"
 
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/v7/command/v6/shared"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

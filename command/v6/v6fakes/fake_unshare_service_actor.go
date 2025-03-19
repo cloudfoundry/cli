@@ -4,8 +4,8 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/v7/actor/v2v3action"
+	v6 "code.cloudfoundry.org/cli/v7/command/v6"
 )
 
 type FakeUnshareServiceActor struct {
@@ -44,15 +44,16 @@ func (fake *FakeUnshareServiceActor) CloudControllerV3APIVersion() string {
 	ret, specificReturn := fake.cloudControllerV3APIVersionReturnsOnCall[len(fake.cloudControllerV3APIVersionArgsForCall)]
 	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CloudControllerV3APIVersionStub
+	fakeReturns := fake.cloudControllerV3APIVersionReturns
 	fake.recordInvocation("CloudControllerV3APIVersion", []interface{}{})
 	fake.cloudControllerV3APIVersionMutex.Unlock()
-	if fake.CloudControllerV3APIVersionStub != nil {
-		return fake.CloudControllerV3APIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cloudControllerV3APIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -100,15 +101,16 @@ func (fake *FakeUnshareServiceActor) UnshareServiceInstanceFromOrganizationNameA
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceStub
+	fakeReturns := fake.unshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceReturns
 	fake.recordInvocation("UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4})
 	fake.unshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceMutex.Unlock()
-	if fake.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceStub != nil {
-		return fake.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

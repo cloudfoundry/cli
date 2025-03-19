@@ -5,14 +5,14 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
-	. "code.cloudfoundry.org/cli/command/v6"
-	"code.cloudfoundry.org/cli/command/v6/v6fakes"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/command/commandfakes"
+	"code.cloudfoundry.org/cli/v7/command/flag"
+	. "code.cloudfoundry.org/cli/v7/command/v6"
+	"code.cloudfoundry.org/cli/v7/command/v6/v6fakes"
+	"code.cloudfoundry.org/cli/v7/util/configv3"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -90,7 +90,7 @@ var _ = Describe("update-user-provided-service Command", func() {
 				Name: fakeOrgName,
 			})
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil) //TODO: test errors
+			fakeConfig.CurrentUserReturns(configv3.User{Name: fakeUserName}, nil) // TODO: test errors
 		})
 
 		It("looks up the service instance GUID", func() {

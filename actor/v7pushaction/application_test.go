@@ -1,9 +1,9 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v2action"
-	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	. "code.cloudfoundry.org/cli/v7/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v7/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -3,8 +3,8 @@ package v3action
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CloudControllerClient

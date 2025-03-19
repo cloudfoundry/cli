@@ -3,11 +3,11 @@ package brokerbuilder_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/cf/actors/brokerbuilder"
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v7/cf/actors/brokerbuilder"
+	"code.cloudfoundry.org/cli/v7/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/v7/cf/models"
 
-	"code.cloudfoundry.org/cli/cf/actors/servicebuilder/servicebuilderfakes"
+	"code.cloudfoundry.org/cli/v7/cf/actors/servicebuilder/servicebuilderfakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

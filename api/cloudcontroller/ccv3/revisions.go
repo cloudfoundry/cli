@@ -1,8 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v7/resources"
 )
 
 func (client *Client) GetApplicationRevisions(appGUID string, query ...Query) ([]resources.Revision, Warnings, error) {

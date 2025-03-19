@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/v7/command/flag"
 )
 
 type SSHEnabledCommand struct {

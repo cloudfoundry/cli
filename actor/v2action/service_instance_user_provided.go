@@ -1,7 +1,7 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2"
 )
 
 // UserProvidedServiceInstance represents an instance of a user-provided service.

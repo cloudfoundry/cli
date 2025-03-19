@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
 )
 
 // Filter is a type of filter that can be passed to specific request to narrow

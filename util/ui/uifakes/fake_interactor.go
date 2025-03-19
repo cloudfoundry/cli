@@ -4,7 +4,7 @@ package uifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v7/util/ui"
 	"github.com/vito/go-interact/interact"
 )
 
@@ -32,15 +32,16 @@ func (fake *FakeInteractor) NewInteraction(arg1 string, arg2 ...interact.Choice)
 		arg1 string
 		arg2 []interact.Choice
 	}{arg1, arg2})
+	stub := fake.NewInteractionStub
+	fakeReturns := fake.newInteractionReturns
 	fake.recordInvocation("NewInteraction", []interface{}{arg1, arg2})
 	fake.newInteractionMutex.Unlock()
-	if fake.NewInteractionStub != nil {
-		return fake.NewInteractionStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.newInteractionReturns
 	return fakeReturns.result1
 }
 

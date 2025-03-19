@@ -5,7 +5,7 @@ import (
 	"errors"
 	"text/template"
 
-	. "code.cloudfoundry.org/cli/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v7/command/translatableerror"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

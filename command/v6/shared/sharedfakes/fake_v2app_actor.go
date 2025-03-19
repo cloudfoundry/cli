@@ -4,8 +4,8 @@ package sharedfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/v7/actor/v2action"
+	"code.cloudfoundry.org/cli/v7/command/v6/shared"
 )
 
 type FakeV2AppActor struct {
@@ -49,15 +49,16 @@ func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplication(arg1 s
 	fake.getApplicationInstancesWithStatsByApplicationArgsForCall = append(fake.getApplicationInstancesWithStatsByApplicationArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationInstancesWithStatsByApplicationStub
+	fakeReturns := fake.getApplicationInstancesWithStatsByApplicationReturns
 	fake.recordInvocation("GetApplicationInstancesWithStatsByApplication", []interface{}{arg1})
 	fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
-	if fake.GetApplicationInstancesWithStatsByApplicationStub != nil {
-		return fake.GetApplicationInstancesWithStatsByApplicationStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationInstancesWithStatsByApplicationReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -115,15 +116,16 @@ func (fake *FakeV2AppActor) GetApplicationRoutes(arg1 string) (v2action.Routes, 
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetApplicationRoutesStub
+	fakeReturns := fake.getApplicationRoutesReturns
 	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
 	fake.getApplicationRoutesMutex.Unlock()
-	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

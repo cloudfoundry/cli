@@ -1,8 +1,8 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v7/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/v7/util/manifest"
 )
 
 func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, spaceGUID string) (manifest.Application, Warnings, error) {
