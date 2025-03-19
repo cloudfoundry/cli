@@ -56,12 +56,10 @@ on:
   push:
     tags:
       - "v8.*"
-      - "v7.*"
   pull_request_target:
     branches:
       - main
       - v8
-      - v7
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
