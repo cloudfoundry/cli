@@ -17,7 +17,8 @@ type AuthCommand struct {
 	RequiredArgs      flag.Authentication `positional-args:"yes"`
 	ClientCredentials bool                `long:"client-credentials" description:"Use (non-user) service account (also called client credentials)"`
 	Origin            string              `long:"origin" description:"Indicates the identity provider to be used for authentication"`
-	usage             interface{}         `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth USERNAME PASSWORD --origin ORIGIN\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n\nENVIRONMENT VARIABLES:\n   CF_USERNAME=user          Authenticating user. Overridden if USERNAME argument is provided.\n   CF_PASSWORD=password      Password associated with user. Overridden if PASSWORD argument is provided.\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n   Consider using the CF_PASSWORD environment variable instead\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
+	Assertion         string              `long:"assertion" description:"Token based authentication with assertion (user) or in combination with client-credentials (non-user)"`
+	usage             interface{}         `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth USERNAME PASSWORD --origin ORIGIN\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --assertion ID-TOKEN\n   CF_NAME auth CLIENT_ID --client-credentials --assertion ACCESS-TOKEN\n\nENVIRONMENT VARIABLES:\n   CF_USERNAME=user          Authenticating user. Overridden if USERNAME argument is provided.\n   CF_PASSWORD=password      Password associated with user. Overridden if PASSWORD argument is provided.\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n   Consider using the CF_PASSWORD environment variable instead\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
 	relatedCommands   interface{}         `related_commands:"api, login, target"`
 }
 
@@ -62,7 +63,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 	if !cmd.ClientCredentials {
 		if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 			return translatableerror.PasswordGrantTypeLogoutRequiredError{}
-		} else if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
+		} else if (cmd.Assertion == "" && cmd.Config.UAAOAuthClient() != "cf") || cmd.Config.UAAOAuthClientSecret() != "" {
 			return translatableerror.ManualClientCredentialsError{}
 		}
 	}
@@ -75,12 +76,35 @@ func (cmd AuthCommand) Execute(args []string) error {
 	grantType := constant.GrantTypePassword
 	if cmd.ClientCredentials {
 		grantType = constant.GrantTypeClientCredentials
+		if cmd.Assertion != "" {
+			if username == "" {
+				username = cmd.Config.UAAOAuthClient()
+			}
+			// use assertion as client_assertion - replacing client_secret - but stay with client credentials grant type
+			credentials["client_assertion"] = cmd.Assertion
+			credentials["client_assertion_type"] = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+		} else {
+			credentials["client_secret"] = password
+		}
 		credentials["client_id"] = username
-		credentials["client_secret"] = password
 	} else {
-		credentials = map[string]string{
-			"username": username,
-			"password": password,
+		if cmd.Assertion != "" {
+			// use assertion as user authentication using JWT bearer grant type
+			grantType = constant.GrantTypeJwtBearer
+			credentials = map[string]string{
+				"assertion": cmd.Assertion,
+			}
+			if username != "" {
+				credentials["client_id"] = username
+			}
+			if password != "" {
+				credentials["client_secret"] = password
+			}
+		} else {
+			credentials = map[string]string{
+				"username": username,
+				"password": password,
+			}
 		}
 	}
 
@@ -130,7 +154,7 @@ func (cmd AuthCommand) getUsernamePassword() (string, string, error) {
 		passwordMissing = false
 	}
 
-	if userMissing || passwordMissing {
+	if cmd.Assertion == "" && (userMissing || passwordMissing) {
 		return "", "", translatableerror.MissingCredentialsError{
 			MissingUsername: userMissing,
 			MissingPassword: passwordMissing,
