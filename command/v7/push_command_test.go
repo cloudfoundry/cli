@@ -1438,7 +1438,7 @@ var _ = Describe("push Command", func() {
 			},
 			translatableerror.ArgumentCombinationError{
 				Args: []string{
-					"--instance-steps", "--strategy=canary",
+					"--instance-steps", "--strategy=rolling or --strategy not provided",
 				}}),
 	)
 })
