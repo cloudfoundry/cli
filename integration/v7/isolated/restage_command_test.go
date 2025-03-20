@@ -31,9 +31,10 @@ var _ = Describe("restage command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rg"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
+				Eventually(session).Should(Say("--instance-steps"))
 				Eventually(session).Should(Say("--max-in-flight"))
 				Eventually(session).Should(Say(`--no-wait\s+Exit when the first instance of the web process is healthy`))
+				Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
@@ -254,10 +255,10 @@ applications:
 					})
 				})
 
-				When("strategy canary is given with a non-default max-in-flight value", func() {
+				When("strategy canary is given with a non-default max-in-flight value and instance-steps", func() {
 					It("restages successfully and notes the max-in-flight value", func() {
 						userName, _ := helpers.GetCredentials()
-						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2")
+						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2", "--instance-steps", "1,20")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))

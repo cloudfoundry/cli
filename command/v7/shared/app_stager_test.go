@@ -30,14 +30,15 @@ var _ = Describe("app stager", func() {
 		fakeActor          *v7fakes.FakeActor
 		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
-		app          resources.Application
-		space        configv3.Space
-		organization configv3.Organization
-		pkgGUID      string
-		strategy     constant.DeploymentStrategy
-		maxInFlight  int
-		noWait       bool
-		appAction    constant.ApplicationAction
+		app               resources.Application
+		space             configv3.Space
+		organization      configv3.Organization
+		pkgGUID           string
+		strategy          constant.DeploymentStrategy
+		maxInFlight       int
+		noWait            bool
+		appAction         constant.ApplicationAction
+		canaryWeightSteps []resources.CanaryStep
 
 		allLogsWritten   chan bool
 		closedTheStreams bool
@@ -113,6 +114,7 @@ var _ = Describe("app stager", func() {
 				MaxInFlight: maxInFlight,
 				NoWait:      noWait,
 				Strategy:    strategy,
+				CanarySteps: canaryWeightSteps,
 			}
 			executeErr = appStager.StageAndStart(app, space, organization, pkgGUID, opts)
 		})
@@ -194,6 +196,24 @@ var _ = Describe("app stager", func() {
 				dep := fakeActor.CreateDeploymentArgsForCall(0)
 				Expect(dep.Options.MaxInFlight).To(Equal(5))
 				Expect(string(dep.Strategy)).To(Equal("rolling"))
+			})
+		})
+
+		When("deployment strategy is canary", func() {
+			BeforeEach(func() {
+				strategy = constant.DeploymentStrategyCanary
+				noWait = true
+				maxInFlight = 5
+				canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}
+				appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
+			})
+
+			It("creates expected deployment", func() {
+				Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1), "CreateDeployment...")
+				dep := fakeActor.CreateDeploymentArgsForCall(0)
+				Expect(dep.Options.MaxInFlight).To(Equal(5))
+				Expect(string(dep.Strategy)).To(Equal("canary"))
+				Expect(dep.Options.CanaryDeploymentOptions.Steps).To(Equal([]resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}))
 			})
 		})
 	})
@@ -351,6 +371,7 @@ var _ = Describe("app stager", func() {
 			noWait = true
 			maxInFlight = 2
 			appAction = constant.ApplicationRestarting
+			canaryWeightSteps = nil
 
 			app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
@@ -368,6 +389,7 @@ var _ = Describe("app stager", func() {
 				NoWait:      noWait,
 				MaxInFlight: maxInFlight,
 				AppAction:   appAction,
+				CanarySteps: canaryWeightSteps,
 			}
 			executeErr = appStager.StartApp(app, space, organization, resourceGUID, opts)
 		})
@@ -517,6 +539,24 @@ var _ = Describe("app stager", func() {
 				})
 			})
 
+			When("the app action is rollback", func() {
+				BeforeEach(func() {
+					appAction = constant.ApplicationRollingBack
+					strategy = constant.DeploymentStrategyCanary
+					canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}
+					app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
+				})
+
+				It("displays output for each step of starting", func() {
+					Expect(executeErr).To(BeNil())
+
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
+					deployment := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(deployment.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+					Expect(deployment.Options.CanaryDeploymentOptions.Steps).To(Equal(canaryWeightSteps))
+				})
+			})
+
 			When("the app action is restarting", func() {
 				It("displays output for each step of restarting", func() {
 					Expect(executeErr).To(BeNil())
@@ -561,6 +601,24 @@ var _ = Describe("app stager", func() {
 					It("returns an error", func() {
 						Expect(executeErr).To(MatchError("stop-app-error"))
 					})
+				})
+			})
+
+			When("deployment is canary and steps are provided", func() {
+				BeforeEach(func() {
+					appAction = constant.ApplicationStarting
+					strategy = constant.DeploymentStrategyCanary
+					canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}
+					app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
+				})
+
+				It("displays output for each step of starting", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1), "CreateDeployment...")
+					dep := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(dep.Options.MaxInFlight).To(Equal(2))
+					Expect(string(dep.Strategy)).To(Equal("canary"))
+					Expect(dep.Options.CanaryDeploymentOptions.Steps).To(Equal([]resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}))
 				})
 			})
 

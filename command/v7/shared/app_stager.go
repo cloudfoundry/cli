@@ -33,6 +33,7 @@ type AppStartOpts struct {
 	MaxInFlight int
 	NoWait      bool
 	Strategy    constant.DeploymentStrategy
+	CanarySteps []resources.CanaryStep
 }
 
 type Stager struct {
@@ -65,7 +66,6 @@ func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Conf
 }
 
 func (stager *Stager) StageAndStart(app resources.Application, space configv3.Space, organization configv3.Organization, packageGUID string, opts AppStartOpts) error {
-
 	droplet, err := stager.StageApp(app, packageGUID, space)
 	if err != nil {
 		return err
@@ -121,6 +121,10 @@ func (stager *Stager) StartApp(app resources.Application, space configv3.Space, 
 		dep := resources.Deployment{
 			Strategy:      opts.Strategy,
 			Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID}},
+		}
+
+		if opts.Strategy == constant.DeploymentStrategyCanary && len(opts.CanarySteps) > 0 {
+			dep.Options = resources.DeploymentOpts{CanaryDeploymentOptions: &resources.CanaryDeploymentOptions{Steps: opts.CanarySteps}}
 		}
 		switch opts.AppAction {
 		case constant.ApplicationRollingBack:
