@@ -204,7 +204,7 @@ var _ = Describe("app stager", func() {
 				strategy = constant.DeploymentStrategyCanary
 				noWait = true
 				maxInFlight = 5
-				canaryWeightSteps = append(canaryWeightSteps, []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}...)
+				canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}
 				appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
 			})
 
@@ -608,7 +608,7 @@ var _ = Describe("app stager", func() {
 				BeforeEach(func() {
 					appAction = constant.ApplicationStarting
 					strategy = constant.DeploymentStrategyCanary
-					canaryWeightSteps = append(canaryWeightSteps, []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}...)
+					canaryWeightSteps = []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 3}}
 					app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
 				})
 
