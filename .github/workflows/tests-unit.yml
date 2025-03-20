@@ -13,13 +13,11 @@ on:
     tags:
       - "v9.*"
       - "v8.*"
-      - "v7.*"
   pull_request:
     branches:
       - main
       - v9
       - v8
-      - v7
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
