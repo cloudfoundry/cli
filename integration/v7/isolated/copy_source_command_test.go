@@ -396,6 +396,8 @@ var _ = Describe("copy-source command", func() {
 			Eventually(session).Should(Exit(0))
 
 			Eventually(helpers.CF("continue-deployment", targetAppName)).Should(Exit(0))
+			Eventually(helpers.CF("continue-deployment", targetAppName)).Should(Exit(0))
+
 			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
