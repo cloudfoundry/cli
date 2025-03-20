@@ -87,7 +87,7 @@ var _ = Describe("push with --strategy canary", func() {
 					Expect(session).To(Say("Active deployment with status PAUSED"))
 					Expect(session).To(Say("strategy:        canary"))
 					Expect(session).To(Say("max-in-flight:   2"))
-					Expect(session).To(Say("canary-steps:    0/1"))
+					Expect(session).To(Say("canary-steps:    1/1"))
 					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 					Expect(session).To(Exit(0))
 				})
