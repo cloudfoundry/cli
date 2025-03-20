@@ -579,7 +579,7 @@ func (cmd PushCommand) ValidateFlags() error {
 	case cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	case len(cmd.InstanceSteps) > 0 && cmd.Strategy.Name != constant.DeploymentStrategyCanary:
-		return translatableerror.ArgumentCombinationError{Args: []string{"--instance-steps", "--strategy=canary"}}
+		return translatableerror.ArgumentCombinationError{Args: []string{"--instance-steps", "--strategy=rolling or --strategy not provided"}}
 	case len(cmd.InstanceSteps) > 0 && !cmd.validateInstanceSteps():
 		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
 	}

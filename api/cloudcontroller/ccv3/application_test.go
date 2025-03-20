@@ -217,7 +217,6 @@ var _ = Describe("Application", func() {
 			})
 
 			When("lifecycle type buildpack is provided", func() {
-
 				When("other buildpacks are provided", func() {
 					BeforeEach(func() {
 						appBytes = []byte(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`)
