@@ -23,7 +23,7 @@ import (
 
 var _ = Describe("rollback Command", func() {
 	var (
-		app             string
+		appName         string
 		binaryName      string
 		executeErr      error
 		fakeActor       *v7fakes.FakeActor
@@ -31,13 +31,14 @@ var _ = Describe("rollback Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		input           *Buffer
 		testUI          *ui.UI
+		app             resources.Application
 
 		fakeAppStager *sharedfakes.FakeAppStager
 		cmd           v7.RollbackCommand
 	)
 
 	BeforeEach(func() {
-		app = "some-app"
+		appName = "some-app"
 		binaryName = "faceman"
 		fakeActor = new(v7fakes.FakeActor)
 		fakeAppStager = new(sharedfakes.FakeAppStager)
@@ -49,6 +50,10 @@ var _ = Describe("rollback Command", func() {
 		revisions := []resources.Revision{
 			resources.Revision{Version: 2},
 			resources.Revision{Version: 1},
+		}
+		app = resources.Application{
+			GUID: "123",
+			Name: "some-app",
 		}
 
 		fakeActor.GetRevisionsByApplicationNameAndSpaceReturns(
@@ -68,7 +73,7 @@ var _ = Describe("rollback Command", func() {
 		})
 
 		cmd = v7.RollbackCommand{
-			RequiredArgs: flag.AppName{AppName: app},
+			RequiredArgs: flag.AppName{AppName: appName},
 			BaseCommand: v7.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -150,7 +155,7 @@ var _ = Describe("rollback Command", func() {
 		When("the app has at least one revision", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					resources.Application{GUID: "123"},
+					app,
 					v7action.Warnings{"app-warning-1"},
 					nil,
 				)
@@ -169,7 +174,7 @@ var _ = Describe("rollback Command", func() {
 			It("fetches the app and revision revision", func() {
 				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1), "GetApplicationByNameAndSpace call count")
 				appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-				Expect(appName).To(Equal(app))
+				Expect(appName).To(Equal(appName))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 
 				Expect(fakeActor.GetRevisionByApplicationAndVersionCallCount()).To(Equal(1), "GetRevisionByApplicationAndVersion call count")
@@ -192,7 +197,7 @@ var _ = Describe("rollback Command", func() {
 					Expect(revisionGUID).To(Equal("some-1-guid"))
 					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
 
-					Expect(testUI.Out).ToNot(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", app))
+					Expect(testUI.Out).ToNot(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision '3' will use the settings from revision '1'.", appName))
 					Expect(testUI.Out).ToNot(Say("Are you sure you want to continue?"))
 
 					Expect(testUI.Out).To(Say("Rolling back to revision 1 for app some-app in org some-org / space some-space as steve..."))
@@ -221,7 +226,7 @@ var _ = Describe("rollback Command", func() {
 					Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 					Expect(opts.MaxInFlight).To(Equal(5))
 
-					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", app))
+					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
 					Expect(testUI.Out).To(Say("Are you sure you want to continue?"))
 					Expect(testUI.Out).To(Say("Rolling back to revision 1 for app some-app in org some-org / space some-space as steve..."))
 
@@ -252,6 +257,34 @@ var _ = Describe("rollback Command", func() {
 				})
 			})
 
+			When("canary strategy is provided", func() {
+				BeforeEach(func() {
+					cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+					cmd.InstanceSteps = "1,2,4"
+
+					fakeConfig = &commandfakes.FakeConfig{}
+					fakeConfig.APIVersionReturns("4.0.0")
+					cmd.Config = fakeConfig
+
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("starts the app with the current droplet", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeAppStager.StartAppCallCount()).To(Equal(1))
+
+					inputApp, inputSpace, inputOrg, inputDropletGuid, opts := fakeAppStager.StartAppArgsForCall(0)
+					Expect(inputApp).To(Equal(app))
+					Expect(inputDropletGuid).To(Equal("some-1-guid"))
+					Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
+					Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
+					Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+					Expect(opts.AppAction).To(Equal(constant.ApplicationRollingBack))
+					Expect(opts.CanarySteps).To(Equal([]resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 4}}))
+				})
+			})
+
 			When("user says no to prompt", func() {
 				BeforeEach(func() {
 					_, err := input.Write([]byte("n\n"))
@@ -261,8 +294,8 @@ var _ = Describe("rollback Command", func() {
 				It("does not execute the command and outputs warnings", func() {
 					Expect(fakeAppStager.StartAppCallCount()).To(Equal(0), "GetStartApp call count")
 
-					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", app))
-					Expect(testUI.Out).To(Say("App '%s' has not been rolled back to revision '1'.", app))
+					Expect(testUI.Out).To(Say("Rolling '%s' back to revision '1' will create a new revision. The new revision will use the settings from revision '1'.", appName))
+					Expect(testUI.Out).To(Say("App '%s' has not been rolled back to revision '1'.", appName))
 
 					Expect(testUI.Err).To(Say("app-warning-1"))
 					Expect(testUI.Err).To(Say("revision-warning-3"))
@@ -280,7 +313,7 @@ var _ = Describe("rollback Command", func() {
 
 					Expect(fakeAppStager.StartAppCallCount()).To(Equal(0), "GetStartApp call count")
 
-					Expect(testUI.Out).To(Say("App '%s' has not been rolled back to revision '1'.", app))
+					Expect(testUI.Out).To(Say("App '%s' has not been rolled back to revision '1'.", appName))
 				})
 			})
 		})
@@ -304,6 +337,39 @@ var _ = Describe("rollback Command", func() {
 			},
 			translatableerror.IncorrectUsageError{
 				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+
+		Entry("instance-steps no strategy provided",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--instance-steps",
+				Arg2: "--strategy=canary",
+			}),
+
+		Entry("instance-steps a valid list of ints",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+				cmd.InstanceSteps = "some,thing,not,right"
+			},
+			translatableerror.ParseArgumentError{
+				ArgumentName: "--instance-steps",
+				ExpectedType: "list of weights",
+			}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.189.0",
 			}),
 	)
 })
