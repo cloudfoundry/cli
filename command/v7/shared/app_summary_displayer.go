@@ -161,10 +161,17 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 		if maxInFlight > 0 {
 			maxInFlightRow = append(maxInFlightRow, display.UI.TranslateText("max-in-flight:"), strconv.Itoa(maxInFlight))
 		}
+		var canaryStepsRow []string
+		if summary.Deployment.CanaryStatus.Steps.TotalSteps > 0 {
+			stepStatus := summary.Deployment.CanaryStatus.Steps
+			canaryStepsRow = []string{display.UI.TranslateText("canary-steps:"), fmt.Sprintf("%d/%d", stepStatus.CurrentStep, stepStatus.TotalSteps)}
+
+		}
 
 		keyValueTable := [][]string{
 			{display.UI.TranslateText("strategy:"), strings.ToLower(string(summary.Deployment.Strategy))},
 			maxInFlightRow,
+			canaryStepsRow,
 		}
 
 		display.UI.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
