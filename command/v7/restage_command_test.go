@@ -120,6 +120,30 @@ var _ = Describe("restage Command", func() {
 		})
 	})
 
+	When("canary strategy is provided", func() {
+		BeforeEach(func() {
+			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+			cmd.InstanceSteps = "1,2,4"
+			fakeConfig = &commandfakes.FakeConfig{}
+			fakeConfig.APIVersionReturns("4.0.0")
+			cmd.Config = fakeConfig
+		})
+
+		It("starts the app with the current droplet", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
+
+			inputApp, inputSpace, inputOrg, inputDropletGuid, opts := fakeAppStager.StageAndStartArgsForCall(0)
+			Expect(inputApp).To(Equal(app))
+			Expect(inputDropletGuid).To(Equal("earliest-package-guid"))
+			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))
+			Expect(inputOrg).To(Equal(cmd.Config.TargetedOrganization()))
+			Expect(opts.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+			Expect(opts.AppAction).To(Equal(constant.ApplicationRestarting))
+			Expect(opts.CanarySteps).To(Equal([]resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}, {InstanceWeight: 4}}))
+		})
+	})
+
 	It("displays that it's restaging", func() {
 		Expect(testUI.Out).To(Say("Restaging app some-app in org some-org / space some-space as steve..."))
 	})
@@ -225,6 +249,49 @@ var _ = Describe("restage Command", func() {
 			},
 			translatableerror.IncorrectUsageError{
 				Message: "--max-in-flight must be greater than or equal to 1",
+			}),
+
+		Entry("instance-steps provided with rolling deployment",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.InstanceSteps = "1,2,3"
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--instance-steps",
+				Arg2: "--strategy=canary",
+			}),
+
+		Entry("instance-steps no strategy provided",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+			},
+			translatableerror.RequiredFlagsError{
+				Arg1: "--instance-steps",
+				Arg2: "--strategy=canary",
+			}),
+
+		Entry("instance-steps a valid list of ints",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyCanary}
+				cmd.InstanceSteps = "some,thing,not,right"
+			},
+			translatableerror.ParseArgumentError{
+				ArgumentName: "--instance-steps",
+				ExpectedType: "list of weights",
+			}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.189.0",
 			}),
 	)
 })

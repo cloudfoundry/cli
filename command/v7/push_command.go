@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -580,15 +581,19 @@ func (cmd PushCommand) ValidateFlags() error {
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
 	case len(cmd.InstanceSteps) > 0 && cmd.Strategy.Name != constant.DeploymentStrategyCanary:
 		return translatableerror.ArgumentCombinationError{Args: []string{"--instance-steps", "--strategy=rolling or --strategy not provided"}}
-	case len(cmd.InstanceSteps) > 0 && !cmd.validateInstanceSteps():
+	case len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps):
 		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil
 }
 
-func (cmd PushCommand) validateInstanceSteps() bool {
-	for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+func validateInstanceSteps(instanceSteps string) bool {
+	for _, v := range strings.Split(instanceSteps, ",") {
 		_, err := strconv.ParseInt(v, 0, 64)
 		if err != nil {
 			return false
