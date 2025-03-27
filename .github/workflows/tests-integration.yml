@@ -308,7 +308,7 @@ jobs:
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
-    name: client creds
+    name: Client credentials
     needs:
       - get-sha
       - units
