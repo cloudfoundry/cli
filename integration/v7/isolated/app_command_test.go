@@ -285,6 +285,7 @@ applications:
 							session1 := helpers.CF("app", appName)
 							Eventually(session1).Should(Say("Active deployment with status PAUSED"))
 							Eventually(session1).Should(Say("strategy:        canary"))
+							Expect(session1).To(Say("canary-steps:    1/1"))
 							Eventually(session1).Should(Exit(0))
 						})
 					})
