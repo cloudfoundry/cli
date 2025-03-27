@@ -129,14 +129,15 @@ jobs:
       - name: Claim Environment
         id: claim
         env:
-          account_token:            ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          template_argument:        ${{ vars.SHEPHERD_TEMPLATE_ARGUMENT        }}
-          template_name:            ${{ vars.SHEPHERD_TEMPLATE_NAME            || 'cfd-bosh-lite@1.0' }}
-          template_namespace:       ${{ vars.SHEPHERD_TEMPLATE_NAMESPACE       || 'official'          }}
-          lease_duration:           ${{ vars.SHEPHERD_LEASE_DURATION           || '8h'                }}
-          additional_opsfiles_b64:  ${{ vars.SHEPHERD_ADDITIONAL_OPSFILES_B64  || ''                  }}
-          lease_namespace:          ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-          cfd_version:              ${{ inputs.cfd_version      || vars.CFD_VERSION              || '' }}
+          account_token:                ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+          template_argument:            ${{ vars.SHEPHERD_TEMPLATE_ARGUMENT        }}
+          template_name:                ${{ vars.SHEPHERD_TEMPLATE_NAME                || 'cfd-bosh-lite@2.0' }}
+          template_namespace:           ${{ vars.SHEPHERD_TEMPLATE_NAMESPACE           || 'official'          }}
+          lease_duration:               ${{ vars.SHEPHERD_LEASE_DURATION               || '8h'                }}
+          cfd_additional_opsfiles_b64:  ${{ vars.SHEPHERD_CFD_ADDITIONAL_OPSFILES_B64  || ''                  }}
+          bosh_additional_opsfiles_b64: ${{ vars.SHEPHERD_BOSH_ADDITIONAL_OPSFILES_B64 || ''                  }}
+          lease_namespace:              ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+          cfd_version:                  ${{ inputs.cfd_version      || vars.CFD_VERSION              || '' }}
         run: |
           shepherd login service-account ${account_token}
 
@@ -150,7 +151,8 @@ jobs:
             "root_disk_gb": 32,
             "disk_pool_gb": 150,
             "cfd_version": "${cfd_version}",
-            "additional_opsfiles_b64": "${additional_opsfiles_b64}"
+            "cfd_additional_opsfiles_b64": "${cfd_additional_opsfiles_b64}",
+            "bosh_additional_opsfiles_b64": "${bosh_additional_opsfiles_b64}"
           }
           EOF
               )
