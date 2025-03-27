@@ -47,6 +47,7 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI, extra
 	}
 
 	ccWrappers = append(ccWrappers, extraWrappers...)
+	ccWrappers = append(ccWrappers, ccWrapper.NewCCTraceHeaderRequest(config.B3TraceID()))
 	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	return ccv3.NewClient(ccv3.Config{
@@ -85,6 +86,7 @@ func newWrappedUAAClient(config command.Config, ui command.UI) (*uaa.Client, err
 
 	uaaAuthWrapper := uaaWrapper.NewUAAAuthentication(uaaClient, config)
 	uaaClient.WrapConnection(uaaAuthWrapper)
+	uaaClient.WrapConnection(uaaWrapper.NewUAATraceHeaderRequest(config.B3TraceID()))
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	err = uaaClient.SetupResources(config.UAAEndpoint(), config.AuthorizationEndpoint())
@@ -121,6 +123,8 @@ func newWrappedRoutingClient(config command.Config, ui command.UI, uaaClient *ua
 	authWrapper := routingWrapper.NewUAAAuthentication(uaaClient, config)
 
 	routingWrappers = append(routingWrappers, authWrapper)
+	routingWrappers = append(routingWrappers, routingWrapper.NewRoutingTraceHeaderRequest(config.B3TraceID()))
+
 	routingConfig.Wrappers = routingWrappers
 
 	routingClient := router.NewClient(routingConfig)
