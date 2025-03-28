@@ -600,7 +600,7 @@ jobs:
     - name: Build and export to Docker locally
       uses: docker/build-push-action@v6
       with:
-        context: .
+        context: docker
         load: true
         no-cache: true
         tags: ${{ env.VERSION_BUILD }}
