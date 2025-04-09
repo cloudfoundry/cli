@@ -18,4 +18,6 @@ const (
 
 	MinVersionCNB          = "3.168.0"
 	MinVersionPerRouteOpts = "3.183.0"
+
+	MinVersionCanarySteps = "3.189.0"
 )

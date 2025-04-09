@@ -35,6 +35,7 @@ var _ = Describe("rollback command", func() {
 				Expect(session).To(Say(`cf rollback APP_NAME \[--version VERSION\]`))
 				Expect(session).To(Say("OPTIONS:"))
 				Expect(session).To(Say(`-f\s+Force rollback without confirmation`))
+				Expect(session).To(Say("--instance-steps"))
 				Expect(session).To(Say("--max-in-flight"))
 				Expect(session).To(Say(`--strategy\s+Deployment strategy can be canary or rolling. When not specified, it defaults to rolling.`))
 				Expect(session).To(Say(`--version\s+Roll back to the specified revision`))
@@ -158,7 +159,7 @@ applications:
 							})
 
 							It("uses the given strategy to rollback and notes the max-in-flight value", func() {
-								session := helpers.CFWithStdin(buffer, "rollback", appName, "--version", "1", "--strategy", "canary")
+								session := helpers.CFWithStdin(buffer, "rollback", appName, "--version", "1", "--strategy", "canary", "--instance-steps", "10,50")
 								Eventually(session).Should(Exit(0))
 
 								Expect(session).To(HaveRollbackPrompt())
