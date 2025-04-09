@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
