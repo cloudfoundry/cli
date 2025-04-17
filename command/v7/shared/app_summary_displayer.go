@@ -255,3 +255,17 @@ func (display AppSummaryDisplayer) displayBuildpackTable(buildpacks []resources.
 		display.UI.DisplayTableWithHeader("\t", keyValueTable, ui.DefaultTableSpacePadding)
 	}
 }
+
+type AppSummaryJSONDisplayer struct {
+	UI command.UI
+}
+
+func NewAppSummaryJSONDisplayer(ui command.UI) *AppSummaryJSONDisplayer {
+	return &AppSummaryJSONDisplayer{
+		UI: ui,
+	}
+}
+
+func (display AppSummaryJSONDisplayer) AppDisplay(summary v7action.DetailedApplicationSummary, displayStartCommand bool) {
+	display.UI.DisplayJSON("", summary)
+}
