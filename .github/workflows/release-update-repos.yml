@@ -310,9 +310,8 @@ jobs:
         image:
         - debian:11
         - debian:12
-        - ubuntu:20.04
         - ubuntu:22.04
-        - ubuntu
+        - ubuntu:latest
     runs-on: ubuntu-latest
     needs:
     - setup
