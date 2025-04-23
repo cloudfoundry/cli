@@ -34,7 +34,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-20.04
+          - ubuntu-22.04
           - macos-latest
           - macos-13
           - windows-latest
