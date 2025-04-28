@@ -198,10 +198,11 @@ var _ = Describe("Buildpack", func() {
 			warnings      Warnings
 			executeErr    error
 			labelSelector string
+			lifecycle     string
 		)
 
 		JustBeforeEach(func() {
-			buildpacks, warnings, executeErr = actor.GetBuildpacks(labelSelector)
+			buildpacks, warnings, executeErr = actor.GetBuildpacks(labelSelector, lifecycle)
 		})
 
 		It("calls CloudControllerClient.GetBuildpacks()", func() {
@@ -211,6 +212,7 @@ var _ = Describe("Buildpack", func() {
 		When("a label selector is not provided", func() {
 			BeforeEach(func() {
 				labelSelector = ""
+				lifecycle = ""
 			})
 			It("only passes through a OrderBy query to the CloudControllerClient", func() {
 				positionQuery := ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}
@@ -263,6 +265,25 @@ var _ = Describe("Buildpack", func() {
 					{Name: "buildpack-1", Position: types.NullInt{Value: 1, IsSet: true}},
 					{Name: "buildpack-2", Position: types.NullInt{Value: 2, IsSet: true}},
 				}))
+			})
+		})
+
+		When("lifecycle flag is provided", func() {
+			BeforeEach(func() {
+				ccBuildpacks := []resources.Buildpack{
+					{Name: "cnb-1", Position: types.NullInt{Value: 1, IsSet: true}, Lifecycle: "cnb"},
+					{Name: "cnb-2", Position: types.NullInt{Value: 2, IsSet: true}, Lifecycle: "cnb"},
+				}
+				fakeCloudControllerClient.GetBuildpacksReturns(
+					ccBuildpacks,
+					ccv3.Warnings{},
+					nil)
+				lifecycle = "cnb"
+			})
+
+			It("passes the lifecycle as a query", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(ContainElement(ccv3.Query{Key: ccv3.LifecycleFilter, Values: []string{"cnb"}}))
 			})
 		})
 	})

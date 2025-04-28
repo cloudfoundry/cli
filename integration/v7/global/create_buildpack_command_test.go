@@ -34,7 +34,7 @@ var _ = Describe("create buildpack command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`cf create-buildpack BUILDPACK PATH POSITION \[--disable\]`))
 				Eventually(session).Should(Say("TIP:"))
-				Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."))
+				Eventually(session).Should(Say("When using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest."))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`--disable\s+Disable the buildpack from being used for staging`))
 				Eventually(session).Should(Say("SEE ALSO:"))

@@ -92,6 +92,17 @@ var _ = Describe("create buildpack Command", func() {
 			Expect(testUI.Out).To(Say(`Creating buildpack %s as the-user\.\.\.`, buildpackName))
 		})
 
+		When("passing in buildpack lifecycle", func() {
+			BeforeEach(func() {
+				cmd.Lifecycle = "cnb"
+			})
+
+			It("sets the correct lifecycle in the buildpack resource", func() {
+				Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateBuildpackArgsForCall(0).Lifecycle).To(Equal("cnb"))
+			})
+		})
+
 		When("preparing the buildpack bits fails", func() {
 			BeforeEach(func() {
 				fakeActor.PrepareBuildpackBitsReturns("some/invalid/path", errors.New("some-prepare-bp-error"))

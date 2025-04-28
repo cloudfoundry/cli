@@ -10,9 +10,10 @@ import (
 type BuildpacksCommand struct {
 	BaseCommand
 
-	usage           interface{} `usage:"CF_NAME buildpacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME buildpacks\n   CF_NAME buildpacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME buildpacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
+	usage           interface{} `usage:"CF_NAME buildpacks [--labels SELECTOR] [--lifecycle buildpack|cnb]\n\nEXAMPLES:\n   CF_NAME buildpacks\n   CF_NAME buildpacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME buildpacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'\n   CF_NAME buildpacks --lifecycle cnb"`
 	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"`
 	Labels          string      `long:"labels" description:"Selector to filter buildpacks by labels"`
+	Lifecycle       string      `long:"lifecycle" description:"Filter buildpacks by lifecycle ('buildpack' or 'cnb')"`
 }
 
 func (cmd BuildpacksCommand) Execute(args []string) error {
@@ -31,7 +32,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	buildpacks, warnings, err := cmd.Actor.GetBuildpacks(cmd.Labels)
+	buildpacks, warnings, err := cmd.Actor.GetBuildpacks(cmd.Labels, cmd.Lifecycle)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -48,8 +49,9 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 func (cmd BuildpacksCommand) displayTable(buildpacks []resources.Buildpack) {
 	if len(buildpacks) > 0 {
 		var keyValueTable = [][]string{
-			{"position", "name", "stack", "enabled", "locked", "state", "filename"},
+			{"position", "name", "stack", "enabled", "locked", "state", "filename", "lifecycle"},
 		}
+
 		for _, buildpack := range buildpacks {
 			keyValueTable = append(keyValueTable, []string{
 				strconv.Itoa(buildpack.Position.Value),
@@ -59,6 +61,7 @@ func (cmd BuildpacksCommand) displayTable(buildpacks []resources.Buildpack) {
 				strconv.FormatBool(buildpack.Locked.Value),
 				buildpack.State,
 				buildpack.Filename,
+				buildpack.Lifecycle,
 			})
 		}
 
