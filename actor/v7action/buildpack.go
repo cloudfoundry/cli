@@ -21,10 +21,14 @@ type Downloader interface {
 	Download(url string, tmpDirPath string) (string, error)
 }
 
-func (actor Actor) GetBuildpacks(labelSelector string) ([]resources.Buildpack, Warnings, error) {
+func (actor Actor) GetBuildpacks(labelSelector string, lifecycle string) ([]resources.Buildpack, Warnings, error) {
 	queries := []ccv3.Query{ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}}
 	if labelSelector != "" {
 		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+
+	if lifecycle != "" {
+		queries = append(queries, ccv3.Query{Key: ccv3.LifecycleFilter, Values: []string{lifecycle}})
 	}
 
 	buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(queries...)

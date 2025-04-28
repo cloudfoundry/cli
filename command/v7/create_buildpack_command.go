@@ -18,9 +18,10 @@ type CreateBuildpackCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.CreateBuildpackArgs `positional-args:"Yes"`
-	usage           interface{}              `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--disable]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
+	usage           interface{}              `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--disable]\n\nTIP:\n   When using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
 	relatedCommands interface{}              `related_commands:"buildpacks, push"`
 	Disable         bool                     `long:"disable" description:"Disable the buildpack from being used for staging"`
+	Lifecycle       string                   `long:"lifecycle" description:"Lifecycle that the buildpack will use ('buildpack' or 'cnb')"`
 
 	ProgressBar v7action.SimpleProgressBar
 }
@@ -59,9 +60,10 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	}
 
 	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(resources.Buildpack{
-		Name:     cmd.RequiredArgs.Buildpack,
-		Position: types.NullInt{IsSet: true, Value: cmd.RequiredArgs.Position},
-		Enabled:  types.NullBool{IsSet: true, Value: !cmd.Disable},
+		Name:      cmd.RequiredArgs.Buildpack,
+		Position:  types.NullInt{IsSet: true, Value: cmd.RequiredArgs.Position},
+		Enabled:   types.NullBool{IsSet: true, Value: !cmd.Disable},
+		Lifecycle: cmd.Lifecycle,
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

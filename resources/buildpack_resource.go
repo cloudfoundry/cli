@@ -31,20 +31,24 @@ type Buildpack struct {
 	Links APILinks
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata
+	// Lifecycle is the lifecycle used with this buildpack
+	Lifecycle string
 }
 
 // MarshalJSON converts a Package into a Cloud Controller Package.
 func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	ccBuildpack := struct {
-		Name     string    `json:"name,omitempty"`
-		Stack    string    `json:"stack,omitempty"`
-		Position *int      `json:"position,omitempty"`
-		Enabled  *bool     `json:"enabled,omitempty"`
-		Locked   *bool     `json:"locked,omitempty"`
-		Metadata *Metadata `json:"metadata,omitempty"`
+		Name      string    `json:"name,omitempty"`
+		Stack     string    `json:"stack,omitempty"`
+		Position  *int      `json:"position,omitempty"`
+		Enabled   *bool     `json:"enabled,omitempty"`
+		Locked    *bool     `json:"locked,omitempty"`
+		Metadata  *Metadata `json:"metadata,omitempty"`
+		Lifecycle string    `json:"lifecycle,omitempty"`
 	}{
-		Name:  buildpack.Name,
-		Stack: buildpack.Stack,
+		Name:      buildpack.Name,
+		Stack:     buildpack.Stack,
+		Lifecycle: buildpack.Lifecycle,
 	}
 
 	if buildpack.Position.IsSet {
@@ -62,16 +66,17 @@ func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 
 func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	var ccBuildpack struct {
-		GUID     string         `json:"guid,omitempty"`
-		Links    APILinks       `json:"links,omitempty"`
-		Name     string         `json:"name,omitempty"`
-		Filename string         `json:"filename,omitempty"`
-		Stack    string         `json:"stack,omitempty"`
-		State    string         `json:"state,omitempty"`
-		Enabled  types.NullBool `json:"enabled"`
-		Locked   types.NullBool `json:"locked"`
-		Position types.NullInt  `json:"position"`
-		Metadata *Metadata      `json:"metadata"`
+		GUID      string         `json:"guid,omitempty"`
+		Links     APILinks       `json:"links,omitempty"`
+		Name      string         `json:"name,omitempty"`
+		Filename  string         `json:"filename,omitempty"`
+		Stack     string         `json:"stack,omitempty"`
+		State     string         `json:"state,omitempty"`
+		Enabled   types.NullBool `json:"enabled"`
+		Locked    types.NullBool `json:"locked"`
+		Position  types.NullInt  `json:"position"`
+		Metadata  *Metadata      `json:"metadata"`
+		Lifecycle string         `json:"lifecycle"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccBuildpack)
@@ -89,6 +94,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	buildpack.State = ccBuildpack.State
 	buildpack.Links = ccBuildpack.Links
 	buildpack.Metadata = ccBuildpack.Metadata
+	buildpack.Lifecycle = ccBuildpack.Lifecycle
 
 	return nil
 }

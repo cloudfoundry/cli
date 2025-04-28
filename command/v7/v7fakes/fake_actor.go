@@ -1210,10 +1210,11 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetBuildpacksStub        func(string) ([]resources.Buildpack, v7action.Warnings, error)
+	GetBuildpacksStub        func(string, string) ([]resources.Buildpack, v7action.Warnings, error)
 	getBuildpacksMutex       sync.RWMutex
 	getBuildpacksArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getBuildpacksReturns struct {
 		result1 []resources.Buildpack
@@ -8939,18 +8940,19 @@ func (fake *FakeActor) GetBuildpackLabelsReturnsOnCall(i int, result1 map[string
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetBuildpacks(arg1 string) ([]resources.Buildpack, v7action.Warnings, error) {
+func (fake *FakeActor) GetBuildpacks(arg1 string, arg2 string) ([]resources.Buildpack, v7action.Warnings, error) {
 	fake.getBuildpacksMutex.Lock()
 	ret, specificReturn := fake.getBuildpacksReturnsOnCall[len(fake.getBuildpacksArgsForCall)]
 	fake.getBuildpacksArgsForCall = append(fake.getBuildpacksArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 string
+	}{arg1, arg2})
 	stub := fake.GetBuildpacksStub
 	fakeReturns := fake.getBuildpacksReturns
-	fake.recordInvocation("GetBuildpacks", []interface{}{arg1})
+	fake.recordInvocation("GetBuildpacks", []interface{}{arg1, arg2})
 	fake.getBuildpacksMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -8964,17 +8966,17 @@ func (fake *FakeActor) GetBuildpacksCallCount() int {
 	return len(fake.getBuildpacksArgsForCall)
 }
 
-func (fake *FakeActor) GetBuildpacksCalls(stub func(string) ([]resources.Buildpack, v7action.Warnings, error)) {
+func (fake *FakeActor) GetBuildpacksCalls(stub func(string, string) ([]resources.Buildpack, v7action.Warnings, error)) {
 	fake.getBuildpacksMutex.Lock()
 	defer fake.getBuildpacksMutex.Unlock()
 	fake.GetBuildpacksStub = stub
 }
 
-func (fake *FakeActor) GetBuildpacksArgsForCall(i int) string {
+func (fake *FakeActor) GetBuildpacksArgsForCall(i int) (string, string) {
 	fake.getBuildpacksMutex.RLock()
 	defer fake.getBuildpacksMutex.RUnlock()
 	argsForCall := fake.getBuildpacksArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeActor) GetBuildpacksReturns(result1 []resources.Buildpack, result2 v7action.Warnings, result3 error) {
