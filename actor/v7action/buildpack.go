@@ -22,7 +22,7 @@ type Downloader interface {
 }
 
 func (actor Actor) GetBuildpacks(labelSelector string, lifecycle string) ([]resources.Buildpack, Warnings, error) {
-	queries := []ccv3.Query{ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}}
+	queries := []ccv3.Query{}
 	if labelSelector != "" {
 		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
 	}
