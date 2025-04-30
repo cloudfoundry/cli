@@ -214,9 +214,8 @@ var _ = Describe("Buildpack", func() {
 				labelSelector = ""
 				lifecycle = ""
 			})
-			It("only passes through a OrderBy query to the CloudControllerClient", func() {
-				positionQuery := ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}
-				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(ConsistOf(positionQuery))
+			It("does not pass a query to the CloudControllerClient", func() {
+				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(BeEmpty())
 			})
 		})
 
