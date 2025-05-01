@@ -45,6 +45,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say(`--position, -i\s+The order in which the buildpacks are checked during buildpack auto-detection`))
 			Eventually(session).Should(Say(`--rename\s+Rename an existing buildpack`))
 			Eventually(session).Should(Say(`--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
+			Eventually(session).Should(Say(`--lifecycle, -l\s+Specify lifecycle to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Say(`--unlock\s+Unlock the buildpack to enable updates`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks, create-buildpack, delete-buildpack"))
@@ -170,7 +171,7 @@ var _ = Describe("update-buildpack command", func() {
 						It("displays an error saying that multiple buildpacks were found", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
 
-							Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag\.`, buildpackName))
+							Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag\.`, buildpackName))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})

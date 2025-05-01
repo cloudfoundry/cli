@@ -174,7 +174,7 @@ var _ = Describe("unset-label command", func() {
 					It("displays an error", func() {
 						session := helpers.CF("unset-label", "buildpack", buildpackName, "pci")
 						Eventually(session).Should(Exit(1))
-						Expect(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+						Expect(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.", buildpackName)))
 						Expect(session).Should(Say("FAILED"))
 					})
 				})
