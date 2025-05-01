@@ -37,6 +37,7 @@ type UpdateBuildpackCommand struct {
 	Position        types.NullInt                    `long:"position" short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
 	NewName         string                           `long:"rename" description:"Rename an existing buildpack"`
 	CurrentStack    string                           `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	Lifecycle       string                           `long:"lifecycle" short:"l" description:"Specify lifecycle to disambiguate buildpacks with the same name"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
 
 	ProgressBar v7action.SimpleProgressBar
@@ -119,9 +120,10 @@ func (cmd UpdateBuildpackCommand) updateBuildpack() (resources.Buildpack, error)
 		desiredBuildpack.Name = cmd.NewName
 	}
 
-	updatedBuildpack, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(
+	updatedBuildpack, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStackAndLifecycle(
 		cmd.RequiredArgs.Buildpack,
 		cmd.CurrentStack,
+		cmd.Lifecycle,
 		desiredBuildpack,
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -181,32 +183,36 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 		})
 	}
 
-	switch {
-	case cmd.NewStack != "":
+	if cmd.NewStack != "" {
 		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 			"Stack":       cmd.NewStack,
 		})
 		if cmd.Position.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
-			cmd.UI.DisplayTextWithFlavor("\nUpdating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-				"Buildpack":   buildpackName,
-				"CurrentUser": userName,
-				"Stack":       cmd.NewStack,
-			})
+			cmd.UI.DisplayNewline()
+			cmd.displayUpdatingBuildpackMessage(buildpackName, userName, cmd.NewStack)
 		}
-	case cmd.CurrentStack == "":
-		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   buildpackName,
-			"CurrentUser": userName,
-		})
-	default:
-		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   buildpackName,
-			"CurrentUser": userName,
-			"Stack":       cmd.CurrentStack,
-		})
+	} else {
+		cmd.displayUpdatingBuildpackMessage(buildpackName, userName, cmd.CurrentStack)
 	}
+}
+
+func (cmd UpdateBuildpackCommand) displayUpdatingBuildpackMessage(buildpackName, userName, stack string) {
+	message := "Updating buildpack {{.Buildpack}}"
+	if stack != "" {
+		message += " with stack {{.Stack}}"
+	}
+	if cmd.Lifecycle != "" {
+		message += " with lifecycle {{.Lifecycle}}"
+	}
+	message += " as {{.CurrentUser}}..."
+	cmd.UI.DisplayTextWithFlavor(message, map[string]interface{}{
+		"Buildpack":   buildpackName,
+		"CurrentUser": userName,
+		"Stack":       stack,
+		"Lifecycle":   cmd.Lifecycle,
+	})
 }
 
 func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {

@@ -31,11 +31,12 @@ const (
 type LabelsCommand struct {
 	BaseCommand
 
-	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
-	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
-	ServiceBroker   string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
-	ServiceOffering string          `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
+	RequiredArgs       flag.LabelsArgs `positional-args:"yes"`
+	BuildpackStack     string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	BuildpackLifecycle string          `long:"lifecycle" short:"l" description:"Specify lifecycle to disambiguate buildpacks with the same name"`
+	relatedCommands    interface{}     `related_commands:"set-label, unset-label"`
+	ServiceBroker      string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
+	ServiceOffering    string          `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
 
 	username string
 }
@@ -67,8 +68,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		cmd.displayMessageWithOrgAndSpace()
 		labels, warnings, err = cmd.Actor.GetApplicationLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 	case Buildpack:
-		cmd.displayMessageWithStack()
-		labels, warnings, err = cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack)
+		cmd.displayMessageWithStackAndLifecycle()
+		labels, warnings, err = cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, cmd.BuildpackLifecycle)
 	case Domain:
 		cmd.displayMessageDefault()
 		labels, warnings, err = cmd.Actor.GetDomainLabels(cmd.RequiredArgs.ResourceName)
@@ -232,19 +233,17 @@ func (cmd LabelsCommand) displayMessageWithOrg() {
 	})
 }
 
-func (cmd LabelsCommand) displayMessageWithStack() {
-	var template string
-	if cmd.BuildpackStack == "" {
-		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
-	} else {
-		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+func (cmd LabelsCommand) displayMessageWithStackAndLifecycle() {
+	template := fmt.Sprintf("Getting labels for %s %s", cmd.RequiredArgs.ResourceType, cmd.RequiredArgs.ResourceName)
+	if cmd.BuildpackStack != "" {
+		template = fmt.Sprintf("%s with stack %s", template, cmd.BuildpackStack)
+	}
+	if cmd.BuildpackLifecycle != "" {
+		template = fmt.Sprintf("%s with lifecycle %s", template, cmd.BuildpackLifecycle)
 	}
 
-	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"StackName":    cmd.BuildpackStack,
-		"User":         cmd.username,
-	})
+	template = fmt.Sprintf("%s as %s...", template, cmd.username)
+	cmd.UI.DisplayTextWithFlavor(template)
 }
 
 func (cmd LabelsCommand) displayMessageForServiceCommands() {
