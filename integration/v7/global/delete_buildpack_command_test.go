@@ -75,7 +75,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 		When("the user specifies a lifecycle", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan("3.193.0")
+				helpers.SkipIfVersionLessThan("3.194.0")
 			})
 			It("displays a warning and exits 0", func() {
 				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack", "-l", "buildpack")
@@ -87,7 +87,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 		When("the user specifies a stack and lifecycle", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan("3.193.0")
+				helpers.SkipIfVersionLessThan("3.194.0")
 				stacks = helpers.FetchStacks()
 			})
 

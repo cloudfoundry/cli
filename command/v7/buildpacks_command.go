@@ -3,6 +3,8 @@ package v7
 import (
 	"strconv"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -25,6 +27,13 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
+	}
+
+	if cmd.Lifecycle != "" {
+		err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionBuildpackLifecycleQuery, "--lifecycle")
+		if err != nil {
+			return err
+		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting buildpacks as {{.Username}}...", map[string]interface{}{

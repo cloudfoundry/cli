@@ -39,6 +39,7 @@ var _ = Describe("create buildpack Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 		args = nil
@@ -80,6 +81,23 @@ var _ = Describe("create buildpack Command", func() {
 			Expect(checkTargetedOrg).To(BeFalse())
 			Expect(checkTargetedSpace).To(BeFalse())
 		})
+	})
+
+	When("--lifecyle is provided", func() {
+		JustBeforeEach(func() {
+			cmd.Lifecycle = "some-lifecycle"
+			fakeConfig.APIVersionReturns("3.193.0")
+		})
+		It("fails when the cc version is below the minimum", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--lifecycle",
+				CurrentVersion: "3.193.0",
+				MinimumVersion: "3.194.0",
+			}))
+		})
+
 	})
 
 	When("the environment is setup correctly", func() {

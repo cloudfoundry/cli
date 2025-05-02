@@ -300,7 +300,7 @@ var _ = Describe("create buildpack command", func() {
 
 		When("uploading from a cnb file with lifecycle 'buildpack'", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan("3.193.0")
+				helpers.SkipIfVersionLessThan("3.194.0")
 			})
 			When("specifying a valid path", func() {
 				When("the new buildpack is unique", func() {

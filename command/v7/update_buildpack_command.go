@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -54,6 +55,13 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	user, err := cmd.validateSetup()
 	if err != nil {
 		return err
+	}
+
+	if cmd.Lifecycle != "" {
+		err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionBuildpackLifecycleQuery, "--lifecycle")
+		if err != nil {
+			return err
+		}
 	}
 
 	cmd.printInitialText(user.Name)
