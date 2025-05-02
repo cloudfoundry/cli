@@ -44,6 +44,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		buildpackGUID = "some guid"
 
 		cmd = UpdateBuildpackCommand{
@@ -352,7 +353,16 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					Expect(buildpack.Lifecycle).To(BeEmpty())
 					Expect(lifecycleQuery).To(Equal("some-lifecycle"))
 				})
+				It("fails when the cc version is below the minimum", func() {
+					fakeConfig.APIVersionReturns("3.193.0")
+					executeErr = cmd.Execute(nil)
 
+					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+						Command:        "--lifecycle",
+						CurrentVersion: "3.193.0",
+						MinimumVersion: "3.194.0",
+					}))
+				})
 			})
 
 			When("the --rename flag is provided", func() {

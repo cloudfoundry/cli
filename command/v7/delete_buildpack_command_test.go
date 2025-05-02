@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -32,6 +33,7 @@ var _ = Describe("delete-buildpack Command", func() {
 		input = NewBuffer()
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 
@@ -48,6 +50,23 @@ var _ = Describe("delete-buildpack Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Buildpack = buildpackName
 		cmd.Force = true
+	})
+
+	When("--lifecyle is provided", func() {
+		JustBeforeEach(func() {
+			cmd.Lifecycle = "some-lifecycle"
+			fakeConfig.APIVersionReturns("3.193.0")
+		})
+		It("fails when the cc version is below the minimum", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--lifecycle",
+				CurrentVersion: "3.193.0",
+				MinimumVersion: "3.194.0",
+			}))
+		})
+
 	})
 
 	When("checking target fails", func() {

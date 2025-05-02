@@ -2,6 +2,8 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -20,6 +22,13 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
+	}
+
+	if cmd.Lifecycle != "" {
+		err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionBuildpackLifecycleQuery, "--lifecycle")
+		if err != nil {
+			return err
+		}
 	}
 
 	if !cmd.Force {

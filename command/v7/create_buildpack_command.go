@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -40,6 +41,13 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	user, err := cmd.Actor.GetCurrentUser()
 	if err != nil {
 		return err
+	}
+
+	if cmd.Lifecycle != "" {
+		err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionBuildpackLifecycleQuery, "--lifecycle")
+		if err != nil {
+			return err
+		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{

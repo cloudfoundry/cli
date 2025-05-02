@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -35,6 +36,7 @@ var _ = Describe("buildpacks Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 		args = nil
@@ -100,6 +102,16 @@ var _ = Describe("buildpacks Command", func() {
 			It("passes the lifecycle to the actor", func() {
 				_, lifecycle := fakeActor.GetBuildpacksArgsForCall(0)
 				Expect(lifecycle).To(Equal("cnb"))
+			})
+			It("fails when the cc version is below the minimum", func() {
+				fakeConfig.APIVersionReturns("3.193.0")
+				executeErr = cmd.Execute(nil)
+
+				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+					Command:        "--lifecycle",
+					CurrentVersion: "3.193.0",
+					MinimumVersion: "3.194.0",
+				}))
 			})
 		})
 
