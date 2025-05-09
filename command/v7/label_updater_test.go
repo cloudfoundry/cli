@@ -348,7 +348,7 @@ var _ = Describe("LabelUpdater", func() {
 			}
 			labels = expectedMap
 
-			fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
+			fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns(
 				v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 				nil,
 			)
@@ -365,10 +365,11 @@ var _ = Describe("LabelUpdater", func() {
 				})
 
 				It("passes the right parameters", func() {
-					Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-					name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+					Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCallCount()).To(Equal(1))
+					name, stack, lifecycle, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall(0)
 					Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
 					Expect(stack).To(Equal("globinski"), "failed to pass stack name")
+					Expect(lifecycle).To(Equal(""), "failed to pass lifecycle name")
 					Expect(labels).To(BeEquivalentTo(expectedMap))
 				})
 
@@ -379,12 +380,34 @@ var _ = Describe("LabelUpdater", func() {
 				})
 			})
 
-			When("the stack is not specified", func() {
+			When("the stack and lifecycle are not specified", func() {
 				It("passes the right parameters", func() {
-					Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-					name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+					Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCallCount()).To(Equal(1))
+					name, stack, lifecycle, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall(0)
 					Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
 					Expect(stack).To(Equal(""), "failed to pass stack name")
+					Expect(lifecycle).To(Equal(""), "failed to pass lifecycle name")
+					Expect(labels).To(BeEquivalentTo(expectedMap))
+				})
+
+				It("prints all warnings and does not error ", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+			})
+
+			When("the lifecycle is specified", func() {
+				BeforeEach(func() {
+					targetResource.BuildpackLifecycle = "cnb"
+				})
+
+				It("passes the right parameters", func() {
+					Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCallCount()).To(Equal(1))
+					name, stack, lifecycle, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall(0)
+					Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+					Expect(stack).To(Equal(""), "failed to pass stack name")
+					Expect(lifecycle).To(Equal("cnb"), "failed to pass lifecycle name")
 					Expect(labels).To(BeEquivalentTo(expectedMap))
 				})
 
@@ -399,9 +422,10 @@ var _ = Describe("LabelUpdater", func() {
 		When("the resource type is not lowercase", func() {
 			BeforeEach(func() {
 				targetResource = TargetResource{
-					ResourceType:   "bUiLdPaCk",
-					ResourceName:   resourceName,
-					BuildpackStack: "globinski",
+					ResourceType:       "bUiLdPaCk",
+					ResourceName:       resourceName,
+					BuildpackStack:     "globinski",
+					BuildpackLifecycle: "cnb",
 				}
 				expectedMap = map[string]types.NullString{
 					"some-label":     types.NewNullString("some-value"),
@@ -411,7 +435,7 @@ var _ = Describe("LabelUpdater", func() {
 
 			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+				Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCallCount()).To(Equal(1))
 			})
 
 			It("displays a message in the right case", func() {
@@ -422,7 +446,7 @@ var _ = Describe("LabelUpdater", func() {
 
 		When("updating the buildpack labels fails", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+				fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
 					errors.New("api call failed"))
 			})
 
@@ -448,9 +472,27 @@ var _ = Describe("LabelUpdater", func() {
 					})
 				})
 
-				When("stack is not passed", func() {
+				When("stack and lifecycle not passed", func() {
 					It("shows 'Removing' as action", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
+					})
+				})
+
+				When("lifecycle is passed", func() {
+					BeforeEach(func() {
+						targetResource.BuildpackLifecycle = "cnb"
+					})
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with lifecycle %s as some-user...`), resourceName, targetResource.BuildpackLifecycle))
+					})
+				})
+				When("stack and lifecycle are passed", func() {
+					BeforeEach(func() {
+						targetResource.BuildpackLifecycle = "cnb"
+						targetResource.BuildpackStack = "globinski"
+					})
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s with lifecycle %s as some-user...`), resourceName, targetResource.BuildpackStack, targetResource.BuildpackLifecycle))
 					})
 				})
 			})
@@ -470,9 +512,28 @@ var _ = Describe("LabelUpdater", func() {
 					})
 				})
 
-				When("stack is not passed", func() {
+				When("stack and lifecycle are not passed", func() {
 					It("shows 'Setting' as action", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as some-user...`), resourceName))
+					})
+				})
+
+				When("lifecycle is passed", func() {
+					BeforeEach(func() {
+						targetResource.BuildpackLifecycle = "cnb"
+					})
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with lifecycle %s as some-user...`), resourceName, targetResource.BuildpackLifecycle))
+					})
+				})
+
+				When("stack and lifecycle are passed", func() {
+					BeforeEach(func() {
+						targetResource.BuildpackLifecycle = "cnb"
+						targetResource.BuildpackStack = "globinski"
+					})
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s with lifecycle %s as some-user...`), resourceName, targetResource.BuildpackStack, targetResource.BuildpackLifecycle))
 					})
 				})
 			})
