@@ -31,6 +31,7 @@ var _ = Describe("delete-buildpack command", func() {
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--force, -f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say(`--stack, -s\s+Specify stack to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous`))
+			Eventually(session).Should(Say(`--lifecycle, -l\s+Specify lifecycle to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous`))
 			Eventually(session).Should(Say("\n"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks"))
@@ -48,12 +49,12 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	When("the buildpack doesn't exist", func() {
-		When("the user does not specify a stack", func() {
+		When("the user does not specify a stack or lifecycle", func() {
 			It("displays a warning and exits 0", func() {
 				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack")
 				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack\.\.\.`))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session.Err).Should(Say(`Buildpack 'nonexistent-buildpack' does not exist\.`))
+				Eventually(session.Err).Should(Say(`Buildpack 'nonexistent-buildpack' not found\.`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -68,6 +69,33 @@ var _ = Describe("delete-buildpack command", func() {
 				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack with stack %s\.\.\.`, stacks[0]))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session.Err).Should(Say(`Buildpack 'nonexistent-buildpack' with stack '%s' not found\.`, stacks[0]))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the user specifies a lifecycle", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan("3.194.0")
+			})
+			It("displays a warning and exits 0", func() {
+				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack", "-l", "buildpack")
+				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack with lifecycle buildpack\.\.\.`))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session.Err).Should(Say(`Buildpack 'nonexistent-buildpack' with lifecycle 'buildpack' not found\.`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+		When("the user specifies a stack and lifecycle", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan("3.194.0")
+				stacks = helpers.FetchStacks()
+			})
+
+			It("displays a warning and exits 0", func() {
+				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack", "-s", stacks[0], "-l", "buildpack")
+				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack with stack %s with lifecycle buildpack\.\.\.`, stacks[0]))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session.Err).Should(Say(`Buildpack 'nonexistent-buildpack' with stack '%s' with lifecycle 'buildpack' does not exist\.`, stacks[0]))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -121,7 +149,7 @@ var _ = Describe("delete-buildpack command", func() {
 				By("failing when no stack specified")
 
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
-				Eventually(session.Err).Should(Say("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName))
+				Eventually(session.Err).Should(Say("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.", buildpackName))
 				Eventually(session).Should(Exit(1))
 
 				By("succeeding with warning when the buildpack name matches but the stack does not")

@@ -32,11 +32,12 @@ var _ = Describe("create buildpack command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("create-buildpack - Create a buildpack"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf create-buildpack BUILDPACK PATH POSITION \[--disable\]`))
+				Eventually(session).Should(Say(`cf create-buildpack BUILDPACK PATH POSITION \[--disable\] \[--lifecycle buildpack|cnb\]`))
 				Eventually(session).Should(Say("TIP:"))
-				Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."))
+				Eventually(session).Should(Say("When using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest."))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`--disable\s+Disable the buildpack from being used for staging`))
+				Eventually(session).Should(Say(`--lifecycle, -l\s+Lifecycle that the buildpack will use`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("buildpacks, push"))
 				Eventually(session).Should(Exit(0))
@@ -117,7 +118,7 @@ var _ = Describe("create buildpack command", func() {
 			})
 		})
 
-		When("uploading from a zip", func() {
+		When("uploading from a zip with lifecycle 'buildpack'", func() {
 			var stacks []string
 
 			BeforeEach(func() {
@@ -295,15 +296,43 @@ var _ = Describe("create buildpack command", func() {
 					})
 				})
 			})
+		})
 
-			When("specifying an invalid path", func() {
-				It("returns the appropriate error", func() {
-					session := helpers.CF("create-buildpack", buildpackName, "bogus-path", "1")
+		When("uploading from a cnb file with lifecycle 'buildpack'", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan("3.194.0")
+			})
+			When("specifying a valid path", func() {
+				When("the new buildpack is unique", func() {
+					When("the new buildpack has a nil stack", func() {
+						It("successfully uploads a buildpack", func() {
+							helpers.CNB(func(buildpackPath string) {
+								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--lifecycle=cnb")
+								Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
 
-					Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'bogus-path' does not exist"))
-					Eventually(session).Should(Say("USAGE:"))
-					Eventually(session).Should(Exit(1))
+							session := helpers.CF("buildpacks")
+							Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+								Name: buildpackName, Position: "1"})))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 				})
+
+			})
+		})
+
+		When("specifying an invalid path", func() {
+			It("returns the appropriate error", func() {
+				session := helpers.CF("create-buildpack", buildpackName, "bogus-path", "1")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'bogus-path' does not exist"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 

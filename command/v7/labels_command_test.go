@@ -752,13 +752,15 @@ var _ = Describe("labels command", func() {
 						ResourceName: "oshkosh",
 					}
 					cmd.BuildpackStack = "cflinuxfs4"
+					cmd.BuildpackLifecycle = "cnb"
 				})
 				It("retrieves the labels when resource type is buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
-					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
+					buildpackName, stackName, lifecycle := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
 					Expect(buildpackName).To(Equal("oshkosh"))
 					Expect(stackName).To(Equal("cflinuxfs4"))
+					Expect(lifecycle).To(Equal("cnb"))
 				})
 			})
 		})

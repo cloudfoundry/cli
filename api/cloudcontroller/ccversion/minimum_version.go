@@ -13,5 +13,7 @@ const (
 	MinVersionLogRateLimitingV3 = "3.125.0"
 	MinVersionPerRouteOpts      = "3.183.0"
 
+	MinVersionBuildpackLifecycleQuery = "3.194.0"
+
 	MinVersionCanarySteps = "3.189.0"
 )
