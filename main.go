@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	fmt.Println("foooob")
 	var exitCode int
 	defer panichandler.HandlePanic()
 
