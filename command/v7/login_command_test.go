@@ -325,13 +325,10 @@ var _ = Describe("login Command", func() {
 			When("targeting the API with --skip-ssl-validation flag", func() {
 				BeforeEach(func() {
 					cmd.APIEndpoint = "api.example.com"
-					// fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
 				})
 
 				It("login succeeds", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					// Expect(executeErr).To(MatchError(
-					// 	translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
 				})
 			})
 		})

@@ -140,7 +140,7 @@ var _ = Describe("api command", func() {
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
-				server.Close()
+				defer server.Close()
 			})
 
 			It("sets the API endpoint", func() {
