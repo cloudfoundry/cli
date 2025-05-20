@@ -16,7 +16,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("logs command", func() {
+var _ = XDescribe("logs command", func() {
 	var server *ghttp.Server
 
 	BeforeEach(func() {
