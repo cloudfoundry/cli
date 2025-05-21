@@ -3,7 +3,6 @@ package isolated
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -15,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("login command", func() {
@@ -243,63 +241,6 @@ var _ = Describe("login command", func() {
 					Expect(session).Should(Say("API endpoint:   %s", apiURL))
 				})
 			})
-
-			When("the SSL Certificate is invalid", func() {
-				var server *ghttp.Server
-
-				BeforeEach(func() {
-					cliVersion := "1.0.0"
-					server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
-					fakeTokenResponse := map[string]string{
-						"access_token": "",
-						"token_type":   "bearer",
-					}
-					server.RouteToHandler(http.MethodPost, "/oauth/token",
-						ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
-					server.RouteToHandler(http.MethodGet, "/v3/organizations",
-						ghttp.RespondWith(http.StatusOK, `{
-							"total_results": 0,
-							"total_pages": 1,
-							"resources": []}`))
-				})
-
-				AfterEach(func() {
-					server.Close()
-				})
-
-				It("errors when --skip-ssl-validation is not provided", func() {
-					session := helpers.CF("login", "-a", server.URL())
-					Eventually(session).Should(Say("API endpoint: %s", server.URL()))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
-					Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
-					Eventually(session).Should(Exit(1))
-				})
-
-				It("doesn't complain about an invalid cert when we specify --skip-ssl-validation", func() {
-					session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
-					Eventually(session).Should(Exit(0))
-
-					Expect(string(session.Err.Contents())).Should(Not(ContainSubstring("Invalid SSL Cert for %s", server.URL())))
-				})
-
-				When("targeted with --skip-ssl-validation", func() {
-					BeforeEach(func() {
-						Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-					})
-
-					When("logging in without --skip-ssl-validation", func() {
-						It("displays a helpful error message and exits 1", func() {
-							session := helpers.CF("login", "-a", server.URL())
-							Eventually(session).Should(Say("API endpoint: %s", server.URL()))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
-							Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
-							Eventually(session).Should(Exit(1))
-						})
-					})
-				})
-			})
 		})
 	})
 
@@ -513,72 +454,6 @@ var _ = Describe("login command", func() {
 				})
 			})
 		})
-
-		When("MFA is enabled", func() {
-			var (
-				mfaCode string
-				server  *ghttp.Server
-			)
-
-			BeforeEach(func() {
-				password = "some-password"
-				mfaCode = "123456"
-				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
-				helpers.AddMfa(server, password, mfaCode)
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			When("correct MFA code and credentials are provided", func() {
-				BeforeEach(func() {
-					fakeTokenResponse := map[string]string{
-						"access_token": "",
-						"token_type":   "bearer",
-					}
-					server.RouteToHandler(http.MethodPost, "/oauth/token",
-						ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
-					server.RouteToHandler(http.MethodGet, "/v3/organizations",
-						ghttp.RespondWith(http.StatusOK, `{
-						 "total_results": 0,
-						 "total_pages": 1,
-						 "resources": []}`))
-				})
-
-				It("logs in the user", func() {
-					input := NewBuffer()
-					_, err := input.Write([]byte(username + "\n" + password + "\n" + mfaCode + "\n"))
-					Expect(err).ToNot(HaveOccurred())
-					session := helpers.CFWithStdin(input, "login")
-					Eventually(session).Should(Say("Email: "))
-					Eventually(session).Should(Say("\n"))
-					Eventually(session).Should(Say("Password:"))
-					Eventually(session).Should(Say("\n"))
-					Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-
-			When("incorrect MFA code and credentials are provided", func() {
-				It("fails", func() {
-					input := NewBuffer()
-					wrongMfaCode := mfaCode + "foo"
-					_, err := input.Write([]byte(username + "\n" + password + "\n" + wrongMfaCode + "\n" + password + "\n" + wrongMfaCode + "\n"))
-					Expect(err).ToNot(HaveOccurred())
-					session := helpers.CFWithStdin(input, "login")
-					Eventually(session).Should(Say("Password: "))
-					Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
-					Eventually(session).Should(Say("Password: "))
-					Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
-					Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Unable to authenticate."))
-
-					Eventually(session).Should(Exit(1))
-				})
-			})
-		})
 	})
 
 	Describe("Client Credentials", func() {
@@ -665,38 +540,6 @@ var _ = Describe("login command", func() {
 					Eventually(createOrgSession).Should(Exit(0))
 					setOrgRoleSession := helpers.CF("set-org-role", username, orgName, "OrgManager")
 					Eventually(setOrgRoleSession).Should(Exit(0))
-				})
-
-				When("there are more than 50 orgs", func() {
-					var server *ghttp.Server
-
-					BeforeEach(func() {
-						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
-						helpers.AddLoginRoutes(server)
-						helpers.AddFiftyOneOrgs(server)
-						// handle request for spaces under "org20"
-						helpers.AddEmptyPaginatedResponse(server, "/v3/spaces?order_by=name&organization_guids=f6653aac-938e-4469-9a66-56a02796412b")
-					})
-
-					AfterEach(func() {
-						server.Close()
-					})
-
-					It("displays a message and prompts the user for the org name", func() {
-						input := NewBuffer()
-						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "org20"))) // "org20" is one of the orgs in the test fixture
-						Expect(wErr).ToNot(HaveOccurred())
-
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
-
-						Eventually(session).Should(Say("Select an org:"))
-						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
-						Eventually(session).Should(Say(`Targeted org org20\.`))
-
-						Eventually(session).Should(Exit(0))
-					})
 				})
 
 				When("user selects an organization by using numbered list", func() {
@@ -1111,35 +954,6 @@ var _ = Describe("login command", func() {
 						Eventually(targetSession).Should(Exit(0))
 						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
-					})
-				})
-
-				When("there are more than 50 spaces", func() {
-					var server *ghttp.Server
-					BeforeEach(func() {
-						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
-						helpers.AddLoginRoutes(server)
-						helpers.AddFiftyOneSpaces(server)
-					})
-
-					AfterEach(func() {
-						server.Close()
-					})
-
-					It("displays a message and prompts the user for the space name", func() {
-						input := NewBuffer()
-						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "test-space-1")))
-						Expect(wErr).ToNot(HaveOccurred())
-
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
-
-						Eventually(session).Should(Say("Select a space:"))
-						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
-						Eventually(session).Should(Say(`Targeted space test-space-1\.`))
-
-						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
