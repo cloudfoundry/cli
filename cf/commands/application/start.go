@@ -340,7 +340,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) error {
 			}
 
 			if count.flapping > 0 || count.crashed > 0 {
-				return fmt.Errorf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+				return errors.New(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
 					map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 			}
 
@@ -393,40 +393,40 @@ func (cmd Start) fetchInstanceCount(appGUID string) (instanceCount, error) {
 }
 
 func instancesDetails(count instanceCount) string {
-	details := []string{fmt.Sprintf(T("{{.RunningCount}} of {{.TotalCount}} instances running",
-		map[string]interface{}{"RunningCount": count.running, "TotalCount": count.total}))}
+	details := []string{T("{{.RunningCount}} of {{.TotalCount}} instances running",
+		map[string]interface{}{"RunningCount": count.running, "TotalCount": count.total})}
 
 	if count.starting > 0 {
 		if len(count.startingDetails) == 0 {
-			details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting",
-				map[string]interface{}{"StartingCount": count.starting})))
+			details = append(details, T("{{.StartingCount}} starting",
+				map[string]interface{}{"StartingCount": count.starting}))
 		} else {
 			info := []string{}
 			for d := range count.startingDetails {
 				info = append(info, d)
 			}
 			sort.Strings(info)
-			details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting ({{.Details}})",
+			details = append(details, T("{{.StartingCount}} starting ({{.Details}})",
 				map[string]interface{}{
 					"StartingCount": count.starting,
 					"Details":       strings.Join(info, ", "),
-				})))
+				}))
 		}
 	}
 
 	if count.down > 0 {
-		details = append(details, fmt.Sprintf(T("{{.DownCount}} down",
-			map[string]interface{}{"DownCount": count.down})))
+		details = append(details, T("{{.DownCount}} down",
+			map[string]interface{}{"DownCount": count.down}))
 	}
 
 	if count.flapping > 0 {
-		details = append(details, fmt.Sprintf(T("{{.FlappingCount}} failing",
-			map[string]interface{}{"FlappingCount": count.flapping})))
+		details = append(details, T("{{.FlappingCount}} failing",
+			map[string]interface{}{"FlappingCount": count.flapping}))
 	}
 
 	if count.crashed > 0 {
-		details = append(details, fmt.Sprintf(T("{{.CrashedCount}} crashed",
-			map[string]interface{}{"CrashedCount": count.crashed})))
+		details = append(details, T("{{.CrashedCount}} crashed",
+			map[string]interface{}{"CrashedCount": count.crashed}))
 	}
 
 	return strings.Join(details, ", ")
