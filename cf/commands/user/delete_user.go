@@ -76,7 +76,7 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 	switch err.(type) {
 	case nil:
 		if len(users) > 1 {
-			return fmt.Errorf(T(
+			return errors.New(T(
 				"Error deleting user {{.Username}} \nThe user exists in multiple origins.",
 				map[string]interface{}{
 					"Username": username,
