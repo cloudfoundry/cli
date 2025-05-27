@@ -328,7 +328,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 	return zipPath, nil
 }
 
-func (Actor) addLinkToZipFromFileSystem(srcPath string,
+func (actor Actor) addLinkToZipFromFileSystem(srcPath string,
 	fileInfo os.FileInfo, resource Resource,
 	zipFile *zip.Writer,
 ) error {
@@ -367,7 +367,7 @@ func (Actor) addLinkToZipFromFileSystem(srcPath string,
 	return nil
 }
 
-func (Actor) addFileToZipFromFileSystem(srcPath string,
+func (actor Actor) addFileToZipFromFileSystem(srcPath string,
 	srcFile io.Reader, fileInfo os.FileInfo, resource Resource,
 	zipFile *zip.Writer,
 ) error {
@@ -424,7 +424,7 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 	return nil
 }
 
-func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnore, error) {
+func (actor Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnore, error) {
 	for _, item := range files {
 		if strings.HasSuffix(item.Name, ".cfignore") {
 			fileReader, err := item.Open()
@@ -438,10 +438,18 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 				return nil, err
 			}
 			s := append(DefaultIgnoreLines, strings.Split(string(raw), "\n")...)
-			return ignore.CompileIgnoreLines(s...)
+			gitIgnore, err := ignore.CompileIgnoreLines(s...)
+			if err != nil {
+				return nil, err
+			}
+			return gitIgnore, nil
 		}
 	}
-	return ignore.CompileIgnoreLines(DefaultIgnoreLines...)
+	gitIgnore, err := ignore.CompileIgnoreLines(DefaultIgnoreLines...)
+	if err != nil {
+		return nil, err
+	}
+	return gitIgnore, nil
 }
 
 func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
@@ -464,12 +472,20 @@ func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.G
 	log.Debugf("ignore rules: %v", additionalIgnoreLines)
 
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
-		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
+		gitIgnore, err := ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
+		if err != nil {
+			return nil, err
+		}
+		return gitIgnore, nil
 	}
-	return ignore.CompileIgnoreLines(additionalIgnoreLines...)
+	gitIgnore, err := ignore.CompileIgnoreLines(additionalIgnoreLines...)
+	if err != nil {
+		return nil, err
+	}
+	return gitIgnore, nil
 }
 
-func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
+func (actor Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
 	for _, resource := range filesToInclude {
 		if resource.Filename == filepath.ToSlash(path) {
 			log.WithField("resource", resource.Filename).Debug("found resource in files to include")
@@ -481,7 +497,7 @@ func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, 
 	return Resource{}, false
 }
 
-func (Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
+func (actor Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
 	info, err := archive.Stat()
 	if err != nil {
 		return nil, err
@@ -492,12 +508,14 @@ func (Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
 
 func (actor Actor) CreateArchive(bitsPath string, resources []Resource) (io.ReadCloser, int64, error) {
 	archivePath, err := actor.ZipDirectoryResources(bitsPath, resources)
-	_ = err
+	if err != nil {
+		return nil, -1, err
+	}
 
 	return actor.ReadArchive(archivePath)
 }
 
-func (Actor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
+func (actor Actor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
 	archive, err := os.Open(archivePath)
 	if err != nil {
 		log.WithField("archivePath", archivePath).Errorln("opening temp archive:", err)
