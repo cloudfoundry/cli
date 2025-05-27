@@ -172,6 +172,9 @@ PLATFORMS
 DEPENDENCIES
   irb
   webrick
+	
+BUNDLED WITH
+   2.5.18
 `,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
