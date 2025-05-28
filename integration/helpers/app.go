@@ -174,7 +174,7 @@ DEPENDENCIES
   webrick
 	
 BUNDLED WITH
-   2.5.18
+   2.6.6
 `,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
