@@ -296,7 +296,7 @@ var _ = Describe("ssh command", func() {
 
 					Eventually(BufferReader(response.Body)).Should(Say("WEBrick"))
 
-					session.Kill()
+					session.Interrupt()
 					Eventually(session).Should(Exit())
 				})
 			})
