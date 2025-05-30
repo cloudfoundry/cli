@@ -12,7 +12,15 @@
       "staticcheck",
       "unused",
       "ineffassign"
-    ]
+    ],
+    "exclusions": {
+      "paths": [
+        "cf",
+        "fixtures",
+        "plugin",
+        "command/plugin"
+      ]
+    }
   },
   "linters-settings": {},
   "issues": {

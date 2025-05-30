@@ -36,7 +36,7 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         with:
           version: v2.1
-          args: -v --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+          args: -v
   format:
     name: Run go fmt
     runs-on: ubuntu-latest
