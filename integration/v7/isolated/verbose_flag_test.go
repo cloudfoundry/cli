@@ -217,7 +217,7 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say(`GET /api/v1/read/.*\?\w+`))
 				Eventually(session).Should(Say(`Host: log-cache\.`))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
-				Eventually(session.Kill()).Should(Exit())
+				Eventually(session.Interrupt()).Should(Exit())
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
@@ -268,7 +268,7 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Say("GET /api/v1/info HTTP/1.1"))
 				Eventually(session).Should(Say("GET /api/v1/read/"))
-				session.Kill()
+				session.Interrupt()
 				Eventually(session).Should(Exit())
 
 				for _, filePath := range location {

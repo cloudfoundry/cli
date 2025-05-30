@@ -60,7 +60,7 @@ var _ = Describe("logs", func() {
 			Eventually(restageSession).Should(Exit(0))
 
 			Eventually(logSession).Should(Say("Staticfile Buildpack version"))
-			logSession.Kill()
+			logSession.Interrupt()
 
 			Eventually(logSession).Should(Exit())
 		})
