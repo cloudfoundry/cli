@@ -468,7 +468,7 @@ jobs:
 
   update-windows:
     name: Update Windows Chocolatey Package
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
@@ -537,7 +537,7 @@ jobs:
 
   test-windows:
     name: Test Windows Chocolatey Package
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
