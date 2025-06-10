@@ -615,7 +615,7 @@ jobs:
     name: Build Windows
     needs:
     - setup
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
