@@ -96,6 +96,9 @@ var _ = Describe("Config", func() {
 		Entry("info returns 4", "info", 4),
 		Entry("debug returns 5", "debug", 5),
 		Entry("dEbUg returns 5", "dEbUg", 5),
+		Entry("trace returns 6", "trace", 6),
+		Entry("TrAcE returns 6", "TrAcE", 6),
+		Entry("invalid returns 0", "invalid", 0),
 	)
 
 	Describe("StagingTimeout", func() {

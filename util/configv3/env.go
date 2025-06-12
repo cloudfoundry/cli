@@ -3,10 +3,10 @@ package configv3
 import (
 	"encoding/json"
 	"strconv"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/util/trace"
+	log "github.com/sirupsen/logrus"
 )
 
 // EnvOverride represents all the environment variables read by the CF CLI
@@ -115,17 +115,8 @@ func (config *Config) LogLevel() int {
 			return int(envVal)
 		}
 
-		switch strings.ToLower(config.ENV.CFLogLevel) {
-		case "fatal":
-			return 1
-		case "error":
-			return 2
-		case "warn":
-			return 3
-		case "info":
-			return 4
-		case "debug":
-			return 5
+		if level, err := log.ParseLevel(config.ENV.CFLogLevel); err == nil {
+			return int(level)
 		}
 	}
 
