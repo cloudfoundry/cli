@@ -13,6 +13,7 @@ type GetHealthCheckCommand struct {
 
 	RequiredArgs flag.AppName `positional-args:"yes"`
 	usage        interface{}  `usage:"CF_NAME get-health-check APP_NAME"`
+	JSONOutput   bool         `long:"json" description:"Output in json form"`
 }
 
 func (cmd GetHealthCheckCommand) Execute(args []string) error {
@@ -37,6 +38,10 @@ func (cmd GetHealthCheckCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	if cmd.JSONOutput {
+		return cmd.UI.DisplayJSON("", map[string][]v7action.ProcessHealthCheck{"app": processHealthChecks})
 	}
 
 	cmd.UI.DisplayNewline()
