@@ -1,26 +1,47 @@
 {
+  "version": 2,
   "run": {
     "concurrency": 4,
     "timeout": "20m"
   },
+  "formaters": {
+    "default": "none",
+    "enable": [
+      "goimports"
+    ],
+    "exclusions": {
+      "paths": [
+        "cf",
+        "fixtures",
+        "plugin",
+        "command/plugin",
+        "integration/helpers/fake_server.go",
+        "command/plugin/*.go$"
+      ]
+    }
+  },
   "linters": {
-    "disable-all": true,
+    "default": "none",
     "enable": [
       "govet",
-      "goimports",
       "errcheck",
       "staticcheck",
       "unused",
       "ineffassign"
-    ]
+    ],
+    "exclusions": {
+      "paths": [
+        "cf",
+        "fixtures",
+        "plugin",
+        "command/plugin",
+        "integration/helpers/fake_server.go",
+        "command/plugin/*.go$"
+      ]
+    }
   },
-  "linters-settings": {},
   "issues": {
     "max-same-issues": 0,
-    "exclude-files":  [
-      "integration/helpers/fake_server.go",
-      "command/plugin/*.go$"
-    ],
     "exclude": [
       "Error return value of `client.GetApplicationTasks` is not checked",
       "Error return value of `logger.output.Stop` is not checked",
