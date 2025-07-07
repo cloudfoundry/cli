@@ -3,18 +3,18 @@ module code.cloudfoundry.org/cli
 go 1.24.3
 
 require (
-	code.cloudfoundry.org/bytefmt v0.42.0
+	code.cloudfoundry.org/bytefmt v0.43.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.40.0
+	code.cloudfoundry.org/clock v1.41.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.39.0
-	code.cloudfoundry.org/tlsconfig v0.29.0
+	code.cloudfoundry.org/lager/v3 v3.40.0
+	code.cloudfoundry.org/tlsconfig v0.30.0
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2
 	github.com/blang/semver/v4 v4.0.0
@@ -65,7 +65,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250607225305-033d6d78b36a // indirect
+	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/pty v1.1.8 // indirect
