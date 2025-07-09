@@ -1,6 +1,7 @@
 package v7pushaction_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 
@@ -39,6 +40,42 @@ var _ = Describe("HandleDiskOverride", func() {
 		})
 
 		When("disk is not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("disk is set, and strategy is set to rolling on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Disk = "5MB"
+				overrides.Strategy = constant.DeploymentStrategyRolling
+			})
+
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("disk is set, and strategy is set to canary on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Disk = "5MB"
+				overrides.Strategy = constant.DeploymentStrategyCanary
+			})
+
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
@@ -143,4 +180,231 @@ var _ = Describe("HandleDiskOverride", func() {
 			Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 		})
 	})
+})
+
+var _ = Describe("HandleDiskOverrideForDeployment", func() {
+	var (
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
+		overrides           FlagOverrides
+		executeErr          error
+	)
+
+	BeforeEach(func() {
+		originalManifest = manifestparser.Manifest{}
+		overrides = FlagOverrides{}
+	})
+
+	JustBeforeEach(func() {
+		transformedManifest, executeErr = HandleDiskOverrideForDeployment(originalManifest, overrides)
+	})
+
+	When("manifest web process does not specify disk", func() {
+		BeforeEach(func() {
+			originalManifest.Applications = []manifestparser.Application{
+				{
+					Processes: []manifestparser.Process{
+						{Type: "web"},
+					},
+				},
+			}
+		})
+
+		When("disk is not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("disk is set, and strategy is not set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Disk = "5MB"
+			})
+
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("disk is set, and strategy is set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Disk = "5MB"
+				overrides.Strategy = constant.DeploymentStrategyRolling
+			})
+
+			It("changes the disk of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{
+								Type:      "web",
+								DiskQuota: "5MB",
+							},
+						},
+					},
+				))
+			})
+		})
+	})
+	When("disk flag is set, and strategy is set to rolling on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Disk = "5MB"
+			overrides.Strategy = constant.DeploymentStrategyRolling
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the disk of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						DiskQuota: "5MB",
+						Processes: []manifestparser.Process{
+							{
+								Type: "worker",
+							},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker", DiskQuota: "2MB"},
+							{Type: "web", DiskQuota: "3MB"},
+						},
+						DiskQuota: "1MB",
+					},
+				}
+			})
+
+			It("changes the disk of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker", DiskQuota: "2MB"},
+							{Type: "web", DiskQuota: "5MB"},
+						},
+						DiskQuota: "1MB",
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
+		})
+	})
+
+	When("disk flag is set, and strategy is set to canary on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Disk = "5MB"
+			overrides.Strategy = constant.DeploymentStrategyCanary
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the disk of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						DiskQuota: "5MB",
+						Processes: []manifestparser.Process{
+							{
+								Type: "worker",
+							},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker", DiskQuota: "2MB"},
+							{Type: "web", DiskQuota: "3MB"},
+						},
+						DiskQuota: "1MB",
+					},
+				}
+			})
+
+			It("changes the disk of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker", DiskQuota: "2MB"},
+							{Type: "web", DiskQuota: "5MB"},
+						},
+						DiskQuota: "1MB",
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
+		})
+	})
+
 })

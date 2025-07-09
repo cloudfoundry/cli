@@ -21,6 +21,10 @@ type PushPlan struct {
 	NoWait              bool
 	Strategy            constant.DeploymentStrategy
 	MaxInFlight         int
+	Instances           types.NullInt
+	MemoryInMB          types.NullUint64
+	DiskInMB            types.NullUint64
+	LogRateLimitInBPS   types.NullInt
 	TaskTypeApplication bool
 	InstanceSteps       []int64
 

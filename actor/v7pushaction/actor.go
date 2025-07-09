@@ -14,12 +14,12 @@ type Actor struct {
 	SharedActor SharedActor
 	V7Actor     V7Actor
 
-	PreparePushPlanSequence   []UpdatePushPlanFunc
-	ChangeApplicationSequence func(plan PushPlan) []ChangeApplicationFunc
-	TransformManifestSequence []HandleFlagOverrideFunc
-
-	startWithProtocol *regexp.Regexp
-	urlValidator      *regexp.Regexp
+	PreparePushPlanSequence                []UpdatePushPlanFunc
+	ChangeApplicationSequence              func(plan PushPlan) []ChangeApplicationFunc
+	TransformManifestSequence              []HandleFlagOverrideFunc
+	TransformManifestSequenceForDeployment []HandleFlagOverrideFunc
+	startWithProtocol                      *regexp.Regexp
+	urlValidator                           *regexp.Regexp
 }
 
 const ProtocolRegexp = "^https?://|^tcp://"
@@ -69,7 +69,12 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		HandleAppPathOverride,
 		HandleDropletPathOverride,
 	}
-
+	actor.TransformManifestSequenceForDeployment = []HandleFlagOverrideFunc{
+		HandleInstancesOverrideForDeployment,
+		HandleMemoryOverrideForDeployment,
+		HandleDiskOverrideForDeployment,
+		HandleLogRateLimitOverrideForDeployment,
+	}
 	actor.PreparePushPlanSequence = []UpdatePushPlanFunc{
 		SetDefaultBitsPathForPushPlan,
 		SetupDropletPathForPushPlan,

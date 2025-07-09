@@ -41,6 +41,20 @@ type FakePushActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	HandleDeploymentScaleFlagOverridesStub        func(manifestparser.Manifest, v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
+	handleDeploymentScaleFlagOverridesMutex       sync.RWMutex
+	handleDeploymentScaleFlagOverridesArgsForCall []struct {
+		arg1 manifestparser.Manifest
+		arg2 v7pushaction.FlagOverrides
+	}
+	handleDeploymentScaleFlagOverridesReturns struct {
+		result1 manifestparser.Manifest
+		result2 error
+	}
+	handleDeploymentScaleFlagOverridesReturnsOnCall map[int]struct {
+		result1 manifestparser.Manifest
+		result2 error
+	}
 	HandleFlagOverridesStub        func(manifestparser.Manifest, v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
 	handleFlagOverridesMutex       sync.RWMutex
 	handleFlagOverridesArgsForCall []struct {
@@ -66,15 +80,16 @@ func (fake *FakePushActor) Actualize(arg1 v7pushaction.PushPlan, arg2 v7pushacti
 		arg1 v7pushaction.PushPlan
 		arg2 v7pushaction.ProgressBar
 	}{arg1, arg2})
+	stub := fake.ActualizeStub
+	fakeReturns := fake.actualizeReturns
 	fake.recordInvocation("Actualize", []interface{}{arg1, arg2})
 	fake.actualizeMutex.Unlock()
-	if fake.ActualizeStub != nil {
-		return fake.ActualizeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.actualizeReturns
 	return fakeReturns.result1
 }
 
@@ -129,15 +144,16 @@ func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 manife
 		arg3 manifestparser.Manifest
 		arg4 v7pushaction.FlagOverrides
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.CreatePushPlansStub
+	fakeReturns := fake.createPushPlansReturns
 	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createPushPlansMutex.Unlock()
-	if fake.CreatePushPlansStub != nil {
-		return fake.CreatePushPlansStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.createPushPlansReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -189,6 +205,71 @@ func (fake *FakePushActor) CreatePushPlansReturnsOnCall(i int, result1 []v7pusha
 	}{result1, result2, result3}
 }
 
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverrides(arg1 manifestparser.Manifest, arg2 v7pushaction.FlagOverrides) (manifestparser.Manifest, error) {
+	fake.handleDeploymentScaleFlagOverridesMutex.Lock()
+	ret, specificReturn := fake.handleDeploymentScaleFlagOverridesReturnsOnCall[len(fake.handleDeploymentScaleFlagOverridesArgsForCall)]
+	fake.handleDeploymentScaleFlagOverridesArgsForCall = append(fake.handleDeploymentScaleFlagOverridesArgsForCall, struct {
+		arg1 manifestparser.Manifest
+		arg2 v7pushaction.FlagOverrides
+	}{arg1, arg2})
+	stub := fake.HandleDeploymentScaleFlagOverridesStub
+	fakeReturns := fake.handleDeploymentScaleFlagOverridesReturns
+	fake.recordInvocation("HandleDeploymentScaleFlagOverrides", []interface{}{arg1, arg2})
+	fake.handleDeploymentScaleFlagOverridesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverridesCallCount() int {
+	fake.handleDeploymentScaleFlagOverridesMutex.RLock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.RUnlock()
+	return len(fake.handleDeploymentScaleFlagOverridesArgsForCall)
+}
+
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverridesCalls(stub func(manifestparser.Manifest, v7pushaction.FlagOverrides) (manifestparser.Manifest, error)) {
+	fake.handleDeploymentScaleFlagOverridesMutex.Lock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.Unlock()
+	fake.HandleDeploymentScaleFlagOverridesStub = stub
+}
+
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverridesArgsForCall(i int) (manifestparser.Manifest, v7pushaction.FlagOverrides) {
+	fake.handleDeploymentScaleFlagOverridesMutex.RLock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.RUnlock()
+	argsForCall := fake.handleDeploymentScaleFlagOverridesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverridesReturns(result1 manifestparser.Manifest, result2 error) {
+	fake.handleDeploymentScaleFlagOverridesMutex.Lock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.Unlock()
+	fake.HandleDeploymentScaleFlagOverridesStub = nil
+	fake.handleDeploymentScaleFlagOverridesReturns = struct {
+		result1 manifestparser.Manifest
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePushActor) HandleDeploymentScaleFlagOverridesReturnsOnCall(i int, result1 manifestparser.Manifest, result2 error) {
+	fake.handleDeploymentScaleFlagOverridesMutex.Lock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.Unlock()
+	fake.HandleDeploymentScaleFlagOverridesStub = nil
+	if fake.handleDeploymentScaleFlagOverridesReturnsOnCall == nil {
+		fake.handleDeploymentScaleFlagOverridesReturnsOnCall = make(map[int]struct {
+			result1 manifestparser.Manifest
+			result2 error
+		})
+	}
+	fake.handleDeploymentScaleFlagOverridesReturnsOnCall[i] = struct {
+		result1 manifestparser.Manifest
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakePushActor) HandleFlagOverrides(arg1 manifestparser.Manifest, arg2 v7pushaction.FlagOverrides) (manifestparser.Manifest, error) {
 	fake.handleFlagOverridesMutex.Lock()
 	ret, specificReturn := fake.handleFlagOverridesReturnsOnCall[len(fake.handleFlagOverridesArgsForCall)]
@@ -196,15 +277,16 @@ func (fake *FakePushActor) HandleFlagOverrides(arg1 manifestparser.Manifest, arg
 		arg1 manifestparser.Manifest
 		arg2 v7pushaction.FlagOverrides
 	}{arg1, arg2})
+	stub := fake.HandleFlagOverridesStub
+	fakeReturns := fake.handleFlagOverridesReturns
 	fake.recordInvocation("HandleFlagOverrides", []interface{}{arg1, arg2})
 	fake.handleFlagOverridesMutex.Unlock()
-	if fake.HandleFlagOverridesStub != nil {
-		return fake.HandleFlagOverridesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.handleFlagOverridesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -260,6 +342,8 @@ func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	defer fake.actualizeMutex.RUnlock()
 	fake.createPushPlansMutex.RLock()
 	defer fake.createPushPlansMutex.RUnlock()
+	fake.handleDeploymentScaleFlagOverridesMutex.RLock()
+	defer fake.handleDeploymentScaleFlagOverridesMutex.RUnlock()
 	fake.handleFlagOverridesMutex.RLock()
 	defer fake.handleFlagOverridesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
