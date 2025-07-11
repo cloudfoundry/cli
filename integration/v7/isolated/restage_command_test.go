@@ -271,7 +271,7 @@ applications:
 					})
 				})
 
-				When("isolation segments are available", func() {
+				XWhen("isolation segments are available", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))

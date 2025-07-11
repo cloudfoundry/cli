@@ -1,0 +1,11 @@
+---
+# Configure sizes for bosh-lite on gcp
+- type: replace
+  path: /resource_pools/name=vms/cloud_properties/machine_type
+  value: n2-standard-8
+- type: replace
+  path: /disk_pools/name=disks/disk_size
+  value: 250000
+- type: replace
+  path: /resource_pools/name=vms/cloud_properties/root_disk_size_gb
+  value: 32  
