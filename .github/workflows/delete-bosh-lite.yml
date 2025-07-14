@@ -1,0 +1,82 @@
+name: Delete environment
+on:
+  workflow_dispatch:
+    inputs:
+      env-name:
+        description: Env name to delete
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      env-name:
+        required: true
+        type: string
+
+env:
+  BBL_IAAS: gcp
+  BBL_GCP_REGION: us-east1
+  BBL_GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_CREDENTIALS_JSON }}
+  BOSH_DEPLOYMENT: cf
+  BOSH_NON_INTERACTIVE: true
+  ENV_NAME: ${{ inputs.env-name }}
+
+jobs:
+  delete-env:
+    runs-on: ubuntu-latest
+    outputs:
+      envName: ${{steps.setup-bbl-env.outputs.env_name}}
+    steps:
+      - name: Install Tools
+        run: |
+          go version
+
+          install_location=/usr/local/bin
+          bbl_version=v9.0.35
+          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
+          
+          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/${bbl_version}/bbl-${bbl_version}_linux_amd64 --silent --location --output  $install_location/bbl
+          sudo chmod +x $install_location/bbl
+          bbl --version
+  
+          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
+          sudo chmod +x $install_location/bosh
+          bosh --version
+  
+          sudo apt update
+          sudo apt install -y build-essential unzip wamerican
+
+      - name: Checkout cli
+        uses: actions/checkout@v4
+        with:
+          path: cli
+
+      - name: Checkout bosh-bootloader
+        uses: actions/checkout@v4
+        with:
+          repository: cloudfoundry/bosh-bootloader
+          path: bosh-bootloader
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Download file from GCS
+        run: |
+          gsutil -m cp -P -R gs://cf-cli-bosh-lites/${ENV_NAME} . 
+
+      - name: delete bosh
+        run: |
+          cd ${ENV_NAME}/bbl-state
+          eval "$(bbl print-env)"
+          
+          echo "Deleting env ${ENV_NAME}"
+          echo ${BBL_GCP_SERVICE_ACCOUNT_KEY} > key.json
+          bbl down --no-confirm --gcp-service-account-key=key.json
+        
+      - name: delete gcs bucket
+        run: |
+          gsutil rm -R gs://cf-cli-bosh-lites/${ENV_NAME} 

@@ -11,7 +11,12 @@ import (
 func main() {
 	http.HandleFunc("/", hello)
 	fmt.Println("listening...")
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%s", os.Getenv("PORT")),
+		Handler: nil,
+	}
+	err := server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +25,6 @@ func main() {
 func hello(res http.ResponseWriter, req *http.Request) {
 	bundlerVersion, err := exec.Command("bundle", "--version").Output()
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
 		log.Print("ERROR:", err)
 		fmt.Fprintf(res, "ERROR: %v\n", err)
 	} else {

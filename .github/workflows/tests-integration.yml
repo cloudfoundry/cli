@@ -1,14 +1,3 @@
-# GitHub repo level Secrets and Variables
-
-# secrets.CLIENT_SECRET
-# secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
-# vars.CAPI_RELEASE_VERSION
-# vars.SHEPHERD_LEASE_DURATION
-# vars.SHEPHERD_LEASE_NAMESPACE
-# vars.SHEPHERD_TEMPLATE_ARGUMENT
-# vars.SHEPHERD_TEMPLATE_NAME
-# vars.SHEPHERD_TEMPLATE_NAMESPACE
-
 name: "Tests: Integration"
 
 run-name: "Integration [${{ github.event_name }}: ${{ github.event.pull_request.head.sha || github.event.push.after || github.event.workflow_run.head_sha}}]: ${{ github.event.workflow_run.head_commit.message }}"
@@ -24,34 +13,10 @@ on:
           - all
           - run-integration-tests-cf-env
           - run-integration-tests-cf-env-with-client-creds
-          - run-cats-cf-env
-      nodes:
-        description: Number of test nodes
+      env-name:
+        description: Pre-provisioned environment name to use in tests
         required: false
         type: string
-        default: "12"
-      lease_id:
-        description: Pre-provisioned environment lease-id to use in tests
-        required: false
-        type: string
-      lease_namespace:
-        description: Pre-provisioned environment lease namespace to use in tests
-        required: false
-        type: string
-      cfd_version:
-        description: Use specific version of CFD. Leave empty to use latest.
-        default: ""
-        type: string
-      run_unit_tests:
-        description: Run unit tests
-        required: false
-        type: boolean
-        default: true
-      reinstall_cfd:
-        description: Force re-installation of CFD
-        required: false
-        type: boolean
-        default: true
 
   push:
     tags:
@@ -64,13 +29,6 @@ on:
       - "doc/**"
       - ".gitpod.yml"
       - "README.md"
-      - ".github/**"
-      - ".grype.yaml"
-      - ".git*"
-      - ".golangci.json"
-
-env:
-  SHEPHERD_LEASE_ID: ${{ inputs.lease_id }}
 
 jobs:
 
@@ -99,269 +57,81 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
           fetch-depth: 0
       - name: Set Up Go
         uses: actions/setup-go@v5
-        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         with:
           go-version-file: go.mod
       - name: Run Units
-        if: ${{ inputs.run_unit_tests || inputs.run_unit_tests == '' }}
         run: make units
 
-  claim-env:
-    name: Claim and Prep Environment
-    outputs:
-      leaseid: ${{steps.claim.outputs.leaseid}}
-    defaults:
-      run:
-        shell: bash
-    runs-on: ubuntu-latest
-    container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
+  create-cf-env:
+    name: Create bosh lite env
     needs:
       - get-sha
       - units
+    if: ${{ inputs.env-name == '' }}
+    uses: ./.github/workflows/create-bosh-lite.yml
+    secrets: inherit
+
+  set-env-name:
+    name: Update env name
+    runs-on: ubuntu-latest
+    needs:
+      - get-sha
+      - units
+      - create-cf-env
+    outputs:
+      env-name: ${{ steps.set-name.outputs.env-name }}
+    if: always()
     steps:
-      - name: Checkout cli
-        uses: actions/checkout@v4
-        with:
-          ref: ${{needs.get-sha.outputs.gitRef}}
-
-      - name: Claim Environment
-        id: claim
-        env:
-          account_token:                ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          template_argument:            ${{ vars.SHEPHERD_TEMPLATE_ARGUMENT        }}
-          template_name:                ${{ vars.SHEPHERD_TEMPLATE_NAME                || 'cfd-bosh-lite@2.0' }}
-          template_namespace:           ${{ vars.SHEPHERD_TEMPLATE_NAMESPACE           || 'official'          }}
-          lease_duration:               ${{ vars.SHEPHERD_LEASE_DURATION               || '8h'                }}
-          cfd_additional_opsfiles_b64:  ${{ vars.SHEPHERD_CFD_ADDITIONAL_OPSFILES_B64  || ''                  }}
-          bosh_additional_opsfiles_b64: ${{ vars.SHEPHERD_BOSH_ADDITIONAL_OPSFILES_B64 || ''                  }}
-          lease_namespace:              ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-          cfd_version:                  ${{ inputs.cfd_version      || vars.CFD_VERSION              || '' }}
+      - name: set env name
+        id: set-name
         run: |
-          shepherd login service-account ${account_token}
-
-          if [[ -z $SHEPHERD_LEASE_ID ]]; then
-
-            if [ -z "$template_argument" ]; then
-              export template_argument=$(cat <<EOF
-          {
-            "gcp_region": "us-west2",
-            "vm_type": "n1-standard-8",
-            "root_disk_gb": 32,
-            "disk_pool_gb": 150,
-            "cfd_version": "${cfd_version}",
-            "cfd_additional_opsfiles_b64": "${cfd_additional_opsfiles_b64}",
-            "bosh_additional_opsfiles_b64": "${bosh_additional_opsfiles_b64}"
-          }
-          EOF
-              )
-            fi
-
-            lease_id=$( shepherd create lease                           \
-                          --template-argument  "$template_argument"     \
-                          --template-namespace "${template_namespace}"  \
-                          --template           "${template_name}"       \
-                          --namespace          "${lease_namespace}"     \
-                          --duration           "${lease_duration}"      \
-                          --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
-                          --json \
-                        | jq -r .id
-                      )
+          if [[ -n "${{ inputs.env-name }}" ]]; then
+            echo "env-name=${{ inputs.env-name }}" >> $GITHUB_OUTPUT
           else
-            lease_id=$SHEPHERD_LEASE_ID
+            echo "env-name=${{ needs.create-cf-env.outputs.env-name }}" >> $GITHUB_OUTPUT
           fi
-
-          echo "Shepherd lease ID: ${lease_id}"
-
-          # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
-          # if the pool is empty.
-          count=0
-          while [ $count -lt 360 ] ; do
-            sleep 30
-            status=$( shepherd get lease ${lease_id} \
-                        --namespace ${lease_namespace} \
-                        --json \
-                      | jq -r .status
-                    )
-            if [ $status == "LEASED" ] ; then
-              shepherd get lease ${lease_id} \
-                --namespace ${lease_namespace} \
-                --json \
-              | jq .output > metadata.json
-              break
-            elif [ $status == "FAILED" -o $status == "EXPIRED" ] ; then
-              echo "There was an error obtaining the lease. Lease status is ${status}."
-              exit 1
-            else
-              echo "Waiting for environment to be ready. Lease status is ${status}."
-            fi
-            count=$(($count+1))
-          done
-
-          env_name=$(jq -r .name metadata.json)
-          echo "env name is ${env_name}"
-          echo "leaseid=${lease_id}" >> "${GITHUB_OUTPUT}"
-
-          cf_deployment_version=$(jq -r '."cf_deployment_version"' metadata.json)
-          echo "cf_deployment_version is ${cf_deployment_version}"
-          echo "cf_deployment_version=${cf_deployment_version}" >> "${GITHUB_OUTPUT}"
-
-      - name: Set Up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          check-latest: true
-        
-      - name: Install Tools
-        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
-        run: |
-          go version
-
-          install_location=/usr/local/bin
-          bbl_artifact=bbl-v8.4.110_linux_x86-64
-          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
-          
-          curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
-          chmod +x $install_location/bbl
-          bbl --version
-  
-          curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
-          chmod +x $install_location/bosh
-          bosh --version
-  
-          apt-get update
-          apt-get install -y build-essential unzip
-
-      - name: Upload latest CAPI release
-        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
-        env:
-          capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
-        run: |
-          if [ -z "$capi_release_version" ]; then
-            capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
-          fi
-          
-          echo "Latest CAPI release is $capi_release_version"
-          
-          eval "$(bbl print-env --metadata-file metadata.json)"
-          env_name=$(jq -r .name metadata.json)
-          jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-
-          bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
-
-      - name: Checkout cf-deployment
-        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
-        uses: actions/checkout@v4
-        with:
-          repository: cloudfoundry/cf-deployment
-          path: cf-deployment
-          ref: ${{steps.claim.outputs.cf_deployment_version}}    
-  
-      - name: Checkout cf-deployment-main
-        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
-        uses: actions/checkout@v4
-        with:
-          repository: cloudfoundry/cf-deployment
-          path: cf-deployment-main
-          ref: main          
-
-      - name: Deploy Isolation Segment and OIDC Provider
-        if: ${{ (inputs.lease_id == '') || (inputs.reinstall_cfd == true) }}
-        run: |
-          env_name=$(jq -r .name metadata.json)
-          jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-          eval "$(bbl print-env --metadata-file metadata.json)"
-
-          bosh -d cf manifest > /tmp/manifest.yml
-          bosh interpolate /tmp/manifest.yml \
-            -o cf-deployment-main/operations/enable-v2-api.yml \
-            -o cf-deployment/operations/use-internal-lookup-for-route-services.yml \
-            -o cf-deployment/operations/add-persistent-isolation-segment-diego-cell.yml \
-            -o .github/ops-files/use-latest-capi.yml \
-            -o .github/ops-files/add-oidc-provider.yml \
-            -o .github/ops-files/add-uaa-client-credentials.yml \
-            -o .github/ops-files/diego-cell-instances.yml \
-            -v client-secret="${{ secrets.CLIENT_SECRET }}" \
-            > ./director.yml
-
-          bosh -d cf deploy director.yml -n
-          echo "Deployed CAPI version:"
-          bosh -d cf releases | grep capi
 
   run-integration-tests-cf-env:
     name: Integration tests
     needs:
       - get-sha
-      - units
-      - claim-env
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
+      - set-env-name
+    if: ${{ always() && (inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      run-with-client-creds: false
-      os: ubuntu-latest
       name: Integration
       gitRef: ${{needs.get-sha.outputs.gitRef}}
-      lease-id: ${{ needs.claim-env.outputs.leaseid }}
-      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-      nodes: ${{ inputs.nodes || '16'}}
+      env-name: ${{ needs.set-env-name.outputs.env-name }}
+      run-with-client-creds: false
     secrets: inherit
 
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
     needs:
       - get-sha
-      - units
-      - claim-env
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
+      - set-env-name
+    if: ${{ always() && (inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
-      run-with-client-creds: true
-      os: ubuntu-latest
       name: Integration client creds
+      env-name: ${{ needs.set-env-name.outputs.env-name }}
       gitRef: ${{needs.get-sha.outputs.gitRef}}
-      lease-id: ${{ needs.claim-env.outputs.leaseid }}
-      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-      nodes: ${{ inputs.nodes || '16'}}
+      run-with-client-creds: true
     secrets: inherit
 
-  run-cats-cf-env:
-    name: CATS
+  delete-env:
+    name: Unclaim environment
+    if: ${{ always() && inputs.env-name == '' }}
     needs:
-      - get-sha
-      - claim-env
+      - set-env-name
       - run-integration-tests-cf-env
       - run-integration-tests-cf-env-with-client-creds
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
-    uses: ./.github/workflows/tests-integration-reusable.yml
+    uses: ./.github/workflows/delete-bosh-lite.yml
     with:
-      run-with-client-creds: false
-      os: ubuntu-latest
-      name: cats
-      gitRef: ${{needs.get-sha.outputs.gitRef}}
-      lease-id: ${{ needs.claim-env.outputs.leaseid }}
-      lease-namespace: ${{ inputs.lease_namespace  || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
+      env-name: ${{ needs.set-env-name.outputs.env-name }}
     secrets: inherit
-
-  unclaim-env:
-    name: Unclaim environment
-    if: ${{ inputs.lease_id == '' }}
-    runs-on: ubuntu-latest
-    container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
-    needs:
-      - claim-env
-      - run-cats-cf-env
-    steps:
-      - name: unclaim
-        env:
-          account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-          lease_namespace:  ${{ inputs.lease_namespace || vars.SHEPHERD_LEASE_NAMESPACE || 'tas-devex' }}
-        run: |
-          shepherd login service-account ${account_token}
-          set -x
-          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
-            --namespace ${lease_namespace}
