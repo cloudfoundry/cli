@@ -33,7 +33,7 @@ on:
 jobs:
   get-sha:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
+    if: ${{ github.actor != 'dependabot[bot]' }}
     outputs:
       gitRef: ${{steps.calculate.outputs.ref}}
     steps:
