@@ -101,7 +101,7 @@ jobs:
     needs:
       - get-sha
       - set-env-name
-    if: ${{ always() && (inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env') }}
+    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       name: Integration
@@ -115,7 +115,7 @@ jobs:
     needs:
       - get-sha
       - set-env-name
-    if: ${{ always() && (inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
+    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       name: Integration client creds
