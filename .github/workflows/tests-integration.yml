@@ -49,6 +49,7 @@ jobs:
             echo "checkout else ${{ github.event.workflow_run.head_sha }}"
             echo "ref=${{github.event.workflow_run.head_sha}}" >> $GITHUB_OUTPUT
           fi
+          echo "Event: ${{ github.event_name }}, Workflow Input: ${{ github.event.inputs.workflow }}"
   units:
     name: Basic units to gate for integration tests
     runs-on: ubuntu-latest
