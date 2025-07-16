@@ -34,6 +34,7 @@ jobs:
 
   get-sha:
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
     outputs:
       gitRef: ${{steps.calculate.outputs.ref}}
     steps:
@@ -86,7 +87,7 @@ jobs:
       - create-cf-env
     outputs:
       env-name: ${{ steps.set-name.outputs.env-name }}
-    if: always()
+    if: ${{ always() && github.actor != 'dependabot[bot]' }}
     steps:
       - name: set env name
         id: set-name
@@ -102,7 +103,11 @@ jobs:
     needs:
       - get-sha
       - set-env-name
-    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env') }}
+    if: >
+      ${{ always() && 
+      needs.set-env-name.result == 'success' && 
+      (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || 
+       inputs.workflow == 'run-integration-tests-cf-env') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       name: Integration
@@ -116,7 +121,11 @@ jobs:
     needs:
       - get-sha
       - set-env-name
-    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
+    if: >
+      ${{ always() && 
+      needs.set-env-name.result == 'success' && 
+      (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' ||
+       inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       name: Integration client creds
@@ -127,7 +136,7 @@ jobs:
 
   delete-env:
     name: Unclaim environment
-    if: ${{ always() && inputs.env-name == '' }}
+    if: ${{ always() && inputs.env-name == '' && needs.set-env-name.result == 'success' }}
     needs:
       - set-env-name
       - run-integration-tests-cf-env
