@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -42,4 +43,11 @@ func (n *NullUint64) UnmarshalJSON(rawJSON []byte) error {
 	}
 
 	return n.ParseStringValue(stringValue)
+}
+
+func (n *NullUint64) MarshalJSON() ([]byte, error) {
+	if n.IsSet {
+		return []byte(fmt.Sprint(n.Value)), nil
+	}
+	return []byte(JsonNull), nil
 }

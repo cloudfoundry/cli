@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type Deployment struct {
@@ -27,10 +28,15 @@ type Deployment struct {
 type DeploymentOpts struct {
 	MaxInFlight             int                      `json:"max_in_flight,omitempty"`
 	CanaryDeploymentOptions *CanaryDeploymentOptions `json:"canary,omitempty"`
+	Instances               types.NullInt            `json:"web_instances,omitempty"`
+	MemoryInMB              types.NullUint64         `json:"memory_in_mb,omitempty"`
+	DiskInMB                types.NullUint64         `json:"disk_in_mb,omitempty"`
+	LogRateLimitInBPS       types.NullInt            `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 }
 
 func (d DeploymentOpts) IsEmpty() bool {
-	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0)
+	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0) &&
+		!d.Instances.IsSet && !d.MemoryInMB.IsSet && !d.DiskInMB.IsSet && !d.LogRateLimitInBPS.IsSet
 }
 
 type CanaryDeploymentOptions struct {

@@ -29,4 +29,15 @@ var _ = Describe("Actor", func() {
 			))
 		})
 	})
+
+	Describe("TransformManifestSequenceForDeployment", func() {
+		It("is a list of functions for preparing the push plan", func() {
+			Expect(actor.TransformManifestSequenceForDeployment).To(matchers.MatchFuncsByName(
+				HandleInstancesOverrideForDeployment,
+				HandleMemoryOverrideForDeployment,
+				HandleDiskOverrideForDeployment,
+				HandleLogRateLimitOverrideForDeployment,
+			))
+		})
+	})
 })
