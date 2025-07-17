@@ -42,6 +42,7 @@ type ProgressBar interface {
 
 type PushActor interface {
 	HandleFlagOverrides(baseManifest manifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
+	HandleDeploymentScaleFlagOverrides(manifest manifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
 	CreatePushPlans(spaceGUID string, orgGUID string, manifest manifestparser.Manifest, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
@@ -188,54 +189,53 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	transformedManifest, err := cmd.PushActor.HandleFlagOverrides(baseManifest, flagOverrides)
+	// Transform manifest from base using flag overrides
+	transformedInitialManifest, err := cmd.PushActor.HandleFlagOverrides(baseManifest, flagOverrides)
 	if err != nil {
 		return err
 	}
 
-	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername, transformedManifest.ContainsPrivateDockerImages())
+	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername, transformedInitialManifest.ContainsPrivateDockerImages())
 	if err != nil {
 		return err
 	}
 
-	transformedRawManifest, err := cmd.ManifestParser.MarshalManifest(transformedManifest)
+	transformedRawInitialManifest, err := cmd.ManifestParser.MarshalManifest(transformedInitialManifest)
 	if err != nil {
 		return err
 	}
 
-	cmd.announcePushing(transformedManifest.AppNames(), user)
+	// Apply deployment scale options (this gives us the final manifest)
+	transformedFinalManifest, err := cmd.PushActor.HandleDeploymentScaleFlagOverrides(transformedInitialManifest, flagOverrides)
+	if err != nil {
+		return err
+	}
+	transformedRawFinalManifest, err := cmd.ManifestParser.MarshalManifest(transformedFinalManifest)
+	if err != nil {
+		return err
+	}
 
-	hasManifest := transformedManifest.PathToManifest != ""
+	cmd.announcePushing(transformedFinalManifest.AppNames(), user)
+
+	hasManifest := transformedFinalManifest.PathToManifest != ""
 
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	if hasManifest {
 		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
-			"Path": transformedManifest.PathToManifest,
+			"Path": transformedFinalManifest.PathToManifest,
 		})
 
-		diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, transformedRawManifest)
-
-		cmd.UI.DisplayWarnings(warnings)
+		err := cmd.showManifestDiff(spaceGUID, transformedRawFinalManifest)
 		if err != nil {
-			if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
-				cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
-			} else {
-				return err
-			}
-		} else {
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayText("Updating with these attributes...")
-
-			err = cmd.DiffDisplayer.DisplayDiff(transformedRawManifest, diff)
-			if err != nil {
-				return err
-			}
+			return err
 		}
+
 	}
 
+	// Set space manifest using initial (non-scaled for rolling/canary deployment strategy) manifest
 	v7ActionWarnings, err := cmd.VersionActor.SetSpaceManifest(
 		cmd.Config.TargetedSpace().GUID,
-		transformedRawManifest,
+		transformedRawInitialManifest,
 	)
 
 	cmd.UI.DisplayWarnings(v7ActionWarnings)
@@ -249,7 +249,7 @@ func (cmd PushCommand) Execute(args []string) error {
 	pushPlans, warnings, err := cmd.PushActor.CreatePushPlans(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
-		transformedManifest,
+		transformedFinalManifest,
 		flagOverrides,
 	)
 
@@ -780,4 +780,27 @@ func (cmd PushCommand) getLogs(logStream <-chan sharedaction.LogMessage, errStre
 			cmd.UI.DisplayWarning("Failed to retrieve logs from Log Cache: " + err.Error())
 		}
 	}
+}
+
+func (cmd PushCommand) showManifestDiff(spaceGUID string, transformedRawFinalManifest []byte) error {
+	diff, warnings, err := cmd.Actor.DiffSpaceManifest(spaceGUID, transformedRawFinalManifest)
+
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		if _, isUnexpectedError := err.(ccerror.V3UnexpectedResponseError); isUnexpectedError {
+			cmd.UI.DisplayWarning("Unable to generate diff. Continuing to apply manifest...")
+		} else {
+			return err
+		}
+	} else {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Updating with these attributes...")
+
+		err = cmd.DiffDisplayer.DisplayDiff(transformedRawFinalManifest, diff)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
