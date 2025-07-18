@@ -40,6 +40,7 @@ type ApplicationNameOnly struct {
 // MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
+		GUID:     a.GUID,
 		Name:     a.Name,
 		Metadata: a.Metadata,
 	}
