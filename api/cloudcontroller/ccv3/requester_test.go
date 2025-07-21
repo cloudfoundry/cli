@@ -358,6 +358,7 @@ var _ = Describe("shared request helpers", func() {
 
 					expectedBody := map[string]interface{}{
 						"name": "some-app-name",
+						"guid": "some-app-guid",
 						"lifecycle": map[string]interface{}{
 							"type": "buildpack",
 							"data": map[string]interface{}{
@@ -489,6 +490,7 @@ var _ = Describe("shared request helpers", func() {
 
 				expectedBody := map[string]interface{}{
 					"name": "some-app-name",
+					"guid": "some-app-guid",
 					"lifecycle": map[string]interface{}{
 						"type": "buildpack",
 						"data": map[string]interface{}{
