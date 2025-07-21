@@ -195,6 +195,9 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 	case flags.ErrUnknownCommand:
 		if containsHelpFlag(originalArgs) {
 			return p.parse([]string{"help", originalArgs[0]}, commandList)
+		} else if containsJSONFlag(originalArgs) {
+			p.UI.IsJson = true
+			return 0, nil
 		} else {
 			return 0, UnknownCommandError{CommandName: originalArgs[0]}
 		}
@@ -214,6 +217,9 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 }
 
 func (p *CommandParser) parse(args []string, commandList interface{}) (int, error) {
+	if containsJSONFlag(args) {
+		p.UI.IsJson = true
+	}
 	flagsParser := flags.NewParser(commandList, flags.HelpFlag)
 	flagsParser.CommandHandler = p.executionWrapper
 	extraArgs, err := flagsParser.ParseArgs(args)
@@ -242,6 +248,15 @@ func (p *CommandParser) parse(args []string, commandList interface{}) (int, erro
 func containsHelpFlag(args []string) bool {
 	for _, arg := range args {
 		if arg == "-h" || arg == "--help" || arg == "--h" {
+			return true
+		}
+	}
+	return false
+}
+
+func containsJSONFlag(args []string) bool {
+	for _, arg := range args {
+		if arg == "--json" {
 			return true
 		}
 	}
