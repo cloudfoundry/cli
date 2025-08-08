@@ -259,7 +259,12 @@ var _ = Describe("login command", func() {
 					input := NewBuffer()
 					_, err := input.Write([]byte("bad-passcode-again\nbad-passcode-strikes-back\n"))
 					Expect(err).ToNot(HaveOccurred())
-					session := helpers.CFWithStdin(input, "login", "--sso-passcode", "some-passcode")
+					var session *Session
+					if skipSSLValidation {
+						session = helpers.CFWithStdin(input, "login", "--sso-passcode", "some-passcode", "--skip-ssl-validation")
+					} else {
+						session = helpers.CFWithStdin(input, "login", "--sso-passcode", "some-passcode")
+					}
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session.Err).Should(Say(`Invalid passcode`))
@@ -293,7 +298,12 @@ var _ = Describe("login command", func() {
 		When("the user provides the --origin flag", func() {
 			It("logs in successfully", func() {
 				username, password := helpers.GetCredentials()
-				session := helpers.CF("login", "-u", username, "-p", password, "--origin", "uaa")
+				var session *Session
+				if skipSSLValidation {
+					session = helpers.CF("login", "-u", username, "-p", password, "--origin", "uaa", "--skip-ssl-validation")
+				} else {
+					session = helpers.CF("login", "-u", username, "-p", password, "--origin", "uaa")
+				}
 				Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 				Eventually(session).Should(Say(`Authenticating\.\.\.`))
 				Eventually(session).Should(Say(`OK`))
@@ -402,7 +412,12 @@ var _ = Describe("login command", func() {
 		When("the user provides the -p and -u flags", func() {
 			Context("and the credentials are correct", func() {
 				It("logs in successfully", func() {
-					session := helpers.CF("login", "-p", password, "-u", username)
+					var session *Session
+					if skipSSLValidation {
+						session = helpers.CF("login", "-p", password, "-u", username, "--skip-ssl-validation")
+					} else {
+						session = helpers.CF("login", "-p", password, "-u", username)
+					}
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`OK`))
@@ -567,7 +582,12 @@ var _ = Describe("login command", func() {
 							_, err := input.Write([]byte("3\n"))
 							Expect(err).ToNot(HaveOccurred())
 
-							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+							var session *Session
+							if skipSSLValidation {
+								session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
+							} else {
+								session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+							}
 
 							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org:")))
 							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
