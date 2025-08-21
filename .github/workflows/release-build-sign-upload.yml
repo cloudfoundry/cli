@@ -105,8 +105,8 @@ jobs:
       run: |
         new_tag="v${{ steps.bump-version.outputs.version-build }}"
         echo "new version is $new_tag"
-        git config user.name "GitHub Actions"
-        git config user.email "github-actions@users.noreply.github.com"
+        git config user.name "cf-cli-eng"
+        git config user.email "cf-cli-eng@pivotal.io"
         git tag -am "Bump cli version ${new_tag}" ${new_tag}
         git push origin $new_tag
 
@@ -1080,8 +1080,8 @@ jobs:
             git add claw-variables.yml
 
             if ! [ -z "$(git status --porcelain)"]; then
-              git config user.name github-actions
-              git config user.email github-actions@github.com
+              git config user.name cf-cli-eng
+              git config user.email cf-cli-eng@pivotal.io
               git commit -m "Add CF CLI ${VERSION_BUILD}"
             else
                 echo "no new version to commit"
