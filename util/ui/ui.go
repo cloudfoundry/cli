@@ -93,6 +93,8 @@ type UI struct {
 	IsTTY         bool
 	TerminalWidth int
 
+	IsJson bool
+
 	TimezoneLocation *time.Location
 
 	deferred []string
@@ -225,6 +227,9 @@ func (ui *UI) DisplayHeader(text string) {
 
 // DisplayNewline outputs a newline to UI.Out.
 func (ui *UI) DisplayNewline() {
+	if ui.IsJson {
+		return
+	}
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
@@ -242,6 +247,9 @@ func (ui *UI) DisplayOK() {
 // DisplayText translates the template, substitutes in templateValues, and
 // outputs the result to ui.Out. Only the first map in templateValues is used.
 func (ui *UI) DisplayText(template string, templateValues ...map[string]interface{}) {
+	if ui.IsJson {
+		return
+	}
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
@@ -275,6 +283,9 @@ func (ui *UI) DisplayTextWithBold(template string, templateValues ...map[string]
 // templateValues, substitutes templateValues into the template, and outputs
 // the result to ui.Out. Only the first map in templateValues is used.
 func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[string]interface{}) {
+	if ui.IsJson {
+		return
+	}
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 

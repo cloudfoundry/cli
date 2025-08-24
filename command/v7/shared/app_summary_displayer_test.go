@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"encoding/json"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -1107,6 +1108,281 @@ var _ = Describe("app summary displayer", func() {
 
 			It("does not display max-in-flight", func() {
 				Expect(testUI.Out).NotTo(Say(`max-in-flight`))
+			})
+		})
+	})
+
+	Describe("AppDisplayJSON", func() {
+
+		var (
+			summary             v7action.DetailedApplicationSummary
+			displayStartCommand bool
+		)
+
+		JustBeforeEach(func() {
+			testUI.IsJson = true
+			appSummaryDisplayer := NewAppSummaryJSONDisplayer(testUI)
+			appSummaryDisplayer.AppDisplay(summary, displayStartCommand)
+		})
+
+		When("the app has instances", func() {
+			When("the process instances are running", func() {
+				var uptime time.Duration
+
+				BeforeEach(func() {
+					uptime = time.Since(time.Unix(267321600, 0))
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: resources.Process{
+										Type:              constant.ProcessTypeWeb,
+										MemoryInMB:        types.NullUint64{Value: 32, IsSet: true},
+										DiskInMB:          types.NullUint64{Value: 1024, IsSet: true},
+										LogRateLimitInBPS: types.NullInt{Value: 1024 * 5, IsSet: true},
+									},
+									Sidecars: []resources.Sidecar{},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:          0,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+											MemoryUsage:    1000000,
+											DiskUsage:      1000000,
+											LogRate:        1024,
+											MemoryQuota:    33554432,
+											DiskQuota:      2000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         uptime,
+											Details:        "Some Details 1",
+										},
+										v7action.ProcessInstance{
+											Index:          1,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 1.0, IsSet: true},
+											MemoryUsage:    2000000,
+											DiskUsage:      2000000,
+											LogRate:        1024 * 2,
+											MemoryQuota:    33554432,
+											DiskQuota:      4000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         time.Since(time.Unix(330480000, 0)),
+											Details:        "Some Details 2",
+										},
+										v7action.ProcessInstance{
+											Index:          2,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.03, IsSet: true},
+											MemoryUsage:    3000000,
+											DiskUsage:      3000000,
+											LogRate:        1024 * 3,
+											MemoryQuota:    33554432,
+											DiskQuota:      6000000,
+											LogRateLimit:   1024 * 5,
+											Uptime:         time.Since(time.Unix(1277164800, 0)),
+										},
+									},
+								},
+								{
+									Process: resources.Process{
+										Type:              "console",
+										MemoryInMB:        types.NullUint64{Value: 16, IsSet: true},
+										DiskInMB:          types.NullUint64{Value: 512, IsSet: true},
+										LogRateLimitInBPS: types.NullInt{Value: 256, IsSet: true},
+									},
+									Sidecars: []resources.Sidecar{},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:          0,
+											State:          constant.ProcessInstanceRunning,
+											CPUEntitlement: types.NullFloat64{Value: 0.0, IsSet: true},
+											MemoryUsage:    1000000,
+											DiskUsage:      1000000,
+											LogRate:        128,
+											MemoryQuota:    33554432,
+											DiskQuota:      8000000,
+											LogRateLimit:   256,
+											Uptime:         time.Since(time.Unix(167572800, 0)),
+										},
+									},
+								},
+							},
+						},
+					}
+				})
+
+				It("lists information for each of the processes", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
+			})
+
+			When("CPU entitlement is not available", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index: 0,
+											State: constant.ProcessInstanceRunning,
+										},
+										v7action.ProcessInstance{
+											Index: 1,
+											State: constant.ProcessInstanceRunning,
+										},
+										v7action.ProcessInstance{
+											Index: 2,
+											State: constant.ProcessInstanceRunning,
+										},
+									},
+								},
+							},
+						},
+					}
+				})
+
+				It("outputs an empty value for the CPU entitlement column", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
+			})
+
+			When("all the instances for a process are down (but scaled to > 0 instances)", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							ProcessSummaries: []v7action.ProcessSummary{
+								{
+									Process: resources.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									},
+									Sidecars:        []resources.Sidecar{},
+									InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
+								}},
+						},
+					}
+				})
+
+				It("displays the instances table", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
+			})
+
+			When("the app is stopped", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStopped,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: resources.Process{
+										Type: constant.ProcessTypeWeb,
+									},
+									Sidecars: []resources.Sidecar{},
+								},
+								{
+									Process: resources.Process{
+										Type: "console",
+									},
+									Sidecars: []resources.Sidecar{},
+								},
+							},
+						},
+					}
+				})
+
+				It("lists information for each of the processes", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
+			})
+
+			When("the application is a docker app", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								GUID:          "some-guid",
+								Name:          "some-app",
+								State:         constant.ApplicationStarted,
+								LifecycleType: constant.AppLifecycleTypeDocker,
+							},
+						},
+						CurrentDroplet: resources.Droplet{
+							Image: "docker/some-image",
+						},
+					}
+				})
+
+				It("displays the app information", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
+			})
+
+			When("the application is a buildpack app", func() {
+				BeforeEach(func() {
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: resources.Application{
+								LifecycleType: constant.AppLifecycleTypeBuildpack,
+							},
+						},
+						CurrentDroplet: resources.Droplet{
+							Stack: "cflinuxfs4",
+							Buildpacks: []resources.DropletBuildpack{
+								{
+									Name:          "ruby_buildpack",
+									BuildpackName: "ruby_buildpack_name",
+									DetectOutput:  "some-detect-output",
+									Version:       "0.0.1",
+								},
+								{
+									Name:          "go_buildpack_without_detect_output",
+									BuildpackName: "go_buildpack_name",
+									DetectOutput:  "",
+									Version:       "0.0.2",
+								},
+								{
+									Name:          "go_buildpack_without_version",
+									BuildpackName: "go_buildpack_name",
+									DetectOutput:  "",
+									Version:       "",
+								},
+								{
+									Name:         "some-buildpack",
+									DetectOutput: "",
+								},
+							},
+						},
+					}
+				})
+
+				It("displays stack and buildpacks", func() {
+					jsonStr, err := json.Marshal(summary)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(output.Contents()).To(MatchJSON(jsonStr))
+				})
 			})
 		})
 	})
