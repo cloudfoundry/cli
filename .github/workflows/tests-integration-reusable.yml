@@ -32,14 +32,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
         path: cli
 
     - name: Checkout CF deployment tasks
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
