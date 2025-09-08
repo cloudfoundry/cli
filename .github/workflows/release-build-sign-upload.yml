@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       
     - name: Bump version
       id: bump-version
@@ -127,10 +127,10 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
@@ -139,7 +139,7 @@ jobs:
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
@@ -396,17 +396,17 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
         ref: main
 
     - name: Checkout bomutils
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: hogliux/bomutils.git
         ref: 0.2
@@ -417,7 +417,7 @@ jobs:
       run: make
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
@@ -625,11 +625,11 @@ jobs:
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -768,7 +768,7 @@ jobs:
     steps:
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Download signed artifacts
       uses: actions/download-artifact@v5
@@ -864,7 +864,7 @@ jobs:
         path: signed/*
 
     - name: Setup aws to upload installers to CLAW S3 bucket
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       env:
         AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1019,7 +1019,7 @@ jobs:
         path: ${{ env.ARTIFACTS_DIR }}
 
     - name: Checkout CLI
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: ${{ env.REPO_DIR }}
        
@@ -1059,7 +1059,7 @@ jobs:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
     steps:
     - name: Checkout CLAW
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/CLAW
         ref: master
