@@ -75,7 +75,7 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
+    # if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       build-version: ${{ steps.set-build-version.outputs.build-version }}
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
