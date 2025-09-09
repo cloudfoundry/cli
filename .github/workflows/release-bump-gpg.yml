@@ -75,7 +75,7 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-    if: ${{ github.action_repository != 'cloudfoundry/cli' }}
+    # if: ${{ github.action_repository != 'cloudfoundry/cli' }}
     outputs:
       build-version: ${{ steps.set-build-version.outputs.build-version }}
       secrets-environment: ${{ steps.set-secrets-environment.outputs.secrets-environment }}
@@ -109,8 +109,9 @@ jobs:
           SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
           SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
         if: always()
-        uses: lhotari/action-upterm@v1
-        timeout-minutes: 60
+        # uses: lhotari/action-upterm@v1
+        uses: mxschmitt/action-tmate@v3
+        # timeout-minutes: 60
 
       - name: Print public key to update CLAW
         env:
