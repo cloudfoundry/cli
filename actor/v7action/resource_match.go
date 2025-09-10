@@ -53,8 +53,10 @@ func (Actor) chunkResources(resources []sharedaction.V3Resource) [][]ccv3.Resour
 		}
 
 		if len(currentSet) == constant.MaxNumberOfResourcesForMatching || index+1 == len(resources) {
-			chunkedResources = append(chunkedResources, currentSet)
-			currentSet = []ccv3.Resource{}
+			if len(currentSet) > 0 {
+				chunkedResources = append(chunkedResources, currentSet)
+				currentSet = []ccv3.Resource{}
+			}
 		}
 	}
 	return chunkedResources
