@@ -21,12 +21,14 @@ func (actor Actor) ResourceMatch(resources []sharedaction.V3Resource) ([]shareda
 	)
 
 	for _, chunk := range resourceChunks {
-		newMatchedAPIResources, warnings, err := actor.CloudControllerClient.ResourceMatch(chunk)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return nil, allWarnings, err
+		if len(chunk) > 0 {
+			newMatchedAPIResources, warnings, err := actor.CloudControllerClient.ResourceMatch(chunk)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return nil, allWarnings, err
+			}
+			matchedAPIResources = append(matchedAPIResources, newMatchedAPIResources...)
 		}
-		matchedAPIResources = append(matchedAPIResources, newMatchedAPIResources...)
 	}
 
 	var matchedResources []sharedaction.V3Resource
@@ -51,8 +53,10 @@ func (Actor) chunkResources(resources []sharedaction.V3Resource) [][]ccv3.Resour
 		}
 
 		if len(currentSet) == constant.MaxNumberOfResourcesForMatching || index+1 == len(resources) {
-			chunkedResources = append(chunkedResources, currentSet)
-			currentSet = []ccv3.Resource{}
+			if len(currentSet) > 0 {
+				chunkedResources = append(chunkedResources, currentSet)
+				currentSet = []ccv3.Resource{}
+			}
 		}
 	}
 	return chunkedResources
