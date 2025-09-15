@@ -33,15 +33,16 @@ func (fake *FakeManifestLocator) Path(arg1 string) (string, bool, error) {
 	fake.pathArgsForCall = append(fake.pathArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.PathStub
+	fakeReturns := fake.pathReturns
 	fake.recordInvocation("Path", []interface{}{arg1})
 	fake.pathMutex.Unlock()
-	if fake.PathStub != nil {
-		return fake.PathStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.pathReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
