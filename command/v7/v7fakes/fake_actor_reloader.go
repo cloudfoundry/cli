@@ -34,15 +34,16 @@ func (fake *FakeActorReloader) Reload(arg1 command.Config, arg2 command.UI) (v7.
 		arg1 command.Config
 		arg2 command.UI
 	}{arg1, arg2})
+	stub := fake.ReloadStub
+	fakeReturns := fake.reloadReturns
 	fake.recordInvocation("Reload", []interface{}{arg1, arg2})
 	fake.reloadMutex.Unlock()
-	if fake.ReloadStub != nil {
-		return fake.ReloadStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.reloadReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
