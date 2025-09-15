@@ -50,15 +50,16 @@ func (fake *FakeNetworkPoliciesActor) NetworkPoliciesBySpace(arg1 string) ([]cfn
 	fake.networkPoliciesBySpaceArgsForCall = append(fake.networkPoliciesBySpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.NetworkPoliciesBySpaceStub
+	fakeReturns := fake.networkPoliciesBySpaceReturns
 	fake.recordInvocation("NetworkPoliciesBySpace", []interface{}{arg1})
 	fake.networkPoliciesBySpaceMutex.Unlock()
-	if fake.NetworkPoliciesBySpaceStub != nil {
-		return fake.NetworkPoliciesBySpaceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.networkPoliciesBySpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -117,15 +118,16 @@ func (fake *FakeNetworkPoliciesActor) NetworkPoliciesBySpaceAndAppName(arg1 stri
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.NetworkPoliciesBySpaceAndAppNameStub
+	fakeReturns := fake.networkPoliciesBySpaceAndAppNameReturns
 	fake.recordInvocation("NetworkPoliciesBySpaceAndAppName", []interface{}{arg1, arg2})
 	fake.networkPoliciesBySpaceAndAppNameMutex.Unlock()
-	if fake.NetworkPoliciesBySpaceAndAppNameStub != nil {
-		return fake.NetworkPoliciesBySpaceAndAppNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.networkPoliciesBySpaceAndAppNameReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

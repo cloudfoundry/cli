@@ -37,9 +37,10 @@ func (fake *FakeProgressBar) Complete() {
 	fake.completeMutex.Lock()
 	fake.completeArgsForCall = append(fake.completeArgsForCall, struct {
 	}{})
+	stub := fake.CompleteStub
 	fake.recordInvocation("Complete", []interface{}{})
 	fake.completeMutex.Unlock()
-	if fake.CompleteStub != nil {
+	if stub != nil {
 		fake.CompleteStub()
 	}
 }
@@ -63,15 +64,16 @@ func (fake *FakeProgressBar) NewProgressBarWrapper(arg1 io.Reader, arg2 int64) i
 		arg1 io.Reader
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.NewProgressBarWrapperStub
+	fakeReturns := fake.newProgressBarWrapperReturns
 	fake.recordInvocation("NewProgressBarWrapper", []interface{}{arg1, arg2})
 	fake.newProgressBarWrapperMutex.Unlock()
-	if fake.NewProgressBarWrapperStub != nil {
-		return fake.NewProgressBarWrapperStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.newProgressBarWrapperReturns
 	return fakeReturns.result1
 }
 
@@ -121,9 +123,10 @@ func (fake *FakeProgressBar) Ready() {
 	fake.readyMutex.Lock()
 	fake.readyArgsForCall = append(fake.readyArgsForCall, struct {
 	}{})
+	stub := fake.ReadyStub
 	fake.recordInvocation("Ready", []interface{}{})
 	fake.readyMutex.Unlock()
-	if fake.ReadyStub != nil {
+	if stub != nil {
 		fake.ReadyStub()
 	}
 }

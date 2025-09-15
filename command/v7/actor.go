@@ -90,6 +90,7 @@ type Actor interface {
 	GetAppSummariesForSpace(spaceGUID string, labels string, omitStats bool) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	GetApplicationMapForRoute(route resources.Route) (map[string]resources.Application, v7action.Warnings, error)
+	GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, v7action.Warnings, error)
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetApplicationPackages(appName string, spaceGUID string) ([]resources.Package, v7action.Warnings, error)
