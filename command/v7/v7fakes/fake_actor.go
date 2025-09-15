@@ -1179,6 +1179,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationsByGUIDsStub        func([]string) ([]resources.Application, v7action.Warnings, error)
+	getApplicationsByGUIDsMutex       sync.RWMutex
+	getApplicationsByGUIDsArgsForCall []struct {
+		arg1 []string
+	}
+	getApplicationsByGUIDsReturns struct {
+		result1 []resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationsByGUIDsReturnsOnCall map[int]struct {
+		result1 []resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]resources.Application, v7action.Warnings, error)
 	getApplicationsByNamesAndSpaceMutex       sync.RWMutex
 	getApplicationsByNamesAndSpaceArgsForCall []struct {
@@ -8799,6 +8814,78 @@ func (fake *FakeActor) GetApplicationTasksReturnsOnCall(i int, result1 []resourc
 	}
 	fake.getApplicationTasksReturnsOnCall[i] = struct {
 		result1 []resources.Task
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDs(arg1 []string) ([]resources.Application, v7action.Warnings, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.getApplicationsByGUIDsMutex.Lock()
+	ret, specificReturn := fake.getApplicationsByGUIDsReturnsOnCall[len(fake.getApplicationsByGUIDsArgsForCall)]
+	fake.getApplicationsByGUIDsArgsForCall = append(fake.getApplicationsByGUIDsArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	stub := fake.GetApplicationsByGUIDsStub
+	fakeReturns := fake.getApplicationsByGUIDsReturns
+	fake.recordInvocation("GetApplicationsByGUIDs", []interface{}{arg1Copy})
+	fake.getApplicationsByGUIDsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDsCallCount() int {
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
+	return len(fake.getApplicationsByGUIDsArgsForCall)
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDsCalls(stub func([]string) ([]resources.Application, v7action.Warnings, error)) {
+	fake.getApplicationsByGUIDsMutex.Lock()
+	defer fake.getApplicationsByGUIDsMutex.Unlock()
+	fake.GetApplicationsByGUIDsStub = stub
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDsArgsForCall(i int) []string {
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
+	argsForCall := fake.getApplicationsByGUIDsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDsReturns(result1 []resources.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsByGUIDsMutex.Lock()
+	defer fake.getApplicationsByGUIDsMutex.Unlock()
+	fake.GetApplicationsByGUIDsStub = nil
+	fake.getApplicationsByGUIDsReturns = struct {
+		result1 []resources.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetApplicationsByGUIDsReturnsOnCall(i int, result1 []resources.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsByGUIDsMutex.Lock()
+	defer fake.getApplicationsByGUIDsMutex.Unlock()
+	fake.GetApplicationsByGUIDsStub = nil
+	if fake.getApplicationsByGUIDsReturnsOnCall == nil {
+		fake.getApplicationsByGUIDsReturnsOnCall = make(map[int]struct {
+			result1 []resources.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationsByGUIDsReturnsOnCall[i] = struct {
+		result1 []resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -19970,6 +20057,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
 	fake.getApplicationsByNamesAndSpaceMutex.RLock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
 	fake.getBuildpackLabelsMutex.RLock()
