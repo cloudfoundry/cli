@@ -71,7 +71,7 @@ var _ = Describe("Root endpoints", func() {
 						"href": "ssh.bosh-lite.com:2222",
 						"meta": {
 							"host_key_fingerprint": "some-fingerprint",
-							"oath_client": "some-client"
+							"oauth_client": "some-client"
 						}
 					}
 				}
