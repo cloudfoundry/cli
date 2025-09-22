@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/v7"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/resources"
@@ -21,7 +20,7 @@ import (
 
 var _ = Describe("revisions Command", func() {
 	var (
-		cmd             RevisionsCommand
+		cmd             v7.RevisionsCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor

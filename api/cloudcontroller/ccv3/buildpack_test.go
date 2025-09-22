@@ -17,7 +17,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -121,7 +120,7 @@ var _ = Describe("Buildpacks", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(buildpacks).To(ConsistOf(
-					Buildpack{
+					resources.Buildpack{
 						Name:     "ruby_buildpack",
 						GUID:     "guid1",
 						Position: types.NullInt{Value: 1, IsSet: true},
@@ -129,9 +128,9 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "windows64",
 						State:    "AWAITING_UPLOAD",
-						Metadata: &Metadata{Labels: map[string]types.NullString{}},
+						Metadata: &resources.Metadata{Labels: map[string]types.NullString{}},
 					},
-					Buildpack{
+					resources.Buildpack{
 						Name:     "staticfile_buildpack",
 						GUID:     "guid2",
 						Position: types.NullInt{Value: 2, IsSet: true},
@@ -139,9 +138,9 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: true, IsSet: true},
 						Stack:    "cflinuxfs4",
 						State:    "AWAITING_UPLOAD",
-						Metadata: &Metadata{Labels: map[string]types.NullString{}},
+						Metadata: &resources.Metadata{Labels: map[string]types.NullString{}},
 					},
-					Buildpack{
+					resources.Buildpack{
 						Name:     "go_buildpack",
 						GUID:     "guid3",
 						Position: types.NullInt{Value: 3, IsSet: true},
@@ -149,7 +148,7 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "cflinuxfs4",
 						State:    "AWAITING_UPLOAD",
-						Metadata: &Metadata{Labels: map[string]types.NullString{}},
+						Metadata: &resources.Metadata{Labels: map[string]types.NullString{}},
 					},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
@@ -203,9 +202,9 @@ var _ = Describe("Buildpacks", func() {
 
 	Describe("CreateBuildpack", func() {
 		var (
-			inputBuildpack Buildpack
+			inputBuildpack resources.Buildpack
 
-			bp         Buildpack
+			bp         resources.Buildpack
 			warnings   Warnings
 			executeErr error
 		)
@@ -216,7 +215,7 @@ var _ = Describe("Buildpacks", func() {
 
 		When("the buildpack is successfully created", func() {
 			BeforeEach(func() {
-				inputBuildpack = Buildpack{
+				inputBuildpack = resources.Buildpack{
 					Name:  "some-buildpack",
 					Stack: "some-stack",
 				}
@@ -259,7 +258,7 @@ var _ = Describe("Buildpacks", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				expectedBuildpack := Buildpack{
+				expectedBuildpack := resources.Buildpack{
 					GUID:     "some-bp-guid",
 					Name:     "some-buildpack",
 					Stack:    "some-stack",

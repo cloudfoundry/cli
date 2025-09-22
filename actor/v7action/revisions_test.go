@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -403,7 +402,7 @@ var _ = Describe("Revisions Actions", func() {
 	Describe("GetEnvironmentVariableGroupByRevision", func() {
 		var (
 			actor                     *Actor
-			environmentVariablesGroup v7action.EnvironmentVariableGroup
+			environmentVariablesGroup EnvironmentVariableGroup
 			executeErr                error
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeConfig                *v7actionfakes.FakeConfig

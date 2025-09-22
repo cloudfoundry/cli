@@ -8,7 +8,8 @@ import (
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+
+	// "code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -113,7 +114,7 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile).To(Equal(
 					JSONConfig{
 						ColorEnabled:         DefaultColorEnabled,
-						ConfigVersion:        configv3.CurrentConfigVersion,
+						ConfigVersion:        CurrentConfigVersion,
 						SSHOAuthClient:       DefaultSSHOAuthClient,
 						UAAOAuthClient:       DefaultUAAOAuthClient,
 						UAAOAuthClientSecret: DefaultUAAOAuthClientSecret,
@@ -153,7 +154,7 @@ var _ = Describe("Config", func() {
 					Expect(config.ConfigFile).To(Equal(
 						JSONConfig{
 							ColorEnabled:         DefaultColorEnabled,
-							ConfigVersion:        configv3.CurrentConfigVersion,
+							ConfigVersion:        CurrentConfigVersion,
 							SSHOAuthClient:       DefaultSSHOAuthClient,
 							UAAOAuthClient:       DefaultUAAOAuthClient,
 							UAAOAuthClientSecret: DefaultUAAOAuthClientSecret,
@@ -199,7 +200,7 @@ var _ = Describe("Config", func() {
 					{
 						"UAAOAuthClient": "",
 						"ConfigVersion": %d
-					}`, configv3.CurrentConfigVersion+1)
+					}`, CurrentConfigVersion+1)
 					setConfig(homeDir, rawConfig)
 				})
 
@@ -221,11 +222,11 @@ var _ = Describe("Config", func() {
 							{
 								"AccessToken": "bearer shazbat!",
 								"ConfigVersion": %d
-							}`, configv3.CurrentConfigVersion-1)
+							}`, CurrentConfigVersion-1)
 						setConfig(homeDir, rawConfig)
 						config := helpers.GetConfig()
 						Expect(loadErr).ToNot(HaveOccurred())
-						Expect(config.ConfigFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
+						Expect(config.ConfigFile.ConfigVersion).To(Equal(CurrentConfigVersion))
 						Expect(config.ConfigFile.AccessToken).To(Equal(""))
 					})
 				})
@@ -236,11 +237,11 @@ var _ = Describe("Config", func() {
 					{
 						"AccessToken": "bearer shazbat!",
 						"ConfigVersion": %d
-					}`, configv3.CurrentConfigVersion)
+					}`, CurrentConfigVersion)
 						setConfig(homeDir, rawConfig)
 						config := helpers.GetConfig()
 						Expect(loadErr).ToNot(HaveOccurred())
-						Expect(config.ConfigFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
+						Expect(config.ConfigFile.ConfigVersion).To(Equal(CurrentConfigVersion))
 						Expect(config.ConfigFile.AccessToken).To(Equal("bearer shazbat!"))
 					})
 				})
@@ -251,11 +252,11 @@ var _ = Describe("Config", func() {
 					{
 						"AccessToken": "bearer shazbat!",
 						"ConfigVersion": %d
-					}`, configv3.CurrentConfigVersion+1)
+					}`, CurrentConfigVersion+1)
 						setConfig(homeDir, rawConfig)
 						config := helpers.GetConfig()
 						Expect(loadErr).ToNot(HaveOccurred())
-						Expect(config.ConfigFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
+						Expect(config.ConfigFile.ConfigVersion).To(Equal(CurrentConfigVersion))
 						Expect(config.ConfigFile.AccessToken).To(Equal(""))
 					})
 				})

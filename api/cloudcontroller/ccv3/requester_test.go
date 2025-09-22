@@ -12,7 +12,8 @@ import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
+
+	// "code.cloudfoundry.org/cli/resources"
 	. "code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -320,11 +321,11 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("PATCH resource", func() {
 			var (
-				responseBody resources.Application
+				responseBody Application
 			)
 
 			BeforeEach(func() {
-				requestBody := resources.Application{
+				requestBody := Application{
 					GUID:                "some-app-guid",
 					Name:                "some-app-name",
 					StackName:           "some-stack-name",
@@ -387,7 +388,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 
-					Expect(responseBody).To(Equal(resources.Application{
+					Expect(responseBody).To(Equal(Application{
 						GUID:                "some-app-guid",
 						StackName:           "some-stack-name",
 						LifecycleBuildpacks: []string{"some-buildpack"},
@@ -550,12 +551,12 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("with query params and included resources", func() {
 			var (
-				resourceList []resources.Role
+				resourceList []Role
 				query        []Query
 			)
 
 			BeforeEach(func() {
-				resourceList = []resources.Role{}
+				resourceList = []Role{}
 				query = []Query{
 					{
 						Key:    OrganizationGUIDFilter,
@@ -569,9 +570,9 @@ var _ = Describe("shared request helpers", func() {
 				requestParams = RequestParams{
 					RequestName:  internal.GetRolesRequest,
 					Query:        query,
-					ResponseBody: resources.Role{},
+					ResponseBody: Role{},
 					AppendToList: func(item interface{}) error {
-						resourceList = append(resourceList, item.(resources.Role))
+						resourceList = append(resourceList, item.(Role))
 						return nil
 					},
 				}
@@ -621,7 +622,7 @@ var _ = Describe("shared request helpers", func() {
 				It("returns the given resources and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resourceList).To(Equal([]resources.Role{{
+					Expect(resourceList).To(Equal([]Role{{
 						GUID: "role-guid-1",
 						Type: constant.OrgUserRole,
 					}, {
@@ -783,7 +784,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(resourceList).To(Equal([]resources.Role{{
+					Expect(resourceList).To(Equal([]Role{{
 						GUID:     "role-guid-1",
 						Type:     constant.OrgUserRole,
 						UserGUID: "user-guid-1",
@@ -794,10 +795,10 @@ var _ = Describe("shared request helpers", func() {
 					}}))
 
 					Expect(includedResources).To(Equal(IncludedResources{
-						Apps: []resources.Application{
+						Apps: []Application{
 							{Name: "app-name-1", GUID: "app-guid-1"},
 						},
-						Users: []resources.User{
+						Users: []User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
 						},
@@ -813,7 +814,7 @@ var _ = Describe("shared request helpers", func() {
 							{Name: "broker-name-1", GUID: "broker-guid-1"},
 							{Name: "broker-name-2", GUID: "broker-guid-2"},
 						},
-						ServiceInstances: []resources.ServiceInstance{
+						ServiceInstances: []ServiceInstance{
 							{Name: "service-instance-name-1", GUID: "service-instance-guid-1"},
 							{Name: "service-instance-name-2", GUID: "service-instance-guid-2"},
 						},
@@ -943,12 +944,12 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("with 'per_page' and 'page' query params", func() {
 			var (
-				resourceList []resources.Stack
+				resourceList []Stack
 				query        []Query
 			)
 
 			BeforeEach(func() {
-				resourceList = []resources.Stack{}
+				resourceList = []Stack{}
 				query = []Query{
 					{
 						Key:    PerPage,
@@ -958,9 +959,9 @@ var _ = Describe("shared request helpers", func() {
 				requestParams = RequestParams{
 					RequestName:  internal.GetStacksRequest,
 					Query:        query,
-					ResponseBody: resources.Stack{},
+					ResponseBody: Stack{},
 					AppendToList: func(item interface{}) error {
-						resourceList = append(resourceList, item.(resources.Stack))
+						resourceList = append(resourceList, item.(Stack))
 						return nil
 					},
 				}
@@ -995,7 +996,7 @@ var _ = Describe("shared request helpers", func() {
 
 				It("returns only the resources from the specified page", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(resourceList).To(Equal([]resources.Stack{{
+					Expect(resourceList).To(Equal([]Stack{{
 						GUID: "stack-guid-1",
 					}}))
 				})
@@ -1028,7 +1029,7 @@ var _ = Describe("shared request helpers", func() {
 
 				It("returns only the resources from the specified page", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(resourceList).To(Equal([]resources.Stack{{
+					Expect(resourceList).To(Equal([]Stack{{
 						GUID: "stack-guid-2",
 					}}))
 				})
