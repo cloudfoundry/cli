@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/resources"
-	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -199,7 +198,7 @@ var _ = Describe("Paginated Resources", func() {
 				resources.User{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 			))
 			Expect(page.IncludedResources.Organizations).To(ConsistOf(
-				Organization{GUID: "org-guid-1", Name: "org-name-1"},
+				resources.Organization{GUID: "org-guid-1", Name: "org-name-1"},
 			))
 		})
 	})

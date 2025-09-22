@@ -94,7 +94,7 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 	interactivePrompt.SetIn(ui.In)
 	interactivePrompt.SetOut(ui.OutForInteraction)
 
-	var value string = "enter to skip"
+	value := "enter to skip"
 	err := interactivePrompt.Resolve(&value)
 
 	if isInterrupt(err) {

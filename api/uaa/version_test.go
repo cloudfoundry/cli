@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/uaa"
-	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -14,13 +13,13 @@ import (
 
 var _ = Describe("Version", func() {
 	var (
-		client     *Client
+		client     *uaa.Client
 		fakeConfig *uaafakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeConfig = NewTestConfig()
-		client = NewClient(fakeConfig)
+		client = uaa.NewClient(fakeConfig)
 
 		client.Info.Links.Login = "https://" + TestAuthorizationResource
 	})
