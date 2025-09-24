@@ -65,9 +65,9 @@
         "third_party$",
         "builtin$",
         "examples$",
-        "cf",
-        "fixtures",
-        "plugin"
+        "cf$",
+        "fixtures$",
+        "plugin$"
       ],
       "presets": [
         "comments",
