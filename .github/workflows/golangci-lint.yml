@@ -3,7 +3,6 @@ name: golangci-lint
 on:
   push:
     tags:
-      - "v9.*"
       - "v8.*"
   pull_request:
     types:
@@ -12,7 +11,6 @@ on:
       - synchronize
     branches:
       - main
-      - v9
       - v8
     paths-ignore:
       - "doc/**"
@@ -35,8 +33,8 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
-          version: v1.64
-          args: -v --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+          version: v2.4
+          args: -v
   format:
     name: Run go fmt
     runs-on: ubuntu-latest

@@ -147,7 +147,7 @@ integration-tests-full-ci: install-test-deps integration-cleanup
 
 lint: format ## Runs all linters and formatters
 	@echo "Running linters..."
-	golangci-lint run --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+	golangci-lint run -v
 	@echo "No lint errors!"
 
 # TODO: version specific tagging for all these builds

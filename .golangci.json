@@ -1,45 +1,131 @@
 {
-  "run": {
-    "concurrency": 4,
-    "timeout": "20m"
+  "formatters": {
+    "enable": [
+      "goimports"
+    ],
+    "exclusions": {
+      "generated": "lax",
+      "paths": [
+        "integration/helpers/fake_server.go",
+        "command/plugin/*.go$",
+        "third_party$",
+        "builtin$",
+        "examples$",
+        "cf$",
+        "fixtures$",
+        "plugin$"
+      ]
+    }
+  },
+  "issues": {
+    "max-same-issues": 0
   },
   "linters": {
-    "disable-all": true,
+    "default": "none",
     "enable": [
-      "govet",
-      "goimports",
       "errcheck",
+      "govet",
+      "ineffassign",
       "staticcheck",
-      "unused",
-      "ineffassign"
-    ]
-  },
-  "linters-settings": {},
-  "issues": {
-    "max-same-issues": 0,
-    "exclude-files":  [
-      "integration/helpers/fake_server.go",
-      "command/plugin/*.go$"
+      "unused"
     ],
-    "exclude": [
-      "Error return value of `client.GetApplicationTasks` is not checked",
-      "Error return value of `logger.output.Stop` is not checked",
-      "Error return value of `request.ResetBody` is not checked",
-      "Error return value of `GinkgoWriter.Write` is not checked",
-      "Error return value of `c.terminalHelper.RestoreTerminal` is not checked",
-      "U1000: field `allproxy` is unused",
-      "U1000: field `dockerPassword` is unused",
-      "U1000: field `envCFStagingTimeout` is unused",
-      "U1000: field `envCFStartupTimeout` is unused",
-      "U1000: field `relatedCommands` is unused",
-      "U1000: field `usage` is unused",
-      "SA5008: duplicate struct tag \"choice\"",
-      "`allproxy` is unused",
-      "`dockerPassword` is unused",
-      "`envCFStagingTimeout` is unused",
-      "`envCFStartupTimeout` is unused",
-      "`relatedCommands` is unused",
-      "`usage` is unused"
-    ]
-  }
+    "settings": {
+      "staticcheck": {
+        "checks": [
+          "all",
+          "-S1002",
+          "-S1005",
+          "-S1007",
+          "-S1009",
+          "-S1011",
+          "-S1012",
+          "-S1016",
+          "-S1020",
+          "-S1039",
+          "-ST1001",
+          "-ST1003",
+          "-ST1005",
+          "-ST1012",
+          "-ST1016",
+          "-QF1001",
+          "-QF1002",
+          "-QF1003",
+          "-QF1004",
+          "-QF1008",
+          "-QF1012",
+          "-SA5008"
+        ]
+      }
+    },
+    "exclusions": {
+      "generated": "lax",
+      "paths": [
+        "integration/helpers/fake_server.go",
+        "command/plugin/*.go$",
+        "third_party$",
+        "builtin$",
+        "examples$",
+        "cf$",
+        "fixtures$",
+        "plugin$"
+      ],
+      "presets": [
+        "comments",
+        "common-false-positives",
+        "legacy",
+        "std-error-handling"
+      ],
+      "rules": [
+        {
+          "linters": ["unused"],
+          "text": "field usage is unused"
+        },
+        {
+          "linters": ["unused"],
+          "text": "field relatedCommands is unused"
+        },
+        {
+          "linters": ["unused"],
+          "text": "field allproxy is unused"
+        },
+        {
+          "linters": ["unused"],
+          "text": "field dockerPassword is unused"
+        },
+        {
+          "linters": ["unused"],
+          "text": "field envCFStagingTimeout is unused"
+        },
+        {
+          "linters": ["unused"],
+          "text": "field envCFStartupTimeout is unused"
+        },
+        {
+          "linters": ["errcheck"],
+          "text": "Error return value of `GinkgoWriter.Write` is not checked"
+        },
+        {
+          "linters": ["errcheck"],
+          "text": "Error return value of `client.GetApplicationTasks` is not checked"
+        },
+        {
+          "linters": ["errcheck"],
+          "text": "Error return value of `logger.output.Stop` is not checked"
+        },
+        {
+          "linters": ["errcheck"],
+          "text": "Error return value of `request.ResetBody` is not checked"
+        },
+        {
+          "linters": ["errcheck"],
+          "text": "Error return value of `c.terminalHelper.RestoreTerminal` is not checked"
+        }
+      ]
+    }
+  },
+  "run": {
+    "concurrency": 4,
+    "timeout": "60m"
+  },
+  "version": "2"
 }
