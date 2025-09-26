@@ -11,9 +11,9 @@
         "third_party$",
         "builtin$",
         "examples$",
-        "cf",
-        "fixtures",
-        "plugin"
+        "cf$",
+        "fixtures$",
+        "plugin$"
       ]
     }
   },
@@ -124,7 +124,8 @@
     }
   },
   "run": {
-    "concurrency": 4
+    "concurrency": 4,
+    "timeout": "60m"
   },
   "version": "2"
 }
