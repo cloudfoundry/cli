@@ -1581,19 +1581,21 @@ var _ = Describe("Route Actions", func() {
 			routeGUID           string
 			appGUID             string
 			destinationProtocol string
+			destinationPort     int
 
 			executeErr error
 			warnings   Warnings
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.MapRoute(routeGUID, appGUID, destinationProtocol)
+			warnings, executeErr = actor.MapRoute(routeGUID, appGUID, destinationProtocol, destinationPort)
 		})
 
 		BeforeEach(func() {
 			routeGUID = "route-guid"
 			appGUID = "app-guid"
 			destinationProtocol = "http2"
+			destinationPort = 8080
 		})
 
 		When("the cloud controller client errors", func() {
@@ -1613,10 +1615,11 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("calls the cloud controller client with the right arguments", func() {
-				actualRouteGUID, actualAppGUID, actualDestinationProtocol := fakeCloudControllerClient.MapRouteArgsForCall(0)
+				actualRouteGUID, actualAppGUID, actualDestinationProtocol, actualDestinationPort := fakeCloudControllerClient.MapRouteArgsForCall(0)
 				Expect(actualRouteGUID).To(Equal("route-guid"))
 				Expect(actualAppGUID).To(Equal("app-guid"))
 				Expect(actualDestinationProtocol).To(Equal("http2"))
+				Expect(actualDestinationPort).To(Equal(8080))
 			})
 
 			It("returns the error and warnings", func() {
