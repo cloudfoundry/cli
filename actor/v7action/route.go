@@ -21,6 +21,7 @@ type RouteSummary struct {
 	resources.Route
 	AppNames            []string
 	AppProtocols        []string
+	AppPorts            []string
 	DomainName          string
 	SpaceName           string
 	ServiceInstanceName string
@@ -279,9 +280,11 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 		var appNames []string
 
 		protocolSet := map[string]bool{}
+		portSet := map[int]bool{}
 		for _, destination := range route.Destinations {
 			appNames = append(appNames, appNamesByGUID[destination.App.GUID])
 			protocolSet[destination.Protocol] = true
+			portSet[destination.Port] = true
 		}
 
 		var appProtocols []string
@@ -293,10 +296,20 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 			sort.Strings(appProtocols)
 		}
 
+		var appPorts []string
+		if len(portSet) > 0 {
+			appPorts = make([]string, 0, len(portSet))
+			for key := range portSet {
+				appPorts = append(appPorts, strconv.Itoa(key))
+			}
+			sort.Strings(appPorts)
+		}
+
 		routeSummaries = append(routeSummaries, RouteSummary{
 			Route:               route,
 			AppNames:            appNames,
 			AppProtocols:        appProtocols,
+			AppPorts:            appPorts,
 			SpaceName:           spaceNamesByGUID[route.SpaceGUID],
 			DomainName:          getDomainName(route.URL, route.Host, route.Path, route.Port),
 			ServiceInstanceName: serviceInstanceNameByRouteGUID[route.GUID],
@@ -397,8 +410,8 @@ func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string
 	return routes[0], Warnings(ccWarnings), nil
 }
 
-func (actor Actor) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID, destinationProtocol)
+func (actor Actor) MapRoute(routeGUID string, appGUID string, destinationProtocol string, destinationPort int) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID, destinationProtocol, destinationPort)
 	return Warnings(warnings), err
 }
 

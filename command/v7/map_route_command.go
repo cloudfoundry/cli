@@ -16,6 +16,7 @@ type MapRouteCommand struct {
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
 	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
 	AppProtocol     string           `long:"app-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
+	AppPort         int              `long:"app-port" description:"[Beta flag, subject to change] Port for the route destination (default: 8080)."`
 	Options         []string         `long:"option" short:"o" description:"Set the value of a per-route option"`
 	relatedCommands interface{}      `related_commands:"create-route, update-route, routes, unmap-route"`
 }
@@ -23,7 +24,7 @@ type MapRouteCommand struct {
 func (cmd MapRouteCommand) Usage() string {
 	return `
 Map an HTTP route:
-   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--app-protocol PROTOCOL] [--option OPTION=VALUE]
+   CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH] [--app-protocol PROTOCOL] [--app-port PORT] [--option OPTION=VALUE]
 
 Map a TCP route:
    CF_NAME map-route APP_NAME DOMAIN [--port PORT] [--option OPTION=VALUE]`
@@ -36,6 +37,7 @@ CF_NAME map-route my-app example.com --hostname myhost                          
 CF_NAME map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option
 CF_NAME map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo
 CF_NAME map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com
+CF_NAME map-route my-app example.com --hostname myhost --app-port 8090                    # myhost.example.com
 CF_NAME map-route my-app example.com --port 5000                                          # example.com:5000`
 }
 
@@ -148,7 +150,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		return nil
 	}
 
-	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.AppProtocol)
+	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID, cmd.AppProtocol, cmd.AppPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
