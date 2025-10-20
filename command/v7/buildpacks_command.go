@@ -13,7 +13,7 @@ type BuildpacksCommand struct {
 	BaseCommand
 
 	usage           interface{} `usage:"CF_NAME buildpacks [--labels SELECTOR] [--lifecycle buildpack|cnb]\n\nEXAMPLES:\n   CF_NAME buildpacks\n   CF_NAME buildpacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME buildpacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'\n   CF_NAME buildpacks --lifecycle cnb"`
-	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"`
+	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, update-buildpack"`
 	Labels          string      `long:"labels" description:"Selector to filter buildpacks by labels"`
 	Lifecycle       string      `long:"lifecycle" description:"Filter buildpacks by lifecycle ('buildpack' or 'cnb')"`
 }
