@@ -1,8 +1,11 @@
 package v7
 
 import (
+	"bytes"
+	"net/http"
 	"net/http/httputil"
 	"os"
+	"strings"
 
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -39,9 +42,9 @@ func (cmd CurlCommand) Execute(args []string) error {
 	}
 
 	var bytesToWrite []byte
-
-	if cmd.IncludeResponseHeaders {
-		headerBytes, _ := httputil.DumpResponse(httpResponse, false)
+	var headerBytes []byte
+	if cmd.IncludeResponseHeaders && httpResponse != nil {
+		headerBytes, _ = httputil.DumpResponse(httpResponse, false)
 		bytesToWrite = append(bytesToWrite, headerBytes...)
 	}
 
@@ -54,9 +57,38 @@ func (cmd CurlCommand) Execute(args []string) error {
 		}
 
 		cmd.UI.DisplayOK()
+		return nil
+	}
+
+	// Check if the response contains binary data
+	if isBinary(httpResponse, responseBodyBytes) {
+		// For binary data, write response headers with string conversion
+		// and the response body without string conversion
+		if cmd.IncludeResponseHeaders {
+			cmd.UI.DisplayTextLiteral(string(headerBytes))
+		}
+		cmd.UI.GetOut().Write(responseBodyBytes)
 	} else {
 		cmd.UI.DisplayText(string(bytesToWrite))
 	}
 
 	return nil
+}
+
+// isBinary determines if the provided `data` is likely binary content.
+// It first checks if the given `contentType` (e.g., from an HTTP header) is a known binary MIME type.
+// If not, it then scans the `data` byte slice for the presence of null bytes (0x00),
+// which are a strong heuristic for binary data.
+// Returns `true` if identified as binary, `false` otherwise.
+func isBinary(response *http.Response, data []byte) bool {
+	responseContextType := ""
+	if response != nil && response.Header != nil {
+		responseContextType = response.Header.Get("Content-Type")
+	}
+	if strings.Contains(responseContextType, "image/") ||
+		strings.Contains(responseContextType, "application/octet-stream") ||
+		strings.Contains(responseContextType, "application/pdf") {
+		return true
+	}
+	return bytes.ContainsRune(data, 0x00) // Check for null byte
 }
