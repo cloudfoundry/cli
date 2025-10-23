@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"gopkg.in/yaml.v2"
 
 	. "github.com/onsi/ginkgo/v2"

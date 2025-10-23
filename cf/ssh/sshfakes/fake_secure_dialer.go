@@ -4,7 +4,7 @@ package sshfakes
 import (
 	"sync"
 
-	sshCmd "code.cloudfoundry.org/cli/cf/ssh"
+	sshCmd "code.cloudfoundry.org/cli/v8/cf/ssh"
 	"golang.org/x/crypto/ssh"
 )
 

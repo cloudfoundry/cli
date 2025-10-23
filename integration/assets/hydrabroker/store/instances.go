@@ -3,9 +3,9 @@ package store
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/database"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/resources"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/database"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/resources"
 )
 
 func (st *Store) CreateInstance(brokerID BrokerID, instanceID InstanceID, details resources.ServiceInstanceDetails) error {

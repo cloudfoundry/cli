@@ -4,7 +4,7 @@ package spacesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/securitygroups/spaces"
+	"code.cloudfoundry.org/cli/v8/cf/api/securitygroups/spaces"
 )
 
 type FakeSecurityGroupSpaceBinder struct {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 type RouteDestinationApp struct {

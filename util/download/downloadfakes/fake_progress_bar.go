@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/v8/util/download"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 

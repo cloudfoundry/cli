@@ -1,8 +1,8 @@
 package commandregistry
 
 import (
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Command

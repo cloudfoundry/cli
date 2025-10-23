@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v8/version"
 )
 
 const maxStackSizeLimit = 1024 * 1024

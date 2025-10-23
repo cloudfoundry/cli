@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginRepo

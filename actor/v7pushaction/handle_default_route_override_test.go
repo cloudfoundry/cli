@@ -1,9 +1,9 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/v8/util/manifestparser"
 
-	. "code.cloudfoundry.org/cli/actor/v7pushaction"
+	. "code.cloudfoundry.org/cli/v8/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/v8/util/clissh"
 )
 
 type FakeListenerFactory struct {

@@ -4,8 +4,8 @@ package routefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commands/route"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/commands/route"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeCreator struct {

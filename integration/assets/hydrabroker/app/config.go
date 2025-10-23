@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/config"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/store"
 	"github.com/go-playground/validator/v10"
 )
 

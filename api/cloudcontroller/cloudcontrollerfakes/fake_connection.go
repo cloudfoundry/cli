@@ -4,7 +4,7 @@ package cloudcontrollerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 type FakeConnection struct {

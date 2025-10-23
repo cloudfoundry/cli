@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	. "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

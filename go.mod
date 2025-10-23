@@ -1,4 +1,4 @@
-module code.cloudfoundry.org/cli
+module code.cloudfoundry.org/cli/v8
 
 go 1.25.0
 
@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/bytefmt v0.55.0
 	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
-	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
+	code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.52.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
@@ -51,6 +51,7 @@ require (
 )
 
 require (
+	code.cloudfoundry.org/cli v7.1.0+incompatible // indirect
 	code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
@@ -101,3 +102,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
+
+replace code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker => ./integration/assets/hydrabroker

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
+	"code.cloudfoundry.org/cli/v8/integration/assets/hydrabroker/app"
 )
 
 func main() {
