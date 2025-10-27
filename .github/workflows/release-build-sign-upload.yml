@@ -169,7 +169,7 @@ jobs:
         make out/cf-cli_linux_arm64
 
     - name: Store Linux Binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-binaries
@@ -274,7 +274,7 @@ jobs:
       working-directory: signed-redhat-installer
 
     - name: Store Signed Linux RPM Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-packages
@@ -375,7 +375,7 @@ jobs:
       working-directory: packaged-deb
 
     - name: Store Debian Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-deb-packages
@@ -465,7 +465,7 @@ jobs:
         make out/cf-cli_macosarm
 
     - name: Store macOS Binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-macos-binaries
@@ -605,7 +605,7 @@ jobs:
           "signed-macos-installer/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_macosarm.pkg"
 
     - name: Store macOS Signed Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-macos-packages
@@ -691,7 +691,7 @@ jobs:
           New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
 
       - name: Save signed binaries as a GitHub Action Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cf-cli-windows-binaries
           if-no-files-found: error
@@ -736,7 +736,7 @@ jobs:
           Get-ChildItem "${env:RUNNER_TEMP}"
 
       - name: Save installer and dist files as a GitHub Action Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cf-cli-windows-packages
           if-no-files-found: error
@@ -771,7 +771,7 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Download signed artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         path: signed # download all artifacts to 'signed/'
 
@@ -857,7 +857,7 @@ jobs:
           signed/winx64/*zip
 
     - name: Store Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: final-artifacts
@@ -894,7 +894,7 @@ jobs:
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-linux-rpm-packages
 
@@ -921,7 +921,7 @@ jobs:
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-linux-deb-packages
 
@@ -949,7 +949,7 @@ jobs:
     steps:
 
     - name: Download Signed macOS Packages
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-macos-packages
 
@@ -973,7 +973,7 @@ jobs:
     steps:
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-windows-binaries
 
@@ -983,7 +983,7 @@ jobs:
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-windows-packages
 
@@ -1013,7 +1013,7 @@ jobs:
     - s3-upload
     steps:
     - name: Download signed artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: final-artifacts
         path: ${{ env.ARTIFACTS_DIR }}
