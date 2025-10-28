@@ -111,7 +111,7 @@ func (cmd Target) setOrganization(orgName string) error {
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 	if apiErr != nil {
-		return fmt.Errorf(T("Could not target org.\n{{.APIErr}}",
+		return errors.New(T("Could not target org.\n{{.APIErr}}",
 			map[string]interface{}{"APIErr": apiErr.Error()}))
 	}
 
@@ -128,7 +128,7 @@ func (cmd Target) setSpace(spaceName string) error {
 
 	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 	if apiErr != nil {
-		return fmt.Errorf(T("Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+		return errors.New(T("Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
 			map[string]interface{}{"SpaceName": spaceName, "APIErr": apiErr.Error()}))
 	}
 

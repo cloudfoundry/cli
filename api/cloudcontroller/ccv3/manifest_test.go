@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-	. "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("Application Manifest", func() {
 	var (
-		client    *Client
+		client    *ccv3.Client
 		requester *ccv3fakes.FakeRequester
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("Application Manifest", func() {
 			appGUID string
 
 			rawManifest []byte
-			warnings    Warnings
+			warnings    ccv3.Warnings
 			executeErr  error
 
 			expectedYAML []byte
@@ -48,7 +48,7 @@ var _ = Describe("Application Manifest", func() {
 		When("getting the manifest is successful", func() {
 			BeforeEach(func() {
 				expectedYAML = []byte("---\n- banana")
-				requester.MakeRequestReceiveRawReturns(expectedYAML, Warnings{"this is a warning"}, nil)
+				requester.MakeRequestReceiveRawReturns(expectedYAML, ccv3.Warnings{"this is a warning"}, nil)
 			})
 
 			It("makes the correct request", func() {
@@ -84,7 +84,7 @@ var _ = Describe("Application Manifest", func() {
 
 				requester.MakeRequestReceiveRawReturns(
 					nil,
-					Warnings{"this is a warning"},
+					ccv3.Warnings{"this is a warning"},
 					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
 				)
 
@@ -117,7 +117,7 @@ var _ = Describe("Application Manifest", func() {
 			rawManifest []byte
 
 			manifestDiff resources.ManifestDiff
-			warnings     Warnings
+			warnings     ccv3.Warnings
 			executeErr   error
 		)
 

@@ -309,15 +309,27 @@ var _ = Describe("login Command", func() {
 			})
 		})
 
-		When("targeting the API fails due to an invalid certificate", func() {
-			BeforeEach(func() {
-				cmd.APIEndpoint = "api.example.com"
-				fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
+		When("certificate is invalid", func() {
+			When("targeting the API without setting --skip-ssl-validation flag", func() {
+				BeforeEach(func() {
+					cmd.APIEndpoint = "api.example.com"
+					fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
+				})
+
+				It("returns an error mentioning the login command", func() {
+					Expect(executeErr).To(MatchError(
+						translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
+				})
 			})
 
-			It("returns an error mentioning the login command", func() {
-				Expect(executeErr).To(MatchError(
-					translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
+			When("targeting the API with --skip-ssl-validation flag", func() {
+				BeforeEach(func() {
+					cmd.APIEndpoint = "api.example.com"
+				})
+
+				It("login succeeds", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+				})
 			})
 		})
 	})

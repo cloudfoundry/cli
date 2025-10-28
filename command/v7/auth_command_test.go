@@ -280,6 +280,65 @@ var _ = Describe("auth Command", func() {
 				})
 			})
 
+			When("--assertion is set", func() {
+				BeforeEach(func() {
+					cmd.ClientCredentials = false
+					cmd.Assertion = "jwt-token"
+					cmd.RequiredArgs.Username = testID
+					cmd.RequiredArgs.Password = testSecret
+				})
+
+				It("outputs API target information and clears the targeted org and space", func() {
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+					Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
+
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
+					ID := credentials["client_id"]
+					secret := credentials["client_secret"]
+					Expect(ID).To(Equal(testID))
+					Expect(secret).To(Equal(testSecret))
+					Expect(origin).To(BeEmpty())
+					Expect(grantType).To(Equal(constant.GrantTypeJwtBearer))
+				})
+			})
+
+			When("--assertion and --client-credentials is set", func() {
+				BeforeEach(func() {
+					cmd.ClientCredentials = true
+					cmd.Assertion = "client-jwt-token"
+					cmd.RequiredArgs.Username = testID
+					cmd.RequiredArgs.Password = testSecret
+				})
+
+				It("outputs API target information and clears the targeted org and space", func() {
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+					Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
+
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
+					ID := credentials["client_id"]
+					secret := credentials["client_secret"]
+					clientAssertion := credentials["client_assertion"]
+					clientAssertionType := credentials["client_assertion_type"]
+					Expect(ID).To(Equal(testID))
+					Expect(secret).To(BeEmpty())
+					Expect(origin).To(BeEmpty())
+					Expect(secret).To(Equal(""))
+					Expect(clientAssertion).To(Equal("client-jwt-token"))
+					Expect(clientAssertionType).To(Equal("urn:ietf:params:oauth:client-assertion-type:jwt-bearer"))
+					Expect(grantType).To(Equal(constant.GrantTypeClientCredentials))
+				})
+			})
+
 			When("the username and password are provided in env variables", func() {
 				var (
 					envUsername string

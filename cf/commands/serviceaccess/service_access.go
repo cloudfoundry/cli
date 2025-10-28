@@ -1,7 +1,6 @@
 package serviceaccess
 
 import (
-	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/v8/cf/actors"
@@ -124,7 +123,7 @@ func (cmd *ServiceAccess) Execute(c flags.FlagContext) error {
 
 func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) error {
 	for _, serviceBroker := range brokers {
-		cmd.ui.Say(fmt.Sprintf(T("broker: {{.Name}}", map[string]interface{}{"Name": serviceBroker.Name})))
+		cmd.ui.Say(T("broker: {{.Name}}", map[string]interface{}{"Name": serviceBroker.Name}))
 
 		table := cmd.ui.Table([]string{"", T("service"), T("plan"), T("access"), T("orgs")})
 		for _, service := range serviceBroker.Services {

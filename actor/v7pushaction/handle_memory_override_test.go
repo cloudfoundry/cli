@@ -1,6 +1,7 @@
 package v7pushaction_test
 
 import (
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/util/manifestparser"
 
@@ -39,6 +40,24 @@ var _ = Describe("HandleMemoryOverride", func() {
 		})
 
 		When("memory are not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("memory are set,and strategy is set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+				overrides.Strategy = constant.DeploymentStrategyRolling
+			})
+
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
@@ -136,6 +155,234 @@ var _ = Describe("HandleMemoryOverride", func() {
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+		})
+	})
+})
+
+var _ = Describe("HandleMemoryOverrideForDeployment", func() {
+	var (
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
+		overrides           FlagOverrides
+		executeErr          error
+	)
+
+	BeforeEach(func() {
+		originalManifest = manifestparser.Manifest{}
+		overrides = FlagOverrides{}
+	})
+
+	JustBeforeEach(func() {
+		transformedManifest, executeErr = HandleMemoryOverrideForDeployment(originalManifest, overrides)
+	})
+
+	When("manifest web process does not specify memory", func() {
+		BeforeEach(func() {
+			originalManifest.Applications = []manifestparser.Application{
+				{
+					Processes: []manifestparser.Process{
+						{Type: "web"},
+					},
+				},
+			}
+		})
+
+		When("memory are not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("memory are set,and strategy is not set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+			})
+
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web"},
+						},
+					},
+				))
+			})
+		})
+
+		When("memory are set, and strategy is set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+				overrides.Strategy = constant.DeploymentStrategyCanary
+			})
+
+			It("changes the memory of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web", Memory: "64M"},
+						},
+					},
+				))
+			})
+		})
+	})
+
+	When("memory flag is set, and strategy is set to rolling on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Memory = "64M"
+			overrides.Strategy = constant.DeploymentStrategyRolling
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the memory of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Memory: "64M",
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web"},
+						},
+						Memory: "8M",
+					},
+				}
+			})
+
+			It("changes the memory of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web", Memory: "64M"},
+						},
+						Memory: "8M",
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
+		})
+	})
+
+	When("memory flag is set, and strategy is set to canary on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Memory = "64M"
+			overrides.Strategy = constant.DeploymentStrategyCanary
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the memory of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Memory: "64M",
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web"},
+						},
+						Memory: "8M",
+					},
+				}
+			})
+
+			It("changes the memory of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web", Memory: "64M"},
+						},
+						Memory: "8M",
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				overrides.Memory = "64M"
+
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
 		})
 	})
 })

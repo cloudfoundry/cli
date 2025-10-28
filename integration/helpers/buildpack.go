@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"archive/tar"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -68,15 +69,66 @@ func SetupBuildpackWithoutStack(buildpackName string) {
 	SetupBuildpackWithStack(buildpackName, "")
 }
 
+// CNB makes a simple cnb (using
+// MakeCNBArchive) and yields it to the given function, removing the cnb file
+// at the end.
+func CNB(f func(buildpackArchive string)) {
+	cnbArchive := MakeCNBArchive()
+	defer os.Remove(cnbArchive)
+
+	f(cnbArchive)
+}
+
+// MakeCNBArchive makes a simple buildpack cnb file for a given stack.
+func MakeCNBArchive() string {
+	archiveDir, err := os.MkdirTemp("", "cnb-archive-file-")
+	Expect(err).ToNot(HaveOccurred())
+
+	archiveFile, err := os.Create(filepath.Join(archiveDir, "buildpack.cnb"))
+	Expect(err).ToNot(HaveOccurred())
+	defer archiveFile.Close()
+
+	tarWriter := tar.NewWriter(archiveFile)
+	defer tarWriter.Close()
+
+	manifestBytes := []byte(`{"schemaVersion": 2,"mediaType": "application/vnd.oci.image.index.v1+json","manifests": []}`)
+	err = tarWriter.WriteHeader(&tar.Header{
+		Name: "index.json",
+		Mode: 0666,
+		Size: int64(len(manifestBytes)),
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	_, err = tarWriter.Write(manifestBytes)
+	Expect(err).ToNot(HaveOccurred())
+
+	layoutBytes := []byte(`{"imageLayoutVersion": "1.0.0"}`)
+	err = tarWriter.WriteHeader(&tar.Header{
+		Name: "oci-layout",
+		Mode: 0666,
+		Size: int64(len(layoutBytes)),
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	_, err = tarWriter.Write(layoutBytes)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = tarWriter.Flush()
+	Expect(err).ToNot(HaveOccurred())
+
+	return archiveFile.Name()
+}
+
 // BuildpackFields represents a buildpack, displayed in the 'cf buildpacks'
 // command.
 type BuildpackFields struct {
-	Position string
-	Name     string
-	Enabled  string
-	Locked   string
-	Filename string
-	Stack    string
+	Position  string
+	Name      string
+	Enabled   string
+	Locked    string
+	Filename  string
+	Stack     string
+	Lifecycle string
 }
 
 // DeleteBuildpackIfOnOldCCAPI deletes the buildpack if the CC API targeted

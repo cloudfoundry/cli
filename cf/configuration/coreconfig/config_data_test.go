@@ -55,7 +55,8 @@ var _ = Describe("V3 Config files", func() {
 		}
 		],
 		"MinCLIVersion": "6.0.0",
-		"MinRecommendedCLIVersion": "6.9.0"
+		"MinRecommendedCLIVersion": "6.9.0",
+        "NetworkPolicyV1Endpoint": "the-network-policy-endpoint"
 	}`
 
 	// V2 by virtue of ConfigVersion only
@@ -104,7 +105,8 @@ var _ = Describe("V3 Config files", func() {
 		}
 		],
 		"MinCLIVersion": "6.0.0",
-		"MinRecommendedCLIVersion": "6.9.0"
+		"MinRecommendedCLIVersion": "6.9.0",
+        "NetworkPolicyV1Endpoint": "the-network-policy-endpoint"
 	}`
 
 	Describe("NewData", func() {
@@ -133,6 +135,7 @@ var _ = Describe("V3 Config files", func() {
 				SSHOAuthClient:           "ssh-oauth-client-id",
 				MinCLIVersion:            "6.0.0",
 				MinRecommendedCLIVersion: "6.9.0",
+				NetworkPolicyV1Endpoint:  "the-network-policy-endpoint",
 				OrganizationFields: models.OrganizationFields{
 					GUID: "the-org-guid",
 					Name: "the-org",
@@ -185,6 +188,7 @@ var _ = Describe("V3 Config files", func() {
 				SSHOAuthClient:           "ssh-oauth-client-id",
 				MinCLIVersion:            "6.0.0",
 				MinRecommendedCLIVersion: "6.9.0",
+				NetworkPolicyV1Endpoint:  "the-network-policy-endpoint",
 				OrganizationFields: models.OrganizationFields{
 					GUID: "the-org-guid",
 					Name: "the-org",

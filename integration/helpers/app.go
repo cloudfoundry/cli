@@ -172,6 +172,12 @@ PLATFORMS
 DEPENDENCIES
   irb
   webrick
+
+RUBY VERSION
+   ruby 3.3.1p55
+
+BUNDLED WITH
+   2.5.18
 `,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())

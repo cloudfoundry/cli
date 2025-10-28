@@ -44,6 +44,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		buildpackGUID = "some guid"
 
 		cmd = UpdateBuildpackCommand{
@@ -173,7 +174,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("exits without updating if the path points to an empty directory", func() {
 					Expect(executeErr).To(MatchError(emptyDirectoryError))
-					Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(0))
+					Expect(fakeActor.UpdateBuildpackByNameAndStackAndLifecycleCallCount()).To(Equal(0))
 				})
 			})
 
@@ -182,7 +183,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					cmd.Path = "path/to/buildpack"
 					fakeActor.PrepareBuildpackBitsReturns("path/to/prepared/bits", nil)
 					expectedErr = errors.New("update-error")
-					fakeActor.UpdateBuildpackByNameAndStackReturns(
+					fakeActor.UpdateBuildpackByNameAndStackAndLifecycleReturns(
 						resources.Buildpack{},
 						v7action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						expectedErr,
@@ -204,7 +205,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Locked.IsSet).To(Equal(true))
 					Expect(buildpack.Locked.Value).To(Equal(true))
 				})
@@ -217,7 +218,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Locked.IsSet).To(Equal(true))
 					Expect(buildpack.Locked.Value).To(Equal(false))
 				})
@@ -230,7 +231,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Enabled.IsSet).To(Equal(true))
 					Expect(buildpack.Enabled.Value).To(Equal(true))
 				})
@@ -243,7 +244,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Enabled.IsSet).To(Equal(true))
 					Expect(buildpack.Enabled.Value).To(Equal(false))
 				})
@@ -256,7 +257,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the new buildpack order when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Position.IsSet).To(Equal(true))
 					Expect(buildpack.Position.Value).To(Equal(99))
 				})
@@ -269,7 +270,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the new stack on the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(testUI.Out).ToNot(Say("Updating buildpack %s", buildpackName))
 					Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, buildpackName, userName))
 					Expect(buildpack.Stack).To(Equal("some-new-stack"))
@@ -342,6 +343,28 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 			})
 
+			When("the --lifecycle flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Lifecycle = "some-lifecycle"
+				})
+				It("is only used for getting the buildpack and does not update existing lifecycle", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, lifecycleQuery, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
+					Expect(buildpack.Lifecycle).To(BeEmpty())
+					Expect(lifecycleQuery).To(Equal("some-lifecycle"))
+				})
+				It("fails when the cc version is below the minimum", func() {
+					fakeConfig.APIVersionReturns("3.193.0")
+					executeErr = cmd.Execute(nil)
+
+					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+						Command:        "--lifecycle",
+						CurrentVersion: "3.193.0",
+						MinimumVersion: "3.194.0",
+					}))
+				})
+			})
+
 			When("the --rename flag is provided", func() {
 				BeforeEach(func() {
 					cmd.NewName = "new-buildpack-name"
@@ -349,7 +372,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the new name on the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 					Expect(buildpack.Name).To(Equal("new-buildpack-name"))
 
 					Expect(testUI.Out).ToNot(Say("Updating buildpack %s", buildpackName))
@@ -365,7 +388,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					It("sets the new name/stack on the buildpack and refers to the new name going forward", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						_, _, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 						Expect(buildpack.Name).To(Equal("new-buildpack-name"))
 						Expect(buildpack.Stack).To(Equal("new-stack"))
 
@@ -384,7 +407,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 			When("updating the buildpack succeeds", func() {
 				BeforeEach(func() {
-					fakeActor.UpdateBuildpackByNameAndStackReturns(
+					fakeActor.UpdateBuildpackByNameAndStackAndLifecycleReturns(
 						resources.Buildpack{GUID: buildpackGUID},
 						v7action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						nil,
@@ -393,14 +416,15 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				When("no arguments are specified", func() {
 					It("makes the actor call to update the buildpack", func() {
-						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
-						_, newStack, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						Expect(fakeActor.UpdateBuildpackByNameAndStackAndLifecycleCallCount()).To(Equal(1))
+						_, newStack, lifecycle, buildpack := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 						Expect(buildpack.Name).To(Equal(""))
 						Expect(buildpack.Stack).To(Equal(""))
 						Expect(buildpack.Position.IsSet).To(BeFalse())
 						Expect(buildpack.Locked.IsSet).To(BeFalse())
 						Expect(buildpack.Enabled.IsSet).To(BeFalse())
 						Expect(newStack).To(Equal(""))
+						Expect(lifecycle).To(Equal(""))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
@@ -415,8 +439,8 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					})
 
 					It("makes the call to update the buildpack", func() {
-						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
-						buildpackNameArg, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						Expect(fakeActor.UpdateBuildpackByNameAndStackAndLifecycleCallCount()).To(Equal(1))
+						buildpackNameArg, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 						Expect(buildpackNameArg).To(Equal(buildpackName))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))

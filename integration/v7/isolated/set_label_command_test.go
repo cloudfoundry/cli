@@ -427,7 +427,7 @@ var _ = Describe("set-label command", func() {
 					When("stack is not specified", func() {
 						It("displays an error", func() {
 							session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value")
-							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.", buildpackName)))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -504,7 +504,7 @@ var _ = Describe("set-label command", func() {
 					When("no stack is specified", func() {
 						It("displays an error", func() {
 							session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value")
-							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.", buildpackName)))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})

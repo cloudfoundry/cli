@@ -6,8 +6,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blang/semver/v4"
-
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	"code.cloudfoundry.org/cli/v8/api/plugin"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
@@ -88,10 +86,6 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 		return configv3.Plugin{}, actionerror.PluginInvalidError{Err: err}
 	}
 
-	cliVersion, err := semver.Make(actor.config.BinaryVersion())
-	if err != nil {
-		return configv3.Plugin{}, actionerror.PluginInvalidError{Err: err}
-	}
 	var pluginLibraryMajorVersion int
 	hasPluginLibraryVersion := plugin.LibraryVersion != configv3.PluginVersion{}
 	if !hasPluginLibraryVersion {
@@ -100,13 +94,8 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 		pluginLibraryMajorVersion = plugin.LibraryVersion.Major
 	}
 
-	switch cliVersion.Major {
-	case 6, 7, 8:
-		if pluginLibraryMajorVersion > 1 {
-			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
-		}
-	default:
-		panic("unrecognized major version")
+	if pluginLibraryMajorVersion > 1 {
+		return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
 	}
 
 	installedPlugins := actor.config.Plugins()

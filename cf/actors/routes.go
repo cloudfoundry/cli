@@ -233,7 +233,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 
 func validateRoute(routeName string, domainType string, port int, path string) error {
 	if domainType == tcp && path != "" {
-		return fmt.Errorf(T("Path not allowed in TCP route {{.RouteName}}",
+		return errors.New(T("Path not allowed in TCP route {{.RouteName}}",
 			map[string]interface{}{
 				"RouteName": routeName,
 			},
@@ -241,7 +241,7 @@ func validateRoute(routeName string, domainType string, port int, path string) e
 	}
 
 	if domainType == "" && port != 0 {
-		return fmt.Errorf(T("Port not allowed in HTTP route {{.RouteName}}",
+		return errors.New(T("Port not allowed in HTTP route {{.RouteName}}",
 			map[string]interface{}{
 				"RouteName": routeName,
 			},
@@ -288,7 +288,7 @@ func parseRoute(routeName string, findFunc func(domainName string) (models.Domai
 		return routeParts[0], domain, false, nil
 	}
 
-	return "", models.DomainFields{}, true, fmt.Errorf(T(
+	return "", models.DomainFields{}, true, errors.New(T(
 		"The route {{.RouteName}} did not match any existing domains.",
 		map[string]interface{}{
 			"RouteName": routeName,

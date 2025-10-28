@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/resources"
+    "code.cloudfoundry.org/cli/v8/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -122,6 +123,10 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				)
 				paramPlan.Strategy = "rolling"
 				paramPlan.MaxInFlight = 10
+				paramPlan.Instances = types.NullInt{IsSet: true, Value: 3}
+				paramPlan.MemoryInMB = types.NullUint64{IsSet: true, Value: 10}
+				paramPlan.DiskInMB = types.NullUint64{IsSet: true, Value: 20}
+				paramPlan.LogRateLimitInBPS = types.NullInt{IsSet: true, Value: 30}
 			})
 
 			It("waits for the app to start", func() {
@@ -135,7 +140,12 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				dep := fakeV7Actor.CreateDeploymentArgsForCall(0)
 				Expect(dep).To(Equal(resources.Deployment{
 					Strategy: "rolling",
-					Options:  resources.DeploymentOpts{MaxInFlight: 10},
+					Options: resources.DeploymentOpts{MaxInFlight: 10,
+						Instances:         types.NullInt{IsSet: true, Value: 3},
+						MemoryInMB:        types.NullUint64{IsSet: true, Value: 10},
+						DiskInMB:          types.NullUint64{IsSet: true, Value: 20},
+						LogRateLimitInBPS: types.NullInt{IsSet: true, Value: 30},
+					},
 					Relationships: resources.Relationships{
 						constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 					},

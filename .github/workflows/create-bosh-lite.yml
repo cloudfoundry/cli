@@ -1,0 +1,177 @@
+name: Create environment
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      env-name: 
+        value: ${{ jobs.create-env.outputs.envName }}
+        description: "Name of the created environment"
+
+env:
+  BBL_IAAS: gcp
+  BBL_GCP_REGION: us-east1
+  BBL_GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_CREDENTIALS_JSON }}
+  BOSH_DEPLOYMENT: cf
+  BOSH_NON_INTERACTIVE: true
+  BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
+  BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
+  CREDHUB_CLI_VERSION: ${{ vars.CREDHUB_CLI_VERSION }}
+
+jobs:
+  create-env:
+    runs-on: ubuntu-latest
+    outputs:
+      envName: ${{steps.setup-bbl-env.outputs.envName}}
+    steps:      
+      - name: Install Tools
+        run: |
+          go version
+
+          install_location=/usr/local/bin
+
+          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v${BBL_CLI_VERSION}/bbl-v${BBL_CLI_VERSION}_linux_amd64 --silent --location --output  $install_location/bbl
+          sudo chmod +x $install_location/bbl
+          bbl --version
+  
+          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v${BOSH_CLI_VERSION}/bosh-cli-${BOSH_CLI_VERSION}-linux-amd64 --silent --output $install_location/bosh --location
+          sudo chmod +x $install_location/bosh
+          bosh --version
+  
+          sudo curl https://github.com/cloudfoundry/credhub-cli/releases/download/${CREDHUB_CLI_VERSION}/credhub-linux-amd64-${CREDHUB_CLI_VERSION}.tgz --silent --location --output /tmp/credhub.tgz
+          sudo tar -xzf /tmp/credhub.tgz -C $install_location  
+          sudo chmod +x $install_location/credhub
+          credhub --version
+
+          sudo apt update
+          sudo apt install -y build-essential unzip wamerican
+
+      - name: Checkout bosh-bootloader
+        uses: actions/checkout@v5
+        with:
+          repository: cloudfoundry/bosh-bootloader
+          path: bosh-bootloader
+
+      - name: Checkout cli
+        uses: actions/checkout@v5
+        with:
+          path: cli
+
+      - name: Setup bbl
+        id: setup-bbl-env
+        run: |
+          env_name="$(grep '^.\{1,4\}$' /usr/share/dict/words |
+          shuf -n1 |
+          tr -dc '[:alnum:]\n\r' |
+          tr '[:upper:]' '[:lower:]')"
+
+          if [ ! -z "${env_name}" ]; then
+            env_name=cli-${env_name}
+            mkdir -p $env_name/bbl-state
+          fi
+          echo "Bbl environment name: $env_name"
+          echo "envName=$env_name" >> $GITHUB_OUTPUT
+
+      - name: Create bbl env
+        run: |
+          env_name=${{ steps.setup-bbl-env.outputs.envName }}
+          cd $env_name/bbl-state
+
+          cp -R ${GITHUB_WORKSPACE}/bosh-bootloader/plan-patches/bosh-lite-gcp/* .
+          bbl plan --name $env_name
+          cp ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/bosh-lite-dns.tf terraform/
+          cp ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/bosh-lite.tfvars vars/
+          cp ${GITHUB_WORKSPACE}/cli/.github/ops-files/bosh-lite-vm-type.yml bosh-deployment/gcp/
+          bbl up
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Save bbl state
+        run: |
+          env_name=${{ steps.setup-bbl-env.outputs.envName }}
+          gsutil -m cp -R -P ./$env_name gs://cf-cli-bosh-lites/
+
+      - name: Checkout cf-deployment
+        uses: actions/checkout@v5
+        with:
+          repository: cloudfoundry/cf-deployment
+          ref: release-candidate
+          path: cf-deployment
+
+      - name: Checkout bosh-deployment
+        uses: actions/checkout@v5
+        with:
+          repository: cloudfoundry/bosh-deployment
+          path: bosh-deployment
+
+      - name: Upload latest CAPI release
+        if: ${{ (vars.USE_LATEST_CAPI == true) || (vars.CAPI_RELEASE_VERSION != '') }}
+        env:
+          capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
+        run: |
+          if [ -z "$capi_release_version" ]; then
+            capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
+          fi
+          
+          echo "Latest CAPI release is $capi_release_version"
+          
+          env_name="${{ steps.setup-bbl-env.outputs.envName }}"
+          cd $env_name/bbl-state
+          eval "$(bbl print-env)"
+          
+          jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
+
+          bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"          
+      - name: Deploy cf
+        run: |
+          env_name="${{ steps.setup-bbl-env.outputs.envName }}"
+          cd $env_name/bbl-state
+          eval "$(bbl print-env)"
+          bosh update-runtime-config ${GITHUB_WORKSPACE}/bosh-deployment/runtime-configs/dns.yml --name dns
+          STEMCELL_VERSION=$(bosh interpolate ${GITHUB_WORKSPACE}/cf-deployment/cf-deployment.yml --path /stemcells/alias=default/version)
+          bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-jammy-go_agent?v=${STEMCELL_VERSION}"
+          bosh update-cloud-config ${GITHUB_WORKSPACE}/cf-deployment/iaas-support/bosh-lite/cloud-config.yml
+          SYSTEM_DOMAIN="$env_name.app-runtime-interfaces.ci.cloudfoundry.org"
+
+          additional_args=''
+          if [ -n "${{ vars.USE_LATEST_CAPI }}" ] || [ -n "${{ vars.CAPI_RELEASE_VERSION }}" ]; then
+            additional_args="-o ${GITHUB_WORKSPACE}/cli/.github/ops-files/use-latest-capi.yml"
+          fi
+
+          bosh interpolate ${GITHUB_WORKSPACE}/cf-deployment/cf-deployment.yml \
+          -o ${GITHUB_WORKSPACE}/cf-deployment/operations/bosh-lite.yml \
+          -o ${GITHUB_WORKSPACE}/cf-deployment/operations/use-compiled-releases.yml \
+          -o ${GITHUB_WORKSPACE}/cf-deployment/operations/enable-v2-api.yml \
+          -o ${GITHUB_WORKSPACE}/cf-deployment/operations/use-internal-lookup-for-route-services.yml \
+          -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/diego-cell-instances.yml \
+          -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/add-uaa-client-credentials.yml \
+          -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/increase-route-registration-interval.yml \
+          -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/add-oidc-provider.yml ${additional_args} \
+          -v client-secret="${{ secrets.CLIENT_SECRET }}" \
+          -v system_domain=${SYSTEM_DOMAIN} \
+          > ./director.yml
+
+          bosh deploy director.yml    
+
+      - name: delete bosh
+        if: failure()
+        run: |
+          env_name="${{ steps.setup-bbl-env.outputs.envName }}"
+          if [ -d ${env_name}/bbl_state ]; then
+            cd ${env_name}/bbl-state
+            eval "$(bbl print-env)"
+            
+            echo "Deleting env ${env_name}"
+            bbl down --no-confirm --gcp-service-account-key=key.json
+
+            echo "Deleting bbl state directory"
+            if gsutil ls gs://cf-cli-bosh-lites | grep -q /${env_name}/; then
+              gsutil rm -R gs://cf-cli-bosh-lites/${env_name} 
+            fi
+          fi
+          

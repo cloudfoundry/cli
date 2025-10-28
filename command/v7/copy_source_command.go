@@ -1,13 +1,18 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/v8/actor/v7action"
+    "strconv"
+    "strings"
+
+    "code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/api/logcache"
 	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/command/v7/shared"
+    "code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
@@ -16,12 +21,13 @@ type CopySourceCommand struct {
 
 	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
 	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY] [--no-wait]"`
-	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null"`
+	InstanceSteps       string                  `long:"instance-steps" description:"An array of percentage steps to deploy when using deployment strategy canary. (e.g. 20,40,60)"`
 	MaxInFlight         *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being started. Only applies when --strategy flag is specified."`
 	NoWait              bool                    `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	NoRestart           bool                    `long:"no-restart" description:"Do not restage the destination application"`
 	Organization        string                  `short:"o" long:"organization" description:"Org that contains the destination application"`
 	Space               string                  `short:"s" long:"space" description:"Space that contains the destination application"`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary, rolling or null"`
 	relatedCommands     interface{}             `related_commands:"apps, push, restage, restart, target"`
 	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
@@ -55,6 +61,18 @@ func (cmd *CopySourceCommand) ValidateFlags() error {
 
 	if cmd.Strategy.Name != constant.DeploymentStrategyDefault && cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1 {
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
+	}
+
+	if cmd.Strategy.Name != constant.DeploymentStrategyCanary && cmd.InstanceSteps != "" {
+		return translatableerror.RequiredFlagsError{Arg1: "--instance-steps", Arg2: "--strategy=canary"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps) {
+		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil
@@ -176,6 +194,18 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 
 		if cmd.MaxInFlight != nil {
 			opts.MaxInFlight = *cmd.MaxInFlight
+		}
+
+		if cmd.InstanceSteps != "" {
+			if len(cmd.InstanceSteps) > 0 {
+				for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+					parsedInt, err := strconv.ParseInt(v, 0, 64)
+					if err != nil {
+						return err
+					}
+					opts.CanarySteps = append(opts.CanarySteps, resources.CanaryStep{InstanceWeight: parsedInt})
+				}
+			}
 		}
 
 		err = cmd.Stager.StageAndStart(targetApp, targetSpace, targetOrg, pkg.GUID, opts)

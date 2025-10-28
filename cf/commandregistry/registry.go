@@ -35,9 +35,10 @@ func initI18nFunc() bool {
 	T = Init(config)
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, fmt.Sprintf("%s\n", T(configErrTemplate, map[string]interface{}{
+		msg := T(configErrTemplate, map[string]interface{}{
 			"FilePath": configv3.ConfigFilePath(),
-		})))
+		})
+		fmt.Fprintf(os.Stderr, "%s\n", msg)
 	}
 	return true
 }

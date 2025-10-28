@@ -784,7 +784,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	if c.String("t") != "" {
 		timeout, err := strconv.Atoi(c.String("t"))
 		if err != nil {
-			return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid timeout param: {{.Timeout}}\n{{.Err}}",
+			return models.AppParams{}, fmt.Errorf("Error: %s", errors.New(T("Invalid timeout param: {{.Timeout}}\n{{.Err}}",
 				map[string]interface{}{"Timeout": c.String("t"), "Err": err.Error()})))
 		}
 
@@ -798,7 +798,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	case "http", "none", "port", "process":
 		appParams.HealthCheckType = &healthCheckType
 	default:
-		return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
+		return models.AppParams{}, fmt.Errorf("Error: %s", errors.New(T("Invalid health-check-type param: {{.healthCheckType}}",
 			map[string]interface{}{"healthCheckType": healthCheckType})))
 	}
 

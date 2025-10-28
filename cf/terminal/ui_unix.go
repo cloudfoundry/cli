@@ -7,6 +7,7 @@ package terminal
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -73,7 +74,7 @@ func echoOff(fd []uintptr) (int, error) {
 	pid, err := syscall.ForkExec(sttyArg0, sttyArgvEOff, &syscall.ProcAttr{Dir: execCWDir, Files: fd})
 
 	if err != nil {
-		return 0, fmt.Errorf(T("failed turning off console echo for password entry:\n{{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err}))
+		return 0, errors.New(T("failed turning off console echo for password entry:\n{{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err}))
 	}
 
 	return pid, nil

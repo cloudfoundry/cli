@@ -30,7 +30,7 @@ jobs:
       run: echo "claw-url=https://packages.cloudfoundry.org" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Parse semver
       id: parse-semver
@@ -71,14 +71,14 @@ jobs:
     steps:
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli-ci.git
         ref: main
         path: cli-ci
 
     - name: Checkout homebrew-tap
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/homebrew-tap
         ref: master
@@ -183,8 +183,8 @@ jobs:
           git add cf-cli@${VERSION_MAJOR}.rb
 
           if ! [ -z "$(git status --porcelain)"]; then
-            git config user.name github-actions
-            git config user.email github-actions@github.com
+            git config user.name cf-cli-eng
+            git config user.email cf-cli-eng@pivotal.io
             git commit -m "Release CF CLI ${VERSION_BUILD}"
           else
               echo "no new version to commit"
@@ -246,7 +246,7 @@ jobs:
         echo "VERSION_BUILD: ${VERSION_BUILD}"
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - uses: ruby/setup-ruby@v1
       with:
@@ -305,6 +305,14 @@ jobs:
 
   test-deb:
     name: Test Debian Repository
+    strategy:
+      matrix:
+        image:
+        - debian:11
+        - debian:12
+        - debian:13
+        - ubuntu:22.04
+        - ubuntu:latest
     runs-on: ubuntu-latest
     needs:
     - setup
@@ -316,17 +324,23 @@ jobs:
     steps:
 
     - name: Install CF CLI via apt
+      env:
+        IMAGE: ${{ matrix.image }}
       run: |
+        docker run \
+          --interactive \
+          --rm \
+          ${IMAGE} <<EOC
         set -o pipefail -e
 
-        sudo apt update
-        sudo apt install -y wget gnupg
+        apt update
+        apt install -y wget gnupg
 
-        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-        echo "deb ${CLAW_URL}/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        wget -q -O - ${CLAW_URL}/debian/cli.cloudfoundry.org.key | gpg --dearmor -o /usr/share/keyrings/cloudfoundry-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloudfoundry-keyring.gpg] ${CLAW_URL}/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 
-        sudo apt update
-        sudo apt install -y cf${VERSION_MAJOR}-cli
+        apt update
+        apt install -y cf${VERSION_MAJOR}-cli
 
         which cf
 
@@ -336,6 +350,7 @@ jobs:
         cf${VERSION_MAJOR} -v
 
         cf -v | grep "${VERSION_BUILD}"
+        EOC
 
   update-rpm:
     name: Update RPM Repository
@@ -370,7 +385,7 @@ jobs:
     #     ls -R
     #
     # - name: Backup current Linux RPM repodata
-    #   uses: actions/upload-artifact@v4
+    #   uses: actions/upload-artifact@v5
     #   with:
     #     if-no-files-found: error
     #     name: cf-cli-linux-rpm-repodata-backup
@@ -388,7 +403,7 @@ jobs:
         && pip3 install awscli
 
     - name: Setup aws to upload installers to CLAW S3 bucket
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with:
         aws-access-key-id:     ${{ vars.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -413,7 +428,7 @@ jobs:
       run: ls -R
 
     - name: Store Linux RPM repodata
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-repodata
@@ -454,7 +469,7 @@ jobs:
 
   update-windows:
     name: Update Windows Chocolatey Package
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
@@ -470,7 +485,7 @@ jobs:
           echo "VERSION_BUILD: ${VERSION_BUILD}"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Calculate Checksums
         run: |
@@ -523,7 +538,7 @@ jobs:
 
   test-windows:
     name: Test Windows Chocolatey Package
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
@@ -571,7 +586,7 @@ jobs:
         echo "Environment: ${ENVIRONMENT}"
     
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli
         ref: ${{ github.ref_name }}
@@ -587,6 +602,7 @@ jobs:
       with:
         context: docker
         load: true
+        no-cache: true
         tags: ${{ env.VERSION_BUILD }}
 
     - name: Test docker container
@@ -617,31 +633,12 @@ jobs:
         docker run -v $(pwd):/clidir -w /clidir \
           --rm ${{ env.VERSION_BUILD }} sh test.sh
 
-        # If bash reaches this point, it means that tests passed, setting latest
-        if [[ ( ${{ github.ref_name }} == "v8" ) ]]; then
-          echo "LATEST_DOCKER=v8" >> "$GITHUB_ENV"
-        fi
-
-        if [[ ( ${{ github.ref_name }} == "v7" ) ]]; then
-          echo "LATEST_DOCKER=v7" >> "$GITHUB_ENV"
-        fi
-        
         rm test.sh
 
-    - name: Push image if its from v8
-      if: ${{ env.LATEST_DOCKER }} == v8
+    - name: Push image 
       uses: docker/build-push-action@v6
       with:
         context: docker
         push: true
         tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}, cloudfoundry/cli:latest
     
-    - name: Push image if its from v7
-      if: ${{ env.LATEST_DOCKER }} == v7
-      uses: docker/build-push-action@v6
-      with:
-        context: docker
-        push: true
-        tags: cloudfoundry/cli:${{ env.VERSION_BUILD }}
-
-# vim: set sw=2 ts=2 sts=2 et tw=78 foldlevel=2 fdm=indent nospell:

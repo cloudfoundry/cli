@@ -51,6 +51,26 @@ type FakeConfig struct {
 	authorizationEndpointReturnsOnCall map[int]struct {
 		result1 string
 	}
+	B3SpanIDStub        func() string
+	b3SpanIDMutex       sync.RWMutex
+	b3SpanIDArgsForCall []struct {
+	}
+	b3SpanIDReturns struct {
+		result1 string
+	}
+	b3SpanIDReturnsOnCall map[int]struct {
+		result1 string
+	}
+	B3TraceIDStub        func() string
+	b3TraceIDMutex       sync.RWMutex
+	b3TraceIDArgsForCall []struct {
+	}
+	b3TraceIDReturns struct {
+		result1 string
+	}
+	b3TraceIDReturnsOnCall map[int]struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct {
@@ -863,6 +883,112 @@ func (fake *FakeConfig) AuthorizationEndpointReturnsOnCall(i int, result1 string
 		})
 	}
 	fake.authorizationEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) B3SpanID() string {
+	fake.b3SpanIDMutex.Lock()
+	ret, specificReturn := fake.b3SpanIDReturnsOnCall[len(fake.b3SpanIDArgsForCall)]
+	fake.b3SpanIDArgsForCall = append(fake.b3SpanIDArgsForCall, struct {
+	}{})
+	stub := fake.B3SpanIDStub
+	fakeReturns := fake.b3SpanIDReturns
+	fake.recordInvocation("B3SpanID", []interface{}{})
+	fake.b3SpanIDMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) B3SpanIDCallCount() int {
+	fake.b3SpanIDMutex.RLock()
+	defer fake.b3SpanIDMutex.RUnlock()
+	return len(fake.b3SpanIDArgsForCall)
+}
+
+func (fake *FakeConfig) B3SpanIDCalls(stub func() string) {
+	fake.b3SpanIDMutex.Lock()
+	defer fake.b3SpanIDMutex.Unlock()
+	fake.B3SpanIDStub = stub
+}
+
+func (fake *FakeConfig) B3SpanIDReturns(result1 string) {
+	fake.b3SpanIDMutex.Lock()
+	defer fake.b3SpanIDMutex.Unlock()
+	fake.B3SpanIDStub = nil
+	fake.b3SpanIDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) B3SpanIDReturnsOnCall(i int, result1 string) {
+	fake.b3SpanIDMutex.Lock()
+	defer fake.b3SpanIDMutex.Unlock()
+	fake.B3SpanIDStub = nil
+	if fake.b3SpanIDReturnsOnCall == nil {
+		fake.b3SpanIDReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.b3SpanIDReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) B3TraceID() string {
+	fake.b3TraceIDMutex.Lock()
+	ret, specificReturn := fake.b3TraceIDReturnsOnCall[len(fake.b3TraceIDArgsForCall)]
+	fake.b3TraceIDArgsForCall = append(fake.b3TraceIDArgsForCall, struct {
+	}{})
+	stub := fake.B3TraceIDStub
+	fakeReturns := fake.b3TraceIDReturns
+	fake.recordInvocation("B3TraceID", []interface{}{})
+	fake.b3TraceIDMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) B3TraceIDCallCount() int {
+	fake.b3TraceIDMutex.RLock()
+	defer fake.b3TraceIDMutex.RUnlock()
+	return len(fake.b3TraceIDArgsForCall)
+}
+
+func (fake *FakeConfig) B3TraceIDCalls(stub func() string) {
+	fake.b3TraceIDMutex.Lock()
+	defer fake.b3TraceIDMutex.Unlock()
+	fake.B3TraceIDStub = stub
+}
+
+func (fake *FakeConfig) B3TraceIDReturns(result1 string) {
+	fake.b3TraceIDMutex.Lock()
+	defer fake.b3TraceIDMutex.Unlock()
+	fake.B3TraceIDStub = nil
+	fake.b3TraceIDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) B3TraceIDReturnsOnCall(i int, result1 string) {
+	fake.b3TraceIDMutex.Lock()
+	defer fake.b3TraceIDMutex.Unlock()
+	fake.B3TraceIDStub = nil
+	if fake.b3TraceIDReturnsOnCall == nil {
+		fake.b3TraceIDReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.b3TraceIDReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -4028,6 +4154,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	fake.authorizationEndpointMutex.RLock()
 	defer fake.authorizationEndpointMutex.RUnlock()
+	fake.b3SpanIDMutex.RLock()
+	defer fake.b3SpanIDMutex.RUnlock()
+	fake.b3TraceIDMutex.RLock()
+	defer fake.b3TraceIDMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()

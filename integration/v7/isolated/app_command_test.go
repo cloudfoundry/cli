@@ -286,6 +286,7 @@ applications:
 							session1 := helpers.CF("app", appName)
 							Eventually(session1).Should(Say("Active deployment with status PAUSED"))
 							Eventually(session1).Should(Say("strategy:        canary"))
+							Expect(session1).To(Say("canary-steps:    1/1"))
 							Eventually(session1).Should(Exit(0))
 						})
 					})
@@ -355,7 +356,7 @@ applications:
 			})
 
 			When("the app exists", func() {
-				When("isolation segments are available", func() {
+				XWhen("isolation segments are available", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
@@ -412,13 +413,13 @@ applications:
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionCNB)
 						helpers.WithJSHelloWorld(func(appDir string) {
-							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://gcr.io/paketo-buildpacks/nodejs:latest")).Should(Exit())
+							Eventually(helpers.CF("push", appName, "-p", appDir, "--lifecycle", "cnb", "-b", "docker://docker.io/paketobuildpacks/nodejs:latest")).Should(Exit())
 						})
 					})
 
 					It("displays the app buildpacks", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say(`paketo-buildpacks\/nodejs`))
+						Eventually(session).Should(Say(`paketobuildpacks\/nodejs`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

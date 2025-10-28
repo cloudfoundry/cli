@@ -35,7 +35,7 @@ var _ = Describe("cf api", func() {
 	When("pointed to cf-on-k8s", func() {
 		BeforeEach(func() {
 			apiConfig.Routes["GET /"] = fake.Response{
-				Code: http.StatusOK, Body: ccv3.Info{CFOnK8s: true},
+				Code: http.StatusOK, Body: ccv3.Root{CFOnK8s: true},
 			}
 			apiServer.SetConfiguration(apiConfig)
 		})
@@ -63,7 +63,7 @@ var _ = Describe("cf api", func() {
 		When("pointed to cf-on-k8s", func() {
 			BeforeEach(func() {
 				apiConfig.Routes["GET /"] = fake.Response{
-					Code: http.StatusOK, Body: ccv3.Info{CFOnK8s: true},
+					Code: http.StatusOK, Body: ccv3.Root{CFOnK8s: true},
 				}
 				apiServer.SetConfiguration(apiConfig)
 			})

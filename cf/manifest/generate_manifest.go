@@ -194,7 +194,7 @@ func (m *appManifest) Save(f io.Writer) error {
 	for _, app := range m.contents {
 		appMap, mapErr := generateAppMap(app)
 		if mapErr != nil {
-			return fmt.Errorf(T("Error saving manifest: {{.Error}}", map[string]interface{}{
+			return errors.New(T("Error saving manifest: {{.Error}}", map[string]interface{}{
 				"Error": mapErr.Error(),
 			}))
 		}

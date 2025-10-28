@@ -34,7 +34,7 @@ var _ = Describe("push with --strategy canary", func() {
 			It("pushes the app and creates a new deployment and notes the max-in-flight value", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
-						PushCommandName, appName, "--strategy", "canary",
+						PushCommandName, appName, "--strategy", "canary", "--instance-steps=10,60",
 					)
 
 					Eventually(session).Should(Exit(0))
@@ -55,6 +55,7 @@ var _ = Describe("push with --strategy canary", func() {
 					Expect(session).To(Say("Active deployment with status PAUSED"))
 					Expect(session).To(Say("strategy:        canary"))
 					Expect(session).To(Say("max-in-flight:   1"))
+					Expect(session).To(Say("canary-steps:    1/2"))
 					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 					Expect(session).To(Exit(0))
 				})
@@ -86,6 +87,7 @@ var _ = Describe("push with --strategy canary", func() {
 					Expect(session).To(Say("Active deployment with status PAUSED"))
 					Expect(session).To(Say("strategy:        canary"))
 					Expect(session).To(Say("max-in-flight:   2"))
+					Expect(session).To(Say("canary-steps:    1/1"))
 					Expect(session).To(Say("Please run `cf continue-deployment %s` to promote the canary deployment, or `cf cancel-deployment %s` to rollback to the previous version.", appName, appName))
 					Expect(session).To(Exit(0))
 				})

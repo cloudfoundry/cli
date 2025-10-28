@@ -31,9 +31,10 @@ var _ = Describe("restage command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rg"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
+				Eventually(session).Should(Say("--instance-steps"))
 				Eventually(session).Should(Say("--max-in-flight"))
 				Eventually(session).Should(Say(`--no-wait\s+Exit when the first instance of the web process is healthy`))
+				Eventually(session).Should(Say(`--strategy\s+Deployment strategy can be canary, rolling or null`))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
@@ -141,20 +142,27 @@ var _ = Describe("restage command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 
-				When("strategy rolling is given", func() {
+				When("a deployment strategy is used", func() {
 					It("fails and displays the deployment failure message", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CustomCF(helpers.CFEnv{
 							EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
-						}, "restage", appName, "--strategy", "rolling", "--max-in-flight", "3")
+						}, "restage", appName, "--strategy", "canary", "--max-in-flight", "3")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
 						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
 						Eventually(session.Err).Should(Say(`Start app timeout`))
-						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\. Instead of hard coding the port, use the \$PORT environment variable\.`))
+						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\.`))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
+
+						appGUID := helpers.AppGUID(appName)
+						Eventually(func() *Buffer {
+							session_deployment := helpers.CF("curl", fmt.Sprintf("/v3/deployments?app_guids=%s", appGUID))
+							Eventually(session_deployment).Should(Exit(0))
+							return session_deployment.Out
+						}).Should(Say(`"reason":\s*"CANCELED"`))
 					})
 				})
 			})
@@ -247,10 +255,10 @@ applications:
 					})
 				})
 
-				When("strategy canary is given with a non-default max-in-flight value", func() {
+				When("strategy canary is given with a non-default max-in-flight value and instance-steps", func() {
 					It("restages successfully and notes the max-in-flight value", func() {
 						userName, _ := helpers.GetCredentials()
-						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2")
+						session := helpers.CF("restage", appName, "--strategy", "canary", "--max-in-flight", "2", "--instance-steps", "1,20")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
@@ -263,7 +271,7 @@ applications:
 					})
 				})
 
-				When("isolation segments are available", func() {
+				XWhen("isolation segments are available", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))

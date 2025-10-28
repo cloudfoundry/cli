@@ -336,7 +336,6 @@ var _ = Describe("logs command", func() {
 									time.Sleep(100 * time.Millisecond)
 									close(logStream)
 									close(errorStream)
-									return
 								}()
 
 								return logStream, errorStream, func() {}, v7action.Warnings{}, nil

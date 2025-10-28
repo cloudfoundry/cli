@@ -109,5 +109,6 @@ func skipAuthenticationHeader(request *http.Request, body []byte) bool {
 		request.Method == http.MethodPost &&
 		(strings.Contains(stringBody, "grant_type=refresh_token") ||
 			strings.Contains(stringBody, "grant_type=password") ||
+			strings.Contains(stringBody, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer") ||
 			strings.Contains(stringBody, "grant_type=client_credentials"))
 }

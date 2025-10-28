@@ -89,15 +89,31 @@ var _ = Describe("Continue Deployment", func() {
 
 		Context("when the continue is successful", func() {
 			When("There is a canary deployment", func() {
-				It("succeeds", func() {
-					helpers.WithHelloWorldApp(func(appDir string) {
-						helpers.CF("push", appName, "-p", appDir, "--strategy=canary").Wait()
-					})
+				When("instance steps are provided", func() {
+					It("displays the number of steps", func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							helpers.CF("push", appName, "-p", appDir, "--strategy=canary", "--instance-steps", "10,20,30,70", "-i", "5").Wait()
+						})
 
-					session := helpers.CF("continue-deployment", appName)
-					Eventually(session).Should(Say(fmt.Sprintf("Continuing deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Eventually(session).Should(Say(fmt.Sprintf(`TIP: Run 'cf app %s' to view app status.`, appName)))
-					Eventually(session).Should(Exit(0))
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("canary-steps:    1/4"))
+						session = helpers.CF("continue-deployment", appName)
+						Eventually(session).Should(Say("canary-steps:    2/4"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("instance steps are NOT provided", func() {
+					It("succeeds", func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							helpers.CF("push", appName, "-p", appDir, "--strategy=canary").Wait()
+						})
+
+						session := helpers.CF("continue-deployment", appName)
+						Eventually(session).Should(Say(fmt.Sprintf("Continuing deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+						Eventually(session).Should(Say(fmt.Sprintf(`TIP: Run 'cf app %s' to view app status.`, appName)))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
