@@ -29,7 +29,7 @@ var _ = Describe("map-route command", func() {
 
 			Eventually(session).Should(Say(`USAGE:`))
 			Eventually(session).Should(Say(`Map an HTTP route:\n`))
-                        Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\] \[--app-port PORT\] \[--option OPTION=VALUE\]\n`))
+			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--app-protocol PROTOCOL\] \[--app-port PORT\] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`Map a TCP route:\n`))
 			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT] \[--option OPTION=VALUE\]\n`))
 			Eventually(session).Should(Say(`\n`))
@@ -48,8 +48,8 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
-			Eventually(session).Should(Say(`--app-protocol\s+\[Beta flag, subject to change\] Protocol for the route destination \(default: http1\). Only applied to HTTP routes`))
-			Eventually(session).Should(Say(`--app-port\s+\[Beta flag, subject to change\] App port for the route destination \(default: 8080\). Only applied to HTTP routes`))
+			Eventually(session).Should(Say(`--app-protocol\s+\[Beta flag, subject to change\] Protocol for the route destination \(default: http1\).\s+Only applied to HTTP routes`))
+			Eventually(session).Should(Say(`--app-port\s+\[Beta flag, subject to change\] App port for the route destination \(default: 8080\).\s+Only applied to HTTP routes`))
 			Eventually(session).Should(Say(`--option, -o\s+Set the value of a per-route option`))
 
 			Eventually(session).Should(Say(`\n`))
