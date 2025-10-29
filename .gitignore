@@ -70,3 +70,4 @@ integration/assets/test_plugin/test_plugin
 .vscode
 .secrets
 .vars
+.patch
