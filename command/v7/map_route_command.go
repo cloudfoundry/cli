@@ -16,7 +16,7 @@ type MapRouteCommand struct {
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
 	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
 	AppProtocol     string           `long:"app-protocol" description:"[Beta flag, subject to change] Protocol for the route destination (default: http1). Only applied to HTTP routes"`
-	AppPort         int              `long:"app-port" description:"[Beta flag, subject to change] Port for the route destination (default: 8080)."`
+	AppPort         int              `long:"app-port" description:"[Beta flag, subject to change] App port for the route destination (default: 8080). Only applied to HTTP routes"`
 	Options         []string         `long:"option" short:"o" description:"Set the value of a per-route option"`
 	relatedCommands interface{}      `related_commands:"create-route, update-route, routes, unmap-route"`
 }
