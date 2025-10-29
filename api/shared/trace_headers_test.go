@@ -3,7 +3,7 @@ package shared_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/shared"
+	. "code.cloudfoundry.org/cli/v9/api/shared"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
