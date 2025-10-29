@@ -100,7 +100,7 @@ func (client Client) UpdateRoute(routeGUID string, options map[string]*string) (
 
 }
 
-func (client Client) MapRoute(routeGUID string, appGUID string, destinationProtocol string) (Warnings, error) {
+func (client Client) MapRoute(routeGUID string, appGUID string, destinationProtocol string, destinationPort int) (Warnings, error) {
 	type destinationProcess struct {
 		ProcessType string `json:"process_type"`
 	}
@@ -112,6 +112,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string, destinationProto
 	type destination struct {
 		App      destinationApp `json:"app"`
 		Protocol string         `json:"protocol,omitempty"`
+		Port     int            `json:"port,omitempty"`
 	}
 
 	type body struct {
@@ -127,6 +128,9 @@ func (client Client) MapRoute(routeGUID string, appGUID string, destinationProto
 	}
 	if destinationProtocol != "" {
 		requestBody.Destinations[0].Protocol = destinationProtocol
+	}
+	if destinationPort != 0 {
+		requestBody.Destinations[0].Port = destinationPort
 	}
 
 	_, warnings, err := client.MakeRequest(RequestParams{

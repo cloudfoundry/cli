@@ -284,7 +284,9 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 		for _, destination := range route.Destinations {
 			appNames = append(appNames, appNamesByGUID[destination.App.GUID])
 			protocolSet[destination.Protocol] = true
-			portSet[destination.Port] = true
+			if destination.Port > 0 {
+				portSet[destination.Port] = true
+			}
 		}
 
 		var appProtocols []string

@@ -234,12 +234,13 @@ type FakeV7Actor struct {
 		result1 resources.RouteDestination
 		result2 error
 	}
-	MapRouteStub        func(string, string, string) (v7action.Warnings, error)
+	MapRouteStub        func(string, string, string, int) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 int
 	}
 	mapRouteReturns struct {
 		result1 v7action.Warnings
@@ -1476,20 +1477,21 @@ func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string, arg3 string, arg4 int) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
 	fake.mapRouteArgsForCall = append(fake.mapRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
+		arg4 int
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.MapRouteStub
 	fakeReturns := fake.mapRouteReturns
-	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.mapRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1503,17 +1505,17 @@ func (fake *FakeV7Actor) MapRouteCallCount() int {
 	return len(fake.mapRouteArgsForCall)
 }
 
-func (fake *FakeV7Actor) MapRouteCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) MapRouteCalls(stub func(string, string, string, int) (v7action.Warnings, error)) {
 	fake.mapRouteMutex.Lock()
 	defer fake.mapRouteMutex.Unlock()
 	fake.MapRouteStub = stub
 }
 
-func (fake *FakeV7Actor) MapRouteArgsForCall(i int) (string, string, string) {
+func (fake *FakeV7Actor) MapRouteArgsForCall(i int) (string, string, string, int) {
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	argsForCall := fake.mapRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeV7Actor) MapRouteReturns(result1 v7action.Warnings, result2 error) {
