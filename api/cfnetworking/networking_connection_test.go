@@ -207,7 +207,7 @@ var _ = Describe("CF Networking Connection", func() {
 						var response Response
 						err = connection.Make(request, &response)
 						Expect(err).To(MatchError(networkerror.SSLValidationHostnameError{
-							Message: "x509: certificate is valid for example.com,  *.example.com, not 127.0.0.1.nip.io",
+							Message: "x509: certificate is valid for example.com, *.example.com, not 127.0.0.1.nip.io",
 						}))
 					})
 				})
