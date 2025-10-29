@@ -39,6 +39,7 @@ var _ = Describe("create buildpack Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 		args = nil
@@ -82,6 +83,23 @@ var _ = Describe("create buildpack Command", func() {
 		})
 	})
 
+	When("--lifecyle is provided", func() {
+		JustBeforeEach(func() {
+			cmd.Lifecycle = "some-lifecycle"
+			fakeConfig.APIVersionReturns("3.193.0")
+		})
+		It("fails when the cc version is below the minimum", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--lifecycle",
+				CurrentVersion: "3.193.0",
+				MinimumVersion: "3.194.0",
+			}))
+		})
+
+	})
+
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeActor.GetCurrentUserReturns(configv3.User{Name: "the-user"}, nil)
@@ -90,6 +108,17 @@ var _ = Describe("create buildpack Command", func() {
 		It("should print text indicating it is creating a buildpack", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Creating buildpack %s as the-user\.\.\.`, buildpackName))
+		})
+
+		When("passing in buildpack lifecycle", func() {
+			BeforeEach(func() {
+				cmd.Lifecycle = "cnb"
+			})
+
+			It("sets the correct lifecycle in the buildpack resource", func() {
+				Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateBuildpackArgsForCall(0).Lifecycle).To(Equal("cnb"))
+			})
 		})
 
 		When("preparing the buildpack bits fails", func() {

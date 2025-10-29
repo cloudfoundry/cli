@@ -3,9 +3,7 @@ name: golangci-lint
 on:
   push:
     tags:
-      - "v9.*"
       - "v8.*"
-      - "v7.*"
   pull_request:
     types:
       - opened
@@ -13,9 +11,7 @@ on:
       - synchronize
     branches:
       - main
-      - v9
       - v8
-      - v7
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
@@ -27,28 +23,28 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: '0'
       - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v1.61
-          args: -v --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+          version: v2.4
+          args: -v
   format:
     name: Run go fmt
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: '0'
     - name: Set Up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
     - name: Run go fmt

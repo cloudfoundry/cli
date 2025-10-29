@@ -17,7 +17,7 @@ import (
 type SetLabelActor interface {
 	GetCurrentUser() (configv3.User, error)
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
-	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle(string, string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
@@ -37,11 +37,12 @@ const (
 )
 
 type TargetResource struct {
-	ResourceType    string
-	ResourceName    string
-	BuildpackStack  string
-	ServiceBroker   string
-	ServiceOffering string
+	ResourceType       string
+	ResourceName       string
+	BuildpackStack     string
+	BuildpackLifecycle string
+	ServiceBroker      string
+	ServiceOffering    string
 }
 
 type LabelUpdater struct {
@@ -83,8 +84,8 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 		cmd.displayMessageWithOrgAndSpace()
 		warnings, err = cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 	case Buildpack:
-		cmd.displayMessageWithStack()
-		warnings, err = cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.targetResource.ResourceName, cmd.targetResource.BuildpackStack, cmd.labels)
+		cmd.displayMessageWithStackAndLifecycle()
+		warnings, err = cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle(cmd.targetResource.ResourceName, cmd.targetResource.BuildpackStack, cmd.targetResource.BuildpackLifecycle, cmd.labels)
 	case Domain:
 		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateDomainLabelsByDomainName(cmd.targetResource.ResourceName, cmd.labels)
@@ -189,17 +190,23 @@ func (cmd *LabelUpdater) displayMessageWithOrgAndSpace() {
 	})
 }
 
-func (cmd *LabelUpdater) displayMessageWithStack() {
-	var template string
-	if cmd.targetResource.BuildpackStack == "" {
-		template = actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} as {{.User}}..."
-	} else {
-		template = actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+func (cmd *LabelUpdater) displayMessageWithStackAndLifecycle() {
+	template := actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}}"
+
+	if cmd.targetResource.BuildpackStack != "" {
+		template += " with stack {{.StackName}}"
 	}
+
+	if cmd.targetResource.BuildpackLifecycle != "" {
+		template += " with lifecycle {{.Lifecycle}}"
+	}
+
+	template += " as {{.User}}..."
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"StackName":    cmd.targetResource.BuildpackStack,
+		"Lifecycle":    cmd.targetResource.BuildpackLifecycle,
 		"User":         cmd.Username,
 	})
 }

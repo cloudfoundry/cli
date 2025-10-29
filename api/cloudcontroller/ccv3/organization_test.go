@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v9/resources"
 	. "code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -23,7 +22,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("GetDefaultDomain", func() {
 		var (
-			defaultDomain resources.Domain
+			defaultDomain Domain
 			warnings      Warnings
 			executeErr    error
 			orgGUID       = "some-org-guid"
@@ -61,7 +60,7 @@ var _ = Describe("Organizations", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(defaultDomain).To(Equal(
-					resources.Domain{Name: "domain-name-1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: false},
+					Domain{Name: "domain-name-1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: false},
 						OrganizationGUID: "some-org-guid"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning"))

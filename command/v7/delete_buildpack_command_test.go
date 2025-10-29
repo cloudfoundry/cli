@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
+    "code.cloudfoundry.org/cli/v9/command/translatableerror"
 	. "code.cloudfoundry.org/cli/v9/command/v7"
 	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v9/util/ui"
@@ -32,6 +33,7 @@ var _ = Describe("delete-buildpack Command", func() {
 		input = NewBuffer()
 		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("4.0.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 
@@ -48,6 +50,23 @@ var _ = Describe("delete-buildpack Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Buildpack = buildpackName
 		cmd.Force = true
+	})
+
+	When("--lifecyle is provided", func() {
+		JustBeforeEach(func() {
+			cmd.Lifecycle = "some-lifecycle"
+			fakeConfig.APIVersionReturns("3.193.0")
+		})
+		It("fails when the cc version is below the minimum", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--lifecycle",
+				CurrentVersion: "3.193.0",
+				MinimumVersion: "3.194.0",
+			}))
+		})
+
 	})
 
 	When("checking target fails", func() {
@@ -69,7 +88,7 @@ var _ = Describe("delete-buildpack Command", func() {
 
 	When("the DeleteBuildpack actor completes successfully", func() {
 		BeforeEach(func() {
-			fakeActor.DeleteBuildpackByNameAndStackReturns(nil, nil)
+			fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(nil, nil)
 		})
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
@@ -137,12 +156,9 @@ var _ = Describe("delete-buildpack Command", func() {
 	})
 
 	When("the buildpack does not exist", func() {
-		BeforeEach(func() {
-			fakeActor.DeleteBuildpackByNameAndStackReturns(v7action.Warnings{"a-warning"}, actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: "stack!"})
-		})
-
 		When("deleting with a stack", func() {
 			BeforeEach(func() {
+				fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: "stack!"})
 				cmd.Stack = "stack!"
 				executeErr = cmd.Execute(nil)
 			})
@@ -153,34 +169,65 @@ var _ = Describe("delete-buildpack Command", func() {
 			})
 		})
 
-		When("deleting without a stack", func() {
+		When("deleting with a lifecycle", func() {
 			BeforeEach(func() {
+				fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, Lifecycle: "cnb"})
+				cmd.Lifecycle = "cnb"
+				executeErr = cmd.Execute(nil)
+			})
+
+			It("prints warnings and helpful error message (that includes the lifecycle name)", func() {
+				Expect(testUI.Err).To(Say("a-warning"))
+				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' with lifecycle 'cnb' not found\.`))
+			})
+
+		})
+		When("deleting with a stack and lifecycle", func() {
+			BeforeEach(func() {
+				fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: "stack!", Lifecycle: "cnb"})
+				cmd.Stack = "stack!"
+				cmd.Lifecycle = "cnb"
+				executeErr = cmd.Execute(nil)
+			})
+
+			It("prints warnings and helpful error message (that includes both names)", func() {
+				Expect(testUI.Err).To(Say("a-warning"))
+				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' with stack 'stack!' with lifecycle 'cnb' does not exist\.`))
+			})
+
+		})
+		When("deleting without a stack or lifecycle", func() {
+			BeforeEach(func() {
+				fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, actionerror.BuildpackNotFoundError{BuildpackName: buildpackName})
 				cmd.Stack = ""
+				cmd.Lifecycle = ""
 				executeErr = cmd.Execute(nil)
 			})
 
 			It("prints warnings and helpful error message", func() {
 				Expect(testUI.Err).To(Say("a-warning"))
-				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' does not exist\.`))
+				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' not found\.`))
 			})
 		})
 	})
 
 	It("delegates to the actor", func() {
 		cmd.Stack = "the-stack"
-		fakeActor.DeleteBuildpackByNameAndStackReturns(nil, nil)
+		cmd.Lifecycle = "cnb"
+		fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(nil, nil)
 
 		executeErr = cmd.Execute(nil)
 
 		Expect(executeErr).ToNot(HaveOccurred())
-		actualBuildpack, actualStack := fakeActor.DeleteBuildpackByNameAndStackArgsForCall(0)
+		actualBuildpack, actualStack, actualLifecycle := fakeActor.DeleteBuildpackByNameAndStackAndLifecycleArgsForCall(0)
 		Expect(actualBuildpack).To(Equal("the-buildpack"))
 		Expect(actualStack).To(Equal("the-stack"))
+		Expect(actualLifecycle).To(Equal("cnb"))
 	})
 
 	It("prints warnings", func() {
 		cmd.Stack = "a-stack"
-		fakeActor.DeleteBuildpackByNameAndStackReturns(v7action.Warnings{"a-warning"}, nil)
+		fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, nil)
 
 		executeErr = cmd.Execute(nil)
 
@@ -191,7 +238,7 @@ var _ = Describe("delete-buildpack Command", func() {
 	It("returns error from the actor and prints the errors", func() {
 		cmd.Stack = "a-stack"
 
-		fakeActor.DeleteBuildpackByNameAndStackReturns(v7action.Warnings{"a-warning"}, errors.New("some-error"))
+		fakeActor.DeleteBuildpackByNameAndStackAndLifecycleReturns(v7action.Warnings{"a-warning"}, errors.New("some-error"))
 
 		executeErr = cmd.Execute(nil)
 

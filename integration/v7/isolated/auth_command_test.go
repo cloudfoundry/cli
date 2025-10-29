@@ -27,7 +27,9 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("cf auth USERNAME PASSWORD\n"))
-			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
+			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n"))
+			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --assertion ID-TOKEN\n"))
+			Eventually(session).Should(Say("cf auth CLIENT_ID --client-credentials --assertion ACCESS-TOKEN\n"))
 
 			Eventually(session).Should(Say("ENVIRONMENT VARIABLES:"))
 			Eventually(session).Should(Say(`CF_USERNAME=user\s+Authenticating user. Overridden if USERNAME argument is provided.`))
@@ -44,7 +46,8 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say("--client-credentials\\s+Use \\(non-user\\) service account \\(also called client credentials\\)\n"))
-			Eventually(session).Should(Say("--origin\\s+Indicates the identity provider to be used for authentication\n\n"))
+			Eventually(session).Should(Say("--origin\\s+Indicates the identity provider to be used for authentication\n"))
+			Eventually(session).Should(Say("--assertion\\s+Token based authentication with assertion \\(user\\) or in combination with client-credentials \\(non-user\\)\n"))
 
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("api, login, target"))

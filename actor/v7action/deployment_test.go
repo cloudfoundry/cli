@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
-	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	. "code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
@@ -18,7 +17,7 @@ var _ = Describe("Deployment Actions", func() {
 	var (
 		actor                     *Actor
 		executeErr                error
-		warnings                  v7action.Warnings
+		warnings                  Warnings
 		returnedDeploymentGUID    string
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 	)

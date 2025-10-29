@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
-	. "code.cloudfoundry.org/cli/v9/command/v7"
 	v7 "code.cloudfoundry.org/cli/v9/command/v7"
 	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/cli/v9/util/ui"
@@ -25,7 +24,7 @@ var _ = Describe("ConfigCommand", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 
-		cmd = ConfigCommand{
+		cmd = v7.ConfigCommand{
 			UI:     testUI,
 			Config: fakeConfig,
 		}

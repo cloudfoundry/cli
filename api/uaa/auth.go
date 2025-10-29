@@ -62,6 +62,17 @@ func (client Client) Authenticate(creds map[string]string, origin string, grantT
 
 	if grantType == constant.GrantTypePassword {
 		request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
+	} else if grantType == constant.GrantTypeJwtBearer {
+		// overwrite client authentication in case of provided parameters in cf auth clientid clientsecret or use defaults as done in password grant
+		clientId := client.config.UAAOAuthClient()
+		clientSecret := client.config.UAAOAuthClientSecret()
+		if creds["client_id"] != "" {
+			clientId = creds["client_id"]
+		}
+		if creds["client_secret"] != "" {
+			clientSecret = creds["client_secret"]
+		}
+		request.SetBasicAuth(clientId, clientSecret)
 	}
 
 	responseBody := AuthResponse{}

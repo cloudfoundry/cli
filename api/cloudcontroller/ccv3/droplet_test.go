@@ -9,7 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+
 	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
@@ -433,7 +433,7 @@ var _ = Describe("Droplet", func() {
 		})
 
 		BeforeEach(func() {
-			requester.MakeRequestReceiveRawCalls(func(string, internal.Params, string) ([]byte, ccv3.Warnings, error) {
+			requester.MakeRequestReceiveRawCalls(func(string, internal.Params, string) ([]byte, Warnings, error) {
 				return []byte{'d', 'r', 'o', 'p'}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})

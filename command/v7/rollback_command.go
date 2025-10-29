@@ -2,21 +2,26 @@ package v7
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+    "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v9/cf/errors"
 	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	"code.cloudfoundry.org/cli/v9/command/v7/shared"
+    "code.cloudfoundry.org/cli/v9/resources"
 )
 
 type RollbackCommand struct {
 	BaseCommand
 
-	Force           bool                    `short:"f" description:"Force rollback without confirmation"`
 	RequiredArgs    flag.AppName            `positional-args:"yes"`
+	Force           bool                    `short:"f" description:"Force rollback without confirmation"`
+	InstanceSteps   string                  `long:"instance-steps" description:"An array of percentage steps to deploy when using deployment strategy canary. (e.g. 20,40,60)"`
 	MaxInFlight     *int                    `long:"max-in-flight" description:"Defines the maximum number of instances that will be actively being rolled back."`
 	Strategy        flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy can be canary or rolling. When not specified, it defaults to rolling."`
 	Version         flag.Revision           `long:"version" required:"true" description:"Roll back to the specified revision"`
@@ -120,6 +125,18 @@ func (cmd RollbackCommand) Execute(args []string) error {
 		opts.Strategy = cmd.Strategy.Name
 	}
 
+	if cmd.InstanceSteps != "" {
+		if len(cmd.InstanceSteps) > 0 {
+			for _, v := range strings.Split(cmd.InstanceSteps, ",") {
+				parsedInt, err := strconv.ParseInt(v, 0, 64)
+				if err != nil {
+					return err
+				}
+				opts.CanarySteps = append(opts.CanarySteps, resources.CanaryStep{InstanceWeight: parsedInt})
+			}
+		}
+	}
+
 	startAppErr := cmd.Stager.StartApp(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), revision.GUID, opts)
 	if startAppErr != nil {
 		return startAppErr
@@ -134,6 +151,14 @@ func (cmd RollbackCommand) ValidateFlags() error {
 	switch {
 	case cmd.MaxInFlight != nil && *cmd.MaxInFlight < 1:
 		return translatableerror.IncorrectUsageError{Message: "--max-in-flight must be greater than or equal to 1"}
+	case cmd.Strategy.Name != constant.DeploymentStrategyCanary && cmd.InstanceSteps != "":
+		return translatableerror.RequiredFlagsError{Arg1: "--instance-steps", Arg2: "--strategy=canary"}
+	case len(cmd.InstanceSteps) > 0 && !validateInstanceSteps(cmd.InstanceSteps):
+		return translatableerror.ParseArgumentError{ArgumentName: "--instance-steps", ExpectedType: "list of weights"}
+	}
+
+	if len(cmd.InstanceSteps) > 0 {
+		return command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionCanarySteps, "--instance-steps")
 	}
 
 	return nil

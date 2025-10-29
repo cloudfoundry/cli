@@ -41,7 +41,7 @@ func (repo CloudControllerStackRepository) FindByGUID(guid string) (models.Stack
 			return models.Stack{}, errNotFound
 		}
 
-		return models.Stack{}, fmt.Errorf(T("Error retrieving stacks: {{.Error}}", map[string]interface{}{
+		return models.Stack{}, errors.New(T("Error retrieving stacks: {{.Error}}", map[string]interface{}{
 			"Error": err.Error(),
 		}))
 	}

@@ -34,7 +34,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]`)))
 			Eventually(session).Should(Say("TIP:"))
-			Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\n"))
+			Eventually(session).Should(Say("When using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\n"))
 			Eventually(session).Should(Say("Use '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--assign-stack\s+Assign a stack to a buildpack that does not have a stack association`))
@@ -45,6 +45,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say(`--position, -i\s+The order in which the buildpacks are checked during buildpack auto-detection`))
 			Eventually(session).Should(Say(`--rename\s+Rename an existing buildpack`))
 			Eventually(session).Should(Say(`--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
+			Eventually(session).Should(Say(`--lifecycle, -l\s+Specify lifecycle to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Say(`--unlock\s+Unlock the buildpack to enable updates`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks, create-buildpack, delete-buildpack"))
@@ -170,7 +171,7 @@ var _ = Describe("update-buildpack command", func() {
 						It("displays an error saying that multiple buildpacks were found", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
 
-							Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag\.`, buildpackName))
+							Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag\.`, buildpackName))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})

@@ -1,6 +1,7 @@
 package v7pushaction_test
 
 import (
+    "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/cli/v9/util/manifestparser"
@@ -40,6 +41,30 @@ var _ = Describe("HandleInstancesOverride", func() {
 		})
 
 		When("instances are not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest).To(Equal(originalManifest))
+			})
+		})
+
+		When("instances are set, and strategy is set to rolling on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+				overrides.Strategy = constant.DeploymentStrategyRolling
+			})
+
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest).To(Equal(originalManifest))
+			})
+		})
+
+		When("instances are set, and strategy is set to rolling on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+				overrides.Strategy = constant.DeploymentStrategyCanary
+			})
+
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest).To(Equal(originalManifest))
@@ -135,4 +160,215 @@ var _ = Describe("HandleInstancesOverride", func() {
 			Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 		})
 	})
+})
+
+var _ = Describe("HandleInstancesOverrideForDeployment", func() {
+	var (
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
+		overrides           FlagOverrides
+		executeErr          error
+	)
+
+	BeforeEach(func() {
+		originalManifest = manifestparser.Manifest{}
+		overrides = FlagOverrides{}
+	})
+
+	JustBeforeEach(func() {
+		transformedManifest, executeErr = HandleInstancesOverrideForDeployment(originalManifest, overrides)
+	})
+
+	When("manifest web process does not specify instances", func() {
+		BeforeEach(func() {
+			originalManifest.Applications = []manifestparser.Application{
+				{
+					Processes: []manifestparser.Process{
+						{Type: "web"},
+					},
+				},
+			}
+		})
+
+		When("instances are not set on the flag overrides", func() {
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest).To(Equal(originalManifest))
+			})
+		})
+
+		When("instances are set, and strategy is not set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+			})
+
+			It("does not change the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest).To(Equal(originalManifest))
+			})
+		})
+
+		When("instances are set, and strategy is set on the flag overrides", func() {
+			BeforeEach(func() {
+				overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+				overrides.Strategy = constant.DeploymentStrategyCanary
+			})
+
+			It("changes the instances of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "web", Instances: &overrides.Instances.Value},
+						},
+					},
+				))
+			})
+		})
+	})
+	When("instances flag is set, and strategy is set to rolling on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+			overrides.Strategy = constant.DeploymentStrategyRolling
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the instances of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Instances: &overrides.Instances.Value,
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			var instances = 5
+
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web"},
+						},
+						Instances: &instances,
+					},
+				}
+			})
+
+			It("changes the instances of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web", Instances: &overrides.Instances.Value},
+						},
+						Instances: &instances,
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
+		})
+	})
+	When("instances flag is set, and strategy is set to canary on the flag overrides", func() {
+		BeforeEach(func() {
+			overrides.Instances = types.NullInt{IsSet: true, Value: 4}
+			overrides.Strategy = constant.DeploymentStrategyCanary
+		})
+
+		When("manifest app has non-web processes", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				}
+			})
+
+			It("changes the instances of the app in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Instances: &overrides.Instances.Value,
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+						},
+					},
+				))
+			})
+		})
+
+		When("manifest app has web and non-web processes", func() {
+			var instances = 5
+
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web"},
+						},
+						Instances: &instances,
+					},
+				}
+			})
+
+			It("changes the instances of the web process in the manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(transformedManifest.Applications).To(ConsistOf(
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
+							{Type: "worker"},
+							{Type: "web", Instances: &overrides.Instances.Value},
+						},
+						Instances: &instances,
+					},
+				))
+			})
+		})
+
+		When("there are multiple apps in the manifest", func() {
+			BeforeEach(func() {
+				originalManifest.Applications = []manifestparser.Application{
+					{},
+					{},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+			})
+		})
+	})
+
 })

@@ -149,4 +149,88 @@ var _ = Describe("curl Command", func() {
 		})
 	})
 
+	When("the response contains binary data", func() {
+		var binaryData []byte
+
+		BeforeEach(func() {
+			// Create binary data with null bytes (like a droplet file)
+			binaryData = []byte{0x50, 0x4B, 0x03, 0x04, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00}
+			fakeActor.MakeCurlRequestReturns(binaryData, &http.Response{
+				Header: http.Header{
+					"Content-Type": []string{"application/octet-stream"},
+				},
+			}, nil)
+		})
+
+		It("writes binary data directly to stdout without string conversion", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say(string(binaryData)))
+		})
+
+		When("Content-Type is not a known binary MIME type", func() {
+			BeforeEach(func() {
+				// Create binary data with null bytes (like a droplet file)
+				binaryData = []byte{0x50, 0x4B, 0x03, 0x04, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00}
+				fakeActor.MakeCurlRequestReturns(binaryData, &http.Response{
+					Header: http.Header{
+						"Content-Type": []string{"text/plain"},
+					},
+				}, nil)
+			})
+			It("inspects the response data and writes binary data directly to stdout without string conversion", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(string(binaryData)))
+			})
+		})
+
+		When("include-response-headers flag is set", func() {
+			BeforeEach(func() {
+				cmd.IncludeResponseHeaders = true
+			})
+
+			It("writes headers as text and binary data separately", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				// Check that headers are written as text (using DisplayTextLiteral)
+				Expect(testUI.Out).To(Say("Content-Type: application/octet-stream"))
+
+				// Check that binary data is preserved
+				Expect(testUI.Out).To(Say(string(binaryData)))
+			})
+		})
+
+		When("output file is specified", func() {
+			BeforeEach(func() {
+				outputFile, err := os.CreateTemp("", "binary-output")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.OutputFile = flag.Path(outputFile.Name())
+			})
+
+			AfterEach(func() {
+				os.RemoveAll(string(cmd.OutputFile))
+			})
+
+			It("writes binary data to the file correctly", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				fileContents, err := os.ReadFile(string(cmd.OutputFile))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fileContents).To(Equal(binaryData))
+			})
+		})
+	})
+
+	When("the response is empty", func() {
+		BeforeEach(func() {
+			fakeActor.MakeCurlRequestReturns([]byte{}, &http.Response{
+				Header: http.Header{},
+			}, nil)
+		})
+
+		It("handles empty response correctly", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say(""))
+		})
+	})
+
 })

@@ -72,7 +72,7 @@ func (m Manifest) getAppMaps(data generic.Map) ([]generic.Map, error) {
 
 		for _, appData := range appMaps {
 			if !generic.IsMappable(appData) {
-				errs = append(errs, fmt.Errorf(T("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
+				errs = append(errs, errors.New(T("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
 					map[string]interface{}{"YmlSnippet": appData})))
 				continue
 			}
@@ -214,7 +214,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	}
 
 	if len(appParams.Buildpacks) > 0 {
-		errs = append(errs, fmt.Errorf(T("The following manifest fields cannot be used with legacy push: {{.fields}}",
+		errs = append(errs, errors.New(T("The following manifest fields cannot be used with legacy push: {{.fields}}",
 			map[string]interface{}{
 				"fields": "buildpacks",
 			})))
@@ -258,7 +258,7 @@ func checkForNulls(yamlMap generic.Map) error {
 			return
 		}
 		if value == nil {
-			errs = append(errs, fmt.Errorf(T("{{.PropertyName}} should not be null", map[string]interface{}{"PropertyName": key})))
+			errs = append(errs, errors.New(T("{{.PropertyName}} should not be null", map[string]interface{}{"PropertyName": key})))
 		}
 	})
 
@@ -280,7 +280,7 @@ func stringVal(yamlMap generic.Map, key string, errs *[]error) *string {
 	}
 	result, ok := val.(string)
 	if !ok {
-		*errs = append(*errs, fmt.Errorf(T("{{.PropertyName}} must be a string value", map[string]interface{}{"PropertyName": key})))
+		*errs = append(*errs, errors.New(T("{{.PropertyName}} must be a string value", map[string]interface{}{"PropertyName": key})))
 		return nil
 	}
 	return &result
@@ -300,7 +300,7 @@ func stringValOrDefault(yamlMap generic.Map, key string, errs *[]error) *string 
 	case nil:
 		return &empty
 	default:
-		*errs = append(*errs, fmt.Errorf(T("{{.PropertyName}} must be a string or null value", map[string]interface{}{"PropertyName": key})))
+		*errs = append(*errs, errors.New(T("{{.PropertyName}} must be a string or null value", map[string]interface{}{"PropertyName": key})))
 		return nil
 	}
 }
@@ -314,7 +314,7 @@ func bytesVal(yamlMap generic.Map, key string, errs *[]error) *int64 {
 	stringVal := coerceToString(yamlVal)
 	value, err := formatters.ToMegabytes(stringVal)
 	if err != nil {
-		*errs = append(*errs, fmt.Errorf(T("Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
+		*errs = append(*errs, errors.New(T("Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
 			map[string]interface{}{
 				"PropertyName": key,
 				"Error":        err.Error(),
@@ -341,7 +341,7 @@ func intVal(yamlMap generic.Map, key string, errs *[]error) *int {
 	case nil:
 		return nil
 	default:
-		err = fmt.Errorf(T("Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
+		err = errors.New(T("Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
 			map[string]interface{}{"PropertyName": key, "PropertyType": val}))
 	}
 
@@ -366,7 +366,7 @@ func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
 	case string:
 		return val == "true"
 	default:
-		*errs = append(*errs, fmt.Errorf(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
+		*errs = append(*errs, errors.New(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
 		return false
 	}
 }
@@ -382,7 +382,7 @@ func boolOrNil(yamlMap generic.Map, key string, errs *[]error) *bool {
 		result = val == "true"
 		return &result
 	default:
-		*errs = append(*errs, fmt.Errorf(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
+		*errs = append(*errs, errors.New(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
 		return &result
 	}
 }
@@ -394,7 +394,7 @@ func sliceOrNil(yamlMap generic.Map, key string, errs *[]error) []string {
 	var err error
 	stringSlice := []string{}
 
-	sliceErr := fmt.Errorf(T("Expected {{.PropertyName}} to be a list of strings.", map[string]interface{}{"PropertyName": key}))
+	sliceErr := errors.New(T("Expected {{.PropertyName}} to be a list of strings.", map[string]interface{}{"PropertyName": key}))
 
 	switch input := yamlMap.Get(key).(type) {
 	case []interface{}:
@@ -444,7 +444,7 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{
 
 		return &result
 	default:
-		*errs = append(*errs, fmt.Errorf(T("Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
+		*errs = append(*errs, errors.New(T("Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
 			map[string]interface{}{"Name": key, "Type": envVars})))
 		return nil
 	}
@@ -453,7 +453,7 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{
 func validateEnvVars(input generic.Map) (errs []error) {
 	generic.Each(input, func(key, value interface{}) {
 		if value == nil {
-			errs = append(errs, fmt.Errorf(T("env var '{{.PropertyName}}' should not be null",
+			errs = append(errs, errors.New(T("env var '{{.PropertyName}}' should not be null",
 				map[string]interface{}{"PropertyName": key})))
 		}
 	})
@@ -475,7 +475,7 @@ func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
 
 	genericRoutes, ok := input.Get("routes").([]interface{})
 	if !ok {
-		*errs = append(*errs, fmt.Errorf(T("'routes' should be a list")))
+		*errs = append(*errs, errors.New(T("'routes' should be a list")))
 		return nil
 	}
 
@@ -483,7 +483,7 @@ func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
 	for _, genericRoute := range genericRoutes {
 		route, ok := genericRoute.(map[interface{}]interface{})
 		if !ok {
-			*errs = append(*errs, fmt.Errorf(T("each route in 'routes' must have a 'route' property")))
+			*errs = append(*errs, errors.New(T("each route in 'routes' must have a 'route' property")))
 			continue
 		}
 
@@ -492,7 +492,7 @@ func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
 				Route: routeVal.(string),
 			})
 		} else {
-			*errs = append(*errs, fmt.Errorf(T("each route in 'routes' must have a 'route' property")))
+			*errs = append(*errs, errors.New(T("each route in 'routes' must have a 'route' property")))
 		}
 	}
 
@@ -511,7 +511,7 @@ func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
 		var ok bool
 		imageValue, ok = dockerMap.Get("image").(string)
 		if !ok {
-			*errs = append(*errs, fmt.Errorf(T("'docker.image' must be a string")))
+			*errs = append(*errs, errors.New(T("'docker.image' must be a string")))
 			return models.ManifestDocker{}
 		}
 	}
@@ -521,7 +521,7 @@ func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
 		var ok bool
 		usernameValue, ok = dockerMap.Get("username").(string)
 		if !ok {
-			*errs = append(*errs, fmt.Errorf(T("'docker.username' must be a string")))
+			*errs = append(*errs, errors.New(T("'docker.username' must be a string")))
 			return models.ManifestDocker{}
 		}
 	}

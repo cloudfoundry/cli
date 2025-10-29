@@ -896,9 +896,15 @@ var _ = Describe("app summary displayer", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
-									Strategy:         constant.DeploymentStrategyCanary,
-									StatusValue:      constant.DeploymentStatusValueActive,
-									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									Strategy:     constant.DeploymentStrategyCanary,
+									StatusValue:  constant.DeploymentStatusValueActive,
+									StatusReason: constant.DeploymentStatusReasonDeploying,
+									CanaryStatus: resources.CanaryStatus{
+										Steps: resources.CanaryStepStatus{
+											CurrentStep: 2,
+											TotalSteps:  5,
+										},
+									},
 									LastStatusChange: LastStatusChangeTimeString,
 									Options: resources.DeploymentOpts{
 										MaxInFlight: 2,
@@ -916,15 +922,25 @@ var _ = Describe("app summary displayer", func() {
 						It("displays max-in-flight value", func() {
 							Expect(testUI.Out).To(Say(`max-in-flight:   2`))
 						})
+
+						It("displays the step the deployment is currently in", func() {
+							Expect(testUI.Out).To(Say(`canary-steps:    2/5`))
+						})
 					})
 
 					When("max-in-flight value is default", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
-									Strategy:         constant.DeploymentStrategyCanary,
-									StatusValue:      constant.DeploymentStatusValueActive,
-									StatusReason:     constant.DeploymentStatusReasonDeploying,
+									Strategy:     constant.DeploymentStrategyCanary,
+									StatusValue:  constant.DeploymentStatusValueActive,
+									StatusReason: constant.DeploymentStatusReasonDeploying,
+									CanaryStatus: resources.CanaryStatus{
+										Steps: resources.CanaryStepStatus{
+											CurrentStep: 2,
+											TotalSteps:  5,
+										},
+									},
 									LastStatusChange: LastStatusChangeTimeString,
 									Options: resources.DeploymentOpts{
 										MaxInFlight: maxInFlightDefaultValue,
@@ -952,9 +968,15 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								Deployment: resources.Deployment{
-									Strategy:         constant.DeploymentStrategyCanary,
-									StatusValue:      constant.DeploymentStatusValueActive,
-									StatusReason:     constant.DeploymentStatusReasonPaused,
+									Strategy:     constant.DeploymentStrategyCanary,
+									StatusValue:  constant.DeploymentStatusValueActive,
+									StatusReason: constant.DeploymentStatusReasonPaused,
+									CanaryStatus: resources.CanaryStatus{
+										Steps: resources.CanaryStepStatus{
+											CurrentStep: 2,
+											TotalSteps:  5,
+										},
+									},
 									LastStatusChange: LastStatusChangeTimeString,
 									Options: resources.DeploymentOpts{
 										MaxInFlight: 2,
@@ -983,9 +1005,15 @@ var _ = Describe("app summary displayer", func() {
 									},
 								},
 								Deployment: resources.Deployment{
-									Strategy:         constant.DeploymentStrategyCanary,
-									StatusValue:      constant.DeploymentStatusValueActive,
-									StatusReason:     constant.DeploymentStatusReasonPaused,
+									Strategy:     constant.DeploymentStrategyCanary,
+									StatusValue:  constant.DeploymentStatusValueActive,
+									StatusReason: constant.DeploymentStatusReasonPaused,
+									CanaryStatus: resources.CanaryStatus{
+										Steps: resources.CanaryStepStatus{
+											CurrentStep: 2,
+											TotalSteps:  5,
+										},
+									},
 									LastStatusChange: LastStatusChangeTimeString,
 									Options: resources.DeploymentOpts{
 										MaxInFlight: maxInFlightDefaultValue,
@@ -1008,9 +1036,15 @@ var _ = Describe("app summary displayer", func() {
 						BeforeEach(func() {
 							summary = v7action.DetailedApplicationSummary{
 								Deployment: resources.Deployment{
-									Strategy:         constant.DeploymentStrategyCanary,
-									StatusValue:      constant.DeploymentStatusValueActive,
-									StatusReason:     constant.DeploymentStatusReasonCanceling,
+									Strategy:     constant.DeploymentStrategyCanary,
+									StatusValue:  constant.DeploymentStatusValueActive,
+									StatusReason: constant.DeploymentStatusReasonCanceling,
+									CanaryStatus: resources.CanaryStatus{
+										Steps: resources.CanaryStepStatus{
+											CurrentStep: 2,
+											TotalSteps:  5,
+										},
+									},
 									LastStatusChange: LastStatusChangeTimeString,
 									Options: resources.DeploymentOpts{
 										MaxInFlight: 2,

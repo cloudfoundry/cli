@@ -2,11 +2,9 @@ package isolated
 
 import (
 	"encoding/json"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
@@ -14,7 +12,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("api command", func() {
@@ -133,25 +130,17 @@ var _ = Describe("api command", func() {
 
 	When("Skip SSL Validation is required", func() {
 		Context("API has SSL", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				cliVersion := "1.0.0"
-				server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
-				apiURL = server.URL()
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
 			It("warns about skip SSL", func() {
+				cliVersion := "1.0.0"
+				server := helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
+				apiURL = server.URL()
 				session := helpers.CF("api", apiURL)
 				Eventually(session).Should(Say("Setting API endpoint to %s...", apiURL))
 				Eventually(session.Err).Should(Say("x509: certificate has expired or is not yet valid|SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
+				defer server.Close()
 			})
 
 			It("sets the API endpoint", func() {
@@ -160,78 +149,6 @@ var _ = Describe("api command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say(`API endpoint:\s+%s`, apiURL))
 				Eventually(session).Should(Say(`API version:\s+\d+\.\d+\.\d+`))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("API does not have SSL", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				serverAPIURL := server.URL()[7:]
-
-				response := `{
-   "links":{
-      "self":{
-         "href":"http://APISERVER"
-      },
-      "bits_service":null,
-      "cloud_controller_v2":{
-         "href":"http://APISERVER/v2",
-         "meta":{
-            "version":"2.146.0"
-         }
-      },
-      "cloud_controller_v3":{
-         "href":"http://APISERVER/v3",
-         "meta":{
-            "version":"3.81.0"
-         }
-      }
-   }
-}`
-				response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/"),
-						ghttp.RespondWith(http.StatusOK, response),
-					),
-				)
-
-				response2 := `{
-   "links":{
-      "self":{
-         "href":"http://APISERVER/v3"
-      }
-   }
-}`
-				response2 = strings.Replace(response2, "APISERVER", serverAPIURL, -1)
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v3"),
-						ghttp.RespondWith(http.StatusOK, response2),
-					),
-				)
-
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/"),
-						ghttp.RespondWith(http.StatusOK, response),
-					),
-				)
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("falls back to http and gives a warning", func() {
-				session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
-				Eventually(session).Should(Say("Setting API endpoint to %s...", server.URL()))
-				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session).Should(Exit(0))
 			})
 		})

@@ -1,11 +1,12 @@
 package net
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v9/cf/terminal"
+    "errors"
+
+    "code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 const DeprecatedEndpointWarning = "Endpoint deprecated"
@@ -41,7 +42,7 @@ func (warningsCollector WarningsCollector) PrintWarnings() error {
 
 	if os.Getenv("CF_RAISE_ERROR_ON_WARNINGS") != "" {
 		if len(warnings) > 0 {
-			return fmt.Errorf(strings.Join(warnings, "\n"))
+			return errors.New(strings.Join(warnings, "\n"))
 		}
 	}
 

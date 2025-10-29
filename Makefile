@@ -2,7 +2,7 @@ CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 FLAKE_ATTEMPTS ?=5
 PACKAGES ?= api actor command types util version integration/helpers
-LC_ALL = "en_US.UTF-8"
+LC_ALL = en_US.UTF-8
 
 ## TODO: Change when new version is released
 CF_BUILD_VERSION ?= v9.0.0
@@ -147,7 +147,7 @@ integration-tests-full-ci: install-test-deps integration-cleanup
 
 lint: format ## Runs all linters and formatters
 	@echo "Running linters..."
-	golangci-lint run --exclude-dirs cf --exclude-dirs fixtures --exclude-dirs plugin --exclude-dirs command/plugin
+	golangci-lint run -v
 	@echo "No lint errors!"
 
 # TODO: version specific tagging for all these builds

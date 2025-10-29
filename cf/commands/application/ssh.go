@@ -107,10 +107,10 @@ func (cmd *SSH) Execute(fc flags.FlagContext) error {
 	if fc.IsSet("i") {
 		instanceIndex := fc.Int("i")
 		if instanceIndex < 0 {
-			return fmt.Errorf(T("The application instance index cannot be negative"))
+			return errors.New(T("The application instance index cannot be negative"))
 		}
 		if instanceIndex >= cmd.appReq.GetApplication().InstanceCount {
-			return fmt.Errorf(T("The specified application instance does not exist"))
+			return errors.New(T("The specified application instance does not exist"))
 		}
 	}
 

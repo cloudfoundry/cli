@@ -1,220 +1,101 @@
-# GitHub repo level Secrets and Variables
-
-# secrets.CLIENT_SECRET
-# secrets.GITHUB_TOKEN
-# secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN
-# vars.TEST_FLAKE_ATTEMPTS
-
-name: "pvt: run integration tests"
+name: "REUSABLE: Integration Tests"
 
 on:
   workflow_call:
     inputs:
-      run-with-client-creds:
-        required: true
-        type: boolean
-      os:
-        required: true
-        type: string
       name:
         required: true
         type: string
-      lease-id:
+      env-name:
         required: true
         type: string
-      lease-namespace:
-        required: false
-        type: string
-        default: 'tas-devex'
       gitRef:
         type: string
         default: ${{github.event.workflow_run.head_sha}}
-      nodes:
-        type: string
-        default: "16"
+      run-with-client-creds:
+        required: true
+        type: boolean
 
 env:
-  NODES: ${{ inputs.nodes }}
+  ENV_NAME: ${{ inputs.env-name }}
+  NODES: 12
   FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '4' }}
+  BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
+  BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
+  CREDHUB_CLI_VERSION: ${{ vars.CREDHUB_CLI_VERSION }}
 
 jobs:
   run-integration-tests:
     defaults:
       run:
         shell: bash
-    runs-on: ${{ inputs.os }}
-    container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
-
-    - name: Checkout cf-acceptance-tests
-      if: ${{ inputs.name == 'cats' }}
-      uses: actions/checkout@v4
-      with:
-        repository: cloudfoundry/cf-acceptance-tests
-        ref: release-candidate
-        path: cf-acceptance-tests
+        path: cli
 
     - name: Checkout CF deployment tasks
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
 
     - name: Set Up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
-        go-version-file: go.mod
+        go-version-file: cli/go.mod
+        check-latest: true
 
     - name: Install Tools
-      env:
-        account_token:    ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
-        lease_namespace:  ${{ inputs.lease-namespace }}
-        lease_id:         ${{ inputs.lease-id }}
       run: |
         go version
 
-        if [[ ${{ inputs.os }} =~ "windows" ]]
-        then
-          install_location=/usr/bin
-          bbl_artifact=bbl-v8.4.110_windows.exe
-          bosh_cli_artifact=bosh-cli-7.7.2-windows-amd64.exe
-          credhub_artifact=credhub-windows-2.9.4.tgz
-        else
-          install_location=/usr/local/bin
-          bbl_artifact=bbl-v8.4.110_linux_x86-64
-          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
-          credhub_artifact=credhub-linux-2.9.4.tgz
-        fi
-        curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v8.4.110/${bbl_artifact} --silent --location --output  $install_location/bbl
-        chmod +x $install_location/bbl
+        install_location=/usr/local/bin
+
+        sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v${BBL_CLI_VERSION}/bbl-v${BBL_CLI_VERSION}_linux_amd64 --silent --location --output  $install_location/bbl
+        sudo chmod +x $install_location/bbl
         bbl --version
 
-        curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
-        chmod +x $install_location/bosh
+        sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v${BOSH_CLI_VERSION}/bosh-cli-${BOSH_CLI_VERSION}-linux-amd64 --silent --output $install_location/bosh --location
+        sudo chmod +x $install_location/bosh
         bosh --version
 
-        curl https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.4/$credhub_artifact --silent --output /tmp/$credhub_artifact --location
-        tar xzvf /tmp/$credhub_artifact
-        mv credhub $install_location/credhub
-        chmod +x $install_location/credhub
+        sudo curl https://github.com/cloudfoundry/credhub-cli/releases/download/${CREDHUB_CLI_VERSION}/credhub-linux-amd64-${CREDHUB_CLI_VERSION}.tgz --silent --location --output /tmp/credhub.tgz
+        sudo tar -xzf /tmp/credhub.tgz -C $install_location  
+        sudo chmod +x $install_location/credhub
         credhub --version
 
-        apt-get update
-        apt-get install -y build-essential unzip
+        sudo apt-get update
+        sudo apt-get install -y build-essential unzip
 
-        shepherd login service-account ${account_token}
-        shepherd get lease ${lease_id} --namespace ${lease_namespace} --json | jq .output > metadata.json
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v3
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
 
-    - name: Add CATS config
-      if: ${{ inputs.name == 'cats' }}
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@v3
+
+    - name: Download file from GCS
       run: |
-        set -eu
-        
-        env_name=$(jq -r .name metadata.json)
-        API="$(jq -r .cf.api_url metadata.json)"
-        DOMAIN=$(echo $API | sed "s/^api\.//")
-        CF_INT_USERNAME="admin"
-
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-        eval "$(bbl print-env --metadata-file ./metadata.json)"
-
-        credhub login
-        CF_INT_PASSWORD=$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)
-
-        cat << EOF | jq -S . > cats_config.json
-        {
-          "admin_password": "${CF_INT_PASSWORD}",
-          "admin_user": "${CF_INT_USERNAME}",
-          "api": "${API}",
-          "apps_domain": "${DOMAIN}",
-          "backend" : "diego",
-          "broker_start_timeout": 330,
-          "cf_push_timeout": 210,
-          "default_timeout": 120,
-          "long_curl_timeout": 210,
-          "skip_ssl_validation": true,
-          "use_http": true,
-          "include_apps": true,
-          "include_backend_compatibility": false,
-          "include_container_networking": true,
-          "include_deployments": true,
-          "include_detect": true,
-          "include_docker": true,
-          "include_cnb": true,
-          "include_internet_dependent": true,
-          "include_isolation_segments": true,
-          "isolation_segment_name": "persistent_isolation_segment",
-          "include_private_docker_registry": false,
-          "include_route_services": true,
-          "include_routing": true,
-          "include_routing_isolation_segments": false,
-          "include_security_groups": true,
-          "include_services": true,
-          "include_service_discovery": true,
-          "include_service_instance_sharing": true,
-          "include_ssh": true,
-          "include_sso": false,
-          "include_tasks": true,
-          "include_tcp_routing": true,
-          "include_v3": true,
-          "include_zipkin": true
-        }
-        EOF
-
-        make build
-        echo "$PWD/out" >> $GITHUB_PATH
-        export PATH="$PWD/out:$PATH"
-        cf version
-
-        export CF_USERNAME=${CF_INT_USERNAME}
-        export CF_PASSWORD=${CF_INT_PASSWORD}
-        cf api ${API} --skip-ssl-validation
-        cf auth
-        cf enable-feature-flag diego_docker
-        cf enable-feature-flag diego_cnb
-        cf enable-feature-flag service_instance_sharing
-
-    - name: Run CATS Tests
-      if: ${{ inputs.name == 'cats' }}
-      run: |
-        set -xeu
-
-        export CONFIG
-        CONFIG=$(mktemp)
-
-        original_config="${PWD}/cats_config.json"
-        cp ${original_config} ${CONFIG}
-
-        cd ./cf-acceptance-tests
-        export CF_DIAL_TIMEOUT=11
-        export CF_PLUGIN_HOME=$HOME
-        go version
-
-        ./bin/test \
-          --keep-going \
-          --randomize-all \
-          --skip-package=helpers \
-          --nodes="${NODES}" \
-          --flake-attempts=${FLAKE_ATTEMPTS} \
-          --timeout="2h" \
-          --no-color
+        gsutil -m cp -R -P gs://cf-cli-bosh-lites/${ENV_NAME} . 
 
     - name: Run Integration Tests
-      if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
+      if: ${{ !inputs.run-with-client-creds }}
       run: |
-        env_name=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-        eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
+        pushd ./${ENV_NAME}/bbl-state
+          eval "$(bbl print-env)"
+        popd
+
+        cd cli
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-${ENV_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
-        API_URL="$(jq -r .cf.api_url metadata.json)"
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-${ENV_NAME}/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        API_URL="api.${ENV_NAME}.app-runtime-interfaces.ci.cloudfoundry.org"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
@@ -222,10 +103,10 @@ jobs:
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
         export CF_INT_TEST_NAME="int"
+        export CF_PASSWORD=${CF_INT_PASSWORD}
 
         make build
-
-        export CF_PASSWORD=${CF_INT_PASSWORD}
+          
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
@@ -237,13 +118,15 @@ jobs:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
-        env_name=$(cat metadata.json | jq -r '.name')
-        jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-        eval "$(bbl print-env --metadata-file ./metadata.json)"
-        export CF_INT_PASSWORD="$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)"
+        pushd ./${ENV_NAME}/bbl-state
+          eval "$(bbl print-env)"
+        popd
+
+        cd cli
+        export CF_INT_PASSWORD="$(credhub get -n /bosh-${ENV_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)"
         export CF_INT_OIDC_USERNAME="admin-oidc"
-        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
-        API_URL="$(jq -r .cf.api_url metadata.json)"
+        export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-${ENV_NAME}/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        API_URL="api.${ENV_NAME}.app-runtime-interfaces.ci.cloudfoundry.org"
         export CF_INT_API="https://$API_URL"
         export CF_DIAL_TIMEOUT=15
         export CF_USERNAME=admin
@@ -251,10 +134,10 @@ jobs:
         export PATH="$GOPATH/bin:$PATH"
         export PATH="$PWD/out:$PATH"
         export CF_INT_TEST_NAME="cc"
+        export CF_PASSWORD=${CF_INT_PASSWORD}
 
         make build
 
-        export CF_PASSWORD=${CF_INT_PASSWORD}
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 

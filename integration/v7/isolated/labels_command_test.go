@@ -247,14 +247,14 @@ var _ = Describe("labels command", func() {
 
 				It("fails when no stack is given", func() {
 					session := helpers.CF("labels", "buildpack", buildpackName)
-					Eventually(session.Err).Should(Say(fmt.Sprintf(`Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.`, buildpackName)))
+					Eventually(session.Err).Should(Say(fmt.Sprintf(`Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.`, buildpackName)))
 					Eventually(session).Should(Say(`FAILED`))
 					Eventually(session).Should(Exit(1))
 				})
 
 				It("fails when an empty-string stack is given", func() {
 					session := helpers.CF("labels", "buildpack", buildpackName, "--stack", "")
-					Eventually(session.Err).Should(Say(fmt.Sprintf(`Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.`, buildpackName)))
+					Eventually(session.Err).Should(Say(fmt.Sprintf(`Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag and/or lifecycle using a '-l' flag.`, buildpackName)))
 					Eventually(session).Should(Say(`FAILED`))
 					Eventually(session).Should(Exit(1))
 				})

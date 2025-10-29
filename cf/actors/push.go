@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"code.cloudfoundry.org/cli/v9/cf/api/applicationbits"
+    "errors"
+
+    "code.cloudfoundry.org/cli/v9/cf/api/applicationbits"
 	"code.cloudfoundry.org/cli/v9/cf/api/resources"
 	"code.cloudfoundry.org/cli/v9/cf/appfiles"
 	. "code.cloudfoundry.org/cli/v9/cf/i18n"
@@ -186,29 +188,29 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 		appName := app.Name
 
 		if app.HealthCheckType != nil && *app.HealthCheckType != "http" && app.HealthCheckHTTPEndpoint != nil {
-			errs = append(errs, fmt.Errorf(T("Health check type must be 'http' to set a health check HTTP endpoint.")))
+			errs = append(errs, errors.New(T("Health check type must be 'http' to set a health check HTTP endpoint.")))
 		}
 
 		if app.Routes != nil {
 			if app.Hosts != nil {
-				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'", map[string]interface{}{"AppName": appName})))
+				errs = append(errs, errors.New(T("Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'", map[string]interface{}{"AppName": appName})))
 			}
 
 			if app.Domains != nil {
-				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'", map[string]interface{}{"AppName": appName})))
+				errs = append(errs, errors.New(T("Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'", map[string]interface{}{"AppName": appName})))
 			}
 
 			if app.NoHostname != nil {
-				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'", map[string]interface{}{"AppName": appName})))
+				errs = append(errs, errors.New(T("Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'", map[string]interface{}{"AppName": appName})))
 			}
 		}
 
 		if app.BuildpackURL != nil && app.DockerImage != nil {
-			errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'buildpack' and 'docker'", map[string]interface{}{"AppName": appName})))
+			errs = append(errs, errors.New(T("Application {{.AppName}} must not be configured with both 'buildpack' and 'docker'", map[string]interface{}{"AppName": appName})))
 		}
 
 		if app.Path != nil && app.DockerImage != nil {
-			errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'docker' and 'path'", map[string]interface{}{"AppName": appName})))
+			errs = append(errs, errors.New(T("Application {{.AppName}} must not be configured with both 'docker' and 'path'", map[string]interface{}{"AppName": appName})))
 		}
 	}
 

@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"errors"
-	"fmt"
 
 	"code.cloudfoundry.org/cli/v9/cf"
 	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
@@ -28,7 +27,7 @@ func NewTargetedOrgRequirement(config coreconfig.Reader) TargetedOrgRequirement 
 
 func (req targetedOrgAPIRequirement) Execute() error {
 	if !req.config.HasOrganization() {
-		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")}))
+		message := T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")})
 		return errors.New(message)
 	}
 

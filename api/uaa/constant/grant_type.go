@@ -10,4 +10,6 @@ const (
 	// GrantTypePassword is used for user's username/password authentication.
 	GrantTypePassword     GrantType = "password"
 	GrantTypeRefreshToken GrantType = "refresh_token"
+	// GrantTypeJwtBearer is used for token based user authentication
+	GrantTypeJwtBearer GrantType = "urn:ietf:params:oauth:grant-type:jwt-bearer"
 )

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+    "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
@@ -27,7 +28,7 @@ type UpdateBuildpackCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.BuildpackName               `positional-args:"Yes"`
-	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
+	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nWhen using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
 	relatedCommands interface{}                      `related_commands:"buildpacks, create-buildpack, delete-buildpack"`
 	NewStack        string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
 	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
@@ -37,6 +38,7 @@ type UpdateBuildpackCommand struct {
 	Position        types.NullInt                    `long:"position" short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
 	NewName         string                           `long:"rename" description:"Rename an existing buildpack"`
 	CurrentStack    string                           `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	Lifecycle       string                           `long:"lifecycle" short:"l" description:"Specify lifecycle to disambiguate buildpacks with the same name"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
 
 	ProgressBar v7action.SimpleProgressBar
@@ -53,6 +55,13 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	user, err := cmd.validateSetup()
 	if err != nil {
 		return err
+	}
+
+	if cmd.Lifecycle != "" {
+		err = command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionBuildpackLifecycleQuery, "--lifecycle")
+		if err != nil {
+			return err
+		}
 	}
 
 	cmd.printInitialText(user.Name)
@@ -119,9 +128,10 @@ func (cmd UpdateBuildpackCommand) updateBuildpack() (resources.Buildpack, error)
 		desiredBuildpack.Name = cmd.NewName
 	}
 
-	updatedBuildpack, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(
+	updatedBuildpack, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStackAndLifecycle(
 		cmd.RequiredArgs.Buildpack,
 		cmd.CurrentStack,
+		cmd.Lifecycle,
 		desiredBuildpack,
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -181,32 +191,36 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 		})
 	}
 
-	switch {
-	case cmd.NewStack != "":
+	if cmd.NewStack != "" {
 		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 			"Stack":       cmd.NewStack,
 		})
 		if cmd.Position.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
-			cmd.UI.DisplayTextWithFlavor("\nUpdating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-				"Buildpack":   buildpackName,
-				"CurrentUser": userName,
-				"Stack":       cmd.NewStack,
-			})
+			cmd.UI.DisplayNewline()
+			cmd.displayUpdatingBuildpackMessage(buildpackName, userName, cmd.NewStack)
 		}
-	case cmd.CurrentStack == "":
-		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   buildpackName,
-			"CurrentUser": userName,
-		})
-	default:
-		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   buildpackName,
-			"CurrentUser": userName,
-			"Stack":       cmd.CurrentStack,
-		})
+	} else {
+		cmd.displayUpdatingBuildpackMessage(buildpackName, userName, cmd.CurrentStack)
 	}
+}
+
+func (cmd UpdateBuildpackCommand) displayUpdatingBuildpackMessage(buildpackName, userName, stack string) {
+	message := "Updating buildpack {{.Buildpack}}"
+	if stack != "" {
+		message += " with stack {{.Stack}}"
+	}
+	if cmd.Lifecycle != "" {
+		message += " with lifecycle {{.Lifecycle}}"
+	}
+	message += " as {{.CurrentUser}}..."
+	cmd.UI.DisplayTextWithFlavor(message, map[string]interface{}{
+		"Buildpack":   buildpackName,
+		"CurrentUser": userName,
+		"Stack":       stack,
+		"Lifecycle":   cmd.Lifecycle,
+	})
 }
 
 func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {

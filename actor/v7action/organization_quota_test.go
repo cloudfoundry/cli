@@ -17,8 +17,8 @@ var _ = Describe("Organization Quota Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
-		trueValue                 bool = true
-		falseValue                bool = false
+		trueValue                 = true
+		falseValue                = false
 	)
 
 	BeforeEach(func() {

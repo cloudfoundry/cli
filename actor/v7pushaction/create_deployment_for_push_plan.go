@@ -25,6 +25,11 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 		}
 	}
 
+	dep.Options.Instances = pushPlan.Instances
+	dep.Options.MemoryInMB = pushPlan.MemoryInMB
+	dep.Options.DiskInMB = pushPlan.DiskInMB
+	dep.Options.LogRateLimitInBPS = pushPlan.LogRateLimitInBPS
+
 	deploymentGUID, warnings, err := actor.V7Actor.CreateDeployment(dep)
 
 	if err != nil {

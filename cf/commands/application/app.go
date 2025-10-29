@@ -183,15 +183,15 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) e
 			uihelpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CPUUsage*100),
-			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
+			T("{{.MemUsage}} of {{.MemQuota}}",
 				map[string]interface{}{
 					"MemUsage": formatters.ByteSize(instance.MemUsage),
-					"MemQuota": formatters.ByteSize(instance.MemQuota)})),
-			fmt.Sprintf(T("{{.DiskUsage}} of {{.DiskQuota}}",
+					"MemQuota": formatters.ByteSize(instance.MemQuota)}),
+			T("{{.DiskUsage}} of {{.DiskQuota}}",
 				map[string]interface{}{
 					"DiskUsage": formatters.ByteSize(instance.DiskUsage),
-					"DiskQuota": formatters.ByteSize(instance.DiskQuota)})),
-			fmt.Sprintf("%s", instance.Details),
+					"DiskQuota": formatters.ByteSize(instance.DiskQuota)}),
+			instance.Details,
 		)
 	}
 

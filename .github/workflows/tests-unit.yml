@@ -13,13 +13,11 @@ on:
     tags:
       - "v9.*"
       - "v8.*"
-      - "v7.*"
   pull_request:
     branches:
       - main
       - v9
       - v8
-      - v7
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
@@ -36,11 +34,10 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-20.04
+          - ubuntu-22.04
           - macos-latest
-          - macos-13
+          - macos-14
           - windows-latest
-          - windows-2019
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -48,10 +45,10 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup Go Environment
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
         cache: true

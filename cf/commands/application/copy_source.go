@@ -2,7 +2,6 @@ package application
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/v9/cf/api/applications"
@@ -171,7 +170,7 @@ func (cmd *CopySource) findSpaceFields(targetOrg, targetSpace string) (models.Sp
 	}
 
 	if !foundSpace {
-		return models.SpaceFields{}, fmt.Errorf(T("Could not find space {{.Space}} in organization {{.Org}}",
+		return models.SpaceFields{}, errors.New(T("Could not find space {{.Space}} in organization {{.Org}}",
 			map[string]interface{}{
 				"Space": terminal.EntityNameColor(targetSpace),
 				"Org":   terminal.EntityNameColor(targetOrg),
@@ -183,7 +182,7 @@ func (cmd *CopySource) findSpaceFields(targetOrg, targetSpace string) (models.Sp
 }
 
 func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, username string) string {
-	return fmt.Sprintf(T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+	return T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"SourceApp": terminal.EntityNameColor(sourceAppName),
 			"TargetApp": terminal.EntityNameColor(targetAppName),
@@ -191,6 +190,6 @@ func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceNam
 			"SpaceName": terminal.EntityNameColor(targetSpaceName),
 			"Username":  terminal.EntityNameColor(username),
 		},
-	))
+	)
 
 }

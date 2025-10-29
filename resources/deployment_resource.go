@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+    "code.cloudfoundry.org/cli/v9/types"
 )
 
 type Deployment struct {
@@ -12,6 +13,7 @@ type Deployment struct {
 	State            constant.DeploymentState
 	StatusValue      constant.DeploymentStatusValue
 	StatusReason     constant.DeploymentStatusReason
+	CanaryStatus     CanaryStatus
 	LastStatusChange string
 	Options          DeploymentOpts
 	RevisionGUID     string
@@ -26,10 +28,15 @@ type Deployment struct {
 type DeploymentOpts struct {
 	MaxInFlight             int                      `json:"max_in_flight,omitempty"`
 	CanaryDeploymentOptions *CanaryDeploymentOptions `json:"canary,omitempty"`
+	Instances               types.NullInt            `json:"web_instances,omitempty"`
+	MemoryInMB              types.NullUint64         `json:"memory_in_mb,omitempty"`
+	DiskInMB                types.NullUint64         `json:"disk_in_mb,omitempty"`
+	LogRateLimitInBPS       types.NullInt            `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 }
 
 func (d DeploymentOpts) IsEmpty() bool {
-	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0)
+	return d.MaxInFlight == 0 && (d.CanaryDeploymentOptions == nil || len(d.CanaryDeploymentOptions.Steps) == 0) &&
+		!d.Instances.IsSet && !d.MemoryInMB.IsSet && !d.DiskInMB.IsSet && !d.LogRateLimitInBPS.IsSet
 }
 
 type CanaryDeploymentOptions struct {
@@ -78,6 +85,15 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccDeployment)
 }
 
+type CanaryStepStatus struct {
+	CurrentStep int `json:"current"`
+	TotalSteps  int `json:"total"`
+}
+
+type CanaryStatus struct {
+	Steps CanaryStepStatus `json:"steps"`
+}
+
 // UnmarshalJSON helps unmarshal a Cloud Controller Deployment response.
 func (d *Deployment) UnmarshalJSON(data []byte) error {
 	var ccDeployment struct {
@@ -89,8 +105,9 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 			Details struct {
 				LastStatusChange string `json:"last_status_change"`
 			}
-			Value  constant.DeploymentStatusValue  `json:"value"`
-			Reason constant.DeploymentStatusReason `json:"reason"`
+			Value        constant.DeploymentStatusValue  `json:"value"`
+			Reason       constant.DeploymentStatusReason `json:"reason"`
+			CanaryStatus CanaryStatus                    `json:"canary,omitempty"`
 		} `json:"status"`
 		Droplet      Droplet                     `json:"droplet,omitempty"`
 		NewProcesses []Process                   `json:"new_processes,omitempty"`
@@ -109,6 +126,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.State = ccDeployment.State
 	d.StatusValue = ccDeployment.Status.Value
 	d.StatusReason = ccDeployment.Status.Reason
+	d.CanaryStatus = ccDeployment.Status.CanaryStatus
 	d.LastStatusChange = ccDeployment.Status.Details.LastStatusChange
 	d.DropletGUID = ccDeployment.Droplet.GUID
 	d.NewProcesses = ccDeployment.NewProcesses

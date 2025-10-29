@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
-	. "code.cloudfoundry.org/cli/v9/command/v7"
+
 	v7 "code.cloudfoundry.org/cli/v9/command/v7"
 	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v9/util/ui"
@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("ssh-code Command", func() {
 	var (
-		cmd             SSHCodeCommand
+		cmd             v7.SSHCodeCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor

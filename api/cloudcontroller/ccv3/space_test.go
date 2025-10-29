@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v9/resources"
+
 	. "code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -31,7 +31,7 @@ var _ = Describe("Spaces", func() {
 		)
 
 		JustBeforeEach(func() {
-			spaceToCreate = Space{Name: "some-space", Relationships: resources.Relationships{constant.RelationshipTypeOrganization: resources.Relationship{GUID: "some-org-guid"}}}
+			spaceToCreate = Space{Name: "some-space", Relationships: Relationships{constant.RelationshipTypeOrganization: Relationship{GUID: "some-org-guid"}}}
 			space, warnings, executeErr = client.CreateSpace(spaceToCreate)
 		})
 
@@ -199,14 +199,14 @@ var _ = Describe("Spaces", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(spaces).To(ConsistOf(
-					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
+					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-1"},
 					}},
-					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
+					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-2"},
 					}},
-					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-3"},
+					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-3"},
 					}},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
@@ -305,14 +305,14 @@ var _ = Describe("Spaces", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(spaces).To(ConsistOf(
-					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
+					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-1"},
 					}},
-					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
+					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-2"},
 					}},
-					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: resources.Relationships{
-						constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-3"},
+					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-3"},
 					}},
 				))
 

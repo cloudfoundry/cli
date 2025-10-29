@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       
     - name: Bump version
       id: bump-version
@@ -105,8 +105,8 @@ jobs:
       run: |
         new_tag="v${{ steps.bump-version.outputs.version-build }}"
         echo "new version is $new_tag"
-        git config user.name "GitHub Actions"
-        git config user.email "github-actions@users.noreply.github.com"
+        git config user.name "cf-cli-eng"
+        git config user.email "cf-cli-eng@pivotal.io"
         git tag -am "Bump cli version ${new_tag}" ${new_tag}
         git push origin $new_tag
 
@@ -114,7 +114,7 @@ jobs:
     name: Build Linux
     needs:
     - setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     env:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
@@ -127,10 +127,10 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
@@ -139,7 +139,7 @@ jobs:
     - name: Install Linux Packages
       run: sudo apt update && sudo apt install -y --no-install-recommends fakeroot
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
@@ -169,7 +169,7 @@ jobs:
         make out/cf-cli_linux_arm64
 
     - name: Store Linux Binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-binaries
@@ -274,7 +274,7 @@ jobs:
       working-directory: signed-redhat-installer
 
     - name: Store Signed Linux RPM Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-packages
@@ -311,7 +311,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_i686 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_i686.deb $root/packaged-deb
             rm -rf cf
           popd
@@ -336,7 +336,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_x86-64 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_x86-64.deb $root/packaged-deb
           popd
         )
@@ -360,7 +360,7 @@ jobs:
             cp ../completion/cf${VERSION_MAJOR} cf/usr/share/bash-completion/completions/cf${VERSION_MAJOR}
             cp $root/out/cf-cli_linux_arm64 cf/usr/bin/cf${VERSION_MAJOR}
             ln -frs cf/usr/bin/cf${VERSION_MAJOR} cf/usr/bin/cf
-            fakeroot dpkg --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
+            fakeroot dpkg-deb -Zxz --build cf cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb
             mv cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_arm64.deb $root/packaged-deb
           popd
         )
@@ -375,7 +375,7 @@ jobs:
       working-directory: packaged-deb
 
     - name: Store Debian Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-linux-deb-packages
@@ -396,17 +396,17 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
         ref: main
 
     - name: Checkout bomutils
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: hogliux/bomutils.git
         ref: 0.2
@@ -417,7 +417,7 @@ jobs:
       run: make
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
@@ -465,7 +465,7 @@ jobs:
         make out/cf-cli_macosarm
 
     - name: Store macOS Binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-macos-binaries
@@ -605,7 +605,7 @@ jobs:
           "signed-macos-installer/cf${VERSION_MAJOR}-cli-installer_${VERSION_BUILD}_macosarm.pkg"
 
     - name: Store macOS Signed Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: cf-cli-macos-packages
@@ -616,7 +616,7 @@ jobs:
     name: Build Windows
     needs:
     - setup
-    runs-on: windows-2019
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
@@ -625,11 +625,11 @@ jobs:
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -691,7 +691,7 @@ jobs:
           New-Item -ItemType SymbolicLink -Target .\out\cf-cli_winx64.exe -Path .\out\cf-cli_winx64-link.exe
 
       - name: Save signed binaries as a GitHub Action Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cf-cli-windows-binaries
           if-no-files-found: error
@@ -736,7 +736,7 @@ jobs:
           Get-ChildItem "${env:RUNNER_TEMP}"
 
       - name: Save installer and dist files as a GitHub Action Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cf-cli-windows-packages
           if-no-files-found: error
@@ -768,10 +768,10 @@ jobs:
     steps:
 
     - name: Checkout cli
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Download signed artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         path: signed # download all artifacts to 'signed/'
 
@@ -857,14 +857,14 @@ jobs:
           signed/winx64/*zip
 
     - name: Store Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         if-no-files-found: error
         name: final-artifacts
         path: signed/*
 
     - name: Setup aws to upload installers to CLAW S3 bucket
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       env:
         AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -894,7 +894,7 @@ jobs:
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-linux-rpm-packages
 
@@ -910,20 +910,35 @@ jobs:
     needs:
     - setup
     - build-linux
-    runs-on: ubuntu-20.04
-    container:
-      image: ubuntu:20.04
+    strategy:
+      matrix:
+        image:
+        - debian:11
+        - debian:12
+        - ubuntu:22.04
+        - ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
 
     - name: Download Signed Linux Packages
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-linux-deb-packages
 
-    - name: Display structure of downloaded files
+    - name: Display structure and verify
+      env:
+        IMAGE: ${{ matrix.image }}
       run: |
-        ls -R
+        docker run \
+          --interactive \
+          --rm \
+          -v .:/workspace \
+          ${IMAGE} <<EOC
+        printf "${IMAGE} -> "
+        grep PRETTY_NAME /etc/os-release | cut -d= -f2-
+        cd workspace
         ls *.deb | xargs -n1 dpkg --info
+        EOC
 
   test-macos:
     name: Test macOS Artifacts
@@ -934,7 +949,7 @@ jobs:
     steps:
 
     - name: Download Signed macOS Packages
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-macos-packages
 
@@ -958,7 +973,7 @@ jobs:
     steps:
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-windows-binaries
 
@@ -968,7 +983,7 @@ jobs:
         Get-AuthenticodeSignature -Verbose -ErrorAction Stop .\cf-cli_winx64.exe
 
     - name: Download Signed Windows Binaries
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: cf-cli-windows-packages
 
@@ -998,13 +1013,13 @@ jobs:
     - s3-upload
     steps:
     - name: Download signed artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: final-artifacts
         path: ${{ env.ARTIFACTS_DIR }}
 
     - name: Checkout CLI
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: ${{ env.REPO_DIR }}
        
@@ -1044,7 +1059,7 @@ jobs:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
     steps:
     - name: Checkout CLAW
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: cloudfoundry/CLAW
         ref: master
@@ -1065,8 +1080,8 @@ jobs:
             git add claw-variables.yml
 
             if ! [ -z "$(git status --porcelain)"]; then
-              git config user.name github-actions
-              git config user.email github-actions@github.com
+              git config user.name cf-cli-eng
+              git config user.email cf-cli-eng@pivotal.io
               git commit -m "Add CF CLI ${VERSION_BUILD}"
             else
                 echo "no new version to commit"

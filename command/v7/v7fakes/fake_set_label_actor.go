@@ -38,18 +38,19 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateBuildpackLabelsByBuildpackNameAndStackStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
-	updateBuildpackLabelsByBuildpackNameAndStackMutex       sync.RWMutex
-	updateBuildpackLabelsByBuildpackNameAndStackArgsForCall []struct {
+	UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub        func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)
+	updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex       sync.RWMutex
+	updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 map[string]types.NullString
+		arg3 string
+		arg4 map[string]types.NullString
 	}
-	updateBuildpackLabelsByBuildpackNameAndStackReturns struct {
+	updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall map[int]struct {
+	updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -311,67 +312,68 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOn
 	}{result1, result2}
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStack(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Lock()
-	ret, specificReturn := fake.updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall[len(fake.updateBuildpackLabelsByBuildpackNameAndStackArgsForCall)]
-	fake.updateBuildpackLabelsByBuildpackNameAndStackArgsForCall = append(fake.updateBuildpackLabelsByBuildpackNameAndStackArgsForCall, struct {
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle(arg1 string, arg2 string, arg3 string, arg4 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Lock()
+	ret, specificReturn := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall[len(fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall)]
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall = append(fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 map[string]types.NullString
-	}{arg1, arg2, arg3})
-	stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub
-	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackReturns
-	fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStack", []interface{}{arg1, arg2, arg3})
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
-	}
+        arg3 string
+        arg4 map[string]types.NullString
+    }{arg1, arg2, arg3, arg4})
+    stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub
+    fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns
+    fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle", []interface{}{arg1, arg2, arg3, arg4})
+    fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+    if stub != nil {
+        return stub(arg1, arg2, arg3, arg4)
+    }
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackCallCount() int {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
-	return len(fake.updateBuildpackLabelsByBuildpackNameAndStackArgsForCall)
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCallCount() int {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RLock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RUnlock()
+	return len(fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall)
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Lock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub = stub
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleCalls(stub func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Lock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+	fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub = stub
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(i int) (string, string, map[string]types.NullString) {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
-	argsForCall := fake.updateBuildpackLabelsByBuildpackNameAndStackArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall(i int) (string, string, string, map[string]types.NullString) {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RLock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RUnlock()
+	argsForCall := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackReturns(result1 v7action.Warnings, result2 error) {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Lock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub = nil
-	fake.updateBuildpackLabelsByBuildpackNameAndStackReturns = struct {
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Lock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+	fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub = nil
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Lock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.Unlock()
-	fake.UpdateBuildpackLabelsByBuildpackNameAndStackStub = nil
-	if fake.updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall == nil {
-		fake.updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall = make(map[int]struct {
+func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Lock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+	fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub = nil
+	if fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall == nil {
+		fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall = make(map[int]struct {
 			result1 v7action.Warnings
 			result2 error
 		})
 	}
-	fake.updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall[i] = struct {
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -975,8 +977,8 @@ func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	defer fake.getCurrentUserMutex.RUnlock()
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
-	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RLock()
+	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RUnlock()
 	fake.updateDomainLabelsByDomainNameMutex.RLock()
 	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()

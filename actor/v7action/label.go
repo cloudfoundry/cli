@@ -56,8 +56,8 @@ func (actor *Actor) GetStackLabels(stackName string) (map[string]types.NullStrin
 	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
-func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, Warnings, error) {
-	resource, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack string, buildpackLifecycle string) (map[string]types.NullString, Warnings, error) {
+	resource, warnings, err := actor.GetBuildpackByNameAndStackAndLifecycle(buildpackName, buildpackStack, buildpackLifecycle)
 	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
@@ -81,8 +81,8 @@ func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spa
 	return actor.updateResourceMetadata("app", app.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
-func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName string, stack string, labels map[string]types.NullString) (Warnings, error) {
-	buildpack, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, stack)
+func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle(buildpackName string, stack string, lifecycle string, labels map[string]types.NullString) (Warnings, error) {
+	buildpack, warnings, err := actor.GetBuildpackByNameAndStackAndLifecycle(buildpackName, stack, lifecycle)
 	if err != nil {
 		return warnings, err
 	}

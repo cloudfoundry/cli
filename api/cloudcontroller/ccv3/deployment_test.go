@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
+    "code.cloudfoundry.org/cli/v9/types"
 
 	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo/v2"
@@ -252,6 +253,10 @@ var _ = Describe("Deployment", func() {
 			dep.RevisionGUID = revisionGUID
 			dep.Relationships = resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"}}
 			dep.Options.CanaryDeploymentOptions = &resources.CanaryDeploymentOptions{Steps: []resources.CanaryStep{{InstanceWeight: 1}, {InstanceWeight: 2}}}
+			dep.Options.Instances = types.NullInt{IsSet: true, Value: 2}
+			dep.Options.MemoryInMB = types.NullUint64{IsSet: true, Value: 1024}
+			dep.Options.DiskInMB = types.NullUint64{IsSet: true, Value: 2048}
+			dep.Options.LogRateLimitInBPS = types.NullInt{IsSet: true, Value: 10}
 			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment(dep)
 		})
 
@@ -278,7 +283,7 @@ var _ = Describe("Deployment", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}},"options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]}}}`),
+							VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary", "relationships":{"app":{"data":{"guid":"some-app-guid"}}},"options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]},"web_instances": 2,"memory_in_mb": 1024,"disk_in_mb": 2048,"log_rate_limit_in_bytes_per_second": 10}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
@@ -307,7 +312,7 @@ var _ = Describe("Deployment", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/deployments"),
-						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary","options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]}}, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+						VerifyJSON(`{"revision":{ "guid":"some-revision-guid" }, "strategy": "canary","options":{"canary": {"steps": [{"instance_weight": 1}, {"instance_weight": 2}]},"web_instances": 2,"memory_in_mb": 1024,"disk_in_mb": 2048,"log_rate_limit_in_bytes_per_second": 10}, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 						RespondWith(http.StatusTeapot, response, http.Header{}),
 					),
 				)
@@ -339,7 +344,13 @@ var _ = Describe("Deployment", func() {
 					"strategy": "canary",
 					"status": {
 						"value": "FINALIZED",
-						"reason": "SUPERSEDED"
+						"reason": "SUPERSEDED",
+						"canary": {
+							"steps": {
+								"current": 4,
+								"total": 5
+							}
+   						}
 					},
 					"droplet": {
  					  "guid": "some-droplet-guid"
@@ -374,6 +385,8 @@ var _ = Describe("Deployment", func() {
 				Expect(deployment.StatusValue).To(Equal(constant.DeploymentStatusValueFinalized))
 				Expect(deployment.StatusReason).To(Equal(constant.DeploymentStatusReasonSuperseded))
 				Expect(deployment.Strategy).To(Equal(constant.DeploymentStrategyCanary))
+				Expect(deployment.CanaryStatus.Steps.CurrentStep).To(Equal(4))
+				Expect(deployment.CanaryStatus.Steps.TotalSteps).To(Equal(5))
 			})
 		})
 

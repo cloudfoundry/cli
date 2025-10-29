@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"code.cloudfoundry.org/cli/v9/util/configv3"
 	. "code.cloudfoundry.org/cli/v9/util/configv3"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -513,7 +512,7 @@ var _ = Describe("JSONConfig", func() {
 		})
 
 		Describe("CurrentUser", func() {
-			var user configv3.User
+			var user User
 
 			JustBeforeEach(func() {
 				user, err = config.CurrentUser()

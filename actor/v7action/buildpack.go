@@ -21,10 +21,14 @@ type Downloader interface {
 	Download(url string, tmpDirPath string) (string, error)
 }
 
-func (actor Actor) GetBuildpacks(labelSelector string) ([]resources.Buildpack, Warnings, error) {
-	queries := []ccv3.Query{ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}}
+func (actor Actor) GetBuildpacks(labelSelector string, lifecycle string) ([]resources.Buildpack, Warnings, error) {
+	queries := []ccv3.Query{}
 	if labelSelector != "" {
 		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+
+	if lifecycle != "" {
+		queries = append(queries, ccv3.Query{Key: ccv3.LifecycleFilter, Values: []string{lifecycle}})
 	}
 
 	buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(queries...)
@@ -32,41 +36,45 @@ func (actor Actor) GetBuildpacks(labelSelector string) ([]resources.Buildpack, W
 	return buildpacks, Warnings(warnings), err
 }
 
-// GetBuildpackByNameAndStack returns a buildpack with the provided name and
-// stack. If `buildpackStack` is not specified, and there are multiple
+// GetBuildpackByNameAndStackAndLifecycle returns a buildpack with the provided name, stack,
+// and lifecycle. If `buildpackStack` is not specified, and there are multiple
 // buildpacks with the same name, it will return the one with no stack, if
-// present.
-func (actor Actor) GetBuildpackByNameAndStack(buildpackName string, buildpackStack string) (resources.Buildpack, Warnings, error) {
+// present. If `buildpackLifecycle` is not specified and there are multiple buildpacks with
+// the same name, it will return the one with the default_app_lifecycle, if present.
+func (actor Actor) GetBuildpackByNameAndStackAndLifecycle(buildpackName string, buildpackStack string, buildpackLifecycle string) (resources.Buildpack, Warnings, error) {
 	var (
 		buildpacks []resources.Buildpack
 		warnings   ccv3.Warnings
 		err        error
 	)
 
-	if buildpackStack == "" {
-		buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(ccv3.Query{
-			Key:    ccv3.NameFilter,
-			Values: []string{buildpackName},
+	queries := []ccv3.Query{{
+		Key:    ccv3.NameFilter,
+		Values: []string{buildpackName},
+	}}
+
+	if buildpackStack != "" {
+		queries = append(queries, ccv3.Query{
+			Key:    ccv3.StackFilter,
+			Values: []string{buildpackStack},
 		})
-	} else {
-		buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(
-			ccv3.Query{
-				Key:    ccv3.NameFilter,
-				Values: []string{buildpackName},
-			},
-			ccv3.Query{
-				Key:    ccv3.StackFilter,
-				Values: []string{buildpackStack},
-			},
-		)
 	}
+
+	if buildpackLifecycle != "" {
+		queries = append(queries, ccv3.Query{
+			Key:    ccv3.LifecycleFilter,
+			Values: []string{buildpackLifecycle},
+		})
+	}
+
+	buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(queries...)
 
 	if err != nil {
 		return resources.Buildpack{}, Warnings(warnings), err
 	}
 
 	if len(buildpacks) == 0 {
-		return resources.Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack}
+		return resources.Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack, Lifecycle: buildpackLifecycle}
 	}
 
 	if len(buildpacks) > 1 {
@@ -87,9 +95,9 @@ func (actor Actor) CreateBuildpack(buildpack resources.Buildpack) (resources.Bui
 	return buildpack, Warnings(warnings), err
 }
 
-func (actor Actor) UpdateBuildpackByNameAndStack(buildpackName string, buildpackStack string, buildpack resources.Buildpack) (resources.Buildpack, Warnings, error) {
+func (actor Actor) UpdateBuildpackByNameAndStackAndLifecycle(buildpackName string, buildpackStack string, buildpackLifecycle string, buildpack resources.Buildpack) (resources.Buildpack, Warnings, error) {
 	var warnings Warnings
-	foundBuildpack, getWarnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	foundBuildpack, getWarnings, err := actor.GetBuildpackByNameAndStackAndLifecycle(buildpackName, buildpackStack, buildpackLifecycle)
 	warnings = append(warnings, getWarnings...)
 
 	if err != nil {
@@ -250,9 +258,9 @@ func Zipit(source, target, prefix string) error {
 	return err
 }
 
-func (actor Actor) DeleteBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Warnings, error) {
+func (actor Actor) DeleteBuildpackByNameAndStackAndLifecycle(buildpackName string, buildpackStack string, buildpackLifecycle string) (Warnings, error) {
 	var allWarnings Warnings
-	buildpack, getBuildpackWarnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	buildpack, getBuildpackWarnings, err := actor.GetBuildpackByNameAndStackAndLifecycle(buildpackName, buildpackStack, buildpackLifecycle)
 	allWarnings = append(allWarnings, getBuildpackWarnings...)
 	if err != nil {
 		return allWarnings, err

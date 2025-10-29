@@ -212,7 +212,7 @@ var _ = Describe("push Command", func() {
 
 			When("the flags are all valid", func() {
 				It("delegating to the GetBaseManifest", func() {
-					// This tells us GetBaseManifest is being called because we dont have a fake
+					// This tells us GetBaseManifest is being called because we don't have a fake
 					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 				})
 
@@ -275,6 +275,14 @@ var _ = Describe("push Command", func() {
 								},
 								nil,
 							)
+							fakeActor.HandleDeploymentScaleFlagOverridesReturns(
+								manifestparser.Manifest{
+									Applications: []manifestparser.Application{
+										{Name: "some-app-name"},
+									},
+								},
+								nil,
+							)
 						})
 
 						When("the docker password is needed", func() {
@@ -299,7 +307,7 @@ var _ = Describe("push Command", func() {
 						})
 
 						It("delegates to the manifest parser", func() {
-							Expect(fakeManifestParser.MarshalManifestCallCount()).To(Equal(1))
+							Expect(fakeManifestParser.MarshalManifestCallCount()).To(Equal(2))
 							Expect(fakeManifestParser.MarshalManifestArgsForCall(0)).To(Equal(
 								manifestparser.Manifest{
 									Applications: []manifestparser.Application{
@@ -336,6 +344,12 @@ var _ = Describe("push Command", func() {
 
 								BeforeEach(func() {
 									fakeActor.HandleFlagOverridesReturns(
+										manifestparser.Manifest{
+											PathToManifest: "path/to/manifest",
+										},
+										nil,
+									)
+									fakeActor.HandleDeploymentScaleFlagOverridesReturns(
 										manifestparser.Manifest{
 											PathToManifest: "path/to/manifest",
 										},
@@ -628,6 +642,9 @@ var _ = Describe("push Command", func() {
 												When("canary strategy is provided", func() {
 													BeforeEach(func() {
 														cmd.Strategy = flag.DeploymentStrategy{Name: "canary"}
+														fakeConfig = &commandfakes.FakeConfig{}
+														fakeConfig.APIVersionReturns("4.0.0")
+														cmd.Config = fakeConfig
 													})
 
 													It("should succeed", func() {
@@ -1438,7 +1455,21 @@ var _ = Describe("push Command", func() {
 			},
 			translatableerror.ArgumentCombinationError{
 				Args: []string{
-					"--instance-steps", "--strategy=canary",
+					"--instance-steps", "--strategy=rolling or --strategy not provided",
 				}}),
+
+		Entry("instance-steps used when CAPI does not support canary steps",
+			func() {
+				cmd.InstanceSteps = "1,2,3"
+				cmd.Strategy.Name = constant.DeploymentStrategyCanary
+				fakeConfig = &commandfakes.FakeConfig{}
+				fakeConfig.APIVersionReturns("3.0.0")
+				cmd.Config = fakeConfig
+			},
+			translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--instance-steps",
+				CurrentVersion: "3.0.0",
+				MinimumVersion: "3.189.0",
+			}),
 	)
 })
