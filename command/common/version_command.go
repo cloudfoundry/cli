@@ -1,6 +1,6 @@
 package common
 
-import "code.cloudfoundry.org/cli/command"
+import "code.cloudfoundry.org/cli/v8/command"
 
 type VersionCommand struct {
 	usage  interface{} `usage:"CF_NAME version\n\n   'cf -v' and 'cf --version' are also accepted."`

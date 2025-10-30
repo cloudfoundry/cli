@@ -11,16 +11,16 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/plugin"
-	plugin_models "code.cloudfoundry.org/cli/plugin/models"
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/plugin"
+	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
 
-	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/v8/cf/trace"
 )
 
 var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
@@ -176,12 +176,12 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	if cmdRegistry.CommandExists(args[0]) {
 		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-		//set deps objs to be the one used by all other commands
-		//once all commands are converted, we can make fresh deps for each command run
+		// set deps objs to be the one used by all other commands
+		// once all commands are converted, we can make fresh deps for each command run
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
 
-		//set command ui's TeePrinter to be the one used by RpcService, for output to be captured
+		// set command ui's TeePrinter to be the one used by RpcService, for output to be captured
 		deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
 
 		err = cmd.newCmdRunner.Command(args, deps, false)
@@ -304,8 +304,8 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Application = retVal
@@ -318,8 +318,8 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.AppsSummary = retVal
@@ -332,8 +332,8 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organizations = retVal
@@ -346,8 +346,8 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Spaces = retVal
@@ -360,9 +360,9 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Services = retVal
@@ -375,8 +375,8 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.OrgUsers = retVal
@@ -389,8 +389,8 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.SpaceUsers = retVal
@@ -403,8 +403,8 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organization = retVal
@@ -417,8 +417,8 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Space = retVal
@@ -431,8 +431,8 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
-	//set deps objs to be the one used by all other commands
-	//once all commands are converted, we can make fresh deps for each command run
+	// set deps objs to be the one used by all other commands
+	// once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Service = retVal

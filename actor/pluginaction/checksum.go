@@ -1,6 +1,6 @@
 package pluginaction
 
-import "code.cloudfoundry.org/cli/util/configv3"
+import "code.cloudfoundry.org/cli/v8/util/configv3"
 
 func (actor Actor) ValidateFileChecksum(path string, checksum string) bool {
 	plugin := configv3.Plugin{Location: path}

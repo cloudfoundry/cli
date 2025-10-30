@@ -1,10 +1,10 @@
 package v7
 
 import (
-	"strconv"
+    "strconv"
 
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/resources"
+    "code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 type RouteCommand struct {

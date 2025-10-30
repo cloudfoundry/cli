@@ -15,7 +15,7 @@ CERT_DIR=cf-credentials/cert_dir
 
 source ~/workspace/cli-private/set_int_test_foundation.sh $ENV
 
-cd $GOPATH/src/code.cloudfoundry.org/cli
+cd $GOPATH/src/code.cloudfoundry.org/cli/v8
 
 echo "Making windows..."
 make out/cf-cli_winx64.exe

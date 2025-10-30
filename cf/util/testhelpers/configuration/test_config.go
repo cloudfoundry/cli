@@ -1,8 +1,8 @@
 package configuration
 
 import (
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 func NewRepository() coreconfig.Repository {

@@ -3,11 +3,11 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/router/routererror"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v8/api/router"
+	"code.cloudfoundry.org/cli/v8/api/router/routererror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

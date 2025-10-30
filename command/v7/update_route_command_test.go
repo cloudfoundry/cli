@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
-	. "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/command/commandfakes"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	. "code.cloudfoundry.org/cli/v8/command/v7"
+	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -259,7 +259,7 @@ var _ = Describe("update-route Command", func() {
 						Expect(actualRouteGUID).To(Equal("route-guid"))
 						Expect(actualOptions).To(Equal(options))
 
-						//Second update route call to remove the option
+						// Second update route call to remove the option
 						actualRouteGUID, actualOptions = fakeActor.UpdateRouteArgsForCall(1)
 						Expect(actualRouteGUID).To(Equal("route-guid"))
 						options["loadbalancing"] = nil

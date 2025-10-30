@@ -37,7 +37,7 @@ func BuildConfigurablePlugin(pluginType string, name string, version string, plu
 		commandHelps = append(commandHelps, command.Help)
 	}
 
-	pluginPath, err := Build(fmt.Sprintf("code.cloudfoundry.org/cli/integration/assets/%s", pluginType),
+	pluginPath, err := Build(fmt.Sprintf("code.cloudfoundry.org/cli/v8/integration/assets/%s", pluginType),
 		"-o",
 		name,
 		"-ldflags",

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 )
 
 type Docker struct {

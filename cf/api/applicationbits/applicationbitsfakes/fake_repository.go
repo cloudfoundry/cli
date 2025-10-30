@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/applicationbits"
-	"code.cloudfoundry.org/cli/cf/api/resources"
+	"code.cloudfoundry.org/cli/v8/cf/api/applicationbits"
+	"code.cloudfoundry.org/cli/v8/cf/api/resources"
 )
 
 type FakeRepository struct {
@@ -51,15 +51,16 @@ func (fake *FakeRepository) GetApplicationFiles(arg1 []resources.AppFileResource
 	fake.getApplicationFilesArgsForCall = append(fake.getApplicationFilesArgsForCall, struct {
 		arg1 []resources.AppFileResource
 	}{arg1Copy})
+	stub := fake.GetApplicationFilesStub
+	fakeReturns := fake.getApplicationFilesReturns
 	fake.recordInvocation("GetApplicationFiles", []interface{}{arg1Copy})
 	fake.getApplicationFilesMutex.Unlock()
-	if fake.GetApplicationFilesStub != nil {
-		return fake.GetApplicationFilesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getApplicationFilesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -121,15 +122,16 @@ func (fake *FakeRepository) UploadBits(arg1 string, arg2 *os.File, arg3 []resour
 		arg2 *os.File
 		arg3 []resources.AppFileResource
 	}{arg1, arg2, arg3Copy})
+	stub := fake.UploadBitsStub
+	fakeReturns := fake.uploadBitsReturns
 	fake.recordInvocation("UploadBits", []interface{}{arg1, arg2, arg3Copy})
 	fake.uploadBitsMutex.Unlock()
-	if fake.UploadBitsStub != nil {
-		return fake.UploadBitsStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uploadBitsReturns
 	return fakeReturns.result1
 }
 

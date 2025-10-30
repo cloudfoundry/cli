@@ -4,9 +4,9 @@ package sharedfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/command/v7/shared"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
 type FakeAppStager struct {

@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"encoding/json"
+    "encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 )
 
 // Droplet represents a Cloud Controller droplet's metadata. A droplet is a set of
@@ -12,7 +12,7 @@ import (
 type Droplet struct {
 	// AppGUID is the unique identifier of the application associated with the droplet.
 	AppGUID string `json:"app_guid"`
-	//Buildpacks are the detected buildpacks from the staging process.
+	// Buildpacks are the detected buildpacks from the staging process.
 	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
 	// CreatedAt is the timestamp that the Cloud Controller created the droplet.
 	CreatedAt string `json:"created_at"`

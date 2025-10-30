@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/router"
+	"code.cloudfoundry.org/cli/v8/api/router"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RequestLoggerOutput

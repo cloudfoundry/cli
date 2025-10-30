@@ -1,6 +1,6 @@
 package pluginaction
 
-import "code.cloudfoundry.org/cli/util/configv3"
+import "code.cloudfoundry.org/cli/v8/util/configv3"
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Config
 

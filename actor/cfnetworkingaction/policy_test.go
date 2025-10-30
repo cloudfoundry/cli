@@ -4,15 +4,15 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/batcher"
+	"code.cloudfoundry.org/cli/v8/api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/batcher"
 
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction/cfnetworkingactionfakes"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v8/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/v8/actor/cfnetworkingaction/cfnetworkingactionfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

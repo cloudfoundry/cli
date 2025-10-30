@@ -3,10 +3,10 @@ package command_parser_test
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/util/command_parser"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v8/command/common"
+	"code.cloudfoundry.org/cli/v8/util/command_parser"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

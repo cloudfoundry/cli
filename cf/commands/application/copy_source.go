@@ -4,18 +4,18 @@ import (
 	"errors"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/api/applications"
-	"code.cloudfoundry.org/cli/cf/api/authentication"
-	"code.cloudfoundry.org/cli/cf/api/copyapplicationsource"
-	"code.cloudfoundry.org/cli/cf/api/organizations"
-	"code.cloudfoundry.org/cli/cf/api/spaces"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications"
+	"code.cloudfoundry.org/cli/v8/cf/api/authentication"
+	"code.cloudfoundry.org/cli/v8/cf/api/copyapplicationsource"
+	"code.cloudfoundry.org/cli/v8/cf/api/organizations"
+	"code.cloudfoundry.org/cli/v8/cf/api/spaces"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 type CopySource struct {
@@ -75,7 +75,7 @@ func (cmd *CopySource) SetDependency(deps commandregistry.Dependency, pluginCall
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.copyAppSourceRepo = deps.RepoLocator.GetCopyApplicationSourceRepository()
 
-	//get command from registry for dependency
+	// get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("restart")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.appRestart = commandDep.(Restarter)

@@ -3,13 +3,13 @@ package application
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Restarter
@@ -63,12 +63,12 @@ func (cmd *Restart) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 
-	//get start for dependency
+	// get start for dependency
 	starter := commandregistry.Commands.FindCommand("start")
 	starter = starter.SetDependency(deps, false)
 	cmd.starter = starter.(Starter)
 
-	//get stop for dependency
+	// get stop for dependency
 	stopper := commandregistry.Commands.FindCommand("stop")
 	stopper = stopper.SetDependency(deps, false)
 	cmd.stopper = stopper.(Stopper)

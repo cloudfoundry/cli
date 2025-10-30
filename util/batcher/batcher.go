@@ -1,6 +1,6 @@
 package batcher
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+import "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 
 const BatchSize = 200
 

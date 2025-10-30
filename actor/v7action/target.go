@@ -1,8 +1,8 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
 type TargetSettings ccv3.TargetSettings

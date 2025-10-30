@@ -1,9 +1,9 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LabelUnsetter

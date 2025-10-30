@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v8/cf/api/resources"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/net"
 	"github.com/google/go-querystring/query"
 )
 

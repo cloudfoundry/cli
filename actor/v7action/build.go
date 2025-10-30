@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/resources"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -90,7 +90,7 @@ func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan 
 					timer.Reset(actor.Config.PollingInterval())
 				default:
 
-					//TODO: uncomment after #150569020
+					// TODO: uncomment after #150569020
 					// droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
 					// warningsStream <- Warnings(warnings)
 					// if err != nil {

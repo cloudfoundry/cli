@@ -3,13 +3,13 @@ package commandregistry_test
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 
-	. "code.cloudfoundry.org/cli/cf/commandregistry/fakecommand"
+	. "code.cloudfoundry.org/cli/v8/cf/commandregistry/fakecommand"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

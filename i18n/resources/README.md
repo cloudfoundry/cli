@@ -3,6 +3,6 @@ This directory will get populated by the pipeline during the `build-binaries` jo
 
 ## How this file was generated
 ```
-$ cd code.cloudfoundry.org/cli/i18n
+$ cd code.cloudfoundry.org/cli/v8/i18n
 $ go-bindata -nometadata  -pkg resources -ignore ".go" -o resources/i18n_resources.go resources/*.all.json
 ```

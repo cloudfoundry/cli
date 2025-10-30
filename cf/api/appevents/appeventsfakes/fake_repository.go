@@ -4,8 +4,8 @@ package appeventsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/appevents"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/appevents"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeRepository struct {
@@ -34,15 +34,16 @@ func (fake *FakeRepository) RecentEvents(arg1 string, arg2 int64) ([]models.Even
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.RecentEventsStub
+	fakeReturns := fake.recentEventsReturns
 	fake.recordInvocation("RecentEvents", []interface{}{arg1, arg2})
 	fake.recentEventsMutex.Unlock()
-	if fake.RecentEventsStub != nil {
-		return fake.RecentEventsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.recentEventsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

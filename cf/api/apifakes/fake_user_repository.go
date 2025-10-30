@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeUserRepository struct {
@@ -203,15 +203,16 @@ func (fake *FakeUserRepository) Create(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -263,15 +264,16 @@ func (fake *FakeUserRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -323,15 +325,16 @@ func (fake *FakeUserRepository) FindAllByUsername(arg1 string) ([]models.UserFie
 	fake.findAllByUsernameArgsForCall = append(fake.findAllByUsernameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindAllByUsernameStub
+	fakeReturns := fake.findAllByUsernameReturns
 	fake.recordInvocation("FindAllByUsername", []interface{}{arg1})
 	fake.findAllByUsernameMutex.Unlock()
-	if fake.FindAllByUsernameStub != nil {
-		return fake.FindAllByUsernameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findAllByUsernameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -386,15 +389,16 @@ func (fake *FakeUserRepository) FindByUsername(arg1 string) (models.UserFields, 
 	fake.findByUsernameArgsForCall = append(fake.findByUsernameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByUsernameStub
+	fakeReturns := fake.findByUsernameReturns
 	fake.recordInvocation("FindByUsername", []interface{}{arg1})
 	fake.findByUsernameMutex.Unlock()
-	if fake.FindByUsernameStub != nil {
-		return fake.FindByUsernameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByUsernameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -450,15 +454,16 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(arg1 string, arg2
 		arg1 string
 		arg2 models.Role
 	}{arg1, arg2})
+	stub := fake.ListUsersInOrgForRoleWithNoUAAStub
+	fakeReturns := fake.listUsersInOrgForRoleWithNoUAAReturns
 	fake.recordInvocation("ListUsersInOrgForRoleWithNoUAA", []interface{}{arg1, arg2})
 	fake.listUsersInOrgForRoleWithNoUAAMutex.Unlock()
-	if fake.ListUsersInOrgForRoleWithNoUAAStub != nil {
-		return fake.ListUsersInOrgForRoleWithNoUAAStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listUsersInOrgForRoleWithNoUAAReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -514,15 +519,16 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(arg1 string, ar
 		arg1 string
 		arg2 models.Role
 	}{arg1, arg2})
+	stub := fake.ListUsersInSpaceForRoleWithNoUAAStub
+	fakeReturns := fake.listUsersInSpaceForRoleWithNoUAAReturns
 	fake.recordInvocation("ListUsersInSpaceForRoleWithNoUAA", []interface{}{arg1, arg2})
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.Unlock()
-	if fake.ListUsersInSpaceForRoleWithNoUAAStub != nil {
-		return fake.ListUsersInSpaceForRoleWithNoUAAStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listUsersInSpaceForRoleWithNoUAAReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -579,15 +585,16 @@ func (fake *FakeUserRepository) SetOrgRoleByGUID(arg1 string, arg2 string, arg3 
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.SetOrgRoleByGUIDStub
+	fakeReturns := fake.setOrgRoleByGUIDReturns
 	fake.recordInvocation("SetOrgRoleByGUID", []interface{}{arg1, arg2, arg3})
 	fake.setOrgRoleByGUIDMutex.Unlock()
-	if fake.SetOrgRoleByGUIDStub != nil {
-		return fake.SetOrgRoleByGUIDStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setOrgRoleByGUIDReturns
 	return fakeReturns.result1
 }
 
@@ -641,15 +648,16 @@ func (fake *FakeUserRepository) SetOrgRoleByUsername(arg1 string, arg2 string, a
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.SetOrgRoleByUsernameStub
+	fakeReturns := fake.setOrgRoleByUsernameReturns
 	fake.recordInvocation("SetOrgRoleByUsername", []interface{}{arg1, arg2, arg3})
 	fake.setOrgRoleByUsernameMutex.Unlock()
-	if fake.SetOrgRoleByUsernameStub != nil {
-		return fake.SetOrgRoleByUsernameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setOrgRoleByUsernameReturns
 	return fakeReturns.result1
 }
 
@@ -704,15 +712,16 @@ func (fake *FakeUserRepository) SetSpaceRoleByGUID(arg1 string, arg2 string, arg
 		arg3 string
 		arg4 models.Role
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.SetSpaceRoleByGUIDStub
+	fakeReturns := fake.setSpaceRoleByGUIDReturns
 	fake.recordInvocation("SetSpaceRoleByGUID", []interface{}{arg1, arg2, arg3, arg4})
 	fake.setSpaceRoleByGUIDMutex.Unlock()
-	if fake.SetSpaceRoleByGUIDStub != nil {
-		return fake.SetSpaceRoleByGUIDStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setSpaceRoleByGUIDReturns
 	return fakeReturns.result1
 }
 
@@ -767,15 +776,16 @@ func (fake *FakeUserRepository) SetSpaceRoleByUsername(arg1 string, arg2 string,
 		arg3 string
 		arg4 models.Role
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.SetSpaceRoleByUsernameStub
+	fakeReturns := fake.setSpaceRoleByUsernameReturns
 	fake.recordInvocation("SetSpaceRoleByUsername", []interface{}{arg1, arg2, arg3, arg4})
 	fake.setSpaceRoleByUsernameMutex.Unlock()
-	if fake.SetSpaceRoleByUsernameStub != nil {
-		return fake.SetSpaceRoleByUsernameStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setSpaceRoleByUsernameReturns
 	return fakeReturns.result1
 }
 
@@ -829,15 +839,16 @@ func (fake *FakeUserRepository) UnsetOrgRoleByGUID(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetOrgRoleByGUIDStub
+	fakeReturns := fake.unsetOrgRoleByGUIDReturns
 	fake.recordInvocation("UnsetOrgRoleByGUID", []interface{}{arg1, arg2, arg3})
 	fake.unsetOrgRoleByGUIDMutex.Unlock()
-	if fake.UnsetOrgRoleByGUIDStub != nil {
-		return fake.UnsetOrgRoleByGUIDStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unsetOrgRoleByGUIDReturns
 	return fakeReturns.result1
 }
 
@@ -891,15 +902,16 @@ func (fake *FakeUserRepository) UnsetOrgRoleByUsername(arg1 string, arg2 string,
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetOrgRoleByUsernameStub
+	fakeReturns := fake.unsetOrgRoleByUsernameReturns
 	fake.recordInvocation("UnsetOrgRoleByUsername", []interface{}{arg1, arg2, arg3})
 	fake.unsetOrgRoleByUsernameMutex.Unlock()
-	if fake.UnsetOrgRoleByUsernameStub != nil {
-		return fake.UnsetOrgRoleByUsernameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unsetOrgRoleByUsernameReturns
 	return fakeReturns.result1
 }
 
@@ -953,15 +965,16 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByGUID(arg1 string, arg2 string, a
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetSpaceRoleByGUIDStub
+	fakeReturns := fake.unsetSpaceRoleByGUIDReturns
 	fake.recordInvocation("UnsetSpaceRoleByGUID", []interface{}{arg1, arg2, arg3})
 	fake.unsetSpaceRoleByGUIDMutex.Unlock()
-	if fake.UnsetSpaceRoleByGUIDStub != nil {
-		return fake.UnsetSpaceRoleByGUIDStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unsetSpaceRoleByGUIDReturns
 	return fakeReturns.result1
 }
 
@@ -1015,15 +1028,16 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByUsername(arg1 string, arg2 strin
 		arg2 string
 		arg3 models.Role
 	}{arg1, arg2, arg3})
+	stub := fake.UnsetSpaceRoleByUsernameStub
+	fakeReturns := fake.unsetSpaceRoleByUsernameReturns
 	fake.recordInvocation("UnsetSpaceRoleByUsername", []interface{}{arg1, arg2, arg3})
 	fake.unsetSpaceRoleByUsernameMutex.Unlock()
-	if fake.UnsetSpaceRoleByUsernameStub != nil {
-		return fake.UnsetSpaceRoleByUsernameStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unsetSpaceRoleByUsernameReturns
 	return fakeReturns.result1
 }
 

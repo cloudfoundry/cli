@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeRoutingAPIRepository struct {
@@ -30,15 +30,16 @@ func (fake *FakeRoutingAPIRepository) ListRouterGroups(arg1 func(models.RouterGr
 	fake.listRouterGroupsArgsForCall = append(fake.listRouterGroupsArgsForCall, struct {
 		arg1 func(models.RouterGroup) bool
 	}{arg1})
+	stub := fake.ListRouterGroupsStub
+	fakeReturns := fake.listRouterGroupsReturns
 	fake.recordInvocation("ListRouterGroups", []interface{}{arg1})
 	fake.listRouterGroupsMutex.Unlock()
-	if fake.ListRouterGroupsStub != nil {
-		return fake.ListRouterGroupsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.listRouterGroupsReturns
 	return fakeReturns.result1
 }
 

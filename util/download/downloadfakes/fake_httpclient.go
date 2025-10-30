@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/v8/util/download"
 )
 
 type FakeHTTPClient struct {
@@ -32,15 +32,16 @@ func (fake *FakeHTTPClient) Get(arg1 string) (*http.Response, error) {
 	fake.getArgsForCall = append(fake.getArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetStub
+	fakeReturns := fake.getReturns
 	fake.recordInvocation("Get", []interface{}{arg1})
 	fake.getMutex.Unlock()
-	if fake.GetStub != nil {
-		return fake.GetStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

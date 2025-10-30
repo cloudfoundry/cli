@@ -4,8 +4,8 @@ package actorsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/actors"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeRouteActor struct {
@@ -129,15 +129,16 @@ func (fake *FakeRouteActor) BindRoute(arg1 models.Application, arg2 models.Route
 		arg1 models.Application
 		arg2 models.Route
 	}{arg1, arg2})
+	stub := fake.BindRouteStub
+	fakeReturns := fake.bindRouteReturns
 	fake.recordInvocation("BindRoute", []interface{}{arg1, arg2})
 	fake.bindRouteMutex.Unlock()
-	if fake.BindRouteStub != nil {
-		return fake.BindRouteStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.bindRouteReturns
 	return fakeReturns.result1
 }
 
@@ -189,15 +190,16 @@ func (fake *FakeRouteActor) CreateRandomTCPRoute(arg1 models.DomainFields) (mode
 	fake.createRandomTCPRouteArgsForCall = append(fake.createRandomTCPRouteArgsForCall, struct {
 		arg1 models.DomainFields
 	}{arg1})
+	stub := fake.CreateRandomTCPRouteStub
+	fakeReturns := fake.createRandomTCPRouteReturns
 	fake.recordInvocation("CreateRandomTCPRoute", []interface{}{arg1})
 	fake.createRandomTCPRouteMutex.Unlock()
-	if fake.CreateRandomTCPRouteStub != nil {
-		return fake.CreateRandomTCPRouteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createRandomTCPRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -254,15 +256,16 @@ func (fake *FakeRouteActor) FindAndBindRoute(arg1 string, arg2 models.Applicatio
 		arg2 models.Application
 		arg3 models.AppParams
 	}{arg1, arg2, arg3})
+	stub := fake.FindAndBindRouteStub
+	fakeReturns := fake.findAndBindRouteReturns
 	fake.recordInvocation("FindAndBindRoute", []interface{}{arg1, arg2, arg3})
 	fake.findAndBindRouteMutex.Unlock()
-	if fake.FindAndBindRouteStub != nil {
-		return fake.FindAndBindRouteStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.findAndBindRouteReturns
 	return fakeReturns.result1
 }
 
@@ -314,15 +317,16 @@ func (fake *FakeRouteActor) FindDomain(arg1 string) (string, models.DomainFields
 	fake.findDomainArgsForCall = append(fake.findDomainArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindDomainStub
+	fakeReturns := fake.findDomainReturns
 	fake.recordInvocation("FindDomain", []interface{}{arg1})
 	fake.findDomainMutex.Unlock()
-	if fake.FindDomainStub != nil {
-		return fake.FindDomainStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.findDomainReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -384,15 +388,16 @@ func (fake *FakeRouteActor) FindOrCreateRoute(arg1 string, arg2 models.DomainFie
 		arg4 int
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.FindOrCreateRouteStub
+	fakeReturns := fake.findOrCreateRouteReturns
 	fake.recordInvocation("FindOrCreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.findOrCreateRouteMutex.Unlock()
-	if fake.FindOrCreateRouteStub != nil {
-		return fake.FindOrCreateRouteStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findOrCreateRouteReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -447,15 +452,16 @@ func (fake *FakeRouteActor) FindPath(arg1 string) (string, string) {
 	fake.findPathArgsForCall = append(fake.findPathArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindPathStub
+	fakeReturns := fake.findPathReturns
 	fake.recordInvocation("FindPath", []interface{}{arg1})
 	fake.findPathMutex.Unlock()
-	if fake.FindPathStub != nil {
-		return fake.FindPathStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findPathReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -510,15 +516,16 @@ func (fake *FakeRouteActor) FindPort(arg1 string) (string, int, error) {
 	fake.findPortArgsForCall = append(fake.findPortArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindPortStub
+	fakeReturns := fake.findPortReturns
 	fake.recordInvocation("FindPort", []interface{}{arg1})
 	fake.findPortMutex.Unlock()
-	if fake.FindPortStub != nil {
-		return fake.FindPortStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.findPortReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -576,15 +583,16 @@ func (fake *FakeRouteActor) UnbindAll(arg1 models.Application) error {
 	fake.unbindAllArgsForCall = append(fake.unbindAllArgsForCall, struct {
 		arg1 models.Application
 	}{arg1})
+	stub := fake.UnbindAllStub
+	fakeReturns := fake.unbindAllReturns
 	fake.recordInvocation("UnbindAll", []interface{}{arg1})
 	fake.unbindAllMutex.Unlock()
-	if fake.UnbindAllStub != nil {
-		return fake.UnbindAllStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unbindAllReturns
 	return fakeReturns.result1
 }
 

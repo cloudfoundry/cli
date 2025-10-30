@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/flag"
 	log "github.com/sirupsen/logrus"
 )
 

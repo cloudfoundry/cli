@@ -3,10 +3,10 @@ package selfcontained_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/v7/selfcontained/fake"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/integration/helpers"
+	"code.cloudfoundry.org/cli/v8/integration/v7/selfcontained/fake"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"

@@ -1,6 +1,6 @@
 package railway
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+import "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 
 type funcWithWarningsAndError = func() (ccv3.Warnings, error)
 

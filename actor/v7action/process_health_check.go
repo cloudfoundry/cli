@@ -3,7 +3,7 @@ package v7action
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 )
 
 type ProcessHealthCheck struct {

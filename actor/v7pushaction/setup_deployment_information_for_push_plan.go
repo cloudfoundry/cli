@@ -1,10 +1,10 @@
 package v7pushaction
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 func SetupDeploymentInformationForPushPlan(pushPlan PushPlan, overrides FlagOverrides) (PushPlan, error) {

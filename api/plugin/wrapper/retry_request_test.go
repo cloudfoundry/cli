@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/plugin"
-	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
-	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
-	. "code.cloudfoundry.org/cli/api/plugin/wrapper"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
+	"code.cloudfoundry.org/cli/v8/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/v8/api/plugin/pluginfakes"
+	. "code.cloudfoundry.org/cli/v8/api/plugin/wrapper"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

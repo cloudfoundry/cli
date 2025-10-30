@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	sshCmd "code.cloudfoundry.org/cli/cf/ssh"
+	sshCmd "code.cloudfoundry.org/cli/v8/cf/ssh"
 )
 
 type FakeListenerFactory struct {
@@ -34,15 +34,16 @@ func (fake *FakeListenerFactory) Listen(arg1 string, arg2 string) (net.Listener,
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ListenStub
+	fakeReturns := fake.listenReturns
 	fake.recordInvocation("Listen", []interface{}{arg1, arg2})
 	fake.listenMutex.Unlock()
-	if fake.ListenStub != nil {
-		return fake.ListenStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

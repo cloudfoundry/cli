@@ -9,7 +9,7 @@ import (
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 )
 
 func EncodeAccessToken(tokenInfo coreconfig.TokenInfo) (accessToken string, err error) {

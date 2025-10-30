@@ -1,6 +1,6 @@
 package v7action
 
-import "code.cloudfoundry.org/cli/api/router"
+import "code.cloudfoundry.org/cli/v8/api/router"
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RoutingClient
 

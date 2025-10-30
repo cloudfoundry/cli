@@ -4,8 +4,8 @@ package pluginactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v8/actor/pluginaction"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
 )
 
 type FakePluginClient struct {
@@ -47,15 +47,16 @@ func (fake *FakePluginClient) DownloadPlugin(arg1 string, arg2 string, arg3 plug
 		arg2 string
 		arg3 plugin.ProxyReader
 	}{arg1, arg2, arg3})
+	stub := fake.DownloadPluginStub
+	fakeReturns := fake.downloadPluginReturns
 	fake.recordInvocation("DownloadPlugin", []interface{}{arg1, arg2, arg3})
 	fake.downloadPluginMutex.Unlock()
-	if fake.DownloadPluginStub != nil {
-		return fake.DownloadPluginStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.downloadPluginReturns
 	return fakeReturns.result1
 }
 
@@ -107,15 +108,16 @@ func (fake *FakePluginClient) GetPluginRepository(arg1 string) (plugin.PluginRep
 	fake.getPluginRepositoryArgsForCall = append(fake.getPluginRepositoryArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetPluginRepositoryStub
+	fakeReturns := fake.getPluginRepositoryReturns
 	fake.recordInvocation("GetPluginRepository", []interface{}{arg1})
 	fake.getPluginRepositoryMutex.Unlock()
-	if fake.GetPluginRepositoryStub != nil {
-		return fake.GetPluginRepositoryStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPluginRepositoryReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

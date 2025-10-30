@@ -4,7 +4,7 @@ package noaabridgefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
+	"code.cloudfoundry.org/cli/v8/api/uaa/noaabridge"
 )
 
 type FakeTokenCache struct {
@@ -37,15 +37,16 @@ func (fake *FakeTokenCache) RefreshToken() string {
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 	}{})
+	stub := fake.RefreshTokenStub
+	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1
 }
 
@@ -89,9 +90,10 @@ func (fake *FakeTokenCache) SetAccessToken(arg1 string) {
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetAccessTokenStub
 	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
 	fake.setAccessTokenMutex.Unlock()
-	if fake.SetAccessTokenStub != nil {
+	if stub != nil {
 		fake.SetAccessTokenStub(arg1)
 	}
 }
@@ -120,9 +122,10 @@ func (fake *FakeTokenCache) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetRefreshTokenStub
 	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
 	fake.setRefreshTokenMutex.Unlock()
-	if fake.SetRefreshTokenStub != nil {
+	if stub != nil {
 		fake.SetRefreshTokenStub(arg1)
 	}
 }

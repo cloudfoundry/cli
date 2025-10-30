@@ -5,10 +5,10 @@ import (
 	"errors"
 	"os/exec"
 
-	. "code.cloudfoundry.org/cli/plugin/plugin_examples/test_rpc_server_example"
+	. "code.cloudfoundry.org/cli/v8/plugin/plugin_examples/test_rpc_server_example"
 
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver"
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver/rpcserverfakes"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/rpcserver"
+	"code.cloudfoundry.org/cli/v8/cf/util/testhelpers/rpcserver/rpcserverfakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,15 +31,15 @@ var _ = Describe("App-Lister", func() {
 		ts, err = rpcserver.NewTestRPCServer(rpcHandlers)
 		Expect(err).NotTo(HaveOccurred())
 
-		//set rpc.CallCoreCommand to a successful call
-		//rpc.CallCoreCommand is used in both cliConnection.CliCommand() and
-		//cliConnection.CliWithoutTerminalOutput()
+		// set rpc.CallCoreCommand to a successful call
+		// rpc.CallCoreCommand is used in both cliConnection.CliCommand() and
+		// cliConnection.CliWithoutTerminalOutput()
 		rpcHandlers.CallCoreCommandStub = func(_ []string, retVal *bool) error {
 			*retVal = true
 			return nil
 		}
 
-		//set rpc.GetOutputAndReset to return empty string; this is used by CliCommand()/CliWithoutTerminalOutput()
+		// set rpc.GetOutputAndReset to return empty string; this is used by CliCommand()/CliWithoutTerminalOutput()
 		rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 			*retVal = []string{"{}"}
 			return nil

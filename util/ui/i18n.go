@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"code.cloudfoundry.org/cli/i18n/resources"
+	"code.cloudfoundry.org/cli/v8/i18n/resources"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/language"
 )

@@ -1,7 +1,7 @@
 package matchers_test
 
 import (
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 	"errors"
 	. "github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"

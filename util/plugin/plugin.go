@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	plugin_transition "code.cloudfoundry.org/cli/plugin/transition"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	plugin_transition "code.cloudfoundry.org/cli/v8/plugin/transition"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 
-	"code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/command/common"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 var ErrFailed = errors.New("command failed")

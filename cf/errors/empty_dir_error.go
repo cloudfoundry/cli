@@ -1,7 +1,7 @@
 package errors
 
 import (
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 )
 
 type EmptyDirError struct {

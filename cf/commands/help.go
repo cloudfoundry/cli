@@ -4,14 +4,14 @@ import (
 	"errors"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/help"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/help"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
 )
 
 type Help struct {
@@ -53,7 +53,7 @@ func (cmd *Help) Execute(c flags.FlagContext) error {
 		if commandregistry.Commands.CommandExists(cmdName) {
 			cmd.ui.Say(commandregistry.Commands.CommandUsage(cmdName))
 		} else {
-			//check plugin commands
+			// check plugin commands
 			found := false
 			for _, meta := range cmd.config.Plugins() {
 				for _, c := range meta.Commands {
@@ -72,7 +72,7 @@ func (cmd *Help) Execute(c flags.FlagContext) error {
 						if len(c.UsageDetails.Options) > 0 {
 							output += "\n" + T("OPTIONS:") + "\n"
 
-							//find longest name length
+							// find longest name length
 							l := 0
 							for n := range c.UsageDetails.Options {
 								if len(n) > l {

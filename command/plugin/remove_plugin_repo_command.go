@@ -1,9 +1,9 @@
 package plugin
 
 import (
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 type RemovePluginRepoCommand struct {

@@ -4,8 +4,8 @@ package stacksfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/stacks"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/stacks"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeStackRepository struct {
@@ -56,15 +56,16 @@ func (fake *FakeStackRepository) FindAll() ([]models.Stack, error) {
 	ret, specificReturn := fake.findAllReturnsOnCall[len(fake.findAllArgsForCall)]
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct {
 	}{})
+	stub := fake.FindAllStub
+	fakeReturns := fake.findAllReturns
 	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
-	if fake.FindAllStub != nil {
-		return fake.FindAllStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findAllReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -112,15 +113,16 @@ func (fake *FakeStackRepository) FindByGUID(arg1 string) (models.Stack, error) {
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByGUIDStub
+	fakeReturns := fake.findByGUIDReturns
 	fake.recordInvocation("FindByGUID", []interface{}{arg1})
 	fake.findByGUIDMutex.Unlock()
-	if fake.FindByGUIDStub != nil {
-		return fake.FindByGUIDStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -175,15 +177,16 @@ func (fake *FakeStackRepository) FindByName(arg1 string) (models.Stack, error) {
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByNameStub
+	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if fake.FindByNameStub != nil {
-		return fake.FindByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

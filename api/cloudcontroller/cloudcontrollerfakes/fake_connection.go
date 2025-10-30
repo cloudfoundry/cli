@@ -4,7 +4,7 @@ package cloudcontrollerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 type FakeConnection struct {
@@ -31,15 +31,16 @@ func (fake *FakeConnection) Make(arg1 *cloudcontroller.Request, arg2 *cloudcontr
 		arg1 *cloudcontroller.Request
 		arg2 *cloudcontroller.Response
 	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 

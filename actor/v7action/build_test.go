@@ -4,12 +4,12 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/clock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -138,7 +138,7 @@ var _ = Describe("Build Actions", func() {
 					fakeCloudControllerClient.GetBuildReturnsOnCall(1, resources.Build{CreatedAt: "some-time", GUID: buildGUID, State: constant.BuildStaged, DropletGUID: "some-droplet-guid"}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
 				})
 
-				//TODO: uncommend after #150569020
+				// TODO: uncommend after #150569020
 				// FWhen("looking up the droplet fails", func() {
 				// 	BeforeEach(func() {
 				// 		fakeCloudControllerClient.GetDropletReturns(resources.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))

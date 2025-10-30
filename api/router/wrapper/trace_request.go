@@ -1,8 +1,8 @@
 package wrapper
 
 import (
-	"code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/shared"
+	"code.cloudfoundry.org/cli/v8/api/router"
+	"code.cloudfoundry.org/cli/v8/api/shared"
 )
 
 // RoutingTraceHeaderRequest is a wrapper that adds b3 trace headers to requests.
