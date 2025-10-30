@@ -17,6 +17,7 @@ type AppInstanceRow struct {
 	LogRate        string
 	CPUEntitlement string
 	Details        string
+	Ready          string
 }
 
 // AppProcessTable represents a process of a V3 app, as displayed in the 'cf
@@ -57,18 +58,8 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 
 		switch {
 		case strings.HasPrefix(row, "#"):
-			const columnCount = 9
-
 			// instance row
 			columns := splitColumns(row)
-			cpuEntitlement, details := "", ""
-			if len(columns) >= columnCount-1 {
-				cpuEntitlement = columns[columnCount-2]
-			}
-			if len(columns) >= columnCount {
-				details = columns[columnCount-1]
-			}
-
 			instanceRow := AppInstanceRow{
 				Index:          columns[0],
 				State:          columns[1],
@@ -77,8 +68,9 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 				Memory:         columns[4],
 				Disk:           columns[5],
 				LogRate:        columns[6],
-				CPUEntitlement: cpuEntitlement,
-				Details:        details,
+				CPUEntitlement: columns[7],
+				Details:        columns[8],
+				Ready:          columns[9],
 			}
 			lastProcessIndex := len(appTable.Processes) - 1
 			appTable.Processes[lastProcessIndex].Instances = append(
@@ -115,9 +107,20 @@ func splitColumns(row string) []string {
 	s := strings.TrimSpace(row)
 	// uses 3 spaces between columns
 	result := regexp.MustCompile(`\s{3,}`).Split(s, -1)
-	// 21 spaces should only occur if cpu entitlement is empty but details is filled in
-	if regexp.MustCompile(`\s{21}`).MatchString(s) {
-		result = append(result[:len(result)-1], "", result[len(result)-1])
+
+	if regexp.MustCompile(`\s{31}`).MatchString(s) {
+
+		if len(result) == 8 {
+			// Both cpu entitlement and details are empty
+			result = append(result[:len(result)-1], "", "", result[len(result)-1])
+		} else {
+			// Only details is empty
+			result = append(result[:len(result)-2], result[len(result)-2], "", result[len(result)-1])
+		}
+
+	} else if regexp.MustCompile(`\s{21}`).MatchString(s) {
+		// cpu entitlement is empty, details is filled
+		result = append(result[:len(result)-2], "", result[len(result)-2], result[len(result)-1])
 	}
 	return result
 }
