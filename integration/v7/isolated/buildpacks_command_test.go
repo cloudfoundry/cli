@@ -32,7 +32,7 @@ var _ = Describe("buildpacks command", func() {
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--labels\s+Selector to filter buildpacks by labels`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"))
+			Eventually(session).Should(Say("create-buildpack, delete-buildpack, update-buildpack"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

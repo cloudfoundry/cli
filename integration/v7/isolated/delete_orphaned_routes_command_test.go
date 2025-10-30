@@ -34,7 +34,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`delete-routes, routes`))
+			Eventually(session).Should(Say(`delete-route, routes`))
 
 			Eventually(session).Should(Exit(0))
 		})
