@@ -80,6 +80,14 @@ func formatCPUEntitlement(cpuEntitlement types.NullFloat64) string {
 	return fmt.Sprintf("%.1f%%", cpuEntitlement.Value*100)
 }
 
+func formatRoutable(b *bool) string {
+	if b == nil {
+		return "-"
+	}
+
+	return fmt.Sprintf("%t", *b)
+}
+
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
@@ -92,6 +100,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			display.UI.TranslateText("logging"),
 			display.UI.TranslateText("cpu entitlement"),
 			display.UI.TranslateText("details"),
+			display.UI.TranslateText("ready"),
 		},
 	}
 
@@ -115,6 +124,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 			}),
 			formatCPUEntitlement(instance.CPUEntitlement),
 			instance.Details,
+			formatRoutable(instance.Routable),
 		})
 	}
 

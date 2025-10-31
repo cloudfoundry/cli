@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("app summary displayer", func() {
 
-	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+cpu entitlement\s+details`
+	const instanceStatsTitles = `state\s+since\s+cpu\s+memory\s+disk\s+logging\s+cpu entitlement\s+details\s+ready`
 
 	var (
 		appSummaryDisplayer *AppSummaryDisplayer
@@ -48,6 +48,10 @@ var _ = Describe("app summary displayer", func() {
 
 				BeforeEach(func() {
 					uptime = time.Since(time.Unix(267321600, 0))
+					var (
+						bTrue  = true
+						bFalse = false
+					)
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
 							Application: resources.Application{
@@ -76,6 +80,7 @@ var _ = Describe("app summary displayer", func() {
 											LogRateLimit:   1024 * 5,
 											Uptime:         uptime,
 											Details:        "Some Details 1",
+											Routable:       &bTrue,
 										},
 										v7action.ProcessInstance{
 											Index:          1,
@@ -89,6 +94,7 @@ var _ = Describe("app summary displayer", func() {
 											LogRateLimit:   1024 * 5,
 											Uptime:         time.Since(time.Unix(330480000, 0)),
 											Details:        "Some Details 2",
+											Routable:       &bTrue,
 										},
 										v7action.ProcessInstance{
 											Index:          2,
@@ -101,6 +107,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskQuota:      6000000,
 											LogRateLimit:   1024 * 5,
 											Uptime:         time.Since(time.Unix(1277164800, 0)),
+											Routable:       &bFalse,
 										},
 									},
 								},
@@ -123,6 +130,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskQuota:    8000000,
 											LogRateLimit: 256,
 											Uptime:       time.Since(time.Unix(167572800, 0)),
+											Routable:     &bTrue,
 										},
 									},
 								},
@@ -149,6 +157,7 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.Instances[0].CPUEntitlement).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[0].LogRate).To(Equal("1K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[0].Details).To(Equal("Some Details 1"))
+					Expect(webProcessSummary.Instances[0].Ready).To(Equal("true"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
@@ -156,12 +165,14 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.Instances[1].CPUEntitlement).To(Equal(""))
 					Expect(webProcessSummary.Instances[1].LogRate).To(Equal("2K/s of 5K/s"))
 					Expect(webProcessSummary.Instances[1].Details).To(Equal("Some Details 2"))
+					Expect(webProcessSummary.Instances[1].Ready).To(Equal("true"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
 					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[2].CPUEntitlement).To(Equal("3.0%"))
 					Expect(webProcessSummary.Instances[2].LogRate).To(Equal("3K/s of 5K/s"))
+					Expect(webProcessSummary.Instances[2].Ready).To(Equal("false"))
 
 					consoleProcessSummary := processTable.Processes[1]
 					Expect(consoleProcessSummary.Type).To(Equal("console"))
