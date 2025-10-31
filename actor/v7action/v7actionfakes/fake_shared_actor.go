@@ -4,8 +4,8 @@ package v7actionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
 )
 
 type FakeSharedActor struct {
@@ -73,15 +73,16 @@ func (fake *FakeSharedActor) GatherArchiveResources(arg1 string) ([]sharedaction
 	fake.gatherArchiveResourcesArgsForCall = append(fake.gatherArchiveResourcesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GatherArchiveResourcesStub
+	fakeReturns := fake.gatherArchiveResourcesReturns
 	fake.recordInvocation("GatherArchiveResources", []interface{}{arg1})
 	fake.gatherArchiveResourcesMutex.Unlock()
-	if fake.GatherArchiveResourcesStub != nil {
-		return fake.GatherArchiveResourcesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.gatherArchiveResourcesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -136,15 +137,16 @@ func (fake *FakeSharedActor) GatherDirectoryResources(arg1 string) ([]sharedacti
 	fake.gatherDirectoryResourcesArgsForCall = append(fake.gatherDirectoryResourcesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GatherDirectoryResourcesStub
+	fakeReturns := fake.gatherDirectoryResourcesReturns
 	fake.recordInvocation("GatherDirectoryResources", []interface{}{arg1})
 	fake.gatherDirectoryResourcesMutex.Unlock()
-	if fake.GatherDirectoryResourcesStub != nil {
-		return fake.GatherDirectoryResourcesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.gatherDirectoryResourcesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -205,15 +207,16 @@ func (fake *FakeSharedActor) ZipArchiveResources(arg1 string, arg2 []sharedactio
 		arg1 string
 		arg2 []sharedaction.Resource
 	}{arg1, arg2Copy})
+	stub := fake.ZipArchiveResourcesStub
+	fakeReturns := fake.zipArchiveResourcesReturns
 	fake.recordInvocation("ZipArchiveResources", []interface{}{arg1, arg2Copy})
 	fake.zipArchiveResourcesMutex.Unlock()
-	if fake.ZipArchiveResourcesStub != nil {
-		return fake.ZipArchiveResourcesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.zipArchiveResourcesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -274,15 +277,16 @@ func (fake *FakeSharedActor) ZipDirectoryResources(arg1 string, arg2 []sharedact
 		arg1 string
 		arg2 []sharedaction.Resource
 	}{arg1, arg2Copy})
+	stub := fake.ZipDirectoryResourcesStub
+	fakeReturns := fake.zipDirectoryResourcesReturns
 	fake.recordInvocation("ZipDirectoryResources", []interface{}{arg1, arg2Copy})
 	fake.zipDirectoryResourcesMutex.Unlock()
-	if fake.ZipDirectoryResourcesStub != nil {
-		return fake.ZipDirectoryResourcesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.zipDirectoryResourcesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

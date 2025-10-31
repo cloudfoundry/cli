@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v9/types"
 )
 
 type Application struct {

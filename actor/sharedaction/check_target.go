@@ -1,6 +1,6 @@
 package sharedaction
 
-import "code.cloudfoundry.org/cli/actor/actionerror"
+import "code.cloudfoundry.org/cli/v9/actor/actionerror"
 
 // CheckTarget confirms that the user is logged in. Optionally it will also
 // check if an organization and space are targeted.

@@ -5,16 +5,16 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/cf/util/testhelpers/net"
+	"code.cloudfoundry.org/cli/v9/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/terminal/terminalfakes"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/net"
 
-	. "code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/trace/tracefakes"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
@@ -203,7 +203,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/service_brokers/bogus-guid",
-				//This error code may not reflect reality.  Check it, change the code to match, and remove this comment.
+				// This error code may not reflect reality.  Check it, change the code to match, and remove this comment.
 				Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{"error_code":"ServiceBrokerNotFound","description":"Service Broker bogus-guid not found","code":270042}`},
 			})
 

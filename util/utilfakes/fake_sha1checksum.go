@@ -4,7 +4,7 @@ package utilfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v9/util"
 )
 
 type FakeSha1Checksum struct {
@@ -46,15 +46,16 @@ func (fake *FakeSha1Checksum) CheckSha1(arg1 string) bool {
 	fake.checkSha1ArgsForCall = append(fake.checkSha1ArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CheckSha1Stub
+	fakeReturns := fake.checkSha1Returns
 	fake.recordInvocation("CheckSha1", []interface{}{arg1})
 	fake.checkSha1Mutex.Unlock()
-	if fake.CheckSha1Stub != nil {
-		return fake.CheckSha1Stub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.checkSha1Returns
 	return fakeReturns.result1
 }
 
@@ -105,15 +106,16 @@ func (fake *FakeSha1Checksum) ComputeFileSha1() ([]byte, error) {
 	ret, specificReturn := fake.computeFileSha1ReturnsOnCall[len(fake.computeFileSha1ArgsForCall)]
 	fake.computeFileSha1ArgsForCall = append(fake.computeFileSha1ArgsForCall, struct {
 	}{})
+	stub := fake.ComputeFileSha1Stub
+	fakeReturns := fake.computeFileSha1Returns
 	fake.recordInvocation("ComputeFileSha1", []interface{}{})
 	fake.computeFileSha1Mutex.Unlock()
-	if fake.ComputeFileSha1Stub != nil {
-		return fake.ComputeFileSha1Stub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.computeFileSha1Returns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -160,9 +162,10 @@ func (fake *FakeSha1Checksum) SetFilePath(arg1 string) {
 	fake.setFilePathArgsForCall = append(fake.setFilePathArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetFilePathStub
 	fake.recordInvocation("SetFilePath", []interface{}{arg1})
 	fake.setFilePathMutex.Unlock()
-	if fake.SetFilePathStub != nil {
+	if stub != nil {
 		fake.SetFilePathStub(arg1)
 	}
 }

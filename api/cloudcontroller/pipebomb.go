@@ -3,7 +3,7 @@ package cloudcontroller
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 )
 
 // Pipebomb is a wrapper around an io.Pipe's io.ReadCloser that turns it into a

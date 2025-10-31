@@ -8,24 +8,24 @@ import (
 
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/actors/brokerbuilder"
-	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
-	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
-	"code.cloudfoundry.org/cli/cf/actors/servicebuilder"
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/appfiles"
-	"code.cloudfoundry.org/cli/cf/configuration"
-	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/manifest"
-	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/plugin/models"
-	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/util/randomword"
+	"code.cloudfoundry.org/cli/v9/cf/actors"
+	"code.cloudfoundry.org/cli/v9/cf/actors/brokerbuilder"
+	"code.cloudfoundry.org/cli/v9/cf/actors/planbuilder"
+	"code.cloudfoundry.org/cli/v9/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/v9/cf/actors/servicebuilder"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/appfiles"
+	"code.cloudfoundry.org/cli/v9/cf/configuration"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/confighelpers"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v9/cf/manifest"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/trace"
+	"code.cloudfoundry.org/cli/v9/plugin/models"
+	"code.cloudfoundry.org/cli/v9/util"
+	"code.cloudfoundry.org/cli/v9/util/randomword"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RandomWordGenerator
@@ -56,7 +56,7 @@ type Dependency struct {
 	PushActor          actors.PushActor
 	RouteActor         actors.RouteActor
 	ChecksumUtil       util.Sha1Checksum
-	WildcardDependency interface{} //use for injecting fakes
+	WildcardDependency interface{} // use for injecting fakes
 	Logger             trace.Printer
 }
 

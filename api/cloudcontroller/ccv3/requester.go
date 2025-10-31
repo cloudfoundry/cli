@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"runtime"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Requester

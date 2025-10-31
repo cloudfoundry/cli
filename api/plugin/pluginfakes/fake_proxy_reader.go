@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v9/api/plugin"
 )
 
 type FakeProxyReader struct {
@@ -37,9 +37,10 @@ func (fake *FakeProxyReader) Finish() {
 	fake.finishMutex.Lock()
 	fake.finishArgsForCall = append(fake.finishArgsForCall, struct {
 	}{})
+	stub := fake.FinishStub
 	fake.recordInvocation("Finish", []interface{}{})
 	fake.finishMutex.Unlock()
-	if fake.FinishStub != nil {
+	if stub != nil {
 		fake.FinishStub()
 	}
 }
@@ -61,9 +62,10 @@ func (fake *FakeProxyReader) Start(arg1 int64) {
 	fake.startArgsForCall = append(fake.startArgsForCall, struct {
 		arg1 int64
 	}{arg1})
+	stub := fake.StartStub
 	fake.recordInvocation("Start", []interface{}{arg1})
 	fake.startMutex.Unlock()
-	if fake.StartStub != nil {
+	if stub != nil {
 		fake.StartStub(arg1)
 	}
 }
@@ -93,15 +95,16 @@ func (fake *FakeProxyReader) Wrap(arg1 io.Reader) io.ReadCloser {
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
 		arg1 io.Reader
 	}{arg1})
+	stub := fake.WrapStub
+	fakeReturns := fake.wrapReturns
 	fake.recordInvocation("Wrap", []interface{}{arg1})
 	fake.wrapMutex.Unlock()
-	if fake.WrapStub != nil {
-		return fake.WrapStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.wrapReturns
 	return fakeReturns.result1
 }
 

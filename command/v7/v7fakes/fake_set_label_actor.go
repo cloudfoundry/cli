@@ -4,10 +4,10 @@ package v7fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 type FakeSetLabelActor struct {
@@ -318,16 +318,16 @@ func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLi
 	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall = append(fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 string
-		arg4 map[string]types.NullString
-	}{arg1, arg2, arg3, arg4})
-	stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub
-	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns
-	fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle", []interface{}{arg1, arg2, arg3, arg4})
-	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
-	}
+        arg3 string
+        arg4 map[string]types.NullString
+    }{arg1, arg2, arg3, arg4})
+    stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub
+    fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns
+    fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle", []interface{}{arg1, arg2, arg3, arg4})
+    fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+    if stub != nil {
+        return stub(arg1, arg2, arg3, arg4)
+    }
 	if specificReturn {
 		return ret.result1, ret.result2
 	}

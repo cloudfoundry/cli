@@ -7,13 +7,13 @@ import (
 	"reflect"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/cmd"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/cf/cmd"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/common"
+	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
@@ -227,7 +227,7 @@ func (p *CommandParser) parse(args []string, commandList interface{}) (int, erro
 		return 1, nil
 	} else if err == ParseErr {
 		fmt.Println()
-		p.parse([]string{"help", args[0]}, commandList) //nolint: errcheck
+		p.parse([]string{"help", args[0]}, commandList) // nolint: errcheck
 		return 1, err
 	} else if exitError, ok := err.(*ssh.ExitError); ok {
 		return exitError.ExitStatus(), nil

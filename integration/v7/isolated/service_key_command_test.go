@@ -1,12 +1,12 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	"code.cloudfoundry.org/cli/v9/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/gomega/gexec"
 
 	. "github.com/onsi/gomega/gbytes"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

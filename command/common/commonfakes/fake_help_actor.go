@@ -4,8 +4,8 @@ package commonfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/command/common"
 )
 
 type FakeHelpActor struct {
@@ -45,15 +45,16 @@ func (fake *FakeHelpActor) CommandInfoByName(arg1 interface{}, arg2 string) (sha
 		arg1 interface{}
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CommandInfoByNameStub
+	fakeReturns := fake.commandInfoByNameReturns
 	fake.recordInvocation("CommandInfoByName", []interface{}{arg1, arg2})
 	fake.commandInfoByNameMutex.Unlock()
-	if fake.CommandInfoByNameStub != nil {
-		return fake.CommandInfoByNameStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.commandInfoByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -108,15 +109,16 @@ func (fake *FakeHelpActor) CommandInfos(arg1 interface{}) map[string]sharedactio
 	fake.commandInfosArgsForCall = append(fake.commandInfosArgsForCall, struct {
 		arg1 interface{}
 	}{arg1})
+	stub := fake.CommandInfosStub
+	fakeReturns := fake.commandInfosReturns
 	fake.recordInvocation("CommandInfos", []interface{}{arg1})
 	fake.commandInfosMutex.Unlock()
-	if fake.CommandInfosStub != nil {
-		return fake.CommandInfosStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.commandInfosReturns
 	return fakeReturns.result1
 }
 

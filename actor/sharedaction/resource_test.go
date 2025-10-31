@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/ykk"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

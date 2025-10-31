@@ -5,31 +5,31 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"code.cloudfoundry.org/cli/cf/actors/actorsfakes"
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
-	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/api/stacks/stacksfakes"
-	"code.cloudfoundry.org/cli/cf/appfiles/appfilesfakes"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commandregistry/commandregistryfakes"
-	"code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/commands/application/applicationfakes"
-	"code.cloudfoundry.org/cli/cf/commands/service/servicefakes"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/manifest"
-	"code.cloudfoundry.org/cli/cf/manifest/manifestfakes"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/util/generic"
+	"code.cloudfoundry.org/cli/v9/cf/actors/actorsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/applications/applicationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/resources"
+	"code.cloudfoundry.org/cli/v9/cf/api/stacks/stacksfakes"
+	"code.cloudfoundry.org/cli/v9/cf/appfiles/appfilesfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry/commandregistryfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/application"
+	"code.cloudfoundry.org/cli/v9/cf/commands/application/applicationfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/service/servicefakes"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/manifest"
+	"code.cloudfoundry.org/cli/v9/cf/manifest/manifestfakes"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/trace"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/util/generic"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -68,7 +68,7 @@ var _ = Describe("Push Command", func() {
 	)
 
 	BeforeEach(func() {
-		//save original command dependences and restore later
+		// save original command dependences and restore later
 		OriginalCommandStart = commandregistry.Commands.FindCommand("start")
 		OriginalCommandStop = commandregistry.Commands.FindCommand("stop")
 		OriginalCommandServiceBind = commandregistry.Commands.FindCommand("bind-service")
@@ -83,7 +83,7 @@ var _ = Describe("Push Command", func() {
 		minVersionReq = requirements.Passing{Type: "minVersionReq"}
 		requirementsFactory.NewMinAPIVersionRequirementReturns(minVersionReq)
 
-		ui = &testterm.FakeUI{} //new(terminalfakes.FakeUI)
+		ui = &testterm.FakeUI{} // new(terminalfakes.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		manifestRepo = new(manifestfakes.FakeRepository)
 		wordGenerator = new(commandregistryfakes.FakeRandomWordGenerator)
@@ -117,7 +117,7 @@ var _ = Describe("Push Command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetStackRepository(stackRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 
-		//setup fake commands (counterfeiter) to correctly interact with commandregistry
+		// setup fake commands (counterfeiter) to correctly interact with commandregistry
 		starter = new(applicationfakes.FakeStarter)
 		starter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return starter
@@ -132,7 +132,7 @@ var _ = Describe("Push Command", func() {
 		stopper.MetaDataReturns(commandregistry.CommandMetadata{Name: "stop"})
 		commandregistry.Register(stopper)
 
-		//inject fake commands dependencies into registry
+		// inject fake commands dependencies into registry
 		serviceBinder = new(servicefakes.OldFakeAppBinder)
 		commandregistry.Register(serviceBinder)
 

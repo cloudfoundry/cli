@@ -3,9 +3,9 @@ package router_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/router/routererror"
-	"code.cloudfoundry.org/cli/api/router/wrapper"
+	. "code.cloudfoundry.org/cli/v9/api/router"
+	"code.cloudfoundry.org/cli/v9/api/router/routererror"
+	"code.cloudfoundry.org/cli/v9/api/router/wrapper"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

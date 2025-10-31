@@ -3,7 +3,7 @@ package flag_test
 import (
 	"fmt"
 
-	. "code.cloudfoundry.org/cli/command/flag"
+	. "code.cloudfoundry.org/cli/v9/command/flag"
 	flags "github.com/jessevdk/go-flags"
 
 	. "github.com/onsi/ginkgo/v2"

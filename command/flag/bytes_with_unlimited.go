@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/bytefmt"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v9/types"
 	flags "github.com/jessevdk/go-flags"
 )
 

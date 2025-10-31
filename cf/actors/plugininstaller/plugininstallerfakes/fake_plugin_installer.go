@@ -4,7 +4,7 @@ package plugininstallerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors/plugininstaller"
+	"code.cloudfoundry.org/cli/v9/cf/actors/plugininstaller"
 )
 
 type FakePluginInstaller struct {
@@ -29,15 +29,16 @@ func (fake *FakePluginInstaller) Install(arg1 string) string {
 	fake.installArgsForCall = append(fake.installArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.InstallStub
+	fakeReturns := fake.installReturns
 	fake.recordInvocation("Install", []interface{}{arg1})
 	fake.installMutex.Unlock()
-	if fake.InstallStub != nil {
-		return fake.InstallStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.installReturns
 	return fakeReturns.result1
 }
 

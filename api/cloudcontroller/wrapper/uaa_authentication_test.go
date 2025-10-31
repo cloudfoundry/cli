@@ -7,18 +7,18 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
-	"code.cloudfoundry.org/cli/api/uaa/wrapper/util"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/cloudcontrollerfakes"
+	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/wrapper/wrapperfakes"
+	"code.cloudfoundry.org/cli/v9/api/uaa/wrapper/util"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

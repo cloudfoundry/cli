@@ -4,8 +4,8 @@ package wrapperfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
 )
 
 type FakeUAAClient struct {
@@ -32,15 +32,16 @@ func (fake *FakeUAAClient) RefreshAccessToken(arg1 string) (uaa.RefreshedTokens,
 	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RefreshAccessTokenStub
+	fakeReturns := fake.refreshAccessTokenReturns
 	fake.recordInvocation("RefreshAccessToken", []interface{}{arg1})
 	fake.refreshAccessTokenMutex.Unlock()
-	if fake.RefreshAccessTokenStub != nil {
-		return fake.RefreshAccessTokenStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshAccessTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

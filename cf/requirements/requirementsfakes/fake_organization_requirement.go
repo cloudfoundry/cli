@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
 )
 
 type FakeOrganizationRequirement struct {
@@ -43,15 +43,16 @@ func (fake *FakeOrganizationRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -95,15 +96,16 @@ func (fake *FakeOrganizationRequirement) GetOrganization() models.Organization {
 	ret, specificReturn := fake.getOrganizationReturnsOnCall[len(fake.getOrganizationArgsForCall)]
 	fake.getOrganizationArgsForCall = append(fake.getOrganizationArgsForCall, struct {
 	}{})
+	stub := fake.GetOrganizationStub
+	fakeReturns := fake.getOrganizationReturns
 	fake.recordInvocation("GetOrganization", []interface{}{})
 	fake.getOrganizationMutex.Unlock()
-	if fake.GetOrganizationStub != nil {
-		return fake.GetOrganizationStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -147,9 +149,10 @@ func (fake *FakeOrganizationRequirement) SetOrganizationName(arg1 string) {
 	fake.setOrganizationNameArgsForCall = append(fake.setOrganizationNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetOrganizationNameStub
 	fake.recordInvocation("SetOrganizationName", []interface{}{arg1})
 	fake.setOrganizationNameMutex.Unlock()
-	if fake.SetOrganizationNameStub != nil {
+	if stub != nil {
 		fake.SetOrganizationNameStub(arg1)
 	}
 }

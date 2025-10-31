@@ -4,8 +4,8 @@ package sharedactionfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/util/clissh"
 )
 
 type FakeSecureShellClient struct {
@@ -76,15 +76,16 @@ func (fake *FakeSecureShellClient) Close() error {
 	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
 	}{})
+	stub := fake.CloseStub
+	fakeReturns := fake.closeReturns
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		return fake.CloseStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.closeReturns
 	return fakeReturns.result1
 }
 
@@ -133,15 +134,16 @@ func (fake *FakeSecureShellClient) Connect(arg1 string, arg2 string, arg3 string
 		arg4 string
 		arg5 bool
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.ConnectStub
+	fakeReturns := fake.connectReturns
 	fake.recordInvocation("Connect", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.connectMutex.Unlock()
-	if fake.ConnectStub != nil {
-		return fake.ConnectStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.connectReturns
 	return fakeReturns.result1
 }
 
@@ -199,15 +201,16 @@ func (fake *FakeSecureShellClient) InteractiveSession(arg1 []string, arg2 clissh
 		arg1 []string
 		arg2 clissh.TTYRequest
 	}{arg1Copy, arg2})
+	stub := fake.InteractiveSessionStub
+	fakeReturns := fake.interactiveSessionReturns
 	fake.recordInvocation("InteractiveSession", []interface{}{arg1Copy, arg2})
 	fake.interactiveSessionMutex.Unlock()
-	if fake.InteractiveSessionStub != nil {
-		return fake.InteractiveSessionStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.interactiveSessionReturns
 	return fakeReturns.result1
 }
 
@@ -264,15 +267,16 @@ func (fake *FakeSecureShellClient) LocalPortForward(arg1 []clissh.LocalPortForwa
 	fake.localPortForwardArgsForCall = append(fake.localPortForwardArgsForCall, struct {
 		arg1 []clissh.LocalPortForward
 	}{arg1Copy})
+	stub := fake.LocalPortForwardStub
+	fakeReturns := fake.localPortForwardReturns
 	fake.recordInvocation("LocalPortForward", []interface{}{arg1Copy})
 	fake.localPortForwardMutex.Unlock()
-	if fake.LocalPortForwardStub != nil {
-		return fake.LocalPortForwardStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.localPortForwardReturns
 	return fakeReturns.result1
 }
 
@@ -323,15 +327,16 @@ func (fake *FakeSecureShellClient) Wait() error {
 	ret, specificReturn := fake.waitReturnsOnCall[len(fake.waitArgsForCall)]
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct {
 	}{})
+	stub := fake.WaitStub
+	fakeReturns := fake.waitReturns
 	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
-	if fake.WaitStub != nil {
-		return fake.WaitStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.waitReturns
 	return fakeReturns.result1
 }
 

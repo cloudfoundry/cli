@@ -3,13 +3,13 @@ package v7action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/batcher"
-	"code.cloudfoundry.org/cli/util/extract"
-	"code.cloudfoundry.org/cli/util/lookuptable"
-	"code.cloudfoundry.org/cli/util/railway"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/util/batcher"
+	"code.cloudfoundry.org/cli/v9/util/extract"
+	"code.cloudfoundry.org/cli/v9/util/lookuptable"
+	"code.cloudfoundry.org/cli/v9/util/railway"
 )
 
 type ServiceInstance struct {

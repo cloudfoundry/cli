@@ -1,8 +1,8 @@
 package command
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/version"
 	"github.com/blang/semver/v4"
 )
 

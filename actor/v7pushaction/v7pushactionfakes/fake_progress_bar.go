@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7pushaction"
 )
 
 type FakeProgressBar struct {
@@ -32,15 +32,16 @@ func (fake *FakeProgressBar) NewProgressBarWrapper(arg1 io.Reader, arg2 int64) i
 		arg1 io.Reader
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.NewProgressBarWrapperStub
+	fakeReturns := fake.newProgressBarWrapperReturns
 	fake.recordInvocation("NewProgressBarWrapper", []interface{}{arg1, arg2})
 	fake.newProgressBarWrapperMutex.Unlock()
-	if fake.NewProgressBarWrapperStub != nil {
-		return fake.NewProgressBarWrapperStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.newProgressBarWrapperReturns
 	return fakeReturns.result1
 }
 

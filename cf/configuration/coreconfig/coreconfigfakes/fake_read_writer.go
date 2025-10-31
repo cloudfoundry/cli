@@ -4,9 +4,9 @@ package coreconfigfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	"github.com/blang/semver/v4"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	semver "github.com/blang/semver/v4"
 )
 
 type FakeReadWriter struct {
@@ -480,15 +480,16 @@ func (fake *FakeReadWriter) APIEndpoint() string {
 	ret, specificReturn := fake.aPIEndpointReturnsOnCall[len(fake.aPIEndpointArgsForCall)]
 	fake.aPIEndpointArgsForCall = append(fake.aPIEndpointArgsForCall, struct {
 	}{})
+	stub := fake.APIEndpointStub
+	fakeReturns := fake.aPIEndpointReturns
 	fake.recordInvocation("APIEndpoint", []interface{}{})
 	fake.aPIEndpointMutex.Unlock()
-	if fake.APIEndpointStub != nil {
-		return fake.APIEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.aPIEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -532,15 +533,16 @@ func (fake *FakeReadWriter) APIVersion() string {
 	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
 	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
 	}{})
+	stub := fake.APIVersionStub
+	fakeReturns := fake.aPIVersionReturns
 	fake.recordInvocation("APIVersion", []interface{}{})
 	fake.aPIVersionMutex.Unlock()
-	if fake.APIVersionStub != nil {
-		return fake.APIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.aPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -584,15 +586,16 @@ func (fake *FakeReadWriter) AccessToken() string {
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
 	}{})
+	stub := fake.AccessTokenStub
+	fakeReturns := fake.accessTokenReturns
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
-	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.accessTokenReturns
 	return fakeReturns.result1
 }
 
@@ -636,15 +639,16 @@ func (fake *FakeReadWriter) AsyncTimeout() uint {
 	ret, specificReturn := fake.asyncTimeoutReturnsOnCall[len(fake.asyncTimeoutArgsForCall)]
 	fake.asyncTimeoutArgsForCall = append(fake.asyncTimeoutArgsForCall, struct {
 	}{})
+	stub := fake.AsyncTimeoutStub
+	fakeReturns := fake.asyncTimeoutReturns
 	fake.recordInvocation("AsyncTimeout", []interface{}{})
 	fake.asyncTimeoutMutex.Unlock()
-	if fake.AsyncTimeoutStub != nil {
-		return fake.AsyncTimeoutStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.asyncTimeoutReturns
 	return fakeReturns.result1
 }
 
@@ -688,15 +692,16 @@ func (fake *FakeReadWriter) AuthenticationEndpoint() string {
 	ret, specificReturn := fake.authenticationEndpointReturnsOnCall[len(fake.authenticationEndpointArgsForCall)]
 	fake.authenticationEndpointArgsForCall = append(fake.authenticationEndpointArgsForCall, struct {
 	}{})
+	stub := fake.AuthenticationEndpointStub
+	fakeReturns := fake.authenticationEndpointReturns
 	fake.recordInvocation("AuthenticationEndpoint", []interface{}{})
 	fake.authenticationEndpointMutex.Unlock()
-	if fake.AuthenticationEndpointStub != nil {
-		return fake.AuthenticationEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.authenticationEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -740,15 +745,16 @@ func (fake *FakeReadWriter) CLIVersion() string {
 	ret, specificReturn := fake.cLIVersionReturnsOnCall[len(fake.cLIVersionArgsForCall)]
 	fake.cLIVersionArgsForCall = append(fake.cLIVersionArgsForCall, struct {
 	}{})
+	stub := fake.CLIVersionStub
+	fakeReturns := fake.cLIVersionReturns
 	fake.recordInvocation("CLIVersion", []interface{}{})
 	fake.cLIVersionMutex.Unlock()
-	if fake.CLIVersionStub != nil {
-		return fake.CLIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.cLIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -791,9 +797,10 @@ func (fake *FakeReadWriter) ClearSession() {
 	fake.clearSessionMutex.Lock()
 	fake.clearSessionArgsForCall = append(fake.clearSessionArgsForCall, struct {
 	}{})
+	stub := fake.ClearSessionStub
 	fake.recordInvocation("ClearSession", []interface{}{})
 	fake.clearSessionMutex.Unlock()
-	if fake.ClearSessionStub != nil {
+	if stub != nil {
 		fake.ClearSessionStub()
 	}
 }
@@ -815,15 +822,16 @@ func (fake *FakeReadWriter) ColorEnabled() string {
 	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct {
 	}{})
+	stub := fake.ColorEnabledStub
+	fakeReturns := fake.colorEnabledReturns
 	fake.recordInvocation("ColorEnabled", []interface{}{})
 	fake.colorEnabledMutex.Unlock()
-	if fake.ColorEnabledStub != nil {
-		return fake.ColorEnabledStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.colorEnabledReturns
 	return fakeReturns.result1
 }
 
@@ -867,15 +875,16 @@ func (fake *FakeReadWriter) DopplerEndpoint() string {
 	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
 	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct {
 	}{})
+	stub := fake.DopplerEndpointStub
+	fakeReturns := fake.dopplerEndpointReturns
 	fake.recordInvocation("DopplerEndpoint", []interface{}{})
 	fake.dopplerEndpointMutex.Unlock()
-	if fake.DopplerEndpointStub != nil {
-		return fake.DopplerEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.dopplerEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -919,15 +928,16 @@ func (fake *FakeReadWriter) HasAPIEndpoint() bool {
 	ret, specificReturn := fake.hasAPIEndpointReturnsOnCall[len(fake.hasAPIEndpointArgsForCall)]
 	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct {
 	}{})
+	stub := fake.HasAPIEndpointStub
+	fakeReturns := fake.hasAPIEndpointReturns
 	fake.recordInvocation("HasAPIEndpoint", []interface{}{})
 	fake.hasAPIEndpointMutex.Unlock()
-	if fake.HasAPIEndpointStub != nil {
-		return fake.HasAPIEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasAPIEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -971,15 +981,16 @@ func (fake *FakeReadWriter) HasOrganization() bool {
 	ret, specificReturn := fake.hasOrganizationReturnsOnCall[len(fake.hasOrganizationArgsForCall)]
 	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct {
 	}{})
+	stub := fake.HasOrganizationStub
+	fakeReturns := fake.hasOrganizationReturns
 	fake.recordInvocation("HasOrganization", []interface{}{})
 	fake.hasOrganizationMutex.Unlock()
-	if fake.HasOrganizationStub != nil {
-		return fake.HasOrganizationStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasOrganizationReturns
 	return fakeReturns.result1
 }
 
@@ -1023,15 +1034,16 @@ func (fake *FakeReadWriter) HasSpace() bool {
 	ret, specificReturn := fake.hasSpaceReturnsOnCall[len(fake.hasSpaceArgsForCall)]
 	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct {
 	}{})
+	stub := fake.HasSpaceStub
+	fakeReturns := fake.hasSpaceReturns
 	fake.recordInvocation("HasSpace", []interface{}{})
 	fake.hasSpaceMutex.Unlock()
-	if fake.HasSpaceStub != nil {
-		return fake.HasSpaceStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -1075,15 +1087,16 @@ func (fake *FakeReadWriter) IsLoggedIn() bool {
 	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
 	}{})
+	stub := fake.IsLoggedInStub
+	fakeReturns := fake.isLoggedInReturns
 	fake.recordInvocation("IsLoggedIn", []interface{}{})
 	fake.isLoggedInMutex.Unlock()
-	if fake.IsLoggedInStub != nil {
-		return fake.IsLoggedInStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isLoggedInReturns
 	return fakeReturns.result1
 }
 
@@ -1128,15 +1141,16 @@ func (fake *FakeReadWriter) IsMinAPIVersion(arg1 semver.Version) bool {
 	fake.isMinAPIVersionArgsForCall = append(fake.isMinAPIVersionArgsForCall, struct {
 		arg1 semver.Version
 	}{arg1})
+	stub := fake.IsMinAPIVersionStub
+	fakeReturns := fake.isMinAPIVersionReturns
 	fake.recordInvocation("IsMinAPIVersion", []interface{}{arg1})
 	fake.isMinAPIVersionMutex.Unlock()
-	if fake.IsMinAPIVersionStub != nil {
-		return fake.IsMinAPIVersionStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isMinAPIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1188,15 +1202,16 @@ func (fake *FakeReadWriter) IsMinCLIVersion(arg1 string) bool {
 	fake.isMinCLIVersionArgsForCall = append(fake.isMinCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.IsMinCLIVersionStub
+	fakeReturns := fake.isMinCLIVersionReturns
 	fake.recordInvocation("IsMinCLIVersion", []interface{}{arg1})
 	fake.isMinCLIVersionMutex.Unlock()
-	if fake.IsMinCLIVersionStub != nil {
-		return fake.IsMinCLIVersionStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isMinCLIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1247,15 +1262,16 @@ func (fake *FakeReadWriter) IsSSLDisabled() bool {
 	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
 	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct {
 	}{})
+	stub := fake.IsSSLDisabledStub
+	fakeReturns := fake.isSSLDisabledReturns
 	fake.recordInvocation("IsSSLDisabled", []interface{}{})
 	fake.isSSLDisabledMutex.Unlock()
-	if fake.IsSSLDisabledStub != nil {
-		return fake.IsSSLDisabledStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isSSLDisabledReturns
 	return fakeReturns.result1
 }
 
@@ -1299,15 +1315,16 @@ func (fake *FakeReadWriter) Locale() string {
 	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct {
 	}{})
+	stub := fake.LocaleStub
+	fakeReturns := fake.localeReturns
 	fake.recordInvocation("Locale", []interface{}{})
 	fake.localeMutex.Unlock()
-	if fake.LocaleStub != nil {
-		return fake.LocaleStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.localeReturns
 	return fakeReturns.result1
 }
 
@@ -1351,15 +1368,16 @@ func (fake *FakeReadWriter) LogCacheEndpoint() string {
 	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
 	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
 	}{})
+	stub := fake.LogCacheEndpointStub
+	fakeReturns := fake.logCacheEndpointReturns
 	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
 	fake.logCacheEndpointMutex.Unlock()
-	if fake.LogCacheEndpointStub != nil {
-		return fake.LogCacheEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.logCacheEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -1403,15 +1421,16 @@ func (fake *FakeReadWriter) MinCLIVersion() string {
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
 	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct {
 	}{})
+	stub := fake.MinCLIVersionStub
+	fakeReturns := fake.minCLIVersionReturns
 	fake.recordInvocation("MinCLIVersion", []interface{}{})
 	fake.minCLIVersionMutex.Unlock()
-	if fake.MinCLIVersionStub != nil {
-		return fake.MinCLIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.minCLIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1455,15 +1474,16 @@ func (fake *FakeReadWriter) MinRecommendedCLIVersion() string {
 	ret, specificReturn := fake.minRecommendedCLIVersionReturnsOnCall[len(fake.minRecommendedCLIVersionArgsForCall)]
 	fake.minRecommendedCLIVersionArgsForCall = append(fake.minRecommendedCLIVersionArgsForCall, struct {
 	}{})
+	stub := fake.MinRecommendedCLIVersionStub
+	fakeReturns := fake.minRecommendedCLIVersionReturns
 	fake.recordInvocation("MinRecommendedCLIVersion", []interface{}{})
 	fake.minRecommendedCLIVersionMutex.Unlock()
-	if fake.MinRecommendedCLIVersionStub != nil {
-		return fake.MinRecommendedCLIVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.minRecommendedCLIVersionReturns
 	return fakeReturns.result1
 }
 
@@ -1507,15 +1527,16 @@ func (fake *FakeReadWriter) OrganizationFields() models.OrganizationFields {
 	ret, specificReturn := fake.organizationFieldsReturnsOnCall[len(fake.organizationFieldsArgsForCall)]
 	fake.organizationFieldsArgsForCall = append(fake.organizationFieldsArgsForCall, struct {
 	}{})
+	stub := fake.OrganizationFieldsStub
+	fakeReturns := fake.organizationFieldsReturns
 	fake.recordInvocation("OrganizationFields", []interface{}{})
 	fake.organizationFieldsMutex.Unlock()
-	if fake.OrganizationFieldsStub != nil {
-		return fake.OrganizationFieldsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.organizationFieldsReturns
 	return fakeReturns.result1
 }
 
@@ -1559,15 +1580,16 @@ func (fake *FakeReadWriter) PluginRepos() []models.PluginRepo {
 	ret, specificReturn := fake.pluginReposReturnsOnCall[len(fake.pluginReposArgsForCall)]
 	fake.pluginReposArgsForCall = append(fake.pluginReposArgsForCall, struct {
 	}{})
+	stub := fake.PluginReposStub
+	fakeReturns := fake.pluginReposReturns
 	fake.recordInvocation("PluginRepos", []interface{}{})
 	fake.pluginReposMutex.Unlock()
-	if fake.PluginReposStub != nil {
-		return fake.PluginReposStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginReposReturns
 	return fakeReturns.result1
 }
 
@@ -1611,15 +1633,16 @@ func (fake *FakeReadWriter) RefreshToken() string {
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 	}{})
+	stub := fake.RefreshTokenStub
+	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1
 }
 
@@ -1663,15 +1686,16 @@ func (fake *FakeReadWriter) RoutingAPIEndpoint() string {
 	ret, specificReturn := fake.routingAPIEndpointReturnsOnCall[len(fake.routingAPIEndpointArgsForCall)]
 	fake.routingAPIEndpointArgsForCall = append(fake.routingAPIEndpointArgsForCall, struct {
 	}{})
+	stub := fake.RoutingAPIEndpointStub
+	fakeReturns := fake.routingAPIEndpointReturns
 	fake.recordInvocation("RoutingAPIEndpoint", []interface{}{})
 	fake.routingAPIEndpointMutex.Unlock()
-	if fake.RoutingAPIEndpointStub != nil {
-		return fake.RoutingAPIEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.routingAPIEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -1715,15 +1739,16 @@ func (fake *FakeReadWriter) SSHOAuthClient() string {
 	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
 	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct {
 	}{})
+	stub := fake.SSHOAuthClientStub
+	fakeReturns := fake.sSHOAuthClientReturns
 	fake.recordInvocation("SSHOAuthClient", []interface{}{})
 	fake.sSHOAuthClientMutex.Unlock()
-	if fake.SSHOAuthClientStub != nil {
-		return fake.SSHOAuthClientStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sSHOAuthClientReturns
 	return fakeReturns.result1
 }
 
@@ -1767,9 +1792,10 @@ func (fake *FakeReadWriter) SetAPIEndpoint(arg1 string) {
 	fake.setAPIEndpointArgsForCall = append(fake.setAPIEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetAPIEndpointStub
 	fake.recordInvocation("SetAPIEndpoint", []interface{}{arg1})
 	fake.setAPIEndpointMutex.Unlock()
-	if fake.SetAPIEndpointStub != nil {
+	if stub != nil {
 		fake.SetAPIEndpointStub(arg1)
 	}
 }
@@ -1798,9 +1824,10 @@ func (fake *FakeReadWriter) SetAPIVersion(arg1 string) {
 	fake.setAPIVersionArgsForCall = append(fake.setAPIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetAPIVersionStub
 	fake.recordInvocation("SetAPIVersion", []interface{}{arg1})
 	fake.setAPIVersionMutex.Unlock()
-	if fake.SetAPIVersionStub != nil {
+	if stub != nil {
 		fake.SetAPIVersionStub(arg1)
 	}
 }
@@ -1829,9 +1856,10 @@ func (fake *FakeReadWriter) SetAccessToken(arg1 string) {
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetAccessTokenStub
 	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
 	fake.setAccessTokenMutex.Unlock()
-	if fake.SetAccessTokenStub != nil {
+	if stub != nil {
 		fake.SetAccessTokenStub(arg1)
 	}
 }
@@ -1860,9 +1888,10 @@ func (fake *FakeReadWriter) SetAsyncTimeout(arg1 uint) {
 	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
 		arg1 uint
 	}{arg1})
+	stub := fake.SetAsyncTimeoutStub
 	fake.recordInvocation("SetAsyncTimeout", []interface{}{arg1})
 	fake.setAsyncTimeoutMutex.Unlock()
-	if fake.SetAsyncTimeoutStub != nil {
+	if stub != nil {
 		fake.SetAsyncTimeoutStub(arg1)
 	}
 }
@@ -1891,9 +1920,10 @@ func (fake *FakeReadWriter) SetAuthenticationEndpoint(arg1 string) {
 	fake.setAuthenticationEndpointArgsForCall = append(fake.setAuthenticationEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetAuthenticationEndpointStub
 	fake.recordInvocation("SetAuthenticationEndpoint", []interface{}{arg1})
 	fake.setAuthenticationEndpointMutex.Unlock()
-	if fake.SetAuthenticationEndpointStub != nil {
+	if stub != nil {
 		fake.SetAuthenticationEndpointStub(arg1)
 	}
 }
@@ -1922,9 +1952,10 @@ func (fake *FakeReadWriter) SetCLIVersion(arg1 string) {
 	fake.setCLIVersionArgsForCall = append(fake.setCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetCLIVersionStub
 	fake.recordInvocation("SetCLIVersion", []interface{}{arg1})
 	fake.setCLIVersionMutex.Unlock()
-	if fake.SetCLIVersionStub != nil {
+	if stub != nil {
 		fake.SetCLIVersionStub(arg1)
 	}
 }
@@ -1953,9 +1984,10 @@ func (fake *FakeReadWriter) SetColorEnabled(arg1 string) {
 	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetColorEnabledStub
 	fake.recordInvocation("SetColorEnabled", []interface{}{arg1})
 	fake.setColorEnabledMutex.Unlock()
-	if fake.SetColorEnabledStub != nil {
+	if stub != nil {
 		fake.SetColorEnabledStub(arg1)
 	}
 }
@@ -1984,9 +2016,10 @@ func (fake *FakeReadWriter) SetDopplerEndpoint(arg1 string) {
 	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetDopplerEndpointStub
 	fake.recordInvocation("SetDopplerEndpoint", []interface{}{arg1})
 	fake.setDopplerEndpointMutex.Unlock()
-	if fake.SetDopplerEndpointStub != nil {
+	if stub != nil {
 		fake.SetDopplerEndpointStub(arg1)
 	}
 }
@@ -2015,9 +2048,10 @@ func (fake *FakeReadWriter) SetLocale(arg1 string) {
 	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetLocaleStub
 	fake.recordInvocation("SetLocale", []interface{}{arg1})
 	fake.setLocaleMutex.Unlock()
-	if fake.SetLocaleStub != nil {
+	if stub != nil {
 		fake.SetLocaleStub(arg1)
 	}
 }
@@ -2046,9 +2080,10 @@ func (fake *FakeReadWriter) SetLogCacheEndpoint(arg1 string) {
 	fake.setLogCacheEndpointArgsForCall = append(fake.setLogCacheEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetLogCacheEndpointStub
 	fake.recordInvocation("SetLogCacheEndpoint", []interface{}{arg1})
 	fake.setLogCacheEndpointMutex.Unlock()
-	if fake.SetLogCacheEndpointStub != nil {
+	if stub != nil {
 		fake.SetLogCacheEndpointStub(arg1)
 	}
 }
@@ -2077,9 +2112,10 @@ func (fake *FakeReadWriter) SetMinCLIVersion(arg1 string) {
 	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetMinCLIVersionStub
 	fake.recordInvocation("SetMinCLIVersion", []interface{}{arg1})
 	fake.setMinCLIVersionMutex.Unlock()
-	if fake.SetMinCLIVersionStub != nil {
+	if stub != nil {
 		fake.SetMinCLIVersionStub(arg1)
 	}
 }
@@ -2108,9 +2144,10 @@ func (fake *FakeReadWriter) SetMinRecommendedCLIVersion(arg1 string) {
 	fake.setMinRecommendedCLIVersionArgsForCall = append(fake.setMinRecommendedCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetMinRecommendedCLIVersionStub
 	fake.recordInvocation("SetMinRecommendedCLIVersion", []interface{}{arg1})
 	fake.setMinRecommendedCLIVersionMutex.Unlock()
-	if fake.SetMinRecommendedCLIVersionStub != nil {
+	if stub != nil {
 		fake.SetMinRecommendedCLIVersionStub(arg1)
 	}
 }
@@ -2139,9 +2176,10 @@ func (fake *FakeReadWriter) SetOrganizationFields(arg1 models.OrganizationFields
 	fake.setOrganizationFieldsArgsForCall = append(fake.setOrganizationFieldsArgsForCall, struct {
 		arg1 models.OrganizationFields
 	}{arg1})
+	stub := fake.SetOrganizationFieldsStub
 	fake.recordInvocation("SetOrganizationFields", []interface{}{arg1})
 	fake.setOrganizationFieldsMutex.Unlock()
-	if fake.SetOrganizationFieldsStub != nil {
+	if stub != nil {
 		fake.SetOrganizationFieldsStub(arg1)
 	}
 }
@@ -2170,9 +2208,10 @@ func (fake *FakeReadWriter) SetPluginRepo(arg1 models.PluginRepo) {
 	fake.setPluginRepoArgsForCall = append(fake.setPluginRepoArgsForCall, struct {
 		arg1 models.PluginRepo
 	}{arg1})
+	stub := fake.SetPluginRepoStub
 	fake.recordInvocation("SetPluginRepo", []interface{}{arg1})
 	fake.setPluginRepoMutex.Unlock()
-	if fake.SetPluginRepoStub != nil {
+	if stub != nil {
 		fake.SetPluginRepoStub(arg1)
 	}
 }
@@ -2201,9 +2240,10 @@ func (fake *FakeReadWriter) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetRefreshTokenStub
 	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
 	fake.setRefreshTokenMutex.Unlock()
-	if fake.SetRefreshTokenStub != nil {
+	if stub != nil {
 		fake.SetRefreshTokenStub(arg1)
 	}
 }
@@ -2232,9 +2272,10 @@ func (fake *FakeReadWriter) SetRoutingAPIEndpoint(arg1 string) {
 	fake.setRoutingAPIEndpointArgsForCall = append(fake.setRoutingAPIEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetRoutingAPIEndpointStub
 	fake.recordInvocation("SetRoutingAPIEndpoint", []interface{}{arg1})
 	fake.setRoutingAPIEndpointMutex.Unlock()
-	if fake.SetRoutingAPIEndpointStub != nil {
+	if stub != nil {
 		fake.SetRoutingAPIEndpointStub(arg1)
 	}
 }
@@ -2263,9 +2304,10 @@ func (fake *FakeReadWriter) SetSSHOAuthClient(arg1 string) {
 	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetSSHOAuthClientStub
 	fake.recordInvocation("SetSSHOAuthClient", []interface{}{arg1})
 	fake.setSSHOAuthClientMutex.Unlock()
-	if fake.SetSSHOAuthClientStub != nil {
+	if stub != nil {
 		fake.SetSSHOAuthClientStub(arg1)
 	}
 }
@@ -2294,9 +2336,10 @@ func (fake *FakeReadWriter) SetSSLDisabled(arg1 bool) {
 	fake.setSSLDisabledArgsForCall = append(fake.setSSLDisabledArgsForCall, struct {
 		arg1 bool
 	}{arg1})
+	stub := fake.SetSSLDisabledStub
 	fake.recordInvocation("SetSSLDisabled", []interface{}{arg1})
 	fake.setSSLDisabledMutex.Unlock()
-	if fake.SetSSLDisabledStub != nil {
+	if stub != nil {
 		fake.SetSSLDisabledStub(arg1)
 	}
 }
@@ -2325,9 +2368,10 @@ func (fake *FakeReadWriter) SetSpaceFields(arg1 models.SpaceFields) {
 	fake.setSpaceFieldsArgsForCall = append(fake.setSpaceFieldsArgsForCall, struct {
 		arg1 models.SpaceFields
 	}{arg1})
+	stub := fake.SetSpaceFieldsStub
 	fake.recordInvocation("SetSpaceFields", []interface{}{arg1})
 	fake.setSpaceFieldsMutex.Unlock()
-	if fake.SetSpaceFieldsStub != nil {
+	if stub != nil {
 		fake.SetSpaceFieldsStub(arg1)
 	}
 }
@@ -2356,9 +2400,10 @@ func (fake *FakeReadWriter) SetTrace(arg1 string) {
 	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetTraceStub
 	fake.recordInvocation("SetTrace", []interface{}{arg1})
 	fake.setTraceMutex.Unlock()
-	if fake.SetTraceStub != nil {
+	if stub != nil {
 		fake.SetTraceStub(arg1)
 	}
 }
@@ -2387,9 +2432,10 @@ func (fake *FakeReadWriter) SetUAAGrantType(arg1 string) {
 	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetUAAGrantTypeStub
 	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
 	fake.setUAAGrantTypeMutex.Unlock()
-	if fake.SetUAAGrantTypeStub != nil {
+	if stub != nil {
 		fake.SetUAAGrantTypeStub(arg1)
 	}
 }
@@ -2418,9 +2464,10 @@ func (fake *FakeReadWriter) SetUAAOAuthClient(arg1 string) {
 	fake.setUAAOAuthClientArgsForCall = append(fake.setUAAOAuthClientArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetUAAOAuthClientStub
 	fake.recordInvocation("SetUAAOAuthClient", []interface{}{arg1})
 	fake.setUAAOAuthClientMutex.Unlock()
-	if fake.SetUAAOAuthClientStub != nil {
+	if stub != nil {
 		fake.SetUAAOAuthClientStub(arg1)
 	}
 }
@@ -2449,9 +2496,10 @@ func (fake *FakeReadWriter) SetUAAOAuthClientSecret(arg1 string) {
 	fake.setUAAOAuthClientSecretArgsForCall = append(fake.setUAAOAuthClientSecretArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetUAAOAuthClientSecretStub
 	fake.recordInvocation("SetUAAOAuthClientSecret", []interface{}{arg1})
 	fake.setUAAOAuthClientSecretMutex.Unlock()
-	if fake.SetUAAOAuthClientSecretStub != nil {
+	if stub != nil {
 		fake.SetUAAOAuthClientSecretStub(arg1)
 	}
 }
@@ -2480,9 +2528,10 @@ func (fake *FakeReadWriter) SetUaaEndpoint(arg1 string) {
 	fake.setUaaEndpointArgsForCall = append(fake.setUaaEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SetUaaEndpointStub
 	fake.recordInvocation("SetUaaEndpoint", []interface{}{arg1})
 	fake.setUaaEndpointMutex.Unlock()
-	if fake.SetUaaEndpointStub != nil {
+	if stub != nil {
 		fake.SetUaaEndpointStub(arg1)
 	}
 }
@@ -2511,15 +2560,16 @@ func (fake *FakeReadWriter) SpaceFields() models.SpaceFields {
 	ret, specificReturn := fake.spaceFieldsReturnsOnCall[len(fake.spaceFieldsArgsForCall)]
 	fake.spaceFieldsArgsForCall = append(fake.spaceFieldsArgsForCall, struct {
 	}{})
+	stub := fake.SpaceFieldsStub
+	fakeReturns := fake.spaceFieldsReturns
 	fake.recordInvocation("SpaceFields", []interface{}{})
 	fake.spaceFieldsMutex.Unlock()
-	if fake.SpaceFieldsStub != nil {
-		return fake.SpaceFieldsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.spaceFieldsReturns
 	return fakeReturns.result1
 }
 
@@ -2563,15 +2613,16 @@ func (fake *FakeReadWriter) Trace() string {
 	ret, specificReturn := fake.traceReturnsOnCall[len(fake.traceArgsForCall)]
 	fake.traceArgsForCall = append(fake.traceArgsForCall, struct {
 	}{})
+	stub := fake.TraceStub
+	fakeReturns := fake.traceReturns
 	fake.recordInvocation("Trace", []interface{}{})
 	fake.traceMutex.Unlock()
-	if fake.TraceStub != nil {
-		return fake.TraceStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.traceReturns
 	return fakeReturns.result1
 }
 
@@ -2615,15 +2666,16 @@ func (fake *FakeReadWriter) UAAGrantType() string {
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
 	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
 	}{})
+	stub := fake.UAAGrantTypeStub
+	fakeReturns := fake.uAAGrantTypeReturns
 	fake.recordInvocation("UAAGrantType", []interface{}{})
 	fake.uAAGrantTypeMutex.Unlock()
-	if fake.UAAGrantTypeStub != nil {
-		return fake.UAAGrantTypeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uAAGrantTypeReturns
 	return fakeReturns.result1
 }
 
@@ -2667,15 +2719,16 @@ func (fake *FakeReadWriter) UAAOAuthClient() string {
 	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
 	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct {
 	}{})
+	stub := fake.UAAOAuthClientStub
+	fakeReturns := fake.uAAOAuthClientReturns
 	fake.recordInvocation("UAAOAuthClient", []interface{}{})
 	fake.uAAOAuthClientMutex.Unlock()
-	if fake.UAAOAuthClientStub != nil {
-		return fake.UAAOAuthClientStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uAAOAuthClientReturns
 	return fakeReturns.result1
 }
 
@@ -2719,15 +2772,16 @@ func (fake *FakeReadWriter) UAAOAuthClientSecret() string {
 	ret, specificReturn := fake.uAAOAuthClientSecretReturnsOnCall[len(fake.uAAOAuthClientSecretArgsForCall)]
 	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct {
 	}{})
+	stub := fake.UAAOAuthClientSecretStub
+	fakeReturns := fake.uAAOAuthClientSecretReturns
 	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
 	fake.uAAOAuthClientSecretMutex.Unlock()
-	if fake.UAAOAuthClientSecretStub != nil {
-		return fake.UAAOAuthClientSecretStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uAAOAuthClientSecretReturns
 	return fakeReturns.result1
 }
 
@@ -2771,15 +2825,16 @@ func (fake *FakeReadWriter) UaaEndpoint() string {
 	ret, specificReturn := fake.uaaEndpointReturnsOnCall[len(fake.uaaEndpointArgsForCall)]
 	fake.uaaEndpointArgsForCall = append(fake.uaaEndpointArgsForCall, struct {
 	}{})
+	stub := fake.UaaEndpointStub
+	fakeReturns := fake.uaaEndpointReturns
 	fake.recordInvocation("UaaEndpoint", []interface{}{})
 	fake.uaaEndpointMutex.Unlock()
-	if fake.UaaEndpointStub != nil {
-		return fake.UaaEndpointStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uaaEndpointReturns
 	return fakeReturns.result1
 }
 
@@ -2823,9 +2878,10 @@ func (fake *FakeReadWriter) UnSetPluginRepo(arg1 int) {
 	fake.unSetPluginRepoArgsForCall = append(fake.unSetPluginRepoArgsForCall, struct {
 		arg1 int
 	}{arg1})
+	stub := fake.UnSetPluginRepoStub
 	fake.recordInvocation("UnSetPluginRepo", []interface{}{arg1})
 	fake.unSetPluginRepoMutex.Unlock()
-	if fake.UnSetPluginRepoStub != nil {
+	if stub != nil {
 		fake.UnSetPluginRepoStub(arg1)
 	}
 }
@@ -2854,15 +2910,16 @@ func (fake *FakeReadWriter) UserEmail() string {
 	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
 	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct {
 	}{})
+	stub := fake.UserEmailStub
+	fakeReturns := fake.userEmailReturns
 	fake.recordInvocation("UserEmail", []interface{}{})
 	fake.userEmailMutex.Unlock()
-	if fake.UserEmailStub != nil {
-		return fake.UserEmailStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.userEmailReturns
 	return fakeReturns.result1
 }
 
@@ -2906,15 +2963,16 @@ func (fake *FakeReadWriter) UserGUID() string {
 	ret, specificReturn := fake.userGUIDReturnsOnCall[len(fake.userGUIDArgsForCall)]
 	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct {
 	}{})
+	stub := fake.UserGUIDStub
+	fakeReturns := fake.userGUIDReturns
 	fake.recordInvocation("UserGUID", []interface{}{})
 	fake.userGUIDMutex.Unlock()
-	if fake.UserGUIDStub != nil {
-		return fake.UserGUIDStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.userGUIDReturns
 	return fakeReturns.result1
 }
 
@@ -2958,15 +3016,16 @@ func (fake *FakeReadWriter) Username() string {
 	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
 	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct {
 	}{})
+	stub := fake.UsernameStub
+	fakeReturns := fake.usernameReturns
 	fake.recordInvocation("Username", []interface{}{})
 	fake.usernameMutex.Unlock()
-	if fake.UsernameStub != nil {
-		return fake.UsernameStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.usernameReturns
 	return fakeReturns.result1
 }
 

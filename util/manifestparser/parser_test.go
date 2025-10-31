@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/util/manifestparser"
+	. "code.cloudfoundry.org/cli/v9/util/manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

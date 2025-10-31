@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/v9/version"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UserConfig

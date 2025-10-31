@@ -8,13 +8,13 @@ import (
 	"os/exec"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	rpcService "code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	rpcService "code.cloudfoundry.org/cli/v9/plugin/rpc"
 )
 
 type PluginUninstall struct {
@@ -51,8 +51,8 @@ func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, plugi
 	cmd.ui = deps.UI
 	cmd.config = deps.PluginConfig
 
-	//reset rpc registration in case there is other running instance,
-	//each service can only be registered once
+	// reset rpc registration in case there is other running instance,
+	// each service can only be registered once
 	server := rpc.NewServer()
 
 	RPCService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server)
@@ -87,7 +87,7 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) error {
 		cmd.ui.Say("Error invoking plugin: " + warn.Error() + ". Process to uninstall ...")
 	}
 
-	time.Sleep(500 * time.Millisecond) //prevent 'process being used' error in Windows
+	time.Sleep(500 * time.Millisecond) // prevent 'process being used' error in Windows
 
 	err = os.Remove(pluginMetadata.Location)
 	if err != nil {

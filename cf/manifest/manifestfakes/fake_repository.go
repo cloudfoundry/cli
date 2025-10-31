@@ -4,7 +4,7 @@ package manifestfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/manifest"
+	"code.cloudfoundry.org/cli/v9/cf/manifest"
 )
 
 type FakeRepository struct {
@@ -31,15 +31,16 @@ func (fake *FakeRepository) ReadManifest(arg1 string) (*manifest.Manifest, error
 	fake.readManifestArgsForCall = append(fake.readManifestArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ReadManifestStub
+	fakeReturns := fake.readManifestReturns
 	fake.recordInvocation("ReadManifest", []interface{}{arg1})
 	fake.readManifestMutex.Unlock()
-	if fake.ReadManifestStub != nil {
-		return fake.ReadManifestStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readManifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

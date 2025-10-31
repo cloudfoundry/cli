@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/cf/terminal"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v9/cf/terminal"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

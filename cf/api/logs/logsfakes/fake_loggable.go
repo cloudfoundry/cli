@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/v9/cf/api/logs"
 )
 
 type FakeLoggable struct {
@@ -49,15 +49,16 @@ func (fake *FakeLoggable) GetSourceName() string {
 	ret, specificReturn := fake.getSourceNameReturnsOnCall[len(fake.getSourceNameArgsForCall)]
 	fake.getSourceNameArgsForCall = append(fake.getSourceNameArgsForCall, struct {
 	}{})
+	stub := fake.GetSourceNameStub
+	fakeReturns := fake.getSourceNameReturns
 	fake.recordInvocation("GetSourceName", []interface{}{})
 	fake.getSourceNameMutex.Unlock()
-	if fake.GetSourceNameStub != nil {
-		return fake.GetSourceNameStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getSourceNameReturns
 	return fakeReturns.result1
 }
 
@@ -102,15 +103,16 @@ func (fake *FakeLoggable) ToLog(arg1 *time.Location) string {
 	fake.toLogArgsForCall = append(fake.toLogArgsForCall, struct {
 		arg1 *time.Location
 	}{arg1})
+	stub := fake.ToLogStub
+	fakeReturns := fake.toLogReturns
 	fake.recordInvocation("ToLog", []interface{}{arg1})
 	fake.toLogMutex.Unlock()
-	if fake.ToLogStub != nil {
-		return fake.ToLogStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.toLogReturns
 	return fakeReturns.result1
 }
 
@@ -161,15 +163,16 @@ func (fake *FakeLoggable) ToSimpleLog() string {
 	ret, specificReturn := fake.toSimpleLogReturnsOnCall[len(fake.toSimpleLogArgsForCall)]
 	fake.toSimpleLogArgsForCall = append(fake.toSimpleLogArgsForCall, struct {
 	}{})
+	stub := fake.ToSimpleLogStub
+	fakeReturns := fake.toSimpleLogReturns
 	fake.recordInvocation("ToSimpleLog", []interface{}{})
 	fake.toSimpleLogMutex.Unlock()
-	if fake.ToSimpleLogStub != nil {
-		return fake.ToSimpleLogStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.toSimpleLogReturns
 	return fakeReturns.result1
 }
 

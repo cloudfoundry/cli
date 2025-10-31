@@ -3,7 +3,7 @@ package servicebrokerstub
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )

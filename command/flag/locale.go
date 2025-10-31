@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/i18n"
 	flags "github.com/jessevdk/go-flags"
 )
 

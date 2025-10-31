@@ -8,21 +8,21 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/actors/plugininstaller"
-	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/util/downloader"
-	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v9/cf/actors/plugininstaller"
+	"code.cloudfoundry.org/cli/v9/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/util/downloader"
+	"code.cloudfoundry.org/cli/v9/plugin"
+	"code.cloudfoundry.org/cli/v9/util"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 
-	pluginRPCService "code.cloudfoundry.org/cli/plugin/rpc"
+	pluginRPCService "code.cloudfoundry.org/cli/v9/plugin/rpc"
 )
 
 type PluginInstall struct {
@@ -78,8 +78,8 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 	cmd.pluginRepo = deps.PluginRepo
 	cmd.checksum = deps.ChecksumUtil
 
-	//reset rpc registration in case there is other running instance,
-	//each service can only be registered once
+	// reset rpc registration in case there is other running instance,
+	// each service can only be registered once
 	server := rpc.NewServer()
 
 	rpcService, err := pluginRPCService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, pluginRPCService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server)
@@ -220,7 +220,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 	}
 
 	for _, pluginCmd := range pluginMetadata.Commands {
-		//check for command conflicting core commands/alias
+		// check for command conflicting core commands/alias
 		if pluginCmd.Name == "help" || commandregistry.Commands.CommandExists(pluginCmd.Name) {
 			return errors.New(T(
 				"Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
@@ -230,7 +230,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 			)
 		}
 
-		//check for alias conflicting core command/alias
+		// check for alias conflicting core command/alias
 		if pluginCmd.Alias == "help" || commandregistry.Commands.CommandExists(pluginCmd.Alias) {
 			return errors.New(T(
 				"Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
@@ -243,7 +243,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 		for installedPluginName, installedPlugin := range plugins {
 			for _, installedPluginCmd := range installedPlugin.Commands {
 
-				//check for command conflicting other plugin commands/alias
+				// check for command conflicting other plugin commands/alias
 				if installedPluginCmd.Name == pluginCmd.Name || installedPluginCmd.Alias == pluginCmd.Name {
 					return errors.New(T(
 						"Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
@@ -254,7 +254,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 					)
 				}
 
-				//check for alias conflicting other plugin commands/alias
+				// check for alias conflicting other plugin commands/alias
 				if pluginCmd.Alias != "" && (installedPluginCmd.Name == pluginCmd.Alias || installedPluginCmd.Alias == pluginCmd.Alias) {
 					return errors.New(T(
 						"Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

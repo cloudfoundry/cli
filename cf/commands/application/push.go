@@ -8,24 +8,24 @@ import (
 	"strconv"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/api/applications"
-	"code.cloudfoundry.org/cli/cf/api/authentication"
-	"code.cloudfoundry.org/cli/cf/api/stacks"
-	"code.cloudfoundry.org/cli/cf/appfiles"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/service"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/formatters"
-	"code.cloudfoundry.org/cli/cf/manifest"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/actors"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/api/applications"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication"
+	"code.cloudfoundry.org/cli/v9/cf/api/stacks"
+	"code.cloudfoundry.org/cli/v9/cf/appfiles"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commands/service"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/formatters"
+	"code.cloudfoundry.org/cli/v9/cf/manifest"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 )
 
 type Push struct {
@@ -122,17 +122,17 @@ func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	cmd.config = deps.Config
 	cmd.manifestRepo = deps.ManifestRepo
 
-	//set appStarter
+	// set appStarter
 	appCommand := commandregistry.Commands.FindCommand("start")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStarter = appCommand.(Starter)
 
-	//set appStopper
+	// set appStopper
 	appCommand = commandregistry.Commands.FindCommand("stop")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStopper = appCommand.(Stopper)
 
-	//set serviceBinder
+	// set serviceBinder
 	appCommand = commandregistry.Commands.FindCommand("bind-service")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.serviceBinder = appCommand.(service.Binder)
@@ -438,7 +438,7 @@ func (cmd *Push) createAndBindRoute(
 		case host != nil:
 			hostname = *host
 		case UseRandomPort:
-			//do nothing
+			// do nothing
 		case UseRandomRoute:
 			hostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
 		default:

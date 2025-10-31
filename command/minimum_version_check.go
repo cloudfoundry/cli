@@ -1,7 +1,7 @@
 package command
 
 import (
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	log "github.com/sirupsen/logrus"
 )
 

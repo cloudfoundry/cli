@@ -17,9 +17,9 @@ import (
 	"syscall"
 	"time"
 
-	. "code.cloudfoundry.org/cli/util/clissh"
-	"code.cloudfoundry.org/cli/util/clissh/clisshfakes"
-	"code.cloudfoundry.org/cli/util/clissh/ssherror"
+	. "code.cloudfoundry.org/cli/v9/util/clissh"
+	"code.cloudfoundry.org/cli/v9/util/clissh/clisshfakes"
+	"code.cloudfoundry.org/cli/v9/util/clissh/ssherror"
 	"code.cloudfoundry.org/diego-ssh/server"
 	fake_server "code.cloudfoundry.org/diego-ssh/server/fakes"
 	"code.cloudfoundry.org/diego-ssh/test_helpers"

@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 // Task represents a Cloud Controller V3 Task.

@@ -3,11 +3,11 @@ package v7pushaction_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	. "code.cloudfoundry.org/cli/v9/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -3,8 +3,8 @@ package wrapper
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/shared"
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/shared"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
 )
 
 // UAATraceHeaderRequest is a wrapper that adds b3 trace headers to requests.

@@ -6,7 +6,7 @@ package generic_test
 import (
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/util/generic"
+	. "code.cloudfoundry.org/cli/v9/util/generic"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

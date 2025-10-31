@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	plugin_models "code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/v9/plugin/models"
 )
 
 type cliConnection struct {
@@ -110,7 +110,7 @@ func (c *cliConnection) callCliCommand(silently bool, args ...string) ([]string,
 }
 
 func (c *cliConnection) pingCLI() {
-	//call back to cf saying we have been setup
+	// call back to cf saying we have been setup
 	var connErr error
 	var conn net.Conn
 	for i := 0; i < 5; i++ {

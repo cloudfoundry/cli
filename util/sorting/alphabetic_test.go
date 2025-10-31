@@ -3,7 +3,7 @@ package sorting_test
 import (
 	"sort"
 
-	. "code.cloudfoundry.org/cli/util/sorting"
+	. "code.cloudfoundry.org/cli/v9/util/sorting"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

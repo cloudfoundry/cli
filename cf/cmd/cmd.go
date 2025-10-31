@@ -8,21 +8,21 @@ import (
 
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commandsloader"
-	"code.cloudfoundry.org/cli/cf/configuration"
-	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/cf/util/spellcheck"
-	"code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commandsloader"
+	"code.cloudfoundry.org/cli/v9/cf/configuration"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/confighelpers"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/trace"
+	"code.cloudfoundry.org/cli/v9/cf/util/spellcheck"
+	"code.cloudfoundry.org/cli/v9/plugin/rpc"
 
 	netrpc "net/rpc"
 )
@@ -31,18 +31,18 @@ var cmdRegistry = commandregistry.Commands
 
 func Main(traceEnv string, args []string) {
 
-	//handle `cf -v` for cf version
+	// handle `cf -v` for cf version
 	if len(args) == 2 && (args[1] == "-v" || args[1] == "--version") {
 		args[1] = "version"
 	}
 
-	//handles `cf`
+	// handles `cf`
 	if len(args) == 1 {
 		args = []string{args[0], "help"}
 	}
 
-	//handles `cf [COMMAND] -h ...`
-	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
+	// handles `cf [COMMAND] -h ...`
+	// rearrange args to `cf help COMMAND` and let `command help` to print out usage
 	args = append([]string{args[0]}, handleHelp(args[1:])...)
 
 	newArgs, isVerbose := handleVerbose(args)
@@ -86,7 +86,7 @@ func Main(traceEnv string, args []string) {
 
 	commandsloader.Load()
 
-	//run core command
+	// run core command
 	cmdName := args[1]
 	cmd := cmdRegistry.FindCommand(cmdName)
 	if cmd != nil {
@@ -137,7 +137,7 @@ func Main(traceEnv string, args []string) {
 		os.Exit(0)
 	}
 
-	//non core command, try plugin command
+	// non core command, try plugin command
 	server := netrpc.NewServer()
 	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, Writer, server)
 	if err != nil {

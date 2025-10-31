@@ -1,8 +1,8 @@
 package requirements
 
 import (
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
 	"github.com/blang/semver/v4"
 )
 

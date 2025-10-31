@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/jsonry"
 )
 

@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeServiceAuthTokenRepository struct {
@@ -78,15 +78,16 @@ func (fake *FakeServiceAuthTokenRepository) Create(arg1 models.ServiceAuthTokenF
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 models.ServiceAuthTokenFields
 	}{arg1})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -138,15 +139,16 @@ func (fake *FakeServiceAuthTokenRepository) Delete(arg1 models.ServiceAuthTokenF
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 models.ServiceAuthTokenFields
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -197,15 +199,16 @@ func (fake *FakeServiceAuthTokenRepository) FindAll() ([]models.ServiceAuthToken
 	ret, specificReturn := fake.findAllReturnsOnCall[len(fake.findAllArgsForCall)]
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct {
 	}{})
+	stub := fake.FindAllStub
+	fakeReturns := fake.findAllReturns
 	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
-	if fake.FindAllStub != nil {
-		return fake.FindAllStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findAllReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -254,15 +257,16 @@ func (fake *FakeServiceAuthTokenRepository) FindByLabelAndProvider(arg1 string, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FindByLabelAndProviderStub
+	fakeReturns := fake.findByLabelAndProviderReturns
 	fake.recordInvocation("FindByLabelAndProvider", []interface{}{arg1, arg2})
 	fake.findByLabelAndProviderMutex.Unlock()
-	if fake.FindByLabelAndProviderStub != nil {
-		return fake.FindByLabelAndProviderStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByLabelAndProviderReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -317,15 +321,16 @@ func (fake *FakeServiceAuthTokenRepository) Update(arg1 models.ServiceAuthTokenF
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.ServiceAuthTokenFields
 	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 
