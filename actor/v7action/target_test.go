@@ -53,7 +53,7 @@ var _ = Describe("Targeting", func() {
 			var meta struct {
 				Version            string `json:"version"`
 				HostKeyFingerprint string `json:"host_key_fingerprint"`
-				OAuthClient        string `json:"oath_client"`
+				OAuthClient        string `json:"oauth_client"`
 			}
 			meta.Version = expectedAPIVersion
 
