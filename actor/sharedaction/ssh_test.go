@@ -3,9 +3,9 @@ package sharedaction_test
 import (
 	"errors"
 
-	. "code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
-	"code.cloudfoundry.org/cli/util/clissh"
+	. "code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction/sharedactionfakes"
+	"code.cloudfoundry.org/cli/v9/util/clissh"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

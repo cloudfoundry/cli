@@ -4,7 +4,7 @@ package errorsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
 )
 
 type FakeHTTPError struct {
@@ -47,15 +47,16 @@ func (fake *FakeHTTPError) Error() string {
 	ret, specificReturn := fake.errorReturnsOnCall[len(fake.errorArgsForCall)]
 	fake.errorArgsForCall = append(fake.errorArgsForCall, struct {
 	}{})
+	stub := fake.ErrorStub
+	fakeReturns := fake.errorReturns
 	fake.recordInvocation("Error", []interface{}{})
 	fake.errorMutex.Unlock()
-	if fake.ErrorStub != nil {
-		return fake.ErrorStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.errorReturns
 	return fakeReturns.result1
 }
 
@@ -99,15 +100,16 @@ func (fake *FakeHTTPError) ErrorCode() string {
 	ret, specificReturn := fake.errorCodeReturnsOnCall[len(fake.errorCodeArgsForCall)]
 	fake.errorCodeArgsForCall = append(fake.errorCodeArgsForCall, struct {
 	}{})
+	stub := fake.ErrorCodeStub
+	fakeReturns := fake.errorCodeReturns
 	fake.recordInvocation("ErrorCode", []interface{}{})
 	fake.errorCodeMutex.Unlock()
-	if fake.ErrorCodeStub != nil {
-		return fake.ErrorCodeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.errorCodeReturns
 	return fakeReturns.result1
 }
 
@@ -151,15 +153,16 @@ func (fake *FakeHTTPError) StatusCode() int {
 	ret, specificReturn := fake.statusCodeReturnsOnCall[len(fake.statusCodeArgsForCall)]
 	fake.statusCodeArgsForCall = append(fake.statusCodeArgsForCall, struct {
 	}{})
+	stub := fake.StatusCodeStub
+	fakeReturns := fake.statusCodeReturns
 	fake.recordInvocation("StatusCode", []interface{}{})
 	fake.statusCodeMutex.Unlock()
-	if fake.StatusCodeStub != nil {
-		return fake.StatusCodeStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.statusCodeReturns
 	return fakeReturns.result1
 }
 

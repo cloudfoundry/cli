@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/authentication"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
 )
 
 type FakeRepository struct {
@@ -91,15 +91,16 @@ func (fake *FakeRepository) Authenticate(arg1 map[string]string) error {
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
 		arg1 map[string]string
 	}{arg1})
+	stub := fake.AuthenticateStub
+	fakeReturns := fake.authenticateReturns
 	fake.recordInvocation("Authenticate", []interface{}{arg1})
 	fake.authenticateMutex.Unlock()
-	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.authenticateReturns
 	return fakeReturns.result1
 }
 
@@ -151,15 +152,16 @@ func (fake *FakeRepository) Authorize(arg1 string) (string, error) {
 	fake.authorizeArgsForCall = append(fake.authorizeArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.AuthorizeStub
+	fakeReturns := fake.authorizeReturns
 	fake.recordInvocation("Authorize", []interface{}{arg1})
 	fake.authorizeMutex.Unlock()
-	if fake.AuthorizeStub != nil {
-		return fake.AuthorizeStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.authorizeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -213,9 +215,10 @@ func (fake *FakeRepository) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	stub := fake.DumpRequestStub
 	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
-	if fake.DumpRequestStub != nil {
+	if stub != nil {
 		fake.DumpRequestStub(arg1)
 	}
 }
@@ -244,9 +247,10 @@ func (fake *FakeRepository) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
+	stub := fake.DumpResponseStub
 	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
-	if fake.DumpResponseStub != nil {
+	if stub != nil {
 		fake.DumpResponseStub(arg1)
 	}
 }
@@ -275,15 +279,16 @@ func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]cor
 	ret, specificReturn := fake.getLoginPromptsAndSaveUAAServerURLReturnsOnCall[len(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall)]
 	fake.getLoginPromptsAndSaveUAAServerURLArgsForCall = append(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall, struct {
 	}{})
+	stub := fake.GetLoginPromptsAndSaveUAAServerURLStub
+	fakeReturns := fake.getLoginPromptsAndSaveUAAServerURLReturns
 	fake.recordInvocation("GetLoginPromptsAndSaveUAAServerURL", []interface{}{})
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Unlock()
-	if fake.GetLoginPromptsAndSaveUAAServerURLStub != nil {
-		return fake.GetLoginPromptsAndSaveUAAServerURLStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getLoginPromptsAndSaveUAAServerURLReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -330,15 +335,16 @@ func (fake *FakeRepository) RefreshAuthToken() (string, error) {
 	ret, specificReturn := fake.refreshAuthTokenReturnsOnCall[len(fake.refreshAuthTokenArgsForCall)]
 	fake.refreshAuthTokenArgsForCall = append(fake.refreshAuthTokenArgsForCall, struct {
 	}{})
+	stub := fake.RefreshAuthTokenStub
+	fakeReturns := fake.refreshAuthTokenReturns
 	fake.recordInvocation("RefreshAuthToken", []interface{}{})
 	fake.refreshAuthTokenMutex.Unlock()
-	if fake.RefreshAuthTokenStub != nil {
-		return fake.RefreshAuthTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshAuthTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -386,15 +392,16 @@ func (fake *FakeRepository) RefreshToken(arg1 string) (string, error) {
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.RefreshTokenStub
+	fakeReturns := fake.refreshTokenReturns
 	fake.recordInvocation("RefreshToken", []interface{}{arg1})
 	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

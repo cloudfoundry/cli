@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
-	. "code.cloudfoundry.org/cli/api/plugin"
-	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	. "code.cloudfoundry.org/cli/v9/api/plugin"
+	"code.cloudfoundry.org/cli/v9/api/plugin/pluginerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

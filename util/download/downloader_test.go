@@ -10,8 +10,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "code.cloudfoundry.org/cli/util/download"
-	"code.cloudfoundry.org/cli/util/download/downloadfakes"
+	. "code.cloudfoundry.org/cli/v9/util/download"
+	"code.cloudfoundry.org/cli/v9/util/download/downloadfakes"
 )
 
 var _ = Describe("Downloader", func() {

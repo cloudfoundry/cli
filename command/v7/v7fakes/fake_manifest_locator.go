@@ -4,7 +4,7 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/command/v7"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
 )
 
 type FakeManifestLocator struct {

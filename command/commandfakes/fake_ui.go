@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 type FakeUI struct {
@@ -742,15 +742,16 @@ func (fake *FakeUI) DisplayJSON(arg1 string, arg2 interface{}) error {
 		arg1 string
 		arg2 interface{}
 	}{arg1, arg2})
+	stub := fake.DisplayJSONStub
+	fakeReturns := fake.displayJSONReturns
 	fake.recordInvocation("DisplayJSON", []interface{}{arg1, arg2})
 	fake.displayJSONMutex.Unlock()
-	if fake.DisplayJSONStub != nil {
-		return fake.DisplayJSONStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.displayJSONReturns
 	return fakeReturns.result1
 }
 

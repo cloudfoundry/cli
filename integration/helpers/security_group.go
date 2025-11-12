@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/resources"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )

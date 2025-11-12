@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/plugin/rpc"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/trace"
+	"code.cloudfoundry.org/cli/v9/plugin/rpc"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 type Config interface {

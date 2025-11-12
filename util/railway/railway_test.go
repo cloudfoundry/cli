@@ -3,8 +3,8 @@ package railway_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/util/railway"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/util/railway"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

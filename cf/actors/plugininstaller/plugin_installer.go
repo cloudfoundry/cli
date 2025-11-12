@@ -1,11 +1,11 @@
 package plugininstaller
 
 import (
-	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/util/downloader"
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v9/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/util/downloader"
+	"code.cloudfoundry.org/cli/v9/util"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PluginInstaller
