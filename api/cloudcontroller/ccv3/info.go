@@ -3,8 +3,8 @@ package ccv3
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
 )
 
 type Info struct {

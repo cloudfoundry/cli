@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	"github.com/onsi/gomega"
 )
 
@@ -25,11 +25,11 @@ func (matcher *OrderMatcher) Match(actualStr interface{}) (success bool, err err
 		return false, nil
 	}
 
-	//loop and match, stop at last actual[0] line
+	// loop and match, stop at last actual[0] line
 	for len(actual) > 1 {
 		if matched, msg := matchSingleLine(actual[0], matcher.expected[0]); matched {
 			if len(matcher.expected) == 1 {
-				return true, nil //no more expected to match, all passed
+				return true, nil // no more expected to match, all passed
 			}
 			matcher.expected = matcher.expected[1:]
 		} else if msg != "" {
@@ -39,7 +39,7 @@ func (matcher *OrderMatcher) Match(actualStr interface{}) (success bool, err err
 		actual = actual[1:]
 	}
 
-	//match the last actual line with the rest of expected
+	// match the last actual line with the rest of expected
 	matched, msg := matchSingleLine(actual[0], matcher.expected[0])
 	if matched && len(matcher.expected) == 1 {
 		return true, nil

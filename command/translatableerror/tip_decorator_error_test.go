@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	. "code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/translatableerror/translatableerrorfakes"
+	. "code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror/translatableerrorfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

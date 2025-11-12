@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/types"
-	. "code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v8/types"
+	. "code.cloudfoundry.org/cli/v8/util/manifest"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 
 	. "github.com/onsi/ginkgo/v2"

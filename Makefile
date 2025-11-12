@@ -8,10 +8,10 @@ CF_BUILD_VERSION ?= $$(git describe --tags --abbrev=0)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
-	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
-	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
+	-X code.cloudfoundry.org/cli/v8/version.binarySHA=$(CF_BUILD_SHA) \
+	-X code.cloudfoundry.org/cli/v8/version.binaryBuildDate=$(CF_BUILD_DATE)
 LD_FLAGS =$(LD_FLAGS_COMMON) \
-	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION)
+	-X code.cloudfoundry.org/cli/v8/version.binaryVersion=$(CF_BUILD_VERSION)
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 REQUIRED_FOR_STATIC_BINARY =-a -tags "netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")

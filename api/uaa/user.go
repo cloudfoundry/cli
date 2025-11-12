@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/uaa/internal"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/uaa/internal"
 )
 
 // User represents an UAA user account.

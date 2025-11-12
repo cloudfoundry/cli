@@ -4,9 +4,9 @@ package v7fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	v7 "code.cloudfoundry.org/cli/v8/command/v7"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 type FakeRevisionsActor struct {

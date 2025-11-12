@@ -4,8 +4,8 @@ package applicationsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/applications"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeRepository struct {
@@ -134,15 +134,16 @@ func (fake *FakeRepository) Create(arg1 models.AppParams) (models.Application, e
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 models.AppParams
 	}{arg1})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -197,15 +198,16 @@ func (fake *FakeRepository) CreateRestageRequest(arg1 string) error {
 	fake.createRestageRequestArgsForCall = append(fake.createRestageRequestArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CreateRestageRequestStub
+	fakeReturns := fake.createRestageRequestReturns
 	fake.recordInvocation("CreateRestageRequest", []interface{}{arg1})
 	fake.createRestageRequestMutex.Unlock()
-	if fake.CreateRestageRequestStub != nil {
-		return fake.CreateRestageRequestStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createRestageRequestReturns
 	return fakeReturns.result1
 }
 
@@ -257,15 +259,16 @@ func (fake *FakeRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -317,15 +320,16 @@ func (fake *FakeRepository) GetApp(arg1 string) (models.Application, error) {
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetAppStub
+	fakeReturns := fake.getAppReturns
 	fake.recordInvocation("GetApp", []interface{}{arg1})
 	fake.getAppMutex.Unlock()
-	if fake.GetAppStub != nil {
-		return fake.GetAppStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAppReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -380,15 +384,16 @@ func (fake *FakeRepository) GetAppRoutes(arg1 string) ([]models.Route, error) {
 	fake.getAppRoutesArgsForCall = append(fake.getAppRoutesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetAppRoutesStub
+	fakeReturns := fake.getAppRoutesReturns
 	fake.recordInvocation("GetAppRoutes", []interface{}{arg1})
 	fake.getAppRoutesMutex.Unlock()
-	if fake.GetAppRoutesStub != nil {
-		return fake.GetAppRoutesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAppRoutesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -443,15 +448,16 @@ func (fake *FakeRepository) Read(arg1 string) (models.Application, error) {
 	fake.readArgsForCall = append(fake.readArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ReadStub
+	fakeReturns := fake.readReturns
 	fake.recordInvocation("Read", []interface{}{arg1})
 	fake.readMutex.Unlock()
-	if fake.ReadStub != nil {
-		return fake.ReadStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -506,15 +512,16 @@ func (fake *FakeRepository) ReadEnv(arg1 string) (*models.Environment, error) {
 	fake.readEnvArgsForCall = append(fake.readEnvArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ReadEnvStub
+	fakeReturns := fake.readEnvReturns
 	fake.recordInvocation("ReadEnv", []interface{}{arg1})
 	fake.readEnvMutex.Unlock()
-	if fake.ReadEnvStub != nil {
-		return fake.ReadEnvStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readEnvReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -570,15 +577,16 @@ func (fake *FakeRepository) ReadFromSpace(arg1 string, arg2 string) (models.Appl
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ReadFromSpaceStub
+	fakeReturns := fake.readFromSpaceReturns
 	fake.recordInvocation("ReadFromSpace", []interface{}{arg1, arg2})
 	fake.readFromSpaceMutex.Unlock()
-	if fake.ReadFromSpaceStub != nil {
-		return fake.ReadFromSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readFromSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -634,15 +642,16 @@ func (fake *FakeRepository) Update(arg1 string, arg2 models.AppParams) (models.A
 		arg1 string
 		arg2 models.AppParams
 	}{arg1, arg2})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1, arg2})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

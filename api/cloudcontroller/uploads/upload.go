@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 func CalculateRequestSize(fileSize int64, path string, fieldName string) (int64, error) {

@@ -4,8 +4,8 @@ package rpcfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/plugin/rpc"
 )
 
 type FakeCommandRunner struct {
@@ -39,15 +39,16 @@ func (fake *FakeCommandRunner) Command(arg1 []string, arg2 commandregistry.Depen
 		arg2 commandregistry.Dependency
 		arg3 bool
 	}{arg1Copy, arg2, arg3})
+	stub := fake.CommandStub
+	fakeReturns := fake.commandReturns
 	fake.recordInvocation("Command", []interface{}{arg1Copy, arg2, arg3})
 	fake.commandMutex.Unlock()
-	if fake.CommandStub != nil {
-		return fake.CommandStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.commandReturns
 	return fakeReturns.result1
 }
 

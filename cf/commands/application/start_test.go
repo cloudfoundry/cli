@@ -5,26 +5,26 @@ import (
 	"runtime"
 	"time"
 
-	. "code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/commands/application/applicationfakes"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
+	. "code.cloudfoundry.org/cli/v8/cf/commands/application"
+	"code.cloudfoundry.org/cli/v8/cf/commands/application/applicationfakes"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v8/cf/trace/tracefakes"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/errors"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 
-	"code.cloudfoundry.org/cli/cf/api/appinstances/appinstancesfakes"
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
-	"code.cloudfoundry.org/cli/cf/api/logs"
-	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/api/appinstances/appinstancesfakes"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications/applicationsfakes"
+	"code.cloudfoundry.org/cli/v8/cf/api/logs"
+	"code.cloudfoundry.org/cli/v8/cf/api/logs/logsfakes"
+	testcmd "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 
 	"sync"
 
@@ -59,7 +59,7 @@ var _ = Describe("start command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
 
-		//inject fake 'Start' into registry
+		// inject fake 'Start' into registry
 		commandregistry.Register(displayApp)
 
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("start").SetDependency(deps, false))
@@ -104,7 +104,7 @@ var _ = Describe("start command", func() {
 
 		displayApp = new(applicationfakes.FakeAppDisplayer)
 
-		//save original command dependency and restore later
+		// save original command dependency and restore later
 		originalAppCommand = commandregistry.Commands.FindCommand("app")
 
 		defaultInstanceErrorCodes = []string{"", ""}
@@ -291,14 +291,14 @@ var _ = Describe("start command", func() {
 		})
 
 		Context("when the timeout happens exactly when the connection is established", func() {
-			//var startWait *sync.WaitGroup
+			// var startWait *sync.WaitGroup
 
 			BeforeEach(func() {
 				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 				configRepo = testconfig.NewRepositoryWithDefaults()
 				logRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
-					//startWait.Wait()
+					// startWait.Wait()
 					onConnect()
 				}
 			})

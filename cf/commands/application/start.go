@@ -10,17 +10,17 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/api/appinstances"
-	"code.cloudfoundry.org/cli/cf/api/applications"
-	"code.cloudfoundry.org/cli/cf/api/logs"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf"
+	"code.cloudfoundry.org/cli/v8/cf/api/appinstances"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications"
+	"code.cloudfoundry.org/cli/v8/cf/api/logs"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 const (
@@ -195,7 +195,7 @@ func (cmd *Start) WatchStaging(app models.Application, orgName, spaceName string
 	}
 	cmd.ui.Ok()
 
-	//detectedstartcommand on first push is not present until starting completes
+	// detectedstartcommand on first push is not present until starting completes
 	startedApp, err := cmd.appRepo.GetApp(updatedApp.GUID)
 	if err != nil {
 		return models.Application{}, err

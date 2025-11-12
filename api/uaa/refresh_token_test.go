@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
+	. "code.cloudfoundry.org/cli/v8/api/uaa"
+	"code.cloudfoundry.org/cli/v8/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v8/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

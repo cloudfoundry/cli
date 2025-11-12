@@ -4,7 +4,7 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/api"
 )
 
 type FakeClientRepository struct {
@@ -31,15 +31,16 @@ func (fake *FakeClientRepository) ClientExists(arg1 string) (bool, error) {
 	fake.clientExistsArgsForCall = append(fake.clientExistsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ClientExistsStub
+	fakeReturns := fake.clientExistsReturns
 	fake.recordInvocation("ClientExists", []interface{}{arg1})
 	fake.clientExistsMutex.Unlock()
-	if fake.ClientExistsStub != nil {
-		return fake.ClientExistsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.clientExistsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

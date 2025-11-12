@@ -4,11 +4,11 @@ package applicationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/application"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands/application"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 type FakeStarter struct {
@@ -91,15 +91,16 @@ func (fake *FakeStarter) ApplicationStart(arg1 models.Application, arg2 string, 
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ApplicationStartStub
+	fakeReturns := fake.applicationStartReturns
 	fake.recordInvocation("ApplicationStart", []interface{}{arg1, arg2, arg3})
 	fake.applicationStartMutex.Unlock()
-	if fake.ApplicationStartStub != nil {
-		return fake.ApplicationStartStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.applicationStartReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -154,15 +155,16 @@ func (fake *FakeStarter) Execute(arg1 flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		arg1 flags.FlagContext
 	}{arg1})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{arg1})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -213,15 +215,16 @@ func (fake *FakeStarter) MetaData() commandregistry.CommandMetadata {
 	ret, specificReturn := fake.metaDataReturnsOnCall[len(fake.metaDataArgsForCall)]
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct {
 	}{})
+	stub := fake.MetaDataStub
+	fakeReturns := fake.metaDataReturns
 	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
-	if fake.MetaDataStub != nil {
-		return fake.MetaDataStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.metaDataReturns
 	return fakeReturns.result1
 }
 
@@ -267,15 +270,16 @@ func (fake *FakeStarter) Requirements(arg1 requirements.Factory, arg2 flags.Flag
 		arg1 requirements.Factory
 		arg2 flags.FlagContext
 	}{arg1, arg2})
+	stub := fake.RequirementsStub
+	fakeReturns := fake.requirementsReturns
 	fake.recordInvocation("Requirements", []interface{}{arg1, arg2})
 	fake.requirementsMutex.Unlock()
-	if fake.RequirementsStub != nil {
-		return fake.RequirementsStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.requirementsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -331,15 +335,16 @@ func (fake *FakeStarter) SetDependency(arg1 commandregistry.Dependency, arg2 boo
 		arg1 commandregistry.Dependency
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.SetDependencyStub
+	fakeReturns := fake.setDependencyReturns
 	fake.recordInvocation("SetDependency", []interface{}{arg1, arg2})
 	fake.setDependencyMutex.Unlock()
-	if fake.SetDependencyStub != nil {
-		return fake.SetDependencyStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setDependencyReturns
 	return fakeReturns.result1
 }
 
@@ -390,9 +395,10 @@ func (fake *FakeStarter) SetStartTimeoutInSeconds(arg1 int) {
 	fake.setStartTimeoutInSecondsArgsForCall = append(fake.setStartTimeoutInSecondsArgsForCall, struct {
 		arg1 int
 	}{arg1})
+	stub := fake.SetStartTimeoutInSecondsStub
 	fake.recordInvocation("SetStartTimeoutInSeconds", []interface{}{arg1})
 	fake.setStartTimeoutInSecondsMutex.Unlock()
-	if fake.SetStartTimeoutInSecondsStub != nil {
+	if stub != nil {
 		fake.SetStartTimeoutInSecondsStub(arg1)
 	}
 }
