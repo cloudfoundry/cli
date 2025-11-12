@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
 )
 
 type FakeConnection struct {
@@ -34,15 +34,16 @@ func (fake *FakeConnection) Make(arg1 *http.Request, arg2 *plugin.Response, arg3
 		arg2 *plugin.Response
 		arg3 plugin.ProxyReader
 	}{arg1, arg2, arg3})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2, arg3})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 

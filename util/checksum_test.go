@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	. "code.cloudfoundry.org/cli/util"
+	. "code.cloudfoundry.org/cli/v8/util"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

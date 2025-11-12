@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v8/cf/net"
 )
 
 type FakeHTTPClientInterface struct {
@@ -54,15 +54,16 @@ func (fake *FakeHTTPClientInterface) Do(arg1 *http.Request) (*http.Response, err
 	fake.doArgsForCall = append(fake.doArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	stub := fake.DoStub
+	fakeReturns := fake.doReturns
 	fake.recordInvocation("Do", []interface{}{arg1})
 	fake.doMutex.Unlock()
-	if fake.DoStub != nil {
-		return fake.DoStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.doReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -116,9 +117,10 @@ func (fake *FakeHTTPClientInterface) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	stub := fake.DumpRequestStub
 	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
-	if fake.DumpRequestStub != nil {
+	if stub != nil {
 		fake.DumpRequestStub(arg1)
 	}
 }
@@ -147,9 +149,10 @@ func (fake *FakeHTTPClientInterface) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
+	stub := fake.DumpResponseStub
 	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
-	if fake.DumpResponseStub != nil {
+	if stub != nil {
 		fake.DumpResponseStub(arg1)
 	}
 }
@@ -185,15 +188,16 @@ func (fake *FakeHTTPClientInterface) ExecuteCheckRedirect(arg1 *http.Request, ar
 		arg1 *http.Request
 		arg2 []*http.Request
 	}{arg1, arg2Copy})
+	stub := fake.ExecuteCheckRedirectStub
+	fakeReturns := fake.executeCheckRedirectReturns
 	fake.recordInvocation("ExecuteCheckRedirect", []interface{}{arg1, arg2Copy})
 	fake.executeCheckRedirectMutex.Unlock()
-	if fake.ExecuteCheckRedirectStub != nil {
-		return fake.ExecuteCheckRedirectStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeCheckRedirectReturns
 	return fakeReturns.result1
 }
 

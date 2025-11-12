@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/router/routerfakes"
-	. "code.cloudfoundry.org/cli/api/router/wrapper"
-	"code.cloudfoundry.org/cli/api/router/wrapper/wrapperfakes"
+	"code.cloudfoundry.org/cli/v8/api/router"
+	"code.cloudfoundry.org/cli/v8/api/router/routerfakes"
+	. "code.cloudfoundry.org/cli/v8/api/router/wrapper"
+	"code.cloudfoundry.org/cli/v8/api/router/wrapper/wrapperfakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

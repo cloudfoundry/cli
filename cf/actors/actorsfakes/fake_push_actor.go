@@ -5,9 +5,9 @@ import (
 	"os"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/actors"
+	"code.cloudfoundry.org/cli/v8/cf/api/resources"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakePushActor struct {
@@ -96,15 +96,16 @@ func (fake *FakePushActor) GatherFiles(arg1 []models.AppFileFields, arg2 string,
 		arg3 string
 		arg4 bool
 	}{arg1Copy, arg2, arg3, arg4})
+	stub := fake.GatherFilesStub
+	fakeReturns := fake.gatherFilesReturns
 	fake.recordInvocation("GatherFiles", []interface{}{arg1Copy, arg2, arg3, arg4})
 	fake.gatherFilesMutex.Unlock()
-	if fake.GatherFilesStub != nil {
-		return fake.GatherFilesStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.gatherFilesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -164,15 +165,16 @@ func (fake *FakePushActor) MapManifestRoute(arg1 string, arg2 models.Application
 		arg2 models.Application
 		arg3 models.AppParams
 	}{arg1, arg2, arg3})
+	stub := fake.MapManifestRouteStub
+	fakeReturns := fake.mapManifestRouteReturns
 	fake.recordInvocation("MapManifestRoute", []interface{}{arg1, arg2, arg3})
 	fake.mapManifestRouteMutex.Unlock()
-	if fake.MapManifestRouteStub != nil {
-		return fake.MapManifestRouteStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.mapManifestRouteReturns
 	return fakeReturns.result1
 }
 
@@ -225,15 +227,16 @@ func (fake *FakePushActor) ProcessPath(arg1 string, arg2 func(string) error) err
 		arg1 string
 		arg2 func(string) error
 	}{arg1, arg2})
+	stub := fake.ProcessPathStub
+	fakeReturns := fake.processPathReturns
 	fake.recordInvocation("ProcessPath", []interface{}{arg1, arg2})
 	fake.processPathMutex.Unlock()
-	if fake.ProcessPathStub != nil {
-		return fake.ProcessPathStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.processPathReturns
 	return fakeReturns.result1
 }
 
@@ -292,15 +295,16 @@ func (fake *FakePushActor) UploadApp(arg1 string, arg2 *os.File, arg3 []resource
 		arg2 *os.File
 		arg3 []resources.AppFileResource
 	}{arg1, arg2, arg3Copy})
+	stub := fake.UploadAppStub
+	fakeReturns := fake.uploadAppReturns
 	fake.recordInvocation("UploadApp", []interface{}{arg1, arg2, arg3Copy})
 	fake.uploadAppMutex.Unlock()
-	if fake.UploadAppStub != nil {
-		return fake.UploadAppStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uploadAppReturns
 	return fakeReturns.result1
 }
 
@@ -357,15 +361,16 @@ func (fake *FakePushActor) ValidateAppParams(arg1 []models.AppParams) []error {
 	fake.validateAppParamsArgsForCall = append(fake.validateAppParamsArgsForCall, struct {
 		arg1 []models.AppParams
 	}{arg1Copy})
+	stub := fake.ValidateAppParamsStub
+	fakeReturns := fake.validateAppParamsReturns
 	fake.recordInvocation("ValidateAppParams", []interface{}{arg1Copy})
 	fake.validateAppParamsMutex.Unlock()
-	if fake.ValidateAppParamsStub != nil {
-		return fake.ValidateAppParamsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.validateAppParamsReturns
 	return fakeReturns.result1
 }
 

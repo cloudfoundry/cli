@@ -4,7 +4,7 @@ package copyapplicationsourcefakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/copyapplicationsource"
+	"code.cloudfoundry.org/cli/v8/cf/api/copyapplicationsource"
 )
 
 type FakeRepository struct {
@@ -31,15 +31,16 @@ func (fake *FakeRepository) CopyApplication(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.CopyApplicationStub
+	fakeReturns := fake.copyApplicationReturns
 	fake.recordInvocation("CopyApplication", []interface{}{arg1, arg2})
 	fake.copyApplicationMutex.Unlock()
-	if fake.CopyApplicationStub != nil {
-		return fake.CopyApplicationStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.copyApplicationReturns
 	return fakeReturns.result1
 }
 

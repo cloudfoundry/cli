@@ -3,8 +3,8 @@ package router
 import (
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/router/internal"
-	"code.cloudfoundry.org/cli/api/router/routererror"
+	"code.cloudfoundry.org/cli/v8/api/router/internal"
+	"code.cloudfoundry.org/cli/v8/api/router/routererror"
 )
 
 // RouterGroup represents a router group.

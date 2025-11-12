@@ -1,9 +1,9 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/lookuptable"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util/lookuptable"
 )
 
 func (client *Client) CreateServiceCredentialBinding(binding resources.ServiceCredentialBinding) (JobURL, Warnings, error) {

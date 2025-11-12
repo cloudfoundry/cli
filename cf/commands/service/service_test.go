@@ -1,21 +1,21 @@
 package service_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/service"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/api"
+	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v8/cf/commands/service"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/requirements/requirementsfakes"
+	testterm "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/terminal"
 
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/v8/cf/api/applications/applicationsfakes"
+	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v8/plugin/models"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

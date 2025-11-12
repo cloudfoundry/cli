@@ -4,8 +4,8 @@ package appfilesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/appfiles"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/appfiles"
+	"code.cloudfoundry.org/cli/v8/cf/models"
 )
 
 type FakeAppFiles struct {
@@ -68,15 +68,16 @@ func (fake *FakeAppFiles) AppFilesInDir(arg1 string) ([]models.AppFileFields, er
 	fake.appFilesInDirArgsForCall = append(fake.appFilesInDirArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.AppFilesInDirStub
+	fakeReturns := fake.appFilesInDirReturns
 	fake.recordInvocation("AppFilesInDir", []interface{}{arg1})
 	fake.appFilesInDirMutex.Unlock()
-	if fake.AppFilesInDirStub != nil {
-		return fake.AppFilesInDirStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.appFilesInDirReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -138,15 +139,16 @@ func (fake *FakeAppFiles) CopyFiles(arg1 []models.AppFileFields, arg2 string, ar
 		arg2 string
 		arg3 string
 	}{arg1Copy, arg2, arg3})
+	stub := fake.CopyFilesStub
+	fakeReturns := fake.copyFilesReturns
 	fake.recordInvocation("CopyFiles", []interface{}{arg1Copy, arg2, arg3})
 	fake.copyFilesMutex.Unlock()
-	if fake.CopyFilesStub != nil {
-		return fake.CopyFilesStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.copyFilesReturns
 	return fakeReturns.result1
 }
 
@@ -198,15 +200,16 @@ func (fake *FakeAppFiles) CountFiles(arg1 string) int64 {
 	fake.countFilesArgsForCall = append(fake.countFilesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.CountFilesStub
+	fakeReturns := fake.countFilesReturns
 	fake.recordInvocation("CountFiles", []interface{}{arg1})
 	fake.countFilesMutex.Unlock()
-	if fake.CountFilesStub != nil {
-		return fake.CountFilesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.countFilesReturns
 	return fakeReturns.result1
 }
 
@@ -259,15 +262,16 @@ func (fake *FakeAppFiles) WalkAppFiles(arg1 string, arg2 func(string, string) er
 		arg1 string
 		arg2 func(string, string) error
 	}{arg1, arg2})
+	stub := fake.WalkAppFilesStub
+	fakeReturns := fake.walkAppFilesReturns
 	fake.recordInvocation("WalkAppFiles", []interface{}{arg1, arg2})
 	fake.walkAppFilesMutex.Unlock()
-	if fake.WalkAppFilesStub != nil {
-		return fake.WalkAppFilesStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.walkAppFilesReturns
 	return fakeReturns.result1
 }
 

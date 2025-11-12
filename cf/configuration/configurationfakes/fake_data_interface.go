@@ -4,7 +4,7 @@ package configurationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/v8/cf/configuration"
 )
 
 type FakeDataInterface struct {
@@ -40,15 +40,16 @@ func (fake *FakeDataInterface) JSONMarshalV3() ([]byte, error) {
 	ret, specificReturn := fake.jSONMarshalV3ReturnsOnCall[len(fake.jSONMarshalV3ArgsForCall)]
 	fake.jSONMarshalV3ArgsForCall = append(fake.jSONMarshalV3ArgsForCall, struct {
 	}{})
+	stub := fake.JSONMarshalV3Stub
+	fakeReturns := fake.jSONMarshalV3Returns
 	fake.recordInvocation("JSONMarshalV3", []interface{}{})
 	fake.jSONMarshalV3Mutex.Unlock()
-	if fake.JSONMarshalV3Stub != nil {
-		return fake.JSONMarshalV3Stub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.jSONMarshalV3Returns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -101,15 +102,16 @@ func (fake *FakeDataInterface) JSONUnmarshalV3(arg1 []byte) error {
 	fake.jSONUnmarshalV3ArgsForCall = append(fake.jSONUnmarshalV3ArgsForCall, struct {
 		arg1 []byte
 	}{arg1Copy})
+	stub := fake.JSONUnmarshalV3Stub
+	fakeReturns := fake.jSONUnmarshalV3Returns
 	fake.recordInvocation("JSONUnmarshalV3", []interface{}{arg1Copy})
 	fake.jSONUnmarshalV3Mutex.Unlock()
-	if fake.JSONUnmarshalV3Stub != nil {
-		return fake.JSONUnmarshalV3Stub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.jSONUnmarshalV3Returns
 	return fakeReturns.result1
 }
 

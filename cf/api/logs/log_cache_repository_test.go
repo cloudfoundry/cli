@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
-	"code.cloudfoundry.org/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction/sharedactionfakes"
+	"code.cloudfoundry.org/cli/v8/cf/api/logs"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
