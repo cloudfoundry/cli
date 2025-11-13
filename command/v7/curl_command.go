@@ -69,7 +69,7 @@ func (cmd CurlCommand) Execute(args []string) error {
 		}
 		cmd.UI.GetOut().Write(responseBodyBytes)
 	} else {
-		cmd.UI.DisplayText(string(bytesToWrite))
+		cmd.UI.DisplayTextLiteral(string(bytesToWrite))
 	}
 
 	return nil
