@@ -3,7 +3,7 @@ package ccerror_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	. "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/util/manifestparser"
+	. "code.cloudfoundry.org/cli/v8/util/manifestparser"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

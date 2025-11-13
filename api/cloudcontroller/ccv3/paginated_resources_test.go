@@ -3,9 +3,9 @@ package ccv3_test
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	. "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

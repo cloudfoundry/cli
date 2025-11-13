@@ -3,8 +3,8 @@ package wrapper
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 )
 
 // RetryRequest is a wrapper that retries failed requests if they contain a 5XX

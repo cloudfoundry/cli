@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/trace"
+	"code.cloudfoundry.org/cli/v8/util/trace"
 )
 
 // EnvOverride represents all the environment variables read by the CF CLI

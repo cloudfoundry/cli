@@ -3,9 +3,9 @@ package noaabridge_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	. "code.cloudfoundry.org/cli/api/uaa/noaabridge"
-	"code.cloudfoundry.org/cli/api/uaa/noaabridge/noaabridgefakes"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
+	. "code.cloudfoundry.org/cli/v8/api/uaa/noaabridge"
+	"code.cloudfoundry.org/cli/v8/api/uaa/noaabridge/noaabridgefakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	. "code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

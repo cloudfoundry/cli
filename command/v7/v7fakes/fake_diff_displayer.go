@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/resources"
+	v7 "code.cloudfoundry.org/cli/v8/command/v7"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 type FakeDiffDisplayer struct {

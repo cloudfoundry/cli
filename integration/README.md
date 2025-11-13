@@ -7,8 +7,8 @@ These are high-level tests for the CLI that make assertions about the behavior o
 On most systems `cf` points to an installed version. To test the latest source (most likely source that you're changing), ensure the dev `cf` binary is in your `PATH`:
 
 ```
-[[ `which cf` = *"$GOPATH/src/code.cloudfoundry.org/cli/out"* ]] || 
-    export PATH="$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH"
+[[ `which cf` = *"$GOPATH/src/code.cloudfoundry.org/cli/v8/out"* ]] || 
+    export PATH="$GOPATH/src/code.cloudfoundry.org/cli/v8/out:$PATH"
 ```
 
 You'll also need to rebuild `cf` after making any relevant changes to the source:

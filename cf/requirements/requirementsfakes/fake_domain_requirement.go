@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/models"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 type FakeDomainRequirement struct {
@@ -38,15 +38,16 @@ func (fake *FakeDomainRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -90,15 +91,16 @@ func (fake *FakeDomainRequirement) GetDomain() models.DomainFields {
 	ret, specificReturn := fake.getDomainReturnsOnCall[len(fake.getDomainArgsForCall)]
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct {
 	}{})
+	stub := fake.GetDomainStub
+	fakeReturns := fake.getDomainReturns
 	fake.recordInvocation("GetDomain", []interface{}{})
 	fake.getDomainMutex.Unlock()
-	if fake.GetDomainStub != nil {
-		return fake.GetDomainStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getDomainReturns
 	return fakeReturns.result1
 }
 

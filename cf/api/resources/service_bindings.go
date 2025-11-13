@@ -1,6 +1,6 @@
 package resources
 
-import "code.cloudfoundry.org/cli/cf/models"
+import "code.cloudfoundry.org/cli/v8/cf/models"
 
 type ServiceBindingResource struct {
 	Resource

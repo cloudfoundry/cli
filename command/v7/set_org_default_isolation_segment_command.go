@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/flag"
 )
 
 type SetOrgDefaultIsolationSegmentCommand struct {

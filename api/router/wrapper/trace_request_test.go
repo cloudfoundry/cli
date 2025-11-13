@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/router"
-	"code.cloudfoundry.org/cli/api/router/routerfakes"
-	. "code.cloudfoundry.org/cli/api/router/wrapper"
+	"code.cloudfoundry.org/cli/v8/api/router"
+	"code.cloudfoundry.org/cli/v8/api/router/routerfakes"
+	. "code.cloudfoundry.org/cli/v8/api/router/wrapper"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

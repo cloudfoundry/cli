@@ -3,8 +3,8 @@ package resources
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 )
 
 // Build represent the process of staging an application package.

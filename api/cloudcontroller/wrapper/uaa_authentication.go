@@ -6,8 +6,8 @@ import (
 
 	"github.com/SermoDigital/jose/jws"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient

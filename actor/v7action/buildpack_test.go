@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -711,7 +711,7 @@ var _ = Describe("Buildpack", func() {
 	})
 
 	Describe("Zipit", func() {
-		//tested in buildpack_linux_test.go and buildpack_windows_test.go
+		// tested in buildpack_linux_test.go and buildpack_windows_test.go
 		var (
 			source string
 			target string

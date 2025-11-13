@@ -4,7 +4,7 @@ package appfilesfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/appfiles"
+	"code.cloudfoundry.org/cli/v8/cf/api/appfiles"
 )
 
 type FakeRepository struct {
@@ -35,15 +35,16 @@ func (fake *FakeRepository) ListFiles(arg1 string, arg2 int, arg3 string) (strin
 		arg2 int
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ListFilesStub
+	fakeReturns := fake.listFilesReturns
 	fake.recordInvocation("ListFiles", []interface{}{arg1, arg2, arg3})
 	fake.listFilesMutex.Unlock()
-	if fake.ListFilesStub != nil {
-		return fake.ListFilesStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listFilesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

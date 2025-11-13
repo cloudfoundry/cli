@@ -1,8 +1,8 @@
 package commandregistry
 
 import (
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/requirements"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Command
@@ -21,7 +21,7 @@ type CommandMetadata struct {
 	Description     string
 	Flags           map[string]flags.FlagSet
 	SkipFlagParsing bool
-	TotalArgs       int //Optional: number of required arguments to skip for flag verification
+	TotalArgs       int // Optional: number of required arguments to skip for flag verification
 	Hidden          bool
 	Examples        []string
 }

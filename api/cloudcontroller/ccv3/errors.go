@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 )
 
 const (
@@ -146,7 +146,7 @@ func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Requ
 }
 
 func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
-	//idea to make route already exist error flexible for all relevant error cases
+	// idea to make route already exist error flexible for all relevant error cases
 	errorString := errorResponse.Detail
 	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
 	appNameTakenRegexp := regexp.MustCompile(`App with the name '.*' already exists\.`)

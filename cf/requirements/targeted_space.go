@@ -3,10 +3,10 @@ package requirements
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf"
+	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/v8/cf/i18n"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
 )
 
 type TargetedSpaceRequirement struct {

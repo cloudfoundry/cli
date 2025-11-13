@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
 )
 
 // RetryRequest is a wrapper that retries failed requests if they contain a 5XX
