@@ -97,6 +97,17 @@ var _ = Describe("curl Command", func() {
 		Expect(testUI.Out).To(Say("sarah, teal, and reid were here"))
 	})
 
+	When("the request contains double curly braces", func() {
+		BeforeEach(func() {
+			fakeActor.MakeCurlRequestReturns([]byte("{{ }}"), &http.Response{}, nil)
+		})
+
+		It("returns the literal text", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say("{{ }}"))
+		})
+	})
+
 	When("the request errors", func() {
 		BeforeEach(func() {
 			fakeActor.MakeCurlRequestReturns([]byte{}, &http.Response{}, errors.New("this sucks"))
