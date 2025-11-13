@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
 )
 
 type FakeServiceInstanceRequirement struct {
@@ -38,15 +38,16 @@ func (fake *FakeServiceInstanceRequirement) Execute() error {
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteStub
+	fakeReturns := fake.executeReturns
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
-	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeReturns
 	return fakeReturns.result1
 }
 
@@ -90,15 +91,16 @@ func (fake *FakeServiceInstanceRequirement) GetServiceInstance() models.ServiceI
 	ret, specificReturn := fake.getServiceInstanceReturnsOnCall[len(fake.getServiceInstanceArgsForCall)]
 	fake.getServiceInstanceArgsForCall = append(fake.getServiceInstanceArgsForCall, struct {
 	}{})
+	stub := fake.GetServiceInstanceStub
+	fakeReturns := fake.getServiceInstanceReturns
 	fake.recordInvocation("GetServiceInstance", []interface{}{})
 	fake.getServiceInstanceMutex.Unlock()
-	if fake.GetServiceInstanceStub != nil {
-		return fake.GetServiceInstanceStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getServiceInstanceReturns
 	return fakeReturns.result1
 }
 

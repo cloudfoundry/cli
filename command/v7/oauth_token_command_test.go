@@ -3,11 +3,11 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/command/commandfakes"
+	. "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo/v2"

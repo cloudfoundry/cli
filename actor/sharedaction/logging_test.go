@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction/sharedactionfakes"
 	logcache "code.cloudfoundry.org/go-log-cache/v2"
 	"code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2"
 	. "github.com/onsi/ginkgo/v2"

@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeAppSummaryRepository struct {
@@ -43,15 +43,16 @@ func (fake *FakeAppSummaryRepository) GetSummariesInCurrentSpace() ([]models.App
 	ret, specificReturn := fake.getSummariesInCurrentSpaceReturnsOnCall[len(fake.getSummariesInCurrentSpaceArgsForCall)]
 	fake.getSummariesInCurrentSpaceArgsForCall = append(fake.getSummariesInCurrentSpaceArgsForCall, struct {
 	}{})
+	stub := fake.GetSummariesInCurrentSpaceStub
+	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	fake.recordInvocation("GetSummariesInCurrentSpace", []interface{}{})
 	fake.getSummariesInCurrentSpaceMutex.Unlock()
-	if fake.GetSummariesInCurrentSpaceStub != nil {
-		return fake.GetSummariesInCurrentSpaceStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSummariesInCurrentSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -99,15 +100,16 @@ func (fake *FakeAppSummaryRepository) GetSummary(arg1 string) (models.Applicatio
 	fake.getSummaryArgsForCall = append(fake.getSummaryArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSummaryStub
+	fakeReturns := fake.getSummaryReturns
 	fake.recordInvocation("GetSummary", []interface{}{arg1})
 	fake.getSummaryMutex.Unlock()
-	if fake.GetSummaryStub != nil {
-		return fake.GetSummaryStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

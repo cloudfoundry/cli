@@ -1,6 +1,6 @@
 package main
 
-import "code.cloudfoundry.org/cli/plugin"
+import "code.cloudfoundry.org/cli/v9/plugin"
 
 type EmptyPlugin struct{}
 

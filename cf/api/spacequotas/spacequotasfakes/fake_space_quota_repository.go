@@ -4,8 +4,8 @@ package spacequotasfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/spacequotas"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api/spacequotas"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeSpaceQuotaRepository struct {
@@ -130,15 +130,16 @@ func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuota(arg1 string, arg2 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.AssociateSpaceWithQuotaStub
+	fakeReturns := fake.associateSpaceWithQuotaReturns
 	fake.recordInvocation("AssociateSpaceWithQuota", []interface{}{arg1, arg2})
 	fake.associateSpaceWithQuotaMutex.Unlock()
-	if fake.AssociateSpaceWithQuotaStub != nil {
-		return fake.AssociateSpaceWithQuotaStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.associateSpaceWithQuotaReturns
 	return fakeReturns.result1
 }
 
@@ -190,15 +191,16 @@ func (fake *FakeSpaceQuotaRepository) Create(arg1 models.SpaceQuota) error {
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 models.SpaceQuota
 	}{arg1})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -250,15 +252,16 @@ func (fake *FakeSpaceQuotaRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -310,15 +313,16 @@ func (fake *FakeSpaceQuotaRepository) FindByGUID(arg1 string) (models.SpaceQuota
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByGUIDStub
+	fakeReturns := fake.findByGUIDReturns
 	fake.recordInvocation("FindByGUID", []interface{}{arg1})
 	fake.findByGUIDMutex.Unlock()
-	if fake.FindByGUIDStub != nil {
-		return fake.FindByGUIDStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -373,15 +377,16 @@ func (fake *FakeSpaceQuotaRepository) FindByName(arg1 string) (models.SpaceQuota
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByNameStub
+	fakeReturns := fake.findByNameReturns
 	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
-	if fake.FindByNameStub != nil {
-		return fake.FindByNameStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -437,15 +442,16 @@ func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGUID(arg1 string, arg2 str
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FindByNameAndOrgGUIDStub
+	fakeReturns := fake.findByNameAndOrgGUIDReturns
 	fake.recordInvocation("FindByNameAndOrgGUID", []interface{}{arg1, arg2})
 	fake.findByNameAndOrgGUIDMutex.Unlock()
-	if fake.FindByNameAndOrgGUIDStub != nil {
-		return fake.FindByNameAndOrgGUIDStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByNameAndOrgGUIDReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -500,15 +506,16 @@ func (fake *FakeSpaceQuotaRepository) FindByOrg(arg1 string) ([]models.SpaceQuot
 	fake.findByOrgArgsForCall = append(fake.findByOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindByOrgStub
+	fakeReturns := fake.findByOrgReturns
 	fake.recordInvocation("FindByOrg", []interface{}{arg1})
 	fake.findByOrgMutex.Unlock()
-	if fake.FindByOrgStub != nil {
-		return fake.FindByOrgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findByOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -564,15 +571,16 @@ func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpace(arg1 string, arg2 s
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UnassignQuotaFromSpaceStub
+	fakeReturns := fake.unassignQuotaFromSpaceReturns
 	fake.recordInvocation("UnassignQuotaFromSpace", []interface{}{arg1, arg2})
 	fake.unassignQuotaFromSpaceMutex.Unlock()
-	if fake.UnassignQuotaFromSpaceStub != nil {
-		return fake.UnassignQuotaFromSpaceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.unassignQuotaFromSpaceReturns
 	return fakeReturns.result1
 }
 
@@ -624,15 +632,16 @@ func (fake *FakeSpaceQuotaRepository) Update(arg1 models.SpaceQuota) error {
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.SpaceQuota
 	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

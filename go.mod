@@ -1,10 +1,9 @@
-module code.cloudfoundry.org/cli
+module code.cloudfoundry.org/cli/v9
 
-go 1.25.0
+go 1.25.4
 
 require (
 	code.cloudfoundry.org/bytefmt v0.56.0
-	code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
 	code.cloudfoundry.org/clock v1.53.0

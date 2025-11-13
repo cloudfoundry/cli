@@ -1,15 +1,15 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-	"code.cloudfoundry.org/cli/api/router"
-	routingWrapper "code.cloudfoundry.org/cli/api/router/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa"
-	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	ccWrapper "code.cloudfoundry.org/cli/v9/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/v9/api/router"
+	routingWrapper "code.cloudfoundry.org/cli/v9/api/router/wrapper"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	uaaWrapper "code.cloudfoundry.org/cli/v9/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 )
 
 func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersionV3 string) (*ccv3.Client, *uaa.Client, *router.Client, error) {

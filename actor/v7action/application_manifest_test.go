@@ -3,12 +3,12 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	. "code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	. "code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/clock"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -303,7 +303,7 @@ var _ = Describe("Application Manifest Actions", func() {
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-application-warning"))
-				_ = manifestBytes //TODO DELETE ME
+				_ = manifestBytes // TODO DELETE ME
 			})
 		})
 	})

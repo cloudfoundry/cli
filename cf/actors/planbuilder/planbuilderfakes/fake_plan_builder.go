@@ -4,8 +4,8 @@ package planbuilderfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/actors/planbuilder"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakePlanBuilder struct {
@@ -118,15 +118,16 @@ func (fake *FakePlanBuilder) AttachOrgToPlans(arg1 []models.ServicePlanFields, a
 		arg1 []models.ServicePlanFields
 		arg2 string
 	}{arg1Copy, arg2})
+	stub := fake.AttachOrgToPlansStub
+	fakeReturns := fake.attachOrgToPlansReturns
 	fake.recordInvocation("AttachOrgToPlans", []interface{}{arg1Copy, arg2})
 	fake.attachOrgToPlansMutex.Unlock()
-	if fake.AttachOrgToPlansStub != nil {
-		return fake.AttachOrgToPlansStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.attachOrgToPlansReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -186,15 +187,16 @@ func (fake *FakePlanBuilder) AttachOrgsToPlans(arg1 []models.ServicePlanFields) 
 	fake.attachOrgsToPlansArgsForCall = append(fake.attachOrgsToPlansArgsForCall, struct {
 		arg1 []models.ServicePlanFields
 	}{arg1Copy})
+	stub := fake.AttachOrgsToPlansStub
+	fakeReturns := fake.attachOrgsToPlansReturns
 	fake.recordInvocation("AttachOrgsToPlans", []interface{}{arg1Copy})
 	fake.attachOrgsToPlansMutex.Unlock()
-	if fake.AttachOrgsToPlansStub != nil {
-		return fake.AttachOrgsToPlansStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.attachOrgsToPlansReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -254,15 +256,16 @@ func (fake *FakePlanBuilder) GetPlansForManyServicesWithOrgs(arg1 []string) ([]m
 	fake.getPlansForManyServicesWithOrgsArgsForCall = append(fake.getPlansForManyServicesWithOrgsArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.GetPlansForManyServicesWithOrgsStub
+	fakeReturns := fake.getPlansForManyServicesWithOrgsReturns
 	fake.recordInvocation("GetPlansForManyServicesWithOrgs", []interface{}{arg1Copy})
 	fake.getPlansForManyServicesWithOrgsMutex.Unlock()
-	if fake.GetPlansForManyServicesWithOrgsStub != nil {
-		return fake.GetPlansForManyServicesWithOrgsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPlansForManyServicesWithOrgsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -317,15 +320,16 @@ func (fake *FakePlanBuilder) GetPlansForService(arg1 string) ([]models.ServicePl
 	fake.getPlansForServiceArgsForCall = append(fake.getPlansForServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetPlansForServiceStub
+	fakeReturns := fake.getPlansForServiceReturns
 	fake.recordInvocation("GetPlansForService", []interface{}{arg1})
 	fake.getPlansForServiceMutex.Unlock()
-	if fake.GetPlansForServiceStub != nil {
-		return fake.GetPlansForServiceStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPlansForServiceReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -381,15 +385,16 @@ func (fake *FakePlanBuilder) GetPlansForServiceForOrg(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetPlansForServiceForOrgStub
+	fakeReturns := fake.getPlansForServiceForOrgReturns
 	fake.recordInvocation("GetPlansForServiceForOrg", []interface{}{arg1, arg2})
 	fake.getPlansForServiceForOrgMutex.Unlock()
-	if fake.GetPlansForServiceForOrgStub != nil {
-		return fake.GetPlansForServiceForOrgStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPlansForServiceForOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -444,15 +449,16 @@ func (fake *FakePlanBuilder) GetPlansForServiceWithOrgs(arg1 string) ([]models.S
 	fake.getPlansForServiceWithOrgsArgsForCall = append(fake.getPlansForServiceWithOrgsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetPlansForServiceWithOrgsStub
+	fakeReturns := fake.getPlansForServiceWithOrgsReturns
 	fake.recordInvocation("GetPlansForServiceWithOrgs", []interface{}{arg1})
 	fake.getPlansForServiceWithOrgsMutex.Unlock()
-	if fake.GetPlansForServiceWithOrgsStub != nil {
-		return fake.GetPlansForServiceWithOrgsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPlansForServiceWithOrgsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -507,15 +513,16 @@ func (fake *FakePlanBuilder) GetPlansVisibleToOrg(arg1 string) ([]models.Service
 	fake.getPlansVisibleToOrgArgsForCall = append(fake.getPlansVisibleToOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetPlansVisibleToOrgStub
+	fakeReturns := fake.getPlansVisibleToOrgReturns
 	fake.recordInvocation("GetPlansVisibleToOrg", []interface{}{arg1})
 	fake.getPlansVisibleToOrgMutex.Unlock()
-	if fake.GetPlansVisibleToOrgStub != nil {
-		return fake.GetPlansVisibleToOrgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPlansVisibleToOrgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/util/clissh/ssherror"
-	"code.cloudfoundry.org/cli/util/download"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v9/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/util/clissh/ssherror"
+	"code.cloudfoundry.org/cli/v9/util/download"
+	"code.cloudfoundry.org/cli/v9/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
 

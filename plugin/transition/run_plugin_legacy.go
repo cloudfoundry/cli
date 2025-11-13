@@ -3,9 +3,9 @@ package plugin_transition
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/cmd"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v9/cf/cmd"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 
 func RunPlugin(plugin configv3.Plugin, _ command.UI) error {
