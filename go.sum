@@ -1,7 +1,5 @@
 code.cloudfoundry.org/bytefmt v0.56.0 h1:qsCKmisDuotACI4KYPNdORvN6WaWEEb6RX2d9gyysNw=
 code.cloudfoundry.org/bytefmt v0.56.0/go.mod h1:J23lJHgcn710FEpbcOw5cqOUsj7K0Z2O1npk8m0adhU=
-code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6 h1:Yc9r1p21kEpni9WlG4mwOZw87TB2QlyS9sAEebZ3+ak=
-code.cloudfoundry.org/cfnetworking-cli-api v0.0.0-20190103195135-4b04f26287a6/go.mod h1:u5FovqC5GGAEbFPz+IdjycDA+gIjhUwqxnu0vbHwVeM=
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85 h1:jaHWw9opYjKPrDT19uydBBWSxl+g5F4Hv030fqMsalo=
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85/go.mod h1:R1EiyOAr7lW0l/YkZNqItUNZ01Q/dYUfbTn4X4Z+82M=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4 h1:O+j8afQWaDuxzKGcculsjgHGK+biBTn6iMjgFpBf54c=

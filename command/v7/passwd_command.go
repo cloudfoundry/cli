@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 )
 
 type PasswdCommand struct {

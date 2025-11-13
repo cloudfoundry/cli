@@ -1,6 +1,6 @@
 package resources
 
-import "code.cloudfoundry.org/cli/types"
+import "code.cloudfoundry.org/cli/v9/types"
 
 type Sidecar struct {
 	GUID    string               `json:"guid"`

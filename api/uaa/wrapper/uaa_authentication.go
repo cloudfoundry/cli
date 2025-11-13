@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . UAAClient

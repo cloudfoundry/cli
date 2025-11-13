@@ -7,25 +7,25 @@ import (
 	"os"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	"code.cloudfoundry.org/cli/plugin"
-	plugin_models "code.cloudfoundry.org/cli/plugin/models"
-	. "code.cloudfoundry.org/cli/plugin/rpc"
-	cmdRunner "code.cloudfoundry.org/cli/plugin/rpc"
-	. "code.cloudfoundry.org/cli/plugin/rpc/fakecommand"
-	"code.cloudfoundry.org/cli/plugin/rpc/rpcfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/v9/plugin"
+	plugin_models "code.cloudfoundry.org/cli/v9/plugin/models"
+	. "code.cloudfoundry.org/cli/v9/plugin/rpc"
+	cmdRunner "code.cloudfoundry.org/cli/v9/plugin/rpc"
+	. "code.cloudfoundry.org/cli/v9/plugin/rpc/fakecommand"
+	"code.cloudfoundry.org/cli/v9/plugin/rpc/rpcfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Server", func() {
 
-	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
+	_ = FakeCommand1{} // make sure fake_command is imported and self-registered with init()
 
 	var (
 		err        error
@@ -69,7 +69,7 @@ var _ = Describe("Server", func() {
 		It("shuts down the rpc server", func() {
 			rpcService.Stop()
 
-			//give time for server to stop
+			// give time for server to stop
 			time.Sleep(50 * time.Millisecond)
 
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
@@ -91,7 +91,7 @@ var _ = Describe("Server", func() {
 		AfterEach(func() {
 			rpcService.Stop()
 
-			//give time for server to stop
+			// give time for server to stop
 			time.Sleep(50 * time.Millisecond)
 		})
 
@@ -192,7 +192,7 @@ var _ = Describe("Server", func() {
 		AfterEach(func() {
 			rpcService.Stop()
 
-			//give time for server to stop
+			// give time for server to stop
 			time.Sleep(50 * time.Millisecond)
 		})
 
@@ -222,7 +222,7 @@ var _ = Describe("Server", func() {
 			AfterEach(func() {
 				rpcService.Stop()
 
-				//give time for server to stop
+				// give time for server to stop
 				time.Sleep(50 * time.Millisecond)
 			})
 
@@ -298,7 +298,7 @@ var _ = Describe("Server", func() {
 		AfterEach(func() {
 			rpcService.Stop()
 
-			//give time for server to stop
+			// give time for server to stop
 			time.Sleep(50 * time.Millisecond)
 		})
 
@@ -441,7 +441,7 @@ var _ = Describe("Server", func() {
 			AfterEach(func() {
 				rpcService.Stop()
 
-				//give time for server to stop
+				// give time for server to stop
 				time.Sleep(50 * time.Millisecond)
 			})
 
@@ -472,7 +472,7 @@ var _ = Describe("Server", func() {
 			AfterEach(func() {
 				rpcService.Stop()
 
-				//give time for server to stop
+				// give time for server to stop
 				time.Sleep(50 * time.Millisecond)
 			})
 

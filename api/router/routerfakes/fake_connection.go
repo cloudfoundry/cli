@@ -4,7 +4,7 @@ package routerfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/router"
+	"code.cloudfoundry.org/cli/v9/api/router"
 )
 
 type FakeConnection struct {
@@ -31,15 +31,16 @@ func (fake *FakeConnection) Make(arg1 *router.Request, arg2 *router.Response) er
 		arg1 *router.Request
 		arg2 *router.Response
 	}{arg1, arg2})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 

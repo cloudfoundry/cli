@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/v9/api/plugin"
 )
 
 type FakeConnectionWrapper struct {
@@ -45,15 +45,16 @@ func (fake *FakeConnectionWrapper) Make(arg1 *http.Request, arg2 *plugin.Respons
 		arg2 *plugin.Response
 		arg3 plugin.ProxyReader
 	}{arg1, arg2, arg3})
+	stub := fake.MakeStub
+	fakeReturns := fake.makeReturns
 	fake.recordInvocation("Make", []interface{}{arg1, arg2, arg3})
 	fake.makeMutex.Unlock()
-	if fake.MakeStub != nil {
-		return fake.MakeStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeReturns
 	return fakeReturns.result1
 }
 
@@ -105,15 +106,16 @@ func (fake *FakeConnectionWrapper) Wrap(arg1 plugin.Connection) plugin.Connectio
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
 		arg1 plugin.Connection
 	}{arg1})
+	stub := fake.WrapStub
+	fakeReturns := fake.wrapReturns
 	fake.recordInvocation("Wrap", []interface{}{arg1})
 	fake.wrapMutex.Unlock()
-	if fake.WrapStub != nil {
-		return fake.WrapStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.wrapReturns
 	return fakeReturns.result1
 }
 

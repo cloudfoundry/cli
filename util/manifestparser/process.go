@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 type Process struct {

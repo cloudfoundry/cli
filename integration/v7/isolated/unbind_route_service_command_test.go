@@ -4,9 +4,9 @@ import (
 	"regexp"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers/servicebrokerstub"
+	"code.cloudfoundry.org/cli/v9/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

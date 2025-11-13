@@ -1,8 +1,8 @@
 package wrapper
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/shared"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v9/api/shared"
 )
 
 // CCTraceHeaderRequest is a wrapper that adds b3 trace headers to requests.
