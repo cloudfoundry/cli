@@ -16,10 +16,10 @@ var _ = Describe("SpaceRole", func() {
 				completions := spaceRole.Complete(prefix)
 				Expect(completions).To(Equal(matches))
 			},
-			Entry("returns 'SpaceManager', 'SpaceDeveloper' and 'SpaceAuditor' when passed 'S'", "S",
-				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}}),
-			Entry("returns 'SpaceManager', 'SpaceDeveloper' and 'SpaceAuditor' when passed 's'", "s",
-				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}}),
+			Entry("returns 'SpaceManager', 'SpaceDeveloper', 'SpaceAuditor' and 'SpaceSupporter' when passed 'S'", "S",
+				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}, {Item: "SpaceSupporter"}}),
+			Entry("returns 'SpaceManager', 'SpaceDeveloper', 'SpaceAuditor' and 'SpaceSupporter' when passed 's'", "s",
+				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}, {Item: "SpaceSupporter"}}),
 			Entry("completes to 'SpaceAuditor' when passed 'Spacea'", "Spacea",
 				[]flags.Completion{{Item: "SpaceAuditor"}}),
 			Entry("completes to 'SpaceDeveloper' when passed 'Spaced'", "Spaced",
@@ -28,8 +28,10 @@ var _ = Describe("SpaceRole", func() {
 				[]flags.Completion{{Item: "SpaceManager"}}),
 			Entry("completes to 'SpaceManager' when passed 'spacEM'", "spacEM",
 				[]flags.Completion{{Item: "SpaceManager"}}),
-			Entry("returns 'SpaceManager', 'SpaceDeveloper' and 'SpaceAuditor' when passed nothing", "",
-				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}}),
+			Entry("completes to 'SpaceSupporter' when passed 'Spaces'", "Spaces",
+				[]flags.Completion{{Item: "SpaceSupporter"}}),
+			Entry("returns 'SpaceManager', 'SpaceDeveloper', 'SpaceAuditor' and 'SpaceSupporter' when passed nothing", "",
+				[]flags.Completion{{Item: "SpaceManager"}, {Item: "SpaceDeveloper"}, {Item: "SpaceAuditor"}, {Item: "SpaceSupporter"}}),
 			Entry("completes to nothing when passed 'wut'", "wut",
 				[]flags.Completion{}),
 		)
