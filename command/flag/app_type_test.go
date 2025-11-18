@@ -19,14 +19,16 @@ var _ = Describe("AppType", func() {
 
 			Entry("completes to 'buildpack' when passed 'b'", "b",
 				[]flags.Completion{{Item: "buildpack"}}),
+			Entry("completes to 'cnb' when passed 'c'", "c",
+				[]flags.Completion{{Item: "cnb"}}),
 			Entry("completes to 'docker' when passed 'd'", "d",
 				[]flags.Completion{{Item: "docker"}}),
 			Entry("completes to 'buildpack' when passed 'bU'", "bU",
 				[]flags.Completion{{Item: "buildpack"}}),
 			Entry("completes to 'docker' when passed 'Do'", "Do",
 				[]flags.Completion{{Item: "docker"}}),
-			Entry("returns 'buildpack' and 'docker' when passed nothing", "",
-				[]flags.Completion{{Item: "buildpack"}, {Item: "docker"}}),
+			Entry("returns 'buildpack', 'cnb', and 'docker' when passed nothing", "",
+				[]flags.Completion{{Item: "buildpack"}, {Item: "docker"}, {Item: "cnb"}}),
 			Entry("completes to nothing when passed 'wut'", "wut",
 				[]flags.Completion{}),
 		)
