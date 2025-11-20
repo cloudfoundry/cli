@@ -150,10 +150,6 @@ func (fake *FakeTranslatableError) TranslateReturnsOnCall(i int, result1 string)
 func (fake *FakeTranslatableError) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.errorMutex.RLock()
-	defer fake.errorMutex.RUnlock()
-	fake.translateMutex.RLock()
-	defer fake.translateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

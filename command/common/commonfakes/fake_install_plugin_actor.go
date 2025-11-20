@@ -795,26 +795,6 @@ func (fake *FakeInstallPluginActor) ValidateFileChecksumReturnsOnCall(i int, res
 func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createExecutableCopyMutex.RLock()
-	defer fake.createExecutableCopyMutex.RUnlock()
-	fake.downloadExecutableBinaryFromURLMutex.RLock()
-	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
-	fake.fileExistsMutex.RLock()
-	defer fake.fileExistsMutex.RUnlock()
-	fake.getAndValidatePluginMutex.RLock()
-	defer fake.getAndValidatePluginMutex.RUnlock()
-	fake.getPlatformStringMutex.RLock()
-	defer fake.getPlatformStringMutex.RUnlock()
-	fake.getPluginInfoFromRepositoriesForPlatformMutex.RLock()
-	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.RUnlock()
-	fake.getPluginRepositoryMutex.RLock()
-	defer fake.getPluginRepositoryMutex.RUnlock()
-	fake.installPluginFromPathMutex.RLock()
-	defer fake.installPluginFromPathMutex.RUnlock()
-	fake.uninstallPluginMutex.RLock()
-	defer fake.uninstallPluginMutex.RUnlock()
-	fake.validateFileChecksumMutex.RLock()
-	defer fake.validateFileChecksumMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
