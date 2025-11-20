@@ -318,16 +318,16 @@ func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackAndLi
 	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall = append(fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleArgsForCall, struct {
 		arg1 string
 		arg2 string
-        arg3 string
-        arg4 map[string]types.NullString
-    }{arg1, arg2, arg3, arg4})
-    stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub
-    fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns
-    fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle", []interface{}{arg1, arg2, arg3, arg4})
-    fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
-    if stub != nil {
-        return stub(arg1, arg2, arg3, arg4)
-    }
+		arg3 string
+		arg4 map[string]types.NullString
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycleStub
+	fakeReturns := fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleReturns
+	fake.recordInvocation("UpdateBuildpackLabelsByBuildpackNameAndStackAndLifecycle", []interface{}{arg1, arg2, arg3, arg4})
+	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
+	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
@@ -973,30 +973,6 @@ func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameReturnsOnCall(i int, 
 func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getCurrentUserMutex.RLock()
-	defer fake.getCurrentUserMutex.RUnlock()
-	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
-	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
-	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RLock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RUnlock()
-	fake.updateDomainLabelsByDomainNameMutex.RLock()
-	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
-	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
-	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
-	fake.updateRouteLabelsMutex.RLock()
-	defer fake.updateRouteLabelsMutex.RUnlock()
-	fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.RLock()
-	defer fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.RUnlock()
-	fake.updateServiceInstanceLabelsMutex.RLock()
-	defer fake.updateServiceInstanceLabelsMutex.RUnlock()
-	fake.updateServiceOfferingLabelsMutex.RLock()
-	defer fake.updateServiceOfferingLabelsMutex.RUnlock()
-	fake.updateServicePlanLabelsMutex.RLock()
-	defer fake.updateServicePlanLabelsMutex.RUnlock()
-	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
-	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
-	fake.updateStackLabelsByStackNameMutex.RLock()
-	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

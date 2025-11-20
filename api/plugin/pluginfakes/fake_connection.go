@@ -92,8 +92,6 @@ func (fake *FakeConnection) MakeReturnsOnCall(i int, result1 error) {
 func (fake *FakeConnection) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.makeMutex.RLock()
-	defer fake.makeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
