@@ -95,8 +95,6 @@ func (fake *FakeDiffDisplayer) DisplayDiffReturnsOnCall(i int, result1 error) {
 func (fake *FakeDiffDisplayer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.displayDiffMutex.RLock()
-	defer fake.displayDiffMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

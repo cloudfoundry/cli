@@ -167,10 +167,6 @@ func (fake *FakeHelpActor) CommandInfosReturnsOnCall(i int, result1 map[string]s
 func (fake *FakeHelpActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.commandInfoByNameMutex.RLock()
-	defer fake.commandInfoByNameMutex.RUnlock()
-	fake.commandInfosMutex.RLock()
-	defer fake.commandInfosMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
