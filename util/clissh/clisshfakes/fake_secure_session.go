@@ -646,24 +646,6 @@ func (fake *FakeSecureSession) WaitReturnsOnCall(i int, result1 error) {
 func (fake *FakeSecureSession) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	fake.requestPtyMutex.RLock()
-	defer fake.requestPtyMutex.RUnlock()
-	fake.sendRequestMutex.RLock()
-	defer fake.sendRequestMutex.RUnlock()
-	fake.shellMutex.RLock()
-	defer fake.shellMutex.RUnlock()
-	fake.startMutex.RLock()
-	defer fake.startMutex.RUnlock()
-	fake.stderrPipeMutex.RLock()
-	defer fake.stderrPipeMutex.RUnlock()
-	fake.stdinPipeMutex.RLock()
-	defer fake.stdinPipeMutex.RUnlock()
-	fake.stdoutPipeMutex.RLock()
-	defer fake.stdoutPipeMutex.RUnlock()
-	fake.waitMutex.RLock()
-	defer fake.waitMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

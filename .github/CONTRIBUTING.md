@@ -139,7 +139,22 @@ below.
 
 The CLI uses [`counterfeiter`](https://github.com/maxbrunsfeld/counterfeiter) to
 generate fakes from interfaces for the unit tests. If any changes are made to an
-interface, the fakes be should regenerated using counterfeiter:
+interface, the fakes be should regenerated using counterfeiter.
+
+### Regenerating all non-legacy fakes
+
+To regenerate fakes for all non-legacy packages (recommended for most cases):
+
+```bash
+make generate-fakes
+```
+
+This will safely regenerate fakes in the `util`, `plugin`, `command`, `api`, and 
+`actor` packages without touching the legacy `cf/` codebase.
+
+### Regenerating fakes for a specific package
+
+If you only need to regenerate fakes for a specific package:
 
 ```bash
 go generate ./<package>/...

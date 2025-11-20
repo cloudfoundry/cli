@@ -52,8 +52,6 @@ func (fake *FakeExiter) ExitArgsForCall(i int) int {
 func (fake *FakeExiter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.exitMutex.RLock()
-	defer fake.exitMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

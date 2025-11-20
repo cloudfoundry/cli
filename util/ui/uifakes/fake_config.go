@@ -268,14 +268,6 @@ func (fake *FakeConfig) TerminalWidthReturnsOnCall(i int, result1 int) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.colorEnabledMutex.RLock()
-	defer fake.colorEnabledMutex.RUnlock()
-	fake.isTTYMutex.RLock()
-	defer fake.isTTYMutex.RUnlock()
-	fake.localeMutex.RLock()
-	defer fake.localeMutex.RUnlock()
-	fake.terminalWidthMutex.RLock()
-	defer fake.terminalWidthMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
