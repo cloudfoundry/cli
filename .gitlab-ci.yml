@@ -1,0 +1,206 @@
+# GitLab CI/CD Pipeline - Comprehensive Testing Suite
+
+image: golang:1.21
+
+variables:
+  GOPATH: $CI_PROJECT_DIR/.go
+  GO111MODULE: "on"
+
+cache:
+  paths:
+    - .go/pkg/mod/
+
+stages:
+  - test
+  - coverage
+  - quality
+  - advanced
+  - report
+
+before_script:
+  - mkdir -p .go
+  - go mod download
+  - go get github.com/onsi/ginkgo/ginkgo
+  - go get github.com/onsi/gomega
+
+# Unit Tests
+unit-tests:
+  stage: test
+  script:
+    - ginkgo -r --skip-package=integration
+  artifacts:
+    reports:
+      junit: test-results/*.xml
+
+# Integration Tests
+integration-tests:
+  stage: test
+  script:
+    - ginkgo -r integration/
+  artifacts:
+    reports:
+      junit: test-results/*.xml
+
+# Test Coverage
+coverage:
+  stage: coverage
+  script:
+    - go test -coverprofile=coverage.out -covermode=atomic ./...
+    - go tool cover -html=coverage.out -o coverage.html
+    - go tool cover -func=coverage.out
+  coverage: '/total:.*\t(\d+\.\d+)%/'
+  artifacts:
+    paths:
+      - coverage.out
+      - coverage.html
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.out
+
+# Coverage Dashboard
+coverage-dashboard:
+  stage: coverage
+  script:
+    - bash scripts/generate-coverage-dashboard.sh
+  artifacts:
+    paths:
+      - test-reports/coverage-dashboard/
+    expire_in: 30 days
+
+# Property-Based Tests
+property-tests:
+  stage: test
+  script:
+    - go test -v ./... -run TestProperty
+
+# Fuzz Tests
+fuzz-tests:
+  stage: advanced
+  script:
+    - go test -fuzz=FuzzNew -fuzztime=30s ./cf/errors || true
+    - go test -fuzz=FuzzBabble -fuzztime=30s ./words/generator || true
+  allow_failure: true
+
+# Benchmark Tests
+benchmarks:
+  stage: quality
+  script:
+    - go test -bench=. -benchmem -run=^$ ./... | tee benchmarks.txt
+  artifacts:
+    paths:
+      - benchmarks.txt
+    expire_in: 30 days
+
+# Performance Regression
+perf-regression:
+  stage: quality
+  script:
+    - bash scripts/perf-regression-test.sh .perf-baseline.txt || true
+  artifacts:
+    paths:
+      - test-reports/performance/
+    expire_in: 30 days
+  allow_failure: true
+
+# Mutation Testing
+mutation-tests:
+  stage: advanced
+  only:
+    - merge_requests
+    - schedules
+  script:
+    - bash scripts/mutation-test.sh ./cf/errors || true
+    - bash scripts/mutation-test.sh ./cf/actors || true
+  artifacts:
+    paths:
+      - test-reports/mutations/
+    expire_in: 30 days
+  allow_failure: true
+
+# Contract Tests
+contract-tests:
+  stage: test
+  script:
+    - ginkgo testhelpers/contracts/
+
+# Chaos Tests
+chaos-tests:
+  stage: advanced
+  script:
+    - ginkgo testhelpers/chaos/
+
+# Snapshot Tests
+snapshot-tests:
+  stage: test
+  script:
+    - ginkgo testhelpers/snapshot/
+  artifacts:
+    paths:
+      - testdata/snapshots/
+    when: on_failure
+
+# Test Analytics
+test-analytics:
+  stage: report
+  script:
+    - bash scripts/test-analytics.sh
+  artifacts:
+    paths:
+      - test-reports/analytics/
+    expire_in: 30 days
+  allow_failure: true
+
+# Code Linting
+lint:
+  stage: quality
+  image: golangci/golangci-lint:latest
+  script:
+    - golangci-lint run -v
+
+# Security Scan
+security-scan:
+  stage: quality
+  image: securego/gosec:latest
+  script:
+    - gosec -fmt json -out gosec-report.json ./... || true
+  artifacts:
+    paths:
+      - gosec-report.json
+    expire_in: 30 days
+  allow_failure: true
+
+# Generate Final Report
+final-report:
+  stage: report
+  dependencies:
+    - coverage
+    - benchmarks
+    - test-analytics
+  script:
+    - echo "======================================"
+    - echo "Test Suite Summary"
+    - echo "======================================"
+    - echo "Coverage Report:"
+    - go tool cover -func=coverage.out | tail -1
+    - echo ""
+    - echo "✅ All tests completed successfully!"
+  artifacts:
+    paths:
+      - coverage.html
+      - test-reports/
+    expire_in: 30 days
+
+# Scheduled Nightly Jobs
+nightly-full-suite:
+  stage: advanced
+  only:
+    - schedules
+  script:
+    - bash scripts/mutation-test.sh ./...
+    - bash scripts/perf-regression-test.sh
+    - bash scripts/test-analytics.sh
+  artifacts:
+    paths:
+      - test-reports/
+    expire_in: 90 days

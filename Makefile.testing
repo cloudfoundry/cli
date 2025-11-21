@@ -1,0 +1,221 @@
+# Advanced Testing Makefile for Cloud Foundry CLI
+# Comprehensive testing suite with 10 different methodologies
+
+.PHONY: help test-all test-unit test-integration test-property test-fuzz test-bench test-mutation test-contract test-chaos test-snapshot test-coverage test-analytics clean-test-reports
+
+# Colors for output
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+BLUE   := $(shell tput -Txterm setaf 4)
+RESET  := $(shell tput -Txterm sgr0)
+
+##@ General
+
+help: ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make $(BLUE)<target>$(RESET)\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  $(BLUE)%-20s$(RESET) %s\n", $$1, $$2 } /^##@/ { printf "\n$(YELLOW)%s$(RESET)\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+##@ Testing
+
+test-all: ## Run ALL test suites (comprehensive!)
+	@echo "$(GREEN)Running complete test suite...$(RESET)"
+	@$(MAKE) test-unit
+	@$(MAKE) test-integration
+	@$(MAKE) test-property
+	@$(MAKE) test-bench
+	@$(MAKE) test-contract
+	@$(MAKE) test-chaos
+	@$(MAKE) test-snapshot
+	@$(MAKE) test-coverage
+	@$(MAKE) test-analytics
+	@echo "$(GREEN)✅ All tests completed!$(RESET)"
+
+test-unit: ## Run unit tests
+	@echo "$(BLUE)Running unit tests...$(RESET)"
+	ginkgo -r --skip-package=integration
+
+test-integration: ## Run integration tests
+	@echo "$(BLUE)Running integration tests...$(RESET)"
+	ginkgo -r integration/ testhelpers/
+
+test-property: ## Run property-based tests
+	@echo "$(BLUE)Running property-based tests...$(RESET)"
+	go test -v ./... -run TestProperty
+
+test-fuzz: ## Run fuzzing tests (Go 1.18+)
+	@echo "$(BLUE)Running fuzz tests...$(RESET)"
+	@echo "Fuzzing cf/errors..."
+	go test -fuzz=FuzzNew -fuzztime=30s ./cf/errors || true
+	go test -fuzz=FuzzHttpError -fuzztime=30s ./cf/errors || true
+	@echo "Fuzzing words/generator..."
+	go test -fuzz=FuzzBabble -fuzztime=30s ./words/generator || true
+	@echo "$(GREEN)Fuzz testing completed$(RESET)"
+
+test-bench: ## Run benchmark tests
+	@echo "$(BLUE)Running benchmarks...$(RESET)"
+	go test -bench=. -benchmem -run=^$$ ./... | tee benchmarks.txt
+	@echo "$(GREEN)Benchmarks saved to benchmarks.txt$(RESET)"
+
+test-mutation: ## Run mutation tests
+	@echo "$(BLUE)Running mutation tests...$(RESET)"
+	@echo "Testing cf/errors..."
+	bash scripts/mutation-test.sh ./cf/errors || true
+	@echo "Testing cf/actors..."
+	bash scripts/mutation-test.sh ./cf/actors || true
+	@echo "$(GREEN)Mutation test reports available in test-reports/mutations/$(RESET)"
+
+test-contract: ## Run API contract tests
+	@echo "$(BLUE)Running API contract tests...$(RESET)"
+	ginkgo testhelpers/contracts/
+
+test-chaos: ## Run chaos/resilience tests
+	@echo "$(BLUE)Running chaos tests...$(RESET)"
+	ginkgo testhelpers/chaos/
+
+test-snapshot: ## Run snapshot tests
+	@echo "$(BLUE)Running snapshot tests...$(RESET)"
+	ginkgo testhelpers/snapshot/
+
+test-coverage: ## Generate test coverage report
+	@echo "$(BLUE)Generating coverage report...$(RESET)"
+	go test -coverprofile=coverage.out -covermode=atomic ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "$(GREEN)Coverage report: coverage.html$(RESET)"
+
+test-coverage-dashboard: ## Generate beautiful coverage dashboard
+	@echo "$(BLUE)Generating coverage dashboard...$(RESET)"
+	bash scripts/generate-coverage-dashboard.sh
+	@echo "$(GREEN)Dashboard: test-reports/coverage-dashboard/index.html$(RESET)"
+
+test-perf-regression: ## Check for performance regressions
+	@echo "$(BLUE)Checking for performance regressions...$(RESET)"
+	bash scripts/perf-regression-test.sh .perf-baseline.txt
+	@echo "$(GREEN)Performance report: test-reports/performance/performance-report.html$(RESET)"
+
+test-analytics: ## Generate test quality analytics
+	@echo "$(BLUE)Generating test analytics...$(RESET)"
+	bash scripts/test-analytics.sh
+	@echo "$(GREEN)Analytics: test-reports/analytics/test-analytics.html$(RESET)"
+
+##@ Snapshots
+
+snapshot-update: ## Update all snapshots
+	@echo "$(YELLOW)Updating snapshots...$(RESET)"
+	UPDATE_SNAPSHOTS=true ginkgo testhelpers/snapshot/
+	@echo "$(GREEN)Snapshots updated$(RESET)"
+
+snapshot-clean: ## Clean all snapshots
+	@echo "$(YELLOW)Cleaning snapshots...$(RESET)"
+	rm -rf testdata/snapshots/*.snap
+	@echo "$(GREEN)Snapshots cleaned$(RESET)"
+
+##@ Performance
+
+perf-baseline: ## Create performance baseline
+	@echo "$(BLUE)Creating performance baseline...$(RESET)"
+	go test -bench=. -benchmem ./... > .perf-baseline.txt
+	@echo "$(GREEN)Baseline saved to .perf-baseline.txt$(RESET)"
+
+perf-compare: ## Compare current performance to baseline
+	@echo "$(BLUE)Comparing performance...$(RESET)"
+	@$(MAKE) test-bench
+	bash scripts/perf-regression-test.sh .perf-baseline.txt
+
+##@ Quick Checks
+
+quick-test: ## Quick test (unit + property tests only)
+	@echo "$(BLUE)Running quick tests...$(RESET)"
+	@$(MAKE) test-unit
+	@$(MAKE) test-property
+	@echo "$(GREEN)✅ Quick tests passed!$(RESET)"
+
+pre-commit: ## Run before committing (quick + coverage)
+	@echo "$(BLUE)Running pre-commit checks...$(RESET)"
+	@$(MAKE) quick-test
+	@$(MAKE) test-coverage
+	@echo "$(GREEN)✅ Pre-commit checks passed!$(RESET)"
+
+pre-push: ## Run before pushing (more comprehensive)
+	@echo "$(BLUE)Running pre-push checks...$(RESET)"
+	@$(MAKE) test-unit
+	@$(MAKE) test-integration
+	@$(MAKE) test-property
+	@$(MAKE) test-contract
+	@$(MAKE) test-coverage
+	@echo "$(GREEN)✅ Pre-push checks passed!$(RESET)"
+
+##@ Reports
+
+reports: ## Generate all reports
+	@echo "$(BLUE)Generating all reports...$(RESET)"
+	@$(MAKE) test-coverage-dashboard
+	@$(MAKE) test-analytics
+	@$(MAKE) test-perf-regression || true
+	@echo "$(GREEN)All reports generated in test-reports/$(RESET)"
+
+view-coverage: ## Open coverage dashboard in browser
+	@open test-reports/coverage-dashboard/index.html || xdg-open test-reports/coverage-dashboard/index.html
+
+view-analytics: ## Open analytics dashboard in browser
+	@open test-reports/analytics/test-analytics.html || xdg-open test-reports/analytics/test-analytics.html
+
+view-mutation: ## Open mutation report in browser
+	@open test-reports/mutations/mutation-report.html || xdg-open test-reports/mutations/mutation-report.html
+
+view-performance: ## Open performance report in browser
+	@open test-reports/performance/performance-report.html || xdg-open test-reports/performance/performance-report.html
+
+##@ CI/CD
+
+ci-test: ## Run tests as in CI
+	@echo "$(BLUE)Running CI test suite...$(RESET)"
+	@$(MAKE) test-unit
+	@$(MAKE) test-integration
+	@$(MAKE) test-property
+	@$(MAKE) test-contract
+	@$(MAKE) test-coverage
+	@$(MAKE) test-analytics
+	@echo "$(GREEN)✅ CI tests completed!$(RESET)"
+
+nightly: ## Run nightly comprehensive suite
+	@echo "$(BLUE)Running nightly test suite...$(RESET)"
+	@$(MAKE) test-all
+	@$(MAKE) test-mutation
+	@$(MAKE) test-fuzz
+	@$(MAKE) reports
+	@echo "$(GREEN)✅ Nightly suite completed!$(RESET)"
+
+##@ Cleanup
+
+clean-test-reports: ## Clean all test reports
+	@echo "$(YELLOW)Cleaning test reports...$(RESET)"
+	rm -rf test-reports/
+	rm -f coverage.out coverage.html
+	rm -f benchmarks.txt
+	@echo "$(GREEN)Test reports cleaned$(RESET)"
+
+clean-all: clean-test-reports ## Clean everything
+	@echo "$(YELLOW)Cleaning all test artifacts...$(RESET)"
+	rm -f .perf-baseline.txt
+	rm -rf testdata/snapshots/*.snap
+	@echo "$(GREEN)All cleaned$(RESET)"
+
+##@ Setup
+
+setup: ## Set up testing environment
+	@echo "$(BLUE)Setting up testing environment...$(RESET)"
+	go get github.com/onsi/ginkgo/ginkgo
+	go get github.com/onsi/gomega
+	go mod download
+	chmod +x scripts/*.sh
+	mkdir -p test-reports
+	@echo "$(GREEN)Setup complete!$(RESET)"
+
+##@ Documentation
+
+docs: ## Generate test documentation
+	@echo "$(BLUE)Test documentation available:$(RESET)"
+	@echo "  - TESTING.md                - Basic testing guide"
+	@echo "  - ADVANCED_TESTING.md       - Advanced testing guide"
+	@echo "  - COVERAGE_ANALYSIS.md      - Coverage analysis"
+	@echo ""
+	@echo "$(BLUE)Run 'make help' for all available commands$(RESET)"

@@ -1,0 +1,294 @@
+name: Comprehensive Testing Suite
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  GO_VERSION: '1.21'
+
+jobs:
+  # Standard unit and integration tests
+  unit-tests:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
+        run: |
+          go get github.com/onsi/ginkgo/ginkgo
+          go get github.com/onsi/gomega
+          go mod download
+
+      - name: Run unit tests
+        run: ginkgo -r --skip-package=integration
+
+      - name: Run integration tests
+        run: ginkgo -r integration/
+
+  # Test coverage analysis
+  coverage:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run tests with coverage
+        run: go test -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Generate coverage report
+        run: go tool cover -html=coverage.out -o coverage.html
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.out
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Generate coverage dashboard
+        run: bash scripts/generate-coverage-dashboard.sh
+
+      - name: Upload coverage dashboard
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-dashboard
+          path: test-reports/coverage-dashboard/
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const coverage = fs.readFileSync('coverage.out', 'utf8');
+            const match = coverage.match(/total:.*\t(\d+\.\d+)%/);
+            if (match) {
+              const percentage = match[1];
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 📊 Test Coverage: ${percentage}%\n\nFull report available in artifacts.`
+              });
+            }
+
+  # Property-based testing
+  property-tests:
+    name: Property-Based Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run property tests
+        run: go test -v ./... -run TestProperty
+
+  # Fuzzing tests
+  fuzz-tests:
+    name: Fuzz Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run fuzz tests
+        run: |
+          # Run each fuzz test for 30 seconds
+          go test -fuzz=FuzzNew -fuzztime=30s ./cf/errors || true
+          go test -fuzz=FuzzBabble -fuzztime=30s ./words/generator || true
+
+  # Benchmark tests
+  benchmarks:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run benchmarks
+        run: go test -bench=. -benchmem -run=^$ ./... > benchmarks.txt
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: benchmarks.txt
+
+      - name: Performance regression check
+        run: bash scripts/perf-regression-test.sh .perf-baseline.txt || true
+
+  # Mutation testing
+  mutation-tests:
+    name: Mutation Testing
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run mutation tests on changed packages
+        run: |
+          # Run mutation testing on critical packages
+          bash scripts/mutation-test.sh ./cf/errors || true
+          bash scripts/mutation-test.sh ./cf/actors || true
+
+      - name: Upload mutation report
+        uses: actions/upload-artifact@v3
+        with:
+          name: mutation-report
+          path: test-reports/mutations/
+
+  # Contract tests
+  contract-tests:
+    name: CF API Contract Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run contract tests
+        run: ginkgo testhelpers/contracts/
+
+  # Chaos testing
+  chaos-tests:
+    name: Chaos & Resilience Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run chaos tests
+        run: ginkgo testhelpers/chaos/
+
+  # Snapshot tests
+  snapshot-tests:
+    name: Snapshot Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run snapshot tests
+        run: ginkgo testhelpers/snapshot/
+
+      - name: Check for snapshot changes
+        if: github.event_name == 'pull_request'
+        run: |
+          if git diff --quiet testdata/snapshots/; then
+            echo "✅ No snapshot changes"
+          else
+            echo "⚠️ Snapshots have changed. Review carefully!"
+            git diff testdata/snapshots/
+          fi
+
+  # Test analytics
+  analytics:
+    name: Test Quality Analytics
+    runs-on: ubuntu-latest
+    needs: [unit-tests, coverage]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Generate test analytics
+        run: bash scripts/test-analytics.sh
+
+      - name: Upload analytics report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-analytics
+          path: test-reports/analytics/
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: '-no-fail -fmt sarif -out results.sarif ./...'
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
+  # Linting and code quality
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+  # Final status check
+  all-tests-passed:
+    name: All Tests Passed
+    runs-on: ubuntu-latest
+    needs: [unit-tests, coverage, property-tests, benchmarks, contract-tests, chaos-tests, lint]
+    steps:
+      - name: All tests passed
+        run: echo "✅ All test suites passed successfully!"
+
+      - name: Create success badge
+        run: |
+          echo "![Tests](https://img.shields.io/badge/tests-passing-brightgreen)" > test-badge.md
+
+      - name: Upload badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-badge
+          path: test-badge.md
