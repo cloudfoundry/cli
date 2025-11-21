@@ -1,7 +1,7 @@
 # Advanced Testing Makefile for Cloud Foundry CLI
-# Comprehensive testing suite with 10 different methodologies
+# THE ULTIMATE testing suite with 15 different methodologies
 
-.PHONY: help test-all test-unit test-integration test-property test-fuzz test-bench test-mutation test-contract test-chaos test-snapshot test-coverage test-analytics clean-test-reports
+.PHONY: help test-all test-unit test-integration test-property test-fuzz test-bench test-mutation test-contract test-chaos test-snapshot test-coverage test-analytics test-flaky test-impact test-load clean-test-reports
 
 # Colors for output
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -16,8 +16,8 @@ help: ## Display this help
 
 ##@ Testing
 
-test-all: ## Run ALL test suites (comprehensive!)
-	@echo "$(GREEN)Running complete test suite...$(RESET)"
+test-all: ## Run ALL test suites (THE ULTIMATE COMPREHENSIVE SUITE!)
+	@echo "$(GREEN)Running THE ULTIMATE test suite - all 15 methodologies!$(RESET)"
 	@$(MAKE) test-unit
 	@$(MAKE) test-integration
 	@$(MAKE) test-property
@@ -25,9 +25,10 @@ test-all: ## Run ALL test suites (comprehensive!)
 	@$(MAKE) test-contract
 	@$(MAKE) test-chaos
 	@$(MAKE) test-snapshot
+	@$(MAKE) test-load
 	@$(MAKE) test-coverage
 	@$(MAKE) test-analytics
-	@echo "$(GREEN)✅ All tests completed!$(RESET)"
+	@echo "$(GREEN)✅ All 15 testing methodologies completed!$(RESET)"
 
 test-unit: ## Run unit tests
 	@echo "$(BLUE)Running unit tests...$(RESET)"
@@ -96,6 +97,21 @@ test-analytics: ## Generate test quality analytics
 	bash scripts/test-analytics.sh
 	@echo "$(GREEN)Analytics: test-reports/analytics/test-analytics.html$(RESET)"
 
+test-flaky: ## Detect flaky tests (run tests multiple times)
+	@echo "$(BLUE)Detecting flaky tests...$(RESET)"
+	bash scripts/flaky-test-detector.sh 10
+	@echo "$(GREEN)Flaky test report: test-reports/flaky-tests/flaky-report.html$(RESET)"
+
+test-impact: ## Analyze which tests need to run
+	@echo "$(BLUE)Analyzing test impact...$(RESET)"
+	bash scripts/test-impact-analysis.sh master
+	@echo "$(GREEN)Impact report: test-reports/test-impact/impact-analysis.html$(RESET)"
+
+test-load: ## Run load/stress tests
+	@echo "$(BLUE)Running load tests...$(RESET)"
+	ginkgo testhelpers/load/
+	@echo "$(GREEN)Load tests completed$(RESET)"
+
 ##@ Snapshots
 
 snapshot-update: ## Update all snapshots
@@ -163,6 +179,20 @@ view-mutation: ## Open mutation report in browser
 
 view-performance: ## Open performance report in browser
 	@open test-reports/performance/performance-report.html || xdg-open test-reports/performance/performance-report.html
+
+view-flaky: ## Open flaky test report in browser
+	@open test-reports/flaky-tests/flaky-report.html || xdg-open test-reports/flaky-tests/flaky-report.html
+
+view-impact: ## Open test impact analysis in browser
+	@open test-reports/test-impact/impact-analysis.html || xdg-open test-reports/test-impact/impact-analysis.html
+
+view-all: ## Open all reports in browser
+	@$(MAKE) view-coverage
+	@$(MAKE) view-analytics
+	@$(MAKE) view-mutation
+	@$(MAKE) view-performance
+	@$(MAKE) view-flaky
+	@$(MAKE) view-impact
 
 ##@ CI/CD
 
