@@ -66,3 +66,6 @@ test-reports/
 *.perf-current.txt
 coverage.out
 benchmarks.txt
+
+# Backup files from mutation testing
+*.backup
