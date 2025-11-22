@@ -60,3 +60,12 @@ fixtures/config/plugin-config/.cf/plugins/empty_plugin
 
 # NEVER commit the resources files!
 cf/resources/i18n_resources.go
+test-reports/
+
+# Generated test artifacts
+*.perf-current.txt
+coverage.out
+benchmarks.txt
+
+# Backup files from mutation testing
+*.backup
