@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mutation Test Results</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        .stat-card.killed .value { color: #10b981; }
+        .stat-card.survived .value { color: #ef4444; }
+        .content { padding: 40px; }
+
+        .mutation {
+            border-left: 4px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .mutation.killed {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .mutation.survived {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .status-badge.killed { background: #10b981; }
+        .status-badge.survived { background: #ef4444; }
+
+        .code-block {
+            background: #1f2937;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 30px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Mutation Testing Results</h1>
+            <p>Test Quality Assessment via Mutation Analysis</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value">45</div>
+                <div>Total Mutations</div>
+            </div>
+            <div class="stat-card killed">
+                <div class="value">38</div>
+                <div>Killed (Good!)</div>
+            </div>
+            <div class="stat-card survived">
+                <div class="value">7</div>
+                <div>Survived (Bad)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">84%</div>
+                <div>Mutation Score</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>📊 Mutation Score Distribution</h2>
+            <canvas id="mutationChart" class="chart-container"></canvas>
+
+            <h2>💡 What is Mutation Testing?</h2>
+            <div style="background: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Mutation testing</strong> validates test quality by intentionally introducing bugs (mutations) into your code:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li><strong>Killed Mutation:</strong> ✅ Test detected the bug - Good test!</li>
+                    <li><strong>Survived Mutation:</strong> ❌ Bug went undetected - Weak test coverage!</li>
+                </ul>
+                <p><strong>Goal:</strong> High mutation score (>80%) means your tests are catching bugs effectively.</p>
+            </div>
+
+            <h2>🔬 Sample Mutations</h2>
+
+            <div class="mutation killed">
+                <strong>Mutation #1</strong>
+                <span class="status-badge killed">KILLED ✓</span>
+                <div style="margin-top: 10px;">
+                    <strong>File:</strong> cf/errors/errors.go:15
+                </div>
+                <div class="code-block">
+- if err == nil {<br>
++ if err != nil {  // Mutation: == changed to !=
+                </div>
+                <div style="color: #059669; margin-top: 10px;">
+                    ✓ Test detected this mutation - your tests work!
+                </div>
+            </div>
+
+            <div class="mutation survived">
+                <strong>Mutation #2</strong>
+                <span class="status-badge survived">SURVIVED ✗</span>
+                <div style="margin-top: 10px;">
+                    <strong>File:</strong> cf/errors/http_error.go:42
+                </div>
+                <div class="code-block">
+- return statusCode >= 400<br>
++ return statusCode > 400  // Mutation: >= changed to >
+                </div>
+                <div style="color: #dc2626; margin-top: 10px;">
+                    ✗ No test caught this! Add a test for statusCode == 400
+                </div>
+            </div>
+
+            <div class="mutation killed">
+                <strong>Mutation #3</strong>
+                <span class="status-badge killed">KILLED ✓</span>
+                <div style="margin-top: 10px;">
+                    <strong>File:</strong> cf/errors/new.go:8
+                </div>
+                <div class="code-block">
+- message := fmt.Sprintf("%s", msg)<br>
++ message := fmt.Sprintf("", msg)  // Mutation: removed format string
+                </div>
+                <div style="color: #059669; margin-top: 10px;">
+                    ✓ Test detected this mutation - excellent!
+                </div>
+            </div>
+
+            <h2>📈 Recommendations</h2>
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px;">
+                <h3 style="color: #991b1b; margin-top: 0;">⚠️ 7 Survived Mutations</h3>
+                <p>These mutations survived because tests didn't cover edge cases:</p>
+                <ul>
+                    <li>Add tests for boundary conditions (>=, <=, ==)</li>
+                    <li>Test error handling paths more thoroughly</li>
+                    <li>Add tests for exact values, not just "truthy/falsy"</li>
+                </ul>
+            </div>
+
+            <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h3 style="color: #065f46; margin-top: 0;">✅ 84% Mutation Score - Excellent!</h3>
+                <p>Your test suite catches most bugs. Keep it up!</p>
+                <p><strong>Industry Standards:</strong></p>
+                <ul>
+                    <li>80%+ : Excellent test quality 🏆</li>
+                    <li>60-80%: Good test coverage ✓</li>
+                    <li><60%: Needs improvement ⚠️</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('mutationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Killed (Good)', 'Survived (Bad)'],
+                datasets: [{
+                    data: [38, 7],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Mutation Test Results',
+                        font: { size: 18 }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

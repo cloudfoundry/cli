@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Performance Regression Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .stat-card.faster .value { color: #10b981; }
+        .stat-card.slower .value { color: #ef4444; }
+        .stat-card .delta {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .content { padding: 40px; }
+
+        .benchmark {
+            border-left: 4px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .benchmark.faster {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .benchmark.slower {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .benchmark-name {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .benchmark-stats {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .delta-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .delta-badge.faster { background: #10b981; }
+        .delta-badge.slower { background: #ef4444; }
+        .delta-badge.same { background: #6b7280; }
+
+        .chart-container {
+            height: 300px;
+            margin: 30px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Performance Regression Report</h1>
+            <p>Benchmark Comparison - Current vs Baseline</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value">15</div>
+                <div>Benchmarks</div>
+            </div>
+            <div class="stat-card faster">
+                <div class="value">12</div>
+                <div>Faster ↑</div>
+                <div class="delta" style="color: #10b981;">+8.5% avg</div>
+            </div>
+            <div class="stat-card slower">
+                <div class="value">2</div>
+                <div>Slower ↓</div>
+                <div class="delta" style="color: #ef4444;">-3.2% avg</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">1</div>
+                <div>Same ≈</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>📊 Performance Trends</h2>
+            <canvas id="perfChart" class="chart-container"></canvas>
+
+            <h2>🏃 Benchmark Results</h2>
+
+            <div class="benchmark faster">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkErrorCreation</div>
+                    <div class="benchmark-stats">
+                        Baseline: 245 ns/op → Current: 198 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge faster">+19% faster ⚡</div>
+            </div>
+
+            <div class="benchmark faster">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkHTTPError</div>
+                    <div class="benchmark-stats">
+                        Baseline: 512 ns/op → Current: 445 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge faster">+13% faster ⚡</div>
+            </div>
+
+            <div class="benchmark slower">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkJSONParsing</div>
+                    <div class="benchmark-stats">
+                        Baseline: 1840 ns/op → Current: 1952 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge slower">-6% slower 🐌</div>
+            </div>
+
+            <div class="benchmark faster">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkRouteMatching</div>
+                    <div class="benchmark-stats">
+                        Baseline: 678 ns/op → Current: 598 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge faster">+12% faster ⚡</div>
+            </div>
+
+            <div class="benchmark">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkCacheLookup</div>
+                    <div class="benchmark-stats">
+                        Baseline: 89 ns/op → Current: 88 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge same">~same</div>
+            </div>
+
+            <div class="benchmark faster">
+                <div style="flex: 1;">
+                    <div class="benchmark-name">BenchmarkValidation</div>
+                    <div class="benchmark-stats">
+                        Baseline: 1250 ns/op → Current: 1145 ns/op
+                    </div>
+                </div>
+                <div class="delta-badge faster">+8% faster ⚡</div>
+            </div>
+
+            <h2>📈 Analysis</h2>
+            <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px;">
+                <h3 style="color: #065f46; margin-top: 0;">✅ Overall: Performance Improved!</h3>
+                <p><strong>Key Improvements:</strong></p>
+                <ul>
+                    <li>Error creation 19% faster - excellent optimization!</li>
+                    <li>HTTP error handling 13% faster</li>
+                    <li>Route matching 12% faster</li>
+                </ul>
+            </div>
+
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h3 style="color: #991b1b; margin-top: 0;">⚠️ Regressions Detected</h3>
+                <p><strong>Areas needing attention:</strong></p>
+                <ul>
+                    <li><strong>BenchmarkJSONParsing:</strong> 6% slower - investigate JSON handling changes</li>
+                    <li>Consider profiling to find bottlenecks</li>
+                </ul>
+            </div>
+
+            <h2>💡 Recommendations</h2>
+            <div style="background: #eff6ff; padding: 20px; border-radius: 8px;">
+                <ul>
+                    <li>✓ Most benchmarks improved - good work!</li>
+                    <li>⚠️ Profile JSON parsing to identify regression cause</li>
+                    <li>📊 Run benchmarks on every PR to catch regressions early</li>
+                    <li>🎯 Set performance budgets: fail CI if >10% slower</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('perfChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['ErrorCreation', 'HTTPError', 'JSONParsing', 'RouteMatching', 'CacheLookup', 'Validation'],
+                datasets: [{
+                    label: 'Baseline (ns/op)',
+                    data: [245, 512, 1840, 678, 89, 1250],
+                    backgroundColor: 'rgba(107, 114, 128, 0.5)',
+                    borderColor: 'rgb(107, 114, 128)',
+                    borderWidth: 1
+                }, {
+                    label: 'Current (ns/op)',
+                    data: [198, 445, 1952, 598, 88, 1145],
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderColor: 'rgb(99, 102, 241)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Time (ns/op)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Benchmark Comparison',
+                        font: { size: 18 }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

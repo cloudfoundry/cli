@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Vulnerability Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .stat-card.total .value { color: #6366f1; }
+        .stat-card.high .value { color: #dc2626; }
+        .stat-card.medium .value { color: #ea580c; }
+        .stat-card.low .value { color: #65a30d; }
+        .content { padding: 40px; }
+
+        .vulnerability {
+            border-left: 4px solid #dc2626;
+            background: #fef2f2;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .severity-badge.high { background: #dc2626; }
+        .severity-badge.medium { background: #ea580c; }
+        .severity-badge.low { background: #65a30d; }
+
+        .code-snippet {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .recommendation {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .recommendation h4 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 60px;
+            color: #10b981;
+        }
+
+        .success-message .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Security Vulnerability Report</h1>
+            <p>Test Code Security Analysis</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card total">
+                <div class="value">EOF
+
+echo "$total_issues" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<EOF
+</div>
+                <div>Total Issues</div>
+            </div>
+            <div class="stat-card high">
+                <div class="value">$high_severity</div>
+                <div>High Severity</div>
+            </div>
+            <div class="stat-card medium">
+                <div class="value">$medium_severity</div>
+                <div>Medium Severity</div>
+            </div>
+            <div class="stat-card low">
+                <div class="value">$low_severity</div>
+                <div>Low Severity</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>🛡️ Security Best Practices for Tests</h2>
+
+            <div class="recommendation">
+                <h4>1. Never Hardcode Credentials</h4>
+                <p>Use environment variables or test fixtures instead:</p>
+                <div class="code-snippet">
+// Bad<br>
+password := "mysecretpassword123"<br>
+<br>
+// Good<br>
+password := os.Getenv("TEST_PASSWORD")
+                </div>
+            </div>
+
+            <div class="recommendation">
+                <h4>2. Use crypto/rand for Security-Critical Tests</h4>
+                <p>Don't use math/rand for cryptographic operations:</p>
+                <div class="code-snippet">
+// Bad<br>
+import "math/rand"<br>
+token := rand.Int()<br>
+<br>
+// Good<br>
+import "crypto/rand"<br>
+token, _ := rand.Int(rand.Reader, big.NewInt(1000000))
+                </div>
+            </div>
+
+            <div class="recommendation">
+                <h4>3. Validate All External Input</h4>
+                <p>Even in tests, validate data from external sources</p>
+            </div>
+
+            <div class="recommendation">
+                <h4>4. Avoid SQL Injection in Test Queries</h4>
+                <p>Use parameterized queries even in tests</p>
+            </div>
+
+            <h2>🔍 Detected Vulnerabilities</h2>
+            <div class="vulnerability">
+                <strong>GoSec Report</strong>
+                <span class="severity-badge high">SECURITY</span>
+                <div class="code-snippet">
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:147
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:146
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:145
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:144
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:131
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:130
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:129
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:128
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:127
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:126
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:125
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:124
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:101
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/github.com/gogo/protobuf/proto/encode.go:87
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:147
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:146
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:145
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:144
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:131
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+File: /home/user/cli/Godeps/_workspace/src/code.google.com/p/gogoprotobuf/proto/encode.go:130
+Severity: HIGH
+Rule: G115
+Details: integer overflow conversion uint64 -&gt; uint8
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

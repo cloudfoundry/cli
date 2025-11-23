@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI-Powered Test Suggestions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            padding: 30px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 72px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        .content { padding: 40px; }
+
+        .suggestion {
+            border-left: 4px solid #6366f1;
+            background: #f9fafb;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .suggestion.high {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .suggestion.medium {
+            border-color: #ea580c;
+            background: #fff7ed;
+        }
+
+        .suggestion.low {
+            border-color: #65a30d;
+            background: #f7fee7;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .priority-badge.high { background: #dc2626; }
+        .priority-badge.medium { background: #ea580c; }
+        .priority-badge.low { background: #65a30d; }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            background: #e5e7eb;
+            color: #1f2937;
+            margin-right: 8px;
+        }
+
+        .suggestion-text {
+            margin: 15px 0;
+            color: #1f2937;
+            font-size: 16px;
+        }
+
+        .file-ref {
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .recommendation {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+
+        .recommendation h4 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI-Powered Test Suggestions</h1>
+            <p>Intelligent Pattern-Based Test Quality Analysis</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-value">EOF
+
+echo "$total_suggestions" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'EOF'
+</div>
+            <p style="color: #6b7280; font-size: 18px; margin-top: 10px;">
+                Test Improvement Suggestions
+            </p>
+        </div>
+
+        <div class="content">
+            <h2>📋 Suggestions by Priority</h2>
+            <div class="suggestion medium">
+                <div>
+                    <span class="category-badge">ERROR_PATH</span>
+                    <span class="priority-badge medium">MEDIUM</span>
+                </div>
+                <div class="suggestion-text">Found 1144 error return statements - ensure all error paths are tested</div>
+                <div class="file-ref">📁 Multiple files</div>
+                <div class="recommendation">
+                    <h4>💡 Recommendation</h4>
+                    <p>Ensure error paths are tested by:</p>
+                    <ul>
+                        <li>Using mocks that return errors</li>
+                        <li>Testing error message format</li>
+                        <li>Verifying error handling behavior</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="suggestion high">
+                <div>
+                    <span class="category-badge">FLAKY_RISK</span>
+                    <span class="priority-badge high">HIGH</span>
+                </div>
+                <div class="suggestion-text">Found 45 uses of Sleep in tests - use Eventually() or polling instead</div>
+                <div class="file-ref">📁 Multiple test files</div>
+                <div class="recommendation">
+                    <h4>💡 Recommendation</h4>
+                    <p>Replace Sleep() with deterministic waiting:</p>
+                    <ul>
+                        <li>Use Eventually() for async operations</li>
+                        <li>Poll with timeout instead of sleep</li>
+                        <li>Use channels or WaitGroups for synchronization</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="suggestion medium">
+                <div>
+                    <span class="category-badge">EDGE_CASES</span>
+                    <span class="priority-badge medium">MEDIUM</span>
+                </div>
+                <div class="suggestion-text">Ensure edge cases are tested: nil values, empty strings, boundary conditions</div>
+                <div class="file-ref">📁 All test files</div>
+            </div>
+            <div class="suggestion low">
+                <div>
+                    <span class="category-badge">DOCUMENTATION</span>
+                    <span class="priority-badge low">LOW</span>
+                </div>
+                <div class="suggestion-text">Many tests lack descriptive comments - add context for future maintainers</div>
+                <div class="file-ref">📁 Multiple test files</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

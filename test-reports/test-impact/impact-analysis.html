@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Impact Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .value {
+            font-size: 42px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .content { padding: 40px; }
+        .section { margin: 30px 0; }
+        .section h2 {
+            font-size: 28px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .file-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .file-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .command-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .command-box .comment { color: #6a9955; }
+        .reduction {
+            font-size: 64px;
+            font-weight: bold;
+            text-align: center;
+            margin: 30px 0;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .benefit {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Test Impact Analysis</h1>
+            <p>Smart Test Selection Based on Code Changes</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value">$total_changed</div>
+                <div class="label">Changed Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">${#affected_packages[@]}</div>
+                <div class="label">Affected Packages</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">$total_tests</div>
+                <div class="label">Tests to Run</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">$total_test_files</div>
+                <div class="label">Total Tests</div>
+            </div>
+        </div>
+
+        <div class="reduction">↓ $reduction% ↓</div>
+        <p style="text-align: center; font-size: 24px; color: #666;">Test Reduction</p>
+
+        <div class="content">
+            <div class="section">
+                <h2>Changed Files</h2>
+                <div class="file-list">
+                    <div class="file-item">📝 cf/models/domain_test_additional.go</div>
+                    <div class="file-item">📝 testhelpers/chaos/chaos.go</div>
+                    <div class="file-item">📝 testhelpers/fixtures/fixtures.go</div>
+                    <div class="file-item">📝 testhelpers/generators/data_generator.go</div>
+                    <div class="file-item">📝 testhelpers/mock/api_mock.go</div>
+                    <div class="file-item">📝 testhelpers/models/model_makers.go</div>
+                    <div class="file-item">📝 testhelpers/observability/realtime_reporter.go</div>
+                    <div class="file-item">📝 testhelpers/retry/smart_retry.go</div>
+                    <div class="file-item">📝 testhelpers/snapshot/snapshot.go</div>
+                    <div class="file-item">📝 testhelpers/visual/visual_regression.go</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Affected Packages</h2>
+                <div class="file-list">
+                    <div class="file-item">📦 cf/models</div>
+                    <div class="file-item">📦 testhelpers/observability</div>
+                    <div class="file-item">📦 testhelpers/snapshot</div>
+                    <div class="file-item">📦 testhelpers/models</div>
+                    <div class="file-item">📦 testhelpers/fixtures</div>
+                    <div class="file-item">📦 testhelpers/generators</div>
+                    <div class="file-item">📦 testhelpers/visual</div>
+                    <div class="file-item">📦 testhelpers/mock</div>
+                    <div class="file-item">📦 testhelpers/retry</div>
+                    <div class="file-item">📦 testhelpers/chaos</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Recommended Test Command</h2>
+                <div class="command-box">
+                    <span class="comment"># Run only affected tests:</span><br>
+                    ginkgo cf/models<br>
+                    ginkgo testhelpers/observability<br>
+                    ginkgo testhelpers/snapshot<br>
+                    ginkgo testhelpers/models<br>
+                    ginkgo testhelpers/fixtures<br>
+                    ginkgo testhelpers/generators<br>
+                    ginkgo testhelpers/visual<br>
+                    ginkgo testhelpers/mock<br>
+                    ginkgo testhelpers/retry<br>
+                    ginkgo testhelpers/chaos<br>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Benefits</h2>
+                <div class="benefit">
+                    <strong>⚡ Faster Feedback:</strong> Run only relevant tests, get results faster
+                </div>
+                <div class="benefit">
+                    <strong>💰 Cost Savings:</strong> Reduce CI/CD compute time and costs
+                </div>
+                <div class="benefit">
+                    <strong>🎯 Focused Testing:</strong> Test what changed, not everything
+                </div>
+                <div class="benefit">
+                    <strong>🔄 Better CI/CD:</strong> Faster iteration cycles for developers
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>How It Works</h2>
+                <ol style="line-height: 2;">
+                    <li><strong>Detect Changes:</strong> Compare current branch with base branch</li>
+                    <li><strong>Build Graph:</strong> Analyze Go import dependencies</li>
+                    <li><strong>Find Tests:</strong> Identify direct and indirect test files</li>
+                    <li><strong>Optimize:</strong> Run only tests that could be affected</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

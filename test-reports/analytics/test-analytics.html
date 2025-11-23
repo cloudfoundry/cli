@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .grade-badge {
+            display: inline-block;
+            padding: 20px 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .grade-badge.A { color: #4CAF50; }
+        .grade-badge.B { color: #FF9800; }
+        .grade-badge.C { color: #FF5722; }
+        .grade-badge.D { color: #f44336; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .icon { font-size: 36px; margin-bottom: 10px; }
+        .stat-card .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .content { padding: 40px; }
+        .section { margin-bottom: 40px; }
+        .section h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .metric-row .label { font-weight: 600; color: #333; }
+        .metric-row .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .smell-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .smell-warning.critical {
+            background: #f8d7da;
+            border-color: #f44336;
+        }
+        .recommendation {
+            background: #d4edda;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .progress-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#4CAF50 0deg, #4CAF50 calc(var(--progress) * 3.6deg), #e0e0e0 calc(var(--progress) * 3.6deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px auto;
+        }
+        .progress-circle::before {
+            content: attr(data-progress) '%';
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Test Analytics Dashboard</h1>
+            <p>Comprehensive Test Quality Analysis</p>
+            <div class="grade-badge HTMLEOF
+
+echo "$(echo $grade | cut -c1)\">" >> "$OUTPUT_FILE"
+echo "$grade" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<HTMLEOF
+</div>
+            <p style="font-size: 24px; margin-top: 20px;">Test Health Score: $test_health_score/100</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">📝</div>
+                <div class="label">Total Test Files</div>
+                <div class="value">$total_test_files</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">✅</div>
+                <div class="label">Test Functions</div>
+                <div class="value">$total_test_funcs</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🎯</div>
+                <div class="label">Assertions</div>
+                <div class="value">$total_assertions</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">⚡</div>
+                <div class="label">Benchmarks</div>
+                <div class="value">$total_benchmark_funcs</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>Test Type Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="testTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Quality Metrics</h2>
+                <div class="metric-row">
+                    <span class="label">Test Diversity Score</span>
+                    <span class="value">$test_types/100</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Code Quality Score</span>
+                    <span class="value">$code_quality_score/100</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Coverage Score</span>
+                    <span class="value">$coverage_score/100</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Test Smells Detected</h2>
+                <div class="smell-warning">
+                    <strong>⚠️ Excessive Sleep Statements</strong><br>
+                    Detected 45 sleep statements in tests. This can lead to flaky tests and slow test execution.
+                    Consider using proper synchronization or mocking instead.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Recommendations</h2>
+                <div class="recommendation">Add more benchmark tests for performance-critical code</div>
+            </div>
+
+            <div class="section">
+                <h2>Test Health Trend</h2>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test type distribution
+        const typeCtx = document.getElementById('testTypeChart').getContext('2d');
+        new Chart(typeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Unit Tests', 'Integration Tests', 'Benchmark Tests', 'Property Tests', 'Fuzz Tests'],
+                datasets: [{
+                    data: [
+                        531, 1, 2, 3, 2
+                    ],
+                    backgroundColor: [
+                        '#4CAF50',
+                        '#2196F3',
+                        '#FF9800',
+                        '#9C27B0',
+                        '#F44336'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: {
+                        display: true,
+                        text: 'Test Types Distribution',
+                        font: { size: 18 }
+                    }
+                }
+            }
+        });
+
+        // Trend chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Current'],
+                datasets: [{
+                    label: 'Test Health Score',
+                    data: [45, 60, 70, 75, 90],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Test Health Over Time',
+                        font: { size: 18 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

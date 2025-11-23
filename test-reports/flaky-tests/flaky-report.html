@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flaky Test Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        .content { padding: 40px; }
+        .flaky-test {
+            background: #fff3cd;
+            border-left: 4px solid #ff6b6b;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .flaky-test h3 { margin: 0 0 10px 0; color: #ff6b6b; }
+        .metric { margin: 5px 0; }
+        .flake-rate {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        .recommendations {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Flaky Test Report</h1>
+            <p>Non-Deterministic Test Detection</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value">$ITERATIONS</div>
+                <div class="label">Test Runs</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">$flaky_count</div>
+                <div class="label">Flaky Tests Found</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>Detected Flaky Tests</h2>
+            <h2>Why Tests Become Flaky</h2>
+            <div class="recommendations">
+                <h3>Common Causes:</h3>
+                <ul>
+                    <li><strong>Race Conditions:</strong> Tests depend on timing or thread ordering</li>
+                    <li><strong>External Dependencies:</strong> Tests rely on external services or network</li>
+                    <li><strong>Shared State:</strong> Tests share mutable state between runs</li>
+                    <li><strong>Time Dependencies:</strong> Tests use time.Sleep() or current time</li>
+                    <li><strong>Random Data:</strong> Tests use random values without seeding</li>
+                    <li><strong>Resource Leaks:</strong> Tests don't clean up resources properly</li>
+                </ul>
+
+                <h3>How to Fix:</h3>
+                <ul>
+                    <li>Use proper synchronization (channels, mutexes)</li>
+                    <li>Mock external dependencies</li>
+                    <li>Isolate test state (use BeforeEach/AfterEach)</li>
+                    <li>Use Eventually() for async operations</li>
+                    <li>Seed random number generators</li>
+                    <li>Ensure cleanup in defer or AfterEach</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dependency Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #bd34fe 0%, #41d1ff 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        #graph-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .demo-graph {
+            text-align: center;
+            color: #8b949e;
+        }
+
+        .demo-graph svg {
+            margin: 30px 0;
+        }
+
+        .node-demo {
+            fill: #58a6ff;
+            stroke: #1f6feb;
+            stroke-width: 2;
+        }
+
+        .link-demo {
+            stroke: #30363d;
+            stroke-width: 2;
+            marker-end: url(#arrow);
+        }
+
+        .legend {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .legend h3 {
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            color: #8b949e;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .info-box {
+            background: #1c2128;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            padding: 8px 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🕸️ Test Dependency Graph</h1>
+        <p>Interactive Visualization of Test Package Dependencies</p>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Test Packages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">28</div>
+                <div class="stat-label">Dependencies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100+</div>
+                <div class="stat-label">Test Files</div>
+            </div>
+        </div>
+
+        <div id="graph-container">
+            <div class="demo-graph">
+                <h2 style="color: #58a6ff; margin-bottom: 20px;">📊 Sample Dependency Graph</h2>
+
+                <svg width="800" height="400">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#30363d"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Links -->
+                    <line class="link-demo" x1="100" y1="100" x2="250" y2="150"/>
+                    <line class="link-demo" x1="100" y1="100" x2="250" y2="250"/>
+                    <line class="link-demo" x1="250" y1="150" x2="450" y2="150"/>
+                    <line class="link-demo" x1="250" y1="250" x2="450" y2="150"/>
+                    <line class="link-demo" x1="250" y1="250" x2="450" y2="250"/>
+                    <line class="link-demo" x1="450" y1="150" x2="650" y2="200"/>
+                    <line class="link-demo" x1="450" y1="250" x2="650" y2="200"/>
+
+                    <!-- Nodes -->
+                    <g>
+                        <circle class="node-demo" cx="100" cy="100" r="15"/>
+                        <text x="100" y="85" text-anchor="middle" fill="#c9d1d9" font-size="12">cf/errors</text>
+                    </g>
+
+                    <g>
+                        <circle class="node-demo" cx="250" cy="150" r="15"/>
+                        <text x="250" y="135" text-anchor="middle" fill="#c9d1d9" font-size="12">cf/actors</text>
+                    </g>
+
+                    <g>
+                        <circle class="node-demo" cx="250" cy="250" r="15"/>
+                        <text x="250" y="270" text-anchor="middle" fill="#c9d1d9" font-size="12">cf/models</text>
+                    </g>
+
+                    <g>
+                        <circle class="node-demo" cx="450" cy="150" r="15"/>
+                        <text x="450" y="135" text-anchor="middle" fill="#c9d1d9" font-size="12">testhelpers</text>
+                    </g>
+
+                    <g>
+                        <circle class="node-demo" cx="450" cy="250" r="15"/>
+                        <text x="450" y="270" text-anchor="middle" fill="#c9d1d9" font-size="12">integration</text>
+                    </g>
+
+                    <g>
+                        <circle class="node-demo" cx="650" cy="200" r="15"/>
+                        <text x="650" y="185" text-anchor="middle" fill="#c9d1d9" font-size="12">tests</text>
+                    </g>
+                </svg>
+
+                <p style="margin-top: 30px; line-height: 1.6;">
+                    This is a visualization of how test packages depend on each other.<br>
+                    In a full run, this would show all import relationships<br>
+                    between your test files as an interactive D3.js graph.
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 Test Package Overview</h3>
+            <ul>
+                <li>✅ <strong>cf/errors_test</strong> - Error handling tests (15 files)</li>
+                <li>✅ <strong>cf/actors/routes_test</strong> - Route actor tests (8 files)</li>
+                <li>✅ <strong>cf/models_test</strong> - Model tests (12 files)</li>
+                <li>✅ <strong>testhelpers</strong> - Shared test utilities (20+ helpers)</li>
+                <li>✅ <strong>integration</strong> - Integration tests (25 scenarios)</li>
+                <li>✅ <strong>testhelpers/chaos</strong> - Chaos testing framework</li>
+                <li>✅ <strong>testhelpers/contracts</strong> - API contract tests</li>
+                <li>✅ <strong>testhelpers/load</strong> - Load & stress tests</li>
+                <li>✅ <strong>testhelpers/mock</strong> - Mock servers</li>
+                <li>✅ <strong>testhelpers/fixtures</strong> - Test data fixtures</li>
+                <li>✅ <strong>testhelpers/visual</strong> - Visual regression testing 🆕</li>
+                <li>✅ <strong>testhelpers/retry</strong> - Smart retry mechanism 🆕</li>
+            </ul>
+        </div>
+
+        <div class="legend">
+            <h3>Legend</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #58a6ff;"></div>
+                <span>Test Package</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #30363d; border-radius: 0; height: 2px;"></div>
+                <span>Dependency</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>💡 Usage</h3>
+            <ul>
+                <li><strong>Understanding Architecture:</strong> See how test packages relate to each other</li>
+                <li><strong>Finding Circular Dependencies:</strong> Identify potential dependency cycles</li>
+                <li><strong>Planning Refactoring:</strong> Visualize impact of changes</li>
+                <li><strong>Documentation:</strong> Generate architecture diagrams</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

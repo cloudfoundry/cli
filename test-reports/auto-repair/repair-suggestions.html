@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automated Test Repair Suggestions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 48px; margin-bottom: 10px; }
+        .summary {
+            padding: 30px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 72px;
+            font-weight: bold;
+            color: #dc2626;
+        }
+        .content { padding: 40px; }
+
+        .failure-item {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .failure-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .test-name {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .failure-badge {
+            background: #dc2626;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #2d1517;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .suggestion-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .suggestion-box h4 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+        }
+
+        .suggestion-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .suggestion-box li {
+            margin: 8px 0;
+            color: #1f2937;
+        }
+
+        .code-example {
+            background: #1f2937;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 8px 0;
+        }
+
+        .quick-fix {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Automated Test Repair Suggestions</h1>
+            <p>Intelligent Failure Analysis & Fix Recommendations</p>
+        </div>
+
+        <div class="summary">
+            <div class="summary-value">EOF
+
+echo "$total_failures" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'EOF'
+</div>
+            <p style="color: #6b7280; font-size: 18px; margin-top: 10px;">
+                Failing Tests Detected
+            </p>
+        </div>
+
+        <div class="content">
+            <h2>📊 Failure Type Distribution</h2>
+            <div class="stats-grid">
+            </div>
+
+            <h2>🔍 Detailed Failure Analysis & Repair Suggestions</h2>
+            <div style="text-align: center; padding: 60px; color: #10b981;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
+                <h2>All Tests Passing!</h2>
+                <p>No test failures detected. Great job!</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
