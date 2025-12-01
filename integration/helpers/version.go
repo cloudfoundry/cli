@@ -43,9 +43,8 @@ func (v UAAVersion) Version() string {
 func IsUAAVersionAtLeast(minVersion string) bool {
 	info := fetchAPIVersion()
 	uaaUrl := fmt.Sprintf("%s/info", info.Links.UAA.Href)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: SkipSSLValidation()},
-	}
+	tr := http.DefaultTransport.(*http.Transport).Clone()
+	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: SkipSSLValidation()}
 	req, err := http.NewRequest("GET", uaaUrl, nil)
 	Expect(err).ToNot(HaveOccurred())
 	req.Header.Add("Accept", "application/json")
