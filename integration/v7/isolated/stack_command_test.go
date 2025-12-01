@@ -103,27 +103,56 @@ var _ = Describe("stack command", func() {
 		When("the stack exists", func() {
 			var stackGUID string
 
-			BeforeEach(func() {
-				jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s"}`, stackName, stackDescription)
-				session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
-				Eventually(session).Should(Exit(0))
+			Context("when the stack has no state", func() {
+				BeforeEach(func() {
+					jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s"}`, stackName, stackDescription)
+					session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
+					Eventually(session).Should(Exit(0))
 
-				r := regexp.MustCompile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
-				stackGUID = string(r.Find(session.Out.Contents()))
+					r := regexp.MustCompile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
+					stackGUID = string(r.Find(session.Out.Contents()))
+				})
+
+				AfterEach(func() {
+					session := helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v3/stacks/%s", stackGUID))
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("Shows the details for the stack without state", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Consistently(session).ShouldNot(Say(`state:`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
-			AfterEach(func() {
-				session := helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v3/stacks/%s", stackGUID))
-				Eventually(session).Should(Exit(0))
-			})
+			Context("when the stack has a valid state", func() {
+				BeforeEach(func() {
+					jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s", "state": "ACTIVE"}`, stackName, stackDescription)
+					session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
+					Eventually(session).Should(Exit(0))
 
-			It("Shows the details for the stack", func() {
-				session := helpers.CF("stack", stackName)
+					r := regexp.MustCompile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
+					stackGUID = string(r.Find(session.Out.Contents()))
+				})
 
-				Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
-				Eventually(session).Should(Say(`name:\s+%s`, stackName))
-				Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
-				Eventually(session).Should(Exit(0))
+				AfterEach(func() {
+					session := helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v3/stacks/%s", stackGUID))
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("Shows the details for the stack with state", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Eventually(session).Should(Say(`state:\s+ACTIVE`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
 			When("the stack exists and the --guid flag is passed", func() {
