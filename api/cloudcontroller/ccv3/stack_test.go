@@ -42,9 +42,10 @@ var _ = Describe("Stacks", func() {
 	},
   "resources": [
     {
-      	"name": "stack-name-1",
-      	"guid": "stack-guid-1",
-      	"description": "stack desc 1"
+	"name": "stack-name-1",
+	"guid": "stack-guid-1",
+	"description": "stack desc 1",
+	"state": "ACTIVE"
     },
     {
       	"name": "stack-name-2",
@@ -61,7 +62,8 @@ var _ = Describe("Stacks", func() {
 	  {
 		"name": "stack-name-3",
 		  "guid": "stack-guid-3",
-		"description": "stack desc 3"
+		"description": "stack desc 3",
+		"state": "DEPRECATED"
 		}
 	]
 }`
@@ -89,9 +91,9 @@ var _ = Describe("Stacks", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(stacks).To(ConsistOf(
-					resources.Stack{Name: "stack-name-1", GUID: "stack-guid-1", Description: "stack desc 1"},
-					resources.Stack{Name: "stack-name-2", GUID: "stack-guid-2", Description: "stack desc 2"},
-					resources.Stack{Name: "stack-name-3", GUID: "stack-guid-3", Description: "stack desc 3"},
+					resources.Stack{Name: "stack-name-1", GUID: "stack-guid-1", Description: "stack desc 1", State: "ACTIVE"},
+					resources.Stack{Name: "stack-name-2", GUID: "stack-guid-2", Description: "stack desc 2", State: ""},
+					resources.Stack{Name: "stack-name-3", GUID: "stack-guid-3", Description: "stack desc 3", State: "DEPRECATED"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})

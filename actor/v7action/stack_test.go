@@ -69,7 +69,7 @@ var _ = Describe("Stack", func() {
 
 		Context("there are no errors", func() {
 
-			When("the stack exists", func() {
+			When("the stack exists without state", func() {
 				expectedStack := resources.Stack{
 					GUID:        "some-stack-guid",
 					Name:        "some-stack-name",
@@ -98,6 +98,43 @@ var _ = Describe("Stack", func() {
 					Expect(stack.GUID).To(Equal(expectedStack.GUID))
 					Expect(stack.Name).To(Equal(expectedStack.Name))
 					Expect(stack.Description).To(Equal(expectedStack.Description))
+					Expect(stack.State).To(Equal(""))
+					Expect(err).To(BeNil())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+
+			When("the stack exists with state", func() {
+				expectedStack := resources.Stack{
+					GUID:        "some-stack-guid",
+					Name:        "some-stack-name",
+					Description: "Some stack desc",
+					State:       "ACTIVE",
+				}
+
+				expectedParams := []ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{"some-stack-name"}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+					{Key: ccv3.Page, Values: []string{"1"}},
+				}
+
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetStacksReturns(
+						[]resources.Stack{expectedStack},
+						ccv3.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns the desired stack with state", func() {
+
+					actualParams := fakeCloudControllerClient.GetStacksArgsForCall(0)
+					Expect(actualParams).To(Equal(expectedParams))
+					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+					Expect(stack.GUID).To(Equal(expectedStack.GUID))
+					Expect(stack.Name).To(Equal(expectedStack.Name))
+					Expect(stack.Description).To(Equal(expectedStack.Description))
+					Expect(stack.State).To(Equal("ACTIVE"))
 					Expect(err).To(BeNil())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})

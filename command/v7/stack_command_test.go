@@ -127,6 +127,58 @@ var _ = Describe("Stack Command", func() {
 			})
 		})
 
+		Context("When the stack has no state", func() {
+			BeforeEach(func() {
+				stack := resources.Stack{
+					Name:        "some-stack-name",
+					GUID:        "some-stack-guid",
+					Description: "some-stack-desc",
+				}
+				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
+			})
+
+			It("Displays the stack information without state", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("When the stack has a valid state", func() {
+			BeforeEach(func() {
+				stack := resources.Stack{
+					Name:        "some-stack-name",
+					GUID:        "some-stack-guid",
+					Description: "some-stack-desc",
+					State:       "ACTIVE",
+				}
+				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
+			})
+
+			It("Displays the stack information with state", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("When the stack has an invalid state", func() {
+			BeforeEach(func() {
+				stack := resources.Stack{
+					Name:        "some-stack-name",
+					GUID:        "some-stack-guid",
+					Description: "some-stack-desc",
+					State:       "INVALID_STATE",
+				}
+				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr.Error()).To(ContainSubstring("Invalid stack state"))
+			})
+		})
+
 		When("The Stack does not Exist", func() {
 			expectedError := actionerror.StackNotFoundError{Name: "some-stack-name"}
 			BeforeEach(func() {

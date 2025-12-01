@@ -7,6 +7,8 @@ type Stack struct {
 	Name string `json:"name"`
 	// Description is the description for the stack
 	Description string `json:"description"`
+	// State is the state of the stack (ACTIVE, RESTRICTED, DEPRECATED, DISABLED)
+	State string `json:"state,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
