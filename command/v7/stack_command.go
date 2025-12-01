@@ -2,6 +2,7 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/resources"
 )
 
@@ -11,7 +12,7 @@ type StackCommand struct {
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	GUID            bool           `long:"guid" description:"Retrieve and display the given stack's guid. All other output for the stack is suppressed."`
 	usage           interface{}    `usage:"CF_NAME stack STACK_NAME"`
-	relatedCommands interface{}    `related_commands:"app, push, stacks, update-stack"`
+	relatedCommands interface{}    `related_commands:"app, push, stacks"`
 }
 
 func (cmd *StackCommand) Execute(args []string) error {
@@ -58,6 +59,21 @@ func (cmd *StackCommand) displayStackInfo() error {
 	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
 	if err != nil {
 		return err
+	}
+
+	// Validate state if present
+	if stack.State != "" {
+		validStates := []string{"ACTIVE", "RESTRICTED", "DEPRECATED", "DISABLED"}
+		isValid := false
+		for _, validState := range validStates {
+			if stack.State == validState {
+				isValid = true
+				break
+			}
+		}
+		if !isValid {
+			return translatableerror.InvalidStackStateError{State: stack.State}
+		}
 	}
 
 	// Build display table
