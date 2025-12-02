@@ -2,7 +2,6 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/resources"
 )
 
@@ -59,21 +58,6 @@ func (cmd *StackCommand) displayStackInfo() error {
 	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
 	if err != nil {
 		return err
-	}
-
-	// Validate state if present
-	if stack.State != "" {
-		validStates := []string{"ACTIVE", "RESTRICTED", "DEPRECATED", "DISABLED"}
-		isValid := false
-		for _, validState := range validStates {
-			if stack.State == validState {
-				isValid = true
-				break
-			}
-		}
-		if !isValid {
-			return translatableerror.InvalidStackStateError{State: stack.State}
-		}
 	}
 
 	// Build display table
