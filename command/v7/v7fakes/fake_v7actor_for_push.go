@@ -448,16 +448,6 @@ func (fake *FakeV7ActorForPush) SetSpaceManifestReturnsOnCall(i int, result1 v7a
 func (fake *FakeV7ActorForPush) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getDetailedAppSummaryMutex.RLock()
-	defer fake.getDetailedAppSummaryMutex.RUnlock()
-	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
-	fake.restartApplicationMutex.RLock()
-	defer fake.restartApplicationMutex.RUnlock()
-	fake.setSpaceManifestMutex.RLock()
-	defer fake.setSpaceManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
