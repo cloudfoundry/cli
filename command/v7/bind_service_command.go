@@ -11,11 +11,12 @@ import (
 type BindServiceCommand struct {
 	BaseCommand
 
-	RequiredArgs     flag.BindServiceArgs          `positional-args:"yes"`
-	BindingName      flag.BindingName              `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
-	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	Wait             bool                          `short:"w" long:"wait" description:"Wait for the operation to complete"`
-	relatedCommands  interface{}                   `related_commands:"services"`
+	RequiredArgs           flag.BindServiceArgs          `positional-args:"yes"`
+	BindingName            flag.BindingName              `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
+	ParametersAsJSON       flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
+	ServiceBindingStrategy flag.ServiceBindingStrategy   `long:"strategy" description:"Service binding strategy. Valid values are 'single' (default) and 'multiple'."`
+	Wait                   bool                          `short:"w" long:"wait" description:"Wait for the operation to complete"`
+	relatedCommands        interface{}                   `related_commands:"services"`
 }
 
 func (cmd BindServiceCommand) Execute(args []string) error {
@@ -33,6 +34,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		AppName:             cmd.RequiredArgs.AppName,
 		BindingName:         cmd.BindingName.Value,
 		Parameters:          types.OptionalObject(cmd.ParametersAsJSON),
+		Strategy:            cmd.ServiceBindingStrategy.Strategy,
 	})
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -82,7 +84,12 @@ Example of valid JSON object:
 
 Optionally provide a binding name for the association between an app and a service instance:
 
-CF_NAME bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME`
+CF_NAME bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME
+
+Optionally provide the binding strategy type. Valid options are 'single' (default) and 'multiple'. The 'multiple' strategy allows multiple bindings between the same app and service instance.
+This is useful for credential rotation scenarios.
+
+CF_NAME bind-service APP_NAME SERVICE_INSTANCE --strategy multiple`
 }
 
 func (cmd BindServiceCommand) Examples() string {
