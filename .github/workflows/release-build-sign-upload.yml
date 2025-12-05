@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Bump version
       id: bump-version
@@ -127,10 +127,10 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
@@ -396,17 +396,17 @@ jobs:
       run: echo "VERSION_BUILD $VERSION_BUILD"
 
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/cli-ci.git
         path: cli-ci
         ref: main
 
     - name: Checkout bomutils
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: hogliux/bomutils.git
         ref: 0.2
@@ -625,7 +625,7 @@ jobs:
       VERSION_MAJOR: ${{ needs.setup.outputs.version-major }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up Go
@@ -768,7 +768,7 @@ jobs:
     steps:
 
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Download signed artifacts
       uses: actions/download-artifact@v6
@@ -1019,7 +1019,7 @@ jobs:
         path: ${{ env.ARTIFACTS_DIR }}
 
     - name: Checkout CLI
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         path: ${{ env.REPO_DIR }}
        
@@ -1059,7 +1059,7 @@ jobs:
       VERSION_BUILD: ${{ needs.setup.outputs.version-build }}
     steps:
     - name: Checkout CLAW
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/CLAW
         ref: master

@@ -46,12 +46,12 @@ jobs:
           sudo apt install -y build-essential unzip wamerican
 
       - name: Checkout cli
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: cli
 
       - name: Checkout bosh-bootloader
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cloudfoundry/bosh-bootloader
           path: bosh-bootloader
