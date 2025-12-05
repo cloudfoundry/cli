@@ -145,6 +145,11 @@ var _ = Describe("delete-buildpack command", func() {
 				}, stacks[1])
 			})
 
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")).Should(Exit(0))
+			})
+
 			It("properly handles ambiguity", func() {
 				By("failing when no stack specified")
 
@@ -186,6 +191,10 @@ var _ = Describe("delete-buildpack command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+			})
 
 			It("properly handles ambiguity", func() {
 				By("deleting the nil stack buildpack when no stack specified")
@@ -211,6 +220,10 @@ var _ = Describe("delete-buildpack command", func() {
 				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 				Eventually(session).Should(Exit(0))
 			})
+		})
+
+		AfterEach(func() {
+			Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 		})
 
 		When("the user enters 'y'", func() {
