@@ -61,6 +61,15 @@ var _ = Describe("service credential binding resource", func() {
 			}`,
 		),
 		Entry(
+			"strategy",
+			ServiceCredentialBinding{
+				Strategy: SingleBindingStrategy,
+			},
+			`{
+				"strategy": "single"
+			}`,
+		),
+		Entry(
 			"everything",
 			ServiceCredentialBinding{
 				Type:                AppBinding,
@@ -71,6 +80,7 @@ var _ = Describe("service credential binding resource", func() {
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
+				Strategy: MultipleBindingStrategy,
 			},
 			`{
 				"type": "app",
@@ -90,7 +100,8 @@ var _ = Describe("service credential binding resource", func() {
 				},
 				"parameters": {
 					"foo": "bar"
-				}
+				},
+				"strategy": "multiple"
 			}`,
 		),
 	)
