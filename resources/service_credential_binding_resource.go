@@ -31,6 +31,8 @@ type ServiceCredentialBinding struct {
 	LastOperation LastOperation `jsonry:"last_operation"`
 	// Parameters can be specified when creating a binding
 	Parameters types.OptionalObject `jsonry:"parameters"`
+	// CreatedAt timestamp when the binding was created (useful for distinguishing multiple bindings)
+	CreatedAt string `json:"created_at,omitempty"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {
