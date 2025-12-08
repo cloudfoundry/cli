@@ -12,7 +12,7 @@ type StacksCommand struct {
 	BaseCommand
 
 	usage           interface{} `usage:"CF_NAME stacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME stacks\n   CF_NAME stacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME stacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
-	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, stack, update-buildpack"`
+	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, stack, update-buildpack, update-stack"`
 	Labels          string      `long:"labels" description:"Selector to filter stacks by labels"`
 }
 

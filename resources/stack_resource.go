@@ -1,5 +1,37 @@
 package resources
 
+import "strings"
+
+// Valid stack states
+const (
+	StackStateActive     = "ACTIVE"
+	StackStateRestricted = "RESTRICTED"
+	StackStateDeprecated = "DEPRECATED"
+	StackStateDisabled   = "DISABLED"
+)
+
+// ValidStackStates contains all valid stack state values
+var ValidStackStates = []string{
+	StackStateActive,
+	StackStateRestricted,
+	StackStateDeprecated,
+	StackStateDisabled,
+}
+
+// ValidStackStatesLowercase returns the valid stack states in lowercase
+func ValidStackStatesLowercase() []string {
+	lowercase := make([]string, len(ValidStackStates))
+	for i, state := range ValidStackStates {
+		lowercase[i] = strings.ToLower(state)
+	}
+	return lowercase
+}
+
+// ValidStackStatesString returns a pipe-separated string of valid states in lowercase
+func ValidStackStatesString() string {
+	return strings.Join(ValidStackStatesLowercase(), "|")
+}
+
 type Stack struct {
 	// GUID is a unique stack identifier.
 	GUID string `json:"guid"`
