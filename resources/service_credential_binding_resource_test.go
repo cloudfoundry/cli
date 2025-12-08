@@ -60,6 +60,7 @@ var _ = Describe("service credential binding resource", func() {
 				}
 			}`,
 		),
+		Entry("created_at", ServiceCredentialBinding{CreatedAt: "fake-created-at"}, `{"created_at": "fake-created-at"}`),
 		Entry(
 			"everything",
 			ServiceCredentialBinding{
@@ -71,6 +72,7 @@ var _ = Describe("service credential binding resource", func() {
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
+				CreatedAt: "fake-created-at",
 			},
 			`{
 				"type": "app",
@@ -90,7 +92,8 @@ var _ = Describe("service credential binding resource", func() {
 				},
 				"parameters": {
 					"foo": "bar"
-				}
+				},
+				"created_at": "fake-created-at"
 			}`,
 		),
 	)
