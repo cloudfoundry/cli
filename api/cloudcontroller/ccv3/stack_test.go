@@ -155,7 +155,7 @@ var _ = Describe("Stacks", func() {
 
 		BeforeEach(func() {
 			stackGUID = "some-stack-guid"
-			state = "DEPRECATED"
+			state = resources.StackStateDeprecated
 		})
 
 		JustBeforeEach(func() {
@@ -168,7 +168,7 @@ var _ = Describe("Stacks", func() {
 					CombineHandlers(
 						VerifyRequest(http.MethodPatch, "/v3/stacks/some-stack-guid"),
 						VerifyJSONRepresenting(map[string]string{
-							"state": "DEPRECATED",
+							"state": resources.StackStateDeprecated,
 						}),
 						RespondWith(http.StatusOK, `{
 						"guid": "some-stack-guid",
@@ -187,7 +187,7 @@ var _ = Describe("Stacks", func() {
 					GUID:        "some-stack-guid",
 					Name:        "some-stack",
 					Description: "some description",
-					State:       "DEPRECATED",
+					State:       resources.StackStateDeprecated,
 				}))
 			})
 		})

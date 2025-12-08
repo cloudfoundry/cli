@@ -4,10 +4,8 @@ import (
 	"slices"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
-	"code.cloudfoundry.org/cli/v9/command"
-	"code.cloudfoundry.org/cli/v9/command/flag"
-	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 type UpdateStackCommand struct {
@@ -15,17 +13,12 @@ type UpdateStackCommand struct {
 
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	State           string         `long:"state" description:"State to transition the stack to (active, restricted, deprecated, disabled)" required:"true"`
-	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state (active | restricted | deprecated | disabled)]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled"`
+	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state active|restricted|deprecated|disabled]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled"`
 	relatedCommands interface{}    `related_commands:"stack, stacks"`
 }
 
 func (cmd UpdateStackCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionUpdateStack)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}

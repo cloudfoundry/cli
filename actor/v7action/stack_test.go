@@ -134,7 +134,7 @@ var _ = Describe("Stack", func() {
 					Expect(stack.GUID).To(Equal(expectedStack.GUID))
 					Expect(stack.Name).To(Equal(expectedStack.Name))
 					Expect(stack.Description).To(Equal(expectedStack.Description))
-					Expect(stack.State).To(Equal("ACTIVE"))
+					Expect(stack.State).To(Equal(resources.StackStateActive))
 					Expect(err).To(BeNil())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
@@ -230,6 +230,71 @@ var _ = Describe("Stack", func() {
 					Expect(executeErr).To(MatchError("some-error"))
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
 				})
+			})
+		})
+	})
+
+	Describe("UpdateStack", func() {
+		var (
+			stackGUID  string
+			state      string
+			stack      resources.Stack
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			stackGUID = "some-stack-guid"
+			state = "DEPRECATED"
+		})
+
+		JustBeforeEach(func() {
+			stack, warnings, executeErr = actor.UpdateStack(stackGUID, state)
+		})
+
+		When("the cloud controller request is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateStackReturns(
+					resources.Stack{
+						GUID:        "some-stack-guid",
+						Name:        "some-stack",
+						Description: "some description",
+						State:       "DEPRECATED",
+					},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the updated stack and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(stack).To(Equal(resources.Stack{
+					GUID:        "some-stack-guid",
+					Name:        "some-stack",
+					Description: "some description",
+					State:       "DEPRECATED",
+				}))
+
+				Expect(fakeCloudControllerClient.UpdateStackCallCount()).To(Equal(1))
+				actualGUID, actualState := fakeCloudControllerClient.UpdateStackArgsForCall(0)
+				Expect(actualGUID).To(Equal(stackGUID))
+				Expect(actualState).To(Equal(state))
+			})
+		})
+
+		When("the cloud controller request fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateStackReturns(
+					resources.Stack{},
+					ccv3.Warnings{"warning-1"},
+					errors.New("some-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("some-error"))
+				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 	})
