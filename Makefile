@@ -1,6 +1,7 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 FLAKE_ATTEMPTS ?=5
+GINKGO_SUITE_TIMEOUT=2h
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = en_US.UTF-8
 
@@ -22,7 +23,7 @@ UNAME_S := $(shell uname -s)
 POLL_PROGRESS_THRESHOLD=120s
 
 GINKGO_FLAGS ?= -r -randomize-all -require-suite
-GINKGO_INT_FLAGS = $(GINKGO_FLAGS) --poll-progress-after $(POLL_PROGRESS_THRESHOLD)
+GINKGO_INT_FLAGS = $(GINKGO_FLAGS) --poll-progress-after $(POLL_PROGRESS_THRESHOLD) --timeout $(GINKGO_SUITE_TIMEOUT)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
 GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomize-suites
