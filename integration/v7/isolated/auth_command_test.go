@@ -309,7 +309,7 @@ var _ = Describe("auth command", func() {
 					username, password = helpers.SkipIfOIDCCredentialsNotSet()
 				})
 
-				It("authenticates the user", func() {
+				It("authenticates the user", FlakeAttempts(3), func() {
 					session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
 
 					Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))

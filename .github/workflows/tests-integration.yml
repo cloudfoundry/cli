@@ -58,7 +58,7 @@ jobs:
       - get-sha
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
           fetch-depth: 0
@@ -121,11 +121,13 @@ jobs:
     needs:
       - get-sha
       - set-env-name
+      - run-integration-tests-cf-env
     if: ${{ 
       always() && 
       needs.set-env-name.result == 'success' && 
       (github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' ||
-       inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') }}
+       inputs.workflow == 'run-integration-tests-cf-env-with-client-creds') &&
+      needs.run-integration-tests-cf-env.result != 'failure' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       name: Integration client creds

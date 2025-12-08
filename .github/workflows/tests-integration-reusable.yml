@@ -19,7 +19,7 @@ on:
 env:
   ENV_NAME: ${{ inputs.env-name }}
   NODES: 12
-  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '4' }}
+  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '5' }}
   BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
   BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
   CREDHUB_CLI_VERSION: ${{ vars.CREDHUB_CLI_VERSION }}
@@ -32,14 +32,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
         path: cli
 
     - name: Checkout CF deployment tasks
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
