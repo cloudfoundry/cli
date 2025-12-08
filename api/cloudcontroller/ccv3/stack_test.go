@@ -143,4 +143,69 @@ var _ = Describe("Stacks", func() {
 			})
 		})
 	})
+
+	Describe("UpdateStack", func() {
+		var (
+			stackGUID string
+			state     string
+			stack     resources.Stack
+			warnings  Warnings
+			err       error
+		)
+
+		BeforeEach(func() {
+			stackGUID = "some-stack-guid"
+			state = resources.StackStateDeprecated
+		})
+
+		JustBeforeEach(func() {
+			stack, warnings, err = client.UpdateStack(stackGUID, state)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/stacks/some-stack-guid"),
+						VerifyJSONRepresenting(map[string]string{
+							"state": resources.StackStateDeprecated,
+						}),
+						RespondWith(http.StatusOK, `{
+						"guid": "some-stack-guid",
+						"name": "some-stack",
+						"description": "some description",
+						"state": "DEPRECATED"
+					}`, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated stack and warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(stack).To(Equal(resources.Stack{
+					GUID:        "some-stack-guid",
+					Name:        "some-stack",
+					Description: "some description",
+					State:       resources.StackStateDeprecated,
+				}))
+			})
+		})
+
+		When("the cloud controller returns an error", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/stacks/some-stack-guid"),
+						RespondWith(http.StatusNotFound, `{"errors":[{"detail":"Stack not found"}]}`, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

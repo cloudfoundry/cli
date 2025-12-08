@@ -201,6 +201,7 @@ type commandList struct {
 	UpgradeService                     v7.UpgradeServiceCommand                     `command:"upgrade-service" description:"Upgrade a service instance to the latest available version of its current service plan"`
 	UpdateServiceBroker                v7.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateSpaceQuota                   v7.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
+	UpdateStack                        v7.UpdateStackCommand                        `command:"update-stack" description:"Transition a stack between the defined states"`
 	UpdateUserProvidedService          v7.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
 }
