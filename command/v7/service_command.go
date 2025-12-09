@@ -241,7 +241,7 @@ func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.S
 		return
 	}
 
-	table := [][]string{{"name", "guid", "binding name", "status", "created_at", "message"}}
+	table := [][]string{{"name", "binding name", "status", "message", "guid", "created_at"}}
 
 	bindings := serviceInstanceWithDetails.BoundApps
 	// sort by app name, then by created at descending
@@ -255,11 +255,11 @@ func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.S
 	for _, app := range bindings {
 		table = append(table, []string{
 			app.AppName,
-			app.GUID,
 			app.Name,
 			fmt.Sprintf("%s %s", app.LastOperation.Type, app.LastOperation.State),
-			app.CreatedAt,
 			app.LastOperation.Description,
+			app.GUID,
+			app.CreatedAt,
 		})
 	}
 

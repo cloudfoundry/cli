@@ -299,9 +299,9 @@ var _ = Describe("service command", func() {
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Showing bound apps:\n`),
-					Say(`   name\s+guid\s+binding name\s+status\s+created_at\s+message\n`),
-					Say(`   app-1\s+guid-1\s+named-binding\s+create succeeded\s+created-at-1\s+great\n`),
-					Say(`   app-2\s+guid-2\s+update failed\s+created-at-2\s+sorry\n`),
+					Say(`   name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+					Say(`   app-1\s+named-binding\s+create succeeded\s+great\s+guid-1\s+created-at-1\n`),
+					Say(`   app-2\s+update failed\s+sorry\s+guid-2\s+created-at-2\n`),
 				))
 			})
 		})
@@ -747,10 +747,10 @@ var _ = Describe("service command", func() {
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Showing bound apps:\n`),
-					Say(`name\s+guid\s+binding name\s+status\s+created_at\s+message\n`),
-					Say(`app-1\s+guid-3\s+named-binding\s+create succeeded\s+created-at-2\s+great\n`),
-					Say(`app-1\s+guid-1\s+named-binding\s+create succeeded\s+created-at-1\s+great\n`),
-					Say(`app-2\s+guid-2\s+update failed\s+created-at-2\s+sorry\n`),
+					Say(`name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+					Say(`app-1\s+named-binding\s+create succeeded\s+great\s+guid-3\s+created-at-2\n`),
+					Say(`app-1\s+named-binding\s+create succeeded\s+great\s+guid-1\s+created-at-1\n`),
+					Say(`app-2\s+update failed\s+sorry\s+guid-2\s+created-at-2\n`),
 				))
 			})
 		})
