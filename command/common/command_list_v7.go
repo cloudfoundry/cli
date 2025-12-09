@@ -167,8 +167,8 @@ type commandList struct {
 	SpaceSSHAllowed                    v7.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
 	SpaceUsers                         v7.SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`
 	Spaces                             v7.SpacesCommand                             `command:"spaces" description:"List all spaces in an org"`
-	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps) and current state"`
+	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps) and current state"`
 	StagingEnvironmentVariableGroup    v7.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
 	StagingSecurityGroups              v7.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups globally configured for staging applications"`
 	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
