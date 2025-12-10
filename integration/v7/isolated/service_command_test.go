@@ -178,9 +178,9 @@ var _ = Describe("service command", func() {
 
 					Expect(session).To(SatisfyAll(
 						Say(`Showing bound apps:\n`),
-						Say(`name\s+binding name\s+status\s+message\n`),
-						Say(`%s\s+%s\s+create succeeded\s*\n`, appName1, bindingName1),
-						Say(`%s\s+%s\s+create succeeded\s*\n`, appName2, bindingName2),
+						Say(`name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+						Say(`%s\s+%s\s+create succeeded\s+%s\s+%s\n`, appName1, bindingName1, helpers.GUIDRegex, helpers.TimestampRegex),
+						Say(`%s\s+%s\s+create succeeded\s+%s\s+%s\n`, appName2, bindingName2, helpers.GUIDRegex, helpers.TimestampRegex),
 					))
 				})
 			})
@@ -524,9 +524,9 @@ var _ = Describe("service command", func() {
 
 					Expect(session).To(SatisfyAll(
 						Say(`Showing bound apps:\n`),
-						Say(`name\s+binding name\s+status\s+message\n`),
-						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName1, bindingName1),
-						Say(`%s\s+%s\s+create succeeded\s+very happy service\n`, appName2, bindingName2),
+						Say(`name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\s+%s\s+%s\n`, appName1, bindingName1, helpers.GUIDRegex, helpers.TimestampRegex),
+						Say(`%s\s+%s\s+create succeeded\s+very happy service\s+%s\s+%s\n`, appName2, bindingName2, helpers.GUIDRegex, helpers.TimestampRegex),
 					))
 				})
 			})
