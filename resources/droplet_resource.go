@@ -44,9 +44,9 @@ type DropletBuildpack struct {
 }
 
 // An object describing the lifecycle that was used when staging the droplet
-// possible values for type: "buildpack", "cnd", "docker"
+// possible values for type: "buildpack", "cnb", "docker"
 type DropletLifecycle struct {
-	Type string `json:"name"`
+	Type string `json:"type"`
 }
 
 func (d Droplet) MarshallJSON() ([]byte, error) {
