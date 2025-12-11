@@ -93,8 +93,6 @@ func (fake *FakePluginMetadata) GetMetadataReturnsOnCall(i int, result1 configv3
 func (fake *FakePluginMetadata) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getMetadataMutex.RLock()
-	defer fake.getMetadataMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

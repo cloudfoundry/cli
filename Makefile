@@ -67,6 +67,11 @@ fly-windows-units:
 format: ## Run go fmt
 	go fmt ./...
 
+generate-fakes: ## Regenerate counterfeiter fakes for non-legacy packages
+	@echo "Generating fakes for non-legacy packages..."
+	go generate ./util/... ./plugin/... ./command/... ./api/... ./actor/...
+	@echo "Fakes generated successfully!"
+
 install-test-deps: ## Install "global" dependencies needed to run tests
 # Running `go install <pkg>` without a version specifier will use version specified in go.mod
 # See https://go.dev/ref/mod#go-install
@@ -222,7 +227,7 @@ units-full: build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-.PHONY: all build clean format version lint
+.PHONY: all build clean format generate-fakes version lint
 .PHONY: test units units-full install-test-deps integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help

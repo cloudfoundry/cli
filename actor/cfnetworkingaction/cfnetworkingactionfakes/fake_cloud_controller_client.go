@@ -352,14 +352,6 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []r
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationsMutex.RLock()
-	defer fake.getApplicationsMutex.RUnlock()
-	fake.getOrganizationsMutex.RLock()
-	defer fake.getOrganizationsMutex.RUnlock()
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
