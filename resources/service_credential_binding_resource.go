@@ -12,6 +12,13 @@ const (
 	KeyBinding ServiceCredentialBindingType = "key"
 )
 
+type BindingStrategyType string
+
+const (
+	SingleBindingStrategy   BindingStrategyType = "single"
+	MultipleBindingStrategy BindingStrategyType = "multiple"
+)
+
 type ServiceCredentialBinding struct {
 	// Type is either "app" or "key"
 	Type ServiceCredentialBindingType `jsonry:"type,omitempty"`
@@ -31,6 +38,8 @@ type ServiceCredentialBinding struct {
 	LastOperation LastOperation `jsonry:"last_operation"`
 	// Parameters can be specified when creating a binding
 	Parameters types.OptionalObject `jsonry:"parameters"`
+	// Strategy can be "single" (default) or "multiple"
+	Strategy BindingStrategyType `jsonry:"strategy,omitempty"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {
