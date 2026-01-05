@@ -22,7 +22,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.6.1
 	github.com/distribution/reference v0.6.0
 	github.com/fatih/color v1.18.0
-	github.com/google/go-querystring v1.1.0
+	github.com/google/go-querystring v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/lunixbochs/vtclean v1.0.0
