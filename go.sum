@@ -57,7 +57,6 @@ github.com/cloudfoundry/bosh-utils v0.0.397/go.mod h1:FPZV+W2FecYFy2N5iWeDFYQvtk
 github.com/codegangsta/negroni v1.0.0/go.mod h1:v0y3T5G7Y1UlFfyxFn/QLRU4a2EuNau2iZY63YTKWo0=
 github.com/cppforlife/go-patch v0.1.0 h1:I0fT+gFTSW4xWwvaTaUUVjr9xxjNXJ4naGc01BeQjwY=
 github.com/cppforlife/go-patch v0.1.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
-github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.24 h1:bJrF4RRfyJnbTJqzRLHzcGaZK1NeM5kTC9jGgovnR1s=
 github.com/creack/pty v1.1.24/go.mod h1:08sCNb52WyoAwi2QDyzUCTgcvVFhUzewun7wtTfvcwE=
 github.com/cyphar/filepath-securejoin v0.6.1 h1:5CeZ1jPXEiYt3+Z6zqprSAgSWiggmpVyciv8syjIpVE=
@@ -263,8 +262,8 @@ github.com/tidwall/pretty v1.2.1/go.mod h1:ITEVvHYasfjBbM0u2Pg8T2nJnzm8xPwvNhhso
 github.com/tidwall/sjson v1.2.5 h1:kLy8mja+1c9jlljvWTlSazM7cKDRfJuR/bOJhcY5NcY=
 github.com/tidwall/sjson v1.2.5/go.mod h1:Fvgq9kS/6ociJEDnK0Fk1cpYF4FIW6ZF7LAe+6jwd28=
 github.com/unrolled/secure v0.0.0-20180416205222-a1cf62cc2159/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
-github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec h1:Klu98tQ9Z1t23gvC7p7sCmvxkZxLhBHLNyrUPsWsYFg=
-github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec/go.mod h1:wPlfmglZmRWMYv/qJy3P+fK/UnoQB5ISk4txfNd9tDo=
+github.com/vito/go-interact v1.0.2 h1:viJuANio3WH9utUG4rKbJC9V3JR5JgYNS+i0efeA+GU=
+github.com/vito/go-interact v1.0.2/go.mod h1:s+y0jK9Z2etBYt5ZM6+DhpOsE5C7NNGC3jrJvW0BBpc=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

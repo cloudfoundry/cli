@@ -38,7 +38,7 @@ require (
 	github.com/sajari/fuzzy v1.0.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
-	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
+	github.com/vito/go-interact v1.0.2
 	golang.org/x/crypto v0.46.0
 	golang.org/x/net v0.48.0
 	golang.org/x/term v0.38.0
@@ -68,7 +68,6 @@ require (
 	github.com/google/pprof v0.0.0-20251213031049-b05bdaca462f // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kr/pty v1.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect

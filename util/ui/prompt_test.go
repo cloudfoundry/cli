@@ -1,6 +1,7 @@
 package ui_test
 
 import (
+	"io"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/v9/util/configv3"
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"github.com/vito/go-interact/interact"
 )
 
 var _ = Describe("Prompts", func() {
@@ -379,7 +379,8 @@ var _ = Describe("Prompts", func() {
 
 			BeforeEach(func() {
 				fakeResolver = new(uifakes.FakeResolver)
-				fakeResolver.ResolveReturns(interact.ErrKeyboardInterrupt)
+				// In go-interact v1.0.1+, keyboard interrupts return io.EOF
+				fakeResolver.ResolveReturns(io.EOF)
 				fakeExiter = new(uifakes.FakeExiter)
 				fakeInteractor = new(uifakes.FakeInteractor)
 				fakeInteractor.NewInteractionReturns(fakeResolver)
@@ -391,7 +392,7 @@ var _ = Describe("Prompts", func() {
 				_, err := ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError(io.EOF))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
@@ -400,7 +401,7 @@ var _ = Describe("Prompts", func() {
 				_, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError(io.EOF))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
@@ -409,14 +410,14 @@ var _ = Describe("Prompts", func() {
 				_, err := ui.DisplayOptionalTextPrompt("some-default-value", "App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError(io.EOF))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
 
 			It("exits immediately from bool prompt", func() {
 				_, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError(io.EOF))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
@@ -425,7 +426,7 @@ var _ = Describe("Prompts", func() {
 				choices := []string{"foo", "bar"}
 				choice, err := ui.DisplayTextMenu(choices, "choose!")
 				Expect(choice).To(Equal(""))
-				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(err).To(MatchError(io.EOF))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
