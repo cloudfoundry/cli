@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/vito/go-interact/interact"
-	"github.com/vito/go-interact/interact/terminal"
 )
 
 const sigIntExitCode = 130
@@ -146,5 +145,7 @@ func contains(s []string, v string) bool {
 }
 
 func isInterrupt(err error) bool {
-	return err == interact.ErrKeyboardInterrupt || err == terminal.ErrKeyboardInterrupt
+	// In go-interact v1.0.1+, which uses golang.org/x/term,
+	// keyboard interrupts (Ctrl+C) result in io.EOF
+	return err == io.EOF
 }
