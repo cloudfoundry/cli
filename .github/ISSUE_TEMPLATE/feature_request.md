@@ -31,4 +31,4 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.
 
 **Note:**
-As of the GA of the v7 CLI, the v6 line is no longer under active development and will be updated only to patch CVEs or fix severe blocking defects with no workarounds.
+The v7 and v6 CLI versions are no longer maintained or released.

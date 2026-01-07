@@ -1,5 +1,7 @@
 ### Downloading the latest V7 CF CLI
 
+**DEPRECATED**: The v7 CF CLI is no longer maintained or released. Please consider upgrading to v8 or later versions. This documentation is kept for historical reference only.
+
 **Important Note**: The v7 CF CLI is now GA and the binary has been renamed from `cf7` to `cf`. If you're already using the v7 CLI in parallel to the v6 CLI, you may need to change your workflow to accomodate the binary name change. See the [Version Switching](#version-switching) section for instructions. For more information and general status on the v7 CLI, please check [releases](https://github.com/cloudfoundry/cli/releases).
 
 #### Compatibility

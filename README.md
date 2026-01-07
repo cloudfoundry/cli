@@ -35,12 +35,13 @@ CF CLI Binary Download Server's uptime:
 
 ***
 ## Getting Started
-Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v8 cf CLI](https://github.com/cloudfoundry/cli/wiki/V8-CLI-Installation-Guide) or the [v7 cf CLI](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide).
+Download and install the cf CLI from the [Downloads Section](#downloads) for the [v8 cf CLI](https://github.com/cloudfoundry/cli/wiki/V8-CLI-Installation-Guide).
 
 Once installed, you can log in and push an app.
-There are now three supported versions of the cf CLI:
+The currently supported version of the cf CLI:
 1. The v8 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins). See [our v8 documentation](https://docs.cloudfoundry.org/cf-cli/v8.html) for more information.
-1. The v7 cf CLI is backed by the [v3 CC API](http://v3-apidocs.cloudfoundry.org/version/3.85.0/) (with the exception of plugins). See [our v7 documentation](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information.
+
+**Note**: v7 and v6 CLI versions are no longer maintained or released.
 
 View our [CLI v7 & v8 Versioning and Support Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-and-Support-Policy) documentation.
 
@@ -61,8 +62,8 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 ## Downloads
 
 ### Installation instructions
-- [Install V7](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide)
 - [Install V8](https://github.com/cloudfoundry/cli/wiki/V8-CLI-Installation-Guide)
+- [Install V7](https://github.com/cloudfoundry/cli/wiki/V7-CLI-Installation-Guide) (**DEPRECATED** - no longer maintained)
 - [Switching Between Multiple Versions](https://github.com/cloudfoundry/cli/wiki/Version-Switching-Guide)
 
 ## Known Issues
