@@ -33,6 +33,11 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 	return serviceInstance, Warnings(warnings), err
 }
 
+func (actor Actor) GetServiceInstanceByGUID(serviceInstanceGUID string) (resources.ServiceInstance, Warnings, error) {
+	serviceInstance, warnings, err := actor.CloudControllerClient.GetServiceInstanceByGUID(serviceInstanceGUID)
+	return serviceInstance, Warnings(warnings), err
+}
+
 func (actor Actor) CreateUserProvidedServiceInstance(serviceInstance resources.ServiceInstance) (Warnings, error) {
 	serviceInstance.Type = resources.UserProvidedServiceInstance
 	_, warnings, err := actor.CloudControllerClient.CreateServiceInstance(serviceInstance)
