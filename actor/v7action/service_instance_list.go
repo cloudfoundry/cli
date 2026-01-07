@@ -121,10 +121,20 @@ func buildPlanDetailsLookup(included ccv3.IncludedResources) map[string]planDeta
 }
 
 func buildBoundAppsLookup(bindings []resources.ServiceCredentialBinding, spaceGUID string) map[string][]string {
+	type bindingKey struct {
+		appGUID             string
+		serviceInstanceGUID string
+	}
+	seenBindingKeys := make(map[bindingKey]struct{})
 	appsBoundLookup := make(map[string][]string)
 	for _, binding := range bindings {
 		if binding.Type == resources.AppBinding && binding.AppSpaceGUID == spaceGUID {
-			appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], binding.AppName)
+			bk := bindingKey{appGUID: binding.AppGUID, serviceInstanceGUID: binding.ServiceInstanceGUID}
+			// Prevent duplicate app names for the same service instance in case of duplicate bindings
+			if _, exists := seenBindingKeys[bk]; !exists {
+				appsBoundLookup[binding.ServiceInstanceGUID] = append(appsBoundLookup[binding.ServiceInstanceGUID], binding.AppName)
+				seenBindingKeys[bk] = struct{}{}
+			}
 		}
 	}
 	return appsBoundLookup
