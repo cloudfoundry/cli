@@ -10,8 +10,8 @@ mailing list.
 The cf CLI follows a branching model:
 - V9 (Next major release) of the cf CLI is built from the [main branch](https://github.com/cloudfoundry/cli/tree/main). **This branch is under active development**.
 - V8 of the cf CLI is built from the [v8 branch](https://github.com/cloudfoundry/cli/tree/v8). **This branch is under active development**.
-- V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is no longer maintained or released**.
-- V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is no longer maintained or released**.
+- V7 of the cf CLI is built from the [v7 branch](https://github.com/cloudfoundry/cli/tree/v7). **This branch is no longer maintained**.
+- V6 of the cf CLI is built from the [v6 branch](https://github.com/cloudfoundry/cli/tree/v6). **This branch is no longer maintained**.
 
 ## Prerequisites
 Before working on a PR to the CLI code base, please:

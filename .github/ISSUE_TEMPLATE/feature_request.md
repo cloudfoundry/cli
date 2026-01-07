@@ -31,4 +31,4 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.
 
 **Note:**
-The v7 and v6 CLI versions are no longer maintained or released.
+The v7 and v6 CLI versions are no longer maintained.
