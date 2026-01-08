@@ -16,4 +16,6 @@ const (
 	MinVersionBuildpackLifecycleQuery = "3.194.0"
 
 	MinVersionCanarySteps = "3.189.0"
+
+	MinVersionServiceBindingStrategy = "3.205.0"
 )
