@@ -38,7 +38,7 @@ type ServiceCredentialBinding struct {
 	LastOperation LastOperation `jsonry:"last_operation"`
 	// Parameters can be specified when creating a binding
 	Parameters types.OptionalObject `jsonry:"parameters"`
-	// Strategy can be "single" (default) or "multiple"
+	// Strategy can be "single" or "multiple" (if empty, "single" is set as default by backend)
 	Strategy BindingStrategyType `jsonry:"strategy,omitempty"`
 }
 
