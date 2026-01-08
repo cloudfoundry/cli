@@ -35,11 +35,18 @@ var _ = Describe("ServiceBindingStrategy", func() {
 			sbs = ServiceBindingStrategy{}
 		})
 
+		When("unmarshal has not been called", func() {
+			It("is marked as not set", func() {
+				Expect(sbs.IsSet).To(BeFalse())
+			})
+		})
+
 		DescribeTable("downcases and sets strategy",
 			func(input string, expected resources.BindingStrategyType) {
 				err := sbs.UnmarshalFlag(input)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(sbs.Strategy).To(Equal(expected))
+				Expect(sbs.IsSet).To(BeTrue())
 			},
 			Entry("sets 'single' when passed 'single'", "single", resources.SingleBindingStrategy),
 			Entry("sets 'single' when passed 'sInGlE'", "sInGlE", resources.SingleBindingStrategy),

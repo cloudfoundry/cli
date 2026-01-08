@@ -3,6 +3,8 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/command/v7/shared"
 	"code.cloudfoundry.org/cli/v9/types"
@@ -22,6 +24,13 @@ type BindServiceCommand struct {
 func (cmd BindServiceCommand) Execute(args []string) error {
 	if err := cmd.SharedActor.CheckTarget(true, true); err != nil {
 		return err
+	}
+
+	if cmd.ServiceBindingStrategy.IsSet {
+		err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionServiceBindingStrategy, "--strategy")
+		if err != nil {
+			return err
+		}
 	}
 
 	if err := cmd.displayIntro(); err != nil {

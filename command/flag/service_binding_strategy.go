@@ -9,6 +9,7 @@ import (
 
 type ServiceBindingStrategy struct {
 	Strategy resources.BindingStrategyType
+	IsSet    bool
 }
 
 func (ServiceBindingStrategy) Complete(prefix string) []flags.Completion {
@@ -20,6 +21,7 @@ func (h *ServiceBindingStrategy) UnmarshalFlag(val string) error {
 	switch valLower {
 	case "single", "multiple":
 		h.Strategy = resources.BindingStrategyType(valLower)
+		h.IsSet = true
 	default:
 		return &flags.Error{
 			Type:    flags.ErrRequired,
