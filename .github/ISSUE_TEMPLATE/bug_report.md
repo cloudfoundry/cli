@@ -32,9 +32,8 @@ Steps to reproduce the behavior; include the exact CLI commands and verbose outp
 - version of the CC API Release you are on
 
 **Notes regarding V6 and V7 CLI support:** 
-- V6:
-  - Minimum supported version of CF Deployment: v7.0.0 (CAPI Release: 1.74.0 (APIs 2.128.0 and 3.63.0))
-  - Maximum supported version of CF Deployment: v13.4.0 (CAPI Release: 1.94.0 (APIs 2.149.0 and 3.84.0))
-- V7:
-  - Minimum supported version of CF Deployment: v13.5.0 (CAPI Release: 1.95.0 (APIs 2.150.0 and 3.85.0))
+- V6: **No longer maintained or released**
+  - Last supported version of CF Deployment: v13.4.0 (CAPI Release: 1.94.0 (APIs 2.149.0 and 3.84.0))
+- V7: **No longer maintained or released**
+  - Last supported version of CF Deployment: v13.5.0 (CAPI Release: 1.95.0 (APIs 2.150.0 and 3.85.0))
 

@@ -1,5 +1,7 @@
 ### Downloading the latest V6 CF CLI
 
+**DEPRECATED**: The v6 CF CLI is no longer maintained or released. Please consider upgrading to v8 or later versions. This documentation is kept for historical reference only.
+
 #### Installing using a package manager
 
 **Mac OS X** and **Linux** using [Homebrew](https://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
