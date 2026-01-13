@@ -4,8 +4,8 @@ package actorsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/actors"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/actors"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeServiceActor struct {
@@ -36,15 +36,16 @@ func (fake *FakeServiceActor) FilterBrokers(arg1 string, arg2 string, arg3 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.FilterBrokersStub
+	fakeReturns := fake.filterBrokersReturns
 	fake.recordInvocation("FilterBrokers", []interface{}{arg1, arg2, arg3})
 	fake.filterBrokersMutex.Unlock()
-	if fake.FilterBrokersStub != nil {
-		return fake.FilterBrokersStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.filterBrokersReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

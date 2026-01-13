@@ -1,6 +1,7 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
 FLAKE_ATTEMPTS ?=5
+GINKGO_SUITE_TIMEOUT=2h
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = en_US.UTF-8
 
@@ -10,10 +11,10 @@ CF_BUILD_VERSION ?= v9.0.0
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
-	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
-	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
+	-X code.cloudfoundry.org/cli/v9/version.binarySHA=$(CF_BUILD_SHA) \
+	-X code.cloudfoundry.org/cli/v9/version.binaryBuildDate=$(CF_BUILD_DATE)
 LD_FLAGS =$(LD_FLAGS_COMMON) \
-	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION)
+	-X code.cloudfoundry.org/cli/v9/version.binaryVersion=$(CF_BUILD_VERSION)
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 REQUIRED_FOR_STATIC_BINARY =-a -tags "netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
@@ -22,7 +23,7 @@ UNAME_S := $(shell uname -s)
 POLL_PROGRESS_THRESHOLD=120s
 
 GINKGO_FLAGS ?= -r -randomize-all -require-suite
-GINKGO_INT_FLAGS = $(GINKGO_FLAGS) --poll-progress-after $(POLL_PROGRESS_THRESHOLD)
+GINKGO_INT_FLAGS = $(GINKGO_FLAGS) --poll-progress-after $(POLL_PROGRESS_THRESHOLD) --timeout $(GINKGO_SUITE_TIMEOUT)
 ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
 GINKGO_UNITS_FLAGS = $(GINKGO_FLAGS) -randomize-suites

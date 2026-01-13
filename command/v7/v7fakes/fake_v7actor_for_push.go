@@ -5,10 +5,10 @@ import (
 	"context"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
+	"code.cloudfoundry.org/cli/v9/resources"
 )
 
 type FakeV7ActorForPush struct {

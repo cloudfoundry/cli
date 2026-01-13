@@ -4,8 +4,8 @@ package v7fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/v9/actor/cfnetworkingaction"
+	v7 "code.cloudfoundry.org/cli/v9/command/v7"
 )
 
 type FakeNetworkPoliciesActor struct {

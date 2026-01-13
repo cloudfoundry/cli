@@ -1,6 +1,6 @@
 package wrapper
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller"
+import "code.cloudfoundry.org/cli/v9/api/cloudcontroller"
 
 // CustomWrapper is a wrapper that can execute arbitrary code via the
 // CustomMake function on every request that passes through Make.

@@ -7,7 +7,7 @@ import (
 	"os"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -66,6 +66,7 @@ var _ = Describe("create buildpack command", func() {
 			AfterEach(func() {
 				err := os.RemoveAll(buildpackDir)
 				Expect(err).ToNot(HaveOccurred())
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 			})
 
 			When("zipping the directory errors", func() {
@@ -126,6 +127,10 @@ var _ = Describe("create buildpack command", func() {
 			})
 
 			When("specifying a valid path", func() {
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+				})
+
 				When("the new buildpack is unique", func() {
 					When("the new buildpack has a nil stack", func() {
 						It("successfully uploads a buildpack", func() {
@@ -146,6 +151,10 @@ var _ = Describe("create buildpack command", func() {
 					})
 
 					When("the new buildpack has a valid stack", func() {
+						AfterEach(func() {
+							Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+						})
+
 						It("successfully uploads a buildpack", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -166,6 +175,10 @@ var _ = Describe("create buildpack command", func() {
 				})
 
 				When("the new buildpack has an invalid stack", func() {
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+					})
+
 					It("returns the appropriate error", func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -196,6 +209,10 @@ var _ = Describe("create buildpack command", func() {
 								}, stacks[0])
 							})
 
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+							})
+
 							It("prints a warning and exits with an error", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -218,6 +235,10 @@ var _ = Describe("create buildpack command", func() {
 								})
 							})
 
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+							})
+
 							It("prints a warning and exits with an error", func() {
 								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -236,6 +257,11 @@ var _ = Describe("create buildpack command", func() {
 									session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 									Eventually(session).Should(Exit(0))
 								}, stacks[1])
+							})
+
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")).Should(Exit(0))
 							})
 
 							It("successfully uploads a buildpack", func() {
@@ -265,6 +291,10 @@ var _ = Describe("create buildpack command", func() {
 								})
 							})
 
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+							})
+
 							It("prints a warning and tip, then exits with an error", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -281,6 +311,10 @@ var _ = Describe("create buildpack command", func() {
 									session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 									Eventually(session).Should(Exit(0))
 								}, stacks[0])
+							})
+
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
 							})
 
 							It("prints a warning then exits with an error", func() {
@@ -305,6 +339,10 @@ var _ = Describe("create buildpack command", func() {
 			When("specifying a valid path", func() {
 				When("the new buildpack is unique", func() {
 					When("the new buildpack has a nil stack", func() {
+						AfterEach(func() {
+							Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+						})
+
 						It("successfully uploads a buildpack", func() {
 							helpers.CNB(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--lifecycle=cnb")
@@ -342,6 +380,10 @@ var _ = Describe("create buildpack command", func() {
 			When("specifying a valid URL", func() {
 				BeforeEach(func() {
 					buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 				})
 
 				It("successfully uploads a buildpack", func() {
@@ -400,6 +442,10 @@ var _ = Describe("create buildpack command", func() {
 
 		When("specifying the position flag", func() {
 			When("position is positive integer", func() {
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+				})
+
 				It("successfully uploads buildpack in correct position", func() {
 					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "3")
@@ -420,6 +466,10 @@ var _ = Describe("create buildpack command", func() {
 		})
 
 		When("specifying disable flag", func() {
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
+			})
+
 			It("disables buildpack", func() {
 				helpers.BuildpackWithoutStack(func(buildpackPath string) {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")

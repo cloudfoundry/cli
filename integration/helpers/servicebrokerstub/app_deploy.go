@@ -11,7 +11,7 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/gomega"
 )
 
@@ -37,7 +37,7 @@ func initialize() {
 func ensureAppIsDeployed() {
 	if !appResponds() {
 		ensureAppIsPushed()
-		Eventually(appResponds()).Should(BeTrue())
+		Eventually(appResponds, time.Minute).Should(BeTrue())
 	}
 }
 

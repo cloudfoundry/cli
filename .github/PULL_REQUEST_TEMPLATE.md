@@ -9,7 +9,7 @@ If your contribution falls under a company CLA but your membership is not public
 * Contributions must conform to our [style guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide). Please reach out to us if you have questions.
 
 
-#### Note: Please create separate PR for every branch (main, v8 and v7) as needed.
+#### Note: Please create separate PR for every branch (main and v8) as needed.
 
 ## Description of the Change
 

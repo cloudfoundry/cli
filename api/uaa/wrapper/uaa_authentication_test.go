@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
-	. "code.cloudfoundry.org/cli/api/uaa/wrapper"
-	"code.cloudfoundry.org/cli/api/uaa/wrapper/util"
-	"code.cloudfoundry.org/cli/api/uaa/wrapper/wrapperfakes"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/api/uaa/uaafakes"
+	. "code.cloudfoundry.org/cli/v9/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/v9/api/uaa/wrapper/util"
+	"code.cloudfoundry.org/cli/v9/api/uaa/wrapper/wrapperfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

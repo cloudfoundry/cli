@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/plugin"
 )
 
 type DemoCmd struct{}

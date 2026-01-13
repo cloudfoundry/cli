@@ -1,7 +1,7 @@
 package translatableerror_test
 
 import (
-	. "code.cloudfoundry.org/cli/command/translatableerror"
+	. "code.cloudfoundry.org/cli/v9/command/translatableerror"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

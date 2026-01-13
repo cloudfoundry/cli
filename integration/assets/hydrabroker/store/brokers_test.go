@@ -3,6 +3,9 @@ package store_test
 import (
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Brokers", func() {
