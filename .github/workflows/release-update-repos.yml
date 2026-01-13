@@ -30,7 +30,7 @@ jobs:
       run: echo "claw-url=https://packages.cloudfoundry.org" >> "${GITHUB_OUTPUT}"
 
     - name: Checkout cli
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Parse semver
       id: parse-semver
@@ -71,14 +71,14 @@ jobs:
     steps:
 
     - name: Checkout cli-ci
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/cli-ci.git
         ref: main
         path: cli-ci
 
     - name: Checkout homebrew-tap
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: cloudfoundry/homebrew-tap
         ref: master
@@ -246,7 +246,7 @@ jobs:
         echo "VERSION_BUILD: ${VERSION_BUILD}"
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - uses: ruby/setup-ruby@v1
       with:
@@ -385,7 +385,7 @@ jobs:
     #     ls -R
     #
     # - name: Backup current Linux RPM repodata
-    #   uses: actions/upload-artifact@v4
+    #   uses: actions/upload-artifact@v6
     #   with:
     #     if-no-files-found: error
     #     name: cf-cli-linux-rpm-repodata-backup
@@ -432,7 +432,7 @@ jobs:
       run: ls -R
 
     - name: Store Linux RPM repodata
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         if-no-files-found: error
         name: cf-cli-linux-rpm-repodata
@@ -489,7 +489,7 @@ jobs:
           echo "VERSION_BUILD: ${VERSION_BUILD}"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Calculate Checksums
         run: |

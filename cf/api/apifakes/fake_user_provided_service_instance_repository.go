@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeUserProvidedServiceInstanceRepository struct {
@@ -66,15 +66,16 @@ func (fake *FakeUserProvidedServiceInstanceRepository) Create(arg1 string, arg2 
 		arg4 map[string]interface{}
 		arg5 []string
 	}{arg1, arg2, arg3, arg4, arg5Copy})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2, arg3, arg4, arg5Copy})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -125,15 +126,16 @@ func (fake *FakeUserProvidedServiceInstanceRepository) GetSummaries() (models.Us
 	ret, specificReturn := fake.getSummariesReturnsOnCall[len(fake.getSummariesArgsForCall)]
 	fake.getSummariesArgsForCall = append(fake.getSummariesArgsForCall, struct {
 	}{})
+	stub := fake.GetSummariesStub
+	fakeReturns := fake.getSummariesReturns
 	fake.recordInvocation("GetSummaries", []interface{}{})
 	fake.getSummariesMutex.Unlock()
-	if fake.GetSummariesStub != nil {
-		return fake.GetSummariesStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSummariesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -181,15 +183,16 @@ func (fake *FakeUserProvidedServiceInstanceRepository) Update(arg1 models.Servic
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 models.ServiceInstanceFields
 	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

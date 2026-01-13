@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/flagcontext"
+	"code.cloudfoundry.org/cli/v9/cf/flagcontext"
 
 	"code.cloudfoundry.org/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo/v2"

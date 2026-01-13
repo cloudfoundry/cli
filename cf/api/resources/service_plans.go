@@ -3,7 +3,7 @@ package resources
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type ServicePlanResource struct {

@@ -1,24 +1,24 @@
 package application_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
-	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
-	"code.cloudfoundry.org/cli/cf/api/copyapplicationsource/copyapplicationsourcefakes"
-	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
-	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
-	"code.cloudfoundry.org/cli/cf/commands/application/applicationfakes"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/applications/applicationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/copyapplicationsource/copyapplicationsourcefakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/api/spaces/spacesfakes"
+	"code.cloudfoundry.org/cli/v9/cf/commands/application/applicationfakes"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -48,7 +48,7 @@ var _ = Describe("CopySource", func() {
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.Config = config
 
-		//inject fake 'command dependency' into registry
+		// inject fake 'command dependency' into registry
 		commandregistry.Register(appRestarter)
 
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("copy-source").SetDependency(deps, pluginCall))
@@ -64,11 +64,11 @@ var _ = Describe("CopySource", func() {
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 
-		//save original command and restore later
+		// save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("restart")
 
 		appRestarter = new(applicationfakes.FakeRestarter)
-		//setup fakes to correctly interact with commandregistry
+		// setup fakes to correctly interact with commandregistry
 		appRestarter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return appRestarter
 		}

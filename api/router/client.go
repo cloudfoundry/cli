@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"code.cloudfoundry.org/cli/api/router/internal"
+	"code.cloudfoundry.org/cli/v9/api/router/internal"
 
 	"github.com/tedsuo/rata"
 )

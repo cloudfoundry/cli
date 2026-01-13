@@ -1,11 +1,11 @@
 package running
 
 import (
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 
-	. "code.cloudfoundry.org/cli/cf/api/securitygroups/defaults"
+	. "code.cloudfoundry.org/cli/v9/cf/api/securitygroups/defaults"
 )
 
 const urlPath = "/v2/config/running_security_groups"

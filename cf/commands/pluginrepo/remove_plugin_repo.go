@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/flags"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/terminal"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
 )
 
 type RemovePluginRepo struct {

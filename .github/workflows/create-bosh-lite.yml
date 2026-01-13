@@ -46,13 +46,13 @@ jobs:
           sudo apt install -y build-essential unzip wamerican
 
       - name: Checkout bosh-bootloader
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cloudfoundry/bosh-bootloader
           path: bosh-bootloader
 
       - name: Checkout cli
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: cli
 
@@ -97,14 +97,14 @@ jobs:
           gsutil -m cp -R -P ./$env_name gs://cf-cli-bosh-lites/
 
       - name: Checkout cf-deployment
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cloudfoundry/cf-deployment
           ref: release-candidate
           path: cf-deployment
 
       - name: Checkout bosh-deployment
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cloudfoundry/bosh-deployment
           path: bosh-deployment

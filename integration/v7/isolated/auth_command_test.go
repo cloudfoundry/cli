@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
-	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/v9/api/uaa/uaaversion"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
+	"code.cloudfoundry.org/cli/v9/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -309,7 +309,7 @@ var _ = Describe("auth command", func() {
 					username, password = helpers.SkipIfOIDCCredentialsNotSet()
 				})
 
-				It("authenticates the user", func() {
+				It("authenticates the user", FlakeAttempts(3), func() {
 					session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
 
 					Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))

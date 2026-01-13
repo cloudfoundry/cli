@@ -3,10 +3,10 @@ package appevents
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/api/resources"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Repository

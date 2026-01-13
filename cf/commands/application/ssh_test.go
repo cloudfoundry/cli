@@ -6,22 +6,22 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
-	"code.cloudfoundry.org/cli/cf/commands/commandsfakes"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/requirements"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"code.cloudfoundry.org/cli/cf/ssh/sshfakes"
-	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/cf/util/testhelpers/net"
-	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/v9/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/v9/cf/commandregistry"
+	"code.cloudfoundry.org/cli/v9/cf/commands/commandsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/net"
+	"code.cloudfoundry.org/cli/v9/cf/requirements"
+	"code.cloudfoundry.org/cli/v9/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/v9/cf/ssh/sshfakes"
+	testcmd "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/net"
+	testterm "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/terminal"
 
-	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/cf/trace/tracefakes"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -47,12 +47,12 @@ var _ = Describe("SSH command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		deps.Gateways = make(map[string]net.Gateway)
 
-		//save original command and restore later
+		// save original command and restore later
 		originalSSHCodeGetter = commandregistry.Commands.FindCommand("ssh-code")
 
 		sshCodeGetter = new(commandsfakes.FakeSSHCodeGetter)
 
-		//setup fakes to correctly interact with commandregistry
+		// setup fakes to correctly interact with commandregistry
 		sshCodeGetter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return sshCodeGetter
 		}
@@ -60,7 +60,7 @@ var _ = Describe("SSH command", func() {
 	})
 
 	AfterEach(func() {
-		//restore original command
+		// restore original command
 		commandregistry.Register(originalSSHCodeGetter)
 	})
 
@@ -68,7 +68,7 @@ var _ = Describe("SSH command", func() {
 		deps.UI = ui
 		deps.Config = configRepo
 
-		//inject fake 'sshCodeGetter' into registry
+		// inject fake 'sshCodeGetter' into registry
 		commandregistry.Register(sshCodeGetter)
 
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))

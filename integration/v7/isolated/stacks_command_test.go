@@ -3,8 +3,8 @@ package isolated
 import (
 	"regexp"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -33,7 +33,7 @@ var _ = Describe("stacks command", func() {
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--labels\s+Selector to filter stacks by labels`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("create-buildpack, delete-buildpack, rename-buildpack, stack, update-buildpack"))
+			Eventually(session).Should(Say("create-buildpack, delete-buildpack, stack, update-buildpack"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

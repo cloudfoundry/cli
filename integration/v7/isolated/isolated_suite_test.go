@@ -3,7 +3,7 @@ package isolated
 import (
 	"testing"
 
-	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
+	"code.cloudfoundry.org/cli/v9/integration/helpers/commonisolated"
 )
 
 const (

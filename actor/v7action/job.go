@@ -1,8 +1,8 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 )
 
 type JobState constant.JobState

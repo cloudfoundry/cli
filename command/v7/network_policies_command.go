@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . NetworkPoliciesActor

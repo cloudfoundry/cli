@@ -4,8 +4,8 @@ package securitygroupsfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/securitygroups"
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/api/securitygroups"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type FakeSecurityGroupRepo struct {
@@ -85,15 +85,16 @@ func (fake *FakeSecurityGroupRepo) Create(arg1 string, arg2 []map[string]interfa
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2Copy})
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
 	fake.recordInvocation("Create", []interface{}{arg1, arg2Copy})
 	fake.createMutex.Unlock()
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.createReturns
 	return fakeReturns.result1
 }
 
@@ -145,15 +146,16 @@ func (fake *FakeSecurityGroupRepo) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
 	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
-	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteReturns
 	return fakeReturns.result1
 }
 
@@ -204,15 +206,16 @@ func (fake *FakeSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
 	ret, specificReturn := fake.findAllReturnsOnCall[len(fake.findAllArgsForCall)]
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct {
 	}{})
+	stub := fake.FindAllStub
+	fakeReturns := fake.findAllReturns
 	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
-	if fake.FindAllStub != nil {
-		return fake.FindAllStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findAllReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -260,15 +263,16 @@ func (fake *FakeSecurityGroupRepo) Read(arg1 string) (models.SecurityGroup, erro
 	fake.readArgsForCall = append(fake.readArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ReadStub
+	fakeReturns := fake.readReturns
 	fake.recordInvocation("Read", []interface{}{arg1})
 	fake.readMutex.Unlock()
-	if fake.ReadStub != nil {
-		return fake.ReadStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.readReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -329,15 +333,16 @@ func (fake *FakeSecurityGroupRepo) Update(arg1 string, arg2 []map[string]interfa
 		arg1 string
 		arg2 []map[string]interface{}
 	}{arg1, arg2Copy})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
 	fake.recordInvocation("Update", []interface{}{arg1, arg2Copy})
 	fake.updateMutex.Unlock()
-	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.updateReturns
 	return fakeReturns.result1
 }
 

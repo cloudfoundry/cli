@@ -3,8 +3,8 @@ package isolated
 import (
 	"regexp"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -34,7 +34,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`delete-routes, routes`))
+			Eventually(session).Should(Say(`delete-route, routes`))
 
 			Eventually(session).Should(Exit(0))
 		})

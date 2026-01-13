@@ -20,7 +20,7 @@ type APILinkMeta struct {
 	HostKeyFingerprint string `json:"host_key_fingerprint"`
 
 	// Identifier for UAA queries
-	OAuthClient string `json:"oath_client"`
+	OAuthClient string `json:"oauth_client"`
 }
 
 // APILinks is a directory of follow-up urls for the resource.

@@ -1,0 +1,45 @@
+{
+  "run": {
+    "concurrency": 4,
+    "timeout": "20m"
+  },
+  "linters": {
+    "disable-all": true,
+    "enable": [
+      "govet",
+      "goimports",
+      "errcheck",
+      "staticcheck",
+      "unused",
+      "ineffassign"
+    ]
+  },
+  "linters-settings": {},
+  "issues": {
+    "max-same-issues": 0,
+    "exclude-files":  [
+      "integration/helpers/fake_server.go",
+      "command/plugin/*.go$"
+    ],
+    "exclude": [
+      "Error return value of `client.GetApplicationTasks` is not checked",
+      "Error return value of `logger.output.Stop` is not checked",
+      "Error return value of `request.ResetBody` is not checked",
+      "Error return value of `GinkgoWriter.Write` is not checked",
+      "Error return value of `c.terminalHelper.RestoreTerminal` is not checked",
+      "U1000: field `allproxy` is unused",
+      "U1000: field `dockerPassword` is unused",
+      "U1000: field `envCFStagingTimeout` is unused",
+      "U1000: field `envCFStartupTimeout` is unused",
+      "U1000: field `relatedCommands` is unused",
+      "U1000: field `usage` is unused",
+      "SA5008: duplicate struct tag \"choice\"",
+      "`allproxy` is unused",
+      "`dockerPassword` is unused",
+      "`envCFStagingTimeout` is unused",
+      "`envCFStartupTimeout` is unused",
+      "`relatedCommands` is unused",
+      "`usage` is unused"
+    ]
+  }
+}

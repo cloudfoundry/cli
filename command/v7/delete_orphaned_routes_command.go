@@ -5,7 +5,7 @@ type DeleteOrphanedRoutesCommand struct {
 
 	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]\n"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
-	relatedCommands interface{} `related_commands:"delete-routes, routes"`
+	relatedCommands interface{} `related_commands:"delete-route, routes"`
 }
 
 func (cmd DeleteOrphanedRoutesCommand) Execute(args []string) error {

@@ -1,12 +1,12 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
 

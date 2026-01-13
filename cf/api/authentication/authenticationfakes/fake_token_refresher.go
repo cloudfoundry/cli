@@ -4,7 +4,7 @@ package authenticationfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api/authentication"
+	"code.cloudfoundry.org/cli/v9/cf/api/authentication"
 )
 
 type FakeTokenRefresher struct {
@@ -29,15 +29,16 @@ func (fake *FakeTokenRefresher) RefreshAuthToken() (string, error) {
 	ret, specificReturn := fake.refreshAuthTokenReturnsOnCall[len(fake.refreshAuthTokenArgsForCall)]
 	fake.refreshAuthTokenArgsForCall = append(fake.refreshAuthTokenArgsForCall, struct {
 	}{})
+	stub := fake.RefreshAuthTokenStub
+	fakeReturns := fake.refreshAuthTokenReturns
 	fake.recordInvocation("RefreshAuthToken", []interface{}{})
 	fake.refreshAuthTokenMutex.Unlock()
-	if fake.RefreshAuthTokenStub != nil {
-		return fake.RefreshAuthTokenStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.refreshAuthTokenReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

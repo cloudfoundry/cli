@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/v9/util"
 )
 
 // UAAConnection represents the connection to UAA

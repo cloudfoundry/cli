@@ -6,19 +6,19 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/resources"
-	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/v9/api/uaa"
+	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/util/ui"
 	"code.cloudfoundry.org/clock"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/uaa/constant"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/uaa/constant"
+	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/command"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ActorReloader

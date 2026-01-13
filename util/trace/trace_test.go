@@ -1,7 +1,7 @@
 package trace_test
 
 import (
-	"code.cloudfoundry.org/cli/util/trace"
+	"code.cloudfoundry.org/cli/v9/util/trace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

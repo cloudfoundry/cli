@@ -3,7 +3,7 @@ package coreconfig
 import (
 	"strings"
 
-	. "code.cloudfoundry.org/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/v9/cf/i18n"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . EndpointRepository

@@ -3,7 +3,7 @@ package shared
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/util/trace"
+	"code.cloudfoundry.org/cli/v9/util/trace"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/v9/cf/models"
 )
 
 type OldFakeServicePlanRepo struct {
@@ -44,7 +44,7 @@ func (fake *OldFakeServicePlanRepo) Search(queryParams map[string]string) ([]mod
 	}
 
 	if queryParams == nil {
-		//return everything
+		// return everything
 		var returnPlans []models.ServicePlanFields
 		for _, value := range fake.SearchReturns {
 			returnPlans = append(returnPlans, value...)
