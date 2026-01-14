@@ -2,6 +2,7 @@ package v7
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -240,13 +241,25 @@ func (cmd ServiceCommand) displayBoundApps(serviceInstanceWithDetails v7action.S
 		return
 	}
 
-	table := [][]string{{"name", "binding name", "status", "message"}}
-	for _, app := range serviceInstanceWithDetails.BoundApps {
+	table := [][]string{{"name", "binding name", "status", "message", "guid", "created_at"}}
+
+	bindings := serviceInstanceWithDetails.BoundApps
+	// sort by app name, then by created at descending
+	sort.Slice(bindings, func(i, j int) bool {
+		if bindings[i].AppName == bindings[j].AppName {
+			return bindings[i].CreatedAt > bindings[j].CreatedAt
+		}
+		return bindings[i].AppName < bindings[j].AppName
+	})
+
+	for _, app := range bindings {
 		table = append(table, []string{
 			app.AppName,
 			app.Name,
 			fmt.Sprintf("%s %s", app.LastOperation.Type, app.LastOperation.State),
 			app.LastOperation.Description,
+			app.GUID,
+			app.CreatedAt,
 		})
 	}
 
