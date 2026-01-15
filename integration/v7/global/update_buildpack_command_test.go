@@ -66,6 +66,7 @@ var _ = Describe("update-buildpack command", func() {
 
 		AfterEach(func() {
 			helpers.DeleteBuildpackIfOnOldCCAPI(buildpackName)
+			Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 		})
 
 		When("the buildpack is not provided", func() {
@@ -111,6 +112,11 @@ var _ = Describe("update-buildpack command", func() {
 							Name: buildpackName, Stack: stacks[0]})))
 						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 						Eventually(listSession).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 					})
 
 					When("no stack association is specified", func() {
@@ -167,6 +173,11 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(listSession).Should(Exit(0))
 					})
 
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")).Should(Exit(0))
+					})
+
 					When("no stack association is specified", func() {
 						It("displays an error saying that multiple buildpacks were found", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
@@ -214,6 +225,10 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(listSession).Should(Exit(0))
 					})
 
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+					})
+
 					When("no stack association is specified", func() {
 						It("updates the only buildpack with that name", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
@@ -248,6 +263,10 @@ var _ = Describe("update-buildpack command", func() {
 					listSession := helpers.CF("buildpacks")
 					Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 					Eventually(listSession).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 				})
 
 				When("only a name is provided", func() {
@@ -542,6 +561,10 @@ var _ = Describe("update-buildpack command", func() {
 						newBuildpackName = helpers.NewBuildpackName()
 					})
 
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", newBuildpackName, "-f")).Should(Exit(0))
+					})
+
 					When("a buildpack with the new name does not already exist", func() {
 						It("renames the buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--rename", newBuildpackName)
@@ -568,6 +591,10 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(listSession).Should(Exit(0))
 						})
 
+						AfterEach(func() {
+							Eventually(helpers.CF("delete-buildpack", newBuildpackName, "-f")).Should(Exit(0))
+						})
+
 						It("fails to rename the buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--rename", newBuildpackName)
 							Eventually(session.Err).Should(Say("Buildpack with name '%s' and an unassigned stack already exists", newBuildpackName))
@@ -584,6 +611,10 @@ var _ = Describe("update-buildpack command", func() {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
 						Eventually(session).Should(Exit(0))
 					})
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 				})
 
 				When("specifying enable flag", func() {
@@ -611,6 +642,10 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 					buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 				})
 
 				Context("specifying -p argument", func() {
