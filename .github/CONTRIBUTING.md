@@ -33,11 +33,11 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
    [Product Style Guide](https://github.com/cloudfoundry/cli/wiki/CLI-Product-Specific-Style-Guide),
    and [Internationalization Guide](https://github.com/cloudfoundry/cli/wiki/Internationalization-Guide).
 1. Fork the project repository.
-1. Create a feature branch from the earliest branch that's [appropriate for your change](#cli-versions) (e.g. `git checkout v8 && git checkout -b better_cli`) and make changes on this branch
+1. Create a feature branch from the earliest branch that's [appropriate for your change](#cli-versions) (e.g. for v9 `git checkout main && git checkout -b main_better_cli`) and make changes on this branch
    * Follow the other sections on this page to [set up your development environment](#development-environment-setup), [build `cf`](#building-the-cf-binary) and [run the tests](#testing).
    * Tests are required for any changes.
-1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
-1. The cf CLI team will merge your changes from the versioned branch (e.g. v8) to main for you after the PR is merged.
+1. Push to your fork (e.g. `git push origin main_better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
+1. The cf CLI team will merge your PR after review.
 
 Note: All contributions must be sent using GitHub Pull Requests.
 We prefer a small, focused pull request with a clear message
@@ -97,12 +97,9 @@ how to cross compile binaries for other architectures.
 To run the unit tests:
 ```bash
 cd cli
-make units-full # will run all unit tests
-make units # runs all non-cf directory unit tests
+make units
 ```
-
-**Note: `make units-full` is recommended over `make units` if you are unsure of
-how wide-reaching the intended changes are.**
+(For historic reasons, there are multiple synonyms in the `Makefile`.)
 
 ## Running the Integration tests
 
