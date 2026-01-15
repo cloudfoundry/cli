@@ -62,6 +62,15 @@ var _ = Describe("service credential binding resource", func() {
 		),
 		Entry("created_at", ServiceCredentialBinding{CreatedAt: "fake-created-at"}, `{"created_at": "fake-created-at"}`),
 		Entry(
+			"strategy",
+			ServiceCredentialBinding{
+				Strategy: SingleBindingStrategy,
+			},
+			`{
+				"strategy": "single"
+			}`,
+		),
+		Entry(
 			"everything",
 			ServiceCredentialBinding{
 				Type:                AppBinding,
@@ -72,6 +81,7 @@ var _ = Describe("service credential binding resource", func() {
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
+				Strategy:  MultipleBindingStrategy,
 				CreatedAt: "fake-created-at",
 			},
 			`{
@@ -93,6 +103,7 @@ var _ = Describe("service credential binding resource", func() {
 				"parameters": {
 					"foo": "bar"
 				},
+				"strategy": "multiple",
 				"created_at": "fake-created-at"
 			}`,
 		),

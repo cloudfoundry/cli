@@ -6,11 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
+	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/v9/command/v7"
 	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
 	"code.cloudfoundry.org/cli/v9/util/ui"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -39,6 +42,7 @@ var _ = Describe("bind-service Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("3.205.0")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
 
@@ -107,6 +111,30 @@ var _ = Describe("bind-service Command", func() {
 				fakeSpaceName,
 				fakeUserName,
 			))
+		})
+	})
+
+	When("strategy flag is set", func() {
+		BeforeEach(func() {
+			setFlag(&cmd, "--strategy", "multiple")
+		})
+
+		It("passes the strategy to the actor", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(fakeActor.CreateServiceAppBindingCallCount()).To(Equal(1))
+			Expect(fakeActor.CreateServiceAppBindingArgsForCall(0).Strategy).
+				To(Equal(resources.MultipleBindingStrategy))
+		})
+
+		It("fails when the cc version is below the minimum", func() {
+			fakeConfig.APIVersionReturns("3.204.0")
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				Command:        "--strategy",
+				CurrentVersion: "3.204.0",
+				MinimumVersion: "3.205.0",
+			}))
 		})
 	})
 
