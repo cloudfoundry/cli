@@ -143,6 +143,8 @@ var _ = Describe("Service Instance List Action", func() {
 		fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
 			[]resources.ServiceCredentialBinding{
 				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1", AppName: "great-app-1", AppSpaceGUID: spaceGUID},
+				// Duplicate binding for (app-1, fake-guid-1) pair to ensure app names are not duplicated
+				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-1", AppName: "great-app-1", AppSpaceGUID: spaceGUID},
 				{Type: "app", ServiceInstanceGUID: "fake-guid-1", AppGUID: "app-2", AppName: "great-app-2", AppSpaceGUID: spaceGUID},
 				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-3", AppName: "great-app-3", AppSpaceGUID: spaceGUID},
 				{Type: "app", ServiceInstanceGUID: "fake-guid-2", AppGUID: "app-4", AppName: "great-app-4", AppSpaceGUID: spaceGUID},

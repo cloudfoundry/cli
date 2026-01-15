@@ -40,6 +40,8 @@ type ServiceCredentialBinding struct {
 	Parameters types.OptionalObject `jsonry:"parameters"`
 	// Strategy can be "single" or "multiple" (if empty, "single" is set as default by backend)
 	Strategy BindingStrategyType `jsonry:"strategy,omitempty"`
+	// CreatedAt timestamp when the binding was created (useful for distinguishing multiple bindings)
+	CreatedAt string `json:"created_at,omitempty"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {
