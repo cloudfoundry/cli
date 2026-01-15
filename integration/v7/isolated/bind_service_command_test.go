@@ -132,7 +132,7 @@ var _ = Describe("bind-service command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "bind-service", "app-name", "service-name")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, command, "app-name", "service-name")
 		})
 	})
 
