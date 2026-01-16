@@ -26,6 +26,8 @@ type ServiceCredentialBinding struct {
 	GUID string `jsonry:"guid,omitempty"`
 	// Name is the name of the service credential binding.
 	Name string `jsonry:"name,omitempty"`
+	// CreatedAt timestamp when the binding was created (useful for distinguishing multiple bindings)
+	CreatedAt string `json:"created_at,omitempty"`
 	// ServiceInstanceGUID is the service instance that this binding originates from
 	ServiceInstanceGUID string `jsonry:"relationships.service_instance.data.guid,omitempty"`
 	// AppGUID is the application that this binding is attached to
@@ -40,8 +42,6 @@ type ServiceCredentialBinding struct {
 	Parameters types.OptionalObject `jsonry:"parameters"`
 	// Strategy can be "single" or "multiple" (if empty, "single" is set as default by backend)
 	Strategy BindingStrategyType `jsonry:"strategy,omitempty"`
-	// CreatedAt timestamp when the binding was created (useful for distinguishing multiple bindings)
-	CreatedAt string `json:"created_at,omitempty"`
 }
 
 func (s ServiceCredentialBinding) MarshalJSON() ([]byte, error) {

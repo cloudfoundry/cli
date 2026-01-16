@@ -83,8 +83,7 @@ var _ = Describe("service credential binding resource", func() {
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Strategy:  MultipleBindingStrategy,
-				CreatedAt: "fake-created-at",
+				Strategy: MultipleBindingStrategy,
 			},
 			`{
 				"type": "app",
@@ -106,8 +105,7 @@ var _ = Describe("service credential binding resource", func() {
 				"parameters": {
 					"foo": "bar"
 				},
-				"strategy": "multiple",
-				"created_at": "fake-created-at"
+				"strategy": "multiple"
 			}`,
 		),
 	)

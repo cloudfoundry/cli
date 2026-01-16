@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/v8/integration/helpers"
@@ -104,36 +103,14 @@ var _ = Describe("cleanup-outdated-service-bindings command", func() {
 			Eventually(helpers.CF("bind-service", appName, serviceInstanceName, "--wait")).Should(Exit(0))
 
 			appGUID := helpers.AppGUID(appName)
-
 			var receiver struct {
 				Resources []resources.ServiceCredentialBinding `json:"resources"`
 			}
 			helpers.Curlf(&receiver, "/v3/service_credential_bindings?app_guids=%s&service_instance_names=%s", appGUID, serviceInstanceName)
 			Expect(receiver.Resources).To(HaveLen(1))
-
 			oldServiceBindingGUID = receiver.Resources[0].GUID
 
-			jsonBody := fmt.Sprintf(`
-{
-    "type": "app",
-    "relationships": {
-      "service_instance": {
-        "data": {
-          "guid": "%s"
-        }
-      },
-      "app": {
-        "data": {
-          "guid": "%s"
-        }
-      }
-    },
-    "strategy": "multiple"
-}
-`, helpers.ServiceInstanceGUID(serviceInstanceName), appGUID)
-			helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/service_credential_bindings")
-			// TODO uncomment and remove previous curl
-			//Eventually(helpers.CF("bind-service", appName, serviceInstanceName, "--wait", "--strategy=multiple")).Should(Exit(0))
+			Eventually(helpers.CF("bind-service", appName, serviceInstanceName, "--wait", "--strategy=multiple")).Should(Exit(0))
 			return
 		}
 
