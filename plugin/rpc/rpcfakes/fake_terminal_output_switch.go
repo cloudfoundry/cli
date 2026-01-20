@@ -52,8 +52,6 @@ func (fake *FakeTerminalOutputSwitch) DisableTerminalOutputArgsForCall(i int) bo
 func (fake *FakeTerminalOutputSwitch) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.disableTerminalOutputMutex.RLock()
-	defer fake.disableTerminalOutputMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
