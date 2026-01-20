@@ -15,6 +15,7 @@ type CreateServiceAppBindingParams struct {
 	AppName             string
 	BindingName         string
 	Parameters          types.OptionalObject
+	Strategy            resources.BindingStrategyType
 }
 
 type DeleteServiceAppBindingParams struct {
@@ -41,7 +42,7 @@ func (actor Actor) CreateServiceAppBinding(params CreateServiceAppBindingParams)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.createServiceAppBinding(serviceInstance.GUID, app.GUID, params.BindingName, params.Parameters)
+			jobURL, warnings, err = actor.createServiceAppBinding(serviceInstance.GUID, app.GUID, params.BindingName, params.Parameters, params.Strategy)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -102,13 +103,14 @@ func (actor Actor) DeleteServiceAppBinding(params DeleteServiceAppBindingParams)
 	}
 }
 
-func (actor Actor) createServiceAppBinding(serviceInstanceGUID, appGUID, bindingName string, parameters types.OptionalObject) (ccv3.JobURL, ccv3.Warnings, error) {
+func (actor Actor) createServiceAppBinding(serviceInstanceGUID, appGUID, bindingName string, parameters types.OptionalObject, strategy resources.BindingStrategyType) (ccv3.JobURL, ccv3.Warnings, error) {
 	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceCredentialBinding(resources.ServiceCredentialBinding{
 		Type:                resources.AppBinding,
 		Name:                bindingName,
 		ServiceInstanceGUID: serviceInstanceGUID,
 		AppGUID:             appGUID,
 		Parameters:          parameters,
+		Strategy:            strategy,
 	})
 	switch err.(type) {
 	case nil:
