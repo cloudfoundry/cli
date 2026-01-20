@@ -698,26 +698,6 @@ func (fake *FakeRequestLoggerOutput) StopReturnsOnCall(i int, result1 error) {
 func (fake *FakeRequestLoggerOutput) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.displayHeaderMutex.RLock()
-	defer fake.displayHeaderMutex.RUnlock()
-	fake.displayHostMutex.RLock()
-	defer fake.displayHostMutex.RUnlock()
-	fake.displayJSONBodyMutex.RLock()
-	defer fake.displayJSONBodyMutex.RUnlock()
-	fake.displayMessageMutex.RLock()
-	defer fake.displayMessageMutex.RUnlock()
-	fake.displayRequestHeaderMutex.RLock()
-	defer fake.displayRequestHeaderMutex.RUnlock()
-	fake.displayResponseHeaderMutex.RLock()
-	defer fake.displayResponseHeaderMutex.RUnlock()
-	fake.displayTypeMutex.RLock()
-	defer fake.displayTypeMutex.RUnlock()
-	fake.handleInternalErrorMutex.RLock()
-	defer fake.handleInternalErrorMutex.RUnlock()
-	fake.startMutex.RLock()
-	defer fake.startMutex.RUnlock()
-	fake.stopMutex.RLock()
-	defer fake.stopMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
