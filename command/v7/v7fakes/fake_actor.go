@@ -2503,21 +2503,6 @@ type FakeActor struct {
 		result1 resources.User
 		result2 error
 	}
-	ListServiceAppBindingsStub        func(v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
-	listServiceAppBindingsMutex       sync.RWMutex
-	listServiceAppBindingsArgsForCall []struct {
-		arg1 v7action.ListServiceAppBindingParams
-	}
-	listServiceAppBindingsReturns struct {
-		result1 []resources.ServiceCredentialBinding
-		result2 v7action.Warnings
-		result3 error
-	}
-	listServiceAppBindingsReturnsOnCall map[int]struct {
-		result1 []resources.ServiceCredentialBinding
-		result2 v7action.Warnings
-		result3 error
-	}
 	MakeCurlRequestStub        func(string, string, []string, string, bool) ([]byte, *http.Response, error)
 	makeCurlRequestMutex       sync.RWMutex
 	makeCurlRequestArgsForCall []struct {
@@ -3648,22 +3633,6 @@ type FakeActor struct {
 	updateStackLabelsByStackNameReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
-	}
-	UpdateStackStub        func(string, string) (resources.Stack, v7action.Warnings, error)
-	updateStackMutex       sync.RWMutex
-	updateStackArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	updateStackReturns struct {
-		result1 resources.Stack
-		result2 v7action.Warnings
-		result3 error
-	}
-	updateStackReturnsOnCall map[int]struct {
-		result1 resources.Stack
-		result2 v7action.Warnings
-		result3 error
 	}
 	UpdateUserPasswordStub        func(string, string, string) error
 	updateUserPasswordMutex       sync.RWMutex
@@ -14575,73 +14544,6 @@ func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 resources.User, resul
 	}{result1, result2}
 }
 
-func (fake *FakeActor) ListServiceAppBindings(arg1 v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {
-	fake.listServiceAppBindingsMutex.Lock()
-	ret, specificReturn := fake.listServiceAppBindingsReturnsOnCall[len(fake.listServiceAppBindingsArgsForCall)]
-	fake.listServiceAppBindingsArgsForCall = append(fake.listServiceAppBindingsArgsForCall, struct {
-		arg1 v7action.ListServiceAppBindingParams
-	}{arg1})
-	stub := fake.ListServiceAppBindingsStub
-	fakeReturns := fake.listServiceAppBindingsReturns
-	fake.recordInvocation("ListServiceAppBindings", []interface{}{arg1})
-	fake.listServiceAppBindingsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeActor) ListServiceAppBindingsCallCount() int {
-	fake.listServiceAppBindingsMutex.RLock()
-	defer fake.listServiceAppBindingsMutex.RUnlock()
-	return len(fake.listServiceAppBindingsArgsForCall)
-}
-
-func (fake *FakeActor) ListServiceAppBindingsCalls(stub func(v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)) {
-	fake.listServiceAppBindingsMutex.Lock()
-	defer fake.listServiceAppBindingsMutex.Unlock()
-	fake.ListServiceAppBindingsStub = stub
-}
-
-func (fake *FakeActor) ListServiceAppBindingsArgsForCall(i int) v7action.ListServiceAppBindingParams {
-	fake.listServiceAppBindingsMutex.RLock()
-	defer fake.listServiceAppBindingsMutex.RUnlock()
-	argsForCall := fake.listServiceAppBindingsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeActor) ListServiceAppBindingsReturns(result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
-	fake.listServiceAppBindingsMutex.Lock()
-	defer fake.listServiceAppBindingsMutex.Unlock()
-	fake.ListServiceAppBindingsStub = nil
-	fake.listServiceAppBindingsReturns = struct {
-		result1 []resources.ServiceCredentialBinding
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) ListServiceAppBindingsReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
-	fake.listServiceAppBindingsMutex.Lock()
-	defer fake.listServiceAppBindingsMutex.Unlock()
-	fake.ListServiceAppBindingsStub = nil
-	if fake.listServiceAppBindingsReturnsOnCall == nil {
-		fake.listServiceAppBindingsReturnsOnCall = make(map[int]struct {
-			result1 []resources.ServiceCredentialBinding
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.listServiceAppBindingsReturnsOnCall[i] = struct {
-		result1 []resources.ServiceCredentialBinding
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeActor) MakeCurlRequest(arg1 string, arg2 string, arg3 []string, arg4 string, arg5 bool) ([]byte, *http.Response, error) {
 	var arg3Copy []string
 	if arg3 != nil {
@@ -19672,74 +19574,6 @@ func (fake *FakeActor) UpdateStackLabelsByStackNameReturnsOnCall(i int, result1 
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
-}
-
-func (fake *FakeActor) UpdateStack(arg1 string, arg2 string) (resources.Stack, v7action.Warnings, error) {
-	fake.updateStackMutex.Lock()
-	ret, specificReturn := fake.updateStackReturnsOnCall[len(fake.updateStackArgsForCall)]
-	fake.updateStackArgsForCall = append(fake.updateStackArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	stub := fake.UpdateStackStub
-	fakeReturns := fake.updateStackReturns
-	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2})
-	fake.updateStackMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeActor) UpdateStackCallCount() int {
-	fake.updateStackMutex.RLock()
-	defer fake.updateStackMutex.RUnlock()
-	return len(fake.updateStackArgsForCall)
-}
-
-func (fake *FakeActor) UpdateStackCalls(stub func(string, string) (resources.Stack, v7action.Warnings, error)) {
-	fake.updateStackMutex.Lock()
-	defer fake.updateStackMutex.Unlock()
-	fake.UpdateStackStub = stub
-}
-
-func (fake *FakeActor) UpdateStackArgsForCall(i int) (string, string) {
-	fake.updateStackMutex.RLock()
-	defer fake.updateStackMutex.RUnlock()
-	argsForCall := fake.updateStackArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeActor) UpdateStackReturns(result1 resources.Stack, result2 v7action.Warnings, result3 error) {
-	fake.updateStackMutex.Lock()
-	defer fake.updateStackMutex.Unlock()
-	fake.UpdateStackStub = nil
-	fake.updateStackReturns = struct {
-		result1 resources.Stack
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeActor) UpdateStackReturnsOnCall(i int, result1 resources.Stack, result2 v7action.Warnings, result3 error) {
-	fake.updateStackMutex.Lock()
-	defer fake.updateStackMutex.Unlock()
-	fake.UpdateStackStub = nil
-	if fake.updateStackReturnsOnCall == nil {
-		fake.updateStackReturnsOnCall = make(map[int]struct {
-			result1 resources.Stack
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.updateStackReturnsOnCall[i] = struct {
-		result1 resources.Stack
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) UpdateUserPassword(arg1 string, arg2 string, arg3 string) error {
