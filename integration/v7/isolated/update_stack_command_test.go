@@ -7,7 +7,6 @@ import (
 	. "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/v8/integration/helpers"
-	"code.cloudfoundry.org/cli/v8/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -45,7 +44,7 @@ var _ = Describe("update-stack command", func() {
 				Eventually(session).Should(Say(`NAME:`))
 				Eventually(session).Should(Say(`update-stack - Transition a stack between the defined states`))
 				Eventually(session).Should(Say(`USAGE:`))
-				Eventually(session).Should(Say(`cf update-stack STACK_NAME \[--state active\|restricted\|deprecated\|disabled\]`))
+				Eventually(session).Should(Say(`cf update-stack STACK_NAME \[--state \(active \| restricted \| deprecated \| disabled\)\]`))
 				Eventually(session).Should(Say(`EXAMPLES:`))
 				Eventually(session).Should(Say(`cf update-stack cflinuxfs3 --state disabled`))
 				Eventually(session).Should(Say(`OPTIONS:`))
