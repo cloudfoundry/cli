@@ -11,7 +11,7 @@ type StackCommand struct {
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	GUID            bool           `long:"guid" description:"Retrieve and display the given stack's guid. All other output for the stack is suppressed."`
 	usage           interface{}    `usage:"CF_NAME stack STACK_NAME"`
-	relatedCommands interface{}    `related_commands:"app, push, stacks"`
+	relatedCommands interface{}    `related_commands:"app, push, stacks, update-stack"`
 }
 
 func (cmd *StackCommand) Execute(args []string) error {
@@ -60,9 +60,17 @@ func (cmd *StackCommand) displayStackInfo() error {
 		return err
 	}
 
-	cmd.UI.DisplayKeyValueTable("", [][]string{
+	// Build display table
+	displayTable := [][]string{
 		{cmd.UI.TranslateText("name:"), stack.Name},
 		{cmd.UI.TranslateText("description:"), stack.Description},
-	}, 3)
+	}
+
+	// Add state only if it's present
+	if stack.State != "" {
+		displayTable = append(displayTable, []string{cmd.UI.TranslateText("state:"), stack.State})
+	}
+
+	cmd.UI.DisplayKeyValueTable("", displayTable, 3)
 	return nil
 }
