@@ -13,7 +13,7 @@ type UpdateStackCommand struct {
 
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	State           string         `long:"state" description:"State to transition the stack to (active, restricted, deprecated, disabled)" required:"true"`
-	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state active|restricted|deprecated|disabled]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled"`
+	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state (active | restricted | deprecated | disabled)]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled"`
 	relatedCommands interface{}    `related_commands:"stack, stacks"`
 }
 
