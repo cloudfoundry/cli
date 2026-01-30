@@ -24,4 +24,6 @@ const (
 	MinVersionCanarySteps = "3.189.0"
 
 	MinVersionServiceBindingStrategy = "3.205.0"
+
+	MinVersionUpdateStack = "3.210.0"
 )
