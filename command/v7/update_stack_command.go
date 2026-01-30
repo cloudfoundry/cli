@@ -4,6 +4,8 @@ import (
 	"slices"
 	"strings"
 
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/resources"
 )
@@ -18,7 +20,12 @@ type UpdateStackCommand struct {
 }
 
 func (cmd UpdateStackCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(false, false)
+	err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionUpdateStack)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
