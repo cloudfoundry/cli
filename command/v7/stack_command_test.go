@@ -137,11 +137,15 @@ var _ = Describe("Stack Command", func() {
 				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
 			})
 
-			It("Displays the stack information without state", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
-				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
-			})
+		It("Displays the stack information without state", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+			Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+			Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+			Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+			Expect(testUI.Out).NotTo(Say("state:"))
+		})
 		})
 
 		Context("When the stack has a state", func() {
@@ -155,11 +159,15 @@ var _ = Describe("Stack Command", func() {
 				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
 			})
 
-			It("Displays the stack information with state", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
-				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
-			})
+		It("Displays the stack information with state", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+			Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+			Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+			Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+			Expect(testUI.Out).To(Say("state:\\s+ACTIVE"))
+		})
 		})
 
 		When("The Stack does not Exist", func() {
