@@ -141,6 +141,10 @@ var _ = Describe("Stack Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
 				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+				Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+				Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+				Expect(testUI.Out).NotTo(Say("state:"))
 			})
 		})
 
@@ -159,6 +163,10 @@ var _ = Describe("Stack Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
 				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+				Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+				Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+				Expect(testUI.Out).To(Say("state:\\s+ACTIVE"))
 			})
 		})
 
