@@ -88,8 +88,6 @@ func (fake *FakeSSHActor) ExecuteSecureShellReturnsOnCall(i int, result1 error) 
 func (fake *FakeSSHActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeSecureShellMutex.RLock()
-	defer fake.executeSecureShellMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

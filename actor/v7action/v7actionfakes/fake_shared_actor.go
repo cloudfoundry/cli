@@ -338,14 +338,6 @@ func (fake *FakeSharedActor) ZipDirectoryResourcesReturnsOnCall(i int, result1 s
 func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.gatherArchiveResourcesMutex.RLock()
-	defer fake.gatherArchiveResourcesMutex.RUnlock()
-	fake.gatherDirectoryResourcesMutex.RLock()
-	defer fake.gatherDirectoryResourcesMutex.RUnlock()
-	fake.zipArchiveResourcesMutex.RLock()
-	defer fake.zipArchiveResourcesMutex.RUnlock()
-	fake.zipDirectoryResourcesMutex.RLock()
-	defer fake.zipDirectoryResourcesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
