@@ -122,7 +122,8 @@ jobs:
           
           env_name="${{ steps.setup-bbl-env.outputs.envName }}"
           cd $env_name/bbl-state
-          eval "$(bbl print-env)"
+          
+          eval "$(bbl print-env --shell-type posix)"
           
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
 
@@ -131,7 +132,9 @@ jobs:
         run: |
           env_name="${{ steps.setup-bbl-env.outputs.envName }}"
           cd $env_name/bbl-state
-          eval "$(bbl print-env)"
+          
+          eval "$(bbl print-env --shell-type posix)"
+          
           bosh update-runtime-config ${GITHUB_WORKSPACE}/bosh-deployment/runtime-configs/dns.yml --name dns
           STEMCELL_VERSION=$(bosh interpolate ${GITHUB_WORKSPACE}/cf-deployment/cf-deployment.yml --path /stemcells/alias=default/version)
           bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-jammy-go_agent?v=${STEMCELL_VERSION}"
@@ -162,9 +165,9 @@ jobs:
         if: failure()
         run: |
           env_name="${{ steps.setup-bbl-env.outputs.envName }}"
-          if [ -d ${env_name}/bbl_state ]; then
+          if [ -d ${env_name}/bbl-state ]; then
             cd ${env_name}/bbl-state
-            eval "$(bbl print-env)"
+            eval "$(bbl print-env --shell-type posix)"
             
             echo "Deleting env ${env_name}"
             bbl down --no-confirm --gcp-service-account-key=key.json
