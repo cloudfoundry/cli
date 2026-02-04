@@ -72,6 +72,8 @@ jobs:
         run: |
           cd ${ENV_NAME}/bbl-state
           eval "$(bbl print-env --shell-type posix)"
+
+          echo $PSModulePath
           
           echo "Deleting env ${ENV_NAME}"
           echo ${BBL_GCP_SERVICE_ACCOUNT_KEY} > key.json
@@ -79,4 +81,4 @@ jobs:
         
       - name: delete gcs bucket
         run: |
-          gsutil rm -R gs://cf-cli-bosh-lites/${ENV_NAME} 
+          gsutil rm -R gs://cf-cli-bosh-lites/${ENV_NAME}
