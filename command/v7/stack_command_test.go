@@ -148,7 +148,8 @@ var _ = Describe("Stack Command", func() {
 			})
 		})
 
-		Context("When the stack has a state", func() {
+	Context("When the stack has a state", func() {
+		Context("When the state is ACTIVE", func() {
 			BeforeEach(func() {
 				stack := resources.Stack{
 					Name:        "some-stack-name",
@@ -159,7 +160,7 @@ var _ = Describe("Stack Command", func() {
 				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
 			})
 
-			It("Displays the stack information with state", func() {
+			It("Displays the stack information with state but no reason", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
 				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
@@ -167,8 +168,57 @@ var _ = Describe("Stack Command", func() {
 				Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
 				Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
 				Expect(testUI.Out).To(Say("state:\\s+ACTIVE"))
+				Expect(testUI.Out).NotTo(Say("reason:"))
 			})
 		})
+
+		Context("When the state is not ACTIVE and has a reason", func() {
+			BeforeEach(func() {
+				stack := resources.Stack{
+					Name:        "some-stack-name",
+					GUID:        "some-stack-guid",
+					Description: "some-stack-desc",
+					State:       "DEPRECATED",
+					StateReason: "This stack is being phased out",
+				}
+				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
+			})
+
+			It("Displays the stack information with state and reason", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+				Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+				Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+				Expect(testUI.Out).To(Say("state:\\s+DEPRECATED"))
+				Expect(testUI.Out).To(Say("reason:\\s+This stack is being phased out"))
+			})
+		})
+
+		Context("When the state is not ACTIVE but has no reason", func() {
+			BeforeEach(func() {
+				stack := resources.Stack{
+					Name:        "some-stack-name",
+					GUID:        "some-stack-guid",
+					Description: "some-stack-desc",
+					State:       "RESTRICTED",
+				}
+				fakeActor.GetStackByNameReturns(stack, v7action.Warnings{}, nil)
+			})
+
+			It("Displays the stack information with state but no reason", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.GetStackByNameArgsForCall(0)).To(Equal("some-stack-name"))
+				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(1))
+
+				Expect(testUI.Out).To(Say("name:\\s+some-stack-name"))
+				Expect(testUI.Out).To(Say("description:\\s+some-stack-desc"))
+				Expect(testUI.Out).To(Say("state:\\s+RESTRICTED"))
+				Expect(testUI.Out).NotTo(Say("reason:"))
+			})
+		})
+	})
 
 		When("The Stack does not Exist", func() {
 			expectedError := actionerror.StackNotFoundError{Name: "some-stack-name"}
