@@ -271,19 +271,23 @@ var _ = Describe("service command", func() {
 							{
 								Name:    "named-binding",
 								AppName: "app-1",
+								GUID:    "guid-1",
 								LastOperation: resources.LastOperation{
 									Type:        resources.CreateOperation,
 									State:       resources.OperationSucceeded,
 									Description: "great",
 								},
+								CreatedAt: "created-at-1",
 							},
 							{
 								AppName: "app-2",
+								GUID:    "guid-2",
 								LastOperation: resources.LastOperation{
 									Type:        resources.UpdateOperation,
 									State:       resources.OperationFailed,
 									Description: "sorry",
 								},
+								CreatedAt: "created-at-2",
 							},
 						},
 					},
@@ -295,9 +299,9 @@ var _ = Describe("service command", func() {
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Showing bound apps:\n`),
-					Say(`   name\s+binding name\s+status\s+message\n`),
-					Say(`   app-1\s+named-binding\s+create succeeded\s+great\n`),
-					Say(`   app-2\s+update failed\s+sorry\n`),
+					Say(`   name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+					Say(`   app-1\s+named-binding\s+create succeeded\s+great\s+guid-1\s+created-at-1\n`),
+					Say(`   app-2\s+update failed\s+sorry\s+guid-2\s+created-at-2\n`),
 				))
 			})
 		})
@@ -704,19 +708,34 @@ var _ = Describe("service command", func() {
 							{
 								Name:    "named-binding",
 								AppName: "app-1",
+								GUID:    "guid-1",
 								LastOperation: resources.LastOperation{
 									Type:        resources.CreateOperation,
 									State:       resources.OperationSucceeded,
 									Description: "great",
 								},
+								CreatedAt: "created-at-1",
 							},
 							{
 								AppName: "app-2",
+								GUID:    "guid-2",
 								LastOperation: resources.LastOperation{
 									Type:        resources.UpdateOperation,
 									State:       resources.OperationFailed,
 									Description: "sorry",
 								},
+								CreatedAt: "created-at-2",
+							},
+							{
+								Name:    "named-binding",
+								AppName: "app-1",
+								GUID:    "guid-3",
+								LastOperation: resources.LastOperation{
+									Type:        resources.CreateOperation,
+									State:       resources.OperationSucceeded,
+									Description: "great",
+								},
+								CreatedAt: "created-at-2",
 							},
 						},
 					},
@@ -728,9 +747,10 @@ var _ = Describe("service command", func() {
 			It("prints the bound apps table", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Showing bound apps:\n`),
-					Say(`name\s+binding name\s+status\s+message\n`),
-					Say(`app-1\s+named-binding\s+create succeeded\s+great\n`),
-					Say(`app-2\s+update failed\s+sorry\n`),
+					Say(`name\s+binding name\s+status\s+message\s+guid\s+created_at\n`),
+					Say(`app-1\s+named-binding\s+create succeeded\s+great\s+guid-3\s+created-at-2\n`),
+					Say(`app-1\s+named-binding\s+create succeeded\s+great\s+guid-1\s+created-at-1\n`),
+					Say(`app-2\s+update failed\s+sorry\s+guid-2\s+created-at-2\n`),
 				))
 			})
 		})

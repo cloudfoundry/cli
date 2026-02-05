@@ -37,7 +37,7 @@ func initialize() {
 func ensureAppIsDeployed() {
 	if !appResponds() {
 		ensureAppIsPushed()
-		Eventually(appResponds()).Should(BeTrue())
+		Eventually(appResponds, time.Minute).Should(BeTrue())
 	}
 }
 
