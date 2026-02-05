@@ -16,7 +16,7 @@ type UpdateStackCommand struct {
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	State           string         `long:"state" description:"State to transition the stack to (active, restricted, deprecated, disabled)" required:"true"`
 	Reason          string         `long:"reason" description:"Optional plain text describing the stack state change"`
-	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state (active | restricted | deprecated | disabled)] [--reason REASON]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled\n   CF_NAME update-stack cflinuxfs3 --state deprecated --reason 'Use cflinuxfs4 instead'"`
+	usage           interface{}    `usage:"CF_NAME update-stack STACK_NAME [--state (active | restricted | deprecated | disabled)] [--reason text]\n\nEXAMPLES:\n   CF_NAME update-stack cflinuxfs3 --state disabled\n   CF_NAME update-stack cflinuxfs3 --state deprecated --reason \"This stack is based on Ubuntu 18.04, which is no longer supported. Please migrate your applications to 'cflinuxfs4'. For more information, see: <link-to-docs>.\""`
 	relatedCommands interface{}    `related_commands:"stack, stacks"`
 }
 
