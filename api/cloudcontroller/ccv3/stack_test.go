@@ -148,6 +148,7 @@ var _ = Describe("Stacks", func() {
 		var (
 			stackGUID string
 			state     string
+			reason    string
 			stack     resources.Stack
 			warnings  Warnings
 			err       error
@@ -156,10 +157,11 @@ var _ = Describe("Stacks", func() {
 		BeforeEach(func() {
 			stackGUID = "some-stack-guid"
 			state = "DEPRECATED"
+			reason = ""
 		})
 
 		JustBeforeEach(func() {
-			stack, warnings, err = client.UpdateStack(stackGUID, state)
+			stack, warnings, err = client.UpdateStack(stackGUID, state, reason)
 		})
 
 		When("the request succeeds", func() {
@@ -188,6 +190,40 @@ var _ = Describe("Stacks", func() {
 					Name:        "some-stack",
 					Description: "some description",
 					State:       "DEPRECATED",
+				}))
+			})
+		})
+
+		When("a reason is provided", func() {
+			BeforeEach(func() {
+				reason = "Use cflinuxfs4 instead"
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/stacks/some-stack-guid"),
+						VerifyJSONRepresenting(map[string]string{
+							"state":        "DEPRECATED",
+							"state_reason": "Use cflinuxfs4 instead",
+						}),
+						RespondWith(http.StatusOK, `{
+						"guid": "some-stack-guid",
+						"name": "some-stack",
+						"description": "some description",
+						"state": "DEPRECATED",
+						"state_reason": "Use cflinuxfs4 instead"
+					}`, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated stack with reason and warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(stack).To(Equal(resources.Stack{
+					GUID:        "some-stack-guid",
+					Name:        "some-stack",
+					Description: "some description",
+					State:       "DEPRECATED",
+					StateReason: "Use cflinuxfs4 instead",
 				}))
 			})
 		})
