@@ -251,7 +251,7 @@ var _ = Describe("Service App Binding Action", func() {
 		})
 	})
 
-	Describe("DeleteServiceAppBinding", func() {
+	Describe("ListServiceAppBindings", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
 			serviceInstanceGUID = "fake-service-instance-guid"
@@ -259,14 +259,13 @@ var _ = Describe("Service App Binding Action", func() {
 			appGUID             = "fake-app-guid"
 			spaceGUID           = "fake-space-guid"
 			bindingGUID         = "fake-binding-guid"
-			fakeJobURL          = ccv3.JobURL("fake-job-url")
 		)
 
 		var (
-			params         DeleteServiceAppBindingParams
-			warnings       Warnings
-			executionError error
-			stream         chan PollJobEvent
+			params                    ListServiceAppBindingParams
+			warnings                  Warnings
+			executionError            error
+			serviceCredentialBindings []resources.ServiceCredentialBinding
 		)
 
 		BeforeEach(func() {
@@ -297,47 +296,27 @@ var _ = Describe("Service App Binding Action", func() {
 				nil,
 			)
 
-			fakeCloudControllerClient.DeleteServiceCredentialBindingReturns(
-				fakeJobURL,
-				ccv3.Warnings{"delete binding warning"},
-				nil,
-			)
-
-			fakeStream := make(chan ccv3.PollJobEvent)
-			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
-			go func() {
-				fakeStream <- ccv3.PollJobEvent{
-					State:    constant.JobPolling,
-					Warnings: ccv3.Warnings{"poll warning"},
-				}
-			}()
-
-			params = DeleteServiceAppBindingParams{
-				SpaceGUID:           spaceGUID,
-				ServiceInstanceName: serviceInstanceName,
-				AppName:             appName,
+			params = ListServiceAppBindingParams{
+				SpaceGUID:           "fake-space-guid",
+				ServiceInstanceName: "fake-service-instance-name",
+				AppName:             "fake-app-name",
 			}
 		})
 
 		JustBeforeEach(func() {
-			stream, warnings, executionError = actor.DeleteServiceAppBinding(params)
+			serviceCredentialBindings, warnings, executionError = actor.ListServiceAppBindings(params)
 		})
 
-		It("returns an event stream, warnings, and no errors", func() {
+		It("returns an event stream, warning, and no errors", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 
 			Expect(warnings).To(ConsistOf(Warnings{
 				"get instance warning",
 				"get app warning",
 				"get bindings warning",
-				"delete binding warning",
 			}))
 
-			Eventually(stream).Should(Receive(Equal(PollJobEvent{
-				State:    JobPolling,
-				Warnings: Warnings{"poll warning"},
-				Err:      nil,
-			})))
+			Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{{GUID: bindingGUID}}))
 		})
 
 		Describe("service instance lookup", func() {
@@ -428,8 +407,6 @@ var _ = Describe("Service App Binding Action", func() {
 					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
 					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
-					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
-					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -465,6 +442,67 @@ var _ = Describe("Service App Binding Action", func() {
 					Expect(executionError).To(MatchError("boom"))
 				})
 			})
+		})
+	})
+
+	Describe("DeleteServiceAppBinding", func() {
+		const (
+			bindingGUID = "fake-binding-guid"
+			fakeJobURL  = ccv3.JobURL("fake-job-url")
+		)
+
+		var (
+			params         DeleteServiceAppBindingParams
+			warnings       Warnings
+			executionError error
+			stream         chan PollJobEvent
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+				[]resources.ServiceCredentialBinding{
+					{GUID: bindingGUID},
+				},
+				ccv3.Warnings{"get bindings warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.DeleteServiceCredentialBindingReturns(
+				fakeJobURL,
+				ccv3.Warnings{"delete binding warning"},
+				nil,
+			)
+
+			fakeStream := make(chan ccv3.PollJobEvent)
+			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+			go func() {
+				fakeStream <- ccv3.PollJobEvent{
+					State:    constant.JobPolling,
+					Warnings: ccv3.Warnings{"poll warning"},
+				}
+			}()
+
+			params = DeleteServiceAppBindingParams{
+				ServiceBindingGUID: bindingGUID,
+			}
+		})
+
+		JustBeforeEach(func() {
+			stream, warnings, executionError = actor.DeleteServiceAppBinding(params)
+		})
+
+		It("returns an event stream, warning, and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+
+			Expect(warnings).To(ConsistOf(Warnings{
+				"delete binding warning",
+			}))
+
+			Eventually(stream).Should(Receive(Equal(PollJobEvent{
+				State:    JobPolling,
+				Warnings: Warnings{"poll warning"},
+				Err:      nil,
+			})))
 		})
 
 		Describe("initiating the delete", func() {
