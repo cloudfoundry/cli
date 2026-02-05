@@ -96,38 +96,66 @@ var _ = Describe("stacks Command", func() {
 		})
 
 		When("StacksActor does not return an error", func() {
-			BeforeEach(func() {
-				stacks := []resources.Stack{
-					{Name: "Stack2", Description: "desc2"},
-					{Name: "stack1", Description: "desc1"},
-				}
-				fakeActor.GetStacksReturns(stacks, v7action.Warnings{"warning-1", "warning-2"}, nil)
-			})
-
-			When("the --labels flag is given", func() {
-				labelsFlagValue := "some-label-selector"
+			Context("when stacks do not have state", func() {
 				BeforeEach(func() {
-					cmd.Labels = labelsFlagValue
+					stacks := []resources.Stack{
+						{Name: "Stack2", Description: "desc2"},
+						{Name: "stack1", Description: "desc1"},
+					}
+					fakeActor.GetStacksReturns(stacks, v7action.Warnings{"warning-1", "warning-2"}, nil)
 				})
-				It("passes the label selector to GetStacks", func() {
-					labelSelector := fakeActor.GetStacksArgsForCall(0)
-					Expect(labelSelector).To(Equal(labelsFlagValue))
+
+				When("the --labels flag is given", func() {
+					labelsFlagValue := "some-label-selector"
+					BeforeEach(func() {
+						cmd.Labels = labelsFlagValue
+					})
+					It("passes the label selector to GetStacks", func() {
+						labelSelector := fakeActor.GetStacksArgsForCall(0)
+						Expect(labelSelector).To(Equal(labelsFlagValue))
+					})
+				})
+
+				It("prints warnings", func() {
+					Expect(testUI.Err).To(Say(`warning-1`))
+					Expect(testUI.Err).To(Say(`warning-2`))
+				})
+
+				It("prints the list of stacks in alphabetical order without state column", func() {
+					Expect(testUI.Out).To(Say(tableHeaders))
+					Expect(testUI.Out).To(Say(`stack1\s+desc1`))
+					Expect(testUI.Out).To(Say(`Stack2\s+desc2`))
+					Expect(testUI.Out).ToNot(Say(`state`))
+				})
+
+				It("prints the flavor text", func() {
+					Expect(testUI.Out).To(Say("Getting stacks as banana\\.\\.\\."))
 				})
 			})
 
-			It("prints warnings", func() {
-				Expect(testUI.Err).To(Say(`warning-1`))
-				Expect(testUI.Err).To(Say(`warning-2`))
-			})
+			Context("when stacks have state", func() {
+				BeforeEach(func() {
+					stacks := []resources.Stack{
+						{Name: "Stack2", Description: "desc2", State: "DEPRECATED"},
+						{Name: "stack1", Description: "desc1", State: "ACTIVE"},
+					}
+					fakeActor.GetStacksReturns(stacks, v7action.Warnings{"warning-1", "warning-2"}, nil)
+				})
 
-			It("prints the list of stacks in alphabetical order", func() {
-				Expect(testUI.Out).To(Say(tableHeaders))
-				Expect(testUI.Out).To(Say(`stack1\s+desc1`))
-				Expect(testUI.Out).To(Say(`Stack2\s+desc2`))
-			})
+				It("prints warnings", func() {
+					Expect(testUI.Err).To(Say(`warning-1`))
+					Expect(testUI.Err).To(Say(`warning-2`))
+				})
 
-			It("prints the flavor text", func() {
-				Expect(testUI.Out).To(Say("Getting stacks as banana\\.\\.\\."))
+				It("prints the list of stacks in alphabetical order with state column", func() {
+					Expect(testUI.Out).To(Say(`name\s+description\s+state`))
+					Expect(testUI.Out).To(Say(`stack1\s+desc1\s+ACTIVE`))
+					Expect(testUI.Out).To(Say(`Stack2\s+desc2\s+DEPRECATED`))
+				})
+
+				It("prints the flavor text", func() {
+					Expect(testUI.Out).To(Say("Getting stacks as banana\\.\\.\\."))
+				})
 			})
 		})
 	})
