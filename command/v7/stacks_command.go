@@ -12,7 +12,7 @@ type StacksCommand struct {
 	BaseCommand
 
 	usage           interface{} `usage:"CF_NAME stacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME stacks\n   CF_NAME stacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME stacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
-	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, stack, update-buildpack"`
+	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, stack, update-buildpack, update-stack"`
 	Labels          string      `long:"labels" description:"Selector to filter stacks by labels"`
 }
 
@@ -47,11 +47,34 @@ func (cmd StacksCommand) Execute(args []string) error {
 
 func (cmd StacksCommand) displayTable(stacks []resources.Stack) {
 	if len(stacks) > 0 {
-		var keyValueTable = [][]string{
-			{"name", "description"},
-		}
+		// Check if any stack has a state value
+		hasState := false
 		for _, stack := range stacks {
-			keyValueTable = append(keyValueTable, []string{stack.Name, stack.Description})
+			if stack.State != "" {
+				hasState = true
+				break
+			}
+		}
+
+		// Build the header based on whether state is present
+		var keyValueTable [][]string
+		if hasState {
+			keyValueTable = [][]string{
+				{"name", "description", "state"},
+			}
+		} else {
+			keyValueTable = [][]string{
+				{"name", "description"},
+			}
+		}
+
+		// Build the rows
+		for _, stack := range stacks {
+			if hasState {
+				keyValueTable = append(keyValueTable, []string{stack.Name, stack.Description, stack.State})
+			} else {
+				keyValueTable = append(keyValueTable, []string{stack.Name, stack.Description})
+			}
 		}
 
 		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
