@@ -1,11 +1,11 @@
-code.cloudfoundry.org/bytefmt v0.62.0 h1:MeIv8SfspydaNWVmZZZGFcE2Bs1PKVfjmA0x2/WQtMU=
-code.cloudfoundry.org/bytefmt v0.62.0/go.mod h1:cV5MEjJxcDcu4oGNGwb3bJK/H3yx0rXhji++YR2rPBY=
+code.cloudfoundry.org/bytefmt v0.63.0 h1:6GFNEi4MAWrD17HDPVfUYRsdVCvIyAPlS02YpdxgXRM=
+code.cloudfoundry.org/bytefmt v0.63.0/go.mod h1:DsygK5w8ed1FNIeJto0+dLafRbmMqMisuE1VeDngbXo=
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85 h1:jaHWw9opYjKPrDT19uydBBWSxl+g5F4Hv030fqMsalo=
 code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85/go.mod h1:R1EiyOAr7lW0l/YkZNqItUNZ01Q/dYUfbTn4X4Z+82M=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4 h1:O+j8afQWaDuxzKGcculsjgHGK+biBTn6iMjgFpBf54c=
 code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4/go.mod h1:dVTgo9kQbYns/QM4A1C2GtxqUnFSvJTk2Qhw+M0/uzk=
-code.cloudfoundry.org/clock v1.59.0 h1:qH/jamlKJX5ViQSt08td9QFnZiqc+VER2pUXnluj+H8=
-code.cloudfoundry.org/clock v1.59.0/go.mod h1:M0p5X+TwhnApXGzFGs/sU8aD31LEHQILD8cgpPPUJSM=
+code.cloudfoundry.org/clock v1.60.0 h1:X47eUg0qVXhzGnGSo6TTQtWKfT1vjMfomP7a3sXi2lo=
+code.cloudfoundry.org/clock v1.60.0/go.mod h1:aIq+ZIUPz32B/Mr8QQlPtEksMKRDKnWOxy+b9d9D7i8=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82 h1:Bns1y0jSlcvfP0u8ael+TUlnyNHsNX808zuo58bf5so=
 code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82/go.mod h1:L2/glHnSK+wKnsG8oZZqdV2sgYY9NDo/I1aDJGhcWaM=
 code.cloudfoundry.org/go-log-cache/v2 v2.0.7 h1:yR/JjQ/RscO1n4xVAT9HDYcpx5ET/3Cq2/RhpJml6ZU=
@@ -19,8 +19,8 @@ code.cloudfoundry.org/inigo v0.0.0-20230612153013-b300679e6ed6/go.mod h1:1ZB1JCh
 code.cloudfoundry.org/jsonry v1.1.4 h1:P9N7IlH1/4aRCLcXLgLFj1hkcBmV7muijJzY+K6U4hE=
 code.cloudfoundry.org/jsonry v1.1.4/go.mod h1:6aKilShQP7w/Ez76h1El2/n9y2OkHuU56nKSBB9Gp0A=
 code.cloudfoundry.org/lager v1.1.1-0.20191008172124-a9afc05ee5be/go.mod h1:O2sS7gKP3HM2iemG+EnwvyNQK7pTSC6Foi4QiMp9sSk=
-code.cloudfoundry.org/lager/v3 v3.59.0 h1:3yRkiLLlrEnzODat1JfTqOEsoRcUO77wgz7yDEfbiRI=
-code.cloudfoundry.org/lager/v3 v3.59.0/go.mod h1:g05wIHDapO43fHCabGb4h0+4+QlO4tYlDa4xdToxqU4=
+code.cloudfoundry.org/lager/v3 v3.60.0 h1:Xtc1orbWeRaHA7HQR5zmerldvzAuvIQsodThGBC0C4k=
+code.cloudfoundry.org/lager/v3 v3.60.0/go.mod h1:raTjd59mrvXX7JqYUOBQgpv36b9+TvtaKsJErufk5J8=
 code.cloudfoundry.org/tlsconfig v0.44.0 h1:YipP4SR67P6omv7TPOpMXjo42bN/4UR4cyjh7GpDuEw=
 code.cloudfoundry.org/tlsconfig v0.44.0/go.mod h1:LGMiYZD1XmqMUkLi58MBkhlmFfQ48MRkhiLi4phAODw=
 code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d h1:M+zXqtXJqcsmpL76aU0tdl1ho23eYa4axYoM4gD62UA=
@@ -127,8 +127,8 @@ github.com/google/go-querystring v1.2.0 h1:yhqkPbu2/OH+V9BfpCVPZkNmUXhb2gBxJArfh
 github.com/google/go-querystring v1.2.0/go.mod h1:8IFJqpSRITyJ8QhQ13bmbeMBDfmeEJZD5A0egEOmkqU=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38/go.mod h1:kpwsk12EmLew5upagYY7GY0pfYCcupk39gWOCRROcvE=
-github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83 h1:z2ogiKUYzX5Is6zr/vP9vJGqPwcdqsWjOt+V8J7+bTc=
-github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
+github.com/google/pprof v0.0.0-20260202012954-cb029daf43ef h1:xpF9fUHpoIrrjX24DURVKiwHcFpw19ndIs+FwTSMbno=
+github.com/google/pprof v0.0.0-20260202012954-cb029daf43ef/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
