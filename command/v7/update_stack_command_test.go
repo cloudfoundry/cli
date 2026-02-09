@@ -157,43 +157,43 @@ var _ = Describe("update-stack Command", func() {
 			})
 		})
 
-	Context("when state values are provided in different cases", func() {
-		It("accepts 'active' and capitalizes it", func() {
-			cmd.State = "active"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateActive}, v7action.Warnings{}, nil)
+		Context("when state values are provided in different cases", func() {
+			It("accepts 'active' and capitalizes it", func() {
+				cmd.State = "active"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateActive}, v7action.Warnings{}, nil)
 
-			executeErr = cmd.Execute(args)
+				executeErr = cmd.Execute(args)
 
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateActive))
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateActive))
+			})
+
+			It("accepts 'RESTRICTED' and keeps it capitalized", func() {
+				cmd.State = "RESTRICTED"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateRestricted}, v7action.Warnings{}, nil)
+
+				executeErr = cmd.Execute(args)
+
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateRestricted))
+			})
+
+			It("accepts 'Disabled' and capitalizes it", func() {
+				cmd.State = "Disabled"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateDisabled}, v7action.Warnings{}, nil)
+
+				executeErr = cmd.Execute(args)
+
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateDisabled))
+			})
 		})
-
-		It("accepts 'RESTRICTED' and keeps it capitalized", func() {
-			cmd.State = "RESTRICTED"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateRestricted}, v7action.Warnings{}, nil)
-
-			executeErr = cmd.Execute(args)
-
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateRestricted))
-		})
-
-		It("accepts 'Disabled' and capitalizes it", func() {
-			cmd.State = "Disabled"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateDisabled}, v7action.Warnings{}, nil)
-
-			executeErr = cmd.Execute(args)
-
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateDisabled))
-		})
-	})
 	})
 })
 

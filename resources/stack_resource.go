@@ -27,11 +27,6 @@ func ValidStackStatesLowercase() []string {
 	return lowercase
 }
 
-// ValidStackStatesString returns a pipe-separated string of valid states in lowercase
-func ValidStackStatesString() string {
-	return strings.Join(ValidStackStatesLowercase(), "|")
-}
-
 type Stack struct {
 	// GUID is a unique stack identifier.
 	GUID string `json:"guid"`
