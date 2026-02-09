@@ -25,7 +25,6 @@ var isPass = regexp.MustCompile("(?i)password|token")
 // CF runs a 'cf' command with given arguments.
 func CF(args ...string) *Session {
 	WriteCommand("", nil, args)
-	// TODO remove hardcoded path
 	session, err := Start(
 		exec.Command("cf", args...),
 		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
