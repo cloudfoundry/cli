@@ -251,7 +251,7 @@ var _ = Describe("unbind-service command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Unbinding app %s from service %s in org %s / space %s as %s\.\.\.\n`, appName, serviceInstanceName, orgName, spaceName, username),
-					Say(`Binding between %s and %s did not exist\n`, serviceInstanceName, appName),
+					Say(`Binding between %s and %s does not exist\n`, serviceInstanceName, appName),
 					Say(`OK\n`),
 				))
 
