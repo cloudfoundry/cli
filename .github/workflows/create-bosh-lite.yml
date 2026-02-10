@@ -153,6 +153,7 @@ jobs:
           -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/add-uaa-client-credentials.yml \
           -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/increase-route-registration-interval.yml \
           -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/add-oidc-provider.yml ${additional_args} \
+          -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/increase-max-service-credential-bindings.yml \
           -v client-secret="${{ secrets.CLIENT_SECRET }}" \
           -v system_domain=${SYSTEM_DOMAIN} \
           > ./director.yml
