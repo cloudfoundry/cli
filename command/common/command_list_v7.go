@@ -31,6 +31,7 @@ type commandList struct {
 	Buildpacks                         v7.BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
 	CancelDeployment                   v7.CancelDeploymentCommand                   `command:"cancel-deployment" description:"Cancel the most recent deployment for an app. Resets the current droplet to the previous deployment's droplet."`
 	CheckRoute                         v7.CheckRouteCommand                         `command:"check-route" description:"Perform a check to determine whether a route currently exists or not"`
+	CleanupOutdatedServiceBindings     v7.CleanupOutdatedServiceBindingsCommand     `command:"cleanup-outdated-service-bindings" description:"Cleans up old service bindings for an app, keeping only the most recent binding for each service instance"`
 	Config                             v7.ConfigCommand                             `command:"config" description:"Write default values to the config"`
 	ContinueDeployment                 v7.ContinueDeploymentCommand                 `command:"continue-deployment" description:"Continue the most recent deployment for an app."`
 	CopySource                         v7.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application and restages that application"`

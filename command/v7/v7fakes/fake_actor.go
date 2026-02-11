@@ -2088,6 +2088,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceInstanceByGUIDStub        func(string) (resources.ServiceInstance, v7action.Warnings, error)
+	getServiceInstanceByGUIDMutex       sync.RWMutex
+	getServiceInstanceByGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getServiceInstanceByGUIDReturns struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceInstanceByGUIDReturnsOnCall map[int]struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceInstanceByNameAndSpaceStub        func(string, string) (resources.ServiceInstance, v7action.Warnings, error)
 	getServiceInstanceByNameAndSpaceMutex       sync.RWMutex
 	getServiceInstanceByNameAndSpaceArgsForCall []struct {
@@ -2502,6 +2517,21 @@ type FakeActor struct {
 	getUserReturnsOnCall map[int]struct {
 		result1 resources.User
 		result2 error
+	}
+	ListAppBindingsStub        func(v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
+	listAppBindingsMutex       sync.RWMutex
+	listAppBindingsArgsForCall []struct {
+		arg1 v7action.ListAppBindingParams
+	}
+	listAppBindingsReturns struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	listAppBindingsReturnsOnCall map[int]struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
 	}
 	ListServiceAppBindingsStub        func(v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
 	listServiceAppBindingsMutex       sync.RWMutex
@@ -12783,6 +12813,73 @@ func (fake *FakeActor) GetServiceBrokersReturnsOnCall(i int, result1 []resources
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServiceInstanceByGUID(arg1 string) (resources.ServiceInstance, v7action.Warnings, error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	ret, specificReturn := fake.getServiceInstanceByGUIDReturnsOnCall[len(fake.getServiceInstanceByGUIDArgsForCall)]
+	fake.getServiceInstanceByGUIDArgsForCall = append(fake.getServiceInstanceByGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetServiceInstanceByGUIDStub
+	fakeReturns := fake.getServiceInstanceByGUIDReturns
+	fake.recordInvocation("GetServiceInstanceByGUID", []interface{}{arg1})
+	fake.getServiceInstanceByGUIDMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDCallCount() int {
+	fake.getServiceInstanceByGUIDMutex.RLock()
+	defer fake.getServiceInstanceByGUIDMutex.RUnlock()
+	return len(fake.getServiceInstanceByGUIDArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDCalls(stub func(string) (resources.ServiceInstance, v7action.Warnings, error)) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = stub
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDArgsForCall(i int) string {
+	fake.getServiceInstanceByGUIDMutex.RLock()
+	defer fake.getServiceInstanceByGUIDMutex.RUnlock()
+	argsForCall := fake.getServiceInstanceByGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDReturns(result1 resources.ServiceInstance, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = nil
+	fake.getServiceInstanceByGUIDReturns = struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDReturnsOnCall(i int, result1 resources.ServiceInstance, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = nil
+	if fake.getServiceInstanceByGUIDReturnsOnCall == nil {
+		fake.getServiceInstanceByGUIDReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceInstance
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstanceByGUIDReturnsOnCall[i] = struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServiceInstanceByNameAndSpace(arg1 string, arg2 string) (resources.ServiceInstance, v7action.Warnings, error) {
 	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceArgsForCall)]
@@ -14541,6 +14638,73 @@ func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 resources.User, resul
 		result1 resources.User
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) ListAppBindings(arg1 v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {
+	fake.listAppBindingsMutex.Lock()
+	ret, specificReturn := fake.listAppBindingsReturnsOnCall[len(fake.listAppBindingsArgsForCall)]
+	fake.listAppBindingsArgsForCall = append(fake.listAppBindingsArgsForCall, struct {
+		arg1 v7action.ListAppBindingParams
+	}{arg1})
+	stub := fake.ListAppBindingsStub
+	fakeReturns := fake.listAppBindingsReturns
+	fake.recordInvocation("ListAppBindings", []interface{}{arg1})
+	fake.listAppBindingsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) ListAppBindingsCallCount() int {
+	fake.listAppBindingsMutex.RLock()
+	defer fake.listAppBindingsMutex.RUnlock()
+	return len(fake.listAppBindingsArgsForCall)
+}
+
+func (fake *FakeActor) ListAppBindingsCalls(stub func(v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = stub
+}
+
+func (fake *FakeActor) ListAppBindingsArgsForCall(i int) v7action.ListAppBindingParams {
+	fake.listAppBindingsMutex.RLock()
+	defer fake.listAppBindingsMutex.RUnlock()
+	argsForCall := fake.listAppBindingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ListAppBindingsReturns(result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = nil
+	fake.listAppBindingsReturns = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) ListAppBindingsReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = nil
+	if fake.listAppBindingsReturnsOnCall == nil {
+		fake.listAppBindingsReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceCredentialBinding
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.listAppBindingsReturnsOnCall[i] = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) ListServiceAppBindings(arg1 v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {

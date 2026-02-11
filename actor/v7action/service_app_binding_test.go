@@ -251,6 +251,140 @@ var _ = Describe("Service App Binding Action", func() {
 		})
 	})
 
+	Describe("ListAppBindings", func() {
+		const (
+			appName     = "fake-app-name"
+			appGUID     = "fake-app-guid"
+			spaceGUID   = "fake-space-guid"
+			bindingGUID = "fake-binding-guid"
+		)
+
+		var (
+			params                    ListAppBindingParams
+			warnings                  Warnings
+			executionError            error
+			serviceCredentialBindings []resources.ServiceCredentialBinding
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+				resources.Application{
+					GUID: appGUID,
+					Name: appName,
+				},
+				ccv3.Warnings{"get app warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+				[]resources.ServiceCredentialBinding{
+					{GUID: bindingGUID},
+				},
+				ccv3.Warnings{"get bindings warning"},
+				nil,
+			)
+
+			params = ListAppBindingParams{
+				SpaceGUID: "fake-space-guid",
+				AppName:   "fake-app-name",
+			}
+		})
+
+		JustBeforeEach(func() {
+			serviceCredentialBindings, warnings, executionError = actor.ListAppBindings(params)
+		})
+
+		It("returns an event stream, warning, and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+
+			Expect(warnings).To(ConsistOf(Warnings{
+				"get app warning",
+				"get bindings warning",
+			}))
+
+			Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{{GUID: bindingGUID}}))
+		})
+
+		Describe("app lookup", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+				actualAppName, actualSpaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
+				Expect(actualAppName).To(Equal(appName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+			})
+
+			When("not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+						resources.Application{},
+						ccv3.Warnings{"get app warning"},
+						ccerror.ApplicationNotFoundError{Name: appName},
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get app warning"))
+					Expect(executionError).To(MatchError(actionerror.ApplicationNotFoundError{Name: appName}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+						resources.Application{},
+						ccv3.Warnings{"get app warning"},
+						errors.New("boom"),
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get app warning"))
+					Expect(executionError).To(MatchError("boom"))
+				})
+			})
+		})
+
+		Describe("binding lookup", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+				))
+			})
+
+			When("there are no bindings", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+						[]resources.ServiceCredentialBinding{},
+						ccv3.Warnings{"get bindings warning"},
+						nil,
+					)
+				})
+
+				It("returns an empty list", func() {
+					Expect(warnings).To(ContainElement("get bindings warning"))
+					Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+						[]resources.ServiceCredentialBinding{},
+						ccv3.Warnings{"get binding warning"},
+						errors.New("boom"),
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get binding warning"))
+					Expect(executionError).To(MatchError("boom"))
+				})
+			})
+		})
+	})
+
 	Describe("ListServiceAppBindings", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
