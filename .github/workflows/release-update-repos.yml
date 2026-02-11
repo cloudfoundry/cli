@@ -403,7 +403,7 @@ jobs:
         && pip3 install awscli
 
     - name: Setup aws to upload installers to CLAW S3 bucket
-      uses: aws-actions/configure-aws-credentials@v5
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id:     ${{ vars.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
