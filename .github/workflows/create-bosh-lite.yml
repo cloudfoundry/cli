@@ -124,8 +124,6 @@ jobs:
           cd $env_name/bbl-state
           eval "$(bbl print-env)"
           
-          jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
-
           bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"          
       - name: Deploy cf
         run: |
