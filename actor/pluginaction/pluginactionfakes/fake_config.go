@@ -521,24 +521,6 @@ func (fake *FakeConfig) WritePluginConfigReturnsOnCall(i int, result1 error) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.addPluginMutex.RLock()
-	defer fake.addPluginMutex.RUnlock()
-	fake.addPluginRepositoryMutex.RLock()
-	defer fake.addPluginRepositoryMutex.RUnlock()
-	fake.binaryVersionMutex.RLock()
-	defer fake.binaryVersionMutex.RUnlock()
-	fake.getPluginMutex.RLock()
-	defer fake.getPluginMutex.RUnlock()
-	fake.pluginHomeMutex.RLock()
-	defer fake.pluginHomeMutex.RUnlock()
-	fake.pluginRepositoriesMutex.RLock()
-	defer fake.pluginRepositoriesMutex.RUnlock()
-	fake.pluginsMutex.RLock()
-	defer fake.pluginsMutex.RUnlock()
-	fake.removePluginMutex.RLock()
-	defer fake.removePluginMutex.RUnlock()
-	fake.writePluginConfigMutex.RLock()
-	defer fake.writePluginConfigMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
