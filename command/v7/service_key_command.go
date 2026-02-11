@@ -9,6 +9,7 @@ type ServiceKeyCommand struct {
 
 	RequiredArgs flag.ServiceInstanceKey `positional-args:"yes"`
 	GUID         bool                    `long:"guid" description:"Retrieve and display the given service-key's guid. All other output is suppressed."`
+	JSON         bool                    `long:"json" description:"Output credentials as JSON. All other output is suppressed."`
 }
 
 func (cmd ServiceKeyCommand) Execute(args []string) error {
@@ -16,9 +17,11 @@ func (cmd ServiceKeyCommand) Execute(args []string) error {
 		return err
 	}
 
-	switch cmd.GUID {
-	case true:
+	switch {
+	case cmd.GUID:
 		return cmd.guid()
+	case cmd.JSON:
+		return cmd.json()
 	default:
 		return cmd.details()
 	}
@@ -38,14 +41,27 @@ func (cmd ServiceKeyCommand) guid() error {
 		cmd.RequiredArgs.ServiceKey,
 		cmd.Config.TargetedSpace().GUID,
 	)
-	switch err.(type) {
-	case nil:
-		cmd.UI.DisplayText(key.GUID)
-		return nil
-	default:
+	if err != nil {
 		cmd.UI.DisplayWarnings(warnings)
 		return err
 	}
+
+	cmd.UI.DisplayText(key.GUID)
+	return nil
+}
+
+func (cmd ServiceKeyCommand) json() error {
+	details, warnings, err := cmd.Actor.GetServiceKeyDetailsByServiceInstanceAndName(
+		cmd.RequiredArgs.ServiceInstance,
+		cmd.RequiredArgs.ServiceKey,
+		cmd.Config.TargetedSpace().GUID,
+	)
+	if err != nil {
+		cmd.UI.DisplayWarnings(warnings)
+		return err
+	}
+
+	return cmd.UI.DisplayJSON("", details)
 }
 
 func (cmd ServiceKeyCommand) details() error {
@@ -72,10 +88,5 @@ func (cmd ServiceKeyCommand) details() error {
 
 	cmd.UI.DisplayNewline()
 
-	err = cmd.UI.DisplayJSON("", details)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return cmd.UI.DisplayJSON("", details)
 }

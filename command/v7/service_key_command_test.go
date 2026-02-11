@@ -64,6 +64,16 @@ var _ = Describe("service-key Command", func() {
 		Expect(actualSpace).To(BeTrue())
 	})
 
+	When("checking target fails", func() {
+		BeforeEach(func() {
+			fakeSharedActor.CheckTargetReturns(errors.New("not logged in"))
+		})
+
+		It("returns the error", func() {
+			Expect(executeErr).To(MatchError("not logged in"))
+		})
+	})
+
 	When("getting details", func() {
 		const fakeUserName = "fake-user-name"
 
@@ -156,6 +166,55 @@ var _ = Describe("service-key Command", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceKeyByServiceInstanceAndNameReturns(
 					resources.ServiceCredentialBinding{},
+					v7action.Warnings{"a warning"},
+					errors.New("bang"),
+				)
+			})
+
+			It("prints warnings and returns an error", func() {
+				Expect(testUI.Err).To(Say("a warning"))
+				Expect(executeErr).To(MatchError("bang"))
+			})
+		})
+	})
+
+	When("getting JSON output", func() {
+		BeforeEach(func() {
+			fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
+				resources.ServiceCredentialBindingDetails{
+					Credentials: map[string]interface{}{"foo": "bar", "pass": "<3test"},
+				},
+				v7action.Warnings{"a warning"},
+				nil,
+			)
+
+			setFlag(&cmd, "--json")
+		})
+
+		It("delegates to the actor", func() {
+			Expect(fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameCallCount()).To(Equal(1))
+			actualServiceInstanceName, actualKeyName, actualSpaceGUID := fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameArgsForCall(0)
+			Expect(actualServiceInstanceName).To(Equal(fakeServiceInstanceName))
+			Expect(actualKeyName).To(Equal(fakeServiceKeyName))
+			Expect(actualSpaceGUID).To(Equal(fakeSpaceGUID))
+		})
+
+		It("prints JSON without intro message or warnings", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Err).NotTo(Say("a warning"))
+			Expect(testUI.Out).NotTo(Say("Getting key"))
+			Expect(testUI.Out).To(SatisfyAll(
+				Say(`\{\n`),
+				Say(`  "foo": "bar",\n`),
+				Say(`  "pass": "<3test"\n`),
+				Say(`\}\n`),
+			))
+		})
+
+		When("actor returns an error", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceKeyDetailsByServiceInstanceAndNameReturns(
+					resources.ServiceCredentialBindingDetails{},
 					v7action.Warnings{"a warning"},
 					errors.New("bang"),
 				)
