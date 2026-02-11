@@ -331,16 +331,6 @@ func (fake *FakeLogMessage) TypeReturnsOnCall(i int, result1 string) {
 func (fake *FakeLogMessage) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.messageMutex.RLock()
-	defer fake.messageMutex.RUnlock()
-	fake.sourceInstanceMutex.RLock()
-	defer fake.sourceInstanceMutex.RUnlock()
-	fake.sourceTypeMutex.RLock()
-	defer fake.sourceTypeMutex.RUnlock()
-	fake.timestampMutex.RLock()
-	defer fake.timestampMutex.RUnlock()
-	fake.typeMutex.RLock()
-	defer fake.typeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

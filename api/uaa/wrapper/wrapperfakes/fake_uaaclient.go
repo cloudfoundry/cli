@@ -93,8 +93,6 @@ func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.Re
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.refreshAccessTokenMutex.RLock()
-	defer fake.refreshAccessTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

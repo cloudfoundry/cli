@@ -151,10 +151,6 @@ func (fake *FakeUserConfig) CurrentUserNameReturnsOnCall(i int, result1 string, 
 func (fake *FakeUserConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.currentUserMutex.RLock()
-	defer fake.currentUserMutex.RUnlock()
-	fake.currentUserNameMutex.RLock()
-	defer fake.currentUserNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

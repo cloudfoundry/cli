@@ -414,18 +414,6 @@ func (fake *FakeSharedActor) RequireTargetedOrgReturnsOnCall(i int, result1 stri
 func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.checkTargetMutex.RLock()
-	defer fake.checkTargetMutex.RUnlock()
-	fake.isLoggedInMutex.RLock()
-	defer fake.isLoggedInMutex.RUnlock()
-	fake.isOrgTargetedMutex.RLock()
-	defer fake.isOrgTargetedMutex.RUnlock()
-	fake.isSpaceTargetedMutex.RLock()
-	defer fake.isSpaceTargetedMutex.RUnlock()
-	fake.requireCurrentUserMutex.RLock()
-	defer fake.requireCurrentUserMutex.RUnlock()
-	fake.requireTargetedOrgMutex.RLock()
-	defer fake.requireTargetedOrgMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
