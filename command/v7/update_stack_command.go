@@ -73,8 +73,8 @@ func (cmd UpdateStackCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("state:"), updatedStack.State},
 	}
 
-	// Add reason if it's present
-	if updatedStack.StateReason != "" {
+	// Add reason whenever state is not ACTIVE
+	if updatedStack.State != resources.StackStateActive {
 		displayTable = append(displayTable, []string{cmd.UI.TranslateText("reason:"), updatedStack.StateReason})
 	}
 
