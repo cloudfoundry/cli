@@ -16,7 +16,7 @@ var _ = Describe("stacks command", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("stacks", "APPS", "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("stacks", "APPS", "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps) and current state"))
 		})
 
 		It("Displays command usage to output", func() {
@@ -80,9 +80,9 @@ var _ = Describe("stacks command", func() {
 			Eventually(session).Should(Exit(0))
 
 			Expect(session).Should(Say(`Getting stacks as %s\.\.\.`, userName))
-			Expect(session).Should(Say(`name\s+description`))
-			Expect(session).Should(Say(`cflinuxfs\d+\s+Cloud Foundry Linux`))
-			Expect(session).Should(Say(`%s\s+CF CLI integration test stack, please delete`, stackName))
+			Expect(session).Should(Say(`name\s+description\s+state`))
+			Expect(session).Should(Say(`cflinuxfs\d+\s+Cloud Foundry Linux.*\s+ACTIVE`))
+			Expect(session).Should(Say(`%s\s+CF CLI integration test stack, please delete\s+ACTIVE`, stackName))
 		})
 	})
 })
