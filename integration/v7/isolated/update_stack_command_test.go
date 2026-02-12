@@ -207,6 +207,32 @@ var _ = Describe("update-stack command", func() {
 				})
 			})
 
+			When("updating to a non-active state without a reason", func() {
+				It("shows an empty reason field in the output", func() {
+					session := helpers.CF("update-stack", stackName, "--state", "deprecated")
+
+					Eventually(session).Should(Say(`Updating stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`state:\s+DEPRECATED`))
+					Eventually(session).Should(Say(`reason:\s*$`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("updating with a reason", func() {
+				It("shows the reason in the update-stack output", func() {
+					session := helpers.CF("update-stack", stackName, "--state", "disabled", "--reason", "This stack is no longer supported.")
+
+					Eventually(session).Should(Say(`Updating stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`state:\s+DISABLED`))
+					Eventually(session).Should(Say(`reason:\s+This stack is no longer supported\.`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
 			When("state value is provided in different cases", func() {
 				It("accepts lowercase state value", func() {
 					session := helpers.CF("update-stack", stackName, "--state", "deprecated")
