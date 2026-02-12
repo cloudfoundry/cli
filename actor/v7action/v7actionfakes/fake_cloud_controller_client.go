@@ -2709,11 +2709,12 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateStackStub        func(string, string) (resources.Stack, ccv3.Warnings, error)
+	UpdateStackStub        func(string, string, string) (resources.Stack, ccv3.Warnings, error)
 	updateStackMutex       sync.RWMutex
 	updateStackArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	updateStackReturns struct {
 		result1 resources.Stack
@@ -14801,19 +14802,20 @@ func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateStack(arg1 string, arg2 string) (resources.Stack, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateStack(arg1 string, arg2 string, arg3 string) (resources.Stack, ccv3.Warnings, error) {
 	fake.updateStackMutex.Lock()
 	ret, specificReturn := fake.updateStackReturnsOnCall[len(fake.updateStackArgsForCall)]
 	fake.updateStackArgsForCall = append(fake.updateStackArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
 	stub := fake.UpdateStackStub
 	fakeReturns := fake.updateStackReturns
-	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2})
+	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2, arg3})
 	fake.updateStackMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -14827,17 +14829,17 @@ func (fake *FakeCloudControllerClient) UpdateStackCallCount() int {
 	return len(fake.updateStackArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateStackCalls(stub func(string, string) (resources.Stack, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateStackCalls(stub func(string, string, string) (resources.Stack, ccv3.Warnings, error)) {
 	fake.updateStackMutex.Lock()
 	defer fake.updateStackMutex.Unlock()
 	fake.UpdateStackStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateStackArgsForCall(i int) (string, string) {
+func (fake *FakeCloudControllerClient) UpdateStackArgsForCall(i int) (string, string, string) {
 	fake.updateStackMutex.RLock()
 	defer fake.updateStackMutex.RUnlock()
 	argsForCall := fake.updateStackArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCloudControllerClient) UpdateStackReturns(result1 resources.Stack, result2 ccv3.Warnings, result3 error) {
