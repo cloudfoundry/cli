@@ -210,8 +210,6 @@ var _ = Describe("update-stack Command", func() {
 		})
 
 		It("passes the reason to the actor and displays it", func() {
-			executeErr = cmd.Execute(args)
-
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(fakeActor.UpdateStackCallCount()).To(Equal(1))
