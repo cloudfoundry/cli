@@ -124,6 +124,15 @@ var _ = Describe("stack command", func() {
 				Eventually(session).Should(Say(`name:\s+%s`, stackName))
 				Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
 				Eventually(session).Should(Say(`state:\s+ACTIVE`))
+				Consistently(session).ShouldNot(Say(`reason:`))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("does not show reason for an active stack", func() {
+				session := helpers.CF("stack", stackName)
+
+				Eventually(session).Should(Say(`state:\s+ACTIVE`))
+				Consistently(session).ShouldNot(Say(`reason:`))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -136,6 +145,42 @@ var _ = Describe("stack command", func() {
 				Consistently(session).ShouldNot(Say(`state:`))
 				Eventually(session).Should(Say(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("the stack is in a non-active state without a reason", func() {
+				BeforeEach(func() {
+					session := helpers.CF("update-stack", stackName, "--state", "deprecated")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("shows an empty reason field", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Eventually(session).Should(Say(`state:\s+DEPRECATED`))
+					Eventually(session).Should(Say(`reason:\s*$`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the stack is in a non-active state with a reason", func() {
+				BeforeEach(func() {
+					session := helpers.CF("update-stack", stackName, "--state", "disabled", "--reason", "This stack is no longer supported.")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("shows the reason in the output", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Eventually(session).Should(Say(`state:\s+DISABLED`))
+					Eventually(session).Should(Say(`reason:\s+This stack is no longer supported\.`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})
