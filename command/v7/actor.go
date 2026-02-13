@@ -179,6 +179,7 @@ type Actor interface {
 	GetStackByName(stackName string) (resources.Stack, v7action.Warnings, error)
 	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetStacks(string) ([]resources.Stack, v7action.Warnings, error)
+	UpdateStack(stackGUID string, state string) (resources.Stack, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (resources.Task, v7action.Warnings, error)
 	GetUAAAPIVersion() (string, error)
