@@ -187,7 +187,7 @@ type Actor interface {
 	GetUser(username, origin string) (resources.User, error)
 	ListServiceAppBindings(params v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
 	MakeCurlRequest(httpMethod string, path string, customHeaders []string, httpData string, failOnHTTPError bool) ([]byte, *http.Response, error)
-	MapRoute(routeGUID string, appGUID string, destinationProtocol string) (v7action.Warnings, error)
+	MapRoute(routeGUID string, appGUID string, destinationProtocol string, destinationPort int) (v7action.Warnings, error)
 	Marketplace(filter v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
 	MoveRoute(routeGUID string, spaceGUID string) (v7action.Warnings, error)
 	ParseAccessToken(accessToken string) (jwt.JWT, error)

@@ -25,7 +25,7 @@ type V7Actor interface {
 	GetDomain(domainGUID string) (resources.Domain, v7action.Warnings, error)
 	GetRouteByAttributes(domain resources.Domain, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error)
-	MapRoute(routeGUID string, appGUID string, destinationProtocol string) (v7action.Warnings, error)
+	MapRoute(routeGUID string, appGUID string, destinationProtocol string, destinationPort int) (v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (resources.Droplet, v7action.Warnings, error)
 	PollPackage(pkg resources.Package) (resources.Package, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
