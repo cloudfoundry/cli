@@ -101,6 +101,8 @@ const (
 	// Include is a query parameter for specifying other resources associated with the
 	// resource returned by the endpoint
 	Include QueryKey = "include"
+	// see https://v3-apidocs.cloudfoundry.org/version/3.212.0/index.html#embed
+	Embed QueryKey = "embed"
 
 	// GloballyEnabledStaging is the query parameter for getting only security groups that are globally enabled for staging
 	GloballyEnabledStaging QueryKey = "globally_enabled_staging"

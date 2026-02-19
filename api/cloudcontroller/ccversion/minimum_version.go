@@ -26,4 +26,6 @@ const (
 	MinVersionServiceBindingStrategy = "3.205.0"
 
 	MinVersionUpdateStack = "3.210.0"
+
+	MinVersionEmbeddedProcessInstances = "3.211.0"
 )
