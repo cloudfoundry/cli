@@ -2,10 +2,14 @@ package v7action
 
 import (
 	"errors"
+	"time"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
+	"code.cloudfoundry.org/cli/v9/actor/versioncheck"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/util/batcher"
 )
@@ -58,7 +62,15 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	var warnings Warnings
 
 	if !omitStats {
-		processSummariesByAppGUID, warnings, err = actor.getProcessSummariesForApps(apps)
+		embeddedProcessInstancesAvailable, versionErr := versioncheck.IsMinimumAPIVersionMet(actor.Config.APIVersion(), ccversion.MinVersionEmbeddedProcessInstances)
+		if versionErr != nil {
+			return nil, allWarnings, versionErr
+		}
+		if embeddedProcessInstancesAvailable {
+			processSummariesByAppGUID, warnings, err = actor.getProcessSummariesForSpace(spaceGUID)
+		} else {
+			processSummariesByAppGUID, warnings, err = actor.getProcessSummariesForApps(apps)
+		}
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err
@@ -173,6 +185,40 @@ func (actor Actor) getProcessSummariesForApps(apps []resources.Application) (map
 		}
 
 		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
+	}
+
+	return processSummariesByAppGUID, allWarnings, nil
+}
+
+func (actor Actor) getProcessSummariesForSpace(spaceGUID string) (map[string]ProcessSummaries, Warnings, error) {
+	processSummariesByAppGUID := make(map[string]ProcessSummaries)
+	var allWarnings Warnings
+	var processes []resources.Process
+
+	// use "/v3/processes?space_guids=:guid&embed=process_instances" to get processes and process instances in one request
+	processes, warnings, err := actor.CloudControllerClient.GetProcesses(
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+		ccv3.Query{Key: ccv3.Embed, Values: []string{"process_instances"}},
+	)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, process := range processes {
+		var instanceDetails []ProcessInstance
+		if process.EmbeddedProcessInstances != nil {
+			for _, instance := range *process.EmbeddedProcessInstances {
+				instanceDetails = append(instanceDetails, NewProcessInstance(instance.Index, constant.ProcessInstanceState(instance.State), time.Duration(instance.Since)))
+			}
+		}
+		processSummary := ProcessSummary{
+			Process:         process,
+			InstanceDetails: instanceDetails,
+		}
+
+		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
+
 	}
 	return processSummariesByAppGUID, allWarnings, nil
 }
