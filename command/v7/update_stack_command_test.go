@@ -51,7 +51,7 @@ var _ = Describe("update-stack Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.APIVersionReturns("3.210.0")
+		fakeConfig.APIVersionReturns("3.211.0")
 	})
 
 	Context("When the environment is not setup correctly", func() {
