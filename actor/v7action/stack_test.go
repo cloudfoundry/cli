@@ -238,6 +238,7 @@ var _ = Describe("Stack", func() {
 		var (
 			stackGUID  string
 			state      string
+			reason     string
 			stack      resources.Stack
 			warnings   Warnings
 			executeErr error
@@ -246,10 +247,11 @@ var _ = Describe("Stack", func() {
 		BeforeEach(func() {
 			stackGUID = "some-stack-guid"
 			state = "DEPRECATED"
+			reason = ""
 		})
 
 		JustBeforeEach(func() {
-			stack, warnings, executeErr = actor.UpdateStack(stackGUID, state)
+			stack, warnings, executeErr = actor.UpdateStack(stackGUID, state, reason)
 		})
 
 		When("the cloud controller request is successful", func() {
@@ -277,9 +279,10 @@ var _ = Describe("Stack", func() {
 				}))
 
 				Expect(fakeCloudControllerClient.UpdateStackCallCount()).To(Equal(1))
-				actualGUID, actualState := fakeCloudControllerClient.UpdateStackArgsForCall(0)
+				actualGUID, actualState, actualReason := fakeCloudControllerClient.UpdateStackArgsForCall(0)
 				Expect(actualGUID).To(Equal(stackGUID))
 				Expect(actualState).To(Equal(state))
+				Expect(actualReason).To(Equal(reason))
 			})
 		})
 
