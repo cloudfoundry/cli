@@ -3619,11 +3619,12 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateStackStub        func(string, string) (resources.Stack, v7action.Warnings, error)
+	UpdateStackStub        func(string, string, string) (resources.Stack, v7action.Warnings, error)
 	updateStackMutex       sync.RWMutex
 	updateStackArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	updateStackReturns struct {
 		result1 resources.Stack
@@ -19525,19 +19526,20 @@ func (fake *FakeActor) UpdateSpaceQuotaReturnsOnCall(i int, result1 v7action.War
 	}{result1, result2}
 }
 
-func (fake *FakeActor) UpdateStack(arg1 string, arg2 string) (resources.Stack, v7action.Warnings, error) {
+func (fake *FakeActor) UpdateStack(arg1 string, arg2 string, arg3 string) (resources.Stack, v7action.Warnings, error) {
 	fake.updateStackMutex.Lock()
 	ret, specificReturn := fake.updateStackReturnsOnCall[len(fake.updateStackArgsForCall)]
 	fake.updateStackArgsForCall = append(fake.updateStackArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
 	stub := fake.UpdateStackStub
 	fakeReturns := fake.updateStackReturns
-	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2})
+	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2, arg3})
 	fake.updateStackMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -19551,17 +19553,17 @@ func (fake *FakeActor) UpdateStackCallCount() int {
 	return len(fake.updateStackArgsForCall)
 }
 
-func (fake *FakeActor) UpdateStackCalls(stub func(string, string) (resources.Stack, v7action.Warnings, error)) {
+func (fake *FakeActor) UpdateStackCalls(stub func(string, string, string) (resources.Stack, v7action.Warnings, error)) {
 	fake.updateStackMutex.Lock()
 	defer fake.updateStackMutex.Unlock()
 	fake.UpdateStackStub = stub
 }
 
-func (fake *FakeActor) UpdateStackArgsForCall(i int) (string, string) {
+func (fake *FakeActor) UpdateStackArgsForCall(i int) (string, string, string) {
 	fake.updateStackMutex.RLock()
 	defer fake.updateStackMutex.RUnlock()
 	argsForCall := fake.updateStackArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeActor) UpdateStackReturns(result1 resources.Stack, result2 v7action.Warnings, result3 error) {

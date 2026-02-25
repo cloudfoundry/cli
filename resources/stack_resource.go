@@ -36,6 +36,8 @@ type Stack struct {
 	Description string `json:"description"`
 	// State is the state of the stack (ACTIVE, RESTRICTED, DEPRECATED, DISABLED)
 	State string `json:"state,omitempty"`
+	// StateReason is the reason for the current state
+	StateReason string `json:"state_reason,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
