@@ -46,3 +46,12 @@ func (actor Actor) GetStacks(labelSelector string) ([]resources.Stack, Warnings,
 
 	return stacks, Warnings(warnings), nil
 }
+
+func (actor Actor) UpdateStack(stackGUID string, state string, reason string) (resources.Stack, Warnings, error) {
+	stack, warnings, err := actor.CloudControllerClient.UpdateStack(stackGUID, state, reason)
+	if err != nil {
+		return resources.Stack{}, Warnings(warnings), err
+	}
+
+	return stack, Warnings(warnings), nil
+}

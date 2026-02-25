@@ -88,7 +88,7 @@ jobs:
       if: ${{ !inputs.run-with-client-creds }}
       run: |
         pushd ./${ENV_NAME}/bbl-state
-          eval "$(bbl print-env)"
+          eval "$(bbl print-env --shell-type posix)"
         popd
 
         cd cli
@@ -119,7 +119,7 @@ jobs:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         pushd ./${ENV_NAME}/bbl-state
-          eval "$(bbl print-env)"
+          eval "$(bbl print-env --shell-type posix)"
         popd
 
         cd cli

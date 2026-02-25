@@ -18,10 +18,14 @@ type CreateServiceAppBindingParams struct {
 	Strategy            resources.BindingStrategyType
 }
 
-type DeleteServiceAppBindingParams struct {
+type ListServiceAppBindingParams struct {
 	SpaceGUID           string
 	ServiceInstanceName string
 	AppName             string
+}
+
+type DeleteServiceAppBindingParams struct {
+	ServiceBindingGUID string
 }
 
 func (actor Actor) CreateServiceAppBinding(params CreateServiceAppBindingParams) (chan PollJobEvent, Warnings, error) {
@@ -61,13 +65,11 @@ func (actor Actor) CreateServiceAppBinding(params CreateServiceAppBindingParams)
 	}
 }
 
-func (actor Actor) DeleteServiceAppBinding(params DeleteServiceAppBindingParams) (chan PollJobEvent, Warnings, error) {
+func (actor Actor) ListServiceAppBindings(params ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, Warnings, error) {
 	var (
 		serviceInstance resources.ServiceInstance
 		app             resources.Application
-		binding         resources.ServiceCredentialBinding
-		jobURL          ccv3.JobURL
-		stream          chan PollJobEvent
+		bindings        []resources.ServiceCredentialBinding
 	)
 
 	warnings, err := railway.Sequentially(
@@ -80,11 +82,30 @@ func (actor Actor) DeleteServiceAppBinding(params DeleteServiceAppBindingParams)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
-			binding, warnings, err = actor.getServiceAppBinding(serviceInstance.GUID, app.GUID)
+			bindings, warnings, err = actor.getServiceAppBindings(serviceInstance.GUID, app.GUID)
 			return
 		},
+	)
+
+	switch err.(type) {
+	case nil:
+		return bindings, Warnings(warnings), nil
+	case ccerror.ApplicationNotFoundError:
+		return nil, Warnings(warnings), actionerror.ApplicationNotFoundError{Name: params.AppName}
+	default:
+		return nil, Warnings(warnings), err
+	}
+}
+
+func (actor Actor) DeleteServiceAppBinding(params DeleteServiceAppBindingParams) (chan PollJobEvent, Warnings, error) {
+	var (
+		jobURL ccv3.JobURL
+		stream chan PollJobEvent
+	)
+
+	warnings, err := railway.Sequentially(
 		func() (warnings ccv3.Warnings, err error) {
-			jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceCredentialBinding(binding.GUID)
+			jobURL, warnings, err = actor.CloudControllerClient.DeleteServiceCredentialBinding(params.ServiceBindingGUID)
 			return
 		},
 		func() (warnings ccv3.Warnings, err error) {
@@ -95,10 +116,10 @@ func (actor Actor) DeleteServiceAppBinding(params DeleteServiceAppBindingParams)
 
 	switch err.(type) {
 	case nil:
+
 		return stream, Warnings(warnings), nil
-	case ccerror.ApplicationNotFoundError:
-		return nil, Warnings(warnings), actionerror.ApplicationNotFoundError{Name: params.AppName}
 	default:
+
 		return nil, Warnings(warnings), err
 	}
 }
@@ -122,24 +143,22 @@ func (actor Actor) createServiceAppBinding(serviceInstanceGUID, appGUID, binding
 	}
 }
 
-func (actor Actor) getServiceAppBinding(serviceInstanceGUID, appGUID string) (resources.ServiceCredentialBinding, ccv3.Warnings, error) {
+func (actor Actor) getServiceAppBindings(serviceInstanceGUID, appGUID string) ([]resources.ServiceCredentialBinding, ccv3.Warnings, error) {
 	bindings, warnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
 		ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
 		ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
-		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
-		ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 	)
 
 	switch {
 	case err != nil:
-		return resources.ServiceCredentialBinding{}, warnings, err
+		return []resources.ServiceCredentialBinding{}, warnings, err
 	case len(bindings) == 0:
-		return resources.ServiceCredentialBinding{}, warnings, actionerror.ServiceBindingNotFoundError{
+		return []resources.ServiceCredentialBinding{}, warnings, actionerror.ServiceBindingNotFoundError{
 			AppGUID:             appGUID,
 			ServiceInstanceGUID: serviceInstanceGUID,
 		}
 	default:
-		return bindings[0], warnings, nil
+		return bindings, warnings, nil
 	}
 }
