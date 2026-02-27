@@ -21,3 +21,22 @@ func (client *Client) GetStacks(query ...Query) ([]resources.Stack, Warnings, er
 
 	return stacks, warnings, err
 }
+
+// UpdateStack updates a stack's state and optionally its state reason.
+func (client *Client) UpdateStack(stackGUID string, state string, reason string) (resources.Stack, Warnings, error) {
+	var responseStack resources.Stack
+
+	type StackUpdate struct {
+		State       string `json:"state"`
+		StateReason string `json:"state_reason,omitempty"`
+	}
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.PatchStackRequest,
+		URIParams:    internal.Params{"stack_guid": stackGUID},
+		RequestBody:  StackUpdate{State: state, StateReason: reason},
+		ResponseBody: &responseStack,
+	})
+
+	return responseStack, warnings, err
+}
