@@ -21,7 +21,7 @@ var HelpCategoryList = []HelpCategory{
 			{"droplets", "set-droplet", "download-droplet"},
 			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
-			{"stacks", "stack"},
+			{"stacks", "stack", "update-stack"},
 			{"copy-source", "create-app-manifest"},
 			{"get-health-check", "set-health-check", "get-readiness-health-check"},
 			{"enable-ssh", "disable-ssh", "ssh-enabled", "ssh"},

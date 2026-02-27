@@ -8,3 +8,6 @@
 
 - type: remove
   path: /releases/name=capi/sha1?
+
+- type: remove
+  path: /releases/name=capi/stemcell?
