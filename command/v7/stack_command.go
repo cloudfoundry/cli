@@ -69,6 +69,11 @@ func (cmd *StackCommand) displayStackInfo() error {
 	// Add state only if it's present
 	if stack.State != "" {
 		displayTable = append(displayTable, []string{cmd.UI.TranslateText("state:"), stack.State})
+
+		// Add reason whenever state is not ACTIVE
+		if stack.State != resources.StackStateActive {
+			displayTable = append(displayTable, []string{cmd.UI.TranslateText("reason:"), stack.StateReason})
+		}
 	}
 
 	cmd.UI.DisplayKeyValueTable("", displayTable, 3)
