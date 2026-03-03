@@ -44,9 +44,10 @@ var _ = Describe("update-stack command", func() {
 				Eventually(session).Should(Say(`NAME:`))
 				Eventually(session).Should(Say(`update-stack - Transition a stack between the defined states`))
 				Eventually(session).Should(Say(`USAGE:`))
-				Eventually(session).Should(Say(`cf update-stack STACK_NAME \[--state \(active \| restricted \| deprecated \| disabled\)\]`))
+				Eventually(session).Should(Say(`cf update-stack STACK_NAME \[--state \(active \| restricted \| deprecated \| disabled\)\] \[--reason text\]`))
 				Eventually(session).Should(Say(`EXAMPLES:`))
 				Eventually(session).Should(Say(`cf update-stack cflinuxfs3 --state disabled`))
+				Eventually(session).Should(Say(`cf update-stack cflinuxfs3 --state deprecated --reason "This stack is based on Ubuntu 18.04, which is no longer supported. Please migrate your applications to 'cflinuxfs4'. For more information, see: <link-to-docs>."`))
 				Eventually(session).Should(Say(`OPTIONS:`))
 				Eventually(session).Should(Say(`--state\s+State to transition the stack to`))
 				Eventually(session).Should(Say(`SEE ALSO:`))
@@ -202,6 +203,32 @@ var _ = Describe("update-stack command", func() {
 					Eventually(session).Should(Say(`Updating stack %s as %s\.\.\.`, stackName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say(`state:\s+ACTIVE`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("updating to a non-active state without a reason", func() {
+				It("shows an empty reason field in the output", func() {
+					session := helpers.CF("update-stack", stackName, "--state", "deprecated")
+
+					Eventually(session).Should(Say(`Updating stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`state:\s+DEPRECATED`))
+					Eventually(session).Should(Say(`reason:\s*$`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("updating with a reason", func() {
+				It("shows the reason in the update-stack output", func() {
+					session := helpers.CF("update-stack", stackName, "--state", "disabled", "--reason", "This stack is no longer supported.")
+
+					Eventually(session).Should(Say(`Updating stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`state:\s+DISABLED`))
+					Eventually(session).Should(Say(`reason:\s+This stack is no longer supported\.`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
