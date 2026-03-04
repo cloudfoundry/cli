@@ -86,6 +86,7 @@ const (
 	GetServiceCredentialBindingsRequest                         = "GetServiceCredentialBindings"
 	GetServiceCredentialBindingDetailsRequest                   = "GetServiceCredentialBindingDetails"
 	GetServiceInstanceParametersRequest                         = "GetServiceInstanceParameters"
+	GetServiceInstanceRequest                                   = "GetServiceInstance"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceInstanceRelationshipsSharedSpacesRequest          = "GetServiceInstanceRelationshipSharedSpacesRequest"
 	GetServiceInstanceSharedSpacesUsageSummaryRequest           = "GetServiceInstanceSharedSpacesUsageSummaryRequest"
@@ -305,6 +306,7 @@ var APIRoutes = map[string]Route{
 	GetServiceCredentialBindingsRequest:                         {Path: "/v3/service_credential_bindings", Method: http.MethodGet},
 	DeleteServiceCredentialBindingRequest:                       {Path: "/v3/service_credential_bindings/:service_credential_binding_guid", Method: http.MethodDelete},
 	GetServiceCredentialBindingDetailsRequest:                   {Path: "/v3/service_credential_bindings/:service_credential_binding_guid/details", Method: http.MethodGet},
+	GetServiceInstanceRequest:                                   {Path: "/v3/service_instances/:service_instance_guid", Method: http.MethodGet},
 	GetServiceInstancesRequest:                                  {Path: "/v3/service_instances", Method: http.MethodGet},
 	PostServiceInstanceRequest:                                  {Path: "/v3/service_instances", Method: http.MethodPost},
 	GetServiceInstanceParametersRequest:                         {Path: "/v3/service_instances/:service_instance_guid/parameters", Method: http.MethodGet},
