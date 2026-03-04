@@ -32,6 +32,18 @@ func (client *Client) GetServiceInstances(query ...Query) ([]resources.ServiceIn
 	return result, included, warnings, err
 }
 
+func (client *Client) GetServiceInstanceByGUID(serviceInstanceGUID string) (resources.ServiceInstance, Warnings, error) {
+	var result resources.ServiceInstance
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.GetServiceInstanceRequest,
+		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
+		ResponseBody: &result,
+	})
+
+	return result, warnings, err
+}
+
 func (client *Client) GetServiceInstanceByNameAndSpace(name, spaceGUID string, query ...Query) (resources.ServiceInstance, IncludedResources, Warnings, error) {
 	query = append(query,
 		Query{Key: NameFilter, Values: []string{name}},
