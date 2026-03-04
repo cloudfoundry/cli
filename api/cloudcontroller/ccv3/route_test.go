@@ -577,6 +577,7 @@ var _ = Describe("Route", func() {
 			routeGUID           = "route-guid"
 			appGUID             = "app-guid"
 			destinationProtocol string
+			destinationPort     int
 			expectedBody        string
 			warnings            Warnings
 			executeErr          error
@@ -591,24 +592,26 @@ var _ = Describe("Route", func() {
 					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 				),
 			)
-			warnings, executeErr = client.MapRoute(routeGUID, appGUID, destinationProtocol)
+			warnings, executeErr = client.MapRoute(routeGUID, appGUID, destinationProtocol, destinationPort)
 		})
 
 		When("the request is successful", func() {
 			BeforeEach(func() {
 				destinationProtocol = "http2"
+				destinationPort = 8080
 				expectedBody = fmt.Sprintf(`
-					{
-						"destinations": [
-						 {
-							"app": {
-								"guid": "%s"
-							},
-							"protocol": "%s"
-						 }
-						]
-					}
-				`, appGUID, destinationProtocol)
+                                        {
+                                                "destinations": [
+                                                 {
+                                                        "app": {
+                                                                "guid": "%s"
+                                                        },
+                                                        "protocol": "%s",
+                                                        "port": %d
+                                                 }
+                                                ]
+                                        }
+                                `, appGUID, destinationProtocol, destinationPort)
 			})
 
 			It("returns the warnings and no error", func() {
@@ -620,20 +623,44 @@ var _ = Describe("Route", func() {
 		Context("when destination protocol is not provided", func() {
 			BeforeEach(func() {
 				destinationProtocol = ""
+				destinationPort = 0
 				expectedBody = fmt.Sprintf(`
-					{
-						"destinations": [
-						 {
-							"app": {
-								"guid": "%s"
-							}
-						 }
-						]
-					}
-				`, appGUID)
+                                        {
+                                                "destinations": [
+                                                 {
+                                                        "app": {
+                                                                "guid": "%s"
+                                                        }
+                                                 }
+                                                ]
+                                        }
+                                `, appGUID)
 			})
 
 			It("does not include it in the request", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+
+		Context("when destination port is provided without protocol", func() {
+			BeforeEach(func() {
+				destinationProtocol = ""
+				destinationPort = 9090
+				expectedBody = fmt.Sprintf(`
+                                        {
+                                                "destinations": [
+                                                 {
+                                                        "app": {
+                                                                "guid": "%s"
+                                                        },
+                                                        "port": %d
+                                                 }
+                                                ]
+                                        }
+                                `, appGUID, destinationPort)
+			})
+
+			It("includes the port in the request", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 		})
