@@ -130,6 +130,98 @@ var _ = Describe("Service Instance", func() {
 		})
 	})
 
+	Describe("GetServiceInstanceByGUID", func() {
+		const guid = "fake-guid"
+		const name = "fake-name"
+
+		var (
+			instance   resources.ServiceInstance
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			instance, warnings, executeErr = client.GetServiceInstanceByGUID(guid)
+		})
+
+		When("service instance exists", func() {
+			BeforeEach(func() {
+				requester.MakeRequestCalls(func(params RequestParams) (JobURL, Warnings, error) {
+					Expect(params.URIParams).To(BeEquivalentTo(map[string]string{"service_instance_guid": guid}))
+					Expect(params.RequestName).To(Equal(internal.GetServiceInstanceRequest))
+					params.ResponseBody.(*resources.ServiceInstance).GUID = guid
+					params.ResponseBody.(*resources.ServiceInstance).Name = name
+					return "", Warnings{"warning-1", "warning-2"}, nil
+				})
+			})
+
+			It("returns the service instance with warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(instance).To(Equal(
+					resources.ServiceInstance{
+						GUID: "fake-guid",
+						Name: "fake-name",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+
+				actualParams := requester.MakeRequestArgsForCall(0)
+				Expect(actualParams.URIParams).To(Equal(internal.Params{"service_instance_guid": guid}))
+				Expect(actualParams.RequestName).To(Equal(internal.GetServiceInstanceRequest))
+				Expect(actualParams.ResponseBody).To(BeAssignableToTypeOf(&resources.ServiceInstance{}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				errors := []ccerror.V3Error{
+					{
+						Code:   42424,
+						Detail: "Some detailed error message",
+						Title:  "CF-SomeErrorTitle",
+					},
+					{
+						Code:   11111,
+						Detail: "Some other detailed error message",
+						Title:  "CF-SomeOtherErrorTitle",
+					},
+				}
+
+				requester.MakeListRequestReturns(
+					IncludedResources{},
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors},
+				)
+
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"this is a warning"},
+					ccerror.MultiError{ResponseCode: http.StatusTeapot, Errors: errors})
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("GetServiceInstanceByNameAndSpace", func() {
 		const (
 			name      = "fake-service-instance-name"
