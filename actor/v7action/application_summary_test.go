@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	. "code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
@@ -13,8 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/v8/types"
 	"code.cloudfoundry.org/clock"
 
-	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -23,11 +22,14 @@ var _ = Describe("Application Summary Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		fakeConfig                *v7actionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, clock.NewClock())
+		fakeConfig = new(v7actionfakes.FakeConfig)
+		fakeConfig.APIVersionReturns("3.210.0")
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, clock.NewClock())
 	})
 
 	Describe("ApplicationSummary", func() {
@@ -285,6 +287,152 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
+			})
+
+			Context("the cloud controller supports embedded process instances", func() {
+				BeforeEach(func() {
+					fakeConfig.APIVersionReturns("3.211.0")
+
+					listedProcesses := []resources.Process{
+						{
+							GUID:       "some-process-guid",
+							Type:       "some-type",
+							Command:    *types.NewFilteredString("[Redacted Value]"),
+							MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+							AppGUID:    "some-app-guid",
+							EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+								{Index: 0, State: "RUNNING", Since: 300},
+								{Index: 1, State: "CRASHED", Since: 0},
+							},
+						},
+						{
+							GUID:       "some-process-web-guid",
+							Type:       "web",
+							Command:    *types.NewFilteredString("[Redacted Value]"),
+							MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+							AppGUID:    "some-app-guid",
+							EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+								{Index: 0, State: "RUNNING", Since: 500},
+								{Index: 1, State: "RUNNING", Since: 600},
+							},
+						},
+					}
+
+					fakeCloudControllerClient.GetProcessesReturns(
+						listedProcesses,
+						ccv3.Warnings{"get-space-processes-warning"},
+						nil,
+					)
+				})
+
+				It("uses the embedded process instances", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(summaries).To(Equal([]ApplicationSummary{
+						{
+							Application: resources.Application{
+								Name:  "some-app-name",
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: []ProcessSummary{
+								{
+									Process: resources.Process{
+										GUID:       "some-process-web-guid",
+										Type:       "web",
+										Command:    *types.NewFilteredString("[Redacted Value]"),
+										MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+										AppGUID:    "some-app-guid",
+										EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+											{Index: 0, State: "RUNNING", Since: 500},
+											{Index: 1, State: "RUNNING", Since: 600},
+										},
+									},
+									InstanceDetails: []ProcessInstance{
+										{
+											Index:  0,
+											State:  "RUNNING",
+											Uptime: 500,
+										},
+										{
+											Index:  1,
+											State:  "RUNNING",
+											Uptime: 600,
+										},
+									},
+								},
+								{
+									Process: resources.Process{
+										GUID:       "some-process-guid",
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+										Type:       "some-type",
+										Command:    *types.NewFilteredString("[Redacted Value]"),
+										AppGUID:    "some-app-guid",
+										EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+											{Index: 0, State: "RUNNING", Since: 300},
+											{Index: 1, State: "CRASHED", Since: 0},
+										},
+									},
+									InstanceDetails: []ProcessInstance{
+										{
+											Index:  0,
+											State:  "RUNNING",
+											Uptime: 300,
+										},
+										{
+											Index:  1,
+											State:  "CRASHED",
+											Uptime: 0,
+										},
+									},
+								},
+							},
+							Routes: []resources.Route{
+								{
+									GUID: "some-route-guid",
+									Destinations: []resources.RouteDestination{
+										{
+											App: resources.RouteDestinationApp{
+												GUID: "some-app-guid",
+											},
+										},
+									},
+								},
+								{
+									GUID: "some-other-route-guid",
+									Destinations: []resources.RouteDestination{
+										{
+											App: resources.RouteDestinationApp{
+												GUID: "some-app-guid",
+											},
+										},
+									},
+								},
+							},
+						},
+					}))
+
+					Expect(warnings).To(ConsistOf(
+						"get-apps-warning",
+						"get-space-processes-warning",
+						"get-routes-warning",
+					))
+
+					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+						ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{"some-key=some-value"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{ccv3.MaxPerPage}},
+					))
+
+					Expect(fakeCloudControllerClient.GetProcessesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetProcessesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+						ccv3.Query{Key: ccv3.Embed, Values: []string{"process_instances"}},
+					))
+
+					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(0))
+				})
 			})
 
 			When("there is no label selector", func() {
