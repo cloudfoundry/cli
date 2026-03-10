@@ -33,7 +33,7 @@ var HelpCategoryList = []HelpCategory{
 			{"marketplace", "services", "service"},
 			{"create-service", "update-service", "upgrade-service", "delete-service", "rename-service"},
 			{"create-service-key", "service-keys", "service-key", "delete-service-key"},
-			{"bind-service", "unbind-service"},
+			{"bind-service", "unbind-service", "cleanup-outdated-service-bindings"},
 			{"bind-route-service", "unbind-route-service"},
 			{"create-user-provided-service", "update-user-provided-service"},
 			{"share-service", "unshare-service"},
