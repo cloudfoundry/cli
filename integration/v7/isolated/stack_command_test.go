@@ -33,7 +33,7 @@ var _ = Describe("stack command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("stack", "APPS", "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("stack", "APPS", "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps) and current state"))
 			})
 
 			It("Displays command usage to output", func() {
@@ -100,11 +100,11 @@ var _ = Describe("stack command", func() {
 			})
 		})
 
-		When("the stack exists", func() {
+		When("the stack exists with valid state", func() {
 			var stackGUID string
 
 			BeforeEach(func() {
-				jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s"}`, stackName, stackDescription)
+				jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s", "state": "ACTIVE"}`, stackName, stackDescription)
 				session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
 				Eventually(session).Should(Exit(0))
 
@@ -117,23 +117,68 @@ var _ = Describe("stack command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			It("Shows the details for the stack", func() {
+			It("Shows the details for the stack with state", func() {
 				session := helpers.CF("stack", stackName)
 
 				Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
 				Eventually(session).Should(Say(`name:\s+%s`, stackName))
 				Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+				Eventually(session).Should(Say(`state:\s+ACTIVE`))
+				Consistently(session).ShouldNot(Say(`reason:`))
 				Eventually(session).Should(Exit(0))
 			})
 
-			When("the stack exists and the --guid flag is passed", func() {
-				It("prints nothing but the guid", func() {
-					session := helpers.CF("stack", stackName, "--guid")
+			It("does not show reason for an active stack", func() {
+				session := helpers.CF("stack", stackName)
 
-					Consistently(session).ShouldNot(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
-					Consistently(session).ShouldNot(Say(`name:\s+%s`, stackName))
-					Consistently(session).ShouldNot(Say(`description:\s+%s`, stackDescription))
-					Eventually(session).Should(Say(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`))
+				Eventually(session).Should(Say(`state:\s+ACTIVE`))
+				Consistently(session).ShouldNot(Say(`reason:`))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("prints nothing but the guid when --guid flag is passed", func() {
+				session := helpers.CF("stack", stackName, "--guid")
+
+				Consistently(session).ShouldNot(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+				Consistently(session).ShouldNot(Say(`name:\s+%s`, stackName))
+				Consistently(session).ShouldNot(Say(`description:\s+%s`, stackDescription))
+				Consistently(session).ShouldNot(Say(`state:`))
+				Eventually(session).Should(Say(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`))
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("the stack is in a non-active state without a reason", func() {
+				BeforeEach(func() {
+					session := helpers.CF("update-stack", stackName, "--state", "deprecated")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("shows an empty reason field", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Eventually(session).Should(Say(`state:\s+DEPRECATED`))
+					Eventually(session).Should(Say(`reason:\s*$`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the stack is in a non-active state with a reason", func() {
+				BeforeEach(func() {
+					session := helpers.CF("update-stack", stackName, "--state", "disabled", "--reason", "This stack is no longer supported.")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("shows the reason in the output", func() {
+					session := helpers.CF("stack", stackName)
+
+					Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+					Eventually(session).Should(Say(`name:\s+%s`, stackName))
+					Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
+					Eventually(session).Should(Say(`state:\s+DISABLED`))
+					Eventually(session).Should(Say(`reason:\s+This stack is no longer supported\.`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
