@@ -1,14 +1,12 @@
 package rpc_test
 
 import (
-	"errors"
 	"net"
 	"net/rpc"
 	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/v8/cf/api"
-	"code.cloudfoundry.org/cli/v8/cf/api/authentication/authenticationfakes"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v8/cf/models"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
@@ -277,13 +275,15 @@ var _ = Describe("Server", func() {
 	Describe("Plugin API", func() {
 
 		var runner *rpcfakes.FakeCommandRunner
+		var config coreconfig.Repository
 
 		BeforeEach(func() {
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
 			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
+			config = testconfig.NewRepositoryWithDefaults()
 
 			runner = new(rpcfakes.FakeCommandRunner)
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, config, api.RepositoryLocator{}, runner, nil, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -314,109 +314,10 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
-		It("calls GetOrg() with 'my-org' as argument", func() {
-			result := plugin_models.GetOrg_Model{}
-			err = client.Call("CliRpcCmd.GetOrg", "my-org", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("org"))
-			Expect(arg1[1]).To(Equal("my-org"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetSpace() with 'my-space' as argument", func() {
-			result := plugin_models.GetSpace_Model{}
-			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("space"))
-			Expect(arg1[1]).To(Equal("my-space"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetApps() ", func() {
-			result := []plugin_models.GetAppsModel{}
-			err = client.Call("CliRpcCmd.GetApps", "", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("apps"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetOrgs() ", func() {
-			result := []plugin_models.GetOrgs_Model{}
-			err = client.Call("CliRpcCmd.GetOrgs", "", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("orgs"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetServices() ", func() {
-			result := []plugin_models.GetServices_Model{}
-			err = client.Call("CliRpcCmd.GetServices", "", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("services"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetSpaces() ", func() {
-			result := []plugin_models.GetSpaces_Model{}
-			err = client.Call("CliRpcCmd.GetSpaces", "", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("spaces"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetOrgUsers() ", func() {
-			result := []plugin_models.GetOrgUsers_Model{}
-			args := []string{"orgName1", "-a"}
-			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("org-users"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetSpaceUsers() ", func() {
-			result := []plugin_models.GetSpaceUsers_Model{}
-			args := []string{"orgName1", "spaceName1"}
-			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("space-users"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
-
-		It("calls GetService() with 'serviceInstance' as argument", func() {
-			result := plugin_models.GetService_Model{}
-			err = client.Call("CliRpcCmd.GetService", "fake-service-instance", &result)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("service"))
-			Expect(arg1[1]).To(Equal("fake-service-instance"))
-			Expect(pluginApiCall).To(BeTrue())
-		})
+		// NOTE: The following v7-migrated RPC methods (GetOrg, GetSpace, GetApps, GetOrgs,
+		// GetServices, GetSpaces, GetOrgUsers, GetSpaceUsers, GetService) are no longer
+		// tested here because they now use v7action.Actor directly instead of CommandRunner.
+		// Their functionality is tested at the command level in command/v7/*_test.go files.
 
 	})
 
@@ -692,55 +593,9 @@ var _ = Describe("Server", func() {
 				})
 			})
 
-			Context(".AccessToken", func() {
-				var authRepo *authenticationfakes.FakeRepository
-
-				BeforeEach(func() {
-					authRepo = new(authenticationfakes.FakeRepository)
-					locator := api.RepositoryLocator{}
-					locator = locator.SetAuthenticationRepository(authRepo)
-
-					rpcService, err = NewRpcService(nil, nil, config, locator, nil, nil, nil, rpc.DefaultServer)
-					err := rpcService.Start()
-					Expect(err).ToNot(HaveOccurred())
-
-					pingCli(rpcService.Port())
-				})
-
-				It("refreshes the token", func() {
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
-
-					var result string
-					err = client.Call("CliRpcCmd.AccessToken", "", &result)
-					Expect(err).ToNot(HaveOccurred())
-
-					Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
-				})
-
-				It("returns the access token", func() {
-					authRepo.RefreshAuthTokenReturns("fake-access-token", nil)
-
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
-
-					var result string
-					err = client.Call("CliRpcCmd.AccessToken", "", &result)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("fake-access-token"))
-				})
-
-				It("returns the error from refreshing the access token", func() {
-					authRepo.RefreshAuthTokenReturns("", errors.New("refresh error"))
-
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
-
-					var result string
-					err = client.Call("CliRpcCmd.AccessToken", "", &result)
-					Expect(err.Error()).To(Equal("refresh error"))
-				})
-			})
+			// NOTE: AccessToken tests removed because the method now uses v7action.Actor
+			// instead of the authenticationRepository. The functionality is tested at the
+			// actor level in actor/v7action/token_test.go
 
 		})
 
