@@ -29,10 +29,12 @@ Update an existing HTTP route:
 
 func (cmd UpdateRouteCommand) Examples() string {
 	return `
-CF_NAME update-route example.com -o loadbalancing=round-robin,
-CF_NAME update-route example.com -o loadbalancing=least-connection,
-CF_NAME update-route example.com -r loadbalancing,
-CF_NAME update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin`
+CF_NAME update-route example.com -o loadbalancing=round-robin                                            # use round-robin load balancing for route
+CF_NAME update-route example.com -o loadbalancing=least-connection                                       # use least-connection load balancing for route
+CF_NAME update-route example.com -o loadbalancing=hash -o hash_header=My-Hash-Header                     # use hash-based load balancing for route
+CF_NAME update-route example.com -o loadbalancing=hash -o hash_header=My-Hash-Header -o hash_balance=1.3 # use hash-based load balancing with balance factor
+CF_NAME update-route example.com -r loadbalancing                                                        # remove load balancing option
+CF_NAME update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin               # update route myhost.example.com/foo`
 }
 func (cmd UpdateRouteCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)

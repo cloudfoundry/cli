@@ -2,8 +2,8 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
-    "code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	"code.cloudfoundry.org/cli/v8/resources"
 )
@@ -33,9 +33,10 @@ func (cmd MapRouteCommand) Examples() string {
 	return `
 CF_NAME map-route my-app example.com                                                      # example.com
 CF_NAME map-route my-app example.com --hostname myhost                                    # myhost.example.com
-CF_NAME map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option
 CF_NAME map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo
 CF_NAME map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com
+CF_NAME map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option
+CF_NAME map-route my-app example.com -o loadbalancing=hash -o hash_header=My-Hash-Header  # use hash-based routing for example.com
 CF_NAME map-route my-app example.com --port 5000                                          # example.com:5000`
 }
 
