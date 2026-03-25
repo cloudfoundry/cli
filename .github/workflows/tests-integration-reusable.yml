@@ -18,8 +18,8 @@ on:
 
 env:
   ENV_NAME: ${{ inputs.env-name }}
-  NODES: 12
-  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '4' }}
+  NODES: 4
+  FLAKE_ATTEMPTS: ${{ vars.TEST_FLAKE_ATTEMPTS || '5' }}
   BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
   BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
   CREDHUB_CLI_VERSION: ${{ vars.CREDHUB_CLI_VERSION }}
@@ -88,7 +88,7 @@ jobs:
       if: ${{ !inputs.run-with-client-creds }}
       run: |
         pushd ./${ENV_NAME}/bbl-state
-          eval "$(bbl print-env)"
+          eval "$(bbl print-env --shell-type posix)"
         popd
 
         cd cli
@@ -119,7 +119,7 @@ jobs:
         CF_INT_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: |
         pushd ./${ENV_NAME}/bbl-state
-          eval "$(bbl print-env)"
+          eval "$(bbl print-env --shell-type posix)"
         popd
 
         cd cli

@@ -1,9 +1,9 @@
 package resources
 
 import (
-    "encoding/json"
+	"encoding/json"
 
-    "code.cloudfoundry.org/cli/v8/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 )
 
@@ -18,6 +18,8 @@ type Droplet struct {
 	CreatedAt string `json:"created_at"`
 	// GUID is the unique droplet identifier.
 	GUID string `json:"guid"`
+	// An object describing the lifecycle that was used when staging the droplet
+	Lifecycle DropletLifecycle `json:"lifecycle"`
 	// Image is the Docker image name.
 	Image string `json:"image"`
 	// Stack is the root filesystem to use with the buildpack.
@@ -41,11 +43,18 @@ type DropletBuildpack struct {
 	Version string `json:"version"`
 }
 
+// An object describing the lifecycle that was used when staging the droplet
+// possible values for type: "buildpack", "cnb", "docker"
+type DropletLifecycle struct {
+	Type string `json:"type"`
+}
+
 func (d Droplet) MarshallJSON() ([]byte, error) {
 	type ccDroplet struct {
 		GUID          string                `json:"guid,omitempty"`
 		Buildpacks    []DropletBuildpack    `json:"buildpacks,omitempty"`
 		CreatedAt     string                `json:"created_at,omitempty"`
+		Lifecycle     DropletLifecycle      `json:"lifecycle,omitempty"`
 		Image         string                `json:"image,omitempty"`
 		Stack         string                `json:"stack,omitempty"`
 		State         constant.DropletState `json:"state,omitempty"`
@@ -62,6 +71,7 @@ func (d Droplet) MarshallJSON() ([]byte, error) {
 		GUID:       d.GUID,
 		Buildpacks: d.Buildpacks,
 		CreatedAt:  d.CreatedAt,
+		Lifecycle:  d.Lifecycle,
 		Image:      d.Image,
 		Stack:      d.Stack,
 		State:      d.State,
@@ -98,6 +108,7 @@ func (d *Droplet) UnmarshalJSON(data []byte) error {
 		Buildpacks    []DropletBuildpack    `json:"buildpacks,omitempty"`
 		CreatedAt     string                `json:"created_at,omitempty"`
 		Image         string                `json:"image,omitempty"`
+		Lifecycle     DropletLifecycle      `json:"lifecycle,omitempty"`
 		Stack         string                `json:"stack,omitempty"`
 		State         constant.DropletState `json:"state,omitempty"`
 		Relationships struct {
@@ -118,6 +129,7 @@ func (d *Droplet) UnmarshalJSON(data []byte) error {
 	d.Buildpacks = alias.Buildpacks
 	d.CreatedAt = alias.CreatedAt
 	d.Image = alias.Image
+	d.Lifecycle = alias.Lifecycle
 	d.Stack = alias.Stack
 	d.State = alias.State
 	d.AppGUID = alias.Relationships.App.Data.GUID

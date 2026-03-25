@@ -41,6 +41,10 @@ var _ = Describe("bind-service command", func() {
 			Say(`\n`),
 			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME\n`),
 			Say(`\n`),
+			Say(`\s+Optionally provide the binding strategy type. Valid options are 'single' \(default\) and 'multiple'. The 'multiple' strategy allows multiple bindings between the same app and service instance.\n`),
+			Say(`\s+This is useful for credential rotation scenarios.\n`),
+			Say(`\n`),
+			Say(`\s+cf bind-service APP_NAME SERVICE_INSTANCE --strategy multiple\n`),
 			Say(`EXAMPLES:\n`),
 			Say(`\s+Linux/Mac:\n`),
 			Say(`\s+cf bind-service myapp mydb -c '\{"permissions":"read-only"\}'\n`),
@@ -59,6 +63,7 @@ var _ = Describe("bind-service command", func() {
 			Say(`OPTIONS:\n`),
 			Say(`\s+--binding-name\s+Name to expose service instance to app process with \(Default: service instance name\)\n`),
 			Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n`),
+			Say(`\s+--strategy\s+Service binding strategy. Valid values are 'single' \(default\) and 'multiple'.\n`),
 			Say(`\s+--wait, -w\s+Wait for the operation to complete\n`),
 			Say(`\n`),
 			Say(`SEE ALSO:\n`),
@@ -132,7 +137,7 @@ var _ = Describe("bind-service command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "bind-service", "app-name", "service-name")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, command, "app-name", "service-name")
 		})
 	})
 

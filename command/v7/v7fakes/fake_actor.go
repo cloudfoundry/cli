@@ -2088,6 +2088,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceInstanceByGUIDStub        func(string) (resources.ServiceInstance, v7action.Warnings, error)
+	getServiceInstanceByGUIDMutex       sync.RWMutex
+	getServiceInstanceByGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getServiceInstanceByGUIDReturns struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceInstanceByGUIDReturnsOnCall map[int]struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceInstanceByNameAndSpaceStub        func(string, string) (resources.ServiceInstance, v7action.Warnings, error)
 	getServiceInstanceByNameAndSpaceMutex       sync.RWMutex
 	getServiceInstanceByNameAndSpaceArgsForCall []struct {
@@ -2503,6 +2518,36 @@ type FakeActor struct {
 		result1 resources.User
 		result2 error
 	}
+	ListAppBindingsStub        func(v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
+	listAppBindingsMutex       sync.RWMutex
+	listAppBindingsArgsForCall []struct {
+		arg1 v7action.ListAppBindingParams
+	}
+	listAppBindingsReturns struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	listAppBindingsReturnsOnCall map[int]struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	ListServiceAppBindingsStub        func(v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)
+	listServiceAppBindingsMutex       sync.RWMutex
+	listServiceAppBindingsArgsForCall []struct {
+		arg1 v7action.ListServiceAppBindingParams
+	}
+	listServiceAppBindingsReturns struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
+	listServiceAppBindingsReturnsOnCall map[int]struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}
 	MakeCurlRequestStub        func(string, string, []string, string, bool) ([]byte, *http.Response, error)
 	makeCurlRequestMutex       sync.RWMutex
 	makeCurlRequestArgsForCall []struct {
@@ -2522,12 +2567,13 @@ type FakeActor struct {
 		result2 *http.Response
 		result3 error
 	}
-	MapRouteStub        func(string, string, string) (v7action.Warnings, error)
+	MapRouteStub        func(string, string, string, int) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 int
 	}
 	mapRouteReturns struct {
 		result1 v7action.Warnings
@@ -3603,6 +3649,23 @@ type FakeActor struct {
 	updateSpaceQuotaReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
+	}
+	UpdateStackStub        func(string, string, string) (resources.Stack, v7action.Warnings, error)
+	updateStackMutex       sync.RWMutex
+	updateStackArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	updateStackReturns struct {
+		result1 resources.Stack
+		result2 v7action.Warnings
+		result3 error
+	}
+	updateStackReturnsOnCall map[int]struct {
+		result1 resources.Stack
+		result2 v7action.Warnings
+		result3 error
 	}
 	UpdateStackLabelsByStackNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
 	updateStackLabelsByStackNameMutex       sync.RWMutex
@@ -12768,6 +12831,73 @@ func (fake *FakeActor) GetServiceBrokersReturnsOnCall(i int, result1 []resources
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServiceInstanceByGUID(arg1 string) (resources.ServiceInstance, v7action.Warnings, error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	ret, specificReturn := fake.getServiceInstanceByGUIDReturnsOnCall[len(fake.getServiceInstanceByGUIDArgsForCall)]
+	fake.getServiceInstanceByGUIDArgsForCall = append(fake.getServiceInstanceByGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetServiceInstanceByGUIDStub
+	fakeReturns := fake.getServiceInstanceByGUIDReturns
+	fake.recordInvocation("GetServiceInstanceByGUID", []interface{}{arg1})
+	fake.getServiceInstanceByGUIDMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDCallCount() int {
+	fake.getServiceInstanceByGUIDMutex.RLock()
+	defer fake.getServiceInstanceByGUIDMutex.RUnlock()
+	return len(fake.getServiceInstanceByGUIDArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDCalls(stub func(string) (resources.ServiceInstance, v7action.Warnings, error)) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = stub
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDArgsForCall(i int) string {
+	fake.getServiceInstanceByGUIDMutex.RLock()
+	defer fake.getServiceInstanceByGUIDMutex.RUnlock()
+	argsForCall := fake.getServiceInstanceByGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDReturns(result1 resources.ServiceInstance, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = nil
+	fake.getServiceInstanceByGUIDReturns = struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceInstanceByGUIDReturnsOnCall(i int, result1 resources.ServiceInstance, result2 v7action.Warnings, result3 error) {
+	fake.getServiceInstanceByGUIDMutex.Lock()
+	defer fake.getServiceInstanceByGUIDMutex.Unlock()
+	fake.GetServiceInstanceByGUIDStub = nil
+	if fake.getServiceInstanceByGUIDReturnsOnCall == nil {
+		fake.getServiceInstanceByGUIDReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceInstance
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstanceByGUIDReturnsOnCall[i] = struct {
+		result1 resources.ServiceInstance
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServiceInstanceByNameAndSpace(arg1 string, arg2 string) (resources.ServiceInstance, v7action.Warnings, error) {
 	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceArgsForCall)]
@@ -14528,6 +14658,140 @@ func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 resources.User, resul
 	}{result1, result2}
 }
 
+func (fake *FakeActor) ListAppBindings(arg1 v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {
+	fake.listAppBindingsMutex.Lock()
+	ret, specificReturn := fake.listAppBindingsReturnsOnCall[len(fake.listAppBindingsArgsForCall)]
+	fake.listAppBindingsArgsForCall = append(fake.listAppBindingsArgsForCall, struct {
+		arg1 v7action.ListAppBindingParams
+	}{arg1})
+	stub := fake.ListAppBindingsStub
+	fakeReturns := fake.listAppBindingsReturns
+	fake.recordInvocation("ListAppBindings", []interface{}{arg1})
+	fake.listAppBindingsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) ListAppBindingsCallCount() int {
+	fake.listAppBindingsMutex.RLock()
+	defer fake.listAppBindingsMutex.RUnlock()
+	return len(fake.listAppBindingsArgsForCall)
+}
+
+func (fake *FakeActor) ListAppBindingsCalls(stub func(v7action.ListAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = stub
+}
+
+func (fake *FakeActor) ListAppBindingsArgsForCall(i int) v7action.ListAppBindingParams {
+	fake.listAppBindingsMutex.RLock()
+	defer fake.listAppBindingsMutex.RUnlock()
+	argsForCall := fake.listAppBindingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ListAppBindingsReturns(result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = nil
+	fake.listAppBindingsReturns = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) ListAppBindingsReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listAppBindingsMutex.Lock()
+	defer fake.listAppBindingsMutex.Unlock()
+	fake.ListAppBindingsStub = nil
+	if fake.listAppBindingsReturnsOnCall == nil {
+		fake.listAppBindingsReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceCredentialBinding
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.listAppBindingsReturnsOnCall[i] = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) ListServiceAppBindings(arg1 v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error) {
+	fake.listServiceAppBindingsMutex.Lock()
+	ret, specificReturn := fake.listServiceAppBindingsReturnsOnCall[len(fake.listServiceAppBindingsArgsForCall)]
+	fake.listServiceAppBindingsArgsForCall = append(fake.listServiceAppBindingsArgsForCall, struct {
+		arg1 v7action.ListServiceAppBindingParams
+	}{arg1})
+	stub := fake.ListServiceAppBindingsStub
+	fakeReturns := fake.listServiceAppBindingsReturns
+	fake.recordInvocation("ListServiceAppBindings", []interface{}{arg1})
+	fake.listServiceAppBindingsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) ListServiceAppBindingsCallCount() int {
+	fake.listServiceAppBindingsMutex.RLock()
+	defer fake.listServiceAppBindingsMutex.RUnlock()
+	return len(fake.listServiceAppBindingsArgsForCall)
+}
+
+func (fake *FakeActor) ListServiceAppBindingsCalls(stub func(v7action.ListServiceAppBindingParams) ([]resources.ServiceCredentialBinding, v7action.Warnings, error)) {
+	fake.listServiceAppBindingsMutex.Lock()
+	defer fake.listServiceAppBindingsMutex.Unlock()
+	fake.ListServiceAppBindingsStub = stub
+}
+
+func (fake *FakeActor) ListServiceAppBindingsArgsForCall(i int) v7action.ListServiceAppBindingParams {
+	fake.listServiceAppBindingsMutex.RLock()
+	defer fake.listServiceAppBindingsMutex.RUnlock()
+	argsForCall := fake.listServiceAppBindingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ListServiceAppBindingsReturns(result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listServiceAppBindingsMutex.Lock()
+	defer fake.listServiceAppBindingsMutex.Unlock()
+	fake.ListServiceAppBindingsStub = nil
+	fake.listServiceAppBindingsReturns = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) ListServiceAppBindingsReturnsOnCall(i int, result1 []resources.ServiceCredentialBinding, result2 v7action.Warnings, result3 error) {
+	fake.listServiceAppBindingsMutex.Lock()
+	defer fake.listServiceAppBindingsMutex.Unlock()
+	fake.ListServiceAppBindingsStub = nil
+	if fake.listServiceAppBindingsReturnsOnCall == nil {
+		fake.listServiceAppBindingsReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceCredentialBinding
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.listServiceAppBindingsReturnsOnCall[i] = struct {
+		result1 []resources.ServiceCredentialBinding
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) MakeCurlRequest(arg1 string, arg2 string, arg3 []string, arg4 string, arg5 bool) ([]byte, *http.Response, error) {
 	var arg3Copy []string
 	if arg3 != nil {
@@ -14604,20 +14868,21 @@ func (fake *FakeActor) MakeCurlRequestReturnsOnCall(i int, result1 []byte, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) MapRoute(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+func (fake *FakeActor) MapRoute(arg1 string, arg2 string, arg3 string, arg4 int) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
 	fake.mapRouteArgsForCall = append(fake.mapRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
+		arg4 int
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.MapRouteStub
 	fakeReturns := fake.mapRouteReturns
-	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.mapRouteMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -14631,17 +14896,17 @@ func (fake *FakeActor) MapRouteCallCount() int {
 	return len(fake.mapRouteArgsForCall)
 }
 
-func (fake *FakeActor) MapRouteCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) MapRouteCalls(stub func(string, string, string, int) (v7action.Warnings, error)) {
 	fake.mapRouteMutex.Lock()
 	defer fake.mapRouteMutex.Unlock()
 	fake.MapRouteStub = stub
 }
 
-func (fake *FakeActor) MapRouteArgsForCall(i int) (string, string, string) {
+func (fake *FakeActor) MapRouteArgsForCall(i int) (string, string, string, int) {
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	argsForCall := fake.mapRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) MapRouteReturns(result1 v7action.Warnings, result2 error) {
@@ -19427,6 +19692,75 @@ func (fake *FakeActor) UpdateSpaceQuotaReturnsOnCall(i int, result1 v7action.War
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateStack(arg1 string, arg2 string, arg3 string) (resources.Stack, v7action.Warnings, error) {
+	fake.updateStackMutex.Lock()
+	ret, specificReturn := fake.updateStackReturnsOnCall[len(fake.updateStackArgsForCall)]
+	fake.updateStackArgsForCall = append(fake.updateStackArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.UpdateStackStub
+	fakeReturns := fake.updateStackReturns
+	fake.recordInvocation("UpdateStack", []interface{}{arg1, arg2, arg3})
+	fake.updateStackMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) UpdateStackCallCount() int {
+	fake.updateStackMutex.RLock()
+	defer fake.updateStackMutex.RUnlock()
+	return len(fake.updateStackArgsForCall)
+}
+
+func (fake *FakeActor) UpdateStackCalls(stub func(string, string, string) (resources.Stack, v7action.Warnings, error)) {
+	fake.updateStackMutex.Lock()
+	defer fake.updateStackMutex.Unlock()
+	fake.UpdateStackStub = stub
+}
+
+func (fake *FakeActor) UpdateStackArgsForCall(i int) (string, string, string) {
+	fake.updateStackMutex.RLock()
+	defer fake.updateStackMutex.RUnlock()
+	argsForCall := fake.updateStackArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) UpdateStackReturns(result1 resources.Stack, result2 v7action.Warnings, result3 error) {
+	fake.updateStackMutex.Lock()
+	defer fake.updateStackMutex.Unlock()
+	fake.UpdateStackStub = nil
+	fake.updateStackReturns = struct {
+		result1 resources.Stack
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) UpdateStackReturnsOnCall(i int, result1 resources.Stack, result2 v7action.Warnings, result3 error) {
+	fake.updateStackMutex.Lock()
+	defer fake.updateStackMutex.Unlock()
+	fake.UpdateStackStub = nil
+	if fake.updateStackReturnsOnCall == nil {
+		fake.updateStackReturnsOnCall = make(map[int]struct {
+			result1 resources.Stack
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.updateStackReturnsOnCall[i] = struct {
+		result1 resources.Stack
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) UpdateStackLabelsByStackName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateStackLabelsByStackNameMutex.Lock()
 	ret, specificReturn := fake.updateStackLabelsByStackNameReturnsOnCall[len(fake.updateStackLabelsByStackNameArgsForCall)]
@@ -19903,494 +20237,6 @@ func (fake *FakeActor) UploadDropletReturnsOnCall(i int, result1 v7action.Warnin
 func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.applyOrganizationQuotaByNameMutex.RLock()
-	defer fake.applyOrganizationQuotaByNameMutex.RUnlock()
-	fake.applySpaceQuotaByNameMutex.RLock()
-	defer fake.applySpaceQuotaByNameMutex.RUnlock()
-	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
-	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
-	fake.authenticateMutex.RLock()
-	defer fake.authenticateMutex.RUnlock()
-	fake.bindSecurityGroupToSpacesMutex.RLock()
-	defer fake.bindSecurityGroupToSpacesMutex.RUnlock()
-	fake.cancelDeploymentMutex.RLock()
-	defer fake.cancelDeploymentMutex.RUnlock()
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
-	fake.clearTargetMutex.RLock()
-	defer fake.clearTargetMutex.RUnlock()
-	fake.continueDeploymentMutex.RLock()
-	defer fake.continueDeploymentMutex.RUnlock()
-	fake.copyPackageMutex.RLock()
-	defer fake.copyPackageMutex.RUnlock()
-	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
-	fake.createApplicationDropletMutex.RLock()
-	defer fake.createApplicationDropletMutex.RUnlock()
-	fake.createApplicationInSpaceMutex.RLock()
-	defer fake.createApplicationInSpaceMutex.RUnlock()
-	fake.createBitsPackageByApplicationMutex.RLock()
-	defer fake.createBitsPackageByApplicationMutex.RUnlock()
-	fake.createBuildpackMutex.RLock()
-	defer fake.createBuildpackMutex.RUnlock()
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
-	fake.createDockerPackageByApplicationMutex.RLock()
-	defer fake.createDockerPackageByApplicationMutex.RUnlock()
-	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createDockerPackageByApplicationNameAndSpaceMutex.RUnlock()
-	fake.createIsolationSegmentByNameMutex.RLock()
-	defer fake.createIsolationSegmentByNameMutex.RUnlock()
-	fake.createManagedServiceInstanceMutex.RLock()
-	defer fake.createManagedServiceInstanceMutex.RUnlock()
-	fake.createOrgRoleMutex.RLock()
-	defer fake.createOrgRoleMutex.RUnlock()
-	fake.createOrganizationMutex.RLock()
-	defer fake.createOrganizationMutex.RUnlock()
-	fake.createOrganizationQuotaMutex.RLock()
-	defer fake.createOrganizationQuotaMutex.RUnlock()
-	fake.createPrivateDomainMutex.RLock()
-	defer fake.createPrivateDomainMutex.RUnlock()
-	fake.createRouteMutex.RLock()
-	defer fake.createRouteMutex.RUnlock()
-	fake.createRouteBindingMutex.RLock()
-	defer fake.createRouteBindingMutex.RUnlock()
-	fake.createSecurityGroupMutex.RLock()
-	defer fake.createSecurityGroupMutex.RUnlock()
-	fake.createServiceAppBindingMutex.RLock()
-	defer fake.createServiceAppBindingMutex.RUnlock()
-	fake.createServiceBrokerMutex.RLock()
-	defer fake.createServiceBrokerMutex.RUnlock()
-	fake.createServiceKeyMutex.RLock()
-	defer fake.createServiceKeyMutex.RUnlock()
-	fake.createSharedDomainMutex.RLock()
-	defer fake.createSharedDomainMutex.RUnlock()
-	fake.createSpaceMutex.RLock()
-	defer fake.createSpaceMutex.RUnlock()
-	fake.createSpaceQuotaMutex.RLock()
-	defer fake.createSpaceQuotaMutex.RUnlock()
-	fake.createSpaceRoleMutex.RLock()
-	defer fake.createSpaceRoleMutex.RUnlock()
-	fake.createUserMutex.RLock()
-	defer fake.createUserMutex.RUnlock()
-	fake.createUserProvidedServiceInstanceMutex.RLock()
-	defer fake.createUserProvidedServiceInstanceMutex.RUnlock()
-	fake.deleteApplicationByNameAndSpaceMutex.RLock()
-	defer fake.deleteApplicationByNameAndSpaceMutex.RUnlock()
-	fake.deleteBuildpackByNameAndStackAndLifecycleMutex.RLock()
-	defer fake.deleteBuildpackByNameAndStackAndLifecycleMutex.RUnlock()
-	fake.deleteDomainMutex.RLock()
-	defer fake.deleteDomainMutex.RUnlock()
-	fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
-	defer fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
-	fake.deleteIsolationSegmentByNameMutex.RLock()
-	defer fake.deleteIsolationSegmentByNameMutex.RUnlock()
-	fake.deleteIsolationSegmentOrganizationByNameMutex.RLock()
-	defer fake.deleteIsolationSegmentOrganizationByNameMutex.RUnlock()
-	fake.deleteOrgRoleMutex.RLock()
-	defer fake.deleteOrgRoleMutex.RUnlock()
-	fake.deleteOrganizationMutex.RLock()
-	defer fake.deleteOrganizationMutex.RUnlock()
-	fake.deleteOrganizationQuotaMutex.RLock()
-	defer fake.deleteOrganizationQuotaMutex.RUnlock()
-	fake.deleteOrphanedRoutesMutex.RLock()
-	defer fake.deleteOrphanedRoutesMutex.RUnlock()
-	fake.deleteRouteMutex.RLock()
-	defer fake.deleteRouteMutex.RUnlock()
-	fake.deleteRouteBindingMutex.RLock()
-	defer fake.deleteRouteBindingMutex.RUnlock()
-	fake.deleteSecurityGroupMutex.RLock()
-	defer fake.deleteSecurityGroupMutex.RUnlock()
-	fake.deleteServiceAppBindingMutex.RLock()
-	defer fake.deleteServiceAppBindingMutex.RUnlock()
-	fake.deleteServiceBrokerMutex.RLock()
-	defer fake.deleteServiceBrokerMutex.RUnlock()
-	fake.deleteServiceInstanceMutex.RLock()
-	defer fake.deleteServiceInstanceMutex.RUnlock()
-	fake.deleteServiceKeyByServiceInstanceAndNameMutex.RLock()
-	defer fake.deleteServiceKeyByServiceInstanceAndNameMutex.RUnlock()
-	fake.deleteSpaceByNameAndOrganizationNameMutex.RLock()
-	defer fake.deleteSpaceByNameAndOrganizationNameMutex.RUnlock()
-	fake.deleteSpaceQuotaByNameMutex.RLock()
-	defer fake.deleteSpaceQuotaByNameMutex.RUnlock()
-	fake.deleteSpaceRoleMutex.RLock()
-	defer fake.deleteSpaceRoleMutex.RUnlock()
-	fake.deleteUserMutex.RLock()
-	defer fake.deleteUserMutex.RUnlock()
-	fake.diffSpaceManifestMutex.RLock()
-	defer fake.diffSpaceManifestMutex.RUnlock()
-	fake.disableFeatureFlagMutex.RLock()
-	defer fake.disableFeatureFlagMutex.RUnlock()
-	fake.disableServiceAccessMutex.RLock()
-	defer fake.disableServiceAccessMutex.RUnlock()
-	fake.downloadCurrentDropletByAppNameMutex.RLock()
-	defer fake.downloadCurrentDropletByAppNameMutex.RUnlock()
-	fake.downloadDropletByGUIDAndAppNameMutex.RLock()
-	defer fake.downloadDropletByGUIDAndAppNameMutex.RUnlock()
-	fake.enableFeatureFlagMutex.RLock()
-	defer fake.enableFeatureFlagMutex.RUnlock()
-	fake.enableServiceAccessMutex.RLock()
-	defer fake.enableServiceAccessMutex.RUnlock()
-	fake.entitleIsolationSegmentToOrganizationByNameMutex.RLock()
-	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.RUnlock()
-	fake.getAppFeatureMutex.RLock()
-	defer fake.getAppFeatureMutex.RUnlock()
-	fake.getAppSummariesForSpaceMutex.RLock()
-	defer fake.getAppSummariesForSpaceMutex.RUnlock()
-	fake.getApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationDropletsMutex.RLock()
-	defer fake.getApplicationDropletsMutex.RUnlock()
-	fake.getApplicationLabelsMutex.RLock()
-	defer fake.getApplicationLabelsMutex.RUnlock()
-	fake.getApplicationMapForRouteMutex.RLock()
-	defer fake.getApplicationMapForRouteMutex.RUnlock()
-	fake.getApplicationPackagesMutex.RLock()
-	defer fake.getApplicationPackagesMutex.RUnlock()
-	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationProcessReadinessHealthChecksByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationRevisionsDeployedMutex.RLock()
-	defer fake.getApplicationRevisionsDeployedMutex.RUnlock()
-	fake.getApplicationRoutesMutex.RLock()
-	defer fake.getApplicationRoutesMutex.RUnlock()
-	fake.getApplicationTasksMutex.RLock()
-	defer fake.getApplicationTasksMutex.RUnlock()
-	fake.getApplicationsByGUIDsMutex.RLock()
-	defer fake.getApplicationsByGUIDsMutex.RUnlock()
-	fake.getApplicationsByNamesAndSpaceMutex.RLock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
-	fake.getBuildpackLabelsMutex.RLock()
-	defer fake.getBuildpackLabelsMutex.RUnlock()
-	fake.getBuildpacksMutex.RLock()
-	defer fake.getBuildpacksMutex.RUnlock()
-	fake.getCurrentUserMutex.RLock()
-	defer fake.getCurrentUserMutex.RUnlock()
-	fake.getDefaultDomainMutex.RLock()
-	defer fake.getDefaultDomainMutex.RUnlock()
-	fake.getDetailedAppSummaryMutex.RLock()
-	defer fake.getDetailedAppSummaryMutex.RUnlock()
-	fake.getDomainMutex.RLock()
-	defer fake.getDomainMutex.RUnlock()
-	fake.getDomainByNameMutex.RLock()
-	defer fake.getDomainByNameMutex.RUnlock()
-	fake.getDomainLabelsMutex.RLock()
-	defer fake.getDomainLabelsMutex.RUnlock()
-	fake.getEffectiveIsolationSegmentBySpaceMutex.RLock()
-	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
-	fake.getEnvironmentVariableGroupMutex.RLock()
-	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
-	fake.getEnvironmentVariableGroupByRevisionMutex.RLock()
-	defer fake.getEnvironmentVariableGroupByRevisionMutex.RUnlock()
-	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
-	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
-	fake.getFeatureFlagByNameMutex.RLock()
-	defer fake.getFeatureFlagByNameMutex.RUnlock()
-	fake.getFeatureFlagsMutex.RLock()
-	defer fake.getFeatureFlagsMutex.RUnlock()
-	fake.getGlobalRunningSecurityGroupsMutex.RLock()
-	defer fake.getGlobalRunningSecurityGroupsMutex.RUnlock()
-	fake.getGlobalStagingSecurityGroupsMutex.RLock()
-	defer fake.getGlobalStagingSecurityGroupsMutex.RUnlock()
-	fake.getInfoResponseMutex.RLock()
-	defer fake.getInfoResponseMutex.RUnlock()
-	fake.getIsolationSegmentByNameMutex.RLock()
-	defer fake.getIsolationSegmentByNameMutex.RUnlock()
-	fake.getIsolationSegmentSummariesMutex.RLock()
-	defer fake.getIsolationSegmentSummariesMutex.RUnlock()
-	fake.getIsolationSegmentsByOrganizationMutex.RLock()
-	defer fake.getIsolationSegmentsByOrganizationMutex.RUnlock()
-	fake.getLatestActiveDeploymentForAppMutex.RLock()
-	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
-	fake.getLoginPromptsMutex.RLock()
-	defer fake.getLoginPromptsMutex.RUnlock()
-	fake.getNewestReadyPackageForApplicationMutex.RLock()
-	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
-	fake.getOrgUsersByRoleTypeMutex.RLock()
-	defer fake.getOrgUsersByRoleTypeMutex.RUnlock()
-	fake.getOrganizationByNameMutex.RLock()
-	defer fake.getOrganizationByNameMutex.RUnlock()
-	fake.getOrganizationDomainsMutex.RLock()
-	defer fake.getOrganizationDomainsMutex.RUnlock()
-	fake.getOrganizationLabelsMutex.RLock()
-	defer fake.getOrganizationLabelsMutex.RUnlock()
-	fake.getOrganizationQuotaByNameMutex.RLock()
-	defer fake.getOrganizationQuotaByNameMutex.RUnlock()
-	fake.getOrganizationQuotasMutex.RLock()
-	defer fake.getOrganizationQuotasMutex.RUnlock()
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
-	fake.getOrganizationSpacesWithLabelSelectorMutex.RLock()
-	defer fake.getOrganizationSpacesWithLabelSelectorMutex.RUnlock()
-	fake.getOrganizationSummaryByNameMutex.RLock()
-	defer fake.getOrganizationSummaryByNameMutex.RUnlock()
-	fake.getOrganizationsMutex.RLock()
-	defer fake.getOrganizationsMutex.RUnlock()
-	fake.getProcessByTypeAndApplicationMutex.RLock()
-	defer fake.getProcessByTypeAndApplicationMutex.RUnlock()
-	fake.getRawApplicationManifestByNameAndSpaceMutex.RLock()
-	defer fake.getRawApplicationManifestByNameAndSpaceMutex.RUnlock()
-	fake.getRecentEventsByApplicationNameAndSpaceMutex.RLock()
-	defer fake.getRecentEventsByApplicationNameAndSpaceMutex.RUnlock()
-	fake.getRecentLogsForApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getRevisionByApplicationAndVersionMutex.RLock()
-	defer fake.getRevisionByApplicationAndVersionMutex.RUnlock()
-	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
-	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
-	fake.getRootResponseMutex.RLock()
-	defer fake.getRootResponseMutex.RUnlock()
-	fake.getRouteByAttributesMutex.RLock()
-	defer fake.getRouteByAttributesMutex.RUnlock()
-	fake.getRouteDestinationByAppGUIDMutex.RLock()
-	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
-	fake.getRouteLabelsMutex.RLock()
-	defer fake.getRouteLabelsMutex.RUnlock()
-	fake.getRouteSummariesMutex.RLock()
-	defer fake.getRouteSummariesMutex.RUnlock()
-	fake.getRouterGroupsMutex.RLock()
-	defer fake.getRouterGroupsMutex.RUnlock()
-	fake.getRoutesByOrgMutex.RLock()
-	defer fake.getRoutesByOrgMutex.RUnlock()
-	fake.getRoutesBySpaceMutex.RLock()
-	defer fake.getRoutesBySpaceMutex.RUnlock()
-	fake.getSSHEnabledMutex.RLock()
-	defer fake.getSSHEnabledMutex.RUnlock()
-	fake.getSSHEnabledByAppNameMutex.RLock()
-	defer fake.getSSHEnabledByAppNameMutex.RUnlock()
-	fake.getSSHPasscodeMutex.RLock()
-	defer fake.getSSHPasscodeMutex.RUnlock()
-	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
-	defer fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
-	fake.getSecurityGroupMutex.RLock()
-	defer fake.getSecurityGroupMutex.RUnlock()
-	fake.getSecurityGroupSummaryMutex.RLock()
-	defer fake.getSecurityGroupSummaryMutex.RUnlock()
-	fake.getSecurityGroupsMutex.RLock()
-	defer fake.getSecurityGroupsMutex.RUnlock()
-	fake.getServiceAccessMutex.RLock()
-	defer fake.getServiceAccessMutex.RUnlock()
-	fake.getServiceBrokerByNameMutex.RLock()
-	defer fake.getServiceBrokerByNameMutex.RUnlock()
-	fake.getServiceBrokerLabelsMutex.RLock()
-	defer fake.getServiceBrokerLabelsMutex.RUnlock()
-	fake.getServiceBrokersMutex.RLock()
-	defer fake.getServiceBrokersMutex.RUnlock()
-	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
-	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
-	fake.getServiceInstanceDetailsMutex.RLock()
-	defer fake.getServiceInstanceDetailsMutex.RUnlock()
-	fake.getServiceInstanceLabelsMutex.RLock()
-	defer fake.getServiceInstanceLabelsMutex.RUnlock()
-	fake.getServiceInstanceParametersMutex.RLock()
-	defer fake.getServiceInstanceParametersMutex.RUnlock()
-	fake.getServiceInstancesForSpaceMutex.RLock()
-	defer fake.getServiceInstancesForSpaceMutex.RUnlock()
-	fake.getServiceKeyByServiceInstanceAndNameMutex.RLock()
-	defer fake.getServiceKeyByServiceInstanceAndNameMutex.RUnlock()
-	fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RLock()
-	defer fake.getServiceKeyDetailsByServiceInstanceAndNameMutex.RUnlock()
-	fake.getServiceKeysByServiceInstanceMutex.RLock()
-	defer fake.getServiceKeysByServiceInstanceMutex.RUnlock()
-	fake.getServiceOfferingLabelsMutex.RLock()
-	defer fake.getServiceOfferingLabelsMutex.RUnlock()
-	fake.getServicePlanByNameOfferingAndBrokerMutex.RLock()
-	defer fake.getServicePlanByNameOfferingAndBrokerMutex.RUnlock()
-	fake.getServicePlanLabelsMutex.RLock()
-	defer fake.getServicePlanLabelsMutex.RUnlock()
-	fake.getSpaceByNameAndOrganizationMutex.RLock()
-	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
-	fake.getSpaceFeatureMutex.RLock()
-	defer fake.getSpaceFeatureMutex.RUnlock()
-	fake.getSpaceLabelsMutex.RLock()
-	defer fake.getSpaceLabelsMutex.RUnlock()
-	fake.getSpaceQuotaByNameMutex.RLock()
-	defer fake.getSpaceQuotaByNameMutex.RUnlock()
-	fake.getSpaceQuotasByOrgGUIDMutex.RLock()
-	defer fake.getSpaceQuotasByOrgGUIDMutex.RUnlock()
-	fake.getSpaceSummaryByNameAndOrganizationMutex.RLock()
-	defer fake.getSpaceSummaryByNameAndOrganizationMutex.RUnlock()
-	fake.getSpaceUsersByRoleTypeMutex.RLock()
-	defer fake.getSpaceUsersByRoleTypeMutex.RUnlock()
-	fake.getStackByNameMutex.RLock()
-	defer fake.getStackByNameMutex.RUnlock()
-	fake.getStackLabelsMutex.RLock()
-	defer fake.getStackLabelsMutex.RUnlock()
-	fake.getStacksMutex.RLock()
-	defer fake.getStacksMutex.RUnlock()
-	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
-	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getTaskBySequenceIDAndApplicationMutex.RLock()
-	defer fake.getTaskBySequenceIDAndApplicationMutex.RUnlock()
-	fake.getUAAAPIVersionMutex.RLock()
-	defer fake.getUAAAPIVersionMutex.RUnlock()
-	fake.getUnstagedNewestPackageGUIDMutex.RLock()
-	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
-	fake.getUserMutex.RLock()
-	defer fake.getUserMutex.RUnlock()
-	fake.makeCurlRequestMutex.RLock()
-	defer fake.makeCurlRequestMutex.RUnlock()
-	fake.mapRouteMutex.RLock()
-	defer fake.mapRouteMutex.RUnlock()
-	fake.marketplaceMutex.RLock()
-	defer fake.marketplaceMutex.RUnlock()
-	fake.moveRouteMutex.RLock()
-	defer fake.moveRouteMutex.RUnlock()
-	fake.parseAccessTokenMutex.RLock()
-	defer fake.parseAccessTokenMutex.RUnlock()
-	fake.pollBuildMutex.RLock()
-	defer fake.pollBuildMutex.RUnlock()
-	fake.pollPackageMutex.RLock()
-	defer fake.pollPackageMutex.RUnlock()
-	fake.pollStartMutex.RLock()
-	defer fake.pollStartMutex.RUnlock()
-	fake.pollStartForDeploymentMutex.RLock()
-	defer fake.pollStartForDeploymentMutex.RUnlock()
-	fake.pollTaskMutex.RLock()
-	defer fake.pollTaskMutex.RUnlock()
-	fake.pollUploadBuildpackJobMutex.RLock()
-	defer fake.pollUploadBuildpackJobMutex.RUnlock()
-	fake.prepareBuildpackBitsMutex.RLock()
-	defer fake.prepareBuildpackBitsMutex.RUnlock()
-	fake.purgeServiceInstanceMutex.RLock()
-	defer fake.purgeServiceInstanceMutex.RUnlock()
-	fake.purgeServiceOfferingByNameAndBrokerMutex.RLock()
-	defer fake.purgeServiceOfferingByNameAndBrokerMutex.RUnlock()
-	fake.refreshAccessTokenMutex.RLock()
-	defer fake.refreshAccessTokenMutex.RUnlock()
-	fake.renameApplicationByNameAndSpaceGUIDMutex.RLock()
-	defer fake.renameApplicationByNameAndSpaceGUIDMutex.RUnlock()
-	fake.renameOrganizationMutex.RLock()
-	defer fake.renameOrganizationMutex.RUnlock()
-	fake.renameServiceInstanceMutex.RLock()
-	defer fake.renameServiceInstanceMutex.RUnlock()
-	fake.renameSpaceByNameAndOrganizationGUIDMutex.RLock()
-	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.RUnlock()
-	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
-	defer fake.resetOrganizationDefaultIsolationSegmentMutex.RUnlock()
-	fake.resetSpaceIsolationSegmentMutex.RLock()
-	defer fake.resetSpaceIsolationSegmentMutex.RUnlock()
-	fake.resourceMatchMutex.RLock()
-	defer fake.resourceMatchMutex.RUnlock()
-	fake.restartApplicationMutex.RLock()
-	defer fake.restartApplicationMutex.RUnlock()
-	fake.revokeAccessAndRefreshTokensMutex.RLock()
-	defer fake.revokeAccessAndRefreshTokensMutex.RUnlock()
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
-	fake.scaleProcessByApplicationMutex.RLock()
-	defer fake.scaleProcessByApplicationMutex.RUnlock()
-	fake.scheduleTokenRefreshMutex.RLock()
-	defer fake.scheduleTokenRefreshMutex.RUnlock()
-	fake.setApplicationDropletMutex.RLock()
-	defer fake.setApplicationDropletMutex.RUnlock()
-	fake.setApplicationDropletByApplicationNameAndSpaceMutex.RLock()
-	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.RUnlock()
-	fake.setApplicationManifestMutex.RLock()
-	defer fake.setApplicationManifestMutex.RUnlock()
-	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RLock()
-	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RUnlock()
-	fake.setEnvironmentVariableByApplicationNameAndSpaceMutex.RLock()
-	defer fake.setEnvironmentVariableByApplicationNameAndSpaceMutex.RUnlock()
-	fake.setEnvironmentVariableGroupMutex.RLock()
-	defer fake.setEnvironmentVariableGroupMutex.RUnlock()
-	fake.setOrganizationDefaultIsolationSegmentMutex.RLock()
-	defer fake.setOrganizationDefaultIsolationSegmentMutex.RUnlock()
-	fake.setSpaceManifestMutex.RLock()
-	defer fake.setSpaceManifestMutex.RUnlock()
-	fake.setTargetMutex.RLock()
-	defer fake.setTargetMutex.RUnlock()
-	fake.sharePrivateDomainMutex.RLock()
-	defer fake.sharePrivateDomainMutex.RUnlock()
-	fake.shareRouteMutex.RLock()
-	defer fake.shareRouteMutex.RUnlock()
-	fake.shareServiceInstanceToSpaceAndOrgMutex.RLock()
-	defer fake.shareServiceInstanceToSpaceAndOrgMutex.RUnlock()
-	fake.stageApplicationPackageMutex.RLock()
-	defer fake.stageApplicationPackageMutex.RUnlock()
-	fake.stagePackageMutex.RLock()
-	defer fake.stagePackageMutex.RUnlock()
-	fake.startApplicationMutex.RLock()
-	defer fake.startApplicationMutex.RUnlock()
-	fake.stopApplicationMutex.RLock()
-	defer fake.stopApplicationMutex.RUnlock()
-	fake.terminateTaskMutex.RLock()
-	defer fake.terminateTaskMutex.RUnlock()
-	fake.unbindSecurityGroupMutex.RLock()
-	defer fake.unbindSecurityGroupMutex.RUnlock()
-	fake.unmapRouteMutex.RLock()
-	defer fake.unmapRouteMutex.RUnlock()
-	fake.unsetEnvironmentVariableByApplicationNameAndSpaceMutex.RLock()
-	defer fake.unsetEnvironmentVariableByApplicationNameAndSpaceMutex.RUnlock()
-	fake.unsetSpaceQuotaMutex.RLock()
-	defer fake.unsetSpaceQuotaMutex.RUnlock()
-	fake.unsharePrivateDomainMutex.RLock()
-	defer fake.unsharePrivateDomainMutex.RUnlock()
-	fake.unshareRouteMutex.RLock()
-	defer fake.unshareRouteMutex.RUnlock()
-	fake.unshareServiceInstanceFromSpaceAndOrgMutex.RLock()
-	defer fake.unshareServiceInstanceFromSpaceAndOrgMutex.RUnlock()
-	fake.updateAppFeatureMutex.RLock()
-	defer fake.updateAppFeatureMutex.RUnlock()
-	fake.updateApplicationMutex.RLock()
-	defer fake.updateApplicationMutex.RUnlock()
-	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
-	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
-	fake.updateBuildpackByNameAndStackAndLifecycleMutex.RLock()
-	defer fake.updateBuildpackByNameAndStackAndLifecycleMutex.RUnlock()
-	fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RLock()
-	defer fake.updateBuildpackLabelsByBuildpackNameAndStackAndLifecycleMutex.RUnlock()
-	fake.updateDestinationMutex.RLock()
-	defer fake.updateDestinationMutex.RUnlock()
-	fake.updateDomainLabelsByDomainNameMutex.RLock()
-	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
-	fake.updateManagedServiceInstanceMutex.RLock()
-	defer fake.updateManagedServiceInstanceMutex.RUnlock()
-	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
-	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
-	fake.updateOrganizationQuotaMutex.RLock()
-	defer fake.updateOrganizationQuotaMutex.RUnlock()
-	fake.updateProcessByTypeAndApplicationMutex.RLock()
-	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
-	fake.updateRouteMutex.RLock()
-	defer fake.updateRouteMutex.RUnlock()
-	fake.updateRouteLabelsMutex.RLock()
-	defer fake.updateRouteLabelsMutex.RUnlock()
-	fake.updateSecurityGroupMutex.RLock()
-	defer fake.updateSecurityGroupMutex.RUnlock()
-	fake.updateSecurityGroupGloballyEnabledMutex.RLock()
-	defer fake.updateSecurityGroupGloballyEnabledMutex.RUnlock()
-	fake.updateServiceBrokerMutex.RLock()
-	defer fake.updateServiceBrokerMutex.RUnlock()
-	fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.RLock()
-	defer fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.RUnlock()
-	fake.updateServiceInstanceLabelsMutex.RLock()
-	defer fake.updateServiceInstanceLabelsMutex.RUnlock()
-	fake.updateServiceOfferingLabelsMutex.RLock()
-	defer fake.updateServiceOfferingLabelsMutex.RUnlock()
-	fake.updateServicePlanLabelsMutex.RLock()
-	defer fake.updateServicePlanLabelsMutex.RUnlock()
-	fake.updateSpaceFeatureMutex.RLock()
-	defer fake.updateSpaceFeatureMutex.RUnlock()
-	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
-	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
-	fake.updateSpaceQuotaMutex.RLock()
-	defer fake.updateSpaceQuotaMutex.RUnlock()
-	fake.updateStackLabelsByStackNameMutex.RLock()
-	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
-	fake.updateUserPasswordMutex.RLock()
-	defer fake.updateUserPasswordMutex.RUnlock()
-	fake.updateUserProvidedServiceInstanceMutex.RLock()
-	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
-	fake.upgradeManagedServiceInstanceMutex.RLock()
-	defer fake.upgradeManagedServiceInstanceMutex.RUnlock()
-	fake.uploadBitsPackageMutex.RLock()
-	defer fake.uploadBitsPackageMutex.RUnlock()
-	fake.uploadBuildpackMutex.RLock()
-	defer fake.uploadBuildpackMutex.RUnlock()
-	fake.uploadDropletMutex.RLock()
-	defer fake.uploadDropletMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

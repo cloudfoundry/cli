@@ -35,6 +35,7 @@ var _ = Describe("Service App Binding Action", func() {
 			bindingName         = "fake-binding-name"
 			spaceGUID           = "fake-space-guid"
 			fakeJobURL          = ccv3.JobURL("fake-job-url")
+			strategy            = "single"
 		)
 
 		var (
@@ -87,6 +88,7 @@ var _ = Describe("Service App Binding Action", func() {
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
+				Strategy: resources.SingleBindingStrategy,
 			}
 		})
 
@@ -202,6 +204,7 @@ var _ = Describe("Service App Binding Action", func() {
 					Parameters: types.NewOptionalObject(map[string]interface{}{
 						"foo": "bar",
 					}),
+					Strategy: strategy,
 				}))
 			})
 
@@ -248,7 +251,141 @@ var _ = Describe("Service App Binding Action", func() {
 		})
 	})
 
-	Describe("DeleteServiceAppBinding", func() {
+	Describe("ListAppBindings", func() {
+		const (
+			appName     = "fake-app-name"
+			appGUID     = "fake-app-guid"
+			spaceGUID   = "fake-space-guid"
+			bindingGUID = "fake-binding-guid"
+		)
+
+		var (
+			params                    ListAppBindingParams
+			warnings                  Warnings
+			executionError            error
+			serviceCredentialBindings []resources.ServiceCredentialBinding
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+				resources.Application{
+					GUID: appGUID,
+					Name: appName,
+				},
+				ccv3.Warnings{"get app warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+				[]resources.ServiceCredentialBinding{
+					{GUID: bindingGUID},
+				},
+				ccv3.Warnings{"get bindings warning"},
+				nil,
+			)
+
+			params = ListAppBindingParams{
+				SpaceGUID: "fake-space-guid",
+				AppName:   "fake-app-name",
+			}
+		})
+
+		JustBeforeEach(func() {
+			serviceCredentialBindings, warnings, executionError = actor.ListAppBindings(params)
+		})
+
+		It("returns an event stream, warning, and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+
+			Expect(warnings).To(ConsistOf(Warnings{
+				"get app warning",
+				"get bindings warning",
+			}))
+
+			Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{{GUID: bindingGUID}}))
+		})
+
+		Describe("app lookup", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+				actualAppName, actualSpaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
+				Expect(actualAppName).To(Equal(appName))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+			})
+
+			When("not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+						resources.Application{},
+						ccv3.Warnings{"get app warning"},
+						ccerror.ApplicationNotFoundError{Name: appName},
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get app warning"))
+					Expect(executionError).To(MatchError(actionerror.ApplicationNotFoundError{Name: appName}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+						resources.Application{},
+						ccv3.Warnings{"get app warning"},
+						errors.New("boom"),
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get app warning"))
+					Expect(executionError).To(MatchError("boom"))
+				})
+			})
+		})
+
+		Describe("binding lookup", func() {
+			It("makes the correct call", func() {
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceCredentialBindingsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+				))
+			})
+
+			When("there are no bindings", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+						[]resources.ServiceCredentialBinding{},
+						ccv3.Warnings{"get bindings warning"},
+						nil,
+					)
+				})
+
+				It("returns an empty list", func() {
+					Expect(warnings).To(ContainElement("get bindings warning"))
+					Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{}))
+				})
+			})
+
+			When("fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+						[]resources.ServiceCredentialBinding{},
+						ccv3.Warnings{"get binding warning"},
+						errors.New("boom"),
+					)
+				})
+
+				It("returns the error and warning", func() {
+					Expect(warnings).To(ContainElement("get binding warning"))
+					Expect(executionError).To(MatchError("boom"))
+				})
+			})
+		})
+	})
+
+	Describe("ListServiceAppBindings", func() {
 		const (
 			serviceInstanceName = "fake-service-instance-name"
 			serviceInstanceGUID = "fake-service-instance-guid"
@@ -256,14 +393,13 @@ var _ = Describe("Service App Binding Action", func() {
 			appGUID             = "fake-app-guid"
 			spaceGUID           = "fake-space-guid"
 			bindingGUID         = "fake-binding-guid"
-			fakeJobURL          = ccv3.JobURL("fake-job-url")
 		)
 
 		var (
-			params         DeleteServiceAppBindingParams
-			warnings       Warnings
-			executionError error
-			stream         chan PollJobEvent
+			params                    ListServiceAppBindingParams
+			warnings                  Warnings
+			executionError            error
+			serviceCredentialBindings []resources.ServiceCredentialBinding
 		)
 
 		BeforeEach(func() {
@@ -294,47 +430,27 @@ var _ = Describe("Service App Binding Action", func() {
 				nil,
 			)
 
-			fakeCloudControllerClient.DeleteServiceCredentialBindingReturns(
-				fakeJobURL,
-				ccv3.Warnings{"delete binding warning"},
-				nil,
-			)
-
-			fakeStream := make(chan ccv3.PollJobEvent)
-			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
-			go func() {
-				fakeStream <- ccv3.PollJobEvent{
-					State:    constant.JobPolling,
-					Warnings: ccv3.Warnings{"poll warning"},
-				}
-			}()
-
-			params = DeleteServiceAppBindingParams{
-				SpaceGUID:           spaceGUID,
-				ServiceInstanceName: serviceInstanceName,
-				AppName:             appName,
+			params = ListServiceAppBindingParams{
+				SpaceGUID:           "fake-space-guid",
+				ServiceInstanceName: "fake-service-instance-name",
+				AppName:             "fake-app-name",
 			}
 		})
 
 		JustBeforeEach(func() {
-			stream, warnings, executionError = actor.DeleteServiceAppBinding(params)
+			serviceCredentialBindings, warnings, executionError = actor.ListServiceAppBindings(params)
 		})
 
-		It("returns an event stream, warnings, and no errors", func() {
+		It("returns an event stream, warning, and no errors", func() {
 			Expect(executionError).NotTo(HaveOccurred())
 
 			Expect(warnings).To(ConsistOf(Warnings{
 				"get instance warning",
 				"get app warning",
 				"get bindings warning",
-				"delete binding warning",
 			}))
 
-			Eventually(stream).Should(Receive(Equal(PollJobEvent{
-				State:    JobPolling,
-				Warnings: Warnings{"poll warning"},
-				Err:      nil,
-			})))
+			Expect(serviceCredentialBindings).To(Equal([]resources.ServiceCredentialBinding{{GUID: bindingGUID}}))
 		})
 
 		Describe("service instance lookup", func() {
@@ -425,8 +541,6 @@ var _ = Describe("Service App Binding Action", func() {
 					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{"app"}},
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
 					ccv3.Query{Key: ccv3.ServiceInstanceGUIDFilter, Values: []string{serviceInstanceGUID}},
-					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
-					ccv3.Query{Key: ccv3.Page, Values: []string{"1"}},
 				))
 			})
 
@@ -462,6 +576,67 @@ var _ = Describe("Service App Binding Action", func() {
 					Expect(executionError).To(MatchError("boom"))
 				})
 			})
+		})
+	})
+
+	Describe("DeleteServiceAppBinding", func() {
+		const (
+			bindingGUID = "fake-binding-guid"
+			fakeJobURL  = ccv3.JobURL("fake-job-url")
+		)
+
+		var (
+			params         DeleteServiceAppBindingParams
+			warnings       Warnings
+			executionError error
+			stream         chan PollJobEvent
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+				[]resources.ServiceCredentialBinding{
+					{GUID: bindingGUID},
+				},
+				ccv3.Warnings{"get bindings warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.DeleteServiceCredentialBindingReturns(
+				fakeJobURL,
+				ccv3.Warnings{"delete binding warning"},
+				nil,
+			)
+
+			fakeStream := make(chan ccv3.PollJobEvent)
+			fakeCloudControllerClient.PollJobToEventStreamReturns(fakeStream)
+			go func() {
+				fakeStream <- ccv3.PollJobEvent{
+					State:    constant.JobPolling,
+					Warnings: ccv3.Warnings{"poll warning"},
+				}
+			}()
+
+			params = DeleteServiceAppBindingParams{
+				ServiceBindingGUID: bindingGUID,
+			}
+		})
+
+		JustBeforeEach(func() {
+			stream, warnings, executionError = actor.DeleteServiceAppBinding(params)
+		})
+
+		It("returns an event stream, warning, and no errors", func() {
+			Expect(executionError).NotTo(HaveOccurred())
+
+			Expect(warnings).To(ConsistOf(Warnings{
+				"delete binding warning",
+			}))
+
+			Eventually(stream).Should(Receive(Equal(PollJobEvent{
+				State:    JobPolling,
+				Warnings: Warnings{"poll warning"},
+				Err:      nil,
+			})))
 		})
 
 		Describe("initiating the delete", func() {

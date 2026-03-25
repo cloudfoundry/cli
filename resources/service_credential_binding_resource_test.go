@@ -26,6 +26,7 @@ var _ = Describe("service credential binding resource", func() {
 		Entry("empty", ServiceCredentialBinding{}, `{}`),
 		Entry("type", ServiceCredentialBinding{Type: "fake-type"}, `{"type": "fake-type"}`),
 		Entry("name", ServiceCredentialBinding{Name: "fake-name"}, `{"name": "fake-name"}`),
+		Entry("created_at", ServiceCredentialBinding{CreatedAt: "fake-created-at"}, `{"created_at": "fake-created-at"}`),
 		Entry("guid", ServiceCredentialBinding{GUID: "fake-guid"}, `{"guid": "fake-guid"}`),
 		Entry("service instance guid guid",
 			ServiceCredentialBinding{ServiceInstanceGUID: "fake-instance-guid"},
@@ -60,22 +61,35 @@ var _ = Describe("service credential binding resource", func() {
 				}
 			}`,
 		),
+		Entry("created_at", ServiceCredentialBinding{CreatedAt: "fake-created-at"}, `{"created_at": "fake-created-at"}`),
+		Entry(
+			"strategy",
+			ServiceCredentialBinding{
+				Strategy: SingleBindingStrategy,
+			},
+			`{
+				"strategy": "single"
+			}`,
+		),
 		Entry(
 			"everything",
 			ServiceCredentialBinding{
 				Type:                AppBinding,
 				GUID:                "fake-guid",
 				Name:                "fake-name",
+				CreatedAt:           "fake-created-at",
 				AppGUID:             "fake-app-guid",
 				ServiceInstanceGUID: "fake-service-instance-guid",
 				Parameters: types.NewOptionalObject(map[string]interface{}{
 					"foo": "bar",
 				}),
+				Strategy: MultipleBindingStrategy,
 			},
 			`{
 				"type": "app",
 				"guid": "fake-guid",
 				"name": "fake-name",
+				"created_at": "fake-created-at",
 				"relationships": {
 					"service_instance": {
 						"data": {
@@ -90,7 +104,9 @@ var _ = Describe("service credential binding resource", func() {
 				},
 				"parameters": {
 					"foo": "bar"
-				}
+				},
+				"strategy": "multiple",
+				"created_at": "fake-created-at"
 			}`,
 		),
 	)

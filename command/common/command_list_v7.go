@@ -31,6 +31,7 @@ type commandList struct {
 	Buildpacks                         v7.BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
 	CancelDeployment                   v7.CancelDeploymentCommand                   `command:"cancel-deployment" description:"Cancel the most recent deployment for an app. Resets the current droplet to the previous deployment's droplet."`
 	CheckRoute                         v7.CheckRouteCommand                         `command:"check-route" description:"Perform a check to determine whether a route currently exists or not"`
+	CleanupOutdatedServiceBindings     v7.CleanupOutdatedServiceBindingsCommand     `command:"cleanup-outdated-service-bindings" description:"Cleans up old service bindings for an app, keeping only the most recent binding for each service instance"`
 	Config                             v7.ConfigCommand                             `command:"config" description:"Write default values to the config"`
 	ContinueDeployment                 v7.ContinueDeploymentCommand                 `command:"continue-deployment" description:"Continue the most recent deployment for an app."`
 	CopySource                         v7.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application and restages that application"`
@@ -167,8 +168,8 @@ type commandList struct {
 	SpaceSSHAllowed                    v7.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
 	SpaceUsers                         v7.SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`
 	Spaces                             v7.SpacesCommand                             `command:"spaces" description:"List all spaces in an org"`
-	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps) and current state"`
+	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps) and current state"`
 	StagingEnvironmentVariableGroup    v7.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
 	StagingSecurityGroups              v7.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups globally configured for staging applications"`
 	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
@@ -201,6 +202,7 @@ type commandList struct {
 	UpgradeService                     v7.UpgradeServiceCommand                     `command:"upgrade-service" description:"Upgrade a service instance to the latest available version of its current service plan"`
 	UpdateServiceBroker                v7.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateSpaceQuota                   v7.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
+	UpdateStack                        v7.UpdateStackCommand                        `command:"update-stack" description:"Transition a stack between the defined states"`
 	UpdateUserProvidedService          v7.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
 }

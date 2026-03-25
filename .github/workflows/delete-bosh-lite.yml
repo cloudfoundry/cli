@@ -71,7 +71,7 @@ jobs:
       - name: delete bosh
         run: |
           cd ${ENV_NAME}/bbl-state
-          eval "$(bbl print-env)"
+          eval "$(bbl print-env --shell-type posix)"
           
           echo "Deleting env ${ENV_NAME}"
           echo ${BBL_GCP_SERVICE_ACCOUNT_KEY} > key.json
