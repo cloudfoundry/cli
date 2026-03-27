@@ -37,10 +37,11 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com                                                      # example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost                                    # myhost.example.com`))
-			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo                         # myhost.example.com/foo`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-protocol http2               # myhost.example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --app-port 8090                    # myhost.example.com`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost -o loadbalancing=least-connection  # myhost.example.com with a per-route option`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com -o loadbalancing=hash -o hash_header=My-Hash-Header  # use hash-based routing for example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                                          # example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
@@ -241,6 +242,21 @@ var _ = Describe("map-route command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 				})
+				Context("when per-route options are provided", func() {
+					It("creates the route and maps it to an app", func() {
+						optionLBAlgo := "loadbalancing=hash"
+						optionHashHeader := "hash_header=X-Header"
+						optionHashBalance := "hash_balance=1.3"
+
+						session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--path", path, "--option", optionLBAlgo, "--option", optionHashHeader, "--option", optionHashBalance)
+						Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 			})
 
 			When("it is an TCP domain", func() {
