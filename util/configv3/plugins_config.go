@@ -140,6 +140,24 @@ func (config *Config) RemovePlugin(pluginName string) {
 	delete(config.pluginsConfig.Plugins, pluginName)
 }
 
+// FindPluginByCommand checks if the given command name matches any installed plugin
+// command or alias. Returns the matching plugin and true if found, empty plugin
+// and false otherwise.
+func (config *Config) FindPluginByCommand(commandName string) (Plugin, bool) {
+	if commandName == "" {
+		return Plugin{}, false
+	}
+
+	for _, plugin := range config.Plugins() {
+		for _, pluginCommand := range plugin.Commands {
+			if commandName == pluginCommand.Name || commandName == pluginCommand.Alias {
+				return plugin, true
+			}
+		}
+	}
+	return Plugin{}, false
+}
+
 // WritePluginConfig writes the plugin config to config.json in the plugin home
 // directory.
 func (config *Config) WritePluginConfig() error {

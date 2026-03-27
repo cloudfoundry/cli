@@ -27,26 +27,6 @@ type UI interface {
 	FlushDeferred()
 }
 
-func IsPluginCommand(osArgs []string) (configv3.Plugin, bool) {
-	if len(osArgs) < 1 {
-		return configv3.Plugin{}, false
-	}
-	command := osArgs[0]
-	config, configErr := configv3.LoadConfig()
-	if configErr != nil {
-		fmt.Fprintf(os.Stderr, "Empty Config, failed to load plugins")
-		return configv3.Plugin{}, false
-	}
-	for _, plugin := range config.Plugins() {
-		for _, pluginCommand := range plugin.Commands {
-			if command == pluginCommand.Name || command == pluginCommand.Alias {
-				return plugin, true
-			}
-		}
-	}
-	return configv3.Plugin{}, false
-}
-
 func PluginCommandNames() []string {
 	var names []string
 

@@ -42,7 +42,15 @@ func main() {
 	}
 
 	if unknownCommandError, ok := err.(command_parser.UnknownCommandError); ok {
-		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
+		var plugin configv3.Plugin
+		var commandIsPlugin bool
+
+		// Note: os.Args[1] can be safely indexed here because UnknownCommandError
+		// is only returned when ParseCommandFromArgs receives at least one argument.
+		// The command parser requires a command name to generate this error.
+		if len(os.Args) > 1 {
+			plugin, commandIsPlugin = config.FindPluginByCommand(os.Args[1])
+		}
 
 		switch {
 		case commandIsPlugin:

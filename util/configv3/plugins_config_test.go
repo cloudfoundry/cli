@@ -318,6 +318,94 @@ var _ = Describe("PluginsConfig", func() {
 			})
 		})
 
+		Describe("FindPluginByCommand", func() {
+			var (
+				config *Config
+				err    error
+			)
+
+			BeforeEach(func() {
+				rawConfig := `
+				{
+					"Plugins": {
+						"test-plugin": {
+							"Location": "~/.cf/plugins/test-plugin",
+							"Version": {
+								"Major": 1,
+								"Minor": 0,
+								"Build": 0
+							},
+							"Commands": [
+								{
+									"Name": "test-command",
+									"Alias": "tc",
+									"HelpText": "A test command",
+									"UsageDetails": {
+										"Usage": "cf test-command",
+										"Options": null
+									}
+								},
+								{
+									"Name": "another-command",
+									"Alias": "",
+									"HelpText": "Another test command",
+									"UsageDetails": {
+										"Usage": "cf another-command",
+										"Options": null
+									}
+								}
+							]
+						}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			When("the command name matches a plugin command", func() {
+				It("returns the plugin and true", func() {
+					plugin, found := config.FindPluginByCommand("test-command")
+					Expect(found).To(BeTrue())
+					Expect(plugin.Name).To(Equal("test-plugin"))
+				})
+			})
+
+			When("the command name matches a plugin command alias", func() {
+				It("returns the plugin and true", func() {
+					plugin, found := config.FindPluginByCommand("tc")
+					Expect(found).To(BeTrue())
+					Expect(plugin.Name).To(Equal("test-plugin"))
+				})
+			})
+
+			When("the command name matches another plugin command", func() {
+				It("returns the plugin and true", func() {
+					plugin, found := config.FindPluginByCommand("another-command")
+					Expect(found).To(BeTrue())
+					Expect(plugin.Name).To(Equal("test-plugin"))
+				})
+			})
+
+			When("the command name does not match any plugin command", func() {
+				It("returns an empty plugin and false", func() {
+					plugin, found := config.FindPluginByCommand("non-existent-command")
+					Expect(found).To(BeFalse())
+					Expect(plugin).To(Equal(Plugin{}))
+				})
+			})
+
+			When("the command name is empty", func() {
+				It("returns an empty plugin and false", func() {
+					plugin, found := config.FindPluginByCommand("")
+					Expect(found).To(BeFalse())
+					Expect(plugin).To(Equal(Plugin{}))
+				})
+			})
+		})
+
 		Describe("WritePluginConfig", func() {
 			var config *Config
 
