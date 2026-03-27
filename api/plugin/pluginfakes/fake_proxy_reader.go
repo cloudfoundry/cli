@@ -153,12 +153,6 @@ func (fake *FakeProxyReader) WrapReturnsOnCall(i int, result1 io.ReadCloser) {
 func (fake *FakeProxyReader) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.finishMutex.RLock()
-	defer fake.finishMutex.RUnlock()
-	fake.startMutex.RLock()
-	defer fake.startMutex.RUnlock()
-	fake.wrapMutex.RLock()
-	defer fake.wrapMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
