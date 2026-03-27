@@ -162,12 +162,6 @@ func (fake *FakeResolver) SetOutArgsForCall(i int) io.Writer {
 func (fake *FakeResolver) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.resolveMutex.RLock()
-	defer fake.resolveMutex.RUnlock()
-	fake.setInMutex.RLock()
-	defer fake.setInMutex.RUnlock()
-	fake.setOutMutex.RLock()
-	defer fake.setOutMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
