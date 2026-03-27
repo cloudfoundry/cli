@@ -158,6 +158,19 @@ func (config *Config) FindPluginByCommand(commandName string) (Plugin, bool) {
 	return Plugin{}, false
 }
 
+// PluginCommandNames returns a list of all plugin command names from installed plugins.
+func (config *Config) PluginCommandNames() []string {
+	var names []string
+
+	for _, plugin := range config.Plugins() {
+		for _, pluginCommand := range plugin.Commands {
+			names = append(names, pluginCommand.Name)
+		}
+	}
+
+	return names
+}
+
 // WritePluginConfig writes the plugin config to config.json in the plugin home
 // directory.
 func (config *Config) WritePluginConfig() error {

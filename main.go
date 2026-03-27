@@ -60,7 +60,7 @@ func main() {
 			}
 
 		default:
-			unknownCommandError.Suggest(plugin_util.PluginCommandNames())
+			unknownCommandError.Suggest(config.PluginCommandNames())
 			fmt.Fprintf(os.Stderr, "%s\n", unknownCommandError.Error())
 			os.Exit(1)
 		}

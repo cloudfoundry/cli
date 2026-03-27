@@ -27,23 +27,6 @@ type UI interface {
 	FlushDeferred()
 }
 
-func PluginCommandNames() []string {
-	var names []string
-
-	config, configErr := configv3.LoadConfig()
-	if configErr != nil {
-		return names
-	}
-
-	for _, plugin := range config.Plugins() {
-		for _, pluginCommand := range plugin.Commands {
-			names = append(names, pluginCommand.Name)
-		}
-	}
-
-	return names
-}
-
 func RunPlugin(plugin configv3.Plugin) error {
 	_, commandUI, err := getCFConfigAndCommandUIObjects()
 	if err != nil {
