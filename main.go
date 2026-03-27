@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/v8/cf/cmd"
-	"code.cloudfoundry.org/cli/v8/command/common"
 	"code.cloudfoundry.org/cli/v8/util/command_parser"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/panichandler"
@@ -52,10 +50,6 @@ func main() {
 			if err != nil {
 				exitCode = 1
 			}
-
-		case common.ShouldFallbackToLegacy:
-			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
-			// NOT REACHED, legacy main will exit the process
 
 		default:
 			unknownCommandError.Suggest(plugin_util.PluginCommandNames())
