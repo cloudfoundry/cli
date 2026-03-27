@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/v8/plugin/runner"
 	"code.cloudfoundry.org/cli/v8/util/command_parser"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/panichandler"
-	plugin_util "code.cloudfoundry.org/cli/v8/util/plugin"
 	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
@@ -54,8 +54,10 @@ func main() {
 
 		switch {
 		case commandIsPlugin:
-			err = plugin_util.RunPlugin(plugin)
+			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin)
+			err = pluginRunner.Run(os.Args[1:])
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())
 				exitCode = 1
 			}
 
