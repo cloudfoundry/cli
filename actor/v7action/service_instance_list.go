@@ -13,6 +13,7 @@ import (
 )
 
 type ServiceInstance struct {
+	GUID                string
 	Type                resources.ServiceInstanceType
 	Name                string
 	ServicePlanName     string
@@ -20,6 +21,8 @@ type ServiceInstance struct {
 	ServiceBrokerName   string
 	BoundApps           []string
 	LastOperation       string
+	LastOperationType   resources.LastOperationType
+	LastOperationState  resources.LastOperationState
 	UpgradeAvailable    types.OptionalBoolean
 }
 
@@ -74,6 +77,7 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 	for i, instance := range instances {
 		names := planDetailsFromPlanGUIDLookup[instance.ServicePlanGUID]
 		result[i] = ServiceInstance{
+			GUID:                instance.GUID,
 			Name:                instance.Name,
 			Type:                instance.Type,
 			UpgradeAvailable:    instance.UpgradeAvailable,
@@ -82,6 +86,8 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 			ServiceBrokerName:   names.broker,
 			BoundApps:           boundAppsNamesFromInstanceGUIDLookup[instance.GUID],
 			LastOperation:       lastOperation(instance.LastOperation),
+			LastOperationType:   instance.LastOperation.Type,
+			LastOperationState:  instance.LastOperation.State,
 		}
 	}
 

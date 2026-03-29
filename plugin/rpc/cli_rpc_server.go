@@ -368,10 +368,25 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		orgs, warnings, err := cmd.actor.GetOrganizations("")
+		if err != nil {
+			return err
+		}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateOrgsModel(orgs)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organizations = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -381,10 +396,30 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+		if orgGUID == "" {
+			return fmt.Errorf("no organization targeted")
+		}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		spaces, warnings, err := cmd.actor.GetOrganizationSpaces(orgGUID)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateSpacesModel(spaces)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Spaces = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -394,10 +429,30 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+		if spaceGUID == "" {
+			return fmt.Errorf("no space targeted")
+		}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		services, warnings, err := cmd.actor.GetServiceInstancesForSpace(spaceGUID, false)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateServicesModel(services)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Services = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -407,10 +462,42 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		if len(args) == 0 {
+			return fmt.Errorf("organization name required")
+		}
+		orgName := args[0]
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		// Get org GUID from name
+		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings from org lookup
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Get users by role type
+		usersByRole, warnings, err := cmd.actor.GetOrgUsersByRoleType(org.GUID)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateOrgUsersModel(usersByRole)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.OrgUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -420,10 +507,54 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		if len(args) < 2 {
+			return fmt.Errorf("organization and space names required")
+		}
+		orgName := args[0]
+		spaceName := args[1]
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		// Get org GUID from name
+		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings from org lookup
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Get space GUID from name
+		space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings from space lookup
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Get users by role type
+		usersByRole, warnings, err := cmd.actor.GetSpaceUsersByRoleType(space.GUID)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateSpaceUsersModel(usersByRole)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.SpaceUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
