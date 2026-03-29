@@ -4,19 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	netrpc "net/rpc"
 	"os"
 	"os/exec"
 
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/confighelpers"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/ui"
-
-	netrpc "net/rpc"
 )
 
 var (
@@ -57,24 +54,10 @@ func NewPluginRunner(config *configv3.Config, commandUI *ui.UI, plugin configv3.
 func (r *pluginRunner) Run(args []string) error {
 	// Setup writer and trace logger (mimicking cf/cmd/cmd.go setup)
 	var writer io.Writer = os.Stdout
-	traceEnv := os.Getenv("CF_TRACE")
 
-	// Get config for trace settings (using legacy config for RPC compatibility)
-	configPath, err := confighelpers.DefaultFilePath()
-	if err != nil {
-		return fmt.Errorf("error getting config path: %w", err)
-	}
-
-	errFunc := func(err error) {
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Config error: %s\n", err)
-		}
-	}
-	legacyConfig := coreconfig.NewRepositoryFromFilepath(configPath, errFunc)
-	defer legacyConfig.Close()
-
-	traceConfigVal := legacyConfig.Trace()
-	traceLogger := trace.NewLogger(writer, false, traceEnv, traceConfigVal)
+	// Get verbose settings from config
+	verbose, tracePaths := r.config.Verbose()
+	traceLogger := trace.NewLogger(writer, verbose, tracePaths...)
 
 	// Create dependencies needed for RPC service
 	deps := commandregistry.NewDependency(writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
