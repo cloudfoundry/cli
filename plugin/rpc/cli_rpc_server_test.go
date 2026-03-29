@@ -19,6 +19,7 @@ import (
 	cmdRunner "code.cloudfoundry.org/cli/v8/plugin/rpc"
 	. "code.cloudfoundry.org/cli/v8/plugin/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc/rpcfakes"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -462,11 +463,13 @@ var _ = Describe("Server", func() {
 
 		Describe("CLI Config object methods", func() {
 			var (
-				config coreconfig.Repository
+				config   coreconfig.Repository
+				v3config *configv3.Config
 			)
 
 			BeforeEach(func() {
 				config = testconfig.NewRepositoryWithDefaults()
+				v3config = testconfig.NewConfigWithDefaults()
 			})
 
 			AfterEach(func() {
@@ -492,7 +495,11 @@ var _ = Describe("Server", func() {
 						},
 					})
 
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					// Update v3config with custom org fields
+					v3config.ConfigFile.TargetedOrganization.GUID = "test-guid"
+					v3config.ConfigFile.TargetedOrganization.Name = "test-org"
+
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -519,7 +526,11 @@ var _ = Describe("Server", func() {
 						Name: "space-name",
 					})
 
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					// Update v3config with custom space fields
+					v3config.ConfigFile.TargetedSpace.GUID = "space-guid"
+					v3config.ConfigFile.TargetedSpace.Name = "space-name"
+
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -541,7 +552,7 @@ var _ = Describe("Server", func() {
 
 			Context(".Username, .UserGuid, .UserEmail", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -555,7 +566,8 @@ var _ = Describe("Server", func() {
 					var result string
 					err = client.Call("CliRpcCmd.Username", "", &result)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("my-user"))
+					// For UAA users, username is the email from the JWT's user_name claim
+					Expect(result).To(Equal("my-user-email"))
 
 					err = client.Call("CliRpcCmd.UserGuid", "", &result)
 					Expect(err).ToNot(HaveOccurred())
@@ -569,7 +581,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsSSLDisabled", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -578,6 +590,7 @@ var _ = Describe("Server", func() {
 
 				It("returns the IsSSLDisabled setting in config", func() {
 					config.SetSSLDisabled(true)
+					v3config.ConfigFile.SkipSSLValidation = true
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
@@ -590,7 +603,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsLoggedIn", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -599,6 +612,7 @@ var _ = Describe("Server", func() {
 
 				It("returns the IsLoggedIn setting in config", func() {
 					config.SetAccessToken("Logged-In-Token")
+					v3config.ConfigFile.AccessToken = "Logged-In-Token"
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
@@ -611,7 +625,7 @@ var _ = Describe("Server", func() {
 
 			Context(".HasOrganization and .HasSpace ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -635,7 +649,7 @@ var _ = Describe("Server", func() {
 
 			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -644,6 +658,7 @@ var _ = Describe("Server", func() {
 
 				It("returns the LoggregatorEndpoint() and DopplerEndpoint() setting in config", func() {
 					config.SetDopplerEndpoint("doppler-endpoint-sample")
+					v3config.ConfigFile.DopplerEndpoint = "doppler-endpoint-sample"
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
@@ -661,7 +676,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -671,6 +686,8 @@ var _ = Describe("Server", func() {
 				It("returns the ApiEndpoint(), ApiVersion() and HasAPIEndpoint() setting in config", func() {
 					config.SetAPIVersion("v1.1.1")
 					config.SetAPIEndpoint("www.fake-domain.com")
+					v3config.ConfigFile.APIVersion = "v1.1.1"
+					v3config.ConfigFile.Target = "www.fake-domain.com"
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())

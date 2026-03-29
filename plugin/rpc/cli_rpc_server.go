@@ -13,6 +13,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
@@ -457,15 +458,45 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_models.GetService_Model) error {
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+		if spaceGUID == "" {
+			return fmt.Errorf("no space targeted")
+		}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
+		// Query to include service plan and service offering details
+		queries := []ccv3.Query{
+			{Key: ccv3.FieldsServicePlan, Values: []string{"name", "guid"}},
+			{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"name", "guid", "documentation_url"}},
+		}
+
+		serviceInstance, includedResources, warnings, err := cmd.actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
+			serviceInstanceName,
+			spaceGUID,
+			queries...,
+		)
+		if err != nil {
+			return err
+		}
+
+		// Log warnings if any
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate the plugin model
+		populateServiceModel(retVal, serviceInstance, includedResources)
+		return nil
+	}
+
+	// Fall back to legacy command runner
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Service = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
 	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
-	return cmd.newCmdRunner.Command([]string{"service", serviceInstance}, deps, true)
+	return cmd.newCmdRunner.Command([]string{"service", serviceInstanceName}, deps, true)
 }
