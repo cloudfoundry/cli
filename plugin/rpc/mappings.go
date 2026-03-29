@@ -254,3 +254,117 @@ func populateOrgModel(
 
 	return model
 }
+
+// populateSpaceModel maps v3 Space and related resources to plugin model
+func populateSpaceModel(
+	space resources.Space,
+	orgGUID string,
+	orgName string,
+	apps []resources.Application,
+	serviceInstances []v7action.ServiceInstance,
+	domains []resources.Domain,
+	spaceQuota resources.SpaceQuota,
+	securityGroups []resources.SecurityGroup,
+) plugin_models.GetSpace_Model {
+	model := plugin_models.GetSpace_Model{
+		GetSpaces_Model: plugin_models.GetSpaces_Model{
+			Guid: space.GUID,
+			Name: space.Name,
+		},
+		Organization: plugin_models.GetSpace_Orgs{
+			Guid: orgGUID,
+			Name: orgName,
+		},
+	}
+
+	// Populate applications
+	model.Applications = make([]plugin_models.GetSpace_Apps, len(apps))
+	for i, app := range apps {
+		model.Applications[i] = plugin_models.GetSpace_Apps{
+			Guid: app.GUID,
+			Name: app.Name,
+		}
+	}
+
+	// Populate service instances
+	model.ServiceInstances = make([]plugin_models.GetSpace_ServiceInstance, len(serviceInstances))
+	for i, svc := range serviceInstances {
+		model.ServiceInstances[i] = plugin_models.GetSpace_ServiceInstance{
+			Guid: svc.GUID,
+			Name: svc.Name,
+		}
+	}
+
+	// Populate domains
+	model.Domains = make([]plugin_models.GetSpace_Domains, len(domains))
+	for i, domain := range domains {
+		model.Domains[i] = plugin_models.GetSpace_Domains{
+			Guid:                   domain.GUID,
+			Name:                   domain.Name,
+			OwningOrganizationGuid: domain.OrganizationGUID,
+			Shared:                 domain.Shared(),
+		}
+	}
+
+	// Populate security groups
+	model.SecurityGroups = make([]plugin_models.GetSpace_SecurityGroup, len(securityGroups))
+	for i, sg := range securityGroups {
+		// Convert rules to map[string]interface{}
+		rules := make([]map[string]interface{}, len(sg.Rules))
+		for j, rule := range sg.Rules {
+			ruleMap := map[string]interface{}{
+				"protocol":    rule.Protocol,
+				"destination": rule.Destination,
+			}
+			if rule.Ports != nil {
+				ruleMap["ports"] = *rule.Ports
+			}
+			if rule.Type != nil {
+				ruleMap["type"] = *rule.Type
+			}
+			if rule.Code != nil {
+				ruleMap["code"] = *rule.Code
+			}
+			if rule.Description != nil {
+				ruleMap["description"] = *rule.Description
+			}
+			if rule.Log != nil {
+				ruleMap["log"] = *rule.Log
+			}
+			rules[j] = ruleMap
+		}
+
+		model.SecurityGroups[i] = plugin_models.GetSpace_SecurityGroup{
+			Guid:  sg.GUID,
+			Name:  sg.Name,
+			Rules: rules,
+		}
+	}
+
+	// Populate space quota (if exists)
+	if spaceQuota.GUID != "" {
+		model.SpaceQuota = plugin_models.GetSpace_SpaceQuota{
+			Guid: spaceQuota.GUID,
+			Name: spaceQuota.Name,
+		}
+
+		// Map space quota limits
+		if spaceQuota.Apps.TotalMemory != nil && spaceQuota.Apps.TotalMemory.IsSet {
+			model.SpaceQuota.MemoryLimit = int64(spaceQuota.Apps.TotalMemory.Value)
+		}
+		if spaceQuota.Apps.InstanceMemory != nil && spaceQuota.Apps.InstanceMemory.IsSet {
+			model.SpaceQuota.InstanceMemoryLimit = int64(spaceQuota.Apps.InstanceMemory.Value)
+		}
+		if spaceQuota.Routes.TotalRoutes != nil && spaceQuota.Routes.TotalRoutes.IsSet {
+			model.SpaceQuota.RoutesLimit = spaceQuota.Routes.TotalRoutes.Value
+		}
+		if spaceQuota.Services.TotalServiceInstances != nil && spaceQuota.Services.TotalServiceInstances.IsSet {
+			model.SpaceQuota.ServicesLimit = spaceQuota.Services.TotalServiceInstances.Value
+		}
+		if spaceQuota.Services.PaidServicePlans != nil {
+			model.SpaceQuota.NonBasicServicesAllowed = *spaceQuota.Services.PaidServicePlans
+		}
+	}
+
+	return model
+}

@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
@@ -637,6 +638,107 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		// Get the targeted organization GUID
+		orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+		if orgGUID == "" {
+			return fmt.Errorf("no organization targeted")
+		}
+
+		// 1. Get the space by name and organization
+		space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 2. Get organization info
+		org, warnings, err := cmd.actor.GetOrganizationByGUID(orgGUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 3. Get applications in the space
+		apps, warnings, err := cmd.actor.GetApplicationsBySpace(space.GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 4. Get service instances in the space
+		serviceInstances, warnings, err := cmd.actor.GetServiceInstancesForSpace(space.GUID, false)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 5. Get domains for the organization (spaces inherit org domains)
+		domains, warnings, err := cmd.actor.GetOrganizationDomains(orgGUID, "")
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 6. Get space quota (if applied)
+		var spaceQuota resources.SpaceQuota
+		if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
+			var ccv3Warnings ccv3.Warnings
+			spaceQuota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+			if err != nil {
+				return err
+			}
+			for _, warning := range ccv3Warnings {
+				fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+			}
+		}
+
+		// 7. Get security groups (both running and staging)
+		var allSecurityGroups []resources.SecurityGroup
+
+		runningSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range ccv3Warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+		allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
+
+		stagingSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range ccv3Warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Deduplicate security groups (some may be both running and staging)
+		seenGroups := make(map[string]bool)
+		for _, sg := range stagingSecurityGroups {
+			if !seenGroups[sg.GUID] {
+				allSecurityGroups = append(allSecurityGroups, sg)
+				seenGroups[sg.GUID] = true
+			}
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateSpaceModel(space, orgGUID, org.Name, apps, serviceInstances, domains, spaceQuota, allSecurityGroups)
+		return nil
+	}
+
+	// Fall back to legacy command runner
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	// set deps objs to be the one used by all other commands
