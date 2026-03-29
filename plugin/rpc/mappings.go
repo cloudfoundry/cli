@@ -161,3 +161,96 @@ func populateSpaceUsersModel(usersByRole map[constant.RoleType][]resources.User)
 	}
 	return result
 }
+
+// populateOrgModel maps v3 Organization and related resources to plugin model
+func populateOrgModel(
+	org resources.Organization,
+	quota resources.OrganizationQuota,
+	spaces []resources.Space,
+	domains []resources.Domain,
+	spaceQuotas []resources.SpaceQuota,
+) plugin_models.GetOrg_Model {
+	model := plugin_models.GetOrg_Model{
+		Guid: org.GUID,
+		Name: org.Name,
+	}
+
+	// Populate quota definition
+	model.QuotaDefinition = plugin_models.QuotaFields{
+		Guid: quota.GUID,
+		Name: quota.Name,
+	}
+
+	// Map memory limits (convert from NullInt)
+	if quota.Apps.TotalMemory != nil && quota.Apps.TotalMemory.IsSet {
+		model.QuotaDefinition.MemoryLimit = int64(quota.Apps.TotalMemory.Value)
+	}
+	if quota.Apps.InstanceMemory != nil && quota.Apps.InstanceMemory.IsSet {
+		model.QuotaDefinition.InstanceMemoryLimit = int64(quota.Apps.InstanceMemory.Value)
+	}
+
+	// Map route limit
+	if quota.Routes.TotalRoutes != nil && quota.Routes.TotalRoutes.IsSet {
+		model.QuotaDefinition.RoutesLimit = quota.Routes.TotalRoutes.Value
+	}
+
+	// Map service limit
+	if quota.Services.TotalServiceInstances != nil && quota.Services.TotalServiceInstances.IsSet {
+		model.QuotaDefinition.ServicesLimit = quota.Services.TotalServiceInstances.Value
+	}
+
+	// Map paid services allowed
+	if quota.Services.PaidServicePlans != nil {
+		model.QuotaDefinition.NonBasicServicesAllowed = *quota.Services.PaidServicePlans
+	}
+
+	// Populate spaces
+	model.Spaces = make([]plugin_models.GetOrg_Space, len(spaces))
+	for i, space := range spaces {
+		model.Spaces[i] = plugin_models.GetOrg_Space{
+			Guid: space.GUID,
+			Name: space.Name,
+		}
+	}
+
+	// Populate domains
+	model.Domains = make([]plugin_models.GetOrg_Domains, len(domains))
+	for i, domain := range domains {
+		model.Domains[i] = plugin_models.GetOrg_Domains{
+			Guid:                   domain.GUID,
+			Name:                   domain.Name,
+			OwningOrganizationGuid: domain.OrganizationGUID,
+			Shared:                 domain.Shared(),
+		}
+	}
+
+	// Populate space quotas
+	model.SpaceQuotas = make([]plugin_models.GetOrg_SpaceQuota, len(spaceQuotas))
+	for i, sq := range spaceQuotas {
+		spaceQuota := plugin_models.GetOrg_SpaceQuota{
+			Guid: sq.GUID,
+			Name: sq.Name,
+		}
+
+		// Map space quota limits
+		if sq.Apps.TotalMemory != nil && sq.Apps.TotalMemory.IsSet {
+			spaceQuota.MemoryLimit = int64(sq.Apps.TotalMemory.Value)
+		}
+		if sq.Apps.InstanceMemory != nil && sq.Apps.InstanceMemory.IsSet {
+			spaceQuota.InstanceMemoryLimit = int64(sq.Apps.InstanceMemory.Value)
+		}
+		if sq.Routes.TotalRoutes != nil && sq.Routes.TotalRoutes.IsSet {
+			spaceQuota.RoutesLimit = sq.Routes.TotalRoutes.Value
+		}
+		if sq.Services.TotalServiceInstances != nil && sq.Services.TotalServiceInstances.IsSet {
+			spaceQuota.ServicesLimit = sq.Services.TotalServiceInstances.Value
+		}
+		if sq.Services.PaidServicePlans != nil {
+			spaceQuota.NonBasicServicesAllowed = *sq.Services.PaidServicePlans
+		}
+
+		model.SpaceQuotas[i] = spaceQuota
+	}
+
+	return model
+}

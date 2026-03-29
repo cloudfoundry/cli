@@ -22,6 +22,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/version"
 	"code.cloudfoundry.org/clock"
@@ -564,6 +565,65 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
+	// Use v7action.Actor if available
+	if cmd.actor != nil {
+		// 1. Get the organization by name
+		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+		if err != nil {
+			return err
+		}
+
+		// Handle warnings
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 2. Get organization quota
+		var quota resources.OrganizationQuota
+		if org.QuotaGUID != "" {
+			var ccv3Warnings ccv3.Warnings
+			quota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+			if err != nil {
+				return err
+			}
+			for _, warning := range ccv3Warnings {
+				fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+			}
+		}
+
+		// 3. Get organization spaces
+		spaces, warnings, err := cmd.actor.GetOrganizationSpaces(org.GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 4. Get organization domains
+		domains, warnings, err := cmd.actor.GetOrganizationDomains(org.GUID, "")
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// 5. Get space quotas for the organization
+		spaceQuotas, warnings, err := cmd.actor.GetSpaceQuotasByOrgGUID(org.GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+
+		// Populate plugin model using mapping function
+		*retVal = populateOrgModel(org, quota, spaces, domains, spaceQuotas)
+		return nil
+	}
+
+	// Fall back to legacy command runner
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	// set deps objs to be the one used by all other commands
