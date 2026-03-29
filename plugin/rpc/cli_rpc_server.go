@@ -13,14 +13,13 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
-
-	"code.cloudfoundry.org/cli/v8/cf/trace"
 )
 
 var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
@@ -38,7 +37,7 @@ type CliRpcCmd struct {
 	MetadataMutex        *sync.RWMutex
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
-	cliConfig            coreconfig.Repository
+	cliConfig            *configv3.Config
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         CommandRunner
 	outputBucket         *bytes.Buffer
@@ -61,7 +60,7 @@ type OutputCapture interface {
 func NewRpcService(
 	outputCapture OutputCapture,
 	terminalOutputSwitch TerminalOutputSwitch,
-	cliConfig coreconfig.Repository,
+	cliConfig *configv3.Config,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner CommandRunner,
 	logger trace.Printer,
@@ -178,7 +177,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 
 		// set deps objs to be the one used by all other commands
 		// once all commands are converted, we can make fresh deps for each command run
-		deps.Config = cmd.cliConfig
+		// Note: deps.Config is already set by NewDependency to a legacy config
 		deps.RepoLocator = cmd.repoLocator
 
 		// set command ui's TeePrinter to be the one used by RpcService, for output to be captured
@@ -206,68 +205,83 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 }
 
 func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
-	retVal.Name = cmd.cliConfig.OrganizationFields().Name
-	retVal.Guid = cmd.cliConfig.OrganizationFields().GUID
+	org := cmd.cliConfig.TargetedOrganization()
+	retVal.Name = org.Name
+	retVal.Guid = org.GUID
 	return nil
 }
 
 func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
-	retVal.Name = cmd.cliConfig.SpaceFields().Name
-	retVal.Guid = cmd.cliConfig.SpaceFields().GUID
+	space := cmd.cliConfig.TargetedSpace()
+	retVal.Name = space.Name
+	retVal.Guid = space.GUID
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.Username()
+	username, err := cmd.cliConfig.CurrentUserName()
+	if err != nil {
+		return err
+	}
+	*retVal = username
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.UserGUID()
+	user, err := cmd.cliConfig.CurrentUser()
+	if err != nil {
+		return err
+	}
+	*retVal = user.GUID
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.UserEmail()
+	user, err := cmd.cliConfig.CurrentUser()
+	if err != nil {
+		*retVal = ""
+		return nil
+	}
+	*retVal = user.Name // For UAA users, Name contains the email
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.IsLoggedIn()
+	*retVal = cmd.cliConfig.AccessToken() != ""
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) IsSSLDisabled(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.IsSSLDisabled()
+	*retVal = cmd.cliConfig.SkipSSLValidation()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasOrganization(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasOrganization()
+	*retVal = cmd.cliConfig.HasTargetedOrganization()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasSpace()
+	*retVal = cmd.cliConfig.HasTargetedSpace()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.APIEndpoint()
+	*retVal = cmd.cliConfig.Target()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasAPIEndpoint()
+	*retVal = cmd.cliConfig.Target() != ""
 
 	return nil
 }
@@ -285,7 +299,7 @@ func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.DopplerEndpoint()
+	*retVal = cmd.cliConfig.ConfigFile.DopplerEndpoint
 
 	return nil
 }
@@ -306,7 +320,6 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Application = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -320,7 +333,6 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.AppsSummary = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -334,7 +346,6 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organizations = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -348,7 +359,6 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Spaces = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -362,8 +372,6 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Services = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -377,7 +385,6 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.OrgUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -391,7 +398,6 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.SpaceUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -405,7 +411,6 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organization = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -419,7 +424,6 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Space = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
@@ -433,7 +437,6 @@ func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.G
 
 	// set deps objs to be the one used by all other commands
 	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Service = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)

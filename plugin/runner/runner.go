@@ -85,7 +85,7 @@ func (r *pluginRunner) Run(args []string) error {
 	rpcService, err := rpc.NewRpcService(
 		deps.TeePrinter,
 		deps.TeePrinter,
-		deps.Config,
+		r.config,
 		deps.RepoLocator,
 		rpc.NewCommandRunner(),
 		deps.Logger,

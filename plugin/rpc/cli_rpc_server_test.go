@@ -492,7 +492,7 @@ var _ = Describe("Server", func() {
 						},
 					})
 
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -519,7 +519,7 @@ var _ = Describe("Server", func() {
 						Name: "space-name",
 					})
 
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -541,7 +541,7 @@ var _ = Describe("Server", func() {
 
 			Context(".Username, .UserGuid, .UserEmail", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -569,7 +569,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsSSLDisabled", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -590,7 +590,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsLoggedIn", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -611,7 +611,7 @@ var _ = Describe("Server", func() {
 
 			Context(".HasOrganization and .HasSpace ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -635,7 +635,7 @@ var _ = Describe("Server", func() {
 
 			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -661,7 +661,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -700,7 +700,7 @@ var _ = Describe("Server", func() {
 					locator := api.RepositoryLocator{}
 					locator = locator.SetAuthenticationRepository(authRepo)
 
-					rpcService, err = NewRpcService(nil, nil, config, locator, nil, nil, nil, rpc.DefaultServer)
+					rpcService, err = NewRpcService(nil, nil, nil, locator, nil, nil, nil, rpc.DefaultServer)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
