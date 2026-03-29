@@ -11,14 +11,19 @@ import (
 	"strings"
 	"sync"
 
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	"code.cloudfoundry.org/cli/v8/cf/trace"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/version"
+	"code.cloudfoundry.org/clock"
 	"github.com/blang/semver/v4"
 )
 
@@ -43,6 +48,7 @@ type CliRpcCmd struct {
 	outputBucket         *bytes.Buffer
 	logger               trace.Printer
 	stdout               io.Writer
+	actor                *v7action.Actor
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalOutputSwitch
@@ -66,7 +72,25 @@ func NewRpcService(
 	logger trace.Printer,
 	w io.Writer,
 	rpcServer *rpc.Server,
+	ui command.UI,
 ) (*CliRpcService, error) {
+	var actor *v7action.Actor
+
+	// Initialize v7 actor if UI is provided
+	if ui != nil {
+		// Initialize shared actor
+		sharedActor := sharedaction.NewActor(cliConfig)
+
+		// Get clients and connect to CF
+		ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(cliConfig, ui, "")
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize v7 actor
+		actor = v7action.NewActor(ccClient, cliConfig, sharedActor, uaaClient, routingClient, clock.NewClock())
+	}
+
 	rpcService := &CliRpcService{
 		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
@@ -80,6 +104,7 @@ func NewRpcService(
 			logger:               logger,
 			outputBucket:         &bytes.Buffer{},
 			stdout:               w,
+			actor:                actor,
 		},
 	}
 

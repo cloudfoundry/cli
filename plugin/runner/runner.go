@@ -91,6 +91,7 @@ func (r *pluginRunner) Run(args []string) error {
 		deps.Logger,
 		writer,
 		server,
+		r.commandUI,
 	)
 	if err != nil {
 		return fmt.Errorf("error initializing RPC service: %w", err)
