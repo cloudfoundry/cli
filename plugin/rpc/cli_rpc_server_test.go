@@ -11,8 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/v8/cf/api"
-	"code.cloudfoundry.org/cli/v8/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/v8/api/uaa"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v8/cf/models"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
@@ -52,19 +51,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			_, err := NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -86,7 +85,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -110,7 +109,7 @@ var _ = Describe("Server", func() {
 
 	// Describe(".IsMinCliVersion()", func() {
 	// 	BeforeEach(func() {
-	// 		rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+	// 		rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 	// 		Expect(err).ToNot(HaveOccurred())
 
 	// 		err := rpcService.Start()
@@ -176,7 +175,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -224,7 +223,7 @@ var _ = Describe("Server", func() {
 				commandParser.ParseCommandFromArgsReturns(0, nil)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -267,7 +266,7 @@ var _ = Describe("Server", func() {
 
 		BeforeEach(func() {
 			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
-			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -292,7 +291,6 @@ var _ = Describe("Server", func() {
 
 	Describe("Plugin API", func() {
 		var (
-			runner                    *rpcfakes.FakeCommandRunner
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeSharedActor           *v7actionfakes.FakeSharedActor
 			fakeUAAClient             *v7actionfakes.FakeUAAClient
@@ -319,8 +317,7 @@ var _ = Describe("Server", func() {
 			// Create actor with fakes (using v3config which implements v7action.Config interface)
 			actor := v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-			runner = new(rpcfakes.FakeCommandRunner)
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, v3config, api.RepositoryLocator{}, runner, nil, os.Stdout, rpc.DefaultServer, actor, nil, nil)
+			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, v3config, os.Stdout, rpc.DefaultServer, actor, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -810,7 +807,7 @@ var _ = Describe("Server", func() {
 				commandParser.ParseCommandFromArgsReturns(0, nil)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -878,7 +875,7 @@ var _ = Describe("Server", func() {
 					v3config.ConfigFile.TargetedOrganization.GUID = "test-guid"
 					v3config.ConfigFile.TargetedOrganization.Name = "test-org"
 
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -909,7 +906,7 @@ var _ = Describe("Server", func() {
 					v3config.ConfigFile.TargetedSpace.GUID = "space-guid"
 					v3config.ConfigFile.TargetedSpace.Name = "space-name"
 
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -931,7 +928,7 @@ var _ = Describe("Server", func() {
 
 			Context(".Username, .UserGuid, .UserEmail", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -960,7 +957,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsSSLDisabled", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -982,7 +979,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsLoggedIn", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1004,7 +1001,7 @@ var _ = Describe("Server", func() {
 
 			Context(".HasOrganization and .HasSpace ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1028,7 +1025,7 @@ var _ = Describe("Server", func() {
 
 			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1055,7 +1052,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1089,14 +1086,28 @@ var _ = Describe("Server", func() {
 			})
 
 			Context(".AccessToken", func() {
-				var authRepo *authenticationfakes.FakeRepository
+				var (
+					fakeUAAClient *v7actionfakes.FakeUAAClient
+					actor         *v7action.Actor
+				)
 
 				BeforeEach(func() {
-					authRepo = new(authenticationfakes.FakeRepository)
-					locator := api.RepositoryLocator{}
-					locator = locator.SetAuthenticationRepository(authRepo)
+					// Create v3config for RPC service
+					v3config := testconfig.NewConfigWithDefaults()
+					v3config.ConfigFile.AccessToken = "bearer old-access-token"
+					v3config.ConfigFile.RefreshToken = "old-refresh-token"
 
-					rpcService, err = NewRpcService(nil, nil, nil, locator, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+					// Create fake dependencies for actor
+					fakeCloudControllerClient := new(v7actionfakes.FakeCloudControllerClient)
+					fakeSharedActor := new(v7actionfakes.FakeSharedActor)
+					fakeUAAClient = new(v7actionfakes.FakeUAAClient)
+					fakeRoutingClient := new(v7actionfakes.FakeRoutingClient)
+					fakeClock := fakeclock.NewFakeClock(time.Now())
+
+					// Create actor with fakes
+					actor = v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
+
+					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, actor, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1104,6 +1115,12 @@ var _ = Describe("Server", func() {
 				})
 
 				It("refreshes the token", func() {
+					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+						AccessToken:  "new-access-token",
+						RefreshToken: "new-refresh-token",
+						Type:         "bearer",
+					}, nil)
+
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1111,11 +1128,15 @@ var _ = Describe("Server", func() {
 					err = client.Call("CliRpcCmd.AccessToken", "", &result)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
+					Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
 				})
 
 				It("returns the access token", func() {
-					authRepo.RefreshAuthTokenReturns("fake-access-token", nil)
+					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+						AccessToken:  "fake-access-token",
+						RefreshToken: "new-refresh-token",
+						Type:         "bearer",
+					}, nil)
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
@@ -1123,11 +1144,11 @@ var _ = Describe("Server", func() {
 					var result string
 					err = client.Call("CliRpcCmd.AccessToken", "", &result)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("fake-access-token"))
+					Expect(result).To(Equal("bearer fake-access-token"))
 				})
 
 				It("returns the error from refreshing the access token", func() {
-					authRepo.RefreshAuthTokenReturns("", errors.New("refresh error"))
+					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{}, errors.New("refresh error"))
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
@@ -1146,7 +1167,7 @@ var _ = Describe("Server", func() {
 				commandParser = new(rpcfakes.FakeCommandParser)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, api.RepositoryLocator{}, nil, nil, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
