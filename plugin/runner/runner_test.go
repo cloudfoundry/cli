@@ -64,23 +64,23 @@ var _ = Describe("PluginRunner", func() {
 
 	Describe("NewPluginRunner", func() {
 		It("creates a new PluginRunner instance", func() {
-			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin)
+			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, nil)
 			Expect(pluginRunner).ToNot(BeNil())
 		})
 
 		It("accepts nil config", func() {
-			pluginRunner := runner.NewPluginRunner(nil, commandUI, plugin)
+			pluginRunner := runner.NewPluginRunner(nil, commandUI, plugin, nil)
 			Expect(pluginRunner).ToNot(BeNil())
 		})
 
 		It("accepts nil UI", func() {
-			pluginRunner := runner.NewPluginRunner(config, nil, plugin)
+			pluginRunner := runner.NewPluginRunner(config, nil, plugin, nil)
 			Expect(pluginRunner).ToNot(BeNil())
 		})
 
 		It("accepts empty plugin", func() {
 			emptyPlugin := configv3.Plugin{}
-			pluginRunner := runner.NewPluginRunner(config, commandUI, emptyPlugin)
+			pluginRunner := runner.NewPluginRunner(config, commandUI, emptyPlugin, nil)
 			Expect(pluginRunner).ToNot(BeNil())
 		})
 	})
@@ -89,7 +89,7 @@ var _ = Describe("PluginRunner", func() {
 		var pluginRunner runner.PluginRunner
 
 		BeforeEach(func() {
-			pluginRunner = runner.NewPluginRunner(config, commandUI, plugin)
+			pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
 		})
 
 		Context("when the plugin binary does not exist", func() {
@@ -103,7 +103,7 @@ var _ = Describe("PluginRunner", func() {
 		Context("when the plugin binary path is empty", func() {
 			BeforeEach(func() {
 				plugin.Location = ""
-				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin)
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
 			})
 
 			It("returns an error", func() {

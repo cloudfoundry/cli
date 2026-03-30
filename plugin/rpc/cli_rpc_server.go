@@ -15,13 +15,12 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/cf/api"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
 )
@@ -48,6 +47,8 @@ type CliRpcCmd struct {
 	logger               trace.Printer
 	stdout               io.Writer
 	actor                *v7action.Actor
+	commandParser        CommandParser
+	commandUI            *ui.UI
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalOutputSwitch
@@ -72,6 +73,8 @@ func NewRpcService(
 	w io.Writer,
 	rpcServer *rpc.Server,
 	actor *v7action.Actor,
+	commandParser CommandParser,
+	commandUI *ui.UI,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		Server: rpcServer,
@@ -87,6 +90,8 @@ func NewRpcService(
 			outputBucket:         &bytes.Buffer{},
 			stdout:               w,
 			actor:                actor,
+			commandParser:        commandParser,
+			commandUI:            commandUI,
 		},
 	}
 
@@ -173,32 +178,24 @@ func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	var err error
-	cmdRegistry := commandregistry.Commands
-
 	cmd.outputBucket = &bytes.Buffer{}
 	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
 
-	if cmdRegistry.CommandExists(args[0]) {
-		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-
-		// set deps objs to be the one used by all other commands
-		// once all commands are converted, we can make fresh deps for each command run
-		// Note: deps.Config is already set by NewDependency to a legacy config
-		deps.RepoLocator = cmd.repoLocator
-
-		// set command ui's TeePrinter to be the one used by RpcService, for output to be captured
-		deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
-
-		err = cmd.newCmdRunner.Command(args, deps, false)
-	} else {
+	if cmd.commandParser == nil {
 		*retVal = false
-		return nil
+		return fmt.Errorf("command parser not initialized")
 	}
 
+	// Use the command parser to execute the command
+	exitCode, err := cmd.commandParser.ParseCommandFromArgs(cmd.commandUI, args)
 	if err != nil {
 		*retVal = false
 		return err
+	}
+
+	if exitCode != 0 {
+		*retVal = false
+		return fmt.Errorf("command exited with code %d", exitCode)
 	}
 
 	*retVal = true

@@ -62,7 +62,7 @@ func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, plugi
 		cmd.ui.Failed("Error loading config: " + err.Error())
 	}
 
-	RPCService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server, nil)
+	RPCService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server, nil, nil, nil)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

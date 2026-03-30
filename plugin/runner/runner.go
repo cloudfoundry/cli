@@ -39,17 +39,19 @@ type PluginRunner interface {
 
 // pluginRunner implements PluginRunner
 type pluginRunner struct {
-	config    *configv3.Config
-	commandUI *ui.UI
-	plugin    configv3.Plugin
+	config        *configv3.Config
+	commandUI     *ui.UI
+	plugin        configv3.Plugin
+	commandParser rpc.CommandParser
 }
 
 // NewPluginRunner creates a new PluginRunner instance
-func NewPluginRunner(config *configv3.Config, commandUI *ui.UI, plugin configv3.Plugin) PluginRunner {
+func NewPluginRunner(config *configv3.Config, commandUI *ui.UI, plugin configv3.Plugin, commandParser rpc.CommandParser) PluginRunner {
 	return &pluginRunner{
-		config:    config,
-		commandUI: commandUI,
-		plugin:    plugin,
+		config:        config,
+		commandUI:     commandUI,
+		plugin:        plugin,
+		commandParser: commandParser,
 	}
 }
 
@@ -95,6 +97,8 @@ func (r *pluginRunner) Run(args []string) error {
 		writer,
 		server,
 		actor,
+		r.commandParser,
+		r.commandUI,
 	)
 	if err != nil {
 		return fmt.Errorf("error initializing RPC service: %w", err)

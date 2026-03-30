@@ -54,7 +54,7 @@ func main() {
 
 		switch {
 		case commandIsPlugin:
-			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin)
+			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, &p)
 			err = pluginRunner.Run(os.Args[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())

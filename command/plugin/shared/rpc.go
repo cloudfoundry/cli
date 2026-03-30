@@ -43,7 +43,7 @@ func NewRPCService(config Config, ui UI) (*RPCService, error) {
 	}
 
 	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, ui.Writer(), server, nil)
+	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, ui.Writer(), server, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
