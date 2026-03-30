@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/api/authentication/authenticationfakes"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
@@ -23,6 +24,7 @@ import (
 	. "code.cloudfoundry.org/cli/v8/plugin/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc/rpcfakes"
 	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/types"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
@@ -329,16 +331,137 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
-		It("calls GetApp() with 'app' as argument", func() {
+		It("calls GetApp() with 'fake-app' as argument", func() {
+			// Setup fake CloudControllerClient to return application data
+			fakeCloudControllerClient.GetApplicationsReturns(
+				[]resources.Application{
+					{
+						GUID:      "fake-app-guid",
+						Name:      "fake-app",
+						State:     constant.ApplicationStarted,
+						SpaceGUID: "test-space-guid",
+					},
+				},
+				ccv3.Warnings{"app-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetApplicationProcessesReturns(
+				[]resources.Process{
+					{
+						GUID:                "fake-process-guid",
+						Type:                "web",
+						Command:             types.FilteredString{IsSet: true, Value: "start-command"},
+						MemoryInMB:          types.NullUint64{IsSet: true, Value: 1024},
+						DiskInMB:            types.NullUint64{IsSet: true, Value: 512},
+						Instances:           types.NullInt{IsSet: true, Value: 2},
+						HealthCheckTimeout:  60,
+						HealthCheckType:     constant.HTTP,
+						HealthCheckEndpoint: "/health",
+						AppGUID:             "fake-app-guid",
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetProcessInstancesReturns(
+				[]ccv3.ProcessInstance{
+					{
+						Index:       0,
+						State:       constant.ProcessInstanceRunning,
+						CPU:         0.5,
+						MemoryUsage: 512000000,
+						DiskUsage:   256000000,
+						MemoryQuota: 1073741824,
+						DiskQuota:   536870912,
+						Uptime:      time.Duration(3600) * time.Second,
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetApplicationRoutesReturns(
+				[]resources.Route{
+					{
+						GUID:       "fake-route-guid",
+						Host:       "fake-app",
+						Path:       "/path",
+						DomainGUID: "fake-domain-guid",
+						URL:        "fake-app.example.com",
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+				resources.Droplet{
+					GUID:      "fake-droplet-guid",
+					CreatedAt: "2021-01-01T00:00:00Z",
+					Stack:     "cflinuxfs3",
+					State:     constant.DropletStaged,
+					Buildpacks: []resources.DropletBuildpack{
+						{
+							Name:          "ruby_buildpack",
+							BuildpackName: "ruby_buildpack",
+						},
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+				[]resources.ServiceCredentialBinding{
+					{
+						GUID:                "fake-binding-guid",
+						Name:                "fake-binding",
+						ServiceInstanceGUID: "fake-service-guid",
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetStacksReturns(
+				[]resources.Stack{
+					{
+						GUID:        "fake-stack-guid",
+						Name:        "cflinuxfs3",
+						Description: "Cloud Foundry Linux-based filesystem",
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetProcessSidecarsReturns(
+				[]resources.Sidecar{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := plugin_models.GetAppModel{}
 			err = client.Call("CliRpcCmd.GetApp", "fake-app", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("app"))
-			Expect(arg1[1]).To(Equal("fake-app"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+			Expect(result.Guid).To(Equal("fake-app-guid"))
+			Expect(result.Name).To(Equal("fake-app"))
+			Expect(result.State).To(Equal("STARTED"))
+			Expect(result.Memory).To(Equal(int64(1024)))
+			Expect(result.DiskQuota).To(Equal(int64(512)))
+			Expect(result.InstanceCount).To(Equal(2))
+			Expect(result.RunningInstances).To(Equal(1))
+			Expect(result.BuildpackUrl).To(Equal("ruby_buildpack"))
+			Expect(result.PackageState).To(Equal("STAGED"))
+			Expect(result.Stack.Name).To(Equal("cflinuxfs3"))
+			Expect(len(result.Routes)).To(Equal(1))
+			Expect(result.Routes[0].Host).To(Equal("fake-app"))
+			Expect(len(result.Services)).To(Equal(1))
+			Expect(result.Services[0].Name).To(Equal("fake-binding"))
 		})
 
 		It("calls GetOrg() with 'my-org' as argument", func() {

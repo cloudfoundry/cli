@@ -323,16 +323,57 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Application = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
+	// Get detailed app summary
+	summary, warnings, err := cmd.actor.GetDetailedAppSummary(appName, spaceGUID, false)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Get service bindings for the app
+	serviceBindings, ccWarnings, err := cmd.actor.CloudControllerClient.GetServiceCredentialBindings(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{summary.GUID}},
+	)
+	for _, warning := range ccWarnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+	if err != nil {
+		return err
+	}
+
+	// Get stack information
+	var stack resources.Stack
+	if summary.CurrentDroplet.Stack != "" {
+		stacks, ccWarnings, err := cmd.actor.CloudControllerClient.GetStacks(
+			ccv3.Query{Key: ccv3.NameFilter, Values: []string{summary.CurrentDroplet.Stack}},
+		)
+		for _, warning := range ccWarnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+		if err != nil {
+			return err
+		}
+		if len(stacks) > 0 {
+			stack = stacks[0]
+		}
+	}
+
+	// Populate the plugin model
+	*retVal = populateAppModel(summary, serviceBindings, stack)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {

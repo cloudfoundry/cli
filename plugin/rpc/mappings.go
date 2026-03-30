@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
@@ -18,9 +20,7 @@ func populateServiceModel(
 	model.Name = serviceInstance.Name
 	model.IsUserProvided = serviceInstance.Type == resources.UserProvidedServiceInstance
 
-	if serviceInstance.DashboardURL.IsSet {
-		model.DashboardUrl = serviceInstance.DashboardURL.Value
-	}
+	model.DashboardUrl = serviceInstance.DashboardURL.Value
 
 	// Populate service plan
 	if len(includedResources.ServicePlans) > 0 {
@@ -182,20 +182,20 @@ func populateOrgModel(
 	}
 
 	// Map memory limits (convert from NullInt)
-	if quota.Apps.TotalMemory != nil && quota.Apps.TotalMemory.IsSet {
+	if quota.Apps.TotalMemory != nil {
 		model.QuotaDefinition.MemoryLimit = int64(quota.Apps.TotalMemory.Value)
 	}
-	if quota.Apps.InstanceMemory != nil && quota.Apps.InstanceMemory.IsSet {
+	if quota.Apps.InstanceMemory != nil {
 		model.QuotaDefinition.InstanceMemoryLimit = int64(quota.Apps.InstanceMemory.Value)
 	}
 
 	// Map route limit
-	if quota.Routes.TotalRoutes != nil && quota.Routes.TotalRoutes.IsSet {
+	if quota.Routes.TotalRoutes != nil {
 		model.QuotaDefinition.RoutesLimit = quota.Routes.TotalRoutes.Value
 	}
 
 	// Map service limit
-	if quota.Services.TotalServiceInstances != nil && quota.Services.TotalServiceInstances.IsSet {
+	if quota.Services.TotalServiceInstances != nil {
 		model.QuotaDefinition.ServicesLimit = quota.Services.TotalServiceInstances.Value
 	}
 
@@ -233,16 +233,16 @@ func populateOrgModel(
 		}
 
 		// Map space quota limits
-		if sq.Apps.TotalMemory != nil && sq.Apps.TotalMemory.IsSet {
+		if sq.Apps.TotalMemory != nil {
 			spaceQuota.MemoryLimit = int64(sq.Apps.TotalMemory.Value)
 		}
-		if sq.Apps.InstanceMemory != nil && sq.Apps.InstanceMemory.IsSet {
+		if sq.Apps.InstanceMemory != nil {
 			spaceQuota.InstanceMemoryLimit = int64(sq.Apps.InstanceMemory.Value)
 		}
-		if sq.Routes.TotalRoutes != nil && sq.Routes.TotalRoutes.IsSet {
+		if sq.Routes.TotalRoutes != nil {
 			spaceQuota.RoutesLimit = sq.Routes.TotalRoutes.Value
 		}
-		if sq.Services.TotalServiceInstances != nil && sq.Services.TotalServiceInstances.IsSet {
+		if sq.Services.TotalServiceInstances != nil {
 			spaceQuota.ServicesLimit = sq.Services.TotalServiceInstances.Value
 		}
 		if sq.Services.PaidServicePlans != nil {
@@ -349,22 +349,131 @@ func populateSpaceModel(
 		}
 
 		// Map space quota limits
-		if spaceQuota.Apps.TotalMemory != nil && spaceQuota.Apps.TotalMemory.IsSet {
+		if spaceQuota.Apps.TotalMemory != nil {
 			model.SpaceQuota.MemoryLimit = int64(spaceQuota.Apps.TotalMemory.Value)
 		}
-		if spaceQuota.Apps.InstanceMemory != nil && spaceQuota.Apps.InstanceMemory.IsSet {
+		if spaceQuota.Apps.InstanceMemory != nil {
 			model.SpaceQuota.InstanceMemoryLimit = int64(spaceQuota.Apps.InstanceMemory.Value)
 		}
-		if spaceQuota.Routes.TotalRoutes != nil && spaceQuota.Routes.TotalRoutes.IsSet {
+		if spaceQuota.Routes.TotalRoutes != nil {
 			model.SpaceQuota.RoutesLimit = spaceQuota.Routes.TotalRoutes.Value
 		}
-		if spaceQuota.Services.TotalServiceInstances != nil && spaceQuota.Services.TotalServiceInstances.IsSet {
+		if spaceQuota.Services.TotalServiceInstances != nil {
 			model.SpaceQuota.ServicesLimit = spaceQuota.Services.TotalServiceInstances.Value
 		}
 		if spaceQuota.Services.PaidServicePlans != nil {
 			model.SpaceQuota.NonBasicServicesAllowed = *spaceQuota.Services.PaidServicePlans
 		}
 	}
+
+	return model
+}
+
+// populateAppModel maps v3 DetailedApplicationSummary to plugin model
+func populateAppModel(
+	summary v7action.DetailedApplicationSummary,
+	serviceBindings []resources.ServiceCredentialBinding,
+	stack resources.Stack,
+) plugin_models.GetAppModel {
+	model := plugin_models.GetAppModel{
+		Guid:      summary.GUID,
+		Name:      summary.Name,
+		State:     string(summary.State),
+		SpaceGuid: summary.SpaceGUID,
+	}
+
+	// Find the web process for main app details
+	var webProcess *v7action.ProcessSummary
+	for i := range summary.ProcessSummaries {
+		if summary.ProcessSummaries[i].Type == constant.ProcessTypeWeb {
+			webProcess = &summary.ProcessSummaries[i]
+			break
+		}
+	}
+
+	if webProcess != nil {
+		// Memory in MB
+		model.Memory = int64(webProcess.MemoryInMB.Value)
+
+		// Disk quota in MB
+		model.DiskQuota = int64(webProcess.DiskInMB.Value)
+
+		// Instance count
+		model.InstanceCount = webProcess.Instances.Value
+
+		// Running instances
+		model.RunningInstances = webProcess.HealthyInstanceCount()
+
+		// Health check timeout
+		model.HealthCheckTimeout = int(webProcess.HealthCheckTimeout)
+
+		// Command
+		model.Command = webProcess.Command.Value
+
+		// Map instances
+		model.Instances = make([]plugin_models.GetApp_AppInstanceFields, len(webProcess.InstanceDetails))
+		for i, inst := range webProcess.InstanceDetails {
+			// Calculate actual time from uptime duration
+			since := time.Now().Add(-inst.Uptime)
+			model.Instances[i] = plugin_models.GetApp_AppInstanceFields{
+				State:     string(inst.State),
+				Details:   inst.Details,
+				Since:     since,
+				CpuUsage:  inst.CPU,
+				DiskQuota: int64(inst.DiskQuota),
+				DiskUsage: int64(inst.DiskUsage),
+				MemQuota:  int64(inst.MemoryQuota),
+				MemUsage:  int64(inst.MemoryUsage),
+			}
+		}
+	}
+
+	// Populate buildpack info from droplet
+	if len(summary.CurrentDroplet.Buildpacks) > 0 {
+		// Use the first buildpack as BuildpackUrl (legacy compatibility)
+		firstBuildpack := summary.CurrentDroplet.Buildpacks[0]
+		if firstBuildpack.Name != "" {
+			model.BuildpackUrl = firstBuildpack.Name
+		} else if firstBuildpack.BuildpackName != "" {
+			model.BuildpackUrl = firstBuildpack.BuildpackName
+		}
+	}
+
+	// Populate stack
+	if stack.GUID != "" {
+		model.Stack = &plugin_models.GetApp_Stack{
+			Guid:        stack.GUID,
+			Name:        stack.Name,
+			Description: stack.Description,
+		}
+	}
+
+	// Populate routes
+	model.Routes = make([]plugin_models.GetApp_RouteSummary, len(summary.Routes))
+	for i, route := range summary.Routes {
+		model.Routes[i] = plugin_models.GetApp_RouteSummary{
+			Guid: route.GUID,
+			Host: route.Host,
+			Path: route.Path,
+			Port: route.Port,
+			Domain: plugin_models.GetApp_DomainFields{
+				Guid: route.DomainGUID,
+				Name: route.URL, // URL contains the full domain
+			},
+		}
+	}
+
+	// Populate bound services
+	model.Services = make([]plugin_models.GetApp_ServiceSummary, len(serviceBindings))
+	for i, binding := range serviceBindings {
+		model.Services[i] = plugin_models.GetApp_ServiceSummary{
+			Guid: binding.ServiceInstanceGUID,
+			Name: binding.Name,
+		}
+	}
+
+	// Populate package state from droplet state
+	model.PackageState = string(summary.CurrentDroplet.State)
 
 	return model
 }
