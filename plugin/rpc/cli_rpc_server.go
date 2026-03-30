@@ -377,16 +377,26 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.AppsSummary = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	// Get app summaries for the space (omitStats=false to get instances)
+	summaries, warnings, err := cmd.actor.GetAppSummariesForSpace(spaceGUID, "", false)
+	if err != nil {
+		return err
+	}
 
-	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateAppsModel(summaries)
+
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {

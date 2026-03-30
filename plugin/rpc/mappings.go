@@ -477,3 +477,50 @@ func populateAppModel(
 
 	return model
 }
+
+// populateAppsModel maps v3 ApplicationSummary to plugin GetAppsModel
+func populateAppsModel(summaries []v7action.ApplicationSummary) []plugin_models.GetAppsModel {
+	models := make([]plugin_models.GetAppsModel, len(summaries))
+
+	for i, summary := range summaries {
+		model := plugin_models.GetAppsModel{
+			Name:  summary.Name,
+			Guid:  summary.GUID,
+			State: string(summary.State),
+		}
+
+		// Get web process if it exists
+		var webProcess *v7action.ProcessSummary
+		for j := range summary.ProcessSummaries {
+			if summary.ProcessSummaries[j].Type == constant.ProcessTypeWeb {
+				webProcess = &summary.ProcessSummaries[j]
+				break
+			}
+		}
+
+		// Populate instance and resource info from web process
+		if webProcess != nil {
+			model.TotalInstances = webProcess.TotalInstanceCount()
+			model.RunningInstances = webProcess.HealthyInstanceCount()
+			model.Memory = int64(webProcess.MemoryInMB.Value)
+			model.DiskQuota = int64(webProcess.DiskInMB.Value)
+		}
+
+		// Populate routes
+		model.Routes = make([]plugin_models.GetAppsRouteSummary, len(summary.Routes))
+		for j, route := range summary.Routes {
+			model.Routes[j] = plugin_models.GetAppsRouteSummary{
+				Guid: route.GUID,
+				Host: route.Host,
+				Domain: plugin_models.GetAppsDomainFields{
+					Guid: route.DomainGUID,
+					Name: route.URL,
+				},
+			}
+		}
+
+		models[i] = model
+	}
+
+	return models
+}

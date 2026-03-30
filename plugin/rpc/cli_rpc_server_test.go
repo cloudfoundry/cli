@@ -560,14 +560,70 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetApps() ", func() {
+			// Setup fake actor to return applications
+			fakeCloudControllerClient.GetApplicationsReturns(
+				[]resources.Application{
+					{GUID: "app-1-guid", Name: "app-1", State: constant.ApplicationStarted, SpaceGUID: "space-guid"},
+					{GUID: "app-2-guid", Name: "app-2", State: constant.ApplicationStopped, SpaceGUID: "space-guid"},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			// Setup processes for apps
+			fakeCloudControllerClient.GetProcessesReturns(
+				[]resources.Process{
+					{GUID: "process-1-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-1-guid", MemoryInMB: types.NullUint64{Value: 1024, IsSet: true}, DiskInMB: types.NullUint64{Value: 2048, IsSet: true}},
+					{GUID: "process-2-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-2-guid", MemoryInMB: types.NullUint64{Value: 512, IsSet: true}, DiskInMB: types.NullUint64{Value: 1024, IsSet: true}},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			// Setup instances for processes
+			fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+				[]ccv3.ProcessInstance{
+					{State: constant.ProcessInstanceRunning, Index: 0},
+					{State: constant.ProcessInstanceRunning, Index: 1},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+				[]ccv3.ProcessInstance{
+					{State: constant.ProcessInstanceDown, Index: 0},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			// Setup routes
+			fakeCloudControllerClient.GetRoutesReturns(
+				[]resources.Route{
+					{GUID: "route-1-guid", Host: "app-1", URL: "app-1.example.com", DomainGUID: "domain-1-guid", Destinations: []resources.RouteDestination{{App: resources.RouteDestinationApp{GUID: "app-1-guid"}}}},
+					{GUID: "route-2-guid", Host: "app-2", URL: "app-2.example.com", DomainGUID: "domain-2-guid", Destinations: []resources.RouteDestination{{App: resources.RouteDestinationApp{GUID: "app-2-guid"}}}},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetAppsModel{}
 			err = client.Call("CliRpcCmd.GetApps", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("apps"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(BeNumerically(">=", 1))
+			Expect(len(result)).To(Equal(2))
+			Expect(result[0].Name).To(Equal("app-1"))
+			Expect(result[0].Guid).To(Equal("app-1-guid"))
+			Expect(result[0].State).To(Equal(string(constant.ApplicationStarted)))
+			Expect(result[0].TotalInstances).To(Equal(2))
+			Expect(result[0].RunningInstances).To(Equal(2))
+			Expect(result[0].Memory).To(Equal(int64(1024)))
+			Expect(result[0].DiskQuota).To(Equal(int64(2048)))
+			Expect(len(result[0].Routes)).To(Equal(1))
+			Expect(result[0].Routes[0].Host).To(Equal("app-1"))
+			Expect(result[1].Name).To(Equal("app-2"))
+			Expect(result[1].Guid).To(Equal("app-2-guid"))
 		})
 
 		It("calls GetOrgs() ", func() {
