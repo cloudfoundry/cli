@@ -7,6 +7,9 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/cf/api"
 	"code.cloudfoundry.org/cli/v8/cf/api/authentication/authenticationfakes"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
@@ -19,7 +22,9 @@ import (
 	cmdRunner "code.cloudfoundry.org/cli/v8/plugin/rpc"
 	. "code.cloudfoundry.org/cli/v8/plugin/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc/rpcfakes"
+	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -276,15 +281,36 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("Plugin API", func() {
-
-		var runner *rpcfakes.FakeCommandRunner
+		var (
+			runner                    *rpcfakes.FakeCommandRunner
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			fakeSharedActor           *v7actionfakes.FakeSharedActor
+			fakeUAAClient             *v7actionfakes.FakeUAAClient
+		)
 
 		BeforeEach(func() {
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
 			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
+			// Create v3config for RPC service
+			v3config := testconfig.NewConfigWithDefaults()
+			v3config.ConfigFile.TargetedOrganization.GUID = "test-org-guid"
+			v3config.ConfigFile.TargetedOrganization.Name = "test-org"
+			v3config.ConfigFile.TargetedSpace.GUID = "test-space-guid"
+			v3config.ConfigFile.TargetedSpace.Name = "test-space"
+
+			// Create fake dependencies for actor
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			fakeSharedActor = new(v7actionfakes.FakeSharedActor)
+			fakeUAAClient = new(v7actionfakes.FakeUAAClient)
+			fakeRoutingClient := new(v7actionfakes.FakeRoutingClient)
+			fakeClock := fakeclock.NewFakeClock(time.Now())
+
+			// Create actor with fakes (using v3config which implements v7action.Config interface)
+			actor := v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
+
 			runner = new(rpcfakes.FakeCommandRunner)
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner, nil, nil, rpc.DefaultServer, nil)
+			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, v3config, api.RepositoryLocator{}, runner, nil, os.Stdout, rpc.DefaultServer, actor)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -316,27 +342,98 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrg() with 'my-org' as argument", func() {
+			// Setup fake actor to return organization data
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]resources.Organization{
+					{
+						GUID: "my-org-guid",
+						Name: "my-org",
+					},
+				},
+				ccv3.Warnings{"warning-1"},
+				nil,
+			)
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetDomainsReturns(
+				[]resources.Domain{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetSpaceQuotasReturns(
+				[]resources.SpaceQuota{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := plugin_models.GetOrg_Model{}
 			err = client.Call("CliRpcCmd.GetOrg", "my-org", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("org"))
-			Expect(arg1[1]).To(Equal("my-org"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+			Expect(result.Guid).To(Equal("my-org-guid"))
+			Expect(result.Name).To(Equal("my-org"))
 		})
 
 		It("calls GetSpace() with 'my-space' as argument", func() {
+			// Setup fake actor to return space data
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{
+					{
+						GUID: "my-space-guid",
+						Name: "my-space",
+					},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetOrganizationReturns(
+				resources.Organization{
+					GUID: "test-org-guid",
+					Name: "test-org",
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetApplicationsReturns(
+				[]resources.Application{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetServiceInstancesReturns(
+				[]resources.ServiceInstance{},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetDomainsReturns(
+				[]resources.Domain{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetSecurityGroupsReturns(
+				[]resources.SecurityGroup{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetSpaceQuotaReturns(
+				resources.SpaceQuota{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := plugin_models.GetSpace_Model{}
 			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("space"))
-			Expect(arg1[1]).To(Equal("my-space"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+			Expect(result.Guid).To(Equal("my-space-guid"))
+			Expect(result.Name).To(Equal("my-space"))
 		})
 
 		It("calls GetApps() ", func() {
@@ -351,72 +448,165 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrgs() ", func() {
+			// Setup fake actor to return organizations
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]resources.Organization{
+					{GUID: "org-1-guid", Name: "org-1"},
+					{GUID: "org-2-guid", Name: "org-2"},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetOrgs_Model{}
 			err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("orgs"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(BeNumerically(">=", 1))
+			Expect(len(result)).To(Equal(2))
+			Expect(result[0].Name).To(Equal("org-1"))
+			Expect(result[1].Name).To(Equal("org-2"))
 		})
 
 		It("calls GetServices() ", func() {
+			// Setup fake actor to return service instances
+			fakeCloudControllerClient.GetServiceInstancesReturns(
+				[]resources.ServiceInstance{
+					{GUID: "service-1-guid", Name: "service-1"},
+					{GUID: "service-2-guid", Name: "service-2"},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetServices_Model{}
 			err = client.Call("CliRpcCmd.GetServices", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("services"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(BeNumerically(">=", 1))
+			Expect(len(result)).To(Equal(2))
+			Expect(result[0].Name).To(Equal("service-1"))
+			Expect(result[1].Name).To(Equal("service-2"))
 		})
 
 		It("calls GetSpaces() ", func() {
+			// Setup fake actor to return spaces
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{
+					{GUID: "space-1-guid", Name: "space-1"},
+					{GUID: "space-2-guid", Name: "space-2"},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetSpaces_Model{}
 			err = client.Call("CliRpcCmd.GetSpaces", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("spaces"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(BeNumerically(">=", 1))
+			Expect(len(result)).To(Equal(2))
+			Expect(result[0].Name).To(Equal("space-1"))
+			Expect(result[1].Name).To(Equal("space-2"))
 		})
 
 		It("calls GetOrgUsers() ", func() {
+			// Setup fake actor to return org and users
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]resources.Organization{
+					{GUID: "org-guid", Name: "orgName1"},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetRolesReturns(
+				[]resources.Role{
+					{GUID: "role-1-guid", Type: "organization_manager"},
+					{GUID: "role-2-guid", Type: "organization_auditor"},
+				},
+				ccv3.IncludedResources{
+					Users: []resources.User{
+						{GUID: "user-1-guid", Username: "user-1"},
+						{GUID: "user-2-guid", Username: "user-2"},
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetOrgUsers_Model{}
 			args := []string{"orgName1", "-a"}
 			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("org-users"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(BeNumerically(">=", 1))
+			Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+			Expect(len(result)).To(BeNumerically(">=", 1))
 		})
 
 		It("calls GetSpaceUsers() ", func() {
+			// Setup fake actor to return org, space, and users
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]resources.Organization{
+					{GUID: "org-guid", Name: "orgName1"},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{
+					{GUID: "space-guid", Name: "spaceName1"},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetRolesReturns(
+				[]resources.Role{
+					{GUID: "role-1-guid", Type: "space_manager"},
+					{GUID: "role-2-guid", Type: "space_developer"},
+				},
+				ccv3.IncludedResources{
+					Users: []resources.User{
+						{GUID: "user-1-guid", Username: "user-1"},
+						{GUID: "user-2-guid", Username: "user-2"},
+					},
+				},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := []plugin_models.GetSpaceUsers_Model{}
 			args := []string{"orgName1", "spaceName1"}
 			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("space-users"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(BeNumerically(">=", 1))
+			Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+			Expect(len(result)).To(BeNumerically(">=", 1))
 		})
 
 		It("calls GetService() with 'serviceInstance' as argument", func() {
+			// Setup fake actor to return service instance
+			fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceReturns(
+				resources.ServiceInstance{
+					GUID: "service-guid",
+					Name: "fake-service-instance",
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+
 			result := plugin_models.GetService_Model{}
 			err = client.Call("CliRpcCmd.GetService", "fake-service-instance", &result)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
-			Expect(arg1[0]).To(Equal("service"))
-			Expect(arg1[1]).To(Equal("fake-service-instance"))
-			Expect(pluginApiCall).To(BeTrue())
+			Expect(fakeCloudControllerClient.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+			Expect(result.Guid).To(Equal("service-guid"))
+			Expect(result.Name).To(Equal("fake-service-instance"))
 		})
 
 	})

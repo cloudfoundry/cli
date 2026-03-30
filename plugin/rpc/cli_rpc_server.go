@@ -11,7 +11,6 @@ import (
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
@@ -19,14 +18,11 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	"code.cloudfoundry.org/cli/v8/cf/trace"
-	"code.cloudfoundry.org/cli/v8/command"
-	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/version"
-	"code.cloudfoundry.org/clock"
 	"github.com/blang/semver/v4"
 )
 
@@ -75,25 +71,8 @@ func NewRpcService(
 	logger trace.Printer,
 	w io.Writer,
 	rpcServer *rpc.Server,
-	ui command.UI,
+	actor *v7action.Actor,
 ) (*CliRpcService, error) {
-	var actor *v7action.Actor
-
-	// Initialize v7 actor if UI is provided
-	if ui != nil {
-		// Initialize shared actor
-		sharedActor := sharedaction.NewActor(cliConfig)
-
-		// Get clients and connect to CF
-		ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(cliConfig, ui, "")
-		if err != nil {
-			return nil, err
-		}
-
-		// Initialize v7 actor
-		actor = v7action.NewActor(ccClient, cliConfig, sharedActor, uaaClient, routingClient, clock.NewClock())
-	}
-
 	rpcService := &CliRpcService{
 		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
@@ -370,426 +349,356 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		orgs, warnings, err := cmd.actor.GetOrganizations("")
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateOrgsModel(orgs)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Organizations = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	orgs, warnings, err := cmd.actor.GetOrganizations("")
+	if err != nil {
+		return err
+	}
 
-	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateOrgsModel(orgs)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		orgGUID := cmd.cliConfig.TargetedOrganization().GUID
-		if orgGUID == "" {
-			return fmt.Errorf("no organization targeted")
-		}
-
-		spaces, warnings, err := cmd.actor.GetOrganizationSpaces(orgGUID)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateSpacesModel(spaces)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Spaces = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return fmt.Errorf("no organization targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
+	spaces, warnings, err := cmd.actor.GetOrganizationSpaces(orgGUID)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpacesModel(spaces)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		spaceGUID := cmd.cliConfig.TargetedSpace().GUID
-		if spaceGUID == "" {
-			return fmt.Errorf("no space targeted")
-		}
-
-		services, warnings, err := cmd.actor.GetServiceInstancesForSpace(spaceGUID, false)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateServicesModel(services)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Services = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
+	services, warnings, err := cmd.actor.GetServiceInstancesForSpace(spaceGUID, false)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateServicesModel(services)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		if len(args) == 0 {
-			return fmt.Errorf("organization name required")
-		}
-		orgName := args[0]
-
-		// Get org GUID from name
-		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings from org lookup
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Get users by role type
-		usersByRole, warnings, err := cmd.actor.GetOrgUsersByRoleType(org.GUID)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateOrgUsersModel(usersByRole)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.OrgUsers = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	if len(args) == 0 {
+		return fmt.Errorf("organization name required")
+	}
+	orgName := args[0]
 
-	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
+	// Get org GUID from name
+	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from org lookup
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Get users by role type
+	usersByRole, warnings, err := cmd.actor.GetOrgUsersByRoleType(org.GUID)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateOrgUsersModel(usersByRole)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		if len(args) < 2 {
-			return fmt.Errorf("organization and space names required")
-		}
-		orgName := args[0]
-		spaceName := args[1]
-
-		// Get org GUID from name
-		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings from org lookup
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Get space GUID from name
-		space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings from space lookup
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Get users by role type
-		usersByRole, warnings, err := cmd.actor.GetSpaceUsersByRoleType(space.GUID)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateSpaceUsersModel(usersByRole)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.SpaceUsers = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	if len(args) < 2 {
+		return fmt.Errorf("organization and space names required")
+	}
+	orgName := args[0]
+	spaceName := args[1]
 
-	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
+	// Get org GUID from name
+	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from org lookup
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Get space GUID from name
+	space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from space lookup
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Get users by role type
+	usersByRole, warnings, err := cmd.actor.GetSpaceUsersByRoleType(space.GUID)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpaceUsersModel(usersByRole)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		// 1. Get the organization by name
-		org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
-		if err != nil {
-			return err
-		}
-
-		// Handle warnings
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 2. Get organization quota
-		var quota resources.OrganizationQuota
-		if org.QuotaGUID != "" {
-			var ccv3Warnings ccv3.Warnings
-			quota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
-			if err != nil {
-				return err
-			}
-			for _, warning := range ccv3Warnings {
-				fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-			}
-		}
-
-		// 3. Get organization spaces
-		spaces, warnings, err := cmd.actor.GetOrganizationSpaces(org.GUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 4. Get organization domains
-		domains, warnings, err := cmd.actor.GetOrganizationDomains(org.GUID, "")
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 5. Get space quotas for the organization
-		spaceQuotas, warnings, err := cmd.actor.GetSpaceQuotasByOrgGUID(org.GUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateOrgModel(org, quota, spaces, domains, spaceQuotas)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// 1. Get the organization by name
+	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Organization = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	// Handle warnings
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
 
-	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
+	// 2. Get organization quota
+	var quota resources.OrganizationQuota
+	if org.QuotaGUID != "" {
+		var ccv3Warnings ccv3.Warnings
+		quota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range ccv3Warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+	}
+
+	// 3. Get organization spaces
+	spaces, warnings, err := cmd.actor.GetOrganizationSpaces(org.GUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 4. Get organization domains
+	domains, warnings, err := cmd.actor.GetOrganizationDomains(org.GUID, "")
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 5. Get space quotas for the organization
+	spaceQuotas, warnings, err := cmd.actor.GetSpaceQuotasByOrgGUID(org.GUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateOrgModel(org, quota, spaces, domains, spaceQuotas)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		// Get the targeted organization GUID
-		orgGUID := cmd.cliConfig.TargetedOrganization().GUID
-		if orgGUID == "" {
-			return fmt.Errorf("no organization targeted")
-		}
-
-		// 1. Get the space by name and organization
-		space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 2. Get organization info
-		org, warnings, err := cmd.actor.GetOrganizationByGUID(orgGUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 3. Get applications in the space
-		apps, warnings, err := cmd.actor.GetApplicationsBySpace(space.GUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 4. Get service instances in the space
-		serviceInstances, warnings, err := cmd.actor.GetServiceInstancesForSpace(space.GUID, false)
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 5. Get domains for the organization (spaces inherit org domains)
-		domains, warnings, err := cmd.actor.GetOrganizationDomains(orgGUID, "")
-		if err != nil {
-			return err
-		}
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// 6. Get space quota (if applied)
-		var spaceQuota resources.SpaceQuota
-		if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
-			var ccv3Warnings ccv3.Warnings
-			spaceQuota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
-			if err != nil {
-				return err
-			}
-			for _, warning := range ccv3Warnings {
-				fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-			}
-		}
-
-		// 7. Get security groups (both running and staging)
-		var allSecurityGroups []resources.SecurityGroup
-
-		runningSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range ccv3Warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-		allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
-
-		stagingSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
-		if err != nil {
-			return err
-		}
-		for _, warning := range ccv3Warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Deduplicate security groups (some may be both running and staging)
-		seenGroups := make(map[string]bool)
-		for _, sg := range stagingSecurityGroups {
-			if !seenGroups[sg.GUID] {
-				allSecurityGroups = append(allSecurityGroups, sg)
-				seenGroups[sg.GUID] = true
-			}
-		}
-
-		// Populate plugin model using mapping function
-		*retVal = populateSpaceModel(space, orgGUID, org.Name, apps, serviceInstances, domains, spaceQuota, allSecurityGroups)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	// Get the targeted organization GUID
+	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return fmt.Errorf("no organization targeted")
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Space = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	// 1. Get the space by name and organization
+	space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
 
-	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
+	// 2. Get organization info
+	org, warnings, err := cmd.actor.GetOrganizationByGUID(orgGUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 3. Get applications in the space
+	apps, warnings, err := cmd.actor.GetApplicationsBySpace(space.GUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 4. Get service instances in the space
+	serviceInstances, warnings, err := cmd.actor.GetServiceInstancesForSpace(space.GUID, false)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 5. Get domains for the organization (spaces inherit org domains)
+	domains, warnings, err := cmd.actor.GetOrganizationDomains(orgGUID, "")
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// 6. Get space quota (if applied)
+	var spaceQuota resources.SpaceQuota
+	if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
+		var ccv3Warnings ccv3.Warnings
+		spaceQuota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		if err != nil {
+			return err
+		}
+		for _, warning := range ccv3Warnings {
+			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+		}
+	}
+
+	// 7. Get security groups (both running and staging)
+	var allSecurityGroups []resources.SecurityGroup
+
+	runningSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range ccv3Warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+	allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
+
+	stagingSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range ccv3Warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Deduplicate security groups (some may be both running and staging)
+	seenGroups := make(map[string]bool)
+	for _, sg := range stagingSecurityGroups {
+		if !seenGroups[sg.GUID] {
+			allSecurityGroups = append(allSecurityGroups, sg)
+			seenGroups[sg.GUID] = true
+		}
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpaceModel(space, orgGUID, org.Name, apps, serviceInstances, domains, spaceQuota, allSecurityGroups)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_models.GetService_Model) error {
-	// Use v7action.Actor if available
-	if cmd.actor != nil {
-		spaceGUID := cmd.cliConfig.TargetedSpace().GUID
-		if spaceGUID == "" {
-			return fmt.Errorf("no space targeted")
-		}
-
-		// Query to include service plan and service offering details
-		queries := []ccv3.Query{
-			{Key: ccv3.FieldsServicePlan, Values: []string{"name", "guid"}},
-			{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"name", "guid", "documentation_url"}},
-		}
-
-		serviceInstance, includedResources, warnings, err := cmd.actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
-			serviceInstanceName,
-			spaceGUID,
-			queries...,
-		)
-		if err != nil {
-			return err
-		}
-
-		// Log warnings if any
-		for _, warning := range warnings {
-			fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
-		}
-
-		// Populate the plugin model
-		populateServiceModel(retVal, serviceInstance, includedResources)
-		return nil
+	if cmd.actor == nil {
+		return fmt.Errorf("actor not initialized")
 	}
 
-	// Fall back to legacy command runner
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Service = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"service", serviceInstanceName}, deps, true)
+	// Query to include service plan and service offering details
+	queries := []ccv3.Query{
+		{Key: ccv3.FieldsServicePlan, Values: []string{"name", "guid"}},
+		{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"name", "guid", "documentation_url"}},
+	}
+
+	serviceInstance, includedResources, warnings, err := cmd.actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
+		serviceInstanceName,
+		spaceGUID,
+		queries...,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Log warnings if any
+	for _, warning := range warnings {
+		fmt.Fprintf(cmd.stdout, "Warning: %s\n", warning)
+	}
+
+	// Populate the plugin model
+	populateServiceModel(retVal, serviceInstance, includedResources)
+	return nil
 }

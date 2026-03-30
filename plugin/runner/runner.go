@@ -8,12 +8,16 @@ import (
 	"os"
 	"os/exec"
 
+	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
 	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
 var (
@@ -63,6 +67,22 @@ func (r *pluginRunner) Run(args []string) error {
 	deps := commandregistry.NewDependency(writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
 	defer deps.Config.Close()
 
+	// Initialize v7 actor
+	var actor *v7action.Actor
+	if r.commandUI != nil {
+		// Initialize shared actor
+		sharedActor := sharedaction.NewActor(r.config)
+
+		// Get clients and connect to CF
+		ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(r.config, r.commandUI, "")
+		if err != nil {
+			return fmt.Errorf("error connecting to CF: %w", err)
+		}
+
+		// Initialize v7 actor
+		actor = v7action.NewActor(ccClient, r.config, sharedActor, uaaClient, routingClient, clock.NewClock())
+	}
+
 	// Initialize RPC server
 	server := netrpc.NewServer()
 	rpcService, err := rpc.NewRpcService(
@@ -74,7 +94,7 @@ func (r *pluginRunner) Run(args []string) error {
 		deps.Logger,
 		writer,
 		server,
-		r.commandUI,
+		actor,
 	)
 	if err != nil {
 		return fmt.Errorf("error initializing RPC service: %w", err)
