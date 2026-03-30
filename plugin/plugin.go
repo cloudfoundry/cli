@@ -1,6 +1,9 @@
 package plugin
 
-import plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+import (
+	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+)
 
 /*
 *
@@ -49,6 +52,7 @@ type CliConnection interface {
 	GetService(string) (plugin_models.GetService_Model, error)
 	GetOrg(string) (plugin_models.GetOrg_Model, error)
 	GetSpace(string) (plugin_models.GetSpace_Model, error)
+	CfClient() (*client.Client, error)
 }
 
 type VersionType struct {
