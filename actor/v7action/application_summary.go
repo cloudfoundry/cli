@@ -207,10 +207,12 @@ func (actor Actor) getProcessSummariesForSpace(spaceGUID string) (map[string]Pro
 
 	for _, process := range processes {
 		var instanceDetails []ProcessInstance
-		if process.EmbeddedProcessInstances != nil {
-			for _, instance := range *process.EmbeddedProcessInstances {
-				instanceDetails = append(instanceDetails, NewProcessInstance(instance.Index, constant.ProcessInstanceState(instance.State), time.Duration(instance.Since)))
-			}
+		for _, instance := range process.EmbeddedProcessInstances {
+			instanceDetails = append(instanceDetails, NewProcessInstance(
+				instance.Index,
+				constant.ProcessInstanceState(instance.State),
+				time.Duration(instance.Since)*time.Second,
+			))
 		}
 		processSummary := ProcessSummary{
 			Process:         process,

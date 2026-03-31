@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	. "code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -300,7 +301,7 @@ var _ = Describe("Application Summary Actions", func() {
 							Command:    *types.NewFilteredString("[Redacted Value]"),
 							MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 							AppGUID:    "some-app-guid",
-							EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+							EmbeddedProcessInstances: []resources.EmbeddedProcessInstance{
 								{Index: 0, State: "RUNNING", Since: 300},
 								{Index: 1, State: "CRASHED", Since: 0},
 							},
@@ -311,7 +312,7 @@ var _ = Describe("Application Summary Actions", func() {
 							Command:    *types.NewFilteredString("[Redacted Value]"),
 							MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 							AppGUID:    "some-app-guid",
-							EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+							EmbeddedProcessInstances: []resources.EmbeddedProcessInstance{
 								{Index: 0, State: "RUNNING", Since: 500},
 								{Index: 1, State: "RUNNING", Since: 600},
 							},
@@ -342,7 +343,7 @@ var _ = Describe("Application Summary Actions", func() {
 										Command:    *types.NewFilteredString("[Redacted Value]"),
 										MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 										AppGUID:    "some-app-guid",
-										EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+										EmbeddedProcessInstances: []resources.EmbeddedProcessInstance{
 											{Index: 0, State: "RUNNING", Since: 500},
 											{Index: 1, State: "RUNNING", Since: 600},
 										},
@@ -351,12 +352,12 @@ var _ = Describe("Application Summary Actions", func() {
 										{
 											Index:  0,
 											State:  "RUNNING",
-											Uptime: 500,
+											Uptime: 500 * time.Second,
 										},
 										{
 											Index:  1,
 											State:  "RUNNING",
-											Uptime: 600,
+											Uptime: 600 * time.Second,
 										},
 									},
 								},
@@ -367,7 +368,7 @@ var _ = Describe("Application Summary Actions", func() {
 										Type:       "some-type",
 										Command:    *types.NewFilteredString("[Redacted Value]"),
 										AppGUID:    "some-app-guid",
-										EmbeddedProcessInstances: &[]resources.EmbeddedProcessInstance{
+										EmbeddedProcessInstances: []resources.EmbeddedProcessInstance{
 											{Index: 0, State: "RUNNING", Since: 300},
 											{Index: 1, State: "CRASHED", Since: 0},
 										},
@@ -376,12 +377,12 @@ var _ = Describe("Application Summary Actions", func() {
 										{
 											Index:  0,
 											State:  "RUNNING",
-											Uptime: 300,
+											Uptime: 300 * time.Second,
 										},
 										{
 											Index:  1,
 											State:  "CRASHED",
-											Uptime: 0,
+											Uptime: 0 * time.Second,
 										},
 									},
 								},
