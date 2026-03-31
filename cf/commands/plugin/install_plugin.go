@@ -89,7 +89,7 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 		cmd.ui.Failed("Error loading config: " + err.Error())
 	}
 
-	rpcService, err := pluginRPCService.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, cmd.ui.Writer(), server, nil, nil, nil)
+	rpcService, err := pluginRPCService.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

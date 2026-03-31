@@ -88,10 +88,7 @@ func (r *pluginRunner) Run(args []string) error {
 	// Initialize RPC server
 	server := netrpc.NewServer()
 	rpcService, err := rpc.NewRpcService(
-		deps.TeePrinter,
-		deps.TeePrinter,
 		r.config,
-		writer,
 		server,
 		actor,
 		r.commandParser,

@@ -148,7 +148,7 @@ func Main(traceEnv string, args []string) {
 		os.Exit(1)
 	}
 
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, v3Config, Writer, server, nil, nil, nil)
+	rpcService, err := rpc.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)

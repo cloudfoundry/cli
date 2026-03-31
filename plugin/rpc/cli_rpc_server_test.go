@@ -14,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/uaa"
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v8/cf/models"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	testconfig "code.cloudfoundry.org/cli/v8/cf/util/testhelpers/configuration"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
@@ -51,19 +50,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			_, err := NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -85,7 +84,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -109,7 +108,7 @@ var _ = Describe("Server", func() {
 
 	// Describe(".IsMinCliVersion()", func() {
 	// 	BeforeEach(func() {
-	// 		rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+	// 		rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 	// 		Expect(err).ToNot(HaveOccurred())
 
 	// 		err := rpcService.Start()
@@ -175,7 +174,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -218,12 +217,11 @@ var _ = Describe("Server", func() {
 			var v3config *configv3.Config
 
 			BeforeEach(func() {
-				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				commandParser = new(rpcfakes.FakeCommandParser)
 				commandParser.ParseCommandFromArgsReturns(0, nil)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -262,11 +260,8 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("disabling terminal output", func() {
-		var terminalOutputSwitch *rpcfakes.FakeTerminalOutputSwitch
-
 		BeforeEach(func() {
-			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
-			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, nil, rpc.DefaultServer, nil, nil, nil)
+			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -275,7 +270,7 @@ var _ = Describe("Server", func() {
 			pingCli(rpcService.Port())
 		})
 
-		It("should disable the terminal output switch", func() {
+		It("should disable the terminal output", func() {
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
 
@@ -284,8 +279,6 @@ var _ = Describe("Server", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(success).To(BeTrue())
-			Expect(terminalOutputSwitch.DisableTerminalOutputCallCount()).To(Equal(1))
-			Expect(terminalOutputSwitch.DisableTerminalOutputArgsForCall(0)).To(Equal(true))
 		})
 	})
 
@@ -297,9 +290,6 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter(os.Stdout)
-			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
-
 			// Create v3config for RPC service
 			v3config := testconfig.NewConfigWithDefaults()
 			v3config.ConfigFile.TargetedOrganization.GUID = "test-org-guid"
@@ -317,7 +307,7 @@ var _ = Describe("Server", func() {
 			// Create actor with fakes (using v3config which implements v7action.Config interface)
 			actor := v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, v3config, os.Stdout, rpc.DefaultServer, actor, nil, nil)
+			rpcService, err = NewRpcService(v3config, rpc.DefaultServer, actor, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -801,13 +791,11 @@ var _ = Describe("Server", func() {
 
 		Context("success", func() {
 			BeforeEach(func() {
-
-				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				commandParser = new(rpcfakes.FakeCommandParser)
 				commandParser.ParseCommandFromArgsReturns(0, nil)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -875,7 +863,7 @@ var _ = Describe("Server", func() {
 					v3config.ConfigFile.TargetedOrganization.GUID = "test-guid"
 					v3config.ConfigFile.TargetedOrganization.Name = "test-org"
 
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -906,7 +894,7 @@ var _ = Describe("Server", func() {
 					v3config.ConfigFile.TargetedSpace.GUID = "space-guid"
 					v3config.ConfigFile.TargetedSpace.Name = "space-name"
 
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -928,7 +916,7 @@ var _ = Describe("Server", func() {
 
 			Context(".Username, .UserGuid, .UserEmail", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -957,7 +945,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsSSLDisabled", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -979,7 +967,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsLoggedIn", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1001,7 +989,7 @@ var _ = Describe("Server", func() {
 
 			Context(".HasOrganization and .HasSpace ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1025,7 +1013,7 @@ var _ = Describe("Server", func() {
 
 			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1052,7 +1040,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, nil, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1107,7 +1095,7 @@ var _ = Describe("Server", func() {
 					// Create actor with fakes
 					actor = v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-					rpcService, err = NewRpcService(nil, nil, v3config, nil, rpc.DefaultServer, actor, nil, nil)
+					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, actor, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1163,11 +1151,10 @@ var _ = Describe("Server", func() {
 
 		Context("fail", func() {
 			BeforeEach(func() {
-				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				commandParser = new(rpcfakes.FakeCommandParser)
 				v3config = testconfig.NewConfigWithDefaults()
 
-				rpcService, err = NewRpcService(outputCapture, nil, v3config, nil, rpc.DefaultServer, nil, commandParser, nil)
+				rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, commandParser, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
