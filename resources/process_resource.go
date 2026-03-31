@@ -27,7 +27,7 @@ type Process struct {
 	DiskInMB                              types.NullUint64
 	LogRateLimitInBPS                     types.NullInt
 	AppGUID                               string
-	EmbeddedProcessInstances              *[]EmbeddedProcessInstance
+	EmbeddedProcessInstances              []EmbeddedProcessInstance
 }
 
 type EmbeddedProcessInstance struct {
@@ -80,7 +80,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 			} `json:"data"`
 		} `json:"readiness_health_check"`
 
-		EmbeddedProcessInstances *[]EmbeddedProcessInstance `json:"process_instances,omitempty"`
+		EmbeddedProcessInstances []EmbeddedProcessInstance `json:"process_instances,omitempty"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccProcess)
@@ -104,9 +104,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	p.LogRateLimitInBPS = ccProcess.LogRateLimitInBPS
 	p.Type = ccProcess.Type
 	p.AppGUID = ccProcess.Relationships[constant.RelationshipTypeApplication].GUID
-	if ccProcess.EmbeddedProcessInstances != nil {
-		p.EmbeddedProcessInstances = ccProcess.EmbeddedProcessInstances
-	}
+	p.EmbeddedProcessInstances = ccProcess.EmbeddedProcessInstances
 
 	return nil
 }
@@ -138,7 +136,7 @@ type marshalProcess struct {
 
 	HealthCheck              *healthCheck               `json:"health_check,omitempty"`
 	ReadinessHealthCheck     *readinessHealthCheck      `json:"readiness_health_check,omitempty"`
-	EmbeddedProcessInstances *[]EmbeddedProcessInstance `json:"process_instances,omitempty"`
+	EmbeddedProcessInstances []EmbeddedProcessInstance  `json:"process_instances,omitempty"`
 }
 
 func marshalCommand(p Process, ccProcess *marshalProcess) {
@@ -196,7 +194,7 @@ func marshalLogRateLimit(p Process, ccProcess *marshalProcess) {
 }
 
 func marshalEmbeddedProcessInstances(p Process, ccProcess *marshalProcess) {
-	if p.EmbeddedProcessInstances != nil {
+	if len(p.EmbeddedProcessInstances) > 0 {
 		ccProcess.EmbeddedProcessInstances = p.EmbeddedProcessInstances
 	}
 }
