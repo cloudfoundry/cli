@@ -30,3 +30,16 @@ func BuildTokenString(expiration time.Time) string {
 	tokenBytes, _ := token.Serialize(nil)
 	return string(tokenBytes)
 }
+
+// BuildTokenStringWithUserInfo builds a JWT with user information for testing.
+func BuildTokenStringWithUserInfo(userGUID, username, email, origin string) string {
+	c := jws.Claims{}
+	c.SetExpiration(time.Now().Add(24 * time.Hour))
+	c.Set("user_id", userGUID)
+	c.Set("user_name", username)
+	c.Set("email", email)
+	c.Set("origin", origin)
+	token := jws.NewJWT(c, crypto.Unsecured)
+	tokenBytes, _ := token.Serialize(nil)
+	return "BEARER " + string(tokenBytes)
+}

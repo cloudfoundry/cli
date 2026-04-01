@@ -240,6 +240,7 @@ var _ = Describe("Service Instance List Action", func() {
 
 				Expect(serviceInstances).To(Equal([]ServiceInstance{
 					{
+						GUID:                "fake-guid-1",
 						Name:                "msi1",
 						Type:                resources.ManagedServiceInstance,
 						ServicePlanName:     "fake-plan-1",
@@ -248,8 +249,11 @@ var _ = Describe("Service Instance List Action", func() {
 						UpgradeAvailable:    types.NewOptionalBoolean(true),
 						BoundApps:           []string{"great-app-1", "great-app-2"},
 						LastOperation:       "create succeeded",
+						LastOperationType:   resources.CreateOperation,
+						LastOperationState:  resources.OperationSucceeded,
 					},
 					{
+						GUID:                "fake-guid-2",
 						Name:                "msi2",
 						Type:                resources.ManagedServiceInstance,
 						ServicePlanName:     "fake-plan-2",
@@ -258,8 +262,11 @@ var _ = Describe("Service Instance List Action", func() {
 						UpgradeAvailable:    types.NewOptionalBoolean(false),
 						BoundApps:           []string{"great-app-3", "great-app-4"},
 						LastOperation:       "update succeeded",
+						LastOperationType:   resources.UpdateOperation,
+						LastOperationState:  resources.OperationSucceeded,
 					},
 					{
+						GUID:                "fake-guid-3",
 						Name:                "msi3",
 						Type:                resources.ManagedServiceInstance,
 						ServicePlanName:     "fake-plan-3",
@@ -267,8 +274,11 @@ var _ = Describe("Service Instance List Action", func() {
 						ServiceBrokerName:   "fake-broker-2",
 						BoundApps:           []string{"great-app-5"},
 						LastOperation:       "create in progress",
+						LastOperationType:   resources.CreateOperation,
+						LastOperationState:  resources.OperationInProgress,
 					},
 					{
+						GUID:                "fake-guid-4",
 						Name:                "msi4",
 						Type:                resources.ManagedServiceInstance,
 						ServicePlanName:     "fake-plan-4",
@@ -277,8 +287,11 @@ var _ = Describe("Service Instance List Action", func() {
 						UpgradeAvailable:    types.NewOptionalBoolean(true),
 						BoundApps:           []string{"great-app-6"},
 						LastOperation:       "create failed",
+						LastOperationType:   resources.CreateOperation,
+						LastOperationState:  resources.OperationFailed,
 					},
 					{
+						GUID:                "fake-guid-5",
 						Name:                "msi5",
 						Type:                resources.ManagedServiceInstance,
 						ServicePlanName:     "fake-plan-4",
@@ -287,8 +300,11 @@ var _ = Describe("Service Instance List Action", func() {
 						UpgradeAvailable:    types.NewOptionalBoolean(false),
 						BoundApps:           []string{"great-app-6"},
 						LastOperation:       "delete in progress",
+						LastOperationType:   resources.DeleteOperation,
+						LastOperationState:  resources.OperationInProgress,
 					},
 					{
+						GUID:      "fake-guid-6",
 						Name:      "upsi",
 						Type:      resources.UserProvidedServiceInstance,
 						BoundApps: nil,

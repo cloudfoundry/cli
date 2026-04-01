@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/requirements"
 	"code.cloudfoundry.org/cli/v8/cf/terminal"
 	rpcService "code.cloudfoundry.org/cli/v8/plugin/rpc"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
 type PluginUninstall struct {
@@ -55,7 +56,13 @@ func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, plugi
 	// each service can only be registered once
 	server := rpc.NewServer()
 
-	RPCService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server)
+	// Load configv3.Config for RPC service
+	v3Config, err := configv3.LoadConfig()
+	if err != nil {
+		cmd.ui.Failed("Error loading config: " + err.Error())
+	}
+
+	RPCService, err := rpcService.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

@@ -20,6 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/util/downloader"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	"code.cloudfoundry.org/cli/v8/util"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	pluginRPCService "code.cloudfoundry.org/cli/v8/plugin/rpc"
@@ -82,7 +83,13 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 	// each service can only be registered once
 	server := rpc.NewServer()
 
-	rpcService, err := pluginRPCService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, pluginRPCService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server)
+	// Load configv3.Config for RPC service
+	v3Config, err := configv3.LoadConfig()
+	if err != nil {
+		cmd.ui.Failed("Error loading config: " + err.Error())
+	}
+
+	rpcService, err := pluginRPCService.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

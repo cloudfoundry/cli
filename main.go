@@ -7,12 +7,10 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/v8/cf/cmd"
-	"code.cloudfoundry.org/cli/v8/command/common"
+	"code.cloudfoundry.org/cli/v8/plugin/runner"
 	"code.cloudfoundry.org/cli/v8/util/command_parser"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/panichandler"
-	plugin_util "code.cloudfoundry.org/cli/v8/util/plugin"
 	"code.cloudfoundry.org/cli/v8/util/ui"
 )
 
@@ -44,21 +42,27 @@ func main() {
 	}
 
 	if unknownCommandError, ok := err.(command_parser.UnknownCommandError); ok {
-		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
+		var plugin configv3.Plugin
+		var commandIsPlugin bool
+
+		// Note: os.Args[1] can be safely indexed here because UnknownCommandError
+		// is only returned when ParseCommandFromArgs receives at least one argument.
+		// The command parser requires a command name to generate this error.
+		if len(os.Args) > 1 {
+			plugin, commandIsPlugin = config.FindPluginByCommand(os.Args[1])
+		}
 
 		switch {
 		case commandIsPlugin:
-			err = plugin_util.RunPlugin(plugin)
+			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, &p)
+			err = pluginRunner.Run(os.Args[1:])
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())
 				exitCode = 1
 			}
 
-		case common.ShouldFallbackToLegacy:
-			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
-			// NOT REACHED, legacy main will exit the process
-
 		default:
-			unknownCommandError.Suggest(plugin_util.PluginCommandNames())
+			unknownCommandError.Suggest(config.PluginCommandNames())
 			fmt.Fprintf(os.Stderr, "%s\n", unknownCommandError.Error())
 			os.Exit(1)
 		}

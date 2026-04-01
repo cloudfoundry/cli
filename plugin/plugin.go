@@ -1,6 +1,9 @@
 package plugin
 
-import plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+import (
+	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+)
 
 /*
 *
@@ -39,16 +42,27 @@ type CliConnection interface {
 	LoggregatorEndpoint() (string, error)
 	DopplerEndpoint() (string, error)
 	AccessToken() (string, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetApp(string) (plugin_models.GetAppModel, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetApps() ([]plugin_models.GetAppsModel, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetOrgs() ([]plugin_models.GetOrgs_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetSpaces() ([]plugin_models.GetSpaces_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetServices() ([]plugin_models.GetServices_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetService(string) (plugin_models.GetService_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetOrg(string) (plugin_models.GetOrg_Model, error)
+	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetSpace(string) (plugin_models.GetSpace_Model, error)
+	CfClient() (*client.Client, error)
 }
 
 type VersionType struct {
