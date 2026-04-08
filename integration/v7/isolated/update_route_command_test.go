@@ -115,7 +115,14 @@ var _ = Describe("update-route command", func() {
 					})
 				})
 
-				When("a hash-based routing options are specified", func() {
+				When("a hash-based routing is enabled and options are specified", func() {
+					BeforeEach(func() {
+						helpers.EnableFeatureFlag("hash_based_routing")
+					})
+					AfterEach(func() {
+						helpers.DisableFeatureFlag("hash_based_routing")
+					})
+
 					It("updates the route and runs to completion without failing", func() {
 						optionLBAlgo := "loadbalancing=hash"
 						optionHashHeader := "hash_header=X-Header"

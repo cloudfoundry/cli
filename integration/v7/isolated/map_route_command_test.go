@@ -243,6 +243,12 @@ var _ = Describe("map-route command", func() {
 					})
 				})
 				Context("when per-route options are provided", func() {
+					BeforeEach(func() {
+						helpers.EnableFeatureFlag("hash_based_routing")
+					})
+					AfterEach(func() {
+						helpers.DisableFeatureFlag("hash_based_routing")
+					})
 					It("creates the route and maps it to an app", func() {
 						optionLBAlgo := "loadbalancing=hash"
 						optionHashHeader := "hash_header=X-Header"
