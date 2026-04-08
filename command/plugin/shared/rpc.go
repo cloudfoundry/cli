@@ -36,8 +36,14 @@ func NewRPCService(config Config, ui UI) (*RPCService, error) {
 	deps := commandregistry.NewDependency(ui.Writer(), traceLogger, fmt.Sprint(config.DialTimeout().Seconds()))
 	defer deps.Config.Close()
 
+	// Load configv3.Config for RPC service
+	v3Config, err := configv3.LoadConfig()
+	if err != nil {
+		return nil, fmt.Errorf("error loading config: %w", err)
+	}
+
 	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, ui.Writer(), server)
+	rpcService, err := rpc.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
