@@ -11,6 +11,7 @@ type IncludedResources struct {
 	ServiceBrokers   []resources.ServiceBroker   `json:"service_brokers,omitempty"`
 	ServicePlans     []resources.ServicePlan     `json:"service_plans,omitempty"`
 	Apps             []resources.Application     `json:"apps,omitempty"`
+	Routes           []resources.Route           `json:"routes,omitempty"`
 }
 
 func (i *IncludedResources) Merge(resources IncludedResources) {
@@ -22,4 +23,5 @@ func (i *IncludedResources) Merge(resources IncludedResources) {
 	i.ServiceInstances = append(i.ServiceInstances, resources.ServiceInstances...)
 	i.ServiceOfferings = append(i.ServiceOfferings, resources.ServiceOfferings...)
 	i.ServicePlans = append(i.ServicePlans, resources.ServicePlans...)
+	i.Routes = append(i.Routes, resources.Routes...)
 }

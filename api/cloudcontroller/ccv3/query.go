@@ -29,6 +29,8 @@ const (
 	SequenceIDFilter QueryKey = "sequence_ids"
 	// RouteGUIDFilter is a query parameter for listing objects by Route GUID.
 	RouteGUIDFilter QueryKey = "route_guids"
+	// SelectorsFilter is a query parameter for listing access rules by selector.
+	SelectorsFilter QueryKey = "selectors"
 	// ServiceInstanceGUIDFilter is a query parameter for listing objects by Service Instance GUID.
 	ServiceInstanceGUIDFilter QueryKey = "service_instance_guids"
 	// SpaceGUIDFilter is a query parameter for listing objects by Space GUID.
