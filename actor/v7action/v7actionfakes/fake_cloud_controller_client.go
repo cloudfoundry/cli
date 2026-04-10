@@ -106,6 +106,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateAccessRuleStub        func(resources.AccessRule) (resources.AccessRule, ccv3.Warnings, error)
+	createAccessRuleMutex       sync.RWMutex
+	createAccessRuleArgsForCall []struct {
+		arg1 resources.AccessRule
+	}
+	createAccessRuleReturns struct {
+		result1 resources.AccessRule
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createAccessRuleReturnsOnCall map[int]struct {
+		result1 resources.AccessRule
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateApplicationStub        func(resources.Application) (resources.Application, ccv3.Warnings, error)
 	createApplicationMutex       sync.RWMutex
 	createApplicationArgsForCall []struct {
@@ -438,6 +453,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteAccessRuleStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteAccessRuleMutex       sync.RWMutex
+	deleteAccessRuleArgsForCall []struct {
+		arg1 string
+	}
+	deleteAccessRuleReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteAccessRuleReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteApplicationStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
 	deleteApplicationArgsForCall []struct {
@@ -765,6 +795,23 @@ type FakeCloudControllerClient struct {
 		result1 resources.RelationshipList
 		result2 ccv3.Warnings
 		result3 error
+	}
+	GetAccessRulesStub        func(...ccv3.Query) ([]resources.AccessRule, ccv3.IncludedResources, ccv3.Warnings, error)
+	getAccessRulesMutex       sync.RWMutex
+	getAccessRulesArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getAccessRulesReturns struct {
+		result1 []resources.AccessRule
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}
+	getAccessRulesReturnsOnCall map[int]struct {
+		result1 []resources.AccessRule
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
 	}
 	GetAppFeatureStub        func(string, string) (resources.ApplicationFeature, ccv3.Warnings, error)
 	getAppFeatureMutex       sync.RWMutex
@@ -3247,6 +3294,73 @@ func (fake *FakeCloudControllerClient) CopyPackageReturnsOnCall(i int, result1 r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) CreateAccessRule(arg1 resources.AccessRule) (resources.AccessRule, ccv3.Warnings, error) {
+	fake.createAccessRuleMutex.Lock()
+	ret, specificReturn := fake.createAccessRuleReturnsOnCall[len(fake.createAccessRuleArgsForCall)]
+	fake.createAccessRuleArgsForCall = append(fake.createAccessRuleArgsForCall, struct {
+		arg1 resources.AccessRule
+	}{arg1})
+	stub := fake.CreateAccessRuleStub
+	fakeReturns := fake.createAccessRuleReturns
+	fake.recordInvocation("CreateAccessRule", []interface{}{arg1})
+	fake.createAccessRuleMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateAccessRuleCallCount() int {
+	fake.createAccessRuleMutex.RLock()
+	defer fake.createAccessRuleMutex.RUnlock()
+	return len(fake.createAccessRuleArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateAccessRuleCalls(stub func(resources.AccessRule) (resources.AccessRule, ccv3.Warnings, error)) {
+	fake.createAccessRuleMutex.Lock()
+	defer fake.createAccessRuleMutex.Unlock()
+	fake.CreateAccessRuleStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateAccessRuleArgsForCall(i int) resources.AccessRule {
+	fake.createAccessRuleMutex.RLock()
+	defer fake.createAccessRuleMutex.RUnlock()
+	argsForCall := fake.createAccessRuleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateAccessRuleReturns(result1 resources.AccessRule, result2 ccv3.Warnings, result3 error) {
+	fake.createAccessRuleMutex.Lock()
+	defer fake.createAccessRuleMutex.Unlock()
+	fake.CreateAccessRuleStub = nil
+	fake.createAccessRuleReturns = struct {
+		result1 resources.AccessRule
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateAccessRuleReturnsOnCall(i int, result1 resources.AccessRule, result2 ccv3.Warnings, result3 error) {
+	fake.createAccessRuleMutex.Lock()
+	defer fake.createAccessRuleMutex.Unlock()
+	fake.CreateAccessRuleStub = nil
+	if fake.createAccessRuleReturnsOnCall == nil {
+		fake.createAccessRuleReturnsOnCall = make(map[int]struct {
+			result1 resources.AccessRule
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createAccessRuleReturnsOnCall[i] = struct {
+		result1 resources.AccessRule
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) CreateApplication(arg1 resources.Application) (resources.Application, ccv3.Warnings, error) {
 	fake.createApplicationMutex.Lock()
 	ret, specificReturn := fake.createApplicationReturnsOnCall[len(fake.createApplicationArgsForCall)]
@@ -4723,6 +4837,73 @@ func (fake *FakeCloudControllerClient) CreateUserReturnsOnCall(i int, result1 re
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) DeleteAccessRule(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteAccessRuleMutex.Lock()
+	ret, specificReturn := fake.deleteAccessRuleReturnsOnCall[len(fake.deleteAccessRuleArgsForCall)]
+	fake.deleteAccessRuleArgsForCall = append(fake.deleteAccessRuleArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DeleteAccessRuleStub
+	fakeReturns := fake.deleteAccessRuleReturns
+	fake.recordInvocation("DeleteAccessRule", []interface{}{arg1})
+	fake.deleteAccessRuleMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteAccessRuleCallCount() int {
+	fake.deleteAccessRuleMutex.RLock()
+	defer fake.deleteAccessRuleMutex.RUnlock()
+	return len(fake.deleteAccessRuleArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteAccessRuleCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteAccessRuleArgsForCall(i int) string {
+	fake.deleteAccessRuleMutex.RLock()
+	defer fake.deleteAccessRuleMutex.RUnlock()
+	argsForCall := fake.deleteAccessRuleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteAccessRuleReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = nil
+	fake.deleteAccessRuleReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteAccessRuleReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = nil
+	if fake.deleteAccessRuleReturnsOnCall == nil {
+		fake.deleteAccessRuleReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteAccessRuleReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) DeleteApplication(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.deleteApplicationMutex.Lock()
 	ret, specificReturn := fake.deleteApplicationReturnsOnCall[len(fake.deleteApplicationArgsForCall)]
@@ -6194,6 +6375,76 @@ func (fake *FakeCloudControllerClient) EntitleIsolationSegmentToOrganizationsRet
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRules(arg1 ...ccv3.Query) ([]resources.AccessRule, ccv3.IncludedResources, ccv3.Warnings, error) {
+	fake.getAccessRulesMutex.Lock()
+	ret, specificReturn := fake.getAccessRulesReturnsOnCall[len(fake.getAccessRulesArgsForCall)]
+	fake.getAccessRulesArgsForCall = append(fake.getAccessRulesArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	stub := fake.GetAccessRulesStub
+	fakeReturns := fake.getAccessRulesReturns
+	fake.recordInvocation("GetAccessRules", []interface{}{arg1})
+	fake.getAccessRulesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRulesCallCount() int {
+	fake.getAccessRulesMutex.RLock()
+	defer fake.getAccessRulesMutex.RUnlock()
+	return len(fake.getAccessRulesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRulesCalls(stub func(...ccv3.Query) ([]resources.AccessRule, ccv3.IncludedResources, ccv3.Warnings, error)) {
+	fake.getAccessRulesMutex.Lock()
+	defer fake.getAccessRulesMutex.Unlock()
+	fake.GetAccessRulesStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRulesArgsForCall(i int) []ccv3.Query {
+	fake.getAccessRulesMutex.RLock()
+	defer fake.getAccessRulesMutex.RUnlock()
+	argsForCall := fake.getAccessRulesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRulesReturns(result1 []resources.AccessRule, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getAccessRulesMutex.Lock()
+	defer fake.getAccessRulesMutex.Unlock()
+	fake.GetAccessRulesStub = nil
+	fake.getAccessRulesReturns = struct {
+		result1 []resources.AccessRule
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeCloudControllerClient) GetAccessRulesReturnsOnCall(i int, result1 []resources.AccessRule, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+	fake.getAccessRulesMutex.Lock()
+	defer fake.getAccessRulesMutex.Unlock()
+	fake.GetAccessRulesStub = nil
+	if fake.getAccessRulesReturnsOnCall == nil {
+		fake.getAccessRulesReturnsOnCall = make(map[int]struct {
+			result1 []resources.AccessRule
+			result2 ccv3.IncludedResources
+			result3 ccv3.Warnings
+			result4 error
+		})
+	}
+	fake.getAccessRulesReturnsOnCall[i] = struct {
+		result1 []resources.AccessRule
+		result2 ccv3.IncludedResources
+		result3 ccv3.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
 }
 
 func (fake *FakeCloudControllerClient) GetAppFeature(arg1 string, arg2 string) (resources.ApplicationFeature, ccv3.Warnings, error) {

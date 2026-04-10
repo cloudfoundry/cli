@@ -22,6 +22,23 @@ import (
 )
 
 type FakeActor struct {
+	AddAccessRuleStub        func(string, string, string, string, string) (v7action.Warnings, error)
+	addAccessRuleMutex       sync.RWMutex
+	addAccessRuleArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}
+	addAccessRuleReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	addAccessRuleReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	ApplyOrganizationQuotaByNameStub        func(string, string) (v7action.Warnings, error)
 	applyOrganizationQuotaByNameMutex       sync.RWMutex
 	applyOrganizationQuotaByNameArgsForCall []struct {
@@ -357,11 +374,13 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreatePrivateDomainStub        func(string, string) (v7action.Warnings, error)
+	CreatePrivateDomainStub        func(string, string, bool, string) (v7action.Warnings, error)
 	createPrivateDomainMutex       sync.RWMutex
 	createPrivateDomainArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
+		arg4 string
 	}
 	createPrivateDomainReturns struct {
 		result1 v7action.Warnings
@@ -463,12 +482,14 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateSharedDomainStub        func(string, bool, string) (v7action.Warnings, error)
+	CreateSharedDomainStub        func(string, bool, string, bool, string) (v7action.Warnings, error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
 		arg1 string
 		arg2 bool
 		arg3 string
+		arg4 bool
+		arg5 string
 	}
 	createSharedDomainReturns struct {
 		result1 v7action.Warnings
@@ -554,6 +575,22 @@ type FakeActor struct {
 		result2 error
 	}
 	createUserProvidedServiceInstanceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	DeleteAccessRuleStub        func(string, string, string, string) (v7action.Warnings, error)
+	deleteAccessRuleMutex       sync.RWMutex
+	deleteAccessRuleArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}
+	deleteAccessRuleReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	deleteAccessRuleReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -988,6 +1025,42 @@ type FakeActor struct {
 	entitleIsolationSegmentToOrganizationByNameReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
+	}
+	GetAccessRulesByRouteStub        func(string, string, string) ([]resources.AccessRule, v7action.Warnings, error)
+	getAccessRulesByRouteMutex       sync.RWMutex
+	getAccessRulesByRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getAccessRulesByRouteReturns struct {
+		result1 []resources.AccessRule
+		result2 v7action.Warnings
+		result3 error
+	}
+	getAccessRulesByRouteReturnsOnCall map[int]struct {
+		result1 []resources.AccessRule
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetAccessRulesForSpaceStub        func(string, string, string, string, string) ([]v7action.AccessRuleWithRoute, v7action.Warnings, error)
+	getAccessRulesForSpaceMutex       sync.RWMutex
+	getAccessRulesForSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}
+	getAccessRulesForSpaceReturns struct {
+		result1 []v7action.AccessRuleWithRoute
+		result2 v7action.Warnings
+		result3 error
+	}
+	getAccessRulesForSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.AccessRuleWithRoute
+		result2 v7action.Warnings
+		result3 error
 	}
 	GetAppFeatureStub        func(string, string) (resources.ApplicationFeature, v7action.Warnings, error)
 	getAppFeatureMutex       sync.RWMutex
@@ -3780,6 +3853,74 @@ type FakeActor struct {
 	invocationsMutex sync.RWMutex
 }
 
+func (fake *FakeActor) AddAccessRule(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (v7action.Warnings, error) {
+	fake.addAccessRuleMutex.Lock()
+	ret, specificReturn := fake.addAccessRuleReturnsOnCall[len(fake.addAccessRuleArgsForCall)]
+	fake.addAccessRuleArgsForCall = append(fake.addAccessRuleArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.AddAccessRuleStub
+	fakeReturns := fake.addAccessRuleReturns
+	fake.recordInvocation("AddAccessRule", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.addAccessRuleMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) AddAccessRuleCallCount() int {
+	fake.addAccessRuleMutex.RLock()
+	defer fake.addAccessRuleMutex.RUnlock()
+	return len(fake.addAccessRuleArgsForCall)
+}
+
+func (fake *FakeActor) AddAccessRuleCalls(stub func(string, string, string, string, string) (v7action.Warnings, error)) {
+	fake.addAccessRuleMutex.Lock()
+	defer fake.addAccessRuleMutex.Unlock()
+	fake.AddAccessRuleStub = stub
+}
+
+func (fake *FakeActor) AddAccessRuleArgsForCall(i int) (string, string, string, string, string) {
+	fake.addAccessRuleMutex.RLock()
+	defer fake.addAccessRuleMutex.RUnlock()
+	argsForCall := fake.addAccessRuleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeActor) AddAccessRuleReturns(result1 v7action.Warnings, result2 error) {
+	fake.addAccessRuleMutex.Lock()
+	defer fake.addAccessRuleMutex.Unlock()
+	fake.AddAccessRuleStub = nil
+	fake.addAccessRuleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) AddAccessRuleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.addAccessRuleMutex.Lock()
+	defer fake.addAccessRuleMutex.Unlock()
+	fake.AddAccessRuleStub = nil
+	if fake.addAccessRuleReturnsOnCall == nil {
+		fake.addAccessRuleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.addAccessRuleReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) ApplyOrganizationQuotaByName(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.applyOrganizationQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.applyOrganizationQuotaByNameReturnsOnCall[len(fake.applyOrganizationQuotaByNameArgsForCall)]
@@ -5273,19 +5414,21 @@ func (fake *FakeActor) CreateOrganizationQuotaReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreatePrivateDomain(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeActor) CreatePrivateDomain(arg1 string, arg2 string, arg3 bool, arg4 string) (v7action.Warnings, error) {
 	fake.createPrivateDomainMutex.Lock()
 	ret, specificReturn := fake.createPrivateDomainReturnsOnCall[len(fake.createPrivateDomainArgsForCall)]
 	fake.createPrivateDomainArgsForCall = append(fake.createPrivateDomainArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
+		arg3 bool
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.CreatePrivateDomainStub
 	fakeReturns := fake.createPrivateDomainReturns
-	fake.recordInvocation("CreatePrivateDomain", []interface{}{arg1, arg2})
+	fake.recordInvocation("CreatePrivateDomain", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createPrivateDomainMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -5299,17 +5442,17 @@ func (fake *FakeActor) CreatePrivateDomainCallCount() int {
 	return len(fake.createPrivateDomainArgsForCall)
 }
 
-func (fake *FakeActor) CreatePrivateDomainCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreatePrivateDomainCalls(stub func(string, string, bool, string) (v7action.Warnings, error)) {
 	fake.createPrivateDomainMutex.Lock()
 	defer fake.createPrivateDomainMutex.Unlock()
 	fake.CreatePrivateDomainStub = stub
 }
 
-func (fake *FakeActor) CreatePrivateDomainArgsForCall(i int) (string, string) {
+func (fake *FakeActor) CreatePrivateDomainArgsForCall(i int) (string, string, bool, string) {
 	fake.createPrivateDomainMutex.RLock()
 	defer fake.createPrivateDomainMutex.RUnlock()
 	argsForCall := fake.createPrivateDomainArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) CreatePrivateDomainReturns(result1 v7action.Warnings, result2 error) {
@@ -5740,20 +5883,22 @@ func (fake *FakeActor) CreateServiceKeyReturnsOnCall(i int, result1 chan v7actio
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string, arg4 bool, arg5 string) (v7action.Warnings, error) {
 	fake.createSharedDomainMutex.Lock()
 	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
 	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
 		arg1 string
 		arg2 bool
 		arg3 string
-	}{arg1, arg2, arg3})
+		arg4 bool
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
 	stub := fake.CreateSharedDomainStub
 	fakeReturns := fake.createSharedDomainReturns
-	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createSharedDomainMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -5767,17 +5912,17 @@ func (fake *FakeActor) CreateSharedDomainCallCount() int {
 	return len(fake.createSharedDomainArgsForCall)
 }
 
-func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool, string, bool, string) (v7action.Warnings, error)) {
 	fake.createSharedDomainMutex.Lock()
 	defer fake.createSharedDomainMutex.Unlock()
 	fake.CreateSharedDomainStub = stub
 }
 
-func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool, string) {
+func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool, string, bool, string) {
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
 	argsForCall := fake.createSharedDomainArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeActor) CreateSharedDomainReturns(result1 v7action.Warnings, result2 error) {
@@ -6137,6 +6282,73 @@ func (fake *FakeActor) CreateUserProvidedServiceInstanceReturnsOnCall(i int, res
 		})
 	}
 	fake.createUserProvidedServiceInstanceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteAccessRule(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
+	fake.deleteAccessRuleMutex.Lock()
+	ret, specificReturn := fake.deleteAccessRuleReturnsOnCall[len(fake.deleteAccessRuleArgsForCall)]
+	fake.deleteAccessRuleArgsForCall = append(fake.deleteAccessRuleArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.DeleteAccessRuleStub
+	fakeReturns := fake.deleteAccessRuleReturns
+	fake.recordInvocation("DeleteAccessRule", []interface{}{arg1, arg2, arg3, arg4})
+	fake.deleteAccessRuleMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) DeleteAccessRuleCallCount() int {
+	fake.deleteAccessRuleMutex.RLock()
+	defer fake.deleteAccessRuleMutex.RUnlock()
+	return len(fake.deleteAccessRuleArgsForCall)
+}
+
+func (fake *FakeActor) DeleteAccessRuleCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = stub
+}
+
+func (fake *FakeActor) DeleteAccessRuleArgsForCall(i int) (string, string, string, string) {
+	fake.deleteAccessRuleMutex.RLock()
+	defer fake.deleteAccessRuleMutex.RUnlock()
+	argsForCall := fake.deleteAccessRuleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeActor) DeleteAccessRuleReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = nil
+	fake.deleteAccessRuleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteAccessRuleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteAccessRuleMutex.Lock()
+	defer fake.deleteAccessRuleMutex.Unlock()
+	fake.DeleteAccessRuleStub = nil
+	if fake.deleteAccessRuleReturnsOnCall == nil {
+		fake.deleteAccessRuleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.deleteAccessRuleReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -8066,6 +8278,146 @@ func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameReturnsOnCall(
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeActor) GetAccessRulesByRoute(arg1 string, arg2 string, arg3 string) ([]resources.AccessRule, v7action.Warnings, error) {
+	fake.getAccessRulesByRouteMutex.Lock()
+	ret, specificReturn := fake.getAccessRulesByRouteReturnsOnCall[len(fake.getAccessRulesByRouteArgsForCall)]
+	fake.getAccessRulesByRouteArgsForCall = append(fake.getAccessRulesByRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.GetAccessRulesByRouteStub
+	fakeReturns := fake.getAccessRulesByRouteReturns
+	fake.recordInvocation("GetAccessRulesByRoute", []interface{}{arg1, arg2, arg3})
+	fake.getAccessRulesByRouteMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetAccessRulesByRouteCallCount() int {
+	fake.getAccessRulesByRouteMutex.RLock()
+	defer fake.getAccessRulesByRouteMutex.RUnlock()
+	return len(fake.getAccessRulesByRouteArgsForCall)
+}
+
+func (fake *FakeActor) GetAccessRulesByRouteCalls(stub func(string, string, string) ([]resources.AccessRule, v7action.Warnings, error)) {
+	fake.getAccessRulesByRouteMutex.Lock()
+	defer fake.getAccessRulesByRouteMutex.Unlock()
+	fake.GetAccessRulesByRouteStub = stub
+}
+
+func (fake *FakeActor) GetAccessRulesByRouteArgsForCall(i int) (string, string, string) {
+	fake.getAccessRulesByRouteMutex.RLock()
+	defer fake.getAccessRulesByRouteMutex.RUnlock()
+	argsForCall := fake.getAccessRulesByRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) GetAccessRulesByRouteReturns(result1 []resources.AccessRule, result2 v7action.Warnings, result3 error) {
+	fake.getAccessRulesByRouteMutex.Lock()
+	defer fake.getAccessRulesByRouteMutex.Unlock()
+	fake.GetAccessRulesByRouteStub = nil
+	fake.getAccessRulesByRouteReturns = struct {
+		result1 []resources.AccessRule
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetAccessRulesByRouteReturnsOnCall(i int, result1 []resources.AccessRule, result2 v7action.Warnings, result3 error) {
+	fake.getAccessRulesByRouteMutex.Lock()
+	defer fake.getAccessRulesByRouteMutex.Unlock()
+	fake.GetAccessRulesByRouteStub = nil
+	if fake.getAccessRulesByRouteReturnsOnCall == nil {
+		fake.getAccessRulesByRouteReturnsOnCall = make(map[int]struct {
+			result1 []resources.AccessRule
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getAccessRulesByRouteReturnsOnCall[i] = struct {
+		result1 []resources.AccessRule
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetAccessRulesForSpace(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) ([]v7action.AccessRuleWithRoute, v7action.Warnings, error) {
+	fake.getAccessRulesForSpaceMutex.Lock()
+	ret, specificReturn := fake.getAccessRulesForSpaceReturnsOnCall[len(fake.getAccessRulesForSpaceArgsForCall)]
+	fake.getAccessRulesForSpaceArgsForCall = append(fake.getAccessRulesForSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.GetAccessRulesForSpaceStub
+	fakeReturns := fake.getAccessRulesForSpaceReturns
+	fake.recordInvocation("GetAccessRulesForSpace", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.getAccessRulesForSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetAccessRulesForSpaceCallCount() int {
+	fake.getAccessRulesForSpaceMutex.RLock()
+	defer fake.getAccessRulesForSpaceMutex.RUnlock()
+	return len(fake.getAccessRulesForSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetAccessRulesForSpaceCalls(stub func(string, string, string, string, string) ([]v7action.AccessRuleWithRoute, v7action.Warnings, error)) {
+	fake.getAccessRulesForSpaceMutex.Lock()
+	defer fake.getAccessRulesForSpaceMutex.Unlock()
+	fake.GetAccessRulesForSpaceStub = stub
+}
+
+func (fake *FakeActor) GetAccessRulesForSpaceArgsForCall(i int) (string, string, string, string, string) {
+	fake.getAccessRulesForSpaceMutex.RLock()
+	defer fake.getAccessRulesForSpaceMutex.RUnlock()
+	argsForCall := fake.getAccessRulesForSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeActor) GetAccessRulesForSpaceReturns(result1 []v7action.AccessRuleWithRoute, result2 v7action.Warnings, result3 error) {
+	fake.getAccessRulesForSpaceMutex.Lock()
+	defer fake.getAccessRulesForSpaceMutex.Unlock()
+	fake.GetAccessRulesForSpaceStub = nil
+	fake.getAccessRulesForSpaceReturns = struct {
+		result1 []v7action.AccessRuleWithRoute
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetAccessRulesForSpaceReturnsOnCall(i int, result1 []v7action.AccessRuleWithRoute, result2 v7action.Warnings, result3 error) {
+	fake.getAccessRulesForSpaceMutex.Lock()
+	defer fake.getAccessRulesForSpaceMutex.Unlock()
+	fake.GetAccessRulesForSpaceStub = nil
+	if fake.getAccessRulesForSpaceReturnsOnCall == nil {
+		fake.getAccessRulesForSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.AccessRuleWithRoute
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getAccessRulesForSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.AccessRuleWithRoute
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) GetAppFeature(arg1 string, arg2 string) (resources.ApplicationFeature, v7action.Warnings, error) {

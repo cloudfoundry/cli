@@ -413,3 +413,13 @@ type TaskArgs struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	TaskID  int    `positional-arg-name:"TASK_ID" required:"true" description:"The Task ID for the application"`
 }
+
+type AddAccessRuleArgs struct {
+	RuleName string `positional-arg-name:"RULE_NAME" required:"true" description:"The access rule name"`
+	Domain   string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
+}
+
+type RemoveAccessRuleArgs struct {
+	RuleName string `positional-arg-name:"RULE_NAME" required:"true" description:"The access rule name"`
+	Domain   string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
+}
