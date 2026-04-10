@@ -118,7 +118,7 @@ var _ = Describe("Domain Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateSharedDomain("the-domain-name", true, routerGroup)
+			warnings, executeErr = actor.CreateSharedDomain("the-domain-name", true, routerGroup, false, "")
 		})
 
 		BeforeEach(func() {
@@ -191,7 +191,7 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		It("delegates to the cloud controller client", func() {
-			warnings, executeErr := actor.CreatePrivateDomain("private-domain-name", "org-name")
+			warnings, executeErr := actor.CreatePrivateDomain("private-domain-name", "org-name", false, "")
 			Expect(executeErr).To(MatchError("create-error"))
 			Expect(warnings).To(ConsistOf("get-orgs-warning", "create-warning-1", "create-warning-2"))
 
