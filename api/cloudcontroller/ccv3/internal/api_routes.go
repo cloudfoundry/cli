@@ -9,6 +9,7 @@ import "net/http"
 // If the request returns a single entity by GUID, use the singular (for example
 // /v3/organizations/:organization_guid is GetOrganization).
 const (
+	DeleteAccessRuleRequest                                     = "DeleteAccessRuleRequest"
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
 	DeleteBuildpackRequest                                      = "DeleteBuildpack"
@@ -35,6 +36,8 @@ const (
 	DeleteSpaceRequest                                          = "DeleteSpace"
 	DeleteSpaceQuotaFromSpaceRequest                            = "DeleteSpaceQuotaFromSpace"
 	DeleteUserRequest                                           = "DeleteUser"
+	GetAccessRuleRequest                                        = "GetAccessRuleRequest"
+	GetAccessRulesRequest                                       = "GetAccessRulesRequest"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
 	GetApplicationFeaturesRequest                               = "GetApplicationFeatures"
@@ -134,6 +137,7 @@ const (
 	PatchSpaceQuotaRequest                                      = "PatchSpaceQuota"
 	PatchStackRequest                                           = "PatchStack"
 	PatchMoveRouteRequest                                       = "PatchMoveRouteRequest"
+	PostAccessRuleRequest                                       = "PostAccessRuleRequest"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
 	PostApplicationActionStartRequest                           = "PostApplicationActionStart"
@@ -186,6 +190,10 @@ const (
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = map[string]Route{
+	GetAccessRulesRequest:                                       {Path: "/v3/access_rules", Method: http.MethodGet},
+	PostAccessRuleRequest:                                       {Path: "/v3/access_rules", Method: http.MethodPost},
+	GetAccessRuleRequest:                                        {Path: "/v3/access_rules/:access_rule_guid", Method: http.MethodGet},
+	DeleteAccessRuleRequest:                                     {Path: "/v3/access_rules/:access_rule_guid", Method: http.MethodDelete},
 	GetApplicationsRequest:                                      {Path: "/v3/apps", Method: http.MethodGet},
 	PostApplicationRequest:                                      {Path: "/v3/apps", Method: http.MethodPost},
 	DeleteApplicationRequest:                                    {Path: "/v3/apps/:app_guid", Method: http.MethodDelete},
