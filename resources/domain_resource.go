@@ -6,12 +6,14 @@ import (
 )
 
 type Domain struct {
-	GUID             string         `json:"guid,omitempty"`
-	Name             string         `json:"name"`
-	Internal         types.NullBool `json:"internal,omitempty"`
-	OrganizationGUID string         `jsonry:"relationships.organization.data.guid,omitempty"`
-	RouterGroup      string         `jsonry:"router_group.guid,omitempty"`
-	Protocols        []string       `jsonry:"supported_protocols,omitempty"`
+	GUID               string         `json:"guid,omitempty"`
+	Name               string         `json:"name"`
+	Internal           types.NullBool `json:"internal,omitempty"`
+	OrganizationGUID   string         `jsonry:"relationships.organization.data.guid,omitempty"`
+	RouterGroup        string         `jsonry:"router_group.guid,omitempty"`
+	Protocols          []string       `jsonry:"supported_protocols,omitempty"`
+	EnforceAccessRules types.NullBool `json:"enforce_access_rules,omitempty"`
+	AccessRulesScope   string         `json:"access_rules_scope,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
@@ -19,12 +21,14 @@ type Domain struct {
 
 func (d Domain) MarshalJSON() ([]byte, error) {
 	type domainWithBoolPointer struct {
-		GUID             string   `jsonry:"guid,omitempty"`
-		Name             string   `jsonry:"name"`
-		Internal         *bool    `jsonry:"internal,omitempty"`
-		OrganizationGUID string   `jsonry:"relationships.organization.data.guid,omitempty"`
-		RouterGroup      string   `jsonry:"router_group.guid,omitempty"`
-		Protocols        []string `jsonry:"supported_protocols,omitempty"`
+		GUID               string   `jsonry:"guid,omitempty"`
+		Name               string   `jsonry:"name"`
+		Internal           *bool    `jsonry:"internal,omitempty"`
+		OrganizationGUID   string   `jsonry:"relationships.organization.data.guid,omitempty"`
+		RouterGroup        string   `jsonry:"router_group.guid,omitempty"`
+		Protocols          []string `jsonry:"supported_protocols,omitempty"`
+		EnforceAccessRules *bool    `jsonry:"enforce_access_rules,omitempty"`
+		AccessRulesScope   string   `jsonry:"access_rules_scope,omitempty"`
 	}
 
 	clone := domainWithBoolPointer{
@@ -33,10 +37,14 @@ func (d Domain) MarshalJSON() ([]byte, error) {
 		OrganizationGUID: d.OrganizationGUID,
 		RouterGroup:      d.RouterGroup,
 		Protocols:        d.Protocols,
+		AccessRulesScope: d.AccessRulesScope,
 	}
 
 	if d.Internal.IsSet {
 		clone.Internal = &d.Internal.Value
+	}
+	if d.EnforceAccessRules.IsSet {
+		clone.EnforceAccessRules = &d.EnforceAccessRules.Value
 	}
 	return jsonry.Marshal(clone)
 }

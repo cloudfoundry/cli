@@ -113,7 +113,7 @@ var _ = Describe("create-private-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreatePrivateDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedOrgName := fakeActor.CreatePrivateDomainArgsForCall(0)
+				expectedDomainName, expectedOrgName, _, _ := fakeActor.CreatePrivateDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedOrgName).To(Equal(orgName))
 			})

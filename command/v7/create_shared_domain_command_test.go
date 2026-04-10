@@ -126,7 +126,7 @@ var _ = Describe("create-shared-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreateSharedDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedInternal, expectedRouterGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+				expectedDomainName, expectedInternal, expectedRouterGroup, _, _ := fakeActor.CreateSharedDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedInternal).To(BeTrue())
 				Expect(expectedRouterGroup).To(Equal("router-group"))
