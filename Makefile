@@ -190,16 +190,19 @@ out/cf-cli_osx_arm: $(GOSRC)
 	GOARCH=arm64 GOOS=darwin go build \
 				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx_arm .
 
-out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
+out/cf-cli_win32.exe: $(GOSRC) rsrc_windows_386.syso
 	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
+	rm rsrc_windows_386.syso
 
-out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
+out/cf-cli_winx64.exe: $(GOSRC) rsrc_windows_amd64.syso
 	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
+	rm rsrc_windows_amd64.syso
 
-rsrc.syso:
-	rsrc -ico cf.ico -o rsrc.syso
+rsrc_windows_386.syso:
+	rsrc -arch 386 -ico cf.ico -o rsrc_windows_386.syso
+
+rsrc_windows_amd64.syso:
+	rsrc -arch amd64 -ico cf.ico -o rsrc_windows_amd64.syso
 
 test: units ## (synonym for units)
 
