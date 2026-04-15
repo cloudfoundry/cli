@@ -114,7 +114,6 @@ var _ = Describe("access-rules Command", func() {
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-1",
-						Name:     "rule-1",
 						Selector: "cf:app:app-guid-1",
 					},
 					Route: resources.Route{
@@ -129,7 +128,6 @@ var _ = Describe("access-rules Command", func() {
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-2",
-						Name:     "rule-2",
 						Selector: "cf:any",
 					},
 					Route: resources.Route{
@@ -139,7 +137,7 @@ var _ = Describe("access-rules Command", func() {
 					},
 					DomainName: "test.com",
 					ScopeType:  "any",
-					SourceName: "(any app)",
+					SourceName: "",
 				},
 			}, v7action.Warnings{"warning-1"}, nil)
 		})
@@ -148,9 +146,9 @@ var _ = Describe("access-rules Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`Getting access rules in org some-org / space some-space as steve\.\.\.`))
-			Expect(testUI.Out).To(Say(`name\s+route\s+selector\s+scope\s+source`))
-			Expect(testUI.Out).To(Say(`rule-1\s+myapp\.example\.com/api\s+cf:app:app-guid-1\s+my-app`))
-			Expect(testUI.Out).To(Say(`rule-2\s+webapp\.test\.com\s+cf:any\s+\(any app\)`))
+			Expect(testUI.Out).To(Say(`route\s+selector\s+scope\s+source`))
+			Expect(testUI.Out).To(Say(`myapp\.example\.com/api\s+cf:app:app-guid-1\s+app\s+my-app`))
+			Expect(testUI.Out).To(Say(`webapp\.test\.com\s+cf:any\s+any`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 
@@ -185,7 +183,6 @@ var _ = Describe("access-rules Command", func() {
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-1",
-						Name:     "rule-1",
 						Selector: "cf:any",
 					},
 					Route: resources.Route{
@@ -194,7 +191,7 @@ var _ = Describe("access-rules Command", func() {
 					},
 					DomainName: "example.com",
 					ScopeType:  "any",
-					SourceName: "(any app)",
+					SourceName: "",
 				},
 			}, v7action.Warnings{}, nil)
 		})
@@ -271,7 +268,6 @@ var _ = Describe("access-rules Command", func() {
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-1",
-						Name:     "filtered-rule",
 						Selector: "cf:app:app-guid-1",
 					},
 					Route: resources.Route{
@@ -302,8 +298,8 @@ var _ = Describe("access-rules Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`Getting access rules in org some-org / space some-space as steve\.\.\.`))
-			Expect(testUI.Out).To(Say(`name\s+route\s+selector\s+scope\s+source`))
-			Expect(testUI.Out).To(Say(`filtered-rule\s+myapp\.example\.com/api\s+cf:app:app-guid-1\s+my-app`))
+			Expect(testUI.Out).To(Say(`route\s+selector\s+scope\s+source`))
+			Expect(testUI.Out).To(Say(`myapp\.example\.com/api\s+cf:app:app-guid-1\s+app\s+my-app`))
 		})
 	})
 
@@ -313,7 +309,6 @@ var _ = Describe("access-rules Command", func() {
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-1",
-						Name:     "no-host-rule",
 						Selector: "cf:any",
 					},
 					Route: resources.Route{
@@ -323,12 +318,11 @@ var _ = Describe("access-rules Command", func() {
 					},
 					DomainName: "example.com",
 					ScopeType:  "any",
-					SourceName: "(any app)",
+					SourceName: "",
 				},
 				{
 					AccessRule: resources.AccessRule{
 						GUID:     "rule-guid-2",
-						Name:     "no-path-rule",
 						Selector: "cf:any",
 					},
 					Route: resources.Route{
@@ -338,7 +332,7 @@ var _ = Describe("access-rules Command", func() {
 					},
 					DomainName: "test.com",
 					ScopeType:  "any",
-					SourceName: "(any app)",
+					SourceName: "",
 				},
 			}, v7action.Warnings{}, nil)
 		})
@@ -347,10 +341,10 @@ var _ = Describe("access-rules Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			// No host, with path: "example.com/api"
-			Expect(testUI.Out).To(Say(`no-host-rule\s+example\.com/api`))
+			Expect(testUI.Out).To(Say(`example\.com/api`))
 
 			// With host, no path: "myapp.test.com"
-			Expect(testUI.Out).To(Say(`no-path-rule\s+myapp\.test\.com`))
+			Expect(testUI.Out).To(Say(`myapp\.test\.com`))
 		})
 	})
 })

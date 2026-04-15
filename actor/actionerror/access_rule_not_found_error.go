@@ -3,9 +3,9 @@ package actionerror
 import "fmt"
 
 type AccessRuleNotFoundError struct {
-	Name string
+	Selector string
 }
 
 func (e AccessRuleNotFoundError) Error() string {
-	return fmt.Sprintf("Access rule '%s' not found.", e.Name)
+	return fmt.Sprintf("Access rule with selector '%s' not found.", e.Selector)
 }
