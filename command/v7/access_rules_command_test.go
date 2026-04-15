@@ -146,9 +146,9 @@ var _ = Describe("access-rules Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`Getting access rules in org some-org / space some-space as steve\.\.\.`))
-			Expect(testUI.Out).To(Say(`route\s+selector\s+scope\s+source`))
-			Expect(testUI.Out).To(Say(`myapp\.example\.com/api\s+cf:app:app-guid-1\s+app\s+my-app`))
-			Expect(testUI.Out).To(Say(`webapp\.test\.com\s+cf:any\s+any`))
+			Expect(testUI.Out).To(Say(`host\s+domain\s+path\s+selector\s+scope\s+source`))
+			Expect(testUI.Out).To(Say(`myapp\s+example\.com\s+/api\s+cf:app:app-guid-1\s+app\s+my-app`))
+			Expect(testUI.Out).To(Say(`webapp\s+test\.com\s+cf:any\s+any`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 
@@ -298,8 +298,8 @@ var _ = Describe("access-rules Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`Getting access rules in org some-org / space some-space as steve\.\.\.`))
-			Expect(testUI.Out).To(Say(`route\s+selector\s+scope\s+source`))
-			Expect(testUI.Out).To(Say(`myapp\.example\.com/api\s+cf:app:app-guid-1\s+app\s+my-app`))
+			Expect(testUI.Out).To(Say(`host\s+domain\s+path\s+selector\s+scope\s+source`))
+			Expect(testUI.Out).To(Say(`myapp\s+example\.com\s+/api\s+cf:app:app-guid-1\s+app\s+my-app`))
 		})
 	})
 
@@ -340,11 +340,11 @@ var _ = Describe("access-rules Command", func() {
 		It("formats routes correctly", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			// No host, with path: "example.com/api"
-			Expect(testUI.Out).To(Say(`example\.com/api`))
+			// No host, with path: empty host, example.com, /api
+			Expect(testUI.Out).To(Say(`\s+example\.com\s+/api`))
 
-			// With host, no path: "myapp.test.com"
-			Expect(testUI.Out).To(Say(`myapp\.test\.com`))
+			// With host, no path: myapp, test.com, empty path
+			Expect(testUI.Out).To(Say(`myapp\s+test\.com\s+`))
 		})
 	})
 })
