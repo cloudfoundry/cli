@@ -1,9 +1,6 @@
 package v7
 
 import (
-	"fmt"
-
-	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
@@ -64,7 +61,9 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 	// Build table data
 	table := [][]string{
 		{
-			cmd.UI.TranslateText("route"),
+			cmd.UI.TranslateText("host"),
+			cmd.UI.TranslateText("domain"),
+			cmd.UI.TranslateText("path"),
 			cmd.UI.TranslateText("selector"),
 			cmd.UI.TranslateText("scope"),
 			cmd.UI.TranslateText("source"),
@@ -73,7 +72,9 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 
 	for _, ruleWithRoute := range rulesWithRoutes {
 		table = append(table, []string{
-			formatRoute(ruleWithRoute.Route, ruleWithRoute.DomainName),
+			ruleWithRoute.Route.Host,
+			ruleWithRoute.DomainName,
+			ruleWithRoute.Route.Path,
 			ruleWithRoute.Selector,
 			ruleWithRoute.ScopeType,
 			ruleWithRoute.SourceName,
@@ -86,16 +87,3 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 	return nil
 }
 
-// formatRoute formats a route as hostname.domain/path
-func formatRoute(route resources.Route, domainName string) string {
-	var formatted string
-	if route.Host != "" {
-		formatted = fmt.Sprintf("%s.%s", route.Host, domainName)
-	} else {
-		formatted = domainName
-	}
-	if route.Path != "" {
-		formatted += route.Path
-	}
-	return formatted
-}
