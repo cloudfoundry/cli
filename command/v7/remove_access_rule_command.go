@@ -8,10 +8,11 @@ type RemoveAccessRuleCommand struct {
 	BaseCommand
 
 	RequiredArgs flag.RemoveAccessRuleArgs `positional-args:"yes"`
+	Selector     string                    `long:"selector" required:"true" description:"Selector to identify the access rule (cf:app:<guid>, cf:space:<guid>, cf:org:<guid>, or cf:any)"`
 	Hostname     string                    `long:"hostname" required:"true" description:"Hostname for the route"`
 	Path         string                    `long:"path" description:"Path for the route"`
 	Force        bool                      `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{}               `usage:"CF_NAME remove-access-rule RULE_NAME DOMAIN --hostname HOSTNAME [--path PATH] [-f]\n\nEXAMPLES:\n   cf remove-access-rule allow-frontend apps.identity --hostname backend\n   cf remove-access-rule allow-monitoring apps.identity --hostname api --path /metrics -f"`
+	usage        interface{}               `usage:"CF_NAME remove-access-rule DOMAIN --selector SELECTOR --hostname HOSTNAME [--path PATH] [-f]\n\nEXAMPLES:\n   cf remove-access-rule apps.identity --selector cf:app:d76446a1-f429-4444-8797-be2f78b75b08 --hostname backend\n   cf remove-access-rule apps.identity --selector cf:space:2b26e210-1b48-4e60-8432-f24bc5927789 --hostname api --path /metrics -f\n   cf remove-access-rule apps.identity --selector cf:any --hostname public-api -f"`
 	relatedCommands interface{} `related_commands:"access-rules, add-access-rule"`
 }
 
@@ -26,13 +27,17 @@ func (cmd RemoveAccessRuleCommand) Execute(args []string) error {
 		return err
 	}
 
-	ruleName := cmd.RequiredArgs.RuleName
+	// Validate selector format
+	if err := validateSelector(cmd.Selector); err != nil {
+		return err
+	}
+
 	domainName := cmd.RequiredArgs.Domain
 
 	if !cmd.Force {
-		prompt := "Really remove access rule {{.RuleName}} for route {{.Hostname}}.{{.Domain}}{{.Path}}?"
+		prompt := "Really remove access rule with selector {{.Selector}} for route {{.Hostname}}.{{.Domain}}{{.Path}}?"
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, prompt, map[string]interface{}{
-			"RuleName": ruleName,
+			"Selector": cmd.Selector,
 			"Hostname": cmd.Hostname,
 			"Domain":   domainName,
 			"Path":     formatPath(cmd.Path),
@@ -43,23 +48,20 @@ func (cmd RemoveAccessRuleCommand) Execute(args []string) error {
 		}
 
 		if !response {
-			cmd.UI.DisplayText("Access rule '{{.RuleName}}' has not been removed.", map[string]interface{}{
-				"RuleName": ruleName,
-			})
+			cmd.UI.DisplayText("Access rule has not been removed.")
 			return nil
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing access rule {{.RuleName}} for route {{.Hostname}}.{{.Domain}}{{.Path}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Removing access rule for route {{.Hostname}}.{{.Domain}}{{.Path}} as {{.User}}...",
 		map[string]interface{}{
-			"RuleName": ruleName,
 			"Hostname": cmd.Hostname,
 			"Domain":   domainName,
 			"Path":     formatPath(cmd.Path),
 			"User":     user.Name,
 		})
 
-	warnings, err := cmd.Actor.DeleteAccessRule(ruleName, domainName, cmd.Hostname, cmd.Path)
+	warnings, err := cmd.Actor.DeleteAccessRuleBySelector(domainName, cmd.Selector, cmd.Hostname, cmd.Path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -122,13 +122,12 @@ var _ = Describe("Access Rule Actions", func() {
 					"get-domain-warning-1",
 					"get-domain-warning-2",
 					"get-app-warning",
-				))
+			))
 
-				Expect(results).To(HaveLen(2))
+			Expect(results).To(HaveLen(2))
 
-				// First rule
+			// First rule
 			Expect(results[0].GUID).To(Equal("rule-guid-1"))
-			Expect(results[0].Name).To(Equal("rule-1"))
 			Expect(results[0].Selector).To(Equal("cf:app:app-guid-1"))
 			Expect(results[0].Route.GUID).To(Equal("route-guid-1"))
 			Expect(results[0].Route.Host).To(Equal("app1"))
@@ -139,7 +138,6 @@ var _ = Describe("Access Rule Actions", func() {
 
 			// Second rule
 			Expect(results[1].GUID).To(Equal("rule-guid-2"))
-			Expect(results[1].Name).To(Equal("rule-2"))
 			Expect(results[1].Selector).To(Equal("cf:any"))
 			Expect(results[1].Route.GUID).To(Equal("route-guid-2"))
 			Expect(results[1].Route.Host).To(Equal("app2"))
@@ -498,8 +496,8 @@ var _ = Describe("Access Rule Actions", func() {
 			It("returns the access rules", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(rules).To(HaveLen(2))
-				Expect(rules[0].Name).To(Equal("rule-1"))
-				Expect(rules[1].Name).To(Equal("rule-2"))
+				Expect(rules[0].Selector).To(Equal("cf:app:app-guid-1"))
+				Expect(rules[1].Selector).To(Equal("cf:app:app-guid-2"))
 				Expect(warnings).To(ConsistOf(
 					"get-domains-warning",
 					"get-routes-warning",
@@ -538,7 +536,6 @@ var _ = Describe("Access Rule Actions", func() {
 
 	Describe("AddAccessRule", func() {
 		var (
-			ruleName   string
 			domainName string
 			selector   string
 			hostname   string
@@ -549,7 +546,6 @@ var _ = Describe("Access Rule Actions", func() {
 		)
 
 		BeforeEach(func() {
-			ruleName = "my-rule"
 			domainName = "example.com"
 			selector = "cf:app:app-guid-1"
 			hostname = "myapp"
@@ -557,7 +553,7 @@ var _ = Describe("Access Rule Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.AddAccessRule(ruleName, domainName, selector, hostname, path)
+			warnings, executeErr = actor.AddAccessRule(domainName, selector, hostname, path)
 		})
 
 		When("creating the access rule succeeds", func() {
@@ -594,16 +590,15 @@ var _ = Describe("Access Rule Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf(
 					"get-domains-warning",
-					"get-routes-warning",
-					"create-rule-warning",
-				))
+				"get-routes-warning",
+				"create-rule-warning",
+			))
 
-				Expect(fakeCloudControllerClient.CreateAccessRuleCallCount()).To(Equal(1))
-				rule := fakeCloudControllerClient.CreateAccessRuleArgsForCall(0)
-				Expect(rule.Name).To(Equal("my-rule"))
-				Expect(rule.Selector).To(Equal("cf:app:app-guid-1"))
-				Expect(rule.RouteGUID).To(Equal("route-guid-1"))
-			})
+			Expect(fakeCloudControllerClient.CreateAccessRuleCallCount()).To(Equal(1))
+			rule := fakeCloudControllerClient.CreateAccessRuleArgsForCall(0)
+			Expect(rule.Selector).To(Equal("cf:app:app-guid-1"))
+			Expect(rule.RouteGUID).To(Equal("route-guid-1"))
+		})
 		})
 
 		When("the route does not exist", func() {
@@ -633,9 +628,9 @@ var _ = Describe("Access Rule Actions", func() {
 		})
 	})
 
-	Describe("DeleteAccessRule", func() {
+	Describe("DeleteAccessRuleBySelector", func() {
 		var (
-			ruleName   string
+			selector   string
 			domainName string
 			hostname   string
 			path       string
@@ -645,14 +640,14 @@ var _ = Describe("Access Rule Actions", func() {
 		)
 
 		BeforeEach(func() {
-			ruleName = "my-rule"
+			selector = "cf:any"
 			domainName = "example.com"
 			hostname = "myapp"
 			path = ""
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.DeleteAccessRule(ruleName, domainName, hostname, path)
+			warnings, executeErr = actor.DeleteAccessRuleBySelector(domainName, selector, hostname, path)
 		})
 
 		When("the access rule exists", func() {
@@ -680,7 +675,7 @@ var _ = Describe("Access Rule Actions", func() {
 
 				fakeCloudControllerClient.GetAccessRulesReturns(
 					[]resources.AccessRule{
-						{GUID: "rule-guid-1", Name: "my-rule", Selector: "cf:any"},
+						{GUID: "rule-guid-1", Selector: "cf:any"},
 					},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-access-rules-warning"},
@@ -732,24 +727,24 @@ var _ = Describe("Access Rule Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetAccessRulesReturns(
-					[]resources.AccessRule{
-						{GUID: "rule-guid-other", Name: "other-rule", Selector: "cf:any"},
-					},
-					ccv3.IncludedResources{},
-					ccv3.Warnings{"get-access-rules-warning"},
-					nil,
-				)
-			})
+			fakeCloudControllerClient.GetAccessRulesReturns(
+				[]resources.AccessRule{
+					{GUID: "rule-guid-other", Selector: "cf:app:other-guid"},
+				},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"get-access-rules-warning"},
+				nil,
+			)
+		})
 
-			It("returns an AccessRuleNotFoundError", func() {
-				Expect(executeErr).To(MatchError(actionerror.AccessRuleNotFoundError{Name: "my-rule"}))
-				Expect(warnings).To(ConsistOf(
-					"get-domains-warning",
-					"get-routes-warning",
-					"get-access-rules-warning",
-				))
-			})
+		It("returns an AccessRuleNotFoundError", func() {
+			Expect(executeErr).To(MatchError(actionerror.AccessRuleNotFoundError{Selector: "cf:any"}))
+			Expect(warnings).To(ConsistOf(
+				"get-domains-warning",
+				"get-routes-warning",
+				"get-access-rules-warning",
+			))
 		})
 	})
+})
 })

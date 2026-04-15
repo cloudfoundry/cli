@@ -25,7 +25,7 @@ type AddAccessRuleCommand struct {
 	// Advanced: raw selector flag
 	Selector string `long:"selector" description:"Raw selector (cf:app:<guid>, cf:space:<guid>, cf:org:<guid>, or cf:any)"`
 
-	usage        interface{} `usage:"CF_NAME add-access-rule RULE_NAME DOMAIN --hostname HOSTNAME [--source-app APP_NAME [--source-space SPACE_NAME] [--source-org ORG_NAME] | --source-space SPACE_NAME [--source-org ORG_NAME] | --source-org ORG_NAME | --source-any | --selector SELECTOR] [--path PATH]\n\nALLOW ACCESS TO A ROUTE:\n   Create an access rule that allows specific apps, spaces, or orgs to access a route using mTLS authentication.\n\nEXAMPLES:\n   # Allow the \"frontend-app\" (in current space) to access the backend route\n   cf add-access-rule allow-frontend apps.identity --source-app frontend-app --hostname backend\n\n   # Allow an app in a different space to access the route\n   cf add-access-rule allow-other-space apps.identity --source-app api-client --source-space other-space --hostname backend\n\n   # Allow an app in a different org to access the route\n   cf add-access-rule allow-other-org apps.identity --source-app external-client --source-space external-space --source-org external-org --hostname backend\n\n   # Allow all apps in the \"monitoring\" space to access the API metrics endpoint\n   cf add-access-rule allow-monitoring apps.identity --source-space monitoring --hostname api --path /metrics\n\n   # Allow all apps in a space in a different org\n   cf add-access-rule allow-prod-space apps.identity --source-space prod-space --source-org prod-org --hostname api\n\n   # Allow all apps in the \"platform\" org to access the route\n   cf add-access-rule allow-platform-org apps.identity --source-org platform --hostname shared-api\n\n   # Allow any authenticated app to access the public API\n   cf add-access-rule allow-all apps.identity --source-any --hostname public-api\n\n   # Use raw selector (advanced)\n   cf add-access-rule allow-raw apps.identity --selector cf:app:d76446a1-f429-4444-8797-be2f78b75b08 --hostname backend"`
+	usage        interface{} `usage:"CF_NAME add-access-rule DOMAIN --hostname HOSTNAME [--source-app APP_NAME [--source-space SPACE_NAME] [--source-org ORG_NAME] | --source-space SPACE_NAME [--source-org ORG_NAME] | --source-org ORG_NAME | --source-any | --selector SELECTOR] [--path PATH]\n\nALLOW ACCESS TO A ROUTE:\n   Create an access rule that allows specific apps, spaces, or orgs to access a route using mTLS authentication.\n\nEXAMPLES:\n   # Allow the \"frontend-app\" (in current space) to access the backend route\n   cf add-access-rule apps.identity --source-app frontend-app --hostname backend\n\n   # Allow an app in a different space to access the route\n   cf add-access-rule apps.identity --source-app api-client --source-space other-space --hostname backend\n\n   # Allow an app in a different org to access the route\n   cf add-access-rule apps.identity --source-app external-client --source-space external-space --source-org external-org --hostname backend\n\n   # Allow all apps in the \"monitoring\" space to access the API metrics endpoint\n   cf add-access-rule apps.identity --source-space monitoring --hostname api --path /metrics\n\n   # Allow all apps in a space in a different org\n   cf add-access-rule apps.identity --source-space prod-space --source-org prod-org --hostname api\n\n   # Allow all apps in the \"platform\" org to access the route\n   cf add-access-rule apps.identity --source-org platform --hostname shared-api\n\n   # Allow any authenticated app to access the public API\n   cf add-access-rule apps.identity --source-any --hostname public-api\n\n   # Use raw selector (advanced)\n   cf add-access-rule apps.identity --selector cf:app:d76446a1-f429-4444-8797-be2f78b75b08 --hostname backend"`
 	relatedCommands interface{} `related_commands:"access-rules, remove-access-rule, create-shared-domain"`
 }
 
@@ -57,12 +57,10 @@ func (cmd AddAccessRuleCommand) Execute(args []string) error {
 		return err
 	}
 
-	ruleName := cmd.RequiredArgs.RuleName
 	domainName := cmd.RequiredArgs.Domain
 
-	cmd.UI.DisplayTextWithFlavor("Adding access rule {{.RuleName}} for route {{.Hostname}}.{{.Domain}}{{.Path}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Adding access rule for route {{.Hostname}}.{{.Domain}}{{.Path}} as {{.User}}...",
 		map[string]interface{}{
-			"RuleName": ruleName,
 			"Hostname": cmd.Hostname,
 			"Domain":   domainName,
 			"Path":     formatPath(cmd.Path),
@@ -79,17 +77,13 @@ func (cmd AddAccessRuleCommand) Execute(args []string) error {
 			"Selector": selector,
 		})
 
-	warnings, err = cmd.Actor.AddAccessRule(ruleName, domainName, selector, cmd.Hostname, cmd.Path)
+	warnings, err = cmd.Actor.AddAccessRule(domainName, selector, cmd.Hostname, cmd.Path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("TIP: Access rule '{{.RuleName}}' has been created. It may take a few seconds for the rule to propagate to GoRouter.",
-		map[string]interface{}{
-			"RuleName": ruleName,
-		})
 
 	return nil
 }

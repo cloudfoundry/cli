@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/resources"
 )
 
-func (actor Actor) AddAccessRule(ruleName, domainName, selector, hostname, path string) (Warnings, error) {
+func (actor Actor) AddAccessRule(domainName, selector, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	// Get the domain to ensure it exists and supports access rules
@@ -35,7 +35,6 @@ func (actor Actor) AddAccessRule(ruleName, domainName, selector, hostname, path 
 
 	// Create the access rule
 	accessRule := resources.AccessRule{
-		Name:      ruleName,
 		Selector:  selector,
 		RouteGUID: route.GUID,
 	}
@@ -87,7 +86,7 @@ func (actor Actor) GetAccessRulesByRoute(domainName, hostname, path string) ([]r
 	return rules, allWarnings, err
 }
 
-func (actor Actor) DeleteAccessRule(ruleName, domainName, hostname, path string) (Warnings, error) {
+func (actor Actor) DeleteAccessRuleBySelector(domainName, selector, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	// Get the domain
@@ -114,7 +113,7 @@ func (actor Actor) DeleteAccessRule(ruleName, domainName, hostname, path string)
 
 	route := routes[0]
 
-	// Get access rules for this route to find the one with matching name
+	// Get access rules for this route to find the one with matching selector
 	accessRules, _, apiWarnings, err := actor.CloudControllerClient.GetAccessRules(
 		ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{route.GUID}},
 	)
@@ -123,17 +122,17 @@ func (actor Actor) DeleteAccessRule(ruleName, domainName, hostname, path string)
 		return allWarnings, err
 	}
 
-	// Find the rule with matching name
+	// Find the rule with matching selector
 	var ruleGUID string
 	for _, rule := range accessRules {
-		if rule.Name == ruleName {
+		if rule.Selector == selector {
 			ruleGUID = rule.GUID
 			break
 		}
 	}
 
 	if ruleGUID == "" {
-		return allWarnings, actionerror.AccessRuleNotFoundError{Name: ruleName}
+		return allWarnings, actionerror.AccessRuleNotFoundError{Selector: selector}
 	}
 
 	// Delete the access rule
@@ -142,6 +141,7 @@ func (actor Actor) DeleteAccessRule(ruleName, domainName, hostname, path string)
 
 	return allWarnings, err
 }
+
 
 // GetRoutesByDomain gets routes for a domain with optional hostname and path filters
 func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resources.Route, Warnings, error) {
