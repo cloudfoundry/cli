@@ -64,7 +64,6 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 	// Build table data
 	table := [][]string{
 		{
-			cmd.UI.TranslateText("name"),
 			cmd.UI.TranslateText("route"),
 			cmd.UI.TranslateText("selector"),
 			cmd.UI.TranslateText("scope"),
@@ -74,7 +73,6 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 
 	for _, ruleWithRoute := range rulesWithRoutes {
 		table = append(table, []string{
-			ruleWithRoute.Name,
 			formatRoute(ruleWithRoute.Route, ruleWithRoute.DomainName),
 			ruleWithRoute.Selector,
 			ruleWithRoute.ScopeType,

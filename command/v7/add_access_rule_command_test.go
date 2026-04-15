@@ -65,8 +65,7 @@ var _ = Describe("add-access-rule Command", func() {
 		Context("when no source flags are provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs = flag.AddAccessRuleArgs{
-					RuleName: "test-rule",
-					Domain:   "apps.internal",
+					Domain: "apps.internal",
 				}
 				cmd.Hostname = "backend"
 			})
@@ -81,8 +80,7 @@ var _ = Describe("add-access-rule Command", func() {
 		Context("when multiple mutually exclusive source flags are provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs = flag.AddAccessRuleArgs{
-					RuleName: "test-rule",
-					Domain:   "apps.internal",
+					Domain: "apps.internal",
 				}
 				cmd.Hostname = "backend"
 				cmd.SourceApp = "app-name"
@@ -99,8 +97,7 @@ var _ = Describe("add-access-rule Command", func() {
 		Context("when --source-space and --source-any are both provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs = flag.AddAccessRuleArgs{
-					RuleName: "test-rule",
-					Domain:   "apps.internal",
+					Domain: "apps.internal",
 				}
 				cmd.Hostname = "backend"
 				cmd.SourceSpace = "some-space"
@@ -118,8 +115,7 @@ var _ = Describe("add-access-rule Command", func() {
 	When("the user is logged in, an org is targeted, and a space is targeted", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.AddAccessRuleArgs{
-				RuleName: "test-rule",
-				Domain:   "apps.internal",
+				Domain: "apps.internal",
 			}
 			cmd.Hostname = "backend"
 		})
@@ -147,15 +143,14 @@ var _ = Describe("add-access-rule Command", func() {
 
 					// Verify access rule creation with resolved selector
 					Expect(fakeActor.AddAccessRuleCallCount()).To(Equal(1))
-					ruleName, domain, selector, hostname, path := fakeActor.AddAccessRuleArgsForCall(0)
-					Expect(ruleName).To(Equal("test-rule"))
+					domain, selector, hostname, path := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(domain).To(Equal("apps.internal"))
 					Expect(selector).To(Equal("cf:app:app-guid"))
 					Expect(hostname).To(Equal("backend"))
 					Expect(path).To(BeEmpty())
 
 					// Verify output
-					Expect(testUI.Out).To(Say("Adding access rule test-rule"))
+					Expect(testUI.Out).To(Say("Adding access rule for route"))
 					Expect(testUI.Out).To(Say("scope: app, source: frontend-app"))
 					Expect(testUI.Out).To(Say("selector: cf:app:app-guid"))
 					Expect(testUI.Out).To(Say("OK"))
@@ -201,7 +196,7 @@ var _ = Describe("add-access-rule Command", func() {
 					Expect(spaceGUID).To(Equal("other-space-guid"))
 
 					// Verify selector
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:app:app-guid"))
 
 					// Verify output shows cross-space info
@@ -283,7 +278,7 @@ var _ = Describe("add-access-rule Command", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
 					// Verify selector is space-level
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:space:space-guid-123"))
 
 					Expect(testUI.Out).To(Say("scope: space, source: monitoring-space"))
@@ -322,7 +317,7 @@ var _ = Describe("add-access-rule Command", func() {
 					Expect(orgGUID).To(Equal("prod-org-guid"))
 
 					// Verify selector is space-level
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:space:prod-space-guid"))
 
 					Expect(testUI.Out).To(Say("scope: space, source: prod-space \\(org: prod-org\\)"))
@@ -344,7 +339,7 @@ var _ = Describe("add-access-rule Command", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
 					// Verify selector is org-level
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:org:org-guid-456"))
 
 					Expect(testUI.Out).To(Say("scope: org, source: platform-org"))
@@ -360,7 +355,7 @@ var _ = Describe("add-access-rule Command", func() {
 				It("creates an 'any' access rule", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:any"))
 
 					Expect(testUI.Out).To(Say("scope: any, source: any authenticated app"))
@@ -376,7 +371,7 @@ var _ = Describe("add-access-rule Command", func() {
 				It("uses the raw selector without resolution", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					_, _, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
+					_, selector, _, _ := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(selector).To(Equal("cf:app:raw-guid-123"))
 
 					Expect(testUI.Out).To(Say("selector: cf:app:raw-guid-123"))
@@ -398,7 +393,7 @@ var _ = Describe("add-access-rule Command", func() {
 				It("passes the path to the actor", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					_, _, _, _, path := fakeActor.AddAccessRuleArgsForCall(0)
+					_, _, _, path := fakeActor.AddAccessRuleArgsForCall(0)
 					Expect(path).To(Equal("/metrics"))
 				})
 			})

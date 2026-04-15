@@ -415,11 +415,9 @@ type TaskArgs struct {
 }
 
 type AddAccessRuleArgs struct {
-	RuleName string `positional-arg-name:"RULE_NAME" required:"true" description:"The access rule name"`
-	Domain   string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
+	Domain string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
 }
 
 type RemoveAccessRuleArgs struct {
-	RuleName string `positional-arg-name:"RULE_NAME" required:"true" description:"The access rule name"`
-	Domain   string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
+	Domain string `positional-arg-name:"DOMAIN" required:"true" description:"The domain name"`
 }

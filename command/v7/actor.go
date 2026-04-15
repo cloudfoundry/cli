@@ -23,7 +23,7 @@ import (
 type Actor interface {
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
-	AddAccessRule(ruleName, domainName, selector, hostname, path string) (v7action.Warnings, error)
+	AddAccessRule(domainName, selector, hostname, path string) (v7action.Warnings, error)
 	AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentName string, spaceGUID string) (v7action.Warnings, error)
 	Authenticate(credentials map[string]string, origin string, grantType uaa.GrantType) error
 	BindSecurityGroupToSpaces(securityGroupGUID string, spaces []resources.Space, lifecycle constant.SecurityGroupLifecycle) (v7action.Warnings, error)
@@ -59,7 +59,7 @@ type Actor interface {
 	CreateUser(username string, password string, origin string) (resources.User, v7action.Warnings, error)
 	CreateUserProvidedServiceInstance(instance resources.ServiceInstance) (v7action.Warnings, error)
 	DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (v7action.Warnings, error)
-	DeleteAccessRule(ruleName, domainName, hostname, path string) (v7action.Warnings, error)
+	DeleteAccessRuleBySelector(domainName, selector, hostname, path string) (v7action.Warnings, error)
 	DeleteBuildpackByNameAndStackAndLifecycle(buildpackName string, buildpackStack string, buildpackLifecycle string) (v7action.Warnings, error)
 	DeleteDomain(domain resources.Domain) (v7action.Warnings, error)
 	DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (v7action.Warnings, error)

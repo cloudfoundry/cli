@@ -22,14 +22,13 @@ import (
 )
 
 type FakeActor struct {
-	AddAccessRuleStub        func(string, string, string, string, string) (v7action.Warnings, error)
+	AddAccessRuleStub        func(string, string, string, string) (v7action.Warnings, error)
 	addAccessRuleMutex       sync.RWMutex
 	addAccessRuleArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
-		arg5 string
 	}
 	addAccessRuleReturns struct {
 		result1 v7action.Warnings
@@ -578,19 +577,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	DeleteAccessRuleStub        func(string, string, string, string) (v7action.Warnings, error)
-	deleteAccessRuleMutex       sync.RWMutex
-	deleteAccessRuleArgsForCall []struct {
+	DeleteAccessRuleBySelectorStub        func(string, string, string, string) (v7action.Warnings, error)
+	deleteAccessRuleBySelectorMutex       sync.RWMutex
+	deleteAccessRuleBySelectorArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
 	}
-	deleteAccessRuleReturns struct {
+	deleteAccessRuleBySelectorReturns struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	deleteAccessRuleReturnsOnCall map[int]struct {
+	deleteAccessRuleBySelectorReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -3853,7 +3852,7 @@ type FakeActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeActor) AddAccessRule(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (v7action.Warnings, error) {
+func (fake *FakeActor) AddAccessRule(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
 	fake.addAccessRuleMutex.Lock()
 	ret, specificReturn := fake.addAccessRuleReturnsOnCall[len(fake.addAccessRuleArgsForCall)]
 	fake.addAccessRuleArgsForCall = append(fake.addAccessRuleArgsForCall, struct {
@@ -3861,14 +3860,13 @@ func (fake *FakeActor) AddAccessRule(arg1 string, arg2 string, arg3 string, arg4
 		arg2 string
 		arg3 string
 		arg4 string
-		arg5 string
-	}{arg1, arg2, arg3, arg4, arg5})
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.AddAccessRuleStub
 	fakeReturns := fake.addAccessRuleReturns
-	fake.recordInvocation("AddAccessRule", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("AddAccessRule", []interface{}{arg1, arg2, arg3, arg4})
 	fake.addAccessRuleMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -3882,17 +3880,17 @@ func (fake *FakeActor) AddAccessRuleCallCount() int {
 	return len(fake.addAccessRuleArgsForCall)
 }
 
-func (fake *FakeActor) AddAccessRuleCalls(stub func(string, string, string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) AddAccessRuleCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
 	fake.addAccessRuleMutex.Lock()
 	defer fake.addAccessRuleMutex.Unlock()
 	fake.AddAccessRuleStub = stub
 }
 
-func (fake *FakeActor) AddAccessRuleArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeActor) AddAccessRuleArgsForCall(i int) (string, string, string, string) {
 	fake.addAccessRuleMutex.RLock()
 	defer fake.addAccessRuleMutex.RUnlock()
 	argsForCall := fake.addAccessRuleArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) AddAccessRuleReturns(result1 v7action.Warnings, result2 error) {
@@ -6287,19 +6285,19 @@ func (fake *FakeActor) CreateUserProvidedServiceInstanceReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeActor) DeleteAccessRule(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
-	fake.deleteAccessRuleMutex.Lock()
-	ret, specificReturn := fake.deleteAccessRuleReturnsOnCall[len(fake.deleteAccessRuleArgsForCall)]
-	fake.deleteAccessRuleArgsForCall = append(fake.deleteAccessRuleArgsForCall, struct {
+func (fake *FakeActor) DeleteAccessRuleBySelector(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
+	fake.deleteAccessRuleBySelectorMutex.Lock()
+	ret, specificReturn := fake.deleteAccessRuleBySelectorReturnsOnCall[len(fake.deleteAccessRuleBySelectorArgsForCall)]
+	fake.deleteAccessRuleBySelectorArgsForCall = append(fake.deleteAccessRuleBySelectorArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.DeleteAccessRuleStub
-	fakeReturns := fake.deleteAccessRuleReturns
-	fake.recordInvocation("DeleteAccessRule", []interface{}{arg1, arg2, arg3, arg4})
-	fake.deleteAccessRuleMutex.Unlock()
+	stub := fake.DeleteAccessRuleBySelectorStub
+	fakeReturns := fake.deleteAccessRuleBySelectorReturns
+	fake.recordInvocation("DeleteAccessRuleBySelector", []interface{}{arg1, arg2, arg3, arg4})
+	fake.deleteAccessRuleBySelectorMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3, arg4)
 	}
@@ -6309,46 +6307,46 @@ func (fake *FakeActor) DeleteAccessRule(arg1 string, arg2 string, arg3 string, a
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeActor) DeleteAccessRuleCallCount() int {
-	fake.deleteAccessRuleMutex.RLock()
-	defer fake.deleteAccessRuleMutex.RUnlock()
-	return len(fake.deleteAccessRuleArgsForCall)
+func (fake *FakeActor) DeleteAccessRuleBySelectorCallCount() int {
+	fake.deleteAccessRuleBySelectorMutex.RLock()
+	defer fake.deleteAccessRuleBySelectorMutex.RUnlock()
+	return len(fake.deleteAccessRuleBySelectorArgsForCall)
 }
 
-func (fake *FakeActor) DeleteAccessRuleCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
-	fake.deleteAccessRuleMutex.Lock()
-	defer fake.deleteAccessRuleMutex.Unlock()
-	fake.DeleteAccessRuleStub = stub
+func (fake *FakeActor) DeleteAccessRuleBySelectorCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
+	fake.deleteAccessRuleBySelectorMutex.Lock()
+	defer fake.deleteAccessRuleBySelectorMutex.Unlock()
+	fake.DeleteAccessRuleBySelectorStub = stub
 }
 
-func (fake *FakeActor) DeleteAccessRuleArgsForCall(i int) (string, string, string, string) {
-	fake.deleteAccessRuleMutex.RLock()
-	defer fake.deleteAccessRuleMutex.RUnlock()
-	argsForCall := fake.deleteAccessRuleArgsForCall[i]
+func (fake *FakeActor) DeleteAccessRuleBySelectorArgsForCall(i int) (string, string, string, string) {
+	fake.deleteAccessRuleBySelectorMutex.RLock()
+	defer fake.deleteAccessRuleBySelectorMutex.RUnlock()
+	argsForCall := fake.deleteAccessRuleBySelectorArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeActor) DeleteAccessRuleReturns(result1 v7action.Warnings, result2 error) {
-	fake.deleteAccessRuleMutex.Lock()
-	defer fake.deleteAccessRuleMutex.Unlock()
-	fake.DeleteAccessRuleStub = nil
-	fake.deleteAccessRuleReturns = struct {
+func (fake *FakeActor) DeleteAccessRuleBySelectorReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteAccessRuleBySelectorMutex.Lock()
+	defer fake.deleteAccessRuleBySelectorMutex.Unlock()
+	fake.DeleteAccessRuleBySelectorStub = nil
+	fake.deleteAccessRuleBySelectorReturns = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeActor) DeleteAccessRuleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.deleteAccessRuleMutex.Lock()
-	defer fake.deleteAccessRuleMutex.Unlock()
-	fake.DeleteAccessRuleStub = nil
-	if fake.deleteAccessRuleReturnsOnCall == nil {
-		fake.deleteAccessRuleReturnsOnCall = make(map[int]struct {
+func (fake *FakeActor) DeleteAccessRuleBySelectorReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteAccessRuleBySelectorMutex.Lock()
+	defer fake.deleteAccessRuleBySelectorMutex.Unlock()
+	fake.DeleteAccessRuleBySelectorStub = nil
+	if fake.deleteAccessRuleBySelectorReturnsOnCall == nil {
+		fake.deleteAccessRuleBySelectorReturnsOnCall = make(map[int]struct {
 			result1 v7action.Warnings
 			result2 error
 		})
 	}
-	fake.deleteAccessRuleReturnsOnCall[i] = struct {
+	fake.deleteAccessRuleBySelectorReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}

@@ -11,7 +11,6 @@ type AccessRule struct {
 	GUID      string     `json:"guid,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-	Name      string     `json:"name"`
 	Selector  string     `json:"selector"`
 	RouteGUID string     `json:"-"`
 
@@ -24,7 +23,6 @@ func (a AccessRule) MarshalJSON() ([]byte, error) {
 		GUID      string     `json:"guid,omitempty"`
 		CreatedAt *time.Time `json:"created_at,omitempty"`
 		UpdatedAt *time.Time `json:"updated_at,omitempty"`
-		Name      string     `json:"name"`
 		Selector  string     `json:"selector"`
 		Metadata  *Metadata  `json:"metadata,omitempty"`
 
@@ -41,7 +39,6 @@ func (a AccessRule) MarshalJSON() ([]byte, error) {
 	aliasData.GUID = a.GUID
 	aliasData.CreatedAt = a.CreatedAt
 	aliasData.UpdatedAt = a.UpdatedAt
-	aliasData.Name = a.Name
 	aliasData.Selector = a.Selector
 	aliasData.Metadata = a.Metadata
 	aliasData.Relationships.Route.Data.GUID = a.RouteGUID
@@ -54,7 +51,6 @@ func (a *AccessRule) UnmarshalJSON(data []byte) error {
 		GUID      string     `json:"guid,omitempty"`
 		CreatedAt *time.Time `json:"created_at,omitempty"`
 		UpdatedAt *time.Time `json:"updated_at,omitempty"`
-		Name      string     `json:"name"`
 		Selector  string     `json:"selector"`
 		Metadata  *Metadata  `json:"metadata,omitempty"`
 
@@ -75,7 +71,6 @@ func (a *AccessRule) UnmarshalJSON(data []byte) error {
 	a.GUID = alias.GUID
 	a.CreatedAt = alias.CreatedAt
 	a.UpdatedAt = alias.UpdatedAt
-	a.Name = alias.Name
 	a.Selector = alias.Selector
 	a.RouteGUID = alias.Relationships.Route.Data.GUID
 	a.Metadata = alias.Metadata
