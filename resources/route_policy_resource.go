@@ -7,23 +7,23 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
 )
 
-type AccessRule struct {
+type RoutePolicy struct {
 	GUID      string     `json:"guid,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-	Selector  string     `json:"selector"`
+	Source    string     `json:"source"`
 	RouteGUID string     `json:"-"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
-func (a AccessRule) MarshalJSON() ([]byte, error) {
+func (r RoutePolicy) MarshalJSON() ([]byte, error) {
 	type alias struct {
 		GUID      string     `json:"guid,omitempty"`
 		CreatedAt *time.Time `json:"created_at,omitempty"`
 		UpdatedAt *time.Time `json:"updated_at,omitempty"`
-		Selector  string     `json:"selector"`
+		Source    string     `json:"source"`
 		Metadata  *Metadata  `json:"metadata,omitempty"`
 
 		Relationships struct {
@@ -36,22 +36,22 @@ func (a AccessRule) MarshalJSON() ([]byte, error) {
 	}
 
 	var aliasData alias
-	aliasData.GUID = a.GUID
-	aliasData.CreatedAt = a.CreatedAt
-	aliasData.UpdatedAt = a.UpdatedAt
-	aliasData.Selector = a.Selector
-	aliasData.Metadata = a.Metadata
-	aliasData.Relationships.Route.Data.GUID = a.RouteGUID
+	aliasData.GUID = r.GUID
+	aliasData.CreatedAt = r.CreatedAt
+	aliasData.UpdatedAt = r.UpdatedAt
+	aliasData.Source = r.Source
+	aliasData.Metadata = r.Metadata
+	aliasData.Relationships.Route.Data.GUID = r.RouteGUID
 
 	return json.Marshal(aliasData)
 }
 
-func (a *AccessRule) UnmarshalJSON(data []byte) error {
+func (r *RoutePolicy) UnmarshalJSON(data []byte) error {
 	var alias struct {
 		GUID      string     `json:"guid,omitempty"`
 		CreatedAt *time.Time `json:"created_at,omitempty"`
 		UpdatedAt *time.Time `json:"updated_at,omitempty"`
-		Selector  string     `json:"selector"`
+		Source    string     `json:"source"`
 		Metadata  *Metadata  `json:"metadata,omitempty"`
 
 		Relationships struct {
@@ -68,12 +68,12 @@ func (a *AccessRule) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	a.GUID = alias.GUID
-	a.CreatedAt = alias.CreatedAt
-	a.UpdatedAt = alias.UpdatedAt
-	a.Selector = alias.Selector
-	a.RouteGUID = alias.Relationships.Route.Data.GUID
-	a.Metadata = alias.Metadata
+	r.GUID = alias.GUID
+	r.CreatedAt = alias.CreatedAt
+	r.UpdatedAt = alias.UpdatedAt
+	r.Source = alias.Source
+	r.RouteGUID = alias.Relationships.Route.Data.GUID
+	r.Metadata = alias.Metadata
 
 	return nil
 }

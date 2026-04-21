@@ -9,13 +9,13 @@ import (
 type CreateSharedDomainCommand struct {
 	BaseCommand
 
-	RequiredArgs       flag.Domain `positional-args:"yes"`
-	RouterGroup        string      `long:"router-group" description:"Routes for this domain will use routers in the specified router group"`
-	Internal           bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
-	EnforceAccessRules bool        `long:"enforce-access-rules" description:"Enable platform-enforced access control for routes on this domain (requires mTLS domain configuration in GoRouter)"`
-	Scope              string      `long:"scope" description:"Operator-level scope boundary for access rules: 'any', 'org', or 'space' (only valid with --enforce-access-rules)"`
-	usage              interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP_NAME | --internal] [--enforce-access-rules [--scope (any|org|space)]]"`
-	relatedCommands    interface{} `related_commands:"create-private-domain, domains, add-access-rule, access-rules"`
+	RequiredArgs         flag.Domain `positional-args:"yes"`
+	RouterGroup          string      `long:"router-group" description:"Routes for this domain will use routers in the specified router group"`
+	Internal             bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
+	EnforceRoutePolicies bool        `long:"enforce-route-policies" description:"Enable platform-enforced access control for routes on this domain (requires mTLS domain configuration in GoRouter)"`
+	Scope                string      `long:"scope" description:"Operator-level scope boundary for route policies: 'any', 'org', or 'space' (only valid with --enforce-route-policies)"`
+	usage                interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP_NAME | --internal] [--enforce-route-policies [--scope (any|org|space)]]"`
+	relatedCommands      interface{} `related_commands:"create-private-domain, domains, add-route-policy, route-policies"`
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
@@ -31,9 +31,9 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 
 	domain := cmd.RequiredArgs.Domain
 
-	// Validate that --scope is only used with --enforce-access-rules
-	if cmd.Scope != "" && !cmd.EnforceAccessRules {
-		return fmt.Errorf("--scope can only be used with --enforce-access-rules")
+	// Validate that --scope is only used with --enforce-route-policies
+	if cmd.Scope != "" && !cmd.EnforceRoutePolicies {
+		return fmt.Errorf("--scope can only be used with --enforce-route-policies")
 	}
 
 	// Validate scope values
@@ -47,16 +47,16 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 			"User":   user.Name,
 		})
 
-	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal, cmd.RouterGroup, cmd.EnforceAccessRules, cmd.Scope)
+	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal, cmd.RouterGroup, cmd.EnforceRoutePolicies, cmd.Scope)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayOK()
-	
-	if cmd.EnforceAccessRules {
-		cmd.UI.DisplayText("TIP: Domain '{{.Domain}}' is a shared identity-aware domain with access rule enforcement enabled. Routes on this domain require access rules to allow traffic.",
+
+	if cmd.EnforceRoutePolicies {
+		cmd.UI.DisplayText("TIP: Domain '{{.Domain}}' is a shared identity-aware domain with route policy enforcement enabled. Routes on this domain require route policies to allow traffic.",
 			map[string]interface{}{
 				"Domain": domain,
 			})
