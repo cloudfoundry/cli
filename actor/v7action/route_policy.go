@@ -6,10 +6,10 @@ import (
 	"code.cloudfoundry.org/cli/v9/resources"
 )
 
-func (actor Actor) AddAccessRule(domainName, selector, hostname, path string) (Warnings, error) {
+func (actor Actor) AddRoutePolicy(domainName, source, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	// Get the domain to ensure it exists and supports access rules
+	// Get the domain to ensure it exists and supports route policies
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -33,19 +33,19 @@ func (actor Actor) AddAccessRule(domainName, selector, hostname, path string) (W
 
 	route := routes[0]
 
-	// Create the access rule
-	accessRule := resources.AccessRule{
-		Selector:  selector,
+	// Create the route policy
+	routePolicy := resources.RoutePolicy{
+		Source:    source,
 		RouteGUID: route.GUID,
 	}
 
-	_, apiWarnings, err := actor.CloudControllerClient.CreateAccessRule(accessRule)
+	_, apiWarnings, err := actor.CloudControllerClient.CreateRoutePolicy(routePolicy)
 	allWarnings = append(allWarnings, Warnings(apiWarnings)...)
 
 	return allWarnings, err
 }
 
-func (actor Actor) GetAccessRulesByRoute(domainName, hostname, path string) ([]resources.AccessRule, Warnings, error) {
+func (actor Actor) GetRoutePoliciesByRoute(domainName, hostname, path string) ([]resources.RoutePolicy, Warnings, error) {
 	allWarnings := Warnings{}
 
 	// Get the domain
@@ -72,21 +72,21 @@ func (actor Actor) GetAccessRulesByRoute(domainName, hostname, path string) ([]r
 
 	route := routes[0]
 
-	// Get access rules for this route
-	accessRules, _, apiWarnings, err := actor.CloudControllerClient.GetAccessRules(
+	// Get route policies for this route
+	routePolicies, _, apiWarnings, err := actor.CloudControllerClient.GetRoutePolicies(
 		ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{route.GUID}},
 	)
 	allWarnings = append(allWarnings, Warnings(apiWarnings)...)
 
-	var rules []resources.AccessRule
-	for _, rule := range accessRules {
-		rules = append(rules, resources.AccessRule(rule))
+	var policies []resources.RoutePolicy
+	for _, policy := range routePolicies {
+		policies = append(policies, resources.RoutePolicy(policy))
 	}
 
-	return rules, allWarnings, err
+	return policies, allWarnings, err
 }
 
-func (actor Actor) DeleteAccessRuleBySelector(domainName, selector, hostname, path string) (Warnings, error) {
+func (actor Actor) DeleteRoutePolicyBySource(domainName, source, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	// Get the domain
@@ -113,8 +113,8 @@ func (actor Actor) DeleteAccessRuleBySelector(domainName, selector, hostname, pa
 
 	route := routes[0]
 
-	// Get access rules for this route to find the one with matching selector
-	accessRules, _, apiWarnings, err := actor.CloudControllerClient.GetAccessRules(
+	// Get route policies for this route to find the one with matching source
+	routePolicies, _, apiWarnings, err := actor.CloudControllerClient.GetRoutePolicies(
 		ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{route.GUID}},
 	)
 	allWarnings = append(allWarnings, Warnings(apiWarnings)...)
@@ -122,26 +122,25 @@ func (actor Actor) DeleteAccessRuleBySelector(domainName, selector, hostname, pa
 		return allWarnings, err
 	}
 
-	// Find the rule with matching selector
-	var ruleGUID string
-	for _, rule := range accessRules {
-		if rule.Selector == selector {
-			ruleGUID = rule.GUID
+	// Find the policy with matching source
+	var policyGUID string
+	for _, policy := range routePolicies {
+		if policy.Source == source {
+			policyGUID = policy.GUID
 			break
 		}
 	}
 
-	if ruleGUID == "" {
-		return allWarnings, actionerror.AccessRuleNotFoundError{Selector: selector}
+	if policyGUID == "" {
+		return allWarnings, actionerror.RoutePolicyNotFoundError{Source: source}
 	}
 
-	// Delete the access rule
-	_, deleteWarnings, err := actor.CloudControllerClient.DeleteAccessRule(ruleGUID)
+	// Delete the route policy
+	_, deleteWarnings, err := actor.CloudControllerClient.DeleteRoutePolicy(policyGUID)
 	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
 
 	return allWarnings, err
 }
-
 
 // GetRoutesByDomain gets routes for a domain with optional hostname and path filters
 func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resources.Route, Warnings, error) {
@@ -170,26 +169,26 @@ func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resou
 	return routes, Warnings(warnings), nil
 }
 
-// AccessRuleWithRoute combines an access rule with its associated route information
-type AccessRuleWithRoute struct {
-	resources.AccessRule
+// RoutePolicyWithRoute combines a route policy with its associated route information
+type RoutePolicyWithRoute struct {
+	resources.RoutePolicy
 	Route      resources.Route
 	DomainName string
 	ScopeType  string // "app", "space", "org", or "any"
 	SourceName string // Resolved source name (app/space/org) or empty string
 }
 
-// GetAccessRulesForSpace gets all access rules for routes in a space with optional filters
-func (actor Actor) GetAccessRulesForSpace(
+// GetRoutePoliciesForSpace gets all route policies for routes in a space with optional filters
+func (actor Actor) GetRoutePoliciesForSpace(
 	spaceGUID string,
 	domainName string,
 	hostname string,
 	path string,
 	labelSelector string,
-) ([]AccessRuleWithRoute, Warnings, error) {
+) ([]RoutePolicyWithRoute, Warnings, error) {
 	allWarnings := Warnings{}
 
-	// Build query for access rules filtered by space, with included routes
+	// Build query for route policies filtered by space, with included routes
 	queries := []ccv3.Query{
 		{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 		{Key: ccv3.Include, Values: []string{"route"}},
@@ -200,16 +199,16 @@ func (actor Actor) GetAccessRulesForSpace(
 		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
 	}
 
-	// Fetch access rules directly by space GUID with included routes (single API call)
-	accessRules, includedResources, apiWarnings, err := actor.CloudControllerClient.GetAccessRules(queries...)
+	// Fetch route policies directly by space GUID with included routes (single API call)
+	routePolicies, includedResources, apiWarnings, err := actor.CloudControllerClient.GetRoutePolicies(queries...)
 	allWarnings = append(allWarnings, Warnings(apiWarnings)...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
-	if len(accessRules) == 0 {
-		// No access rules found - return empty list, not an error
-		return []AccessRuleWithRoute{}, allWarnings, nil
+	if len(routePolicies) == 0 {
+		// No route policies found - return empty list, not an error
+		return []RoutePolicyWithRoute{}, allWarnings, nil
 	}
 
 	// Build route lookup map from included resources
@@ -273,60 +272,60 @@ func (actor Actor) GetAccessRulesForSpace(
 	}
 
 	// Build results with route information and resolved sources
-	// Only include access rules whose routes match the filters
-	var results []AccessRuleWithRoute
-	for _, rule := range accessRules {
-		route, exists := routeByGUID[rule.RouteGUID]
+	// Only include route policies whose routes match the filters
+	var results []RoutePolicyWithRoute
+	for _, policy := range routePolicies {
+		route, exists := routeByGUID[policy.RouteGUID]
 		if !exists {
-			// Skip rules for routes that don't match the optional filters
+			// Skip policies for routes that don't match the optional filters
 			continue
 		}
 
-		scopeType, sourceName, warnings, err := actor.resolveAccessRuleSource(rule.Selector)
+		scopeType, sourceName, warnings, err := actor.resolveRoutePolicySource(policy.Source)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			// If we can't resolve the source, sourceName is already empty string
 			// scopeType is still set correctly
 		}
 
-		results = append(results, AccessRuleWithRoute{
-			AccessRule: resources.AccessRule(rule),
-			Route:      route,
-			DomainName: domainCache[route.DomainGUID],
-			ScopeType:  scopeType,
-			SourceName: sourceName,
+		results = append(results, RoutePolicyWithRoute{
+			RoutePolicy: resources.RoutePolicy(policy),
+			Route:       route,
+			DomainName:  domainCache[route.DomainGUID],
+			ScopeType:   scopeType,
+			SourceName:  sourceName,
 		})
 	}
 
 	return results, allWarnings, nil
 }
 
-// resolveAccessRuleSource resolves a selector to scope type and human-readable source name
-func (actor Actor) resolveAccessRuleSource(selector string) (scopeType string, sourceName string, warnings Warnings, err error) {
+// resolveRoutePolicySource resolves a source to scope type and human-readable source name
+func (actor Actor) resolveRoutePolicySource(source string) (scopeType string, sourceName string, warnings Warnings, err error) {
 	allWarnings := Warnings{}
 
-	// Parse selector format: cf:app:<guid>, cf:space:<guid>, cf:org:<guid>, or cf:any
-	if selector == "cf:any" {
+	// Parse source format: cf:app:<guid>, cf:space:<guid>, cf:org:<guid>, or cf:any
+	if source == "cf:any" {
 		return "any", "", nil, nil
 	}
 
-	// Split selector into parts
+	// Split source into parts
 	// Expected format: cf:type:guid
 	const prefix = "cf:"
-	if len(selector) < len(prefix) {
+	if len(source) < len(prefix) {
 		return "unknown", "", nil, nil
 	}
 
-	selectorBody := selector[len(prefix):]
-	parts := splitSelector(selectorBody)
+	sourceBody := source[len(prefix):]
+	parts := splitSource(sourceBody)
 	if len(parts) < 2 {
 		return "unknown", "", nil, nil
 	}
 
-	selectorType := parts[0]
+	sourceType := parts[0]
 	guid := parts[1]
 
-	switch selectorType {
+	switch sourceType {
 	case "app":
 		apps, apiWarnings, err := actor.CloudControllerClient.GetApplications(
 			ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{guid}},
@@ -362,9 +361,9 @@ func (actor Actor) resolveAccessRuleSource(selector string) (scopeType string, s
 	}
 }
 
-// splitSelector splits a selector body by colon, handling the case where
-// the selector might be "type:guid" format
-func splitSelector(s string) []string {
+// splitSource splits a source body by colon, handling the case where
+// the source might be "type:guid" format
+func splitSource(s string) []string {
 	var parts []string
 	current := ""
 	for _, char := range s {

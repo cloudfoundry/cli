@@ -4,19 +4,19 @@ import (
 	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
-type AccessRulesCommand struct {
+type RoutePoliciesCommand struct {
 	BaseCommand
 
 	Domain   string `long:"domain" description:"Filter by domain name"`
 	Hostname string `long:"hostname" description:"Filter by hostname"`
 	Path     string `long:"path" description:"Filter by path"`
-	Labels   string `long:"labels" description:"Selector to filter access rules by labels"`
+	Labels   string `long:"labels" description:"Selector to filter route policies by labels"`
 
-	usage           interface{} `usage:"CF_NAME access-rules [--domain DOMAIN] [--hostname HOSTNAME] [--path PATH] [--labels SELECTOR]\n\nEXAMPLES:\n   cf access-rules\n   cf access-rules --domain apps.identity\n   cf access-rules --domain apps.identity --hostname backend\n   cf access-rules --labels env=prod"`
-	relatedCommands interface{} `related_commands:"add-access-rule, remove-access-rule, routes"`
+	usage           interface{} `usage:"CF_NAME route-policies [--domain DOMAIN] [--hostname HOSTNAME] [--path PATH] [--labels SELECTOR]\n\nEXAMPLES:\n   cf route-policies\n   cf route-policies --domain apps.identity\n   cf route-policies --domain apps.identity --hostname backend\n   cf route-policies --labels env=prod"`
+	relatedCommands interface{} `related_commands:"add-route-policy, remove-route-policy, routes"`
 }
 
-func (cmd AccessRulesCommand) Execute(args []string) error {
+func (cmd RoutePoliciesCommand) Execute(args []string) error {
 	// Check target (org + space required)
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
@@ -31,7 +31,7 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 
 	// Display contextual header
 	cmd.UI.DisplayTextWithFlavor(
-		"Getting access rules in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		"Getting route policies in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
 			"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -39,8 +39,8 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 		})
 	cmd.UI.DisplayNewline()
 
-	// Fetch access rules for space with filters
-	rulesWithRoutes, warnings, err := cmd.Actor.GetAccessRulesForSpace(
+	// Fetch route policies for space with filters
+	policiesWithRoutes, warnings, err := cmd.Actor.GetRoutePoliciesForSpace(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Domain,
 		cmd.Hostname,
@@ -53,8 +53,8 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 	}
 
 	// Handle empty results
-	if len(rulesWithRoutes) == 0 {
-		cmd.UI.DisplayText("No access rules found.")
+	if len(policiesWithRoutes) == 0 {
+		cmd.UI.DisplayText("No route policies found.")
 		return nil
 	}
 
@@ -64,20 +64,20 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("host"),
 			cmd.UI.TranslateText("domain"),
 			cmd.UI.TranslateText("path"),
-			cmd.UI.TranslateText("selector"),
-			cmd.UI.TranslateText("scope"),
 			cmd.UI.TranslateText("source"),
+			cmd.UI.TranslateText("scope"),
+			cmd.UI.TranslateText("name"),
 		},
 	}
 
-	for _, ruleWithRoute := range rulesWithRoutes {
+	for _, policyWithRoute := range policiesWithRoutes {
 		table = append(table, []string{
-			ruleWithRoute.Route.Host,
-			ruleWithRoute.DomainName,
-			ruleWithRoute.Route.Path,
-			ruleWithRoute.Selector,
-			ruleWithRoute.ScopeType,
-			ruleWithRoute.SourceName,
+			policyWithRoute.Route.Host,
+			policyWithRoute.DomainName,
+			policyWithRoute.Route.Path,
+			policyWithRoute.Source,
+			policyWithRoute.ScopeType,
+			policyWithRoute.SourceName,
 		})
 	}
 
@@ -86,4 +86,3 @@ func (cmd AccessRulesCommand) Execute(args []string) error {
 
 	return nil
 }
-

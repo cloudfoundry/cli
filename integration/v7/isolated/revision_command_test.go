@@ -1,13 +1,13 @@
 package isolated
 
 import (
-    "bytes"
-    "encoding/json"
-    "fmt"
-    "os/exec"
-    "strings"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"os/exec"
+	"strings"
 
-    . "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/v9/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

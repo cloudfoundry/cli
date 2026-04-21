@@ -2,8 +2,8 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
-    "code.cloudfoundry.org/cli/v9/cf/errors"
-    "code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/cf/errors"
+	"code.cloudfoundry.org/cli/v9/types"
 
 	. "code.cloudfoundry.org/cli/v9/actor/v7pushaction"
 

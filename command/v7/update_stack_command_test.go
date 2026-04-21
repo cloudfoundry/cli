@@ -158,67 +158,66 @@ var _ = Describe("update-stack Command", func() {
 			})
 		})
 
-	Context("when state values are provided in different cases", func() {
-		It("accepts 'active' and capitalizes it", func() {
-			cmd.State = "active"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateActive}, v7action.Warnings{}, nil)
+		Context("when state values are provided in different cases", func() {
+			It("accepts 'active' and capitalizes it", func() {
+				cmd.State = "active"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateActive}, v7action.Warnings{}, nil)
 
-			executeErr = cmd.Execute(args)
+				executeErr = cmd.Execute(args)
 
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state, _ := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateActive))
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state, _ := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateActive))
+			})
+
+			It("accepts 'RESTRICTED' and keeps it capitalized", func() {
+				cmd.State = "RESTRICTED"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateRestricted}, v7action.Warnings{}, nil)
+
+				executeErr = cmd.Execute(args)
+
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state, _ := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateRestricted))
+			})
+
+			It("accepts 'Disabled' and capitalizes it", func() {
+				cmd.State = "Disabled"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateDisabled}, v7action.Warnings{}, nil)
+
+				executeErr = cmd.Execute(args)
+
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, state, _ := fakeActor.UpdateStackArgsForCall(0)
+				Expect(state).To(Equal(resources.StackStateDisabled))
+			})
 		})
 
-		It("accepts 'RESTRICTED' and keeps it capitalized", func() {
-			cmd.State = "RESTRICTED"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateRestricted}, v7action.Warnings{}, nil)
+		Context("when the reason flag is provided", func() {
+			BeforeEach(func() {
+				cmd.State = "deprecated"
+				cmd.Reason = "Use cflinuxfs4 instead"
+				fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
+				fakeActor.UpdateStackReturns(resources.Stack{
+					Name:        "some-stack",
+					Description: "some description",
+					State:       resources.StackStateDeprecated,
+					StateReason: "Use cflinuxfs4 instead",
+				}, v7action.Warnings{}, nil)
+			})
 
-			executeErr = cmd.Execute(args)
+			It("passes the reason to the actor and displays it", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state, _ := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateRestricted))
+				Expect(fakeActor.UpdateStackCallCount()).To(Equal(1))
+				_, _, reason := fakeActor.UpdateStackArgsForCall(0)
+				Expect(reason).To(Equal("Use cflinuxfs4 instead"))
+
+				Expect(testUI.Out).To(Say(`reason:\s+Use cflinuxfs4 instead`))
+			})
 		})
-
-		It("accepts 'Disabled' and capitalizes it", func() {
-			cmd.State = "Disabled"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{Name: "some-stack", State: resources.StackStateDisabled}, v7action.Warnings{}, nil)
-
-			executeErr = cmd.Execute(args)
-
-			Expect(executeErr).ToNot(HaveOccurred())
-			_, state, _ := fakeActor.UpdateStackArgsForCall(0)
-			Expect(state).To(Equal(resources.StackStateDisabled))
-		})
-	})
-
-	Context("when the reason flag is provided", func() {
-		BeforeEach(func() {
-			cmd.State = "deprecated"
-			cmd.Reason = "Use cflinuxfs4 instead"
-			fakeActor.GetStackByNameReturns(resources.Stack{GUID: "guid"}, v7action.Warnings{}, nil)
-			fakeActor.UpdateStackReturns(resources.Stack{
-				Name:        "some-stack",
-				Description: "some description",
-				State:       resources.StackStateDeprecated,
-				StateReason: "Use cflinuxfs4 instead",
-			}, v7action.Warnings{}, nil)
-		})
-
-		It("passes the reason to the actor and displays it", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
-
-			Expect(fakeActor.UpdateStackCallCount()).To(Equal(1))
-			_, _, reason := fakeActor.UpdateStackArgsForCall(0)
-			Expect(reason).To(Equal("Use cflinuxfs4 instead"))
-
-			Expect(testUI.Out).To(Say(`reason:\s+Use cflinuxfs4 instead`))
-		})
-	})
 	})
 })
-

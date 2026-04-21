@@ -10,11 +10,11 @@ import (
 type CreatePrivateDomainCommand struct {
 	BaseCommand
 
-	RequiredArgs       flag.OrgDomain `positional-args:"yes"`
-	EnforceAccessRules bool           `long:"enforce-access-rules" description:"Enable platform-enforced access control for routes on this domain (requires mTLS domain configuration in GoRouter)"`
-	Scope              string         `long:"scope" description:"Operator-level scope boundary for access rules: 'any', 'org', or 'space' (only valid with --enforce-access-rules)"`
-	usage              interface{}    `usage:"CF_NAME create-private-domain ORG DOMAIN [--enforce-access-rules [--scope (any|org|space)]]"`
-	relatedCommands    interface{}    `related_commands:"create-shared-domain, domains, share-private-domain, add-access-rule, access-rules"`
+	RequiredArgs         flag.OrgDomain `positional-args:"yes"`
+	EnforceRoutePolicies bool           `long:"enforce-route-policies" description:"Enable platform-enforced access control for routes on this domain (requires mTLS domain configuration in GoRouter)"`
+	Scope                string         `long:"scope" description:"Operator-level scope boundary for route policies: 'any', 'org', or 'space' (only valid with --enforce-route-policies)"`
+	usage                interface{}    `usage:"CF_NAME create-private-domain ORG DOMAIN [--enforce-route-policies [--scope (any|org|space)]]"`
+	relatedCommands      interface{}    `related_commands:"create-shared-domain, domains, share-private-domain, add-route-policy, route-policies"`
 }
 
 func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
@@ -31,9 +31,9 @@ func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
 	domain := cmd.RequiredArgs.Domain
 	orgName := cmd.RequiredArgs.Organization
 
-	// Validate that --scope is only used with --enforce-access-rules
-	if cmd.Scope != "" && !cmd.EnforceAccessRules {
-		return fmt.Errorf("--scope can only be used with --enforce-access-rules")
+	// Validate that --scope is only used with --enforce-route-policies
+	if cmd.Scope != "" && !cmd.EnforceRoutePolicies {
+		return fmt.Errorf("--scope can only be used with --enforce-route-policies")
 	}
 
 	// Validate scope values
@@ -48,7 +48,7 @@ func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	warnings, err := cmd.Actor.CreatePrivateDomain(domain, orgName, cmd.EnforceAccessRules, cmd.Scope)
+	warnings, err := cmd.Actor.CreatePrivateDomain(domain, orgName, cmd.EnforceRoutePolicies, cmd.Scope)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -65,8 +65,8 @@ func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 
-	if cmd.EnforceAccessRules {
-		cmd.UI.DisplayText("TIP: Domain '{{.Domain}}' is a private identity-aware domain with access rule enforcement enabled. Routes on this domain require access rules to allow traffic.",
+	if cmd.EnforceRoutePolicies {
+		cmd.UI.DisplayText("TIP: Domain '{{.Domain}}' is a private identity-aware domain with route policy enforcement enabled. Routes on this domain require route policies to allow traffic.",
 			map[string]interface{}{
 				"Domain": domain,
 			})

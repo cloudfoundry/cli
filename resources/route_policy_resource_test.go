@@ -9,29 +9,27 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAccessRuleResource(t *testing.T) {
+func TestRoutePolicyResource(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "AccessRule Resource Suite")
+	RunSpecs(t, "RoutePolicy Resource Suite")
 }
 
-var _ = Describe("AccessRule", func() {
+var _ = Describe("RoutePolicy", func() {
 	Describe("MarshalJSON", func() {
-		It("marshals the access rule with relationships", func() {
-			rule := resources.AccessRule{
-				Name:      "allow-backend",
-				Selector:  "cf:app:some-app-guid",
+		It("marshals the route policy with relationships", func() {
+			policy := resources.RoutePolicy{
+				Source:    "cf:app:some-app-guid",
 				RouteGUID: "some-route-guid",
 			}
 
-			data, err := json.Marshal(rule)
+			data, err := json.Marshal(policy)
 			Expect(err).NotTo(HaveOccurred())
 
 			var result map[string]interface{}
 			err = json.Unmarshal(data, &result)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(result["name"]).To(Equal("allow-backend"))
-			Expect(result["selector"]).To(Equal("cf:app:some-app-guid"))
+			Expect(result["source"]).To(Equal("cf:app:some-app-guid"))
 			Expect(result["relationships"]).NotTo(BeNil())
 
 			relationships := result["relationships"].(map[string]interface{})
@@ -42,11 +40,10 @@ var _ = Describe("AccessRule", func() {
 	})
 
 	Describe("UnmarshalJSON", func() {
-		It("unmarshals the access rule from relationships", func() {
+		It("unmarshals the route policy from relationships", func() {
 			jsonData := `{
 				"guid": "some-guid",
-				"name": "test-rule",
-				"selector": "cf:app:app-guid",
+				"source": "cf:app:app-guid",
 				"relationships": {
 					"route": {
 						"data": {
@@ -56,14 +53,13 @@ var _ = Describe("AccessRule", func() {
 				}
 			}`
 
-			var rule resources.AccessRule
-			err := json.Unmarshal([]byte(jsonData), &rule)
+			var policy resources.RoutePolicy
+			err := json.Unmarshal([]byte(jsonData), &policy)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(rule.GUID).To(Equal("some-guid"))
-			Expect(rule.Name).To(Equal("test-rule"))
-			Expect(rule.Selector).To(Equal("cf:app:app-guid"))
-			Expect(rule.RouteGUID).To(Equal("route-guid-123"))
+			Expect(policy.GUID).To(Equal("some-guid"))
+			Expect(policy.Source).To(Equal("cf:app:app-guid"))
+			Expect(policy.RouteGUID).To(Equal("route-guid-123"))
 		})
 	})
 })

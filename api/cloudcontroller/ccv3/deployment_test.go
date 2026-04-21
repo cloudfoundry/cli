@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
-    "code.cloudfoundry.org/cli/v9/types"
+	"code.cloudfoundry.org/cli/v9/types"
 
 	. "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo/v2"
