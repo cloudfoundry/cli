@@ -1,18 +1,18 @@
 package v7
 
 import (
-    "strconv"
-    "strings"
+	"strconv"
+	"strings"
 
-    "code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
-    "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v9/api/logcache"
 	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	"code.cloudfoundry.org/cli/v9/command/v7/shared"
-    "code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
 )
 

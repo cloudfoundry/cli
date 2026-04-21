@@ -72,7 +72,7 @@ var HelpCategoryList = []HelpCategory{
 			{"update-destination"},
 			{"share-route", "unshare-route"},
 			{"move-route"},
-			{"access-rules", "add-access-rule", "remove-access-rule"},
+			{"route-policies", "add-route-policy", "remove-route-policy"},
 		},
 	},
 	{

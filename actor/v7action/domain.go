@@ -43,10 +43,10 @@ func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGr
 		RouterGroup: routerGroupGUID,
 	}
 
-	// Set enforce_access_rules if specified
+	// Set enforce_route_policies if specified
 	if enforceAccessRules {
-		domain.EnforceAccessRules = types.NullBool{IsSet: true, Value: true}
-		domain.AccessRulesScope = accessRulesScope
+		domain.EnforceRoutePolicies = types.NullBool{IsSet: true, Value: true}
+		domain.RoutePoliciesScope = accessRulesScope
 	}
 
 	_, warnings, err := actor.CloudControllerClient.CreateDomain(domain)
@@ -63,16 +63,16 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string, enforc
 	if err != nil {
 		return allWarnings, err
 	}
-	
+
 	domain := resources.Domain{
 		Name:             domainName,
 		OrganizationGUID: organization.GUID,
 	}
 
-	// Set enforce_access_rules if specified
+	// Set enforce_route_policies if specified
 	if enforceAccessRules {
-		domain.EnforceAccessRules = types.NullBool{IsSet: true, Value: true}
-		domain.AccessRulesScope = accessRulesScope
+		domain.EnforceRoutePolicies = types.NullBool{IsSet: true, Value: true}
+		domain.RoutePoliciesScope = accessRulesScope
 	}
 
 	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(domain)
