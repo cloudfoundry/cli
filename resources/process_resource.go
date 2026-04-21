@@ -134,9 +134,9 @@ type marshalProcess struct {
 	DiskInMB          json.Number `json:"disk_in_mb,omitempty"`
 	LogRateLimitInBPS json.Number `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 
-	HealthCheck              *healthCheck               `json:"health_check,omitempty"`
-	ReadinessHealthCheck     *readinessHealthCheck      `json:"readiness_health_check,omitempty"`
-	EmbeddedProcessInstances []EmbeddedProcessInstance  `json:"process_instances,omitempty"`
+	HealthCheck              *healthCheck              `json:"health_check,omitempty"`
+	ReadinessHealthCheck     *readinessHealthCheck     `json:"readiness_health_check,omitempty"`
+	EmbeddedProcessInstances []EmbeddedProcessInstance `json:"process_instances,omitempty"`
 }
 
 func marshalCommand(p Process, ccProcess *marshalProcess) {

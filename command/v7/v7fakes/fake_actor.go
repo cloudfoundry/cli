@@ -22,6 +22,22 @@ import (
 )
 
 type FakeActor struct {
+	AddRoutePolicyStub        func(string, string, string, string) (v7action.Warnings, error)
+	addRoutePolicyMutex       sync.RWMutex
+	addRoutePolicyArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}
+	addRoutePolicyReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	addRoutePolicyReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	ApplyOrganizationQuotaByNameStub        func(string, string) (v7action.Warnings, error)
 	applyOrganizationQuotaByNameMutex       sync.RWMutex
 	applyOrganizationQuotaByNameArgsForCall []struct {
@@ -357,11 +373,13 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreatePrivateDomainStub        func(string, string) (v7action.Warnings, error)
+	CreatePrivateDomainStub        func(string, string, bool, string) (v7action.Warnings, error)
 	createPrivateDomainMutex       sync.RWMutex
 	createPrivateDomainArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
+		arg4 string
 	}
 	createPrivateDomainReturns struct {
 		result1 v7action.Warnings
@@ -463,12 +481,14 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateSharedDomainStub        func(string, bool, string) (v7action.Warnings, error)
+	CreateSharedDomainStub        func(string, bool, string, bool, string) (v7action.Warnings, error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
 		arg1 string
 		arg2 bool
 		arg3 string
+		arg4 bool
+		arg5 string
 	}
 	createSharedDomainReturns struct {
 		result1 v7action.Warnings
@@ -729,6 +749,22 @@ type FakeActor struct {
 		result1 chan v7action.PollJobEvent
 		result2 v7action.Warnings
 		result3 error
+	}
+	DeleteRoutePolicyBySourceStub        func(string, string, string, string) (v7action.Warnings, error)
+	deleteRoutePolicyBySourceMutex       sync.RWMutex
+	deleteRoutePolicyBySourceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}
+	deleteRoutePolicyBySourceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	deleteRoutePolicyBySourceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
 	}
 	DeleteSecurityGroupStub        func(string) (v7action.Warnings, error)
 	deleteSecurityGroupMutex       sync.RWMutex
@@ -1860,6 +1896,42 @@ type FakeActor struct {
 	}
 	getRouteLabelsReturnsOnCall map[int]struct {
 		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetRoutePoliciesByRouteStub        func(string, string, string) ([]resources.RoutePolicy, v7action.Warnings, error)
+	getRoutePoliciesByRouteMutex       sync.RWMutex
+	getRoutePoliciesByRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getRoutePoliciesByRouteReturns struct {
+		result1 []resources.RoutePolicy
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRoutePoliciesByRouteReturnsOnCall map[int]struct {
+		result1 []resources.RoutePolicy
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetRoutePoliciesForSpaceStub        func(string, string, string, string, string) ([]v7action.RoutePolicyWithRoute, v7action.Warnings, error)
+	getRoutePoliciesForSpaceMutex       sync.RWMutex
+	getRoutePoliciesForSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}
+	getRoutePoliciesForSpaceReturns struct {
+		result1 []v7action.RoutePolicyWithRoute
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRoutePoliciesForSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.RoutePolicyWithRoute
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -3780,6 +3852,73 @@ type FakeActor struct {
 	invocationsMutex sync.RWMutex
 }
 
+func (fake *FakeActor) AddRoutePolicy(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
+	fake.addRoutePolicyMutex.Lock()
+	ret, specificReturn := fake.addRoutePolicyReturnsOnCall[len(fake.addRoutePolicyArgsForCall)]
+	fake.addRoutePolicyArgsForCall = append(fake.addRoutePolicyArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.AddRoutePolicyStub
+	fakeReturns := fake.addRoutePolicyReturns
+	fake.recordInvocation("AddRoutePolicy", []interface{}{arg1, arg2, arg3, arg4})
+	fake.addRoutePolicyMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) AddRoutePolicyCallCount() int {
+	fake.addRoutePolicyMutex.RLock()
+	defer fake.addRoutePolicyMutex.RUnlock()
+	return len(fake.addRoutePolicyArgsForCall)
+}
+
+func (fake *FakeActor) AddRoutePolicyCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
+	fake.addRoutePolicyMutex.Lock()
+	defer fake.addRoutePolicyMutex.Unlock()
+	fake.AddRoutePolicyStub = stub
+}
+
+func (fake *FakeActor) AddRoutePolicyArgsForCall(i int) (string, string, string, string) {
+	fake.addRoutePolicyMutex.RLock()
+	defer fake.addRoutePolicyMutex.RUnlock()
+	argsForCall := fake.addRoutePolicyArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeActor) AddRoutePolicyReturns(result1 v7action.Warnings, result2 error) {
+	fake.addRoutePolicyMutex.Lock()
+	defer fake.addRoutePolicyMutex.Unlock()
+	fake.AddRoutePolicyStub = nil
+	fake.addRoutePolicyReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) AddRoutePolicyReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.addRoutePolicyMutex.Lock()
+	defer fake.addRoutePolicyMutex.Unlock()
+	fake.AddRoutePolicyStub = nil
+	if fake.addRoutePolicyReturnsOnCall == nil {
+		fake.addRoutePolicyReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.addRoutePolicyReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) ApplyOrganizationQuotaByName(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.applyOrganizationQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.applyOrganizationQuotaByNameReturnsOnCall[len(fake.applyOrganizationQuotaByNameArgsForCall)]
@@ -5273,19 +5412,21 @@ func (fake *FakeActor) CreateOrganizationQuotaReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreatePrivateDomain(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeActor) CreatePrivateDomain(arg1 string, arg2 string, arg3 bool, arg4 string) (v7action.Warnings, error) {
 	fake.createPrivateDomainMutex.Lock()
 	ret, specificReturn := fake.createPrivateDomainReturnsOnCall[len(fake.createPrivateDomainArgsForCall)]
 	fake.createPrivateDomainArgsForCall = append(fake.createPrivateDomainArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
+		arg3 bool
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.CreatePrivateDomainStub
 	fakeReturns := fake.createPrivateDomainReturns
-	fake.recordInvocation("CreatePrivateDomain", []interface{}{arg1, arg2})
+	fake.recordInvocation("CreatePrivateDomain", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createPrivateDomainMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -5299,17 +5440,17 @@ func (fake *FakeActor) CreatePrivateDomainCallCount() int {
 	return len(fake.createPrivateDomainArgsForCall)
 }
 
-func (fake *FakeActor) CreatePrivateDomainCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreatePrivateDomainCalls(stub func(string, string, bool, string) (v7action.Warnings, error)) {
 	fake.createPrivateDomainMutex.Lock()
 	defer fake.createPrivateDomainMutex.Unlock()
 	fake.CreatePrivateDomainStub = stub
 }
 
-func (fake *FakeActor) CreatePrivateDomainArgsForCall(i int) (string, string) {
+func (fake *FakeActor) CreatePrivateDomainArgsForCall(i int) (string, string, bool, string) {
 	fake.createPrivateDomainMutex.RLock()
 	defer fake.createPrivateDomainMutex.RUnlock()
 	argsForCall := fake.createPrivateDomainArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) CreatePrivateDomainReturns(result1 v7action.Warnings, result2 error) {
@@ -5740,20 +5881,22 @@ func (fake *FakeActor) CreateServiceKeyReturnsOnCall(i int, result1 chan v7actio
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string, arg4 bool, arg5 string) (v7action.Warnings, error) {
 	fake.createSharedDomainMutex.Lock()
 	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
 	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
 		arg1 string
 		arg2 bool
 		arg3 string
-	}{arg1, arg2, arg3})
+		arg4 bool
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
 	stub := fake.CreateSharedDomainStub
 	fakeReturns := fake.createSharedDomainReturns
-	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createSharedDomainMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -5767,17 +5910,17 @@ func (fake *FakeActor) CreateSharedDomainCallCount() int {
 	return len(fake.createSharedDomainArgsForCall)
 }
 
-func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool, string, bool, string) (v7action.Warnings, error)) {
 	fake.createSharedDomainMutex.Lock()
 	defer fake.createSharedDomainMutex.Unlock()
 	fake.CreateSharedDomainStub = stub
 }
 
-func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool, string) {
+func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool, string, bool, string) {
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
 	argsForCall := fake.createSharedDomainArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeActor) CreateSharedDomainReturns(result1 v7action.Warnings, result2 error) {
@@ -6926,6 +7069,73 @@ func (fake *FakeActor) DeleteRouteBindingReturnsOnCall(i int, result1 chan v7act
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySource(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
+	fake.deleteRoutePolicyBySourceMutex.Lock()
+	ret, specificReturn := fake.deleteRoutePolicyBySourceReturnsOnCall[len(fake.deleteRoutePolicyBySourceArgsForCall)]
+	fake.deleteRoutePolicyBySourceArgsForCall = append(fake.deleteRoutePolicyBySourceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.DeleteRoutePolicyBySourceStub
+	fakeReturns := fake.deleteRoutePolicyBySourceReturns
+	fake.recordInvocation("DeleteRoutePolicyBySource", []interface{}{arg1, arg2, arg3, arg4})
+	fake.deleteRoutePolicyBySourceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySourceCallCount() int {
+	fake.deleteRoutePolicyBySourceMutex.RLock()
+	defer fake.deleteRoutePolicyBySourceMutex.RUnlock()
+	return len(fake.deleteRoutePolicyBySourceArgsForCall)
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySourceCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
+	fake.deleteRoutePolicyBySourceMutex.Lock()
+	defer fake.deleteRoutePolicyBySourceMutex.Unlock()
+	fake.DeleteRoutePolicyBySourceStub = stub
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySourceArgsForCall(i int) (string, string, string, string) {
+	fake.deleteRoutePolicyBySourceMutex.RLock()
+	defer fake.deleteRoutePolicyBySourceMutex.RUnlock()
+	argsForCall := fake.deleteRoutePolicyBySourceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySourceReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteRoutePolicyBySourceMutex.Lock()
+	defer fake.deleteRoutePolicyBySourceMutex.Unlock()
+	fake.DeleteRoutePolicyBySourceStub = nil
+	fake.deleteRoutePolicyBySourceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteRoutePolicyBySourceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteRoutePolicyBySourceMutex.Lock()
+	defer fake.deleteRoutePolicyBySourceMutex.Unlock()
+	fake.DeleteRoutePolicyBySourceStub = nil
+	if fake.deleteRoutePolicyBySourceReturnsOnCall == nil {
+		fake.deleteRoutePolicyBySourceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.deleteRoutePolicyBySourceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) DeleteSecurityGroup(arg1 string) (v7action.Warnings, error) {
@@ -11846,6 +12056,146 @@ func (fake *FakeActor) GetRouteLabelsReturnsOnCall(i int, result1 map[string]typ
 	}
 	fake.getRouteLabelsReturnsOnCall[i] = struct {
 		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRoute(arg1 string, arg2 string, arg3 string) ([]resources.RoutePolicy, v7action.Warnings, error) {
+	fake.getRoutePoliciesByRouteMutex.Lock()
+	ret, specificReturn := fake.getRoutePoliciesByRouteReturnsOnCall[len(fake.getRoutePoliciesByRouteArgsForCall)]
+	fake.getRoutePoliciesByRouteArgsForCall = append(fake.getRoutePoliciesByRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.GetRoutePoliciesByRouteStub
+	fakeReturns := fake.getRoutePoliciesByRouteReturns
+	fake.recordInvocation("GetRoutePoliciesByRoute", []interface{}{arg1, arg2, arg3})
+	fake.getRoutePoliciesByRouteMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRouteCallCount() int {
+	fake.getRoutePoliciesByRouteMutex.RLock()
+	defer fake.getRoutePoliciesByRouteMutex.RUnlock()
+	return len(fake.getRoutePoliciesByRouteArgsForCall)
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRouteCalls(stub func(string, string, string) ([]resources.RoutePolicy, v7action.Warnings, error)) {
+	fake.getRoutePoliciesByRouteMutex.Lock()
+	defer fake.getRoutePoliciesByRouteMutex.Unlock()
+	fake.GetRoutePoliciesByRouteStub = stub
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRouteArgsForCall(i int) (string, string, string) {
+	fake.getRoutePoliciesByRouteMutex.RLock()
+	defer fake.getRoutePoliciesByRouteMutex.RUnlock()
+	argsForCall := fake.getRoutePoliciesByRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRouteReturns(result1 []resources.RoutePolicy, result2 v7action.Warnings, result3 error) {
+	fake.getRoutePoliciesByRouteMutex.Lock()
+	defer fake.getRoutePoliciesByRouteMutex.Unlock()
+	fake.GetRoutePoliciesByRouteStub = nil
+	fake.getRoutePoliciesByRouteReturns = struct {
+		result1 []resources.RoutePolicy
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRoutePoliciesByRouteReturnsOnCall(i int, result1 []resources.RoutePolicy, result2 v7action.Warnings, result3 error) {
+	fake.getRoutePoliciesByRouteMutex.Lock()
+	defer fake.getRoutePoliciesByRouteMutex.Unlock()
+	fake.GetRoutePoliciesByRouteStub = nil
+	if fake.getRoutePoliciesByRouteReturnsOnCall == nil {
+		fake.getRoutePoliciesByRouteReturnsOnCall = make(map[int]struct {
+			result1 []resources.RoutePolicy
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRoutePoliciesByRouteReturnsOnCall[i] = struct {
+		result1 []resources.RoutePolicy
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpace(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) ([]v7action.RoutePolicyWithRoute, v7action.Warnings, error) {
+	fake.getRoutePoliciesForSpaceMutex.Lock()
+	ret, specificReturn := fake.getRoutePoliciesForSpaceReturnsOnCall[len(fake.getRoutePoliciesForSpaceArgsForCall)]
+	fake.getRoutePoliciesForSpaceArgsForCall = append(fake.getRoutePoliciesForSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.GetRoutePoliciesForSpaceStub
+	fakeReturns := fake.getRoutePoliciesForSpaceReturns
+	fake.recordInvocation("GetRoutePoliciesForSpace", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.getRoutePoliciesForSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpaceCallCount() int {
+	fake.getRoutePoliciesForSpaceMutex.RLock()
+	defer fake.getRoutePoliciesForSpaceMutex.RUnlock()
+	return len(fake.getRoutePoliciesForSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpaceCalls(stub func(string, string, string, string, string) ([]v7action.RoutePolicyWithRoute, v7action.Warnings, error)) {
+	fake.getRoutePoliciesForSpaceMutex.Lock()
+	defer fake.getRoutePoliciesForSpaceMutex.Unlock()
+	fake.GetRoutePoliciesForSpaceStub = stub
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpaceArgsForCall(i int) (string, string, string, string, string) {
+	fake.getRoutePoliciesForSpaceMutex.RLock()
+	defer fake.getRoutePoliciesForSpaceMutex.RUnlock()
+	argsForCall := fake.getRoutePoliciesForSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpaceReturns(result1 []v7action.RoutePolicyWithRoute, result2 v7action.Warnings, result3 error) {
+	fake.getRoutePoliciesForSpaceMutex.Lock()
+	defer fake.getRoutePoliciesForSpaceMutex.Unlock()
+	fake.GetRoutePoliciesForSpaceStub = nil
+	fake.getRoutePoliciesForSpaceReturns = struct {
+		result1 []v7action.RoutePolicyWithRoute
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRoutePoliciesForSpaceReturnsOnCall(i int, result1 []v7action.RoutePolicyWithRoute, result2 v7action.Warnings, result3 error) {
+	fake.getRoutePoliciesForSpaceMutex.Lock()
+	defer fake.getRoutePoliciesForSpaceMutex.Unlock()
+	fake.GetRoutePoliciesForSpaceStub = nil
+	if fake.getRoutePoliciesForSpaceReturnsOnCall == nil {
+		fake.getRoutePoliciesForSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.RoutePolicyWithRoute
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRoutePoliciesForSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.RoutePolicyWithRoute
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

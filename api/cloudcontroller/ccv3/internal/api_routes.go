@@ -9,6 +9,7 @@ import "net/http"
 // If the request returns a single entity by GUID, use the singular (for example
 // /v3/organizations/:organization_guid is GetOrganization).
 const (
+	DeleteRoutePolicyRequest                                    = "DeleteRoutePolicyRequest"
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
 	DeleteBuildpackRequest                                      = "DeleteBuildpack"
@@ -35,6 +36,8 @@ const (
 	DeleteSpaceRequest                                          = "DeleteSpace"
 	DeleteSpaceQuotaFromSpaceRequest                            = "DeleteSpaceQuotaFromSpace"
 	DeleteUserRequest                                           = "DeleteUser"
+	GetRoutePolicyRequest                                       = "GetRoutePolicyRequest"
+	GetRoutePoliciesRequest                                     = "GetRoutePoliciesRequest"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
 	GetApplicationFeaturesRequest                               = "GetApplicationFeatures"
@@ -134,6 +137,7 @@ const (
 	PatchSpaceQuotaRequest                                      = "PatchSpaceQuota"
 	PatchStackRequest                                           = "PatchStack"
 	PatchMoveRouteRequest                                       = "PatchMoveRouteRequest"
+	PostRoutePolicyRequest                                      = "PostRoutePolicyRequest"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
 	PostApplicationActionStartRequest                           = "PostApplicationActionStart"
@@ -186,6 +190,10 @@ const (
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = map[string]Route{
+	GetRoutePoliciesRequest:                                     {Path: "/v3/route_policies", Method: http.MethodGet},
+	PostRoutePolicyRequest:                                      {Path: "/v3/route_policies", Method: http.MethodPost},
+	GetRoutePolicyRequest:                                       {Path: "/v3/route_policies/:route_policy_guid", Method: http.MethodGet},
+	DeleteRoutePolicyRequest:                                    {Path: "/v3/route_policies/:route_policy_guid", Method: http.MethodDelete},
 	GetApplicationsRequest:                                      {Path: "/v3/apps", Method: http.MethodGet},
 	PostApplicationRequest:                                      {Path: "/v3/apps", Method: http.MethodPost},
 	DeleteApplicationRequest:                                    {Path: "/v3/apps/:app_guid", Method: http.MethodDelete},
