@@ -133,7 +133,7 @@ jobs:
 
           bosh update-runtime-config ${GITHUB_WORKSPACE}/bosh-deployment/runtime-configs/dns.yml --name dns
           STEMCELL_VERSION=$(bosh interpolate ${GITHUB_WORKSPACE}/cf-deployment/cf-deployment.yml --path /stemcells/alias=default/version)
-          bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-jammy-go_agent?v=${STEMCELL_VERSION}"
+          bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-noble?v=${STEMCELL_VERSION}"
           bosh update-cloud-config ${GITHUB_WORKSPACE}/cf-deployment/iaas-support/bosh-lite/cloud-config.yml
           SYSTEM_DOMAIN="$env_name.app-runtime-interfaces.ci.cloudfoundry.org"
 
