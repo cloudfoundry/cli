@@ -1,8 +1,12 @@
 ---
-# Configure sizes for bosh-lite on gcp
+# Configure sizes for bosh-lite on gcp.
+# n2-standard-16 (16 vCPU / 64 GB): the whole cf-deployment runs as warden
+# containers on this single director VM; on Ubuntu Noble each container runs a
+# full systemd PID 1, so 32 GB (n2-standard-8) overcommits memory and a random
+# instance-group agent fails to boot ("Timed out pinging VM"). 64 GB gives headroom.
 - type: replace
   path: /resource_pools/name=vms/cloud_properties/machine_type
-  value: n2-standard-8
+  value: n2-standard-16
 - type: replace
   path: /disk_pools/name=disks/disk_size
   value: 250000
