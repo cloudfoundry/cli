@@ -135,7 +135,13 @@ integration-selfcontained: build install-test-deps
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global integration-selfcontained ## Run all isolated, push, selfcontained, and global integration tests
 
-integration-tests-ci-client-creds: build integration-cleanup integration-push integration-global integration-selfcontained
+integration-tests-ci-client-creds: build install-test-deps integration-cleanup
+	$(ginkgo_int) -nodes $(NODES) -flake-attempts $(FLAKE_ATTEMPTS) \
+		integration/v7/push
+	$(ginkgo_int) -flake-attempts $(FLAKE_ATTEMPTS) \
+		integration/shared/global integration/v7/global
+	$(ginkgo_int) -nodes $(NODES) -flake-attempts $(FLAKE_ATTEMPTS) \
+		integration/v7/selfcontained
 
 i: integration-tests-full
 integration-full-tests: integration-tests-full
