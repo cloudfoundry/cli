@@ -81,6 +81,12 @@ jobs:
           cp ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/bosh-lite-dns.tf terraform/
           cp ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/bosh-lite.tfvars vars/
           cp ${GITHUB_WORKSPACE}/cli/.github/ops-files/bosh-lite-vm-type.yml bosh-deployment/gcp/
+          cp ${GITHUB_WORKSPACE}/cli/.github/ops-files/director-inotify.yml bosh-deployment/gcp/
+          # Overwrite the plan-patch's stock create-director-override.sh with ours
+          # (bbl runs *-override.sh in preference to the generated create-director.sh)
+          # so the director gets director-inotify.yml during bosh create-env.
+          cp ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/create-director-override.sh create-director-override.sh
+          chmod +x create-director-override.sh
           bbl up
 
       - name: Authenticate to Google Cloud
@@ -131,7 +137,9 @@ jobs:
           cd $env_name/bbl-state
           eval "$(bbl print-env --shell-type posix)"
 
-          bosh update-runtime-config ${GITHUB_WORKSPACE}/bosh-deployment/runtime-configs/dns.yml --name dns
+          bosh update-runtime-config ${GITHUB_WORKSPACE}/bosh-deployment/runtime-configs/dns.yml \
+            -o ${GITHUB_WORKSPACE}/cli/.github/ops-files/bosh-dns-noble-bosh-lite.yml \
+            --name dns
           STEMCELL_VERSION=$(bosh interpolate ${GITHUB_WORKSPACE}/cf-deployment/cf-deployment.yml --path /stemcells/alias=default/version)
           bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-noble?v=${STEMCELL_VERSION}"
           bosh update-cloud-config ${GITHUB_WORKSPACE}/cf-deployment/iaas-support/bosh-lite/cloud-config.yml
@@ -167,7 +175,7 @@ jobs:
             eval "$(bbl print-env --shell-type posix)"
 
             echo "Deleting env ${env_name}"
-            bbl down --no-confirm --gcp-service-account-key=key.json
+            bbl down --no-confirm
 
             echo "Deleting bbl state directory"
             if gsutil ls gs://cf-cli-bosh-lites | grep -q /${env_name}/; then
