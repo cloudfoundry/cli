@@ -54,8 +54,8 @@ github.com/clipperhouse/uax29/v2 v2.2.0 h1:ChwIKnQN3kcZteTXMgb1wztSgaU+ZemkgWdoh
 github.com/clipperhouse/uax29/v2 v2.2.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJSwu5BF98AuoVM=
 github.com/cloudfoundry/bosh-cli v6.4.1+incompatible h1:n5/+NIF9QxvGINOrjh6DmO+GTen78MoCj5+LU9L8bR4=
 github.com/cloudfoundry/bosh-cli v6.4.1+incompatible/go.mod h1:rzIB+e1sn7wQL/TJ54bl/FemPKRhXby5BIMS3tLuWFM=
-github.com/cloudfoundry/bosh-utils v0.0.385 h1:rOgL4fKxeLNUAYoHSfycRro29ns9bhsEyBJ8DQ5W4Rc=
-github.com/cloudfoundry/bosh-utils v0.0.385/go.mod h1:vYjxd5zpxGjBKC+8voohfdXZkVk0UMOOvlMlZfxyOLM=
+github.com/cloudfoundry/bosh-utils v0.0.397 h1:1zs2vFN6P1eefDZ2u68j8PARbv/IKNJJQKWeeN/1B4g=
+github.com/cloudfoundry/bosh-utils v0.0.397/go.mod h1:FPZV+W2FecYFy2N5iWeDFYQvtkPbgrVf0uIg1Xdwk+E=
 github.com/codegangsta/negroni v1.0.0/go.mod h1:v0y3T5G7Y1UlFfyxFn/QLRU4a2EuNau2iZY63YTKWo0=
 github.com/cppforlife/go-patch v0.1.0 h1:I0fT+gFTSW4xWwvaTaUUVjr9xxjNXJ4naGc01BeQjwY=
 github.com/cppforlife/go-patch v0.1.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
