@@ -3,6 +3,8 @@ package v7
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/command/flag"
 )
 
@@ -19,6 +21,10 @@ type AddRoutePolicyCommand struct {
 }
 
 func (cmd AddRoutePolicyCommand) Execute(args []string) error {
+	if err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionRoutePolicies); err != nil {
+		return err
+	}
+
 	if err := cmd.RoutePolicySourceFlags.validateSourceFlags(); err != nil {
 		return err
 	}

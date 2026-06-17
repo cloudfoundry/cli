@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/util/ui"
 )
 
@@ -17,6 +19,10 @@ type RoutePoliciesCommand struct {
 }
 
 func (cmd RoutePoliciesCommand) Execute(args []string) error {
+	if err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionRoutePolicies); err != nil {
+		return err
+	}
+
 	// Check target (org + space required)
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {

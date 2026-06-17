@@ -3,6 +3,8 @@ package v7
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 )
 
@@ -39,6 +41,12 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 	// Validate scope values
 	if cmd.Scope != "" && cmd.Scope != "any" && cmd.Scope != "org" && cmd.Scope != "space" {
 		return fmt.Errorf("--scope must be one of: any, org, space")
+	}
+
+	if cmd.EnforceRoutePolicies {
+		if err := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionRoutePolicies, "--enforce-route-policies"); err != nil {
+			return err
+		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating shared domain {{.Domain}} as {{.User}}...",
