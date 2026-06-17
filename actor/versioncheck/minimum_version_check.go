@@ -8,6 +8,9 @@ func IsMinimumAPIVersionMet(current string, minimum string) (bool, error) {
 	if minimum == "" {
 		return true, nil
 	}
+	if current == "" {
+		return false, nil
+	}
 
 	currentSemver, err := semver.Make(current)
 	if err != nil {
