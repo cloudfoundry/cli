@@ -39,6 +39,14 @@ func (f RoutePolicySourceFlags) validateSourceFlags() error {
 		sourceFlags = append(sourceFlags, "--source-any")
 	}
 
+	// --source-org requires --source-space when used with --source-app
+	if f.SourceOrg != "" && f.SourceApp != "" && f.SourceSpace == "" {
+		return translatableerror.RequiredFlagsError{
+			Arg1: "--source-org",
+			Arg2: "--source-space",
+		}
+	}
+
 	if len(sourceFlags) == 0 {
 		return translatableerror.RequiredArgumentError{
 			ArgumentName: "one of: --source-app, --source-space, --source-org, --source-any, or --source",

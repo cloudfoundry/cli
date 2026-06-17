@@ -81,6 +81,22 @@ var _ = Describe("remove-route-policy Command", func() {
 		})
 	})
 
+	When("--source-org is used with --source-app but without --source-space", func() {
+		BeforeEach(func() {
+			cmd.RoutePolicySourceFlags = RoutePolicySourceFlags{
+				SourceApp: "my-app",
+				SourceOrg: "my-org",
+			}
+		})
+
+		It("returns a RequiredFlagsError for --source-space", func() {
+			Expect(executeErr).To(MatchError(translatableerror.RequiredFlagsError{
+				Arg1: "--source-org",
+				Arg2: "--source-space",
+			}))
+		})
+	})
+
 	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: "faceman"})
