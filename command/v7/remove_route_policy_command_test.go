@@ -42,7 +42,7 @@ var _ = Describe("remove-route-policy Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-			RequiredArgs: flag.RemoveRoutePolicyArgs{Domain: "apps.example.com"},
+			RequiredArgs: flag.RoutePolicyArgs{Domain: "apps.example.com"},
 			Hostname:     "myapp",
 			RoutePolicySourceFlags: RoutePolicySourceFlags{
 				SourceAny: true,

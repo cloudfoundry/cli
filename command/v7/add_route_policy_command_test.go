@@ -40,7 +40,7 @@ var _ = Describe("add-route-policy Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-			RequiredArgs: flag.AddRoutePolicyArgs{Domain: "apps.example.com"},
+			RequiredArgs: flag.RoutePolicyArgs{Domain: "apps.example.com"},
 			Hostname:     "myapp",
 			RoutePolicySourceFlags: RoutePolicySourceFlags{
 				SourceAny: true,
