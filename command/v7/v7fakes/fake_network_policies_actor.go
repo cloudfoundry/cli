@@ -182,6 +182,10 @@ func (fake *FakeNetworkPoliciesActor) NetworkPoliciesBySpaceAndAppNameReturnsOnC
 func (fake *FakeNetworkPoliciesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.networkPoliciesBySpaceMutex.RLock()
+	defer fake.networkPoliciesBySpaceMutex.RUnlock()
+	fake.networkPoliciesBySpaceAndAppNameMutex.RLock()
+	defer fake.networkPoliciesBySpaceAndAppNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

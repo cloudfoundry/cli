@@ -255,3 +255,4 @@ var _ = Describe("update-stack command", func() {
 		})
 	})
 })
+
