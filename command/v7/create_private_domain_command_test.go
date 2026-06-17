@@ -5,8 +5,10 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/command/commandfakes"
 	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	. "code.cloudfoundry.org/cli/v8/command/v7"
 	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
@@ -113,9 +115,84 @@ var _ = Describe("create-private-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreatePrivateDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedOrgName, _, _ := fakeActor.CreatePrivateDomainArgsForCall(0)
+				expectedDomainName, expectedOrgName, enforceRules, scope := fakeActor.CreatePrivateDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedOrgName).To(Equal(orgName))
+				Expect(enforceRules).To(BeFalse())
+				Expect(scope).To(BeEmpty())
+			})
+		})
+
+		When("--scope is specified without --enforce-route-policies", func() {
+			BeforeEach(func() {
+				cmd.Scope = "org"
+				cmd.EnforceRoutePolicies = false
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("--scope can only be used with --enforce-route-policies"))
+			})
+		})
+
+		When("--scope has an invalid value", func() {
+			BeforeEach(func() {
+				cmd.EnforceRoutePolicies = true
+				cmd.Scope = "invalid"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("--scope must be one of: any, org, space"))
+			})
+		})
+
+		When("--enforce-route-policies is specified", func() {
+			BeforeEach(func() {
+				cmd.EnforceRoutePolicies = true
+				fakeConfig.APIVersionReturns(ccversion.MinVersionRoutePolicies)
+				fakeActor.CreatePrivateDomainReturns(v7action.Warnings{}, nil)
+			})
+
+			When("the API version is too old", func() {
+				BeforeEach(func() {
+					fakeConfig.APIVersionReturns("0.0.0")
+				})
+
+				It("returns a version error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+						Command:        "--enforce-route-policies",
+						CurrentVersion: "0.0.0",
+						MinimumVersion: ccversion.MinVersionRoutePolicies,
+					}))
+				})
+			})
+
+			When("the API version is sufficient", func() {
+				It("passes enforce=true and empty scope to the actor", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeActor.CreatePrivateDomainCallCount()).To(Equal(1))
+					_, _, enforceRules, scope := fakeActor.CreatePrivateDomainArgsForCall(0)
+					Expect(enforceRules).To(BeTrue())
+					Expect(scope).To(BeEmpty())
+				})
+
+				It("prints the identity-aware TIP", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(Say("TIP: Domain '%s' is a private identity-aware domain", domainName))
+				})
+
+				When("--scope is also specified", func() {
+					BeforeEach(func() {
+						cmd.Scope = "org"
+					})
+
+					It("passes the scope to the actor", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeActor.CreatePrivateDomainCallCount()).To(Equal(1))
+						_, _, enforceRules, scope := fakeActor.CreatePrivateDomainArgsForCall(0)
+						Expect(enforceRules).To(BeTrue())
+						Expect(scope).To(Equal("org"))
+					})
+				})
 			})
 		})
 	})
