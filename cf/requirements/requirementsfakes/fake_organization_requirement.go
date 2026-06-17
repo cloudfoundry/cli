@@ -179,12 +179,6 @@ func (fake *FakeOrganizationRequirement) SetOrganizationNameArgsForCall(i int) s
 func (fake *FakeOrganizationRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getOrganizationMutex.RLock()
-	defer fake.getOrganizationMutex.RUnlock()
-	fake.setOrganizationNameMutex.RLock()
-	defer fake.setOrganizationNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

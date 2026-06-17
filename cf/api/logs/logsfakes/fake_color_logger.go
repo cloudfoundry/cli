@@ -231,12 +231,6 @@ func (fake *FakeColorLogger) LogSysHeaderColorReturnsOnCall(i int, result1 strin
 func (fake *FakeColorLogger) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.logStderrColorMutex.RLock()
-	defer fake.logStderrColorMutex.RUnlock()
-	fake.logStdoutColorMutex.RLock()
-	defer fake.logStdoutColorMutex.RUnlock()
-	fake.logSysHeaderColorMutex.RLock()
-	defer fake.logSysHeaderColorMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
