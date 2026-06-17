@@ -5,10 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/command/commandfakes"
 	"code.cloudfoundry.org/cli/v8/command/flag"
-	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	. "code.cloudfoundry.org/cli/v8/command/v7"
 	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
@@ -137,77 +135,23 @@ var _ = Describe("create-shared-domain Command", func() {
 			})
 		})
 
-		When("--scope is specified without --enforce-route-policies", func() {
-			BeforeEach(func() {
-				cmd.Scope = "org"
-				cmd.EnforceRoutePolicies = false
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("--scope can only be used with --enforce-route-policies"))
-			})
-		})
-
-		When("--scope has an invalid value", func() {
-			BeforeEach(func() {
-				cmd.EnforceRoutePolicies = true
-				cmd.Scope = "invalid"
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("--scope must be one of: any, org, space"))
-			})
-		})
-
-		When("--enforce-route-policies is specified", func() {
-			BeforeEach(func() {
-				cmd.EnforceRoutePolicies = true
-				fakeConfig.APIVersionReturns(ccversion.MinVersionRoutePolicies)
-				fakeActor.CreateSharedDomainReturns(v7action.Warnings{}, nil)
-			})
-
-			When("the API version is too old", func() {
-				BeforeEach(func() {
-					fakeConfig.APIVersionReturns("0.0.0")
-				})
-
-				It("returns a version error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-						Command:        "--enforce-route-policies",
-						CurrentVersion: "0.0.0",
-						MinimumVersion: ccversion.MinVersionRoutePolicies,
-					}))
-				})
-			})
-
-			When("the API version is sufficient", func() {
-				It("passes enforce=true and empty scope to the actor", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(fakeActor.CreateSharedDomainCallCount()).To(Equal(1))
-					_, _, _, enforceRules, scope := fakeActor.CreateSharedDomainArgsForCall(0)
-					Expect(enforceRules).To(BeTrue())
-					Expect(scope).To(BeEmpty())
-				})
-
-				It("prints the identity-aware TIP", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say("TIP: Domain '%s' is a shared identity-aware domain", domainName))
-				})
-
-				When("--scope is also specified", func() {
-					BeforeEach(func() {
-						cmd.Scope = "org"
-					})
-
-					It("passes the scope to the actor", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(fakeActor.CreateSharedDomainCallCount()).To(Equal(1))
-						_, _, _, enforceRules, scope := fakeActor.CreateSharedDomainArgsForCall(0)
-						Expect(enforceRules).To(BeTrue())
-						Expect(scope).To(Equal("org"))
-					})
-				})
-			})
+		ItEnforcesRoutePolicies(&EnforceRoutePoliciesBehavior{
+			SetEnforce:       func(v bool) { cmd.EnforceRoutePolicies = v },
+			SetScope:         func(v string) { cmd.Scope = v },
+			SetAPIVersion:    func(v string) { fakeConfig.APIVersionReturns(v) },
+			SetActorSucceeds: func() { fakeActor.CreateSharedDomainReturns(v7action.Warnings{}, nil) },
+			ExecuteErr:       func() error { return executeErr },
+			UI:               func() *ui.UI { return testUI },
+			DomainName:       func() string { return domainName },
+			EnforceArg: func() bool {
+				_, _, _, enforce, _ := fakeActor.CreateSharedDomainArgsForCall(0)
+				return enforce
+			},
+			ScopeArg: func() string {
+				_, _, _, _, scope := fakeActor.CreateSharedDomainArgsForCall(0)
+				return scope
+			},
+			TIPAdjective: "shared",
 		})
 	})
 })
