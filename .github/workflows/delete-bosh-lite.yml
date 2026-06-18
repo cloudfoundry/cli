@@ -19,6 +19,8 @@ env:
   BOSH_DEPLOYMENT: cf
   BOSH_NON_INTERACTIVE: true
   ENV_NAME: ${{ inputs.env-name }}
+  BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
+  BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
 
 jobs:
   delete-env:
@@ -31,14 +33,12 @@ jobs:
           go version
 
           install_location=/usr/local/bin
-          bbl_version=v9.0.35
-          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
-          
-          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/${bbl_version}/bbl-${bbl_version}_linux_amd64 --silent --location --output  $install_location/bbl
+
+          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v${BBL_CLI_VERSION}/bbl-v${BBL_CLI_VERSION}_linux_amd64 --silent --location --output $install_location/bbl
           sudo chmod +x $install_location/bbl
           bbl --version
-  
-          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
+
+          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v${BOSH_CLI_VERSION}/bosh-cli-${BOSH_CLI_VERSION}-linux-amd64 --silent --output $install_location/bosh --location
           sudo chmod +x $install_location/bosh
           bosh --version
   
@@ -72,10 +72,14 @@ jobs:
         run: |
           cd ${ENV_NAME}/bbl-state
           eval "$(bbl print-env --shell-type posix)"
-          
+
+          # Delete the CF deployment first so warden containers release their
+          # bind mounts on the director's persistent disk. 
+          echo "Deleting CF deployment ${BOSH_DEPLOYMENT}"
+          bosh delete-deployment -d ${BOSH_DEPLOYMENT} --force --skip-drain || true
+
           echo "Deleting env ${ENV_NAME}"
-          echo ${BBL_GCP_SERVICE_ACCOUNT_KEY} > key.json
-          bbl down --no-confirm --gcp-service-account-key=key.json
+          bbl down --no-confirm
         
       - name: delete gcs bucket
         run: |
