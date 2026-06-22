@@ -25,6 +25,11 @@ on:
     branches:
       - main
       - v8
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
@@ -33,7 +38,13 @@ on:
 jobs:
   get-sha:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: |
+      ${{ github.actor != 'dependabot[bot]' && (
+        github.event.pull_request.author_association == 'OWNER' ||
+        github.event.pull_request.author_association == 'COLLABORATOR' ||
+        (github.event_name == 'labeled' &&
+         github.event.label.name == 'safe-to-test')
+      ) }}
     outputs:
       gitRef: ${{steps.calculate.outputs.ref}}
     steps:
