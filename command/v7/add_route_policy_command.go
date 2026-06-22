@@ -12,7 +12,7 @@ type AddRoutePolicyCommand struct {
 	BaseCommand
 
 	RequiredArgs flag.RoutePolicyArgs `positional-args:"yes"`
-	Hostname     string                  `long:"hostname" required:"true" description:"Hostname for the route"`
+	Hostname     string                  `long:"hostname" short:"n" required:"true" description:"Hostname for the route"`
 	Path         string                  `long:"path" description:"Path for the route"`
 	RoutePolicySourceFlags
 
