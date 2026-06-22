@@ -21,6 +21,7 @@ type SetLabelActor interface {
 	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateRoutePolicyLabels(routeURL string, spaceGUID string, source string, labels map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceInstanceLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
@@ -43,6 +44,7 @@ type TargetResource struct {
 	BuildpackLifecycle string
 	ServiceBroker      string
 	ServiceOffering    string
+	RoutePolicySource  string
 }
 
 type LabelUpdater struct {
