@@ -258,12 +258,6 @@ func (fake *FakeAppStager) StartAppReturnsOnCall(i int, result1 error) {
 func (fake *FakeAppStager) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.stageAndStartMutex.RLock()
-	defer fake.stageAndStartMutex.RUnlock()
-	fake.stageAppMutex.RLock()
-	defer fake.stageAppMutex.RUnlock()
-	fake.startAppMutex.RLock()
-	defer fake.startAppMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

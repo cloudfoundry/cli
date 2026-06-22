@@ -20,6 +20,7 @@ const (
 	Domain          ResourceType = "domain"
 	Org             ResourceType = "org"
 	Route           ResourceType = "route"
+	RoutePolicy     ResourceType = "route-policy"
 	Space           ResourceType = "space"
 	Stack           ResourceType = "stack"
 	ServiceBroker   ResourceType = "service-broker"
@@ -79,6 +80,9 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	case Route:
 		cmd.displayMessageWithOrgAndSpace()
 		labels, warnings, err = cmd.Actor.GetRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
+	case RoutePolicy:
+		cmd.displayMessageWithOrgAndSpace()
+		labels, warnings, err = cmd.Actor.GetRoutePolicyLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, "")
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		labels, warnings, err = cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
@@ -127,6 +131,7 @@ buildpack
 domain
 org
 route
+route-policy
 service-broker
 service-instance
 service-offering
@@ -198,7 +203,7 @@ func (cmd LabelsCommand) validateFlags() error {
 
 func (cmd LabelsCommand) checkTarget() error {
 	switch ResourceType(cmd.RequiredArgs.ResourceType) {
-	case App, Route, ServiceInstance:
+	case App, Route, RoutePolicy, ServiceInstance:
 		return cmd.SharedActor.CheckTarget(true, true)
 	case Space:
 		return cmd.SharedActor.CheckTarget(true, false)

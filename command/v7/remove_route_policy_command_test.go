@@ -66,7 +66,7 @@ var _ = Describe("remove-route-policy Command", func() {
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.999.0",
+				MinimumVersion: "3.221.0",
 			}))
 		})
 	})
