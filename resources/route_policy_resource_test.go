@@ -2,17 +2,11 @@ package resources_test
 
 import (
 	"encoding/json"
-	"testing"
 
 	"code.cloudfoundry.org/cli/v9/resources"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
-
-func TestRoutePolicyResource(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "RoutePolicy Resource Suite")
-}
 
 var _ = Describe("RoutePolicy", func() {
 	Describe("MarshalJSON", func() {
