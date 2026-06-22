@@ -9,7 +9,7 @@ import (
 type RoutePoliciesCommand struct {
 	BaseCommand
 
-	Domain   string `long:"domain" description:"Filter by domain name"`
+	Domain   string `long:"domain" short:"d" description:"Filter by domain name"`
 	Hostname string `long:"hostname" short:"n" description:"Filter by hostname"`
 	Path     string `long:"path" description:"Filter by path"`
 	Labels   string `long:"labels" description:"Selector to filter route policies by labels"`

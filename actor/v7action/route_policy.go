@@ -191,54 +191,57 @@ func (actor Actor) GetRoutePoliciesForSpace(
 		return []RoutePolicyWithRoute{}, allWarnings, nil
 	}
 
-	// Build route lookup map from included resources
-	routeByGUID := make(map[string]resources.Route)
-	for _, route := range includedResources.Routes {
-		routeByGUID[route.GUID] = route
-	}
+	// Create domain name cache; pre-populated below if a domain filter is used.
+	domainCache := make(map[string]string)
 
-	// Apply optional filters to the included routes
+	// Filter the routes slice before building the lookup map.
+	filteredRoutes := includedResources.Routes
+
 	if domainName != "" {
 		domain, warnings, err := actor.GetDomainByName(domainName)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err
 		}
-		// Filter routes by domain GUID
-		filteredRoutes := make(map[string]resources.Route)
-		for guid, route := range routeByGUID {
+		// Pre-populate cache: all matching routes share this single domain GUID.
+		domainCache[domain.GUID] = domain.Name
+		var matched []resources.Route
+		for _, route := range filteredRoutes {
 			if route.DomainGUID == domain.GUID {
-				filteredRoutes[guid] = route
+				matched = append(matched, route)
 			}
 		}
-		routeByGUID = filteredRoutes
+		filteredRoutes = matched
 	}
 
 	if hostname != "" {
-		// Filter routes by hostname
-		filteredRoutes := make(map[string]resources.Route)
-		for guid, route := range routeByGUID {
+		var matched []resources.Route
+		for _, route := range filteredRoutes {
 			if route.Host == hostname {
-				filteredRoutes[guid] = route
+				matched = append(matched, route)
 			}
 		}
-		routeByGUID = filteredRoutes
+		filteredRoutes = matched
 	}
 
 	if path != "" {
-		// Filter routes by path
-		filteredRoutes := make(map[string]resources.Route)
-		for guid, route := range routeByGUID {
+		var matched []resources.Route
+		for _, route := range filteredRoutes {
 			if route.Path == path {
-				filteredRoutes[guid] = route
+				matched = append(matched, route)
 			}
 		}
-		routeByGUID = filteredRoutes
+		filteredRoutes = matched
 	}
 
-	// Build domain name cache
-	domainCache := make(map[string]string)
-	for _, route := range routeByGUID {
+	// Build route lookup map from filtered routes only.
+	routeByGUID := make(map[string]resources.Route, len(filteredRoutes))
+	for _, route := range filteredRoutes {
+		routeByGUID[route.GUID] = route
+	}
+
+	// Populate domain cache for any domain GUIDs not yet known.
+	for _, route := range filteredRoutes {
 		if _, exists := domainCache[route.DomainGUID]; !exists {
 			domain, warnings, err := actor.GetDomain(route.DomainGUID)
 			allWarnings = append(allWarnings, warnings...)

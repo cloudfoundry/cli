@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
+	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	. "code.cloudfoundry.org/cli/v9/command/v7"
@@ -43,7 +44,7 @@ var _ = Describe("route-policies Command", func() {
 		}
 
 		fakeConfig.BinaryNameReturns("faceman")
-		fakeConfig.APIVersionReturns("3.999.0")
+		fakeConfig.APIVersionReturns(ccversion.MinVersionRoutePolicies)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "org-guid"})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "space-guid"})
 		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
@@ -61,7 +62,7 @@ var _ = Describe("route-policies Command", func() {
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.999.0",
+				MinimumVersion: ccversion.MinVersionRoutePolicies,
 			}))
 		})
 	})
@@ -144,6 +145,18 @@ var _ = Describe("route-policies Command", func() {
 			Expect(hostnameArg).To(Equal(""))
 			Expect(pathArg).To(Equal(""))
 			Expect(labelsArg).To(Equal(""))
+		})
+
+		When("the --domain flag is set", func() {
+			BeforeEach(func() {
+				cmd.Domain = "apps.example.com"
+			})
+
+			It("passes the domain value to the actor", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				_, domainArg, _, _, _ := fakeActor.GetRoutePoliciesForSpaceArgsForCall(0)
+				Expect(domainArg).To(Equal("apps.example.com"))
+			})
 		})
 	})
 })
