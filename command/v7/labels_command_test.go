@@ -138,17 +138,17 @@ var _ = Describe("labels command", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 
-				switch resourceType {
-				case "app", "route", "service-instance":
-					Expect(checkOrg).To(BeTrue())
-					Expect(checkSpace).To(BeTrue())
-				case "space":
-					Expect(checkOrg).To(BeTrue())
-					Expect(checkSpace).To(BeFalse())
-				default:
-					Expect(checkOrg).To(BeFalse())
-					Expect(checkSpace).To(BeFalse())
-				}
+			switch resourceType {
+			case "app", "route", "service-instance", "route-policy":
+				Expect(checkOrg).To(BeTrue())
+				Expect(checkSpace).To(BeTrue())
+			case "space":
+				Expect(checkOrg).To(BeTrue())
+				Expect(checkSpace).To(BeFalse())
+			default:
+				Expect(checkOrg).To(BeFalse())
+				Expect(checkSpace).To(BeFalse())
+			}
 			},
 			labelSubcommands(),
 		)

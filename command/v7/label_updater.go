@@ -97,6 +97,9 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 	case Route:
 		cmd.displayMessageWithOrgAndSpace()
 		warnings, err = cmd.Actor.UpdateRouteLabels(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
+	case RoutePolicy:
+		cmd.displayMessageWithOrgAndSpace()
+		warnings, err = cmd.Actor.UpdateRoutePolicyLabels(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.targetResource.RoutePolicySource, cmd.labels)
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.targetResource.ResourceName, cmd.labels)
@@ -128,7 +131,7 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 
 func (cmd *LabelUpdater) checkTarget() error {
 	switch ResourceType(cmd.targetResource.ResourceType) {
-	case App, ServiceInstance, Route:
+	case App, ServiceInstance, Route, RoutePolicy:
 		return cmd.SharedActor.CheckTarget(true, true)
 	case Space:
 		return cmd.SharedActor.CheckTarget(true, false)
@@ -140,7 +143,7 @@ func (cmd *LabelUpdater) checkTarget() error {
 func (cmd *LabelUpdater) validateFlags() error {
 	resourceType := ResourceType(cmd.targetResource.ResourceType)
 	switch resourceType {
-	case App, Buildpack, Domain, Org, Route, ServiceBroker, ServiceInstance, ServiceOffering, ServicePlan, Space, Stack:
+	case App, Buildpack, Domain, Org, Route, RoutePolicy, ServiceBroker, ServiceInstance, ServiceOffering, ServicePlan, Space, Stack:
 	default:
 		return errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.targetResource.ResourceType}))
 	}
@@ -165,6 +168,14 @@ func (cmd *LabelUpdater) validateFlags() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				cmd.targetResource.ResourceType, "--offering, -o",
+			},
+		}
+	}
+
+	if cmd.targetResource.RoutePolicySource != "" && resourceType != RoutePolicy {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.targetResource.ResourceType, "--source",
 			},
 		}
 	}
