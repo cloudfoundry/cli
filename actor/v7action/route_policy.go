@@ -9,11 +9,15 @@ import (
 func (actor Actor) AddRoutePolicy(domainName, source, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	// Get the domain to ensure it exists and supports route policies
+	// Get the domain and verify it has route policy enforcement enabled
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
+	}
+
+	if !domain.EnforceRoutePolicies.IsSet || !domain.EnforceRoutePolicies.Value {
+		return allWarnings, actionerror.DomainNotEnforcingRoutePoliciesError{Name: domainName}
 	}
 
 	// Find the route

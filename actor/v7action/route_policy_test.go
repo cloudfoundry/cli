@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v9/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -35,7 +36,7 @@ var _ = Describe("Route Policy Actions", func() {
 		When("the API calls are successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid"}},
+					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid", EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}}},
 					ccv3.Warnings{"domain-warning"},
 					nil,
 				)
@@ -62,6 +63,22 @@ var _ = Describe("Route Policy Actions", func() {
 			})
 		})
 
+		When("the domain does not enforce route policies", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid", EnforceRoutePolicies: types.NullBool{IsSet: false}}},
+					ccv3.Warnings{"domain-warning"},
+					nil,
+				)
+			})
+
+			It("returns a DomainNotEnforcingRoutePoliciesError and the domain warning", func() {
+				Expect(executeErr).To(MatchError(actionerror.DomainNotEnforcingRoutePoliciesError{Name: "apps.example.com"}))
+				Expect(warnings).To(ConsistOf("domain-warning"))
+				Expect(fakeCloudControllerClient.CreateRoutePolicyCallCount()).To(Equal(0))
+			})
+		})
+
 		When("getting the domain fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
@@ -80,7 +97,7 @@ var _ = Describe("Route Policy Actions", func() {
 		When("getting routes fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid"}},
+					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid", EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}}},
 					ccv3.Warnings{"domain-warning"},
 					nil,
 				)
@@ -96,7 +113,7 @@ var _ = Describe("Route Policy Actions", func() {
 		When("the route is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid"}},
+					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid", EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}}},
 					ccv3.Warnings{"domain-warning"},
 					nil,
 				)
@@ -120,7 +137,7 @@ var _ = Describe("Route Policy Actions", func() {
 		When("creating the route policy fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid"}},
+					[]resources.Domain{{Name: "apps.example.com", GUID: "domain-guid", EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}}},
 					ccv3.Warnings{"domain-warning"},
 					nil,
 				)
