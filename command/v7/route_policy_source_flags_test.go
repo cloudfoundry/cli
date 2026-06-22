@@ -1,9 +1,5 @@
 package v7_test
 
-// Tests for RoutePolicySourceFlags validation and resolution, exercised
-// through AddRoutePolicyCommand.Execute() using the standard v7fakes.FakeActor
-// pattern instead of an inline stub actor.
-
 import (
 	"errors"
 	"fmt"
