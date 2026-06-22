@@ -474,17 +474,8 @@ func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resou
 		queries = append(queries, ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}})
 	}
 
-	ccv3Routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
-	if err != nil {
-		return nil, Warnings(warnings), err
-	}
-
-	var routes []resources.Route
-	for _, route := range ccv3Routes {
-		routes = append(routes, resources.Route(route))
-	}
-
-	return routes, Warnings(warnings), nil
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
+	return routes, Warnings(warnings), err
 }
 
 func getDomainName(fullURL, host, path string, port int) string {
