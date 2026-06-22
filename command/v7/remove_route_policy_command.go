@@ -11,7 +11,7 @@ type RemoveRoutePolicyCommand struct {
 
 	RequiredArgs flag.RoutePolicyArgs `positional-args:"yes"`
 	RoutePolicySourceFlags
-	Hostname string `long:"hostname" required:"true" description:"Hostname for the route"`
+	Hostname string `long:"hostname" short:"n" required:"true" description:"Hostname for the route"`
 	Path     string `long:"path" description:"Path for the route"`
 	Force    bool   `short:"f" description:"Force deletion without confirmation"`
 
