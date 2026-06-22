@@ -38,6 +38,7 @@ type LabelsCommand struct {
 	relatedCommands    interface{}     `related_commands:"set-label, unset-label"`
 	ServiceBroker      string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
 	ServiceOffering    string          `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
+	RoutePolicySource  string          `long:"source" description:"Specify a route policy source to disambiguate when a route has multiple policies"`
 
 	username string
 }
@@ -82,7 +83,7 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.Actor.GetRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 	case RoutePolicy:
 		cmd.displayMessageWithOrgAndSpace()
-		labels, warnings, err = cmd.Actor.GetRoutePolicyLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, "")
+		labels, warnings, err = cmd.Actor.GetRoutePolicyLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.RoutePolicySource)
 	case ServiceBroker:
 		cmd.displayMessageDefault()
 		labels, warnings, err = cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
@@ -194,6 +195,14 @@ func (cmd LabelsCommand) validateFlags() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				cmd.RequiredArgs.ResourceType, "--offering, -o",
+			},
+		}
+	}
+
+	if cmd.RoutePolicySource != "" && cmd.canonicalResourceTypeForName() != RoutePolicy {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--source",
 			},
 		}
 	}

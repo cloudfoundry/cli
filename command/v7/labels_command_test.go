@@ -138,10 +138,10 @@ var _ = Describe("labels command", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 
-			switch resourceType {
-			case "app", "route", "service-instance", "route-policy":
-				Expect(checkOrg).To(BeTrue())
-				Expect(checkSpace).To(BeTrue())
+		switch resourceType {
+		case "app", "route", "route-policy", "service-instance":
+			Expect(checkOrg).To(BeTrue())
+			Expect(checkSpace).To(BeTrue())
 			case "space":
 				Expect(checkOrg).To(BeTrue())
 				Expect(checkSpace).To(BeFalse())
@@ -163,19 +163,20 @@ var _ = Describe("labels command", func() {
 					Expect(expectedMethodCallCount()).To(Equal(1))
 				}
 
-				testCases :=
-					map[string]MethodCallCountType{
-						"aPp":              fakeLabelsActor.GetApplicationLabelsCallCount,
-						"bUiLdPaCK":        fakeLabelsActor.GetBuildpackLabelsCallCount,
-						"dOmAiN":           fakeLabelsActor.GetDomainLabelsCallCount,
-						"oRg":              fakeLabelsActor.GetOrganizationLabelsCallCount,
-						"rOuTe":            fakeLabelsActor.GetRouteLabelsCallCount,
-						"sErViCe-BrOkEr":   fakeLabelsActor.GetServiceBrokerLabelsCallCount,
-						"serVice-OfferIng": fakeLabelsActor.GetServiceOfferingLabelsCallCount,
-						"serVice-PlAn":     fakeLabelsActor.GetServicePlanLabelsCallCount,
-						"sPaCe":            fakeLabelsActor.GetSpaceLabelsCallCount,
-						"sTaCk":            fakeLabelsActor.GetStackLabelsCallCount,
-					}
+			testCases :=
+				map[string]MethodCallCountType{
+					"aPp":              fakeLabelsActor.GetApplicationLabelsCallCount,
+					"bUiLdPaCK":        fakeLabelsActor.GetBuildpackLabelsCallCount,
+					"dOmAiN":           fakeLabelsActor.GetDomainLabelsCallCount,
+					"oRg":              fakeLabelsActor.GetOrganizationLabelsCallCount,
+					"rOuTe":            fakeLabelsActor.GetRouteLabelsCallCount,
+					"rOuTe-PoLiCy":     fakeLabelsActor.GetRoutePolicyLabelsCallCount,
+					"sErViCe-BrOkEr":   fakeLabelsActor.GetServiceBrokerLabelsCallCount,
+					"serVice-OfferIng": fakeLabelsActor.GetServiceOfferingLabelsCallCount,
+					"serVice-PlAn":     fakeLabelsActor.GetServicePlanLabelsCallCount,
+					"sPaCe":            fakeLabelsActor.GetSpaceLabelsCallCount,
+					"sTaCk":            fakeLabelsActor.GetStackLabelsCallCount,
+				}
 
 				for resourceType, callCountMethod := range testCases {
 					testBody(resourceType, callCountMethod)
@@ -501,22 +502,108 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
-		Describe("for spaces", func() {
+	Describe("for route-policy", func() {
+		BeforeEach(func() {
+			fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
+			cmd.RequiredArgs = flag.LabelsArgs{
+				ResourceType: "route-policy",
+				ResourceName: "foo.example.com/the-path",
+			}
+			fakeLabelsActor.GetRoutePolicyLabelsReturns(
+				map[string]types.NullString{
+					"some-other-label": types.NewNullString("some-other-value"),
+					"some-label":       types.NewNullString("some-value"),
+				},
+				v7action.Warnings{},
+				nil)
+		})
+
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+		It("displays a message that it is retrieving the labels", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for route-policy foo.example.com/the-path in org fake-org / space fake-space as some-user...`)))
+		})
+
+		It("retrieves the labels associated with the route-policy", func() {
+			Expect(fakeLabelsActor.GetRoutePolicyLabelsCallCount()).To(Equal(1))
+			routeURL, spaceGUID, source := fakeLabelsActor.GetRoutePolicyLabelsArgsForCall(0)
+			Expect(routeURL).To(Equal("foo.example.com/the-path"))
+			Expect(spaceGUID).To(Equal("some-space-guid"))
+			Expect(source).To(Equal(""))
+		})
+
+		It("displays the labels alphabetically", func() {
+			Expect(testUI.Out).To(Say(`key\s+value`))
+			Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+			Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+		})
+
+		When("a --source flag is given", func() {
 			BeforeEach(func() {
-				fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
-				cmd.RequiredArgs = flag.LabelsArgs{
-					ResourceType: "space",
-					ResourceName: "fake-space",
-				}
-				fakeLabelsActor.GetSpaceLabelsReturns(
-					map[string]types.NullString{
-						"some-other-label": types.NewNullString("some-other-value"),
-						"some-label":       types.NewNullString("some-value"),
-					},
-					v7action.Warnings{},
+				cmd.RoutePolicySource = "cf:app:some-app-guid"
+			})
+
+			It("passes the source to the actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, _, source := fakeLabelsActor.GetRoutePolicyLabelsArgsForCall(0)
+				Expect(source).To(Equal("cf:app:some-app-guid"))
+			})
+		})
+
+		When("CAPI returns warnings", func() {
+			BeforeEach(func() {
+				fakeLabelsActor.GetRoutePolicyLabelsReturns(
+					map[string]types.NullString{},
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
 					nil)
 			})
+
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+		})
+
+		When("there is an error retrieving the route-policy labels", func() {
+			BeforeEach(func() {
+				fakeLabelsActor.GetRoutePolicyLabelsReturns(
+					map[string]types.NullString{},
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("boom"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("boom"))
+			})
+
+			It("still prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+		})
+	})
+
+	Describe("for spaces", func() {
+		BeforeEach(func() {
+			fakeLabelsActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
+			cmd.RequiredArgs = flag.LabelsArgs{
+				ResourceType: "space",
+				ResourceName: "fake-space",
+			}
+			fakeLabelsActor.GetSpaceLabelsReturns(
+				map[string]types.NullString{
+					"some-other-label": types.NewNullString("some-other-value"),
+					"some-label":       types.NewNullString("some-value"),
+				},
+				v7action.Warnings{},
+				nil)
+		})
 
 			It("doesn't error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
