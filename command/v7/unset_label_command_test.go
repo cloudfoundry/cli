@@ -1,6 +1,8 @@
 package v7_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	v7 "code.cloudfoundry.org/cli/v8/command/v7"
 	"code.cloudfoundry.org/cli/v8/command/v7/v7fakes"
@@ -49,5 +51,43 @@ var _ = Describe("unset-label command", func() {
 			"FOO": types.NewNullString(),
 			"ENV": types.NewNullString(),
 		}))
+	})
+
+	When("--source flag is provided", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "route-policy",
+				ResourceName: "some-route",
+				LabelKeys:    []string{"FOO"},
+			}
+			cmd.RoutePolicySource = "cf:app:some-app-guid"
+		})
+
+		It("passes the source to the label unsetter", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeLabelSetter.ExecuteCallCount()).To(Equal(1))
+			targetResource, _ := fakeLabelSetter.ExecuteArgsForCall(0)
+			Expect(targetResource.RoutePolicySource).To(Equal("cf:app:some-app-guid"))
+		})
+	})
+
+	When("--source flag is provided with a non-route-policy resource", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "app",
+				ResourceName: "my-app",
+				LabelKeys:    []string{"FOO"},
+			}
+			cmd.RoutePolicySource = "cf:app:some-app-guid"
+			fakeLabelSetter.ExecuteReturns(errors.New("argument combination error"))
+		})
+
+		It("returns an error", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).To(HaveOccurred())
+		})
 	})
 })
