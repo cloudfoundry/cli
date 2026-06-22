@@ -126,19 +126,20 @@ var _ = Describe("Metadata", func() {
 			})
 		}
 
-		testForResourceType("app", "")
-		testForResourceType("domain", "")
-		testForResourceType("buildpack", "")
-		testForResourceType("org", "organization")
-		testForResourceType("route", "")
-		testForResourceType("service-broker", "service_broker")
-		testForResourceType("service-instance", "service_instance")
-		testForResourceType("service-offering", "service_offering")
-		testForResourceType("service-plan", "service_plan")
-		testForResourceType("space", "")
-		testForResourceType("stack", "")
+	testForResourceType("app", "")
+	testForResourceType("domain", "")
+	testForResourceType("buildpack", "")
+	testForResourceType("org", "organization")
+	testForResourceType("route", "")
+	testForResourceType("service-broker", "service_broker")
+	testForResourceType("service-instance", "service_instance")
+	testForResourceType("service-offering", "service_offering")
+	testForResourceType("service-plan", "service_plan")
+	testForResourceType("space", "")
+	testForResourceType("stack", "")
+	testForResourceType("route-policy", "route_policie")
 
-		When("updating metadata on an unsupported resource", func() {
+	When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {
 				_, _, err := client.UpdateResourceMetadata("anything", "fake-guid", Metadata{})
 				Expect(err).To(MatchError("unknown resource type (anything) requested"))

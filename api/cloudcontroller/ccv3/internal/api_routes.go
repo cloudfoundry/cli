@@ -137,6 +137,7 @@ const (
 	PatchSpaceQuotaRequest                                      = "PatchSpaceQuota"
 	PatchStackRequest                                           = "PatchStack"
 	PatchMoveRouteRequest                                       = "PatchMoveRouteRequest"
+	PatchRoutePolicyRequest                                     = "PatchRoutePolicyRequest"
 	PostRoutePolicyRequest                                      = "PostRoutePolicyRequest"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
@@ -194,6 +195,7 @@ var APIRoutes = map[string]Route{
 	PostRoutePolicyRequest:                                      {Path: "/v3/route_policies", Method: http.MethodPost},
 	GetRoutePolicyRequest:                                       {Path: "/v3/route_policies/:route_policy_guid", Method: http.MethodGet},
 	DeleteRoutePolicyRequest:                                    {Path: "/v3/route_policies/:route_policy_guid", Method: http.MethodDelete},
+	PatchRoutePolicyRequest:                                     {Path: "/v3/route_policies/:route_policy_guid", Method: http.MethodPatch},
 	GetApplicationsRequest:                                      {Path: "/v3/apps", Method: http.MethodGet},
 	PostApplicationRequest:                                      {Path: "/v3/apps", Method: http.MethodPost},
 	DeleteApplicationRequest:                                    {Path: "/v3/apps/:app_guid", Method: http.MethodDelete},
