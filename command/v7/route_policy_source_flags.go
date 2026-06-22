@@ -84,23 +84,19 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 		orgName := config.TargetedOrganization().Name
 
 		if f.SourceSpace != "" {
-			orgGUID := config.TargetedOrganization().GUID
-			if f.SourceOrg != "" {
-				org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
-				allWarnings = append(allWarnings, warnings...)
-				if err != nil {
-					return "", "", allWarnings, err
-				}
-				orgGUID = org.GUID
-				orgName = f.SourceOrg
-			}
-
-			space, warnings, err := actor.GetSpaceByNameAndOrganization(f.SourceSpace, orgGUID)
-			allWarnings = append(allWarnings, warnings...)
+			resolvedOrgGUID, resolvedOrgName, orgWarnings, err := resolveOrgGUID(f, actor, config)
+			allWarnings = append(allWarnings, orgWarnings...)
 			if err != nil {
 				return "", "", allWarnings, err
 			}
-			spaceGUID = space.GUID
+			orgName = resolvedOrgName
+
+			resolvedSpaceGUID, spaceWarnings, err := resolveSpaceGUID(f.SourceSpace, resolvedOrgGUID, actor)
+			allWarnings = append(allWarnings, spaceWarnings...)
+			if err != nil {
+				return "", "", allWarnings, err
+			}
+			spaceGUID = resolvedSpaceGUID
 			spaceName = f.SourceSpace
 		}
 
@@ -132,20 +128,14 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 
 	// --source-space (primary: space-level policy)
 	if f.SourceSpace != "" {
-		orgGUID := config.TargetedOrganization().GUID
-		orgName := config.TargetedOrganization().Name
-		if f.SourceOrg != "" {
-			org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
-			allWarnings = append(allWarnings, warnings...)
-			if err != nil {
-				return "", "", allWarnings, err
-			}
-			orgGUID = org.GUID
-			orgName = f.SourceOrg
+		orgGUID, orgName, orgWarnings, err := resolveOrgGUID(f, actor, config)
+		allWarnings = append(allWarnings, orgWarnings...)
+		if err != nil {
+			return "", "", allWarnings, err
 		}
 
-		space, warnings, err := actor.GetSpaceByNameAndOrganization(f.SourceSpace, orgGUID)
-		allWarnings = append(allWarnings, warnings...)
+		spaceGUID, spaceWarnings, err := resolveSpaceGUID(f.SourceSpace, orgGUID, actor)
+		allWarnings = append(allWarnings, spaceWarnings...)
 		if err != nil {
 			return "", "", allWarnings, err
 		}
@@ -155,7 +145,7 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 			scopeDisplay += fmt.Sprintf(" (org: %s)", orgName)
 		}
 
-		return fmt.Sprintf("cf:space:%s", space.GUID), scopeDisplay, allWarnings, nil
+		return fmt.Sprintf("cf:space:%s", spaceGUID), scopeDisplay, allWarnings, nil
 	}
 
 	// --source-org (primary: org-level policy)
@@ -172,4 +162,26 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 	}
 
 	return "", "", allWarnings, fmt.Errorf("no source specified")
+}
+
+// resolveOrgGUID returns the GUID and name of the org identified by --source-org,
+// falling back to the targeted org if --source-org is not set.
+func resolveOrgGUID(f RoutePolicySourceFlags, actor Actor, config command.Config) (string, string, v7action.Warnings, error) {
+	if f.SourceOrg == "" {
+		return config.TargetedOrganization().GUID, config.TargetedOrganization().Name, nil, nil
+	}
+	org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
+	if err != nil {
+		return "", "", v7action.Warnings(warnings), err
+	}
+	return org.GUID, f.SourceOrg, v7action.Warnings(warnings), nil
+}
+
+// resolveSpaceGUID returns the GUID of the named space within the given org.
+func resolveSpaceGUID(spaceName, orgGUID string, actor Actor) (string, v7action.Warnings, error) {
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	if err != nil {
+		return "", v7action.Warnings(warnings), err
+	}
+	return space.GUID, v7action.Warnings(warnings), nil
 }

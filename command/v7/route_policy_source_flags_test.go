@@ -326,6 +326,16 @@ var _ = Describe("RoutePolicySourceFlags", func() {
 				Expect(warnings).To(ConsistOf("warn"))
 			})
 
+			It("returns the error and warnings when GetOrganizationByName fails (--source-space + --source-org)", func() {
+				actor.getOrgByName = func(string) (resources.Organization, v7action.Warnings, error) {
+					return resources.Organization{}, v7action.Warnings{"warn"}, errors.New("org-lookup-error")
+				}
+				f := RoutePolicySourceFlags{SourceSpace: "my-space", SourceOrg: "bad-org"}
+				_, _, warnings, err := resolveSource(f, actor, fakeConfig)
+				Expect(err).To(MatchError("org-lookup-error"))
+				Expect(warnings).To(ConsistOf("warn"))
+			})
+
 			It("returns the error and warnings when GetSpaceByNameAndOrganization fails (--source-space)", func() {
 				actor.getSpaceByNameAndOrg = func(string, string) (resources.Space, v7action.Warnings, error) {
 					return resources.Space{}, v7action.Warnings{"warn"}, errors.New("space-lookup-error")
@@ -353,6 +363,80 @@ var _ = Describe("RoutePolicySourceFlags", func() {
 				_, _, _, err := resolveSource(f, actor, fakeConfig)
 				Expect(err).To(MatchError("space-lookup-error"))
 			})
+		})
+	})
+
+	Describe("resolveOrgGUID", func() {
+		var (
+			fakeConfig *commandfakes.FakeConfig
+			actor      *stubSourceActor
+		)
+
+		BeforeEach(func() {
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid", Name: "targeted-org"})
+			actor = &stubSourceActor{}
+		})
+
+		It("returns the targeted org when --source-org is not set", func() {
+			f := RoutePolicySourceFlags{}
+			guid, name, warnings, err := resolveOrgGUID(f, actor, fakeConfig)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(guid).To(Equal("targeted-org-guid"))
+			Expect(name).To(Equal("targeted-org"))
+			Expect(warnings).To(BeEmpty())
+		})
+
+		It("resolves and returns the named org when --source-org is set", func() {
+			actor.getOrgByName = func(orgName string) (resources.Organization, v7action.Warnings, error) {
+				Expect(orgName).To(Equal("other-org"))
+				return resources.Organization{GUID: "other-org-guid"}, v7action.Warnings{"org-warning"}, nil
+			}
+			f := RoutePolicySourceFlags{SourceOrg: "other-org"}
+			guid, name, warnings, err := resolveOrgGUID(f, actor, fakeConfig)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(guid).To(Equal("other-org-guid"))
+			Expect(name).To(Equal("other-org"))
+			Expect(warnings).To(ConsistOf("org-warning"))
+		})
+
+		It("propagates the error and warnings when org lookup fails", func() {
+			actor.getOrgByName = func(string) (resources.Organization, v7action.Warnings, error) {
+				return resources.Organization{}, v7action.Warnings{"warn"}, errors.New("org-error")
+			}
+			f := RoutePolicySourceFlags{SourceOrg: "bad-org"}
+			_, _, warnings, err := resolveOrgGUID(f, actor, fakeConfig)
+			Expect(err).To(MatchError("org-error"))
+			Expect(warnings).To(ConsistOf("warn"))
+		})
+	})
+
+	Describe("resolveSpaceGUID", func() {
+		var actor *stubSourceActor
+
+		BeforeEach(func() {
+			actor = &stubSourceActor{}
+		})
+
+		It("returns the space GUID and warnings on success", func() {
+			actor.getSpaceByNameAndOrg = func(spaceName, orgGUID string) (resources.Space, v7action.Warnings, error) {
+				Expect(spaceName).To(Equal("my-space"))
+				Expect(orgGUID).To(Equal("my-org-guid"))
+				return resources.Space{GUID: "my-space-guid"}, v7action.Warnings{"space-warning"}, nil
+			}
+			guid, warnings, err := resolveSpaceGUID("my-space", "my-org-guid", actor)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(guid).To(Equal("my-space-guid"))
+			Expect(warnings).To(ConsistOf("space-warning"))
+		})
+
+		It("propagates the error and warnings when space lookup fails", func() {
+			actor.getSpaceByNameAndOrg = func(string, string) (resources.Space, v7action.Warnings, error) {
+				return resources.Space{}, v7action.Warnings{"warn"}, errors.New("space-error")
+			}
+			_, warnings, err := resolveSpaceGUID("bad-space", "some-org-guid", actor)
+			Expect(err).To(MatchError("space-error"))
+			Expect(warnings).To(ConsistOf("warn"))
 		})
 	})
 })
