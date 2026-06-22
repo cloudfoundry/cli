@@ -321,11 +321,20 @@ var _ = Describe("Route Policy Actions", func() {
 			policiesWithRoutes []RoutePolicyWithRoute
 			warnings           Warnings
 			executeErr         error
+			domainFilter       string
+			hostnameFilter     string
+			pathFilter         string
 		)
+
+		BeforeEach(func() {
+			domainFilter = ""
+			hostnameFilter = ""
+			pathFilter = ""
+		})
 
 		JustBeforeEach(func() {
 			policiesWithRoutes, warnings, executeErr = actor.GetRoutePoliciesForSpace(
-				"space-guid", "", "", "", "",
+				"space-guid", domainFilter, hostnameFilter, pathFilter, "",
 			)
 		})
 
@@ -443,6 +452,118 @@ var _ = Describe("Route Policy Actions", func() {
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(MatchError("get-policies-error"))
 				Expect(warnings).To(ConsistOf("get-policies-warning"))
+			})
+		})
+
+		When("filtering by domain name", func() {
+			BeforeEach(func() {
+				domainFilter = "apps.example.com"
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "p-match", Source: "cf:any", RouteGUID: "r-match"},
+						{GUID: "p-other", Source: "cf:any", RouteGUID: "r-other"},
+					},
+					ccv3.IncludedResources{
+						Routes: []resources.Route{
+							{GUID: "r-match", Host: "backend", DomainGUID: "target-domain-guid"},
+							{GUID: "r-other", Host: "other", DomainGUID: "other-domain-guid"},
+						},
+					},
+					ccv3.Warnings{"get-policies-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "apps.example.com", GUID: "target-domain-guid"}},
+					ccv3.Warnings{"domain-filter-warning"},
+					nil,
+				)
+			})
+
+			It("returns only matching policies with domain name from cache, no GetDomain call", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(policiesWithRoutes).To(HaveLen(1))
+				Expect(policiesWithRoutes[0].GUID).To(Equal("p-match"))
+				Expect(policiesWithRoutes[0].DomainName).To(Equal("apps.example.com"))
+				// Cache pre-populated from GetDomainByName — GetDomain must not be called
+				Expect(fakeCloudControllerClient.GetDomainCallCount()).To(Equal(0))
+				Expect(warnings).To(ConsistOf("get-policies-warning", "domain-filter-warning"))
+			})
+
+			When("GetDomainByName fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDomainsReturns(
+						nil,
+						ccv3.Warnings{"domain-filter-warning"},
+						errors.New("domain-lookup-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("domain-lookup-error"))
+					Expect(warnings).To(ContainElement("domain-filter-warning"))
+				})
+			})
+		})
+
+		When("filtering by hostname", func() {
+			BeforeEach(func() {
+				hostnameFilter = "backend"
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "p-match", Source: "cf:any", RouteGUID: "r-match"},
+						{GUID: "p-other", Source: "cf:any", RouteGUID: "r-other"},
+					},
+					ccv3.IncludedResources{
+						Routes: []resources.Route{
+							{GUID: "r-match", Host: "backend", DomainGUID: "domain-guid"},
+							{GUID: "r-other", Host: "other", DomainGUID: "domain-guid"},
+						},
+					},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetDomainReturns(
+					resources.Domain{Name: "apps.example.com", GUID: "domain-guid"},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns only policies for routes matching the hostname", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(policiesWithRoutes).To(HaveLen(1))
+				Expect(policiesWithRoutes[0].GUID).To(Equal("p-match"))
+			})
+		})
+
+		When("filtering by path", func() {
+			BeforeEach(func() {
+				pathFilter = "/api"
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "p-match", Source: "cf:any", RouteGUID: "r-match"},
+						{GUID: "p-other", Source: "cf:any", RouteGUID: "r-other"},
+					},
+					ccv3.IncludedResources{
+						Routes: []resources.Route{
+							{GUID: "r-match", Host: "backend", Path: "/api", DomainGUID: "domain-guid"},
+							{GUID: "r-other", Host: "backend", Path: "/other", DomainGUID: "domain-guid"},
+						},
+					},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetDomainReturns(
+					resources.Domain{Name: "apps.example.com", GUID: "domain-guid"},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns only policies for routes matching the path", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(policiesWithRoutes).To(HaveLen(1))
+				Expect(policiesWithRoutes[0].GUID).To(Equal("p-match"))
 			})
 		})
 	})
