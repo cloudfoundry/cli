@@ -460,6 +460,33 @@ func (actor Actor) MoveRoute(routeGUID string, spaceGUID string) (Warnings, erro
 	return Warnings(warnings), err
 }
 
+// GetRoutesByDomain gets routes for a domain with optional hostname and path filters.
+func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resources.Route, Warnings, error) {
+	queries := []ccv3.Query{
+		{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+	}
+
+	if hostname != "" {
+		queries = append(queries, ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}})
+	}
+
+	if path != "" {
+		queries = append(queries, ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}})
+	}
+
+	ccv3Routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	var routes []resources.Route
+	for _, route := range ccv3Routes {
+		routes = append(routes, resources.Route(route))
+	}
+
+	return routes, Warnings(warnings), nil
+}
+
 func getDomainName(fullURL, host, path string, port int) string {
 	domainWithoutHost := strings.TrimPrefix(fullURL, host+".")
 	domainWithoutPath := strings.TrimSuffix(domainWithoutHost, path)
