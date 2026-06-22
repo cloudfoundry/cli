@@ -73,6 +73,25 @@ var _ = Describe("set-label command", func() {
 		})
 	})
 
+	When("setting labels on a route-policy resource", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs = flag.SetLabelArgs{
+				ResourceType: "route-policy",
+				ResourceName: "foo.example.com/the-path",
+				Labels:       []string{"FOO=BAR"},
+			}
+		})
+
+		It("passes the route URL as ResourceName to the label setter without parsing", func() {
+			executeErr = cmd.Execute(nil)
+
+			Expect(executeErr).ToNot(HaveOccurred())
+			targetResource, _ := fakeLabelSetter.ExecuteArgsForCall(0)
+			Expect(targetResource.ResourceType).To(Equal("route-policy"))
+			Expect(targetResource.ResourceName).To(Equal("foo.example.com/the-path"))
+		})
+	})
+
 	When("--source flag is provided", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.SetLabelArgs{
