@@ -329,7 +329,7 @@ var _ = Describe("Route Policy Actions", func() {
 			)
 		})
 
-		When("the API calls are successful", func() {
+		When("the API calls are successful (cf:any source)", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRoutePoliciesReturns(
 					[]resources.RoutePolicy{
@@ -350,7 +350,7 @@ var _ = Describe("Route Policy Actions", func() {
 				)
 			})
 
-			It("returns policies with route info and all warnings", func() {
+			It("sends ?include=route,source and returns policies with route info", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-policies-warning"))
 				Expect(policiesWithRoutes).To(HaveLen(1))
@@ -360,9 +360,57 @@ var _ = Describe("Route Policy Actions", func() {
 				Expect(policiesWithRoutes[0].DomainName).To(Equal("apps.example.com"))
 				Expect(policiesWithRoutes[0].ScopeType).To(Equal("any"))
 
+				queries := fakeCloudControllerClient.GetRoutePoliciesArgsForCall(0)
+				Expect(queries).To(ContainElement(ccv3.Query{Key: ccv3.Include, Values: []string{"route,source"}}))
+
 				Expect(fakeCloudControllerClient.GetDomainCallCount()).To(Equal(1))
-				domainGUIDArg := fakeCloudControllerClient.GetDomainArgsForCall(0)
-				Expect(domainGUIDArg).To(Equal("domain-guid"))
+				Expect(fakeCloudControllerClient.GetDomainArgsForCall(0)).To(Equal("domain-guid"))
+			})
+		})
+
+		When("source names are resolved from CAPI included resources", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "p-app", Source: "cf:app:app-guid", RouteGUID: "r-guid"},
+						{GUID: "p-space", Source: "cf:space:space-guid", RouteGUID: "r-guid"},
+						{GUID: "p-org", Source: "cf:org:org-guid", RouteGUID: "r-guid"},
+					},
+					ccv3.IncludedResources{
+						Routes: []resources.Route{
+							{GUID: "r-guid", Host: "backend", DomainGUID: "domain-guid"},
+						},
+						Apps:          []resources.Application{{GUID: "app-guid", Name: "my-app"}},
+						Spaces:        []resources.Space{{GUID: "space-guid", Name: "my-space"}},
+						Organizations: []resources.Organization{{GUID: "org-guid", Name: "my-org"}},
+					},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetDomainReturns(
+					resources.Domain{Name: "apps.example.com", GUID: "domain-guid"},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("resolves source names from included resources without additional API calls", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(policiesWithRoutes).To(HaveLen(3))
+
+				Expect(policiesWithRoutes[0].ScopeType).To(Equal("app"))
+				Expect(policiesWithRoutes[0].SourceName).To(Equal("my-app"))
+
+				Expect(policiesWithRoutes[1].ScopeType).To(Equal("space"))
+				Expect(policiesWithRoutes[1].SourceName).To(Equal("my-space"))
+
+				Expect(policiesWithRoutes[2].ScopeType).To(Equal("org"))
+				Expect(policiesWithRoutes[2].SourceName).To(Equal("my-org"))
+
+				// No additional API calls for name resolution
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(0))
 			})
 		})
 

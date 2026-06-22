@@ -166,10 +166,12 @@ func (actor Actor) GetRoutePoliciesForSpace(
 ) ([]RoutePolicyWithRoute, Warnings, error) {
 	allWarnings := Warnings{}
 
-	// Build query for route policies filtered by space, with included routes
+	// Build query for route policies filtered by space, with included routes and sources.
+	// ?include=route,source causes CAPI to return all referenced apps/spaces/orgs inline,
+	// avoiding per-policy follow-up lookups.
 	queries := []ccv3.Query{
 		{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
-		{Key: ccv3.Include, Values: []string{"route"}},
+		{Key: ccv3.Include, Values: []string{"route,source"}},
 	}
 
 	// Add label selector if provided
@@ -249,8 +251,24 @@ func (actor Actor) GetRoutePoliciesForSpace(
 		}
 	}
 
-	// Build results with route information and resolved sources
-	// Only include route policies whose routes match the filters
+	// Build name lookup maps from included source resources.
+	// CAPI returns all referenced apps/spaces/orgs inline when ?include=source is sent,
+	// so no additional API calls are required per policy.
+	appNameByGUID := make(map[string]string)
+	for _, app := range includedResources.Apps {
+		appNameByGUID[app.GUID] = app.Name
+	}
+	spaceNameByGUID := make(map[string]string)
+	for _, space := range includedResources.Spaces {
+		spaceNameByGUID[space.GUID] = space.Name
+	}
+	orgNameByGUID := make(map[string]string)
+	for _, org := range includedResources.Organizations {
+		orgNameByGUID[org.GUID] = org.Name
+	}
+
+	// Build results with route information and resolved sources.
+	// Only include route policies whose routes match the filters.
 	var results []RoutePolicyWithRoute
 	for _, policy := range routePolicies {
 		route, exists := routeByGUID[policy.RouteGUID]
@@ -259,12 +277,7 @@ func (actor Actor) GetRoutePoliciesForSpace(
 			continue
 		}
 
-		scopeType, sourceName, warnings, err := actor.resolveRoutePolicySource(policy.Source)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			// If we can't resolve the source, sourceName is already empty string
-			// scopeType is still set correctly
-		}
+		scopeType, sourceName := sourceInfoFromIncluded(policy.Source, appNameByGUID, spaceNameByGUID, orgNameByGUID)
 
 		results = append(results, RoutePolicyWithRoute{
 			RoutePolicy: resources.RoutePolicy(policy),
@@ -278,64 +291,34 @@ func (actor Actor) GetRoutePoliciesForSpace(
 	return results, allWarnings, nil
 }
 
-// resolveRoutePolicySource resolves a source to scope type and human-readable source name
-func (actor Actor) resolveRoutePolicySource(source string) (scopeType string, sourceName string, warnings Warnings, err error) {
-	allWarnings := Warnings{}
-
-	// Parse source format: cf:app:<guid>, cf:space:<guid>, cf:org:<guid>, or cf:any
+// sourceInfoFromIncluded resolves a source string to a scope type and human-readable name
+// using the name maps pre-built from CAPI's ?include=source response.
+// It performs no API calls.
+func sourceInfoFromIncluded(source string, apps, spaces, orgs map[string]string) (scopeType, sourceName string) {
 	if source == "cf:any" {
-		return "any", "", nil, nil
+		return "any", ""
 	}
 
-	// Split source into parts
-	// Expected format: cf:type:guid
 	const prefix = "cf:"
 	if len(source) < len(prefix) {
-		return "unknown", "", nil, nil
+		return "unknown", ""
 	}
 
-	sourceBody := source[len(prefix):]
-	parts := splitSource(sourceBody)
+	parts := splitSource(source[len(prefix):])
 	if len(parts) < 2 {
-		return "unknown", "", nil, nil
+		return "unknown", ""
 	}
 
-	sourceType := parts[0]
-	guid := parts[1]
-
+	sourceType, guid := parts[0], parts[1]
 	switch sourceType {
 	case "app":
-		apps, apiWarnings, err := actor.CloudControllerClient.GetApplications(
-			ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{guid}},
-		)
-		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
-		if err != nil || len(apps) == 0 {
-			return "app", "", allWarnings, err
-		}
-		return "app", apps[0].Name, allWarnings, nil
-
+		return "app", apps[guid]
 	case "space":
-		spaces, _, apiWarnings, err := actor.CloudControllerClient.GetSpaces(
-			ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{guid}},
-		)
-		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
-		if err != nil || len(spaces) == 0 {
-			return "space", "", allWarnings, err
-		}
-		return "space", spaces[0].Name, allWarnings, nil
-
+		return "space", spaces[guid]
 	case "org":
-		orgs, apiWarnings, err := actor.CloudControllerClient.GetOrganizations(
-			ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{guid}},
-		)
-		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
-		if err != nil || len(orgs) == 0 {
-			return "org", "", allWarnings, err
-		}
-		return "org", orgs[0].Name, allWarnings, nil
-
+		return "org", orgs[guid]
 	default:
-		return "unknown", "", nil, nil
+		return "unknown", ""
 	}
 }
 
