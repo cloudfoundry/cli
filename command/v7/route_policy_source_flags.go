@@ -64,6 +64,10 @@ func (f RoutePolicySourceFlags) validateSourceFlags() error {
 
 // resolveSource resolves source flags to a raw source string and a human-readable
 // scope description. Returns (source, scopeDisplay, warnings, error).
+//
+// Resolution cascades org -> space -> app: each level refines the GUID that the
+// next level resolves against, and the most specific flag provided becomes the
+// scope. The result is always of the form cf:<scope>:<guid>.
 func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config) (string, string, v7action.Warnings, error) {
 	var allWarnings v7action.Warnings
 
@@ -77,29 +81,38 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 		return "cf:any", "scope: any, source: any authenticated app", allWarnings, nil
 	}
 
-	// --source-app (with optional --source-space / --source-org for cross-space/org lookup)
-	if f.SourceApp != "" {
-		spaceGUID := config.TargetedSpace().GUID
-		spaceName := config.TargetedSpace().Name
-		orgName := config.TargetedOrganization().Name
+	scope := ""
+	var sourceGUID string
 
-		if f.SourceSpace != "" {
-			resolvedOrgGUID, resolvedOrgName, orgWarnings, err := resolveOrgGUID(f, actor, config)
-			allWarnings = append(allWarnings, orgWarnings...)
-			if err != nil {
-				return "", "", allWarnings, err
-			}
-			orgName = resolvedOrgName
-
-			resolvedSpaceGUID, spaceWarnings, err := resolveSpaceGUID(f.SourceSpace, resolvedOrgGUID, actor)
-			allWarnings = append(allWarnings, spaceWarnings...)
-			if err != nil {
-				return "", "", allWarnings, err
-			}
-			spaceGUID = resolvedSpaceGUID
-			spaceName = f.SourceSpace
+	// Org level: default to the targeted org; --source-org overrides it and, when it
+	// is the most specific flag provided, becomes the scope.
+	orgGUID := config.TargetedOrganization().GUID
+	orgName := config.TargetedOrganization().Name
+	if f.SourceOrg != "" {
+		org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return "", "", allWarnings, err
 		}
+		orgGUID, orgName = org.GUID, f.SourceOrg
+		scope, sourceGUID = "org", orgGUID
+	}
 
+	// Space level: resolved within orgGUID (targeted or --source-org).
+	spaceGUID := config.TargetedSpace().GUID
+	spaceName := config.TargetedSpace().Name
+	if f.SourceSpace != "" {
+		space, warnings, err := actor.GetSpaceByNameAndOrganization(f.SourceSpace, orgGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return "", "", allWarnings, err
+		}
+		spaceGUID, spaceName = space.GUID, f.SourceSpace
+		scope, sourceGUID = "space", spaceGUID
+	}
+
+	// App level: resolved within spaceGUID (targeted, --source-space, or both).
+	if f.SourceApp != "" {
 		app, warnings, err := actor.GetApplicationByNameAndSpace(f.SourceApp, spaceGUID)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
@@ -113,8 +126,18 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 			}
 			return "", "", allWarnings, err
 		}
+		scope, sourceGUID = "app", app.GUID
+	}
 
-		scopeDisplay := fmt.Sprintf("scope: app, source: %s", f.SourceApp)
+	if scope == "" {
+		return "", "", allWarnings, fmt.Errorf("no source specified")
+	}
+
+	// Human-readable scope description; annotate cross-space/cross-org modifiers when present.
+	var scopeDisplay string
+	switch scope {
+	case "app":
+		scopeDisplay = fmt.Sprintf("scope: app, source: %s", f.SourceApp)
 		if f.SourceSpace != "" {
 			scopeDisplay += fmt.Sprintf(" (space: %s", spaceName)
 			if f.SourceOrg != "" {
@@ -122,66 +145,14 @@ func resolveSource(f RoutePolicySourceFlags, actor Actor, config command.Config)
 			}
 			scopeDisplay += ")"
 		}
-
-		return fmt.Sprintf("cf:app:%s", app.GUID), scopeDisplay, allWarnings, nil
-	}
-
-	// --source-space (primary: space-level policy)
-	if f.SourceSpace != "" {
-		orgGUID, orgName, orgWarnings, err := resolveOrgGUID(f, actor, config)
-		allWarnings = append(allWarnings, orgWarnings...)
-		if err != nil {
-			return "", "", allWarnings, err
-		}
-
-		spaceGUID, spaceWarnings, err := resolveSpaceGUID(f.SourceSpace, orgGUID, actor)
-		allWarnings = append(allWarnings, spaceWarnings...)
-		if err != nil {
-			return "", "", allWarnings, err
-		}
-
-		scopeDisplay := fmt.Sprintf("scope: space, source: %s", f.SourceSpace)
+	case "space":
+		scopeDisplay = fmt.Sprintf("scope: space, source: %s", f.SourceSpace)
 		if f.SourceOrg != "" {
 			scopeDisplay += fmt.Sprintf(" (org: %s)", orgName)
 		}
-
-		return fmt.Sprintf("cf:space:%s", spaceGUID), scopeDisplay, allWarnings, nil
+	default: // "org"
+		scopeDisplay = fmt.Sprintf("scope: org, source: %s", f.SourceOrg)
 	}
 
-	// --source-org (primary: org-level policy)
-	if f.SourceOrg != "" {
-		org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return "", "", allWarnings, err
-		}
-
-		return fmt.Sprintf("cf:org:%s", org.GUID),
-			fmt.Sprintf("scope: org, source: %s", f.SourceOrg),
-			allWarnings, nil
-	}
-
-	return "", "", allWarnings, fmt.Errorf("no source specified")
-}
-
-// resolveOrgGUID returns the GUID and name of the org identified by --source-org,
-// falling back to the targeted org if --source-org is not set.
-func resolveOrgGUID(f RoutePolicySourceFlags, actor Actor, config command.Config) (string, string, v7action.Warnings, error) {
-	if f.SourceOrg == "" {
-		return config.TargetedOrganization().GUID, config.TargetedOrganization().Name, nil, nil
-	}
-	org, warnings, err := actor.GetOrganizationByName(f.SourceOrg)
-	if err != nil {
-		return "", "", v7action.Warnings(warnings), err
-	}
-	return org.GUID, f.SourceOrg, v7action.Warnings(warnings), nil
-}
-
-// resolveSpaceGUID returns the GUID of the named space within the given org.
-func resolveSpaceGUID(spaceName, orgGUID string, actor Actor) (string, v7action.Warnings, error) {
-	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-	if err != nil {
-		return "", v7action.Warnings(warnings), err
-	}
-	return space.GUID, v7action.Warnings(warnings), nil
+	return fmt.Sprintf("cf:%s:%s", scope, sourceGUID), scopeDisplay, allWarnings, nil
 }
