@@ -2,7 +2,6 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
-	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/types"
 )
@@ -178,42 +177,6 @@ func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID str
 	}
 
 	return warnings, nil
-}
-
-// resolveRoutePolicyGUID finds the GUID of the route policy to operate on.
-// If source is non-empty, it finds the policy with that source.
-// If source is empty, it requires exactly one policy (returns ambiguity or not-found error).
-func (actor *Actor) resolveRoutePolicyGUID(routeURL, spaceGUID, source string) (string, *resources.Metadata, Warnings, error) {
-	route, routeWarnings, err := actor.GetRoute(routeURL, spaceGUID)
-	if err != nil {
-		return "", nil, routeWarnings, err
-	}
-
-	routePolicies, _, policyWarnings, err := actor.CloudControllerClient.GetRoutePolicies(
-		ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{route.GUID}},
-	)
-	allWarnings := append(routeWarnings, Warnings(policyWarnings)...)
-	if err != nil {
-		return "", nil, allWarnings, err
-	}
-
-	if source != "" {
-		for _, p := range routePolicies {
-			if p.Source == source {
-				return p.GUID, p.Metadata, allWarnings, nil
-			}
-		}
-		return "", nil, allWarnings, actionerror.RoutePolicyNotFoundError{Source: source}
-	}
-
-	if len(routePolicies) == 0 {
-		return "", nil, allWarnings, actionerror.RoutePolicyNotFoundError{Source: ""}
-	}
-	if len(routePolicies) > 1 {
-		return "", nil, allWarnings, actionerror.RoutePolicyAmbiguityError{RouteURL: routeURL, Count: len(routePolicies)}
-	}
-	p := routePolicies[0]
-	return p.GUID, p.Metadata, allWarnings, nil
 }
 
 func (actor *Actor) GetRoutePolicyLabels(routeURL, spaceGUID, source string) (map[string]types.NullString, Warnings, error) {
