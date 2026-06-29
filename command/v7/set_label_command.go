@@ -85,6 +85,7 @@ buildpack
 domain
 org
 route
+route-policy
 service-broker
 service-instance
 service-offering
