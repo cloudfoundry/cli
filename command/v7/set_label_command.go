@@ -24,6 +24,7 @@ type SetLabelCommand struct {
 	BuildpackLifecycle string            `long:"lifecycle" short:"l" description:"Specify lifecycle to disambiguate buildpacks with the same name"`
 	ServiceBroker      string            `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
 	ServiceOffering    string            `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
+	RoutePolicySource  string            `long:"source" description:"Specify a route policy source to disambiguate when a route has multiple policies"`
 
 	LabelSetter LabelSetter
 }
@@ -46,11 +47,12 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd SetLabelCommand) Execute(args []string) error {
 	targetResource := TargetResource{
-		ResourceType:    cmd.RequiredArgs.ResourceType,
-		ResourceName:    cmd.RequiredArgs.ResourceName,
-		BuildpackStack:  cmd.BuildpackStack,
-		ServiceBroker:   cmd.ServiceBroker,
-		ServiceOffering: cmd.ServiceOffering,
+		ResourceType:      cmd.RequiredArgs.ResourceType,
+		ResourceName:      cmd.RequiredArgs.ResourceName,
+		BuildpackStack:    cmd.BuildpackStack,
+		ServiceBroker:     cmd.ServiceBroker,
+		ServiceOffering:   cmd.ServiceOffering,
+		RoutePolicySource: cmd.RoutePolicySource,
 	}
 
 	labels := make(map[string]types.NullString)
@@ -83,6 +85,7 @@ buildpack
 domain
 org
 route
+route-policy
 service-broker
 service-instance
 service-offering

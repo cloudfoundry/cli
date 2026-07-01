@@ -28,4 +28,10 @@ const (
 	MinVersionEmbeddedProcessInstances = "3.211.0"
 
 	MinVersionUpdateStack = "3.211.0"
+
+	// MinVersionRoutePolicies is a placeholder until the CAPI team confirms the
+	// version that introduces /v3/route_policies and the enforce_route_policies /
+	// route_policies_scope domain fields. Replace "3.999.0" with the real version
+	// once known. The test in minimum_version_test.go will keep failing until then.
+	MinVersionRoutePolicies = "3.221.0"
 )
