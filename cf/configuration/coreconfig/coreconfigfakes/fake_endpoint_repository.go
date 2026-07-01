@@ -97,8 +97,6 @@ func (fake *FakeEndpointRepository) GetCCInfoReturnsOnCall(i int, result1 *corec
 func (fake *FakeEndpointRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getCCInfoMutex.RLock()
-	defer fake.getCCInfoMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -592,24 +592,6 @@ func (fake *FakeConfig) VerboseReturnsOnCall(i int, result1 bool, result2 []stri
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	fake.binaryNameMutex.RLock()
-	defer fake.binaryNameMutex.RUnlock()
-	fake.currentUserNameMutex.RLock()
-	defer fake.currentUserNameMutex.RUnlock()
-	fake.hasTargetedOrganizationMutex.RLock()
-	defer fake.hasTargetedOrganizationMutex.RUnlock()
-	fake.hasTargetedSpaceMutex.RLock()
-	defer fake.hasTargetedSpaceMutex.RUnlock()
-	fake.isCFOnK8sMutex.RLock()
-	defer fake.isCFOnK8sMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	fake.targetedOrganizationNameMutex.RLock()
-	defer fake.targetedOrganizationNameMutex.RUnlock()
-	fake.verboseMutex.RLock()
-	defer fake.verboseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

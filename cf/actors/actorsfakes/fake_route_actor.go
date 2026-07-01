@@ -641,22 +641,6 @@ func (fake *FakeRouteActor) UnbindAllReturnsOnCall(i int, result1 error) {
 func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.bindRouteMutex.RLock()
-	defer fake.bindRouteMutex.RUnlock()
-	fake.createRandomTCPRouteMutex.RLock()
-	defer fake.createRandomTCPRouteMutex.RUnlock()
-	fake.findAndBindRouteMutex.RLock()
-	defer fake.findAndBindRouteMutex.RUnlock()
-	fake.findDomainMutex.RLock()
-	defer fake.findDomainMutex.RUnlock()
-	fake.findOrCreateRouteMutex.RLock()
-	defer fake.findOrCreateRouteMutex.RUnlock()
-	fake.findPathMutex.RLock()
-	defer fake.findPathMutex.RUnlock()
-	fake.findPortMutex.RLock()
-	defer fake.findPortMutex.RUnlock()
-	fake.unbindAllMutex.RLock()
-	defer fake.unbindAllMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

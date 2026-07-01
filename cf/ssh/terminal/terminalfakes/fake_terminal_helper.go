@@ -467,18 +467,6 @@ func (fake *FakeTerminalHelper) StdStreamsReturnsOnCall(i int, result1 io.ReadCl
 func (fake *FakeTerminalHelper) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getFdInfoMutex.RLock()
-	defer fake.getFdInfoMutex.RUnlock()
-	fake.getWinsizeMutex.RLock()
-	defer fake.getWinsizeMutex.RUnlock()
-	fake.isTerminalMutex.RLock()
-	defer fake.isTerminalMutex.RUnlock()
-	fake.restoreTerminalMutex.RLock()
-	defer fake.restoreTerminalMutex.RUnlock()
-	fake.setRawTerminalMutex.RLock()
-	defer fake.setRawTerminalMutex.RUnlock()
-	fake.stdStreamsMutex.RLock()
-	defer fake.stdStreamsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

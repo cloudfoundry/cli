@@ -398,16 +398,6 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturnsOnCall(i int,
 func (fake *FakeServicePlanActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.findServiceAccessMutex.RLock()
-	defer fake.findServiceAccessMutex.RUnlock()
-	fake.updateAllPlansForServiceMutex.RLock()
-	defer fake.updateAllPlansForServiceMutex.RUnlock()
-	fake.updateOrgForServiceMutex.RLock()
-	defer fake.updateOrgForServiceMutex.RUnlock()
-	fake.updatePlanAndOrgForServiceMutex.RLock()
-	defer fake.updatePlanAndOrgForServiceMutex.RUnlock()
-	fake.updateSinglePlanForServiceMutex.RLock()
-	defer fake.updateSinglePlanForServiceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -105,8 +105,6 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturnsOnCall(i int
 func (fake *FakeRemoveNetworkPolicyActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.removeNetworkPolicyMutex.RLock()
-	defer fake.removeNetworkPolicyMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

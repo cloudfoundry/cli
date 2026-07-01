@@ -105,8 +105,6 @@ func (fake *FakeCurlRepository) RequestReturnsOnCall(i int, result1 string, resu
 func (fake *FakeCurlRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.requestMutex.RLock()
-	defer fake.requestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

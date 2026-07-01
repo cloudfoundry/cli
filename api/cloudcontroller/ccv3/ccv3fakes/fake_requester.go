@@ -661,24 +661,6 @@ func (fake *FakeRequester) WrapConnectionArgsForCall(i int) ccv3.ConnectionWrapp
 func (fake *FakeRequester) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.initializeConnectionMutex.RLock()
-	defer fake.initializeConnectionMutex.RUnlock()
-	fake.initializeRouterMutex.RLock()
-	defer fake.initializeRouterMutex.RUnlock()
-	fake.makeListRequestMutex.RLock()
-	defer fake.makeListRequestMutex.RUnlock()
-	fake.makeRequestMutex.RLock()
-	defer fake.makeRequestMutex.RUnlock()
-	fake.makeRequestReceiveRawMutex.RLock()
-	defer fake.makeRequestReceiveRawMutex.RUnlock()
-	fake.makeRequestSendRawMutex.RLock()
-	defer fake.makeRequestSendRawMutex.RUnlock()
-	fake.makeRequestSendReceiveRawMutex.RLock()
-	defer fake.makeRequestSendReceiveRawMutex.RUnlock()
-	fake.makeRequestUploadAsyncMutex.RLock()
-	defer fake.makeRequestUploadAsyncMutex.RUnlock()
-	fake.wrapConnectionMutex.RLock()
-	defer fake.wrapConnectionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
