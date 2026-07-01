@@ -1,9 +1,9 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/v9/actor/actionerror"
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/v9/resources"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/resources"
 )
 
 func (actor Actor) AddRoutePolicy(domainName, source, hostname, path string) (Warnings, error) {

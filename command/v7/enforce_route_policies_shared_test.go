@@ -1,9 +1,9 @@
 package v7_test
 
 import (
-	ccversionPkg "code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
-	translatablerrorPkg "code.cloudfoundry.org/cli/v9/command/translatableerror"
-	uiPkg "code.cloudfoundry.org/cli/v9/util/ui"
+	ccversionPkg "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
+	translatablerrorPkg "code.cloudfoundry.org/cli/v8/command/translatableerror"
+	uiPkg "code.cloudfoundry.org/cli/v8/util/ui"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -3,10 +3,10 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/v9/actor/actionerror"
-	"code.cloudfoundry.org/cli/v9/actor/v7action"
-	"code.cloudfoundry.org/cli/v9/command"
-	"code.cloudfoundry.org/cli/v9/command/translatableerror"
+	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/command"
+	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 )
 
 // RoutePolicySourceFlags holds the mutually exclusive source-resolution flags

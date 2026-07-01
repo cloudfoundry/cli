@@ -3,7 +3,7 @@ package ccversion_test
 import (
 	"testing"
 
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 )
 
 // TestMinVersionRoutePoliciesIsNotPlaceholder will keep failing until

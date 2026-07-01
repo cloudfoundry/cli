@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller"
 )
 
 type RoutePolicy struct {
