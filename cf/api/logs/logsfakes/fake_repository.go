@@ -163,12 +163,6 @@ func (fake *FakeRepository) TailLogsForArgsForCall(i int) (string, func(), chan<
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	fake.recentLogsForMutex.RLock()
-	defer fake.recentLogsForMutex.RUnlock()
-	fake.tailLogsForMutex.RLock()
-	defer fake.tailLogsForMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

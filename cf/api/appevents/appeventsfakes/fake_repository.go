@@ -95,8 +95,6 @@ func (fake *FakeRepository) RecentEventsReturnsOnCall(i int, result1 []models.Ev
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.recentEventsMutex.RLock()
-	defer fake.recentEventsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

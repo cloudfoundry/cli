@@ -618,22 +618,6 @@ func (fake *FakeOrganizationRepository) UnsharePrivateDomainReturnsOnCall(i int,
 func (fake *FakeOrganizationRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.findByNameMutex.RLock()
-	defer fake.findByNameMutex.RUnlock()
-	fake.getManyOrgsByGUIDMutex.RLock()
-	defer fake.getManyOrgsByGUIDMutex.RUnlock()
-	fake.listOrgsMutex.RLock()
-	defer fake.listOrgsMutex.RUnlock()
-	fake.renameMutex.RLock()
-	defer fake.renameMutex.RUnlock()
-	fake.sharePrivateDomainMutex.RLock()
-	defer fake.sharePrivateDomainMutex.RUnlock()
-	fake.unsharePrivateDomainMutex.RLock()
-	defer fake.unsharePrivateDomainMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

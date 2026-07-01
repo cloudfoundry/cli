@@ -92,8 +92,6 @@ func (fake *FakeClientRepository) ClientExistsReturnsOnCall(i int, result1 bool,
 func (fake *FakeClientRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.clientExistsMutex.RLock()
-	defer fake.clientExistsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
