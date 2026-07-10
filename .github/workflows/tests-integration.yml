@@ -25,6 +25,11 @@ on:
     branches:
       - main
       - v8
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
     paths-ignore:
       - "doc/**"
       - ".gitpod.yml"
@@ -34,7 +39,15 @@ jobs:
 
   get-sha:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: |
+      ${{ github.actor != 'dependabot[bot]' && (
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'push' ||
+        github.event.pull_request.author_association == 'OWNER' ||
+        github.event.pull_request.author_association == 'COLLABORATOR' ||
+        (github.event.action == 'labeled' &&
+         github.event.label.name == 'safe-to-test')
+      ) }}
     outputs:
       gitRef: ${{steps.calculate.outputs.ref}}
     steps:
@@ -46,6 +59,9 @@ jobs:
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             echo "checkout push request ${{github.event.push.after}}"
             echo "ref=${{github.event.push.after}}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "checkout workflow_dispatch ref ${{ github.sha }}"
+            echo "ref=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo "checkout else ${{ github.event.workflow_run.head_sha }}"
             echo "ref=${{github.event.workflow_run.head_sha}}" >> $GITHUB_OUTPUT
@@ -58,7 +74,7 @@ jobs:
       - get-sha
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
           fetch-depth: 0
@@ -87,7 +103,7 @@ jobs:
       - create-cf-env
     outputs:
       env-name: ${{ steps.set-name.outputs.env-name }}
-    if: ${{ always() && github.actor != 'dependabot[bot]' }}
+    if: ${{ always() && needs.get-sha.result == 'success' && github.actor != 'dependabot[bot]' }}
     steps:
       - name: set env name
         id: set-name

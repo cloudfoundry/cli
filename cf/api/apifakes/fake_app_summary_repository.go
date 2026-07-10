@@ -161,10 +161,6 @@ func (fake *FakeAppSummaryRepository) GetSummaryReturnsOnCall(i int, result1 mod
 func (fake *FakeAppSummaryRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getSummariesInCurrentSpaceMutex.RLock()
-	defer fake.getSummariesInCurrentSpaceMutex.RUnlock()
-	fake.getSummaryMutex.RLock()
-	defer fake.getSummaryMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
