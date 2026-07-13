@@ -78,6 +78,10 @@ jobs:
         with:
           ref: ${{needs.get-sha.outputs.gitRef}}
           fetch-depth: 0
+          # get-sha only produces this ref for OWNER/COLLABORATOR authors or
+          # after a maintainer applies the safe-to-test label - see get-sha's
+          # if: condition above.
+          allow-unsafe-pr-checkout: true
       - name: Set Up Go
         uses: actions/setup-go@v6
         with:
