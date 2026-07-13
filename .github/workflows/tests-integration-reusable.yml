@@ -37,6 +37,10 @@ jobs:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
         path: cli
+        # gitRef is only ever populated by tests-integration.yml's get-sha
+        # job, which is gated on OWNER/COLLABORATOR authors or the
+        # safe-to-test label.
+        allow-unsafe-pr-checkout: true
 
     - name: Checkout CF deployment tasks
       uses: actions/checkout@v7
