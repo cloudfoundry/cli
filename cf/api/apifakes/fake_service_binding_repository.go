@@ -248,12 +248,6 @@ func (fake *FakeServiceBindingRepository) ListAllForServiceReturnsOnCall(i int, 
 func (fake *FakeServiceBindingRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.listAllForServiceMutex.RLock()
-	defer fake.listAllForServiceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -163,10 +163,6 @@ func (fake *FakeSecurityGroupSpaceBinder) UnbindSpaceReturnsOnCall(i int, result
 func (fake *FakeSecurityGroupSpaceBinder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.bindSpaceMutex.RLock()
-	defer fake.bindSpaceMutex.RUnlock()
-	fake.unbindSpaceMutex.RLock()
-	defer fake.unbindSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -385,16 +385,6 @@ func (fake *FakeOrgRoleSetter) SetOrgRoleReturnsOnCall(i int, result1 error) {
 func (fake *FakeOrgRoleSetter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.metaDataMutex.RLock()
-	defer fake.metaDataMutex.RUnlock()
-	fake.requirementsMutex.RLock()
-	defer fake.requirementsMutex.RUnlock()
-	fake.setDependencyMutex.RLock()
-	defer fake.setDependencyMutex.RUnlock()
-	fake.setOrgRoleMutex.RLock()
-	defer fake.setOrgRoleMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
