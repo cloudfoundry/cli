@@ -66,21 +66,41 @@ jobs:
 
       - name: Download file from GCS
         run: |
-          gsutil -m cp -P -R gs://cf-cli-bosh-lites/${ENV_NAME} . 
+          gcloud storage cp -r gs://cf-cli-bosh-lites/${ENV_NAME} .
 
       - name: delete bosh
+        id: delete-bosh
+        timeout-minutes: 30
+        continue-on-error: true
         run: |
           cd ${ENV_NAME}/bbl-state
           eval "$(bbl print-env --shell-type posix)"
 
           # Delete the CF deployment first so warden containers release their
-          # bind mounts on the director's persistent disk. 
+          # bind mounts on the director's persistent disk. --force makes bosh ignore
+          # per-instance errors (like a busy unmount) and still delete the
+          # deployment record.
           echo "Deleting CF deployment ${BOSH_DEPLOYMENT}"
-          bosh delete-deployment -d ${BOSH_DEPLOYMENT} --force --skip-drain || true
+          bosh delete-deployment -d ${BOSH_DEPLOYMENT} --force || true
 
           echo "Deleting env ${ENV_NAME}"
           bbl down --no-confirm
-        
-      - name: delete gcs bucket
+
+      - name: force delete env (fallback)
+        if: steps.delete-bosh.outcome == 'failure'
+        timeout-minutes: 15
         run: |
-          gsutil rm -R gs://cf-cli-bosh-lites/${ENV_NAME} 
+          echo "${BBL_GCP_SERVICE_ACCOUNT_KEY}" > /tmp/gcp_key.json
+          export BBL_GCP_SERVICE_ACCOUNT_KEY_PATH=/tmp/gcp_key.json
+          bash ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/force-delete-env.sh "${ENV_NAME}"
+          rm -f /tmp/gcp_key.json
+
+      - name: delete gcs bucket
+        if: always()
+        run: |
+          gcloud storage rm -r gs://cf-cli-bosh-lites/${ENV_NAME}
+
+      - name: warn if delete bosh needed the fallback
+        if: steps.delete-bosh.outcome == 'failure'
+        run: |
+          echo "::warning::The graceful 'delete bosh' step failed for ${ENV_NAME} and the environment was torn down via the force-delete-env.sh fallback instead. This usually means an abandoned BOSH task or a warden mount was still busy - see the 'delete bosh' step log for details."

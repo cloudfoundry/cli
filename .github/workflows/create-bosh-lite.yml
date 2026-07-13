@@ -132,6 +132,7 @@ jobs:
           
           bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"          
       - name: Deploy cf
+        timeout-minutes: 90
         run: |
           env_name="${{ steps.setup-bbl-env.outputs.envName }}"
           cd $env_name/bbl-state
