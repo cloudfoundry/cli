@@ -97,8 +97,6 @@ func (fake *FakeSecureDialer) DialReturnsOnCall(i int, result1 clissh.SecureClie
 func (fake *FakeSecureDialer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.dialMutex.RLock()
-	defer fake.dialMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
