@@ -269,12 +269,6 @@ func (fake *FakeManifestParser) ParseManifestReturnsOnCall(i int, result1 manife
 func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.interpolateManifestMutex.RLock()
-	defer fake.interpolateManifestMutex.RUnlock()
-	fake.marshalManifestMutex.RLock()
-	defer fake.marshalManifestMutex.RUnlock()
-	fake.parseManifestMutex.RLock()
-	defer fake.parseManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

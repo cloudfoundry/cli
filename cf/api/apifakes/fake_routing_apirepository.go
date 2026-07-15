@@ -88,8 +88,6 @@ func (fake *FakeRoutingAPIRepository) ListRouterGroupsReturnsOnCall(i int, resul
 func (fake *FakeRoutingAPIRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.listRouterGroupsMutex.RLock()
-	defer fake.listRouterGroupsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

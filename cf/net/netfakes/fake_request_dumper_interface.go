@@ -90,10 +90,6 @@ func (fake *FakeRequestDumperInterface) DumpResponseArgsForCall(i int) *http.Res
 func (fake *FakeRequestDumperInterface) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.dumpRequestMutex.RLock()
-	defer fake.dumpRequestMutex.RUnlock()
-	fake.dumpResponseMutex.RLock()
-	defer fake.dumpResponseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

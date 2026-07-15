@@ -296,14 +296,6 @@ func (fake *FakeRepository) SetStagingReturnsOnCall(i int, result1 error) {
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.listRunningMutex.RLock()
-	defer fake.listRunningMutex.RUnlock()
-	fake.listStagingMutex.RLock()
-	defer fake.listStagingMutex.RUnlock()
-	fake.setRunningMutex.RLock()
-	defer fake.setRunningMutex.RUnlock()
-	fake.setStagingMutex.RLock()
-	defer fake.setStagingMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

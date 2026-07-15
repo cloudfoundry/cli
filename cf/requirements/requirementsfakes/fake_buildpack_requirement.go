@@ -142,10 +142,6 @@ func (fake *FakeBuildpackRequirement) GetBuildpackReturnsOnCall(i int, result1 m
 func (fake *FakeBuildpackRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getBuildpackMutex.RLock()
-	defer fake.getBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

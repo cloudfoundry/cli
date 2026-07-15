@@ -280,16 +280,6 @@ func (fake *FakePluginConfiguration) SetPluginArgsForCall(i int) (string, plugin
 func (fake *FakePluginConfiguration) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getPluginPathMutex.RLock()
-	defer fake.getPluginPathMutex.RUnlock()
-	fake.listCommandsMutex.RLock()
-	defer fake.listCommandsMutex.RUnlock()
-	fake.pluginsMutex.RLock()
-	defer fake.pluginsMutex.RUnlock()
-	fake.removePluginMutex.RLock()
-	defer fake.removePluginMutex.RUnlock()
-	fake.setPluginMutex.RLock()
-	defer fake.setPluginMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

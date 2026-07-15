@@ -404,16 +404,6 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceReturnsOnCall(i int,
 func (fake *FakeBrokerBuilder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.attachBrokersToServicesMutex.RLock()
-	defer fake.attachBrokersToServicesMutex.RUnlock()
-	fake.attachSpecificBrokerToServicesMutex.RLock()
-	defer fake.attachSpecificBrokerToServicesMutex.RUnlock()
-	fake.getAllServiceBrokersMutex.RLock()
-	defer fake.getAllServiceBrokersMutex.RUnlock()
-	fake.getBrokerWithAllServicesMutex.RLock()
-	defer fake.getBrokerWithAllServicesMutex.RUnlock()
-	fake.getBrokerWithSpecifiedServiceMutex.RLock()
-	defer fake.getBrokerWithSpecifiedServiceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

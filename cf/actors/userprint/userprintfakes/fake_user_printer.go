@@ -54,8 +54,6 @@ func (fake *FakeUserPrinter) PrintUsersArgsForCall(i int) (string, string) {
 func (fake *FakeUserPrinter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.printUsersMutex.RLock()
-	defer fake.printUsersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -142,10 +142,6 @@ func (fake *FakeApplicationRequirement) GetApplicationReturnsOnCall(i int, resul
 func (fake *FakeApplicationRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getApplicationMutex.RLock()
-	defer fake.getApplicationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
