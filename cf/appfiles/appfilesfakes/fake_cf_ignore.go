@@ -87,8 +87,6 @@ func (fake *FakeCfIgnore) FileShouldBeIgnoredReturnsOnCall(i int, result1 bool) 
 func (fake *FakeCfIgnore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.fileShouldBeIgnoredMutex.RLock()
-	defer fake.fileShouldBeIgnoredMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

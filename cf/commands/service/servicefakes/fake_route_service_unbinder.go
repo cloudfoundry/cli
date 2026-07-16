@@ -90,8 +90,6 @@ func (fake *FakeRouteServiceUnbinder) UnbindRouteReturnsOnCall(i int, result1 er
 func (fake *FakeRouteServiceUnbinder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.unbindRouteMutex.RLock()
-	defer fake.unbindRouteMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

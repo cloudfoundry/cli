@@ -78,8 +78,6 @@ func (fake *FakeRandomWordGenerator) BabbleReturnsOnCall(i int, result1 string) 
 func (fake *FakeRandomWordGenerator) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.babbleMutex.RLock()
-	defer fake.babbleMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
