@@ -24,7 +24,7 @@ func (actor Actor) CheckRoute(domainName string, hostname string, path string, p
 	return matches, allWarnings, err
 }
 
-func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGroupName string) (Warnings, error) {
+func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGroupName string, enforceAccessRules bool, accessRulesScope string) (Warnings, error) {
 	allWarnings := Warnings{}
 	routerGroupGUID := ""
 
@@ -37,17 +37,25 @@ func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGr
 		routerGroupGUID = routerGroup.GUID
 	}
 
-	_, warnings, err := actor.CloudControllerClient.CreateDomain(resources.Domain{
+	domain := resources.Domain{
 		Name:        domainName,
 		Internal:    types.NullBool{IsSet: true, Value: internal},
 		RouterGroup: routerGroupGUID,
-	})
+	}
+
+	// Set enforce_route_policies if specified
+	if enforceAccessRules {
+		domain.EnforceRoutePolicies = types.NullBool{IsSet: true, Value: true}
+		domain.RoutePoliciesScope = accessRulesScope
+	}
+
+	_, warnings, err := actor.CloudControllerClient.CreateDomain(domain)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 
 	return allWarnings, err
 }
 
-func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warnings, error) {
+func (actor Actor) CreatePrivateDomain(domainName string, orgName string, enforceAccessRules bool, accessRulesScope string) (Warnings, error) {
 	allWarnings := Warnings{}
 	organization, warnings, err := actor.GetOrganizationByName(orgName)
 	allWarnings = append(allWarnings, warnings...)
@@ -55,10 +63,19 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	if err != nil {
 		return allWarnings, err
 	}
-	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(resources.Domain{
+
+	domain := resources.Domain{
 		Name:             domainName,
 		OrganizationGUID: organization.GUID,
-	})
+	}
+
+	// Set enforce_route_policies if specified
+	if enforceAccessRules {
+		domain.EnforceRoutePolicies = types.NullBool{IsSet: true, Value: true}
+		domain.RoutePoliciesScope = accessRulesScope
+	}
+
+	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(domain)
 
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
