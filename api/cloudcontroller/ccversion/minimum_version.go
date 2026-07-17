@@ -28,4 +28,10 @@ const (
 	MinVersionEmbeddedProcessInstances = "3.211.0"
 
 	MinVersionUpdateStack = "3.211.0"
+
+	// MinVersionRoutePolicies is the CC API version that introduces
+	// /v3/route_policies and the enforce_route_policies / route_policies_scope
+	// domain fields (RFC0055 Identity-Aware Routing), as shipped in
+	// capi-release 1.239.0.
+	MinVersionRoutePolicies = "3.224.0"
 )

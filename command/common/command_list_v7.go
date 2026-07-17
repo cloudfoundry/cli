@@ -15,6 +15,8 @@ type commandList struct {
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 
+	RoutePolicies                      v7.RoutePoliciesCommand                      `command:"route-policies" description:"List all route policies in the target space"`
+	AddRoutePolicy                     v7.AddRoutePolicyCommand                     `command:"add-route-policy" description:"Add a route policy to allow specific apps, spaces, or orgs to access a route"`
 	API                                v7.APICommand                                `command:"api" description:"Set or view target api url"`
 	AddNetworkPolicy                   v7.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
@@ -113,6 +115,7 @@ type commandList struct {
 	PurgeServiceOffering               v7.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service offering and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	RemoveNetworkPolicy                v7.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
+	RemoveRoutePolicy                  v7.RemoveRoutePolicyCommand                  `command:"remove-route-policy" description:"Remove a route policy from a route"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	Rename                             v7.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RenameOrg                          v7.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`

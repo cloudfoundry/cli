@@ -26,6 +26,7 @@ func labelSubcommands(subcommandsToRemove ...string) []TableEntry {
 		"domain",
 		"org",
 		"route",
+		"route-policy",
 		"space",
 		"stack",
 		"service-broker",
@@ -206,17 +207,17 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 
-				switch resourceType {
-				case "app", "route", "service-instance":
-					Expect(checkOrg).To(BeTrue())
-					Expect(checkSpace).To(BeTrue())
-				case "space":
-					Expect(checkOrg).To(BeTrue())
-					Expect(checkSpace).To(BeFalse())
-				default:
-					Expect(checkOrg).To(BeFalse())
-					Expect(checkSpace).To(BeFalse())
-				}
+			switch resourceType {
+			case "app", "route", "route-policy", "service-instance":
+				Expect(checkOrg).To(BeTrue())
+				Expect(checkSpace).To(BeTrue())
+			case "space":
+				Expect(checkOrg).To(BeTrue())
+				Expect(checkSpace).To(BeFalse())
+			default:
+				Expect(checkOrg).To(BeFalse())
+				Expect(checkSpace).To(BeFalse())
+			}
 			},
 			labelSubcommands(),
 		)
@@ -830,6 +831,119 @@ var _ = Describe("LabelUpdater", func() {
 
 				It("shows 'Setting' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org fake-org / space fake-space as some-user...`), resourceName))
+				})
+			})
+		})
+	})
+
+	When("updating labels on route-policy", func() {
+		var (
+			resourceName string
+			expectedMap  map[string]types.NullString
+			executeErr   error
+		)
+
+		BeforeEach(func() {
+			resourceName = "some-route.example.com/the-path"
+			targetResource = TargetResource{
+				ResourceType: "route-policy",
+				ResourceName: resourceName,
+			}
+
+			expectedMap = map[string]types.NullString{
+				"some-label":     types.NewNullString("some-value"),
+				"some-other-key": types.NewNullString(),
+			}
+			labels = expectedMap
+
+			fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "space-guid"})
+			fakeActor.UpdateRoutePolicyLabelsReturns(v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(targetResource, labels)
+		})
+
+		When("updating the route-policy labels succeeds", func() {
+			It("doesn't error and prints all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the right parameters to the actor", func() {
+				Expect(fakeActor.UpdateRoutePolicyLabelsCallCount()).To(Equal(1))
+				routeURL, spaceGUID, source, sentLabels := fakeActor.UpdateRoutePolicyLabelsArgsForCall(0)
+				Expect(routeURL).To(Equal(resourceName), "failed to pass route URL")
+				Expect(spaceGUID).To(Equal("space-guid"))
+				Expect(source).To(Equal(""))
+				Expect(sentLabels).To(BeEquivalentTo(expectedMap))
+			})
+		})
+
+		When("a --source is provided", func() {
+			BeforeEach(func() {
+				targetResource.RoutePolicySource = "cf:app:some-app-guid"
+			})
+
+			It("passes the source to the actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, _, source, _ := fakeActor.UpdateRoutePolicyLabelsArgsForCall(0)
+				Expect(source).To(Equal("cf:app:some-app-guid"))
+			})
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				targetResource.ResourceType = "RouTE-poLiCy"
+			})
+
+			It("calls the right actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.UpdateRoutePolicyLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays a message in the right case", func() {
+				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for route-policy (.*)"))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("updating the route-policy labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateRoutePolicyLabelsReturns(
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"),
+				)
+			})
+
+			It("returns the error and prints all warnings", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+		})
+
+		Context("shows the right update message", func() {
+			When("Unsetting labels", func() {
+				BeforeEach(func() {
+					cmd.Action = Unset
+				})
+
+				It("shows 'Removing' as action", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for route-policy %s in org fake-org / space fake-space as some-user...`), resourceName))
+				})
+			})
+
+			When("Setting labels", func() {
+				BeforeEach(func() {
+					cmd.Action = Set
+				})
+
+				It("shows 'Setting' as action", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for route-policy %s in org fake-org / space fake-space as some-user...`), resourceName))
 				})
 			})
 		})

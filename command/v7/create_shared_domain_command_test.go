@@ -126,11 +126,32 @@ var _ = Describe("create-shared-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreateSharedDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedInternal, expectedRouterGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+				expectedDomainName, expectedInternal, expectedRouterGroup, enforceRules, scope := fakeActor.CreateSharedDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedInternal).To(BeTrue())
 				Expect(expectedRouterGroup).To(Equal("router-group"))
+				Expect(enforceRules).To(BeFalse())
+				Expect(scope).To(BeEmpty())
 			})
+		})
+
+		ItEnforcesRoutePolicies(&EnforceRoutePoliciesBehavior{
+			SetEnforce:       func(v bool) { cmd.EnforceRoutePolicies = v },
+			SetScope:         func(v string) { cmd.Scope = v },
+			SetAPIVersion:    func(v string) { fakeConfig.APIVersionReturns(v) },
+			SetActorSucceeds: func() { fakeActor.CreateSharedDomainReturns(v7action.Warnings{}, nil) },
+			ExecuteErr:       func() error { return executeErr },
+			UI:               func() *ui.UI { return testUI },
+			DomainName:       func() string { return domainName },
+			EnforceArg: func() bool {
+				_, _, _, enforce, _ := fakeActor.CreateSharedDomainArgsForCall(0)
+				return enforce
+			},
+			ScopeArg: func() string {
+				_, _, _, _, scope := fakeActor.CreateSharedDomainArgsForCall(0)
+				return scope
+			},
+			TIPAdjective: "shared",
 		})
 	})
 })

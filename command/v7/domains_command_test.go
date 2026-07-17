@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/types"
 
@@ -205,6 +206,54 @@ var _ = Describe("domains Command", func() {
 				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
 				_, labelSelector := fakeActor.GetOrganizationDomainsArgsForCall(0)
 				Expect(labelSelector).To(Equal("fish=moose"))
+			})
+		})
+
+		When("the CAPI version supports route policies", func() {
+			BeforeEach(func() {
+				fakeConfig.APIVersionReturns(ccversion.MinVersionRoutePolicies)
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid", Name: "some-org"})
+				fakeActor.GetOrganizationDomainsReturns(
+					[]resources.Domain{
+						{Name: "aaa-plain.example.com", Protocols: []string{"http"}},
+						{Name: "bbb-enforced.example.com", Protocols: []string{"http"}, EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}},
+						{Name: "ccc-any.example.com", Protocols: []string{"http"}, EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}, RoutePoliciesScope: "any"},
+						{Name: "ddd-org.example.com", Protocols: []string{"http"}, EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}, RoutePoliciesScope: "org"},
+						{Name: "eee-space.example.com", Protocols: []string{"http"}, EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}, RoutePoliciesScope: "space"},
+					},
+					nil,
+					nil,
+				)
+			})
+
+			It("shows the route policies column and renders all cell variants correctly", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`name\s+availability\s+internal\s+protocols\s+route policies`))
+				Expect(testUI.Out).To(Say(`aaa-plain\.example\.com\s+shared\s+http`))
+				Expect(testUI.Out).To(Say(`bbb-enforced\.example\.com\s+shared\s+http\s+enforced`))
+				Expect(testUI.Out).To(Say(`ccc-any\.example\.com\s+shared\s+http\s+enforced \(any\)`))
+				Expect(testUI.Out).To(Say(`ddd-org\.example\.com\s+shared\s+http\s+enforced \(org\)`))
+				Expect(testUI.Out).To(Say(`eee-space\.example\.com\s+shared\s+http\s+enforced \(space\)`))
+			})
+		})
+
+		When("the CAPI version does not support route policies", func() {
+			BeforeEach(func() {
+				fakeConfig.APIVersionReturns("3.0.0")
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid", Name: "some-org"})
+				fakeActor.GetOrganizationDomainsReturns(
+					[]resources.Domain{
+						{Name: "policy.example.com", Protocols: []string{"http"}, EnforceRoutePolicies: types.NullBool{IsSet: true, Value: true}, RoutePoliciesScope: "org"},
+					},
+					nil,
+					nil,
+				)
+			})
+
+			It("omits the route policies column", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).NotTo(Say(`route policies`))
+				Expect(testUI.Out).NotTo(Say(`enforced`))
 			})
 		})
 	})

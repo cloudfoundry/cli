@@ -113,10 +113,31 @@ var _ = Describe("create-private-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreatePrivateDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedOrgName := fakeActor.CreatePrivateDomainArgsForCall(0)
+				expectedDomainName, expectedOrgName, enforceRules, scope := fakeActor.CreatePrivateDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedOrgName).To(Equal(orgName))
+				Expect(enforceRules).To(BeFalse())
+				Expect(scope).To(BeEmpty())
 			})
+		})
+
+		ItEnforcesRoutePolicies(&EnforceRoutePoliciesBehavior{
+			SetEnforce:       func(v bool) { cmd.EnforceRoutePolicies = v },
+			SetScope:         func(v string) { cmd.Scope = v },
+			SetAPIVersion:    func(v string) { fakeConfig.APIVersionReturns(v) },
+			SetActorSucceeds: func() { fakeActor.CreatePrivateDomainReturns(v7action.Warnings{}, nil) },
+			ExecuteErr:       func() error { return executeErr },
+			UI:               func() *ui.UI { return testUI },
+			DomainName:       func() string { return domainName },
+			EnforceArg: func() bool {
+				_, _, enforce, _ := fakeActor.CreatePrivateDomainArgsForCall(0)
+				return enforce
+			},
+			ScopeArg: func() string {
+				_, _, _, scope := fakeActor.CreatePrivateDomainArgsForCall(0)
+				return scope
+			},
+			TIPAdjective: "private",
 		})
 	})
 })

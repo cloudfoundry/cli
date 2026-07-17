@@ -1,9 +1,12 @@
 package v7
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/util/sorting"
 	"code.cloudfoundry.org/cli/v8/util/ui"
@@ -51,14 +54,19 @@ func (cmd DomainsCommand) Execute(args []string) error {
 }
 
 func (cmd DomainsCommand) displayDomainsTable(domains []resources.Domain) {
-	var domainsTable = [][]string{
-		{
-			cmd.UI.TranslateText("name"),
-			cmd.UI.TranslateText("availability"),
-			cmd.UI.TranslateText("internal"),
-			cmd.UI.TranslateText("protocols"),
-		},
+	showRoutePoliciesCol := command.MinimumCCAPIVersionCheck(cmd.Config.APIVersion(), ccversion.MinVersionRoutePolicies) == nil
+
+	headers := []string{
+		cmd.UI.TranslateText("name"),
+		cmd.UI.TranslateText("availability"),
+		cmd.UI.TranslateText("internal"),
+		cmd.UI.TranslateText("protocols"),
 	}
+	if showRoutePoliciesCol {
+		headers = append(headers, cmd.UI.TranslateText("route policies"))
+	}
+
+	domainsTable := [][]string{headers}
 
 	for _, domain := range domains {
 		var availability string
@@ -74,14 +82,35 @@ func (cmd DomainsCommand) displayDomainsTable(domains []resources.Domain) {
 			internal = cmd.UI.TranslateText("true")
 		}
 
-		domainsTable = append(domainsTable, []string{
+		row := []string{
 			domain.Name,
 			availability,
 			internal,
 			strings.Join(domain.Protocols, ","),
-		})
+		}
+
+		if showRoutePoliciesCol {
+			row = append(row, routePoliciesDisplay(domain))
+		}
+
+		domainsTable = append(domainsTable, row)
 	}
 
 	cmd.UI.DisplayTableWithHeader("", domainsTable, ui.DefaultTableSpacePadding)
+}
 
+// routePoliciesDisplay returns the combined route policies cell value for a domain:
+//   - blank   — enforcement not enabled
+//   - "enforced"          — enabled, no scope restriction
+//   - "enforced (org)"    — enabled, org-scoped
+//   - "enforced (space)"  — enabled, space-scoped
+//   - "enforced (any)"    — enabled, any-scoped
+func routePoliciesDisplay(d resources.Domain) string {
+	if !d.EnforceRoutePolicies.IsSet || !d.EnforceRoutePolicies.Value {
+		return ""
+	}
+	if d.RoutePoliciesScope == "" {
+		return "enforced"
+	}
+	return fmt.Sprintf("enforced (%s)", d.RoutePoliciesScope)
 }

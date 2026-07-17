@@ -97,6 +97,22 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateRoutePolicyLabelsStub        func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)
+	updateRoutePolicyLabelsMutex       sync.RWMutex
+	updateRoutePolicyLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]types.NullString
+	}
+	updateRoutePolicyLabelsReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateRoutePolicyLabelsReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateServiceBrokerLabelsByServiceBrokerNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
 	updateServiceBrokerLabelsByServiceBrokerNameMutex       sync.RWMutex
 	updateServiceBrokerLabelsByServiceBrokerNameArgsForCall []struct {
@@ -570,6 +586,73 @@ func (fake *FakeSetLabelActor) UpdateRouteLabelsReturnsOnCall(i int, result1 v7a
 		})
 	}
 	fake.updateRouteLabelsReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabels(arg1 string, arg2 string, arg3 string, arg4 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateRoutePolicyLabelsMutex.Lock()
+	ret, specificReturn := fake.updateRoutePolicyLabelsReturnsOnCall[len(fake.updateRoutePolicyLabelsArgsForCall)]
+	fake.updateRoutePolicyLabelsArgsForCall = append(fake.updateRoutePolicyLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]types.NullString
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.UpdateRoutePolicyLabelsStub
+	fakeReturns := fake.updateRoutePolicyLabelsReturns
+	fake.recordInvocation("UpdateRoutePolicyLabels", []interface{}{arg1, arg2, arg3, arg4})
+	fake.updateRoutePolicyLabelsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabelsCallCount() int {
+	fake.updateRoutePolicyLabelsMutex.RLock()
+	defer fake.updateRoutePolicyLabelsMutex.RUnlock()
+	return len(fake.updateRoutePolicyLabelsArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabelsCalls(stub func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateRoutePolicyLabelsMutex.Lock()
+	defer fake.updateRoutePolicyLabelsMutex.Unlock()
+	fake.UpdateRoutePolicyLabelsStub = stub
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabelsArgsForCall(i int) (string, string, string, map[string]types.NullString) {
+	fake.updateRoutePolicyLabelsMutex.RLock()
+	defer fake.updateRoutePolicyLabelsMutex.RUnlock()
+	argsForCall := fake.updateRoutePolicyLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabelsReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateRoutePolicyLabelsMutex.Lock()
+	defer fake.updateRoutePolicyLabelsMutex.Unlock()
+	fake.UpdateRoutePolicyLabelsStub = nil
+	fake.updateRoutePolicyLabelsReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateRoutePolicyLabelsReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateRoutePolicyLabelsMutex.Lock()
+	defer fake.updateRoutePolicyLabelsMutex.Unlock()
+	fake.UpdateRoutePolicyLabelsStub = nil
+	if fake.updateRoutePolicyLabelsReturnsOnCall == nil {
+		fake.updateRoutePolicyLabelsReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateRoutePolicyLabelsReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
