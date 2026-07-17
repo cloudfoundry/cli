@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/command/commandfakes"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
@@ -66,7 +67,7 @@ var _ = Describe("remove-route-policy Command", func() {
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.221.0",
+				MinimumVersion: ccversion.MinVersionRoutePolicies,
 			}))
 		})
 	})
