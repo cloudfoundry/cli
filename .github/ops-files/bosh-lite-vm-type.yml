@@ -12,4 +12,13 @@
   value: 250000
 - type: replace
   path: /resource_pools/name=vms/cloud_properties/root_disk_size_gb
-  value: 32  
+  value: 32
+# Cost-tracking labels required by the CF infra owners. The google CPI applies
+# these as GCP labels on the director VM. env_name is supplied via -v by
+# create-director-override.sh. (The CPI has no equivalent for disks, so the
+# director's disks are labeled with gcloud in the create workflow instead.)
+- type: replace
+  path: /resource_pools/name=vms/cloud_properties/labels?
+  value:
+    belongs-to: cli
+    environment: ((env_name))
