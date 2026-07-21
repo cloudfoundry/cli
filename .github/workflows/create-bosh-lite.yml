@@ -74,6 +74,9 @@ jobs:
       - name: Create bbl env
         run: |
           env_name=${{ steps.setup-bbl-env.outputs.envName }}
+          # Exported so create-director-override.sh (invoked by `bbl up`) can pass
+          # it to `bosh create-env` as -v env_name for the VM cost-tracking labels.
+          export ENV_NAME="$env_name"
           cd $env_name/bbl-state
 
           cp -R ${GITHUB_WORKSPACE}/bosh-bootloader/plan-patches/bosh-lite-gcp/* .
@@ -96,6 +99,51 @@ jobs:
 
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v3
+
+      - name: Label GCP resources for cost tracking
+        # Best-effort: never fail env creation over a labeling hiccup (that would
+        # trigger teardown of a good env). The director VM itself is labeled by the
+        # CPI (bosh-lite-vm-type.yml); here we cover the resource types the CPI
+        # can't. NOTE: GCP does not support labels on VPC networks, subnets or
+        # firewall rules, so those bbl-created resources cannot be labeled.
+        run: |
+          set -uo pipefail
+          env_name="${{ steps.setup-bbl-env.outputs.envName }}"
+          region="${BBL_GCP_REGION}"
+          labels="belongs-to=cli,environment=${env_name}"
+
+          # Static external IP(s): created by bbl's terraform, name-prefixed with
+          # the env id. Anchor with a trailing '-' so e.g. env "cli-ab" does not
+          # match "cli-abcd-...".
+          for name in $(gcloud compute addresses list --regions="${region}" \
+              --filter="name~^${env_name}-" --format="value(name)"); do
+            echo "Labeling address ${name}"
+            gcloud compute addresses update "${name}" --region="${region}" \
+              --update-labels="${labels}" \
+              || echo "::warning::failed to label address ${name}"
+          done
+
+          # Director disks: discover the director VM by the label the CPI applied,
+          # then label each attached (boot + persistent) disk.
+          gcloud compute instances list \
+            --filter="labels.environment=${env_name}" \
+            --format="csv[no-heading](name,zone.basename())" \
+          | while IFS=, read -r vm zone; do
+              [ -z "${vm}" ] && continue
+              disks="$(gcloud compute instances describe "${vm}" --zone="${zone}" \
+                --format='value(disks[].source)')"
+              old_ifs="${IFS}"; IFS=';'
+              for d in ${disks}; do
+                IFS="${old_ifs}"
+                disk_name="$(basename "${d}")"
+                echo "Labeling disk ${disk_name}"
+                gcloud compute disks update "${disk_name}" --zone="${zone}" \
+                  --update-labels="${labels}" \
+                  || echo "::warning::failed to label disk ${disk_name}"
+                IFS=';'
+              done
+              IFS="${old_ifs}"
+            done
 
       - name: Save bbl state
         run: |
