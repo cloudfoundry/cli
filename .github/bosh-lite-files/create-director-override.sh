@@ -11,6 +11,7 @@ bosh create-env \
  --var-file gcp_credentials_json="${BBL_GCP_SERVICE_ACCOUNT_KEY_PATH}" \
  -v project_id="${BBL_GCP_PROJECT_ID}" \
  -v zone="${BBL_GCP_ZONE}" \
+ -v env_name="${ENV_NAME}" \
  -o ${BBL_STATE_DIR}/bosh-deployment/gcp/cpi.yml \
  -o ${BBL_STATE_DIR}/bosh-deployment/jumpbox-user.yml \
  -o ${BBL_STATE_DIR}/bosh-deployment/uaa.yml \
