@@ -81,7 +81,7 @@ jobs:
           # if: condition above.
           allow-unsafe-pr-checkout: true
       - name: Set Up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           check-latest: true
