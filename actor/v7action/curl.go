@@ -47,8 +47,19 @@ func (actor Actor) MakeCurlRequest(
 		requestBodyBytes,
 	)
 
-	if err != nil && failOnHTTPError {
-		return nil, nil, translatableerror.CurlExit22Error{StatusCode: httpResponse.StatusCode}
+	if err != nil {
+		// A nil HTTP response means the request never reached the API (e.g. a token
+		// refresh or other authentication failure in the request wrapper). There is no
+		// status code to read and no response body to print, so surface the error
+		// directly. This also avoids a nil-pointer dereference on httpResponse below
+		// when the fail-on-http-error flag is set.
+		if httpResponse == nil {
+			return nil, nil, err
+		}
+
+		if failOnHTTPError {
+			return nil, nil, translatableerror.CurlExit22Error{StatusCode: httpResponse.StatusCode}
+		}
 	}
 
 	return responseBody, httpResponse, nil
