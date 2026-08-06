@@ -192,12 +192,6 @@ func (fake *FakeSha1Checksum) SetFilePathArgsForCall(i int) string {
 func (fake *FakeSha1Checksum) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.checkSha1Mutex.RLock()
-	defer fake.checkSha1Mutex.RUnlock()
-	fake.computeFileSha1Mutex.RLock()
-	defer fake.computeFileSha1Mutex.RUnlock()
-	fake.setFilePathMutex.RLock()
-	defer fake.setFilePathMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
