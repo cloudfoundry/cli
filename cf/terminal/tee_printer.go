@@ -3,7 +3,6 @@ package terminal
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 type TeePrinter struct {
@@ -14,14 +13,14 @@ type TeePrinter struct {
 
 func NewTeePrinter(w io.Writer) *TeePrinter {
 	return &TeePrinter{
-		outputBucket: ioutil.Discard,
+		outputBucket: io.Discard,
 		stdout:       w,
 	}
 }
 
 func (t *TeePrinter) SetOutputBucket(bucket io.Writer) {
 	if bucket == nil {
-		bucket = ioutil.Discard
+		bucket = io.Discard
 	}
 
 	t.outputBucket = bucket

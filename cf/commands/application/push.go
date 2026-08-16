@@ -2,7 +2,6 @@ package application
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
@@ -818,7 +817,7 @@ func (cmd Push) ValidateContextAndAppParams(appsFromManifest []models.AppParams,
 }
 
 func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
-	uploadDir, err := ioutil.TempDir("", "apps")
+	uploadDir, err := os.MkdirTemp("", "apps")
 	if err != nil {
 		return err
 	}
@@ -834,7 +833,7 @@ func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles [
 		return err
 	}
 
-	zipFile, err := ioutil.TempFile("", "uploads")
+	zipFile, err := os.CreateTemp("", "uploads")
 	if err != nil {
 		return err
 	}

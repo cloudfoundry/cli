@@ -3,7 +3,6 @@ package manifest
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -82,7 +81,7 @@ func (repo DiskRepository) readAllYAMLFiles(path string) (mergedMap generic.Map,
 }
 
 func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
-	manifest, err := ioutil.ReadAll(file)
+	manifest, err := io.ReadAll(file)
 	if err != nil {
 		return
 	}

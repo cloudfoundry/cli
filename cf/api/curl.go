@@ -3,7 +3,7 @@ package api
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/textproto"
@@ -64,7 +64,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 	headerBytes, _ := httputil.DumpResponse(res, false)
 	resHeaders = string(headerBytes)
 
-	bytes, err := ioutil.ReadAll(res.Body)
+	bytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		err = fmt.Errorf("%s: %s", T("Error reading response"), err.Error())
 	}

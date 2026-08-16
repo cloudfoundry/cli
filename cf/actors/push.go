@@ -2,14 +2,13 @@ package actors
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 
-    "errors"
+	"errors"
 
-    "code.cloudfoundry.org/cli/v9/cf/api/applicationbits"
+	"code.cloudfoundry.org/cli/v9/cf/api/applicationbits"
 	"code.cloudfoundry.org/cli/v9/cf/api/resources"
 	"code.cloudfoundry.org/cli/v9/cf/appfiles"
 	. "code.cloudfoundry.org/cli/v9/cf/i18n"
@@ -84,7 +83,7 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string) error
 		return nil
 	}
 
-	tempDir, err := ioutil.TempDir("", "unzipped-app")
+	tempDir, err := os.MkdirTemp("", "unzipped-app")
 	if err != nil {
 		return err
 	}

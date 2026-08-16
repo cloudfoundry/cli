@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -212,7 +211,7 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 }
 
 func loadIgnoreFile(dir string) CfIgnore {
-	fileContents, err := ioutil.ReadFile(filepath.Join(dir, ".cfignore"))
+	fileContents, err := os.ReadFile(filepath.Join(dir, ".cfignore"))
 	if err != nil {
 		return NewCfIgnore("")
 	}

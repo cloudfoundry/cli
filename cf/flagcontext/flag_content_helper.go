@@ -2,7 +2,7 @@ package flagcontext
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func GetContentsFromOptionalFlagValue(input string) ([]byte, error) {
 	trimmedInput := strings.Trim(input, `"'`)
 	if strings.HasPrefix(trimmedInput, `@`) {
 		trimmedInput = strings.Trim(trimmedInput[1:], `"'`)
-		bs, err := ioutil.ReadFile(trimmedInput)
+		bs, err := os.ReadFile(trimmedInput)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -26,7 +26,7 @@ func GetContentsFromOptionalFlagValue(input string) ([]byte, error) {
 		return bs, nil
 	}
 
-	bs, err := ioutil.ReadFile(trimmedInput)
+	bs, err := os.ReadFile(trimmedInput)
 	if err != nil {
 		return []byte(trimmedInput), nil
 	}
