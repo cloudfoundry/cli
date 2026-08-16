@@ -1,12 +1,14 @@
 package commands_test
 
 import (
+	"io"
+	"log/slog"
+
 	"code.cloudfoundry.org/cli/v9/cf/commands"
 	"code.cloudfoundry.org/cli/v9/cf/i18n"
 	"code.cloudfoundry.org/cli/v9/cf/util/testhelpers/configuration"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	log "github.com/sirupsen/logrus"
 
 	"testing"
 )
@@ -21,8 +23,9 @@ func TestCommands(t *testing.T) {
 	RunSpecs(t, "Commands Suite")
 }
 
-var _ = BeforeEach(func() {
-	log.SetLevel(log.PanicLevel)
+var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 })
 
 type passingRequirement struct {

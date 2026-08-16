@@ -1,11 +1,9 @@
 package v7pushaction
 
-import (
-	log "github.com/sirupsen/logrus"
-)
+import "log/slog"
 
 func (actor Actor) RestartApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	log.Info("Restarting Application")
+	slog.Info("Restarting Application")
 
 	var allWarnings Warnings
 

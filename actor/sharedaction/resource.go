@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/ykk"
 	ignore "github.com/sabhiram/go-gitignore"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -81,7 +81,7 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 
 	gitIgnore, err := actor.generateArchiveCFIgnoreMatcher(reader.File)
 	if err != nil {
-		log.Errorln("reading .cfignore file:", err)
+		slog.Error("reading .cfignore file", "err", err)
 		return nil, err
 	}
 
@@ -135,13 +135,13 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 
 	gitIgnore, err := actor.generateDirectoryCFIgnoreMatcher(sourceDir)
 	if err != nil {
-		log.Errorln("reading .cfignore file:", err)
+		slog.Error("reading .cfignore file", "err", err)
 		return nil, err
 	}
 
 	evalDir, err := filepath.EvalSymlinks(sourceDir)
 	if err != nil {
-		log.Errorln("evaluating symlink:", err)
+		slog.Error("evaluating symlink", "err", err)
 		return nil, err
 	}
 
@@ -212,7 +212,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 // path/filename) list of resources and returns the location. On Windows, the
 // filemode for user is forced to be readable and executable.
 func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude []Resource) (string, error) {
-	log.WithField("sourceArchive", sourceArchivePath).Info("zipping source files from archive")
+	slog.Info("zipping source files from archive", "sourceArchive", sourceArchivePath)
 	zipFile, err := os.CreateTemp("", "cf-cli-")
 	if err != nil {
 		return "", err
@@ -237,15 +237,15 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 	for _, archiveFile := range reader.File {
 		resource, ok := actor.findInResources(archiveFile.Name, filesToInclude)
 		if !ok {
-			log.WithField("archiveFileName", archiveFile.Name).Debug("skipping file")
+			slog.Debug("skipping file", "archiveFileName", archiveFile.Name)
 			continue
 		}
 
-		log.WithField("archiveFileName", archiveFile.Name).Debug("zipping file")
+		slog.Debug("zipping file", "archiveFileName", archiveFile.Name)
 		// archiveFile.Open opens the symlink file, not the file it points too
 		reader, openErr := archiveFile.Open()
 		if openErr != nil {
-			log.WithField("archiveFile", archiveFile.Name).Errorln("opening path in dir:", openErr)
+			slog.Error("opening path in dir", "archiveFile", archiveFile.Name, "err", openErr)
 			return zipPath, openErr
 		}
 		defer reader.Close()
@@ -255,16 +255,13 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 			resource, writer,
 		)
 		if err != nil {
-			log.WithField("archiveFileName", archiveFile.Name).Errorln("zipping file:", err)
+			slog.Error("zipping file", "archiveFileName", archiveFile.Name, "err", err)
 			return zipPath, err
 		}
 		reader.Close()
 	}
 
-	log.WithFields(log.Fields{
-		"zip_file_location": zipFile.Name(),
-		"zipped_file_count": len(filesToInclude),
-	}).Info("zip file created")
+	slog.Info("zip file created", "zip_file_location", zipFile.Name(), "zipped_file_count", len(filesToInclude))
 	return zipPath, nil
 }
 
@@ -272,7 +269,7 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 // path/filename) list of resources and returns the location. On Windows, the
 // filemode for user is forced to be readable and executable.
 func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Resource) (string, error) {
-	log.WithField("sourceDir", sourceDir).Info("zipping source files from directory")
+	slog.Info("zipping source files from directory", "sourceDir", sourceDir)
 	zipFile, err := os.CreateTemp("", "cf-cli-")
 	if err != nil {
 		return "", err
@@ -285,26 +282,26 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 
 	for _, resource := range filesToInclude {
 		fullPath := filepath.Join(sourceDir, resource.Filename)
-		log.WithField("fullPath", fullPath).Debug("zipping file")
+		slog.Debug("zipping file", "fullPath", fullPath)
 
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
-			log.WithField("fullPath", fullPath).Errorln("stat error in dir:", err)
+			slog.Error("stat error in dir", "fullPath", fullPath, "err", err)
 			return zipPath, err
 		}
 
-		log.WithField("file-mode", fileInfo.Mode().String()).Debug("resource file info")
+		slog.Debug("resource file info", "file-mode", fileInfo.Mode().String())
 		if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
 			// we need to user os.Readlink to read a symlink file from a directory
 			err = actor.addLinkToZipFromFileSystem(fullPath, fileInfo, resource, writer)
 			if err != nil {
-				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
+				slog.Error("zipping file", "fullPath", fullPath, "err", err)
 				return zipPath, err
 			}
 		} else {
 			srcFile, err := os.Open(fullPath)
 			if err != nil {
-				log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
+				slog.Error("opening path in dir", "fullPath", fullPath, "err", err)
 				return zipPath, err
 			}
 			defer srcFile.Close()
@@ -315,16 +312,13 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 			)
 			srcFile.Close()
 			if err != nil {
-				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
+				slog.Error("zipping file", "fullPath", fullPath, "err", err)
 				return zipPath, err
 			}
 		}
 	}
 
-	log.WithFields(log.Fields{
-		"zip_file_location": zipFile.Name(),
-		"zipped_file_count": len(filesToInclude),
-	}).Info("zip file created")
+	slog.Info("zip file created", "zip_file_location", zipFile.Name(), "zipped_file_count", len(filesToInclude))
 	return zipPath, nil
 }
 
@@ -334,22 +328,18 @@ func (Actor) addLinkToZipFromFileSystem(srcPath string,
 ) error {
 	header, err := zip.FileInfoHeader(fileInfo)
 	if err != nil {
-		log.WithField("srcPath", srcPath).Errorln("getting file info in dir:", err)
+		slog.Error("getting file info in dir", "srcPath", srcPath, "err", err)
 		return err
 	}
 
 	header.Name = resource.Filename
 	header.Method = zip.Deflate
 
-	log.WithFields(log.Fields{
-		"srcPath":  srcPath,
-		"destPath": header.Name,
-		"mode":     header.Mode().String(),
-	}).Debug("setting mode for file")
+	slog.Debug("setting mode for file", "srcPath", srcPath, "destPath", header.Name, "mode", header.Mode().String())
 
 	destFileWriter, err := zipFile.CreateHeader(header)
 	if err != nil {
-		log.Errorln("creating header:", err)
+		slog.Error("creating header", "err", err)
 		return err
 	}
 
@@ -357,10 +347,10 @@ func (Actor) addLinkToZipFromFileSystem(srcPath string,
 	if err != nil {
 		return err
 	}
-	log.WithField("path", pathInSymlink).Debug("resolving symlink")
+	slog.Debug("resolving symlink", "path", pathInSymlink)
 	symLinkContents := strings.NewReader(pathInSymlink)
 	if _, err := io.Copy(destFileWriter, symLinkContents); err != nil {
-		log.WithField("srcPath", srcPath).Errorln("copying data in dir:", err)
+		slog.Error("copying data in dir", "srcPath", srcPath, "err", err)
 		return err
 	}
 
@@ -373,7 +363,7 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 ) error {
 	header, err := zip.FileInfoHeader(fileInfo)
 	if err != nil {
-		log.WithField("srcPath", srcPath).Errorln("getting file info in dir:", err)
+		slog.Error("getting file info in dir", "srcPath", srcPath, "err", err)
 		return err
 	}
 
@@ -386,15 +376,11 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 	header.Method = zip.Deflate
 	header.SetMode(resource.Mode)
 
-	log.WithFields(log.Fields{
-		"srcPath":  srcPath,
-		"destPath": header.Name,
-		"mode":     header.Mode().String(),
-	}).Debug("setting mode for file")
+	slog.Debug("setting mode for file", "srcPath", srcPath, "destPath", header.Name, "mode", header.Mode().String())
 
 	destFileWriter, err := zipFile.CreateHeader(header)
 	if err != nil {
-		log.Errorln("creating header:", err)
+		slog.Error("creating header", "err", err)
 		return err
 	}
 
@@ -403,15 +389,12 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 		multi := io.MultiWriter(sum, destFileWriter)
 
 		if _, err := io.Copy(multi, srcFile); err != nil {
-			log.WithField("srcPath", srcPath).Errorln("copying data in dir:", err)
+			slog.Error("copying data in dir", "srcPath", srcPath, "err", err)
 			return err
 		}
 
 		if currentSum := fmt.Sprintf("%x", sum.Sum(nil)); resource.SHA1 != currentSum {
-			log.WithFields(log.Fields{
-				"expected":   resource.SHA1,
-				"currentSum": currentSum,
-			}).Error("setting mode for file")
+			slog.Error("setting mode for file", "expected", resource.SHA1, "currentSum", currentSum)
 			return actionerror.FileChangedError{Filename: srcPath}
 		}
 	} else if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
@@ -446,10 +429,7 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 
 func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
-	log.WithFields(log.Fields{
-		"pathToCFIgnore": pathToCFIgnore,
-		"sourceDir":      sourceDir,
-	}).Debug("using ignore file")
+	slog.Debug("using ignore file", "pathToCFIgnore", pathToCFIgnore, "sourceDir", sourceDir)
 
 	additionalIgnoreLines := DefaultIgnoreLines
 
@@ -461,7 +441,7 @@ func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.G
 		}
 	}
 
-	log.Debugf("ignore rules: %v", additionalIgnoreLines)
+	slog.Debug("ignore rules", "rules", additionalIgnoreLines)
 
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
 		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
@@ -472,12 +452,12 @@ func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.G
 func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
 	for _, resource := range filesToInclude {
 		if resource.Filename == filepath.ToSlash(path) {
-			log.WithField("resource", resource.Filename).Debug("found resource in files to include")
+			slog.Debug("found resource in files to include", "resource", resource.Filename)
 			return resource, true
 		}
 	}
 
-	log.WithField("path", path).Debug("did not find resource in files to include")
+	slog.Debug("did not find resource in files to include", "path", path)
 	return Resource{}, false
 }
 
@@ -500,14 +480,14 @@ func (actor Actor) CreateArchive(bitsPath string, resources []Resource) (io.Read
 func (Actor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
 	archive, err := os.Open(archivePath)
 	if err != nil {
-		log.WithField("archivePath", archivePath).Errorln("opening temp archive:", err)
+		slog.Error("opening temp archive", "archivePath", archivePath, "err", err)
 		return nil, -1, err
 	}
 
 	archiveInfo, err := archive.Stat()
 	if err != nil {
 		archive.Close()
-		log.WithField("archivePath", archivePath).Errorln("stat temp archive:", err)
+		slog.Error("stat temp archive", "archivePath", archivePath, "err", err)
 		return nil, -1, err
 	}
 

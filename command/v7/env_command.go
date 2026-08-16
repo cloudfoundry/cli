@@ -2,10 +2,10 @@ package v7
 
 import (
 	"fmt"
+	"log/slog"
 	"sort"
 
 	"code.cloudfoundry.org/cli/v9/command/flag"
-	log "github.com/sirupsen/logrus"
 )
 
 type EnvCommand struct {
@@ -48,13 +48,13 @@ func (cmd EnvCommand) Execute(_ []string) error {
 		cmd.UI.DisplayHeader("System-Provided:")
 		err = cmd.displaySystem(envGroups.System)
 		if err != nil {
-			log.Errorln("error formatting system provided:", err)
+			slog.Error("error formatting system provided", "err", err)
 		}
 		if len(envGroups.Application) > 0 {
 			cmd.UI.DisplayNewline()
 			err = cmd.displaySystem(envGroups.Application)
 			if err != nil {
-				log.Errorln("error formatting application:", err)
+				slog.Error("error formatting application", "err", err)
 			}
 		}
 	} else {

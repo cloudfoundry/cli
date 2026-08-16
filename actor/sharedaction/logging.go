@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"strings"
 	"time"
 
 	logcache "code.cloudfoundry.org/go-log-cache/v2"
 	"code.cloudfoundry.org/go-log-cache/v2/rpc/logcache_v1"
 	"code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -123,7 +123,7 @@ func (b *cliRetryBackoff) Reset() {
 
 func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc) {
 
-	logrus.Info("Start Tailing Logs")
+	slog.Info("Start Tailing Logs")
 
 	outgoingLogStream := make(chan LogMessage, 1000)
 	outgoingErrStream := make(chan error, 1000)

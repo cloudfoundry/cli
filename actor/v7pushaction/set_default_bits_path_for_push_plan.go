@@ -1,16 +1,15 @@
 package v7pushaction
 
 import (
+	"log/slog"
 	"os"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func SetDefaultBitsPathForPushPlan(pushPlan PushPlan, overrides FlagOverrides) (PushPlan, error) {
 	if pushPlan.BitsPath == "" && pushPlan.DropletPath == "" && pushPlan.DockerImageCredentials.Path == "" {
 		var err error
 		pushPlan.BitsPath, err = os.Getwd()
-		log.WithField("path", pushPlan.BitsPath).Debug("using current directory for bits path")
+		slog.Debug("using current directory for bits path", "path", pushPlan.BitsPath)
 		if err != nil {
 			return pushPlan, err
 		}

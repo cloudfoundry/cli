@@ -2,12 +2,12 @@ package v7action
 
 import (
 	"fmt"
+	"log/slog"
 	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
-	log "github.com/sirupsen/logrus"
 )
 
 // ProcessSummary represents a process with instance details.
@@ -73,10 +73,7 @@ func (ps ProcessSummaries) String() string {
 }
 
 func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValues bool) (ProcessSummaries, Warnings, error) {
-	log.WithFields(log.Fields{
-		"appGUID":              appGUID,
-		"withObfuscatedValues": withObfuscatedValues,
-	}).Info("retrieving process information")
+	slog.Info("retrieving process information", "appGUID", appGUID, "withObfuscatedValues", withObfuscatedValues)
 
 	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
 	allWarnings := Warnings(warnings)

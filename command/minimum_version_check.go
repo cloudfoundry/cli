@@ -1,12 +1,13 @@
 package command
 
 import (
+	"log/slog"
+
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
-	log "github.com/sirupsen/logrus"
 )
 
 func MinimumCCAPIVersionCheck(current string, minimum string, customCommand ...string) error {
-	log.WithFields(log.Fields{"current": current, "minimum": minimum}).Debug("minimum api version")
+	slog.Error("minimum api version", "current", current, "minimum", minimum)
 	var command string
 	if len(customCommand) > 0 {
 		command = customCommand[0]
@@ -18,7 +19,7 @@ func MinimumCCAPIVersionCheck(current string, minimum string, customCommand ...s
 	}
 
 	if isOutdated {
-		log.WithFields(log.Fields{"current": current, "minimum": minimum}).Error("minimum not met")
+		slog.Error("minimum not met", "current", current, "minimum", minimum)
 		return translatableerror.MinimumCFAPIVersionNotMetError{
 			Command:        command,
 			CurrentVersion: current,
@@ -30,7 +31,7 @@ func MinimumCCAPIVersionCheck(current string, minimum string, customCommand ...s
 }
 
 func MinimumUAAAPIVersionCheck(current string, minimum string, customCommand ...string) error {
-	log.WithFields(log.Fields{"current": current, "minimum": minimum}).Debug("minimum api version")
+	slog.Error("minimum not met", "current", current, "minimum", minimum)
 	var command string
 	if len(customCommand) > 0 {
 		command = customCommand[0]
@@ -42,7 +43,7 @@ func MinimumUAAAPIVersionCheck(current string, minimum string, customCommand ...
 	}
 
 	if isOutdated {
-		log.WithFields(log.Fields{"current": current, "minimum": minimum}).Error("minimum not met")
+		slog.Error("minimum not met", "current", current, "minimum", minimum)
 		return translatableerror.MinimumUAAAPIVersionNotMetError{
 			Command:        command,
 			MinimumVersion: minimum,

@@ -3,13 +3,13 @@ package v7
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccversion"
 	"github.com/cloudfoundry/bosh-cli/director/template"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
@@ -253,7 +253,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	log.WithField("number of plans", len(pushPlans)).Debug("completed generating plan")
+	slog.Debug("completed generating plan", "number of plans", len(pushPlans))
 	defer func() {
 		if cmd.stopStreamingFunc != nil {
 			cmd.stopStreamingFunc()
@@ -261,7 +261,7 @@ func (cmd PushCommand) Execute(args []string) error {
 	}()
 
 	for _, plan := range pushPlans {
-		log.WithField("app_name", plan.Application.Name).Info("actualizing")
+		slog.Info("actualizing", "app_name", plan.Application.Name)
 		eventStream := cmd.PushActor.Actualize(plan, cmd.ProgressBar)
 		err := cmd.eventStreamHandler(eventStream)
 
@@ -286,14 +286,14 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 		},
 	}
 	if cmd.NoManifest {
-		log.Debugf("No manifest given, generating manifest")
+		slog.Debug("No manifest given, generating manifest")
 		return defaultManifest, nil
 	}
 
-	log.Info("reading manifest if exists")
+	slog.Info("reading manifest if exists")
 	readPath := cmd.CWD
 	if flagOverrides.ManifestPath != "" {
-		log.WithField("manifestPath", flagOverrides.ManifestPath).Debug("reading '-f' provided manifest")
+		slog.Debug("reading '-f' provided manifest", "manifestPath", flagOverrides.ManifestPath)
 		readPath = flagOverrides.ManifestPath
 	}
 
@@ -303,14 +303,14 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	if !exists {
-		log.Debugf("No manifest given, generating manifest")
+		slog.Debug("No manifest given, generating manifest")
 		return defaultManifest, nil
 	}
 
-	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
+	slog.Debug("path to manifest", "manifestPath", pathToManifest)
 	rawManifest, err := cmd.ManifestParser.InterpolateManifest(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
-		log.Errorln("reading manifest:", err)
+		slog.Error("reading manifest", "err", err)
 		if _, ok := err.(*yaml.TypeError); ok {
 			return manifestparser.Manifest{}, errors.New(fmt.Sprintf("Unable to push app because manifest %s is not valid yaml.", pathToManifest))
 		}
@@ -319,7 +319,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 
 	manifest, err := cmd.ManifestParser.ParseManifest(pathToManifest, rawManifest)
 	if err != nil {
-		log.Errorln("parsing manifest:", err)
+		slog.Error("parsing manifest", "err", err)
 		return manifestparser.Manifest{}, err
 	}
 
@@ -647,7 +647,7 @@ func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
 }
 
 func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
-	log.Info("getting application summary info")
+	slog.Info("getting application summary info")
 	summary, warnings, err := cmd.VersionActor.GetDetailedAppSummary(
 		plan.Application.Name,
 		cmd.Config.TargetedSpace().GUID,
@@ -683,7 +683,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case v7pushaction.UploadingApplicationWithArchive:
 		cmd.UI.DisplayText("Uploading files...")
-		log.Debug("starting progress bar")
+		slog.Debug("starting progress bar")
 		cmd.ProgressBar.Ready()
 	case v7pushaction.UploadingApplication:
 		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
@@ -748,7 +748,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 		cmd.UI.DisplayText("Waiting for app to deploy...")
 		cmd.UI.DisplayNewline()
 	default:
-		log.WithField("event", event).Debug("ignoring event")
+		slog.Debug("ignoring event", "event", event)
 	}
 
 	return nil

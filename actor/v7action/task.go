@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"log/slog"
 	"sort"
 	"strconv"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
-	log "github.com/sirupsen/logrus"
 )
 
 // Run resources.Task runs the provided command in the application environment associated
@@ -80,10 +80,7 @@ func (actor Actor) PollTask(task resources.Task) (resources.Task, Warnings, erro
 		time.Sleep(actor.Config.PollingInterval())
 
 		ccTask, warnings, err := actor.CloudControllerClient.GetTask(task.GUID)
-		log.WithFields(log.Fields{
-			"task_guid": task.GUID,
-			"state":     task.State,
-		}).Debug("polling task state")
+		slog.Debug("polling task state", "task_guid", task.GUID, "state", task.State)
 
 		allWarnings = append(allWarnings, warnings...)
 

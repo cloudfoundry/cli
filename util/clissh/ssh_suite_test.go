@@ -1,6 +1,8 @@
 package clissh_test
 
 import (
+	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,7 +10,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -23,6 +24,9 @@ func TestCmd(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
+
 	SetDefaultEventuallyTimeout(3 * time.Second)
 
 	hostKeyBytes, err := os.ReadFile(filepath.Join("..", "..", "fixtures", "host-key"))
@@ -37,8 +41,4 @@ var _ = BeforeSuite(func() {
 
 	TestHostKey = hostKey
 	TestPrivateKey = privateKey
-})
-
-var _ = BeforeEach(func() {
-	log.SetLevel(log.PanicLevel)
 })

@@ -2,6 +2,8 @@ package v7_test
 
 import (
 	"fmt"
+	"io"
+	"log/slog"
 	"reflect"
 	"strings"
 	"testing"
@@ -9,7 +11,6 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	log "github.com/sirupsen/logrus"
 )
 
 func TestV3(t *testing.T) {
@@ -17,8 +18,9 @@ func TestV3(t *testing.T) {
 	RunSpecs(t, "V7 Command Suite")
 }
 
-var _ = BeforeEach(func() {
-	log.SetLevel(log.PanicLevel)
+var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 })
 
 // RandomString provides a random string

@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"archive/zip"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +15,6 @@ import (
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	log "github.com/sirupsen/logrus"
 )
 
 func TestV3Action(t *testing.T) {
@@ -22,8 +22,9 @@ func TestV3Action(t *testing.T) {
 	RunSpecs(t, "V7 Actions Suite")
 }
 
-var _ = BeforeEach(func() {
-	log.SetLevel(log.PanicLevel)
+var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 })
 
 func NewTestActor() (*Actor, *v7actionfakes.FakeCloudControllerClient, *v7actionfakes.FakeConfig, *v7actionfakes.FakeSharedActor, *v7actionfakes.FakeUAAClient, *v7actionfakes.FakeRoutingClient, *fakeclock.FakeClock) {

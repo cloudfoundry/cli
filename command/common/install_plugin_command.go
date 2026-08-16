@@ -1,6 +1,7 @@
 package common
 
 import (
+	"log/slog"
 	"os"
 	"runtime"
 	"strings"
@@ -16,7 +17,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/command/translatableerror"
 	"code.cloudfoundry.org/cli/v9/util"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
-	log "github.com/sirupsen/logrus"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . InstallPluginActor
@@ -75,11 +75,11 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd InstallPluginCommand) Execute([]string) (err error) {
-	log.WithField("PluginHome", cmd.Config.PluginHome()).Info("making plugin dir")
+	slog.Info("making plugin dir", "PluginHome", cmd.Config.PluginHome())
 
 	var tempPluginDir string
 	tempPluginDir, err = os.MkdirTemp(cmd.Config.PluginHome(), "temp")
-	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")
+	slog.Info("making plugin dir", "tempPluginDir", tempPluginDir)
 
 	defer func() {
 		removed := false
@@ -119,7 +119,7 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	} else if err != nil {
 		return err
 	}
-	log.WithFields(log.Fields{"tempPluginPath": tempPluginPath, "pluginSource": pluginSource}).Debug("getPluginBinaryAndSource")
+	slog.Debug("getPluginBinaryAndSource", "tempPluginPath", tempPluginPath, "pluginSource", pluginSource)
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
@@ -127,22 +127,22 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	if err != nil {
 		return err
 	}
-	log.WithField("executablePath", executablePath).Debug("created executable copy")
+	slog.Debug("created executable copy", "executablePath", executablePath)
 
 	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
 	}
-	log.Info("started RPC server")
+	slog.Info("started RPC server")
 
 	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, executablePath)
 	if err != nil {
 		return err
 	}
-	log.Info("validated plugin")
+	slog.Info("validated plugin")
 
 	if installedPlugin, installed := cmd.Config.GetPluginCaseInsensitive(plugin.Name); installed {
-		log.WithField("version", installedPlugin.Version).Debug("uninstall plugin")
+		slog.Debug("uninstall plugin", "version", installedPlugin.Version)
 
 		if !cmd.Force && pluginSource != PluginFromRepository {
 			return translatableerror.PluginAlreadyInstalledError{
@@ -158,7 +158,7 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 		}
 	}
 
-	log.Info("install plugin")
+	slog.Info("install plugin")
 
 	return cmd.installPlugin(plugin, executablePath)
 }
@@ -206,7 +206,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 	switch {
 	case cmd.RegisteredRepository != "":
-		log.WithField("RegisteredRepository", cmd.RegisteredRepository).Info("installing from specified repository")
+		slog.Info("installing from specified repository", "RegisteredRepository", cmd.RegisteredRepository)
 		pluginRepository, err := cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
 		if err != nil {
 			return "", 0, err
@@ -235,19 +235,19 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		return path, pluginSource, nil
 
 	case cmd.Actor.FileExists(pluginNameOrLocation):
-		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Info("installing from specified file")
+		slog.Info("installing from specified file", "pluginNameOrLocation", pluginNameOrLocation)
 		return cmd.getPluginFromLocalFile(pluginNameOrLocation)
 
 	case util.IsHTTPScheme(pluginNameOrLocation):
-		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Info("installing from specified URL")
+		slog.Info("installing from specified URL", "pluginNameOrLocation", pluginNameOrLocation)
 		return cmd.getPluginFromURL(pluginNameOrLocation, tempPluginDir)
 
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
-		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Error("Unsupported URL")
+		slog.Error("Unsupported URL", "pluginNameOrLocation", pluginNameOrLocation)
 		return "", 0, translatableerror.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 
 	default:
-		log.Info("installing from first repository with plugin")
+		slog.Info("installing from first repository with plugin")
 		repos := cmd.Config.PluginRepositories()
 		if len(repos) == 0 {
 			return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
@@ -406,7 +406,7 @@ func (cmd InstallPluginCommand) installPluginPrompt(template string, templateVal
 	}
 
 	if !really {
-		log.Debug("plugin confirmation - 'no' inputted")
+		slog.Debug("plugin confirmation - 'no' inputted")
 		return cancelInstall{}
 	}
 

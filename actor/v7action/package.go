@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"io"
+	"log/slog"
 	"os"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -207,10 +207,7 @@ func (actor Actor) PollPackage(pkg resources.Package) (resources.Package, Warnin
 	for pkg.State != constant.PackageReady && pkg.State != constant.PackageFailed && pkg.State != constant.PackageExpired {
 		time.Sleep(actor.Config.PollingInterval())
 		ccPkg, warnings, err := actor.CloudControllerClient.GetPackage(pkg.GUID)
-		log.WithFields(log.Fields{
-			"package_guid": pkg.GUID,
-			"state":        pkg.State,
-		}).Debug("polling package state")
+		slog.Debug("polling package state", "package_guid", pkg.GUID, "state", pkg.State)
 
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {

@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"errors"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -9,8 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v9/resources"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan Warnings, <-chan error) {
@@ -119,13 +118,13 @@ func (actor Actor) StageApplicationPackage(packageGUID string) (resources.Build,
 
 	build := resources.Build{PackageGUID: packageGUID}
 	build, warnings, err := actor.CloudControllerClient.CreateBuild(build)
-	log.Debug("created build")
+	slog.Debug("created build")
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return resources.Build{}, allWarnings, err
 	}
 
-	log.Debug("no errors creating build")
+	slog.Debug("no errors creating build")
 	return resources.Build{GUID: build.GUID}, allWarnings, nil
 }
 

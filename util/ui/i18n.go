@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strings"
 	"text/template"
 
 	"code.cloudfoundry.org/cli/v9/i18n/resources"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/language"
 )
 
@@ -119,7 +119,7 @@ func generateTranslationFunc(rawTranslation []byte) (TranslateFunc, error) {
 		formattedTemplate := template.Must(template.New("Display Text").Parse(translated))
 		err := formattedTemplate.Execute(&buffer, keys)
 		if err != nil {
-			log.WithField("translationID", translationID).Errorln("executing template:", err)
+			slog.Error("executing template", "translationID", translationID, "err", err)
 		}
 
 		return buffer.String()

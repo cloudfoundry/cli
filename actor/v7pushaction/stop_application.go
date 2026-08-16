@@ -1,15 +1,16 @@
 package v7pushaction
 
 import (
+	"log/slog"
+
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
-	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) StopApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	var warnings v7action.Warnings
 	var err error
 
-	log.Info("Stopping Application")
+	slog.Info("Stopping Application")
 	eventStream <- &PushEvent{Plan: pushPlan, Event: StoppingApplication}
 	warnings, err = actor.V7Actor.StopApplication(pushPlan.Application.GUID)
 	if err != nil {

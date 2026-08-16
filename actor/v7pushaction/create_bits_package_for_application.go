@@ -1,6 +1,7 @@
 package v7pushaction
 
 import (
+	"log/slog"
 	"os"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
@@ -8,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/v7action"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v9/resources"
-	log "github.com/sirupsen/logrus"
 )
 
 const PushRetries = 3
@@ -27,7 +27,7 @@ func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStrea
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (resources.Package, Warnings, error) {
-	log.WithField("Path", pushPlan.BitsPath).Info("creating archive")
+	slog.Info("creating archive", "Path", pushPlan.BitsPath)
 
 	var (
 		allWarnings        Warnings
@@ -59,7 +59,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 	}
 
 	eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingPackage}
-	log.WithField("GUID", pushPlan.Application.GUID).Info("creating package")
+	slog.Info("creating package", "GUID", pushPlan.Application.GUID)
 	pkg, createPackageWarnings, err := actor.V7Actor.CreateBitsPackageByApplication(pushPlan.Application.GUID)
 	allWarnings = append(allWarnings, createPackageWarnings...)
 	if err != nil {
@@ -77,7 +77,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 		// Uploading package/app bits
 		for count := 0; count < PushRetries; count++ {
 			eventStream <- &PushEvent{Plan: pushPlan, Event: ReadingArchive}
-			log.WithField("GUID", pushPlan.Application.GUID).Info("reading archive")
+			slog.Info("reading archive", "GUID", pushPlan.Application.GUID)
 			file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
 			if readErr != nil {
 				return resources.Package{}, allWarnings, readErr
