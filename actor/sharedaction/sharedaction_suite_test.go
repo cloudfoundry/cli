@@ -3,6 +3,7 @@ package sharedaction_test
 import (
 	"archive/zip"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,7 +11,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	log "github.com/sirupsen/logrus"
 )
 
 func TestSharedAction(t *testing.T) {
@@ -18,8 +18,9 @@ func TestSharedAction(t *testing.T) {
 	RunSpecs(t, "Shared Actions Suite")
 }
 
-var _ = BeforeEach(func() {
-	log.SetLevel(log.PanicLevel)
+var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 })
 
 // Thanks to Svett Ralchev

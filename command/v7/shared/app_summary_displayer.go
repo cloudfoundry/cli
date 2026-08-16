@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/command"
 	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/util/ui"
-	log "github.com/sirupsen/logrus"
 )
 
 type AppSummaryDisplayer struct {
@@ -206,7 +206,7 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	if summary.CurrentDroplet.CreatedAt != "" {
 		timestamp, err := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 		if err != nil {
-			log.WithField("createdAt", summary.CurrentDroplet.CreatedAt).Errorln("error parsing created at:", err)
+			slog.Error("error parsing created at", "err", err, "createdAt", summary.CurrentDroplet.CreatedAt)
 		}
 
 		return display.UI.UserFriendlyDate(timestamp)
@@ -219,7 +219,7 @@ func (display AppSummaryDisplayer) getLastStatusChangeTime(summary v7action.Deta
 	if summary.Deployment.LastStatusChange != "" {
 		timestamp, err := time.Parse(time.RFC3339, summary.Deployment.LastStatusChange)
 		if err != nil {
-			log.WithField("last_status_change", summary.Deployment.LastStatusChange).Errorln("error parsing last status change:", err)
+			slog.Error("error parsing last status change", "err", err, "last_status_change", summary.Deployment.LastStatusChange)
 		}
 
 		return display.UI.UserFriendlyDate(timestamp)

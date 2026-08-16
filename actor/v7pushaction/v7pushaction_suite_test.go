@@ -1,6 +1,8 @@
 package v7pushaction_test
 
 import (
+	"io"
+	"log/slog"
 	"os"
 	"testing"
 	"time"
@@ -9,8 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/actor/v7pushaction/v7pushactionfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func TestPushAction(t *testing.T) {
@@ -18,9 +18,10 @@ func TestPushAction(t *testing.T) {
 	RunSpecs(t, "V7 Push Actions Suite")
 }
 
-var _ = BeforeEach(func() {
+var _ = BeforeSuite(func() {
+	// Suppress log output during tests. This equates with setting to panic-level severity in older logging libraries
+	slog.SetDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 	SetDefaultEventuallyTimeout(3 * time.Second)
-	log.SetLevel(log.PanicLevel)
 })
 
 func getCurrentDir() string {

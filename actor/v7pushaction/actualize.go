@@ -1,15 +1,15 @@
 package v7pushaction
 
 import (
-	log "github.com/sirupsen/logrus"
+	"log/slog"
 )
 
 func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) <-chan *PushEvent {
-	log.Debugln("Starting to Actualize Push plan:", plan)
+	slog.Debug("Starting to Actualize Push plan", "plan", plan)
 	eventStream := make(chan *PushEvent)
 
 	go func() {
-		log.Debug("starting actualize go routine")
+		slog.Debug("starting actualize go routine")
 		defer close(eventStream)
 
 		var err error
@@ -22,7 +22,7 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) <-chan *Pus
 			}
 		}
 
-		log.Debug("completed apply")
+		slog.Debug("completed apply")
 	}()
 
 	return eventStream

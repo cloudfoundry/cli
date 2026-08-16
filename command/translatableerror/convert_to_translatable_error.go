@@ -3,6 +3,7 @@ package translatableerror
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
@@ -12,11 +13,10 @@ import (
 	"code.cloudfoundry.org/cli/v9/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/v9/util/download"
 	"code.cloudfoundry.org/cli/v9/util/manifest"
-	log "github.com/sirupsen/logrus"
 )
 
 func ConvertToTranslatableError(err error) error {
-	log.WithField("err", fmt.Sprintf("%#v", err)).Debugf("convert to translatable error")
+	slog.Debug("convert to translatable error", "err", fmt.Sprintf("%#v", err))
 
 	switch e := err.(type) {
 	// Action Errors

@@ -1,19 +1,17 @@
 package v7action
 
 import (
+	"log/slog"
+
 	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/constant"
-	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, Warnings, error) {
 	resourceChunks := actor.chunkResources(resources)
 
-	log.WithFields(log.Fields{
-		"total_resources": len(resources),
-		"chunks":          len(resourceChunks),
-	}).Debug("sending resource match stats")
+	slog.Debug("sending resource match stats", "total_resources", len(resources), "chunks", len(resourceChunks))
 
 	var (
 		allWarnings         Warnings
@@ -36,9 +34,7 @@ func (actor Actor) ResourceMatch(resources []sharedaction.V3Resource) ([]shareda
 		matchedResources = append(matchedResources, sharedaction.V3Resource(resource))
 	}
 
-	log.WithFields(log.Fields{
-		"matchedResources": len(matchedResources),
-	}).Debug("number of resources matched by CC")
+	slog.Debug("number of resources matched by CC", "matchedResources", len(matchedResources))
 
 	return matchedResources, allWarnings, nil
 }

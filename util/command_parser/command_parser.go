@@ -3,6 +3,7 @@ package command_parser
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"reflect"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/util/configv3"
 	"code.cloudfoundry.org/cli/v9/util/ui"
 	"github.com/jessevdk/go-flags"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -77,9 +77,6 @@ func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) err
 	}()
 
 	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
-		log.SetOutput(os.Stderr)
-		log.SetLevel(log.Level(cfConfig.LogLevel()))
-
 		err = extendedCmd.Setup(cfConfig, p.UI)
 		if err != nil {
 			return p.handleError(err)
@@ -101,7 +98,7 @@ func (p *CommandParser) handleError(passedErr error) error {
 
 	switch typedErr := translatedErr.(type) {
 	case translatableerror.V3V2SwitchError:
-		log.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
+		slog.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
 		return passedErr
 	case TriggerLegacyMain:
 		if typedErr.Error() != "" {

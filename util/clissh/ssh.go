@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"os"
 	"os/signal"
@@ -21,7 +22,6 @@ import (
 	"code.cloudfoundry.org/cli/v9/cf/ssh/sigwinch"
 	"code.cloudfoundry.org/cli/v9/util/clissh/ssherror"
 	"github.com/moby/term"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -151,7 +151,7 @@ func (c *SecureShell) InteractiveSession(commands []string, terminalRequest TTYR
 		if err == nil {
 			defer func() {
 				err := c.terminalHelper.RestoreTerminal(stdinFd, state)
-				log.Errorln("restore terminal", err)
+				slog.Error("restore terminal", "error", err)
 			}()
 		}
 	}
@@ -302,7 +302,7 @@ func (c *SecureShell) resize(resized <-chan os.Signal, session SecureSession, te
 
 		_, err := session.SendRequest("window-change", false, ssh.Marshal(message))
 		if err != nil {
-			log.Errorln("window-change:", err)
+			slog.Error("window-change", "err", err)
 		}
 
 		previousWidth = width
@@ -344,7 +344,7 @@ func sha256Fingerprint(key ssh.PublicKey, encode bool) string {
 func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
 	_, err := io.Copy(dest, src)
 	if err != nil {
-		log.Errorln("copy and close:", err)
+		slog.Error("copy and close", "err", err)
 	}
 	_ = dest.Close()
 	if wg != nil {
@@ -355,7 +355,7 @@ func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
 func copyAndDone(wg *sync.WaitGroup, dest io.Writer, src io.Reader) {
 	_, err := io.Copy(dest, src)
 	if err != nil {
-		log.Errorln("copy and done:", err)
+		slog.Error("copy and done", "err", err)
 	}
 	wg.Done()
 }
@@ -402,7 +402,7 @@ func keepalive(conn ssh.Conn, ticker *time.Ticker, stopCh chan struct{}) {
 		case <-ticker.C:
 			_, _, err := conn.SendRequest("keepalive@cloudfoundry.org", true, nil)
 			if err != nil {
-				log.Errorln("err sending keep alive:", err)
+				slog.Error("err sending keep alive", "err", err)
 			}
 		case <-stopCh:
 			ticker.Stop()
