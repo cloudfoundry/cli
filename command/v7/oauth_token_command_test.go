@@ -8,8 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/v9/command/v7"
 	"code.cloudfoundry.org/cli/v9/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/v9/util/ui"
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -71,7 +70,7 @@ var _ = Describe("oauth-token command", func() {
 
 		When("the existing access token is invalid", func() {
 			BeforeEach(func() {
-				token := jws.NewJWT(jws.Claims{}, crypto.SigningMethodHS256)
+				token := jwtv5.MapClaims{}
 				fakeConfig.AccessTokenReturns("invalid-existing-access-token")
 				fakeActor.ParseAccessTokenReturns(token, errors.New("Access token is invalid"))
 			})
@@ -89,7 +88,7 @@ var _ = Describe("oauth-token command", func() {
 
 		When("the existing access token does not have an expiry time", func() {
 			BeforeEach(func() {
-				token := jws.NewJWT(jws.Claims{}, crypto.SigningMethodHS256)
+				token := jwtv5.MapClaims{}
 				fakeConfig.AccessTokenReturns("existing-access-token")
 				fakeActor.ParseAccessTokenReturns(token, nil)
 			})

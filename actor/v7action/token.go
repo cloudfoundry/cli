@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SermoDigital/jose/jws"
-	"github.com/SermoDigital/jose/jwt"
+	utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
 func (actor Actor) RefreshAccessToken() (string, error) {
@@ -14,12 +14,12 @@ func (actor Actor) RefreshAccessToken() (string, error) {
 	refreshToken := actor.Config.RefreshToken()
 
 	accessTokenString := strings.TrimPrefix(actor.Config.AccessToken(), "bearer ")
-	token, err := jws.ParseJWT([]byte(accessTokenString))
+	claims, err := utiljwt.Parse(accessTokenString)
 
 	if err == nil {
-		expiration, ok := token.Claims().Expiration()
-		if ok {
-			expiresIn = time.Until(expiration)
+		expiration, err := claims.GetExpirationTime()
+		if err == nil && expiration != nil {
+			expiresIn = time.Until(expiration.Time)
 		}
 	}
 
@@ -37,7 +37,7 @@ func (actor Actor) RefreshAccessToken() (string, error) {
 	return actor.Config.AccessToken(), nil
 }
 
-func (actor Actor) ParseAccessToken(accessToken string) (jwt.JWT, error) {
+func (actor Actor) ParseAccessToken(accessToken string) (jwtv5.MapClaims, error) {
 	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
-	return jws.ParseJWT([]byte(tokenStr))
+	return utiljwt.Parse(tokenStr)
 }

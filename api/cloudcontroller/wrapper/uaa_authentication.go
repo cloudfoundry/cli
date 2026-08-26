@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SermoDigital/jose/jws"
+	utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/v9/api/uaa"
@@ -81,12 +81,12 @@ func (t *UAAAuthentication) refreshTokenIfNecessary(accessToken string) error {
 	var expiresIn time.Duration
 
 	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
-	token, err := jws.ParseJWT([]byte(tokenStr))
+	claims, err := utiljwt.Parse(tokenStr)
 
 	if err == nil {
-		expiration, ok := token.Claims().Expiration()
-		if ok {
-			expiresIn = time.Until(expiration)
+		expiration, err := claims.GetExpirationTime()
+		if err == nil && expiration != nil {
+			expiresIn = time.Until(expiration.Time)
 		}
 	}
 

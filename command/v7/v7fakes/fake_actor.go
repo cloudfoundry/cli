@@ -18,7 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
-	"github.com/SermoDigital/jose/jwt"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
 type FakeActor struct {
@@ -2701,17 +2701,17 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	ParseAccessTokenStub        func(string) (jwt.JWT, error)
+	ParseAccessTokenStub        func(string) (jwtv5.MapClaims, error)
 	parseAccessTokenMutex       sync.RWMutex
 	parseAccessTokenArgsForCall []struct {
 		arg1 string
 	}
 	parseAccessTokenReturns struct {
-		result1 jwt.JWT
+		result1 jwtv5.MapClaims
 		result2 error
 	}
 	parseAccessTokenReturnsOnCall map[int]struct {
-		result1 jwt.JWT
+		result1 jwtv5.MapClaims
 		result2 error
 	}
 	PollBuildStub        func(string, string) (resources.Droplet, v7action.Warnings, error)
@@ -15519,7 +15519,7 @@ func (fake *FakeActor) MoveRouteReturnsOnCall(i int, result1 v7action.Warnings, 
 	}{result1, result2}
 }
 
-func (fake *FakeActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
+func (fake *FakeActor) ParseAccessToken(arg1 string) (jwtv5.MapClaims, error) {
 	fake.parseAccessTokenMutex.Lock()
 	ret, specificReturn := fake.parseAccessTokenReturnsOnCall[len(fake.parseAccessTokenArgsForCall)]
 	fake.parseAccessTokenArgsForCall = append(fake.parseAccessTokenArgsForCall, struct {
@@ -15544,7 +15544,7 @@ func (fake *FakeActor) ParseAccessTokenCallCount() int {
 	return len(fake.parseAccessTokenArgsForCall)
 }
 
-func (fake *FakeActor) ParseAccessTokenCalls(stub func(string) (jwt.JWT, error)) {
+func (fake *FakeActor) ParseAccessTokenCalls(stub func(string) (jwtv5.MapClaims, error)) {
 	fake.parseAccessTokenMutex.Lock()
 	defer fake.parseAccessTokenMutex.Unlock()
 	fake.ParseAccessTokenStub = stub
@@ -15557,28 +15557,28 @@ func (fake *FakeActor) ParseAccessTokenArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) ParseAccessTokenReturns(result1 jwt.JWT, result2 error) {
+func (fake *FakeActor) ParseAccessTokenReturns(result1 jwtv5.MapClaims, result2 error) {
 	fake.parseAccessTokenMutex.Lock()
 	defer fake.parseAccessTokenMutex.Unlock()
 	fake.ParseAccessTokenStub = nil
 	fake.parseAccessTokenReturns = struct {
-		result1 jwt.JWT
+		result1 jwtv5.MapClaims
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeActor) ParseAccessTokenReturnsOnCall(i int, result1 jwt.JWT, result2 error) {
+func (fake *FakeActor) ParseAccessTokenReturnsOnCall(i int, result1 jwtv5.MapClaims, result2 error) {
 	fake.parseAccessTokenMutex.Lock()
 	defer fake.parseAccessTokenMutex.Unlock()
 	fake.ParseAccessTokenStub = nil
 	if fake.parseAccessTokenReturnsOnCall == nil {
 		fake.parseAccessTokenReturnsOnCall = make(map[int]struct {
-			result1 jwt.JWT
+			result1 jwtv5.MapClaims
 			result2 error
 		})
 	}
 	fake.parseAccessTokenReturnsOnCall[i] = struct {
-		result1 jwt.JWT
+		result1 jwtv5.MapClaims
 		result2 error
 	}{result1, result2}
 }

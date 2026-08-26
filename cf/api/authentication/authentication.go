@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SermoDigital/jose/jws"
+	utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
 
 	"code.cloudfoundry.org/cli/v9/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/v9/cf/errors"
@@ -189,12 +189,12 @@ func (uaa UAARepository) RefreshAuthToken() (string, error) {
 
 func (uaa UAARepository) RefreshToken(t string) (string, error) {
 	tokenStr := strings.TrimPrefix(t, "bearer ")
-	token, err := jws.ParseJWT([]byte(tokenStr))
+	claims, err := utiljwt.Parse(tokenStr)
 	if err != nil {
 		return "", err
 	}
-	expiration, ok := token.Claims().Expiration()
-	if ok && expiration.Sub(time.Now()) > accessTokenExpirationMargin {
+	expiration, err := claims.GetExpirationTime()
+	if err == nil && expiration != nil && expiration.Sub(time.Now()) > accessTokenExpirationMargin {
 		return t, nil
 	}
 

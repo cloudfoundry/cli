@@ -1,8 +1,6 @@
 package configv3
 
-import (
-	"github.com/SermoDigital/jose/jws"
-)
+import utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
 
 type DefaultUserConfig struct {
 	// ConfigFile stores the configuration from the .cf/config
@@ -29,22 +27,20 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 		return User{}, nil
 	}
 
-	token, err := jws.ParseJWT([]byte(accessToken[7:]))
+	claims, err := utiljwt.Parse(accessToken[7:])
 	if err != nil {
 		return User{}, err
 	}
 
-	claims := token.Claims()
-
 	var name, GUID, origin string
 	var isClient bool
-	if claims.Has("user_name") {
-		name = claims.Get("user_name").(string)
-		GUID = claims.Get("user_id").(string)
-		origin = claims.Get("origin").(string)
+	if value, ok := claims["user_name"].(string); ok {
+		name = value
+		GUID, _ = claims["user_id"].(string)
+		origin, _ = claims["origin"].(string)
 		isClient = false
 	} else {
-		name = claims.Get("client_id").(string)
+		name, _ = claims["client_id"].(string)
 		GUID = name
 		isClient = true
 	}

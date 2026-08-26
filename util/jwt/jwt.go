@@ -1,0 +1,15 @@
+package jwt
+
+import (
+	"strings"
+
+	jwtv5 "github.com/golang-jwt/jwt/v5"
+)
+
+// Parse parses JWT claims without validating the access token signature.
+func Parse(accessToken string) (jwtv5.MapClaims, error) {
+	tokenString := strings.TrimPrefix(accessToken, "bearer ")
+	claims := jwtv5.MapClaims{}
+	_, _, err := new(jwtv5.Parser).ParseUnverified(tokenString, claims)
+	return claims, err
+}

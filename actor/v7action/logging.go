@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/v9/actor/sharedaction"
-	"github.com/SermoDigital/jose/jws"
+	utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
 )
 
 func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, Warnings, error) {
@@ -92,17 +92,17 @@ func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
 	}
 
 	accessToken = strings.TrimPrefix(accessToken, "bearer ")
-	token, err := jws.ParseJWT([]byte(accessToken))
+	claims, err := utiljwt.Parse(accessToken)
 	if err != nil {
 		return nil, err
 	}
 
 	var timeToRefresh time.Duration
-	expiration, ok := token.Claims().Expiration()
-	if !ok {
+	expiration, err := claims.GetExpirationTime()
+	if err != nil || expiration == nil {
 		return nil, errors.New("Failed to get an expiry time from the current access token")
 	}
-	expiresIn := time.Until(expiration)
+	expiresIn := time.Until(expiration.Time)
 	if expiresIn >= 2*time.Minute {
 		timeToRefresh = expiresIn - time.Minute
 	} else {
@@ -115,14 +115,14 @@ func (actor Actor) tokenExpiryTime(accessToken string) (*time.Duration, error) {
 	var expiresIn time.Duration
 
 	accessTokenString := strings.TrimPrefix(accessToken, "bearer ")
-	token, err := jws.ParseJWT([]byte(accessTokenString))
+	claims, err := utiljwt.Parse(accessTokenString)
 	if err != nil {
 		return nil, err
 	}
 
-	expiration, ok := token.Claims().Expiration()
-	if ok {
-		expiresIn = time.Until(expiration)
+	expiration, err := claims.GetExpirationTime()
+	if err == nil && expiration != nil {
+		expiresIn = time.Until(expiration.Time)
 	}
 	return &expiresIn, nil
 }
