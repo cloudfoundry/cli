@@ -26,7 +26,7 @@ func BuildTokenString(expiration time.Time) string {
 // ParseTokenString takes a string typed token and returns a jwt.JWT struct representation of that token
 func ParseTokenString(token string) jwtv5.MapClaims {
 	strippedToken := strings.TrimPrefix(token, "bearer ")
-	claims, err := utiljwt.Parse(strippedToken)
+	claims, err := utiljwt.ParseUnverified(strippedToken)
 	Expect(err).NotTo(HaveOccurred())
 	return claims
 }

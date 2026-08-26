@@ -92,7 +92,7 @@ func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
 	}
 
 	accessToken = strings.TrimPrefix(accessToken, "bearer ")
-	claims, err := utiljwt.Parse(accessToken)
+	claims, err := utiljwt.ParseUnverified(accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (actor Actor) tokenExpiryTime(accessToken string) (*time.Duration, error) {
 	var expiresIn time.Duration
 
 	accessTokenString := strings.TrimPrefix(accessToken, "bearer ")
-	claims, err := utiljwt.Parse(accessTokenString)
+	claims, err := utiljwt.ParseUnverified(accessTokenString)
 	if err != nil {
 		return nil, err
 	}

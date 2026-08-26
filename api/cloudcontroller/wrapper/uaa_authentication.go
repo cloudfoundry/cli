@@ -81,7 +81,7 @@ func (t *UAAAuthentication) refreshTokenIfNecessary(accessToken string) error {
 	var expiresIn time.Duration
 
 	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
-	claims, err := utiljwt.Parse(tokenStr)
+	claims, err := utiljwt.ParseUnverified(tokenStr)
 
 	if err == nil {
 		expiration, err := claims.GetExpirationTime()

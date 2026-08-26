@@ -189,7 +189,7 @@ func (uaa UAARepository) RefreshAuthToken() (string, error) {
 
 func (uaa UAARepository) RefreshToken(t string) (string, error) {
 	tokenStr := strings.TrimPrefix(t, "bearer ")
-	claims, err := utiljwt.Parse(tokenStr)
+	claims, err := utiljwt.ParseUnverified(tokenStr)
 	if err != nil {
 		return "", err
 	}

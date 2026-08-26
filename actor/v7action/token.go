@@ -14,7 +14,7 @@ func (actor Actor) RefreshAccessToken() (string, error) {
 	refreshToken := actor.Config.RefreshToken()
 
 	accessTokenString := strings.TrimPrefix(actor.Config.AccessToken(), "bearer ")
-	claims, err := utiljwt.Parse(accessTokenString)
+	claims, err := utiljwt.ParseUnverified(accessTokenString)
 
 	if err == nil {
 		expiration, err := claims.GetExpirationTime()
@@ -39,5 +39,5 @@ func (actor Actor) RefreshAccessToken() (string, error) {
 
 func (actor Actor) ParseAccessToken(accessToken string) (jwtv5.MapClaims, error) {
 	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
-	return utiljwt.Parse(tokenStr)
+	return utiljwt.ParseUnverified(tokenStr)
 }

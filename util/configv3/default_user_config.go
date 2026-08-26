@@ -27,7 +27,7 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 		return User{}, nil
 	}
 
-	claims, err := utiljwt.Parse(accessToken[7:])
+	claims, err := utiljwt.ParseUnverified(accessToken[7:])
 	if err != nil {
 		return User{}, err
 	}
