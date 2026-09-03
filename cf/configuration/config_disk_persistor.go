@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"io/ioutil"
 	"os"
 )
 
@@ -70,7 +69,7 @@ func (dp DiskPersistor) read(data DataInterface) error {
 		return err
 	}
 
-	jsonBytes, err := ioutil.ReadFile(dp.filePath)
+	jsonBytes, err := os.ReadFile(dp.filePath)
 	if err != nil {
 		return err
 	}
@@ -85,6 +84,6 @@ func (dp DiskPersistor) write(data DataInterface) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(dp.filePath, bytes, filePermissions)
+	err = os.WriteFile(dp.filePath, bytes, filePermissions)
 	return err
 }

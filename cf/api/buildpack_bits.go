@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	gonet "net"
 	"net/http"
@@ -52,7 +51,7 @@ func zipErrorHelper(err error) error {
 }
 
 func (repo CloudControllerBuildpackBitsRepository) CreateBuildpackZipFile(buildpackPath string) (*os.File, string, error) {
-	zipFileToUpload, err := ioutil.TempFile("", "buildpack-upload")
+	zipFileToUpload, err := os.CreateTemp("", "buildpack-upload")
 	if err != nil {
 		os.RemoveAll(zipFileToUpload.Name())
 		return nil, "", fmt.Errorf("%s: %s", T("Couldn't create temp file for upload"), err.Error())

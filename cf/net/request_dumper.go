@@ -2,7 +2,7 @@ package net
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -54,9 +54,9 @@ func (p RequestDumper) DumpRequest(req *http.Request) {
 		return
 	}
 
-	requestBody, err := ioutil.ReadAll(req.Body)
+	requestBody, err := io.ReadAll(req.Body)
 	req.Body.Close()
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+	req.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 
 	if len(requestBody) == 0 {
 		return

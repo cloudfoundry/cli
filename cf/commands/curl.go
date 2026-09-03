@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -152,5 +151,5 @@ func (cmd Curl) writeToFile(responseBody, filePath string) (err error) {
 		return
 	}
 
-	return ioutil.WriteFile(filePath, []byte(responseBody), 0644)
+	return os.WriteFile(filePath, []byte(responseBody), 0644)
 }

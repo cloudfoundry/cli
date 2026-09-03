@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -99,7 +99,7 @@ func (cmd *AddPluginRepo) Execute(c flags.FlagContext) error {
 		return errors.New(repoURL + T(" is not responding. Please make sure it is a valid plugin repo."))
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return errors.New(T("Error reading response from server: ") + err.Error())
 	}

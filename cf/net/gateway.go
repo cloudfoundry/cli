@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -250,7 +249,7 @@ func (gateway Gateway) performRequestForResponseBytes(request *Request) ([]byte,
 	}
 	defer rawResponse.Body.Close()
 
-	bytes, err := ioutil.ReadAll(rawResponse.Body)
+	bytes, err := io.ReadAll(rawResponse.Body)
 	if err != nil {
 		return bytes, nil, rawResponse, fmt.Errorf("%s: %s", T("Error reading response"), err.Error())
 	}
@@ -267,7 +266,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	bytes, headers, rawResponse, err := gateway.performRequestForResponseBytes(request)
 	if err != nil {
 		if rawResponse != nil && rawResponse.Body != nil {
-			b, _ := ioutil.ReadAll(rawResponse.Body)
+			b, _ := io.ReadAll(rawResponse.Body)
 			_ = json.Unmarshal(b, &response)
 		}
 		return headers, err
@@ -361,7 +360,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (*http.Response, 
 	httpReq := request.HTTPReq
 
 	if request.SeekableBody != nil {
-		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
+		httpReq.Body = io.NopCloser(request.SeekableBody)
 	}
 
 	if gateway.authenticator != nil {
@@ -390,8 +389,8 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (*http.Respons
 
 	if rawResponse.StatusCode > 299 {
 		defer rawResponse.Body.Close()
-		jsonBytes, _ := ioutil.ReadAll(rawResponse.Body)
-		rawResponse.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
+		jsonBytes, _ := io.ReadAll(rawResponse.Body)
+		rawResponse.Body = io.NopCloser(bytes.NewBuffer(jsonBytes))
 		err = gateway.errHandler(rawResponse.StatusCode, jsonBytes)
 	}
 
