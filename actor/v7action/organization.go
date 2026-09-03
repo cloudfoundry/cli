@@ -87,25 +87,22 @@ func (actor Actor) RenameOrganization(oldOrgName, newOrgName string) (resources.
 	return org, allWarnings, nil
 }
 
-func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
+func (actor Actor) DeleteOrganization(name string) (chan PollJobEvent, Warnings, error) {
 	var allWarnings Warnings
 
 	org, warnings, err := actor.GetOrganizationByName(name)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
 	jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(org.GUID)
 	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
-	ccWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, Warnings(ccWarnings)...)
-
-	return allWarnings, err
+	return actor.PollJobToEventStream(jobURL), allWarnings, nil
 }
 
 func (actor Actor) GetDefaultDomain(orgGUID string) (resources.Domain, Warnings, error) {
