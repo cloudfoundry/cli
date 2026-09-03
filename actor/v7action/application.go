@@ -14,14 +14,13 @@ import (
 	"code.cloudfoundry.org/cli/v9/util/unique"
 )
 
-func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
+func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (chan PollJobEvent, Warnings, error) {
 	var allWarnings Warnings
-	var jobQueue []ccv3.JobURL
 
 	app, getAppWarnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
 	allWarnings = append(allWarnings, getAppWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
 	var routes []resources.Route
@@ -30,15 +29,14 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 		routes, getRoutesWarnings, err = actor.GetApplicationRoutes(app.GUID)
 		allWarnings = append(allWarnings, getRoutesWarnings...)
 		if err != nil {
-			return allWarnings, err
+			return nil, allWarnings, err
 		}
 
 		for _, route := range routes {
 			if len(route.Destinations) > 1 {
 				for _, destination := range route.Destinations {
-					guid := destination.App.GUID
-					if guid != app.GUID {
-						return allWarnings, actionerror.RouteBoundToMultipleAppsError{AppName: app.Name, RouteURL: route.URL}
+					if destination.App.GUID != app.GUID {
+						return nil, allWarnings, actionerror.RouteBoundToMultipleAppsError{AppName: app.Name, RouteURL: route.URL}
 					}
 				}
 			}
@@ -48,39 +46,44 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 	appDeleteJobURL, deleteAppWarnings, err := actor.CloudControllerClient.DeleteApplication(app.GUID)
 	allWarnings = append(allWarnings, deleteAppWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
-	pollWarnings, err := actor.CloudControllerClient.PollJob(appDeleteJobURL)
-	allWarnings = append(allWarnings, pollWarnings...)
-	if err != nil {
-		return allWarnings, err
-	}
+	stream := make(chan PollJobEvent)
+	go func() {
+		defer close(stream)
 
-	if deleteRoutes {
-		for _, route := range routes {
-			jobURL, deleteRouteWarnings, err := actor.CloudControllerClient.DeleteRoute(route.GUID)
-			allWarnings = append(allWarnings, deleteRouteWarnings...)
-			if err != nil {
-				if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-					continue
-				}
-				return allWarnings, err
+		for event := range actor.PollJobToEventStream(appDeleteJobURL) {
+			stream <- event
+			if event.Err != nil {
+				return
 			}
-
-			jobQueue = append(jobQueue, jobURL)
 		}
-	}
 
-	for _, job := range jobQueue {
-		pollWarnings, err := actor.CloudControllerClient.PollJob(job)
-		allWarnings = append(allWarnings, pollWarnings...)
-		if err != nil {
-			return allWarnings, err
+		if deleteRoutes {
+			for _, route := range routes {
+				jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteRoute(route.GUID)
+				if err != nil {
+					if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+						stream <- PollJobEvent{Warnings: Warnings(deleteWarnings)}
+						continue
+					}
+					stream <- PollJobEvent{Warnings: Warnings(deleteWarnings), Err: err}
+					return
+				}
+				stream <- PollJobEvent{Warnings: Warnings(deleteWarnings)}
+
+				for event := range actor.PollJobToEventStream(jobURL) {
+					stream <- event
+					if event.Err != nil {
+						return
+					}
+				}
+			}
 		}
-	}
+	}()
 
-	return allWarnings, err
+	return stream, allWarnings, nil
 }
 
 func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Application, Warnings, error) {

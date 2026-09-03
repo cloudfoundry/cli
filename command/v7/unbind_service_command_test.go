@@ -296,7 +296,7 @@ var _ = Describe("unbind-service Command", func() {
 			It("waits for the event stream to complete", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Deleting service binding %s\.\.\.\n`, fakeBindingGUID),
-					Say(`Waiting for the operation to complete\.+\n`),
+					Say(`Waiting for the operation to complete\n\.+`),
 					Say(`\n`),
 					Say(`OK\n`),
 				))
