@@ -53,8 +53,6 @@ func (fake *FakeOutputCapture) SetOutputBucketArgsForCall(i int) io.Writer {
 func (fake *FakeOutputCapture) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.setOutputBucketMutex.RLock()
-	defer fake.setOutputBucketMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
