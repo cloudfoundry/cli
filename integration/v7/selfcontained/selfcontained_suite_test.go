@@ -14,8 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/integration/helpers"
 	"code.cloudfoundry.org/cli/v9/integration/v7/selfcontained/fake"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
@@ -44,10 +43,12 @@ var _ = BeforeEach(func() {
 	keyPair, err := rsa.GenerateKey(rand.Reader, 2048)
 	Expect(err).NotTo(HaveOccurred())
 
-	jwt := jws.NewJWT(jws.Claims{
-		"exp": time.Now().Add(time.Hour).Unix(),
-	}, crypto.SigningMethodRS256)
-	token, err = jwt.Serialize(keyPair)
+	jwtToken := jwtv5.NewWithClaims(jwtv5.SigningMethodRS256, jwtv5.MapClaims{
+		"exp": jwtv5.NewNumericDate(time.Now().Add(time.Hour)),
+	})
+	var tokenString string
+	tokenString, err = jwtToken.SignedString(keyPair)
+	token = []byte(tokenString)
 	Expect(err).NotTo(HaveOccurred())
 })
 
