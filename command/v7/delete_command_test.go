@@ -64,6 +64,15 @@ var _ = Describe("delete Command", func() {
 		fakeActor.GetCurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
+	closedStream := func() chan v7action.PollJobEvent {
+		stream := make(chan v7action.PollJobEvent)
+		go func() {
+			stream <- v7action.PollJobEvent{State: v7action.JobComplete}
+			close(stream)
+		}()
+		return stream
+	}
+
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
@@ -75,7 +84,7 @@ var _ = Describe("delete Command", func() {
 			_, err := input.Write([]byte("y\n"))
 			Expect(err).ToNot(HaveOccurred())
 
-			fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
+			fakeActor.DeleteApplicationByNameAndSpaceReturns(closedStream(), v7action.Warnings{"some-warning"}, nil)
 		})
 
 		It("asks for a special prompt about deleting associated routes", func() {
@@ -97,7 +106,7 @@ var _ = Describe("delete Command", func() {
 
 		When("the route is mapped to a different app", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, actionerror.RouteBoundToMultipleAppsError{})
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(nil, v7action.Warnings{"some-warning"}, actionerror.RouteBoundToMultipleAppsError{})
 			})
 
 			It("returns the error", func() {
@@ -150,7 +159,7 @@ var _ = Describe("delete Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(closedStream(), v7action.Warnings{"some-warning"}, nil)
 			})
 
 			It("delegates to the Actor", func() {
@@ -224,7 +233,7 @@ var _ = Describe("delete Command", func() {
 		When("deleting the app errors", func() {
 			Context("generic error", func() {
 				BeforeEach(func() {
-					fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
+					fakeActor.DeleteApplicationByNameAndSpaceReturns(nil, v7action.Warnings{"some-warning"}, errors.New("some-error"))
 				})
 
 				It("displays all warnings, and returns the error", func() {
@@ -238,7 +247,7 @@ var _ = Describe("delete Command", func() {
 
 		When("the app doesn't exist", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(nil, v7action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
 
 			It("displays all warnings, that the app wasn't found, and does not error", func() {
@@ -253,7 +262,7 @@ var _ = Describe("delete Command", func() {
 
 		When("the app exists", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(closedStream(), v7action.Warnings{"some-warning"}, nil)
 			})
 
 			It("displays all warnings, and does not error", func() {

@@ -48,6 +48,15 @@ var _ = Describe("delete-org Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
+	closedStream := func() chan v7action.PollJobEvent {
+		stream := make(chan v7action.PollJobEvent)
+		go func() {
+			stream <- v7action.PollJobEvent{State: v7action.JobComplete}
+			close(stream)
+		}()
+		return stream
+	}
+
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
@@ -100,7 +109,7 @@ var _ = Describe("delete-org Command", func() {
 
 					When("no errors are encountered", func() {
 						BeforeEach(func() {
-							fakeActor.DeleteOrganizationReturns(v7action.Warnings{"warning-1", "warning-2"}, nil)
+							fakeActor.DeleteOrganizationReturns(closedStream(), v7action.Warnings{"warning-1", "warning-2"}, nil)
 						})
 
 						It("does not prompt for user confirmation, displays warnings, and deletes the org", func() {
@@ -123,6 +132,7 @@ var _ = Describe("delete-org Command", func() {
 						When("the organization does not exist", func() {
 							BeforeEach(func() {
 								fakeActor.DeleteOrganizationReturns(
+									nil,
 									v7action.Warnings{"warning-1", "warning-2"},
 									actionerror.OrganizationNotFoundError{
 										Name: "some-org",
@@ -152,7 +162,7 @@ var _ = Describe("delete-org Command", func() {
 
 							BeforeEach(func() {
 								returnedErr = errors.New("some error")
-								fakeActor.DeleteOrganizationReturns(v7action.Warnings{"warning-1", "warning-2"}, returnedErr)
+								fakeActor.DeleteOrganizationReturns(nil, v7action.Warnings{"warning-1", "warning-2"}, returnedErr)
 							})
 
 							It("returns the error, displays all warnings, and does not delete the org", func() {

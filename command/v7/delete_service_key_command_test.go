@@ -324,7 +324,7 @@ var _ = Describe("delete-service-key Command", func() {
 
 			It("waits for the event stream to complete", func() {
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Waiting for the operation to complete\.\.\.\n`),
+					Say(`Waiting for the operation to complete\n\.\.\.`),
 					Say(`\n`),
 					Say(`OK\n`),
 				))
