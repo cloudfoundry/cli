@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
 )
 
 type DeleteSpaceCommand struct {
@@ -62,7 +63,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 			"CurrentUser": user.Name,
 		})
 
-	warnings, err := cmd.Actor.DeleteSpaceByNameAndOrganizationName(cmd.RequiredArgs.Space, orgName)
+	stream, warnings, err := cmd.Actor.DeleteSpaceByNameAndOrganizationName(cmd.RequiredArgs.Space, orgName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
@@ -73,6 +74,8 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		default:
 			return err
 		}
+	} else if _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayOK()

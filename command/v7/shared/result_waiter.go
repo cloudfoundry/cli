@@ -13,7 +13,7 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 	}
 
 	if waitForCompletion {
-		fmt.Fprint(ui.Writer(), "Waiting for the operation to complete")
+		fmt.Fprintln(ui.Writer(), "Waiting for the operation to complete")
 
 		defer func() {
 			ui.DisplayNewline()
@@ -21,8 +21,9 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 		}()
 	}
 
+	seen := map[string]bool{}
 	for event := range stream {
-		ui.DisplayWarnings(event.Warnings)
+		ui.DisplayWarnings(dedupeSeenWarnings(event.Warnings, seen))
 		if waitForCompletion {
 			fmt.Fprint(ui.Writer(), ".")
 		}
@@ -35,4 +36,19 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 	}
 
 	return true, nil
+}
+
+// dedupeSeenWarnings prints each distinct warning at most once per operation:
+// CC re-sends warnings like "still in progress" on every poll tick.
+func dedupeSeenWarnings(warnings v7action.Warnings, seen map[string]bool) v7action.Warnings {
+	var deduped v7action.Warnings
+	for _, warning := range warnings {
+		if seen[warning] {
+			continue
+		}
+		seen[warning] = true
+		deduped = append(deduped, warning)
+	}
+
+	return deduped
 }
