@@ -102,16 +102,18 @@ jobs:
       - name: View GPG keys
         run: gpg --list-keys
 
+      - name: Disable needrestart to prevent apt hangs
+        run: sudo apt-get purge -y needrestart
+
       - name: Setup upterm session
         env:
           BACKUP_SIGNING_KEY_GPG:     ${{ secrets.BACKUP_SIGNING_KEY_GPG }}
           SIGNING_KEY_GPG:            ${{ secrets.SIGNING_KEY_GPG }}
           SIGNING_KEY_GPG_ID:         ${{ secrets.SIGNING_KEY_GPG_ID }}
           SIGNING_KEY_GPG_PASSPHRASE: ${{ secrets.SIGNING_KEY_GPG_PASSPHRASE }}
+          DEBIAN_FRONTEND: noninteractive
         if: always()
-        # uses: lhotari/action-upterm@v1
         uses: mxschmitt/action-tmate@v3
-        # timeout-minutes: 60
 
       - name: Print public key to update CLAW
         env:
