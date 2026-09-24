@@ -1,3 +1,14 @@
 exclude:
   - './integration/assets'
   - './fixtures/applications'
+
+ignore:
+  # CVE-2026-84445 (grpc-go xDS DoS, GHSA-2v4p-qf9q-27wj) is already fixed here:
+  # grpc was bumped to v1.84.0, and grpc-go's own advisory lists v1.82.2 and
+  # v1.83.2 as containing the fix, both older than v1.84.0. Verified directly
+  # against the v1.84.0 tag's source (internal/xds/server/routing.go already
+  # has the ":authority" header check from fix commit 93e31b485). The scanner
+  # DB anchors "fixed in" to an unreleased dev pseudo-version
+  # (1.85.0-dev.0.20260825072537-93e31b48545e) from a squash-merged backport,
+  # so it can't recognize the later tagged release already supersedes it.
+  - vulnerability: CVE-2026-84445
