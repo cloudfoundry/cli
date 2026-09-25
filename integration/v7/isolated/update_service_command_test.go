@@ -183,7 +183,7 @@ var _ = Describe("update-service command", func() {
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
-					Say(`Update of service instance %s complete\n\.\n`, serviceInstanceName),
+					Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
 					Say(`OK\n`),
 				))
 
@@ -207,7 +207,7 @@ var _ = Describe("update-service command", func() {
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Updating service instance %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, orgName, spaceName, username),
 						Say(`\n`),
-						Say(`Update of service instance %s complete\n\.\n`, serviceInstanceName),
+						Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
 						Say(`OK\n`),
 					))
 
@@ -333,7 +333,7 @@ var _ = Describe("update-service command", func() {
 						Say(`\n`),
 						Say(`Waiting for the operation to complete\n\.+`),
 						Say(`\n`),
-						Say(`Update of service instance %s complete\n\.\n`, serviceInstanceName),
+						Say(`Update of service instance %s complete\.\n`, serviceInstanceName),
 						Say(`OK\n`),
 					))
 

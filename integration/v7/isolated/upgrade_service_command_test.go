@@ -153,7 +153,7 @@ var _ = Describe("upgrade-service command", func() {
 						Say(`\n`),
 						Say(`Waiting for the operation to complete\n\.+`),
 						Say(`\n`),
-						Say(`Upgrade of service instance %s complete\n\.\n`, serviceInstanceName),
+						Say(`Upgrade of service instance %s complete\.\n`, serviceInstanceName),
 						Say(`OK\n`),
 					))
 				})

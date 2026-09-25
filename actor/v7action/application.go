@@ -61,11 +61,7 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 		}
 
 		if deleteRoutes {
-			type routeJob struct {
-				jobURL   ccv3.JobURL
-				warnings Warnings
-			}
-			var routeJobs []routeJob
+			var routeJobURLs []ccv3.JobURL
 
 			for _, route := range routes {
 				jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteRoute(route.GUID)
@@ -78,11 +74,11 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 					return
 				}
 				stream <- PollJobEvent{Warnings: Warnings(deleteWarnings)}
-				routeJobs = append(routeJobs, routeJob{jobURL: jobURL, warnings: Warnings(deleteWarnings)})
+				routeJobURLs = append(routeJobURLs, jobURL)
 			}
 
-			for _, rj := range routeJobs {
-				for event := range actor.PollJobToEventStream(rj.jobURL) {
+			for _, jobURL := range routeJobURLs {
+				for event := range actor.PollJobToEventStream(jobURL) {
 					stream <- event
 					if event.Err != nil {
 						return
