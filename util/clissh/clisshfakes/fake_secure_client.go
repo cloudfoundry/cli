@@ -353,16 +353,6 @@ func (fake *FakeSecureClient) WaitReturnsOnCall(i int, result1 error) {
 func (fake *FakeSecureClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	fake.connMutex.RLock()
-	defer fake.connMutex.RUnlock()
-	fake.dialMutex.RLock()
-	defer fake.dialMutex.RUnlock()
-	fake.newSessionMutex.RLock()
-	defer fake.newSessionMutex.RUnlock()
-	fake.waitMutex.RLock()
-	defer fake.waitMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

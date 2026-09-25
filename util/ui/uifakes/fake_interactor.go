@@ -90,8 +90,6 @@ func (fake *FakeInteractor) NewInteractionReturnsOnCall(i int, result1 ui.Resolv
 func (fake *FakeInteractor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.newInteractionMutex.RLock()
-	defer fake.newInteractionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
