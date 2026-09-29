@@ -18,8 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/command/commandfakes"
 	"code.cloudfoundry.org/cli/v9/integration/helpers"
 
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -147,11 +146,13 @@ var _ = Describe("KubernetesAuthentication", func() {
 	checkBearerTokenInAuthHeader := func() {
 		actualReq := checkCalls()
 
-		token, err := jws.ParseJWTFromRequest(actualReq.Request)
+		token, err := jwtv5.Parse(strings.TrimPrefix(actualReq.Header.Get("Authorization"), "Bearer "), func(_ *jwtv5.Token) (interface{}, error) {
+			return keyPair.Public(), nil
+		}, jwtv5.WithValidMethods([]string{jwtv5.SigningMethodRS256.Alg()}))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(token.Validate(keyPair.Public(), crypto.SigningMethodRS256)).To(Succeed())
+		Expect(token.Valid).To(BeTrue())
 
-		claims := token.Claims()
+		claims := token.Claims.(jwtv5.MapClaims)
 		Expect(claims).To(HaveKeyWithValue("another", "thing"))
 	}
 
@@ -179,13 +180,13 @@ var _ = Describe("KubernetesAuthentication", func() {
 		var token []byte
 
 		BeforeEach(func() {
-			jwt := jws.NewJWT(jws.Claims{
+			claims := jwtv5.MapClaims{
 				"exp":     time.Now().Add(time.Hour).Unix(),
 				"another": "thing",
-			}, crypto.SigningMethodRS256)
-			var err error
-			token, err = jwt.Serialize(keyPair)
+			}
+			tokenString, err := jwtv5.NewWithClaims(jwtv5.SigningMethodRS256, claims).SignedString(keyPair)
 			Expect(err).NotTo(HaveOccurred())
+			token = []byte(tokenString)
 
 			kubeConfig.AuthInfos["auth-test"] = &api.AuthInfo{
 				AuthProvider: &api.AuthProviderConfig{
@@ -368,13 +369,13 @@ var _ = Describe("KubernetesAuthentication", func() {
 		var token []byte
 
 		BeforeEach(func() {
-			jwt := jws.NewJWT(jws.Claims{
+			claims := jwtv5.MapClaims{
 				"exp":     time.Now().Add(time.Hour).Unix(),
 				"another": "thing",
-			}, crypto.SigningMethodRS256)
-			var err error
-			token, err = jwt.Serialize(keyPair)
+			}
+			tokenString, err := jwtv5.NewWithClaims(jwtv5.SigningMethodRS256, claims).SignedString(keyPair)
 			Expect(err).NotTo(HaveOccurred())
+			token = []byte(tokenString)
 		})
 
 		Context("inline tokens", func() {
