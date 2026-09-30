@@ -3,17 +3,17 @@ module code.cloudfoundry.org/cli/v9
 go 1.26.7
 
 require (
-	code.cloudfoundry.org/bytefmt v0.89.0
+	code.cloudfoundry.org/bytefmt v0.90.0
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.87.0
+	code.cloudfoundry.org/clock v1.88.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.86.0
-	code.cloudfoundry.org/tlsconfig v0.66.0
+	code.cloudfoundry.org/lager/v3 v3.87.0
+	code.cloudfoundry.org/tlsconfig v0.67.0
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
@@ -31,8 +31,8 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.13.0
 	github.com/moby/term v0.5.2
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
+	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/gomega v1.43.1
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20171017070213-362f9845770f
 	github.com/sajari/fuzzy v1.0.0
@@ -87,9 +87,9 @@ require (
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.50.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260414002931-afd174a4e478 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
-	google.golang.org/grpc v1.82.1 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
+	google.golang.org/grpc v1.83.2 // indirect
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
