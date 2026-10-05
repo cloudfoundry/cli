@@ -9,8 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v9/api/uaa"
 
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
 
@@ -225,9 +224,8 @@ var _ = Describe("UAA Authentication", func() {
 })
 
 func buildTokenString(expiration time.Time) (string, error) {
-	c := jws.Claims{}
-	c.SetExpiration(expiration)
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, err := token.Serialize(nil)
-	return string(tokenBytes), err
+	claims := jwtv5.MapClaims{"exp": jwtv5.NewNumericDate(expiration)}
+	token := jwtv5.NewWithClaims(jwtv5.SigningMethodNone, claims)
+	tokenBytes, err := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
+	return tokenBytes, err
 }

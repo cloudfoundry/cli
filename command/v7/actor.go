@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/v9/resources"
 	"code.cloudfoundry.org/cli/v9/types"
 	"code.cloudfoundry.org/cli/v9/util/configv3"
-	"github.com/SermoDigital/jose/jwt"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Actor
@@ -197,7 +197,7 @@ type Actor interface {
 	MapRoute(routeGUID string, appGUID string, destinationProtocol string, destinationPort int) (v7action.Warnings, error)
 	Marketplace(filter v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
 	MoveRoute(routeGUID string, spaceGUID string) (v7action.Warnings, error)
-	ParseAccessToken(accessToken string) (jwt.JWT, error)
+	ParseAccessToken(accessToken string) (jwtv5.MapClaims, error)
 	PollBuild(buildGUID string, appName string) (resources.Droplet, v7action.Warnings, error)
 	PollPackage(pkg resources.Package) (resources.Package, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)

@@ -4,29 +4,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
-	"github.com/SermoDigital/jose/jwt"
+	utiljwt "code.cloudfoundry.org/cli/v9/util/jwt"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/gomega"
 )
 
 // BuildTokenString returns a string typed JSON web token with the specified expiration time
 func BuildTokenString(expiration time.Time) string {
-	c := jws.Claims{}
-	c.SetExpiration(expiration)
-	c.Set("user_name", "some-user")
-	c.Set("user_id", "some-guid")
-	c.Set("origin", "uaa")
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, err := token.Serialize(nil)
+	claims := jwtv5.MapClaims{
+		"exp":       jwtv5.NewNumericDate(expiration),
+		"user_name": "some-user",
+		"user_id":   "some-guid",
+		"origin":    "uaa",
+	}
+	token := jwtv5.NewWithClaims(jwtv5.SigningMethodNone, claims)
+	tokenBytes, err := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
 	Expect(err).NotTo(HaveOccurred())
 	return string(tokenBytes)
 }
 
 // ParseTokenString takes a string typed token and returns a jwt.JWT struct representation of that token
-func ParseTokenString(token string) jwt.JWT {
+func ParseTokenString(token string) jwtv5.MapClaims {
 	strippedToken := strings.TrimPrefix(token, "bearer ")
-	jwt, err := jws.ParseJWT([]byte(strippedToken))
+	claims, err := utiljwt.ParseUnverified(strippedToken)
 	Expect(err).NotTo(HaveOccurred())
-	return jwt
+	return claims
 }
