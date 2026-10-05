@@ -26,8 +26,8 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 			return errors.New(cmd.UI.TranslateText("Access token is invalid."))
 		}
 
-		expiration, success := token.Claims().Expiration()
-		if !success {
+		expiration, err := token.GetExpirationTime()
+		if err != nil || expiration == nil {
 			return errors.New(cmd.UI.TranslateText("Access token is missing expiration claim."))
 		}
 
