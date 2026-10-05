@@ -164,7 +164,7 @@ var _ = Describe("delete-service-key command", func() {
 
 				Expect(session.Out).To(SatisfyAll(
 					Say(`Deleting key %s for service instance %s as %s\.\.\.\n`, serviceKeyName, serviceInstanceName, username),
-					Say(`Waiting for the operation to complete\.+\n`),
+					Say(`Waiting for the operation to complete\n\.+`),
 					Say(`\n`),
 					Say(`OK\n`),
 				))

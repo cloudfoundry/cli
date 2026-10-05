@@ -50,6 +50,15 @@ var _ = Describe("delete-space Command", func() {
 		fakeActor.GetCurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
+	closedStream := func() chan v7action.PollJobEvent {
+		stream := make(chan v7action.PollJobEvent)
+		go func() {
+			stream <- v7action.PollJobEvent{State: v7action.JobComplete}
+			close(stream)
+		}()
+		return stream
+	}
+
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
@@ -116,7 +125,7 @@ var _ = Describe("delete-space Command", func() {
 
 					When("the deleting the space errors", func() {
 						BeforeEach(func() {
-							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: "some-space"})
+							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(nil, v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: "some-space"})
 						})
 
 						It("displays all warnings and does not error", func() {
@@ -131,7 +140,7 @@ var _ = Describe("delete-space Command", func() {
 
 					When("the deleting the space succeeds", func() {
 						BeforeEach(func() {
-							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v7action.Warnings{"warning-1", "warning-2"}, nil)
+							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(closedStream(), v7action.Warnings{"warning-1", "warning-2"}, nil)
 						})
 
 						When("the user was targeted to the space", func() {
@@ -190,7 +199,7 @@ var _ = Describe("delete-space Command", func() {
 							_, err := input.Write([]byte("y\n"))
 							Expect(err).ToNot(HaveOccurred())
 
-							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v7action.Warnings{"warning-1", "warning-2"}, nil)
+							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(closedStream(), v7action.Warnings{"warning-1", "warning-2"}, nil)
 						})
 
 						It("deletes the space", func() {
@@ -258,7 +267,7 @@ var _ = Describe("delete-space Command", func() {
 					cmd.Org = ""
 					cmd.Force = true
 					fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-targeted-org"})
-					fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v7action.Warnings{"warning-1", "warning-2"}, nil)
+					fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(closedStream(), v7action.Warnings{"warning-1", "warning-2"}, nil)
 				})
 
 				It("deletes the space in the targeted org", func() {

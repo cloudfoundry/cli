@@ -277,7 +277,7 @@ var _ = Describe("create-service Command", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Creating service instance %s in org %s / space %s as %s\.\.\.\n`, requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
 					Say(`\n`),
-					Say(`Waiting for the operation to complete\.\.\n`),
+					Say(`Waiting for the operation to complete\n\.\.`),
 					Say(`\n`),
 					Say(`Service instance %s created\.\n`, requestedServiceInstanceName),
 					Say(`OK\n`),

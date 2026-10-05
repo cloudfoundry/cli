@@ -289,7 +289,7 @@ var _ = Describe("create-service-key command", func() {
 						Eventually(session).Should(Exit(0))
 						Expect(session.Out).To(SatisfyAll(
 							Say(`Creating service key %s for service instance %s as %s\.\.\.\n`, serviceKeyName, serviceInstanceName, username),
-							Say(`Waiting for the operation to complete\.+\n`),
+							Say(`Waiting for the operation to complete\n\.+`),
 							Say(`\n`),
 							Say(`OK\n`),
 						))

@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/v9/actor/actionerror"
 	"code.cloudfoundry.org/cli/v9/command/flag"
+	"code.cloudfoundry.org/cli/v9/command/v7/shared"
 )
 
 type DeleteOrgCommand struct {
@@ -46,7 +47,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 		"Username": user.Name,
 	})
 
-	warnings, err := cmd.Actor.DeleteOrganization(cmd.RequiredArgs.Organization)
+	stream, warnings, err := cmd.Actor.DeleteOrganization(cmd.RequiredArgs.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
@@ -57,6 +58,8 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 		default:
 			return err
 		}
+	} else if _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayOK()
