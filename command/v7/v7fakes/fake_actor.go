@@ -577,7 +577,7 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	DeleteApplicationByNameAndSpaceStub        func(string, string, bool) (v7action.Warnings, error)
+	DeleteApplicationByNameAndSpaceStub        func(string, string, bool) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	deleteApplicationByNameAndSpaceMutex       sync.RWMutex
 	deleteApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
@@ -585,12 +585,14 @@ type FakeActor struct {
 		arg3 bool
 	}
 	deleteApplicationByNameAndSpaceReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	deleteApplicationByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	DeleteBuildpackByNameAndStackAndLifecycleStub        func(string, string, string) (v7action.Warnings, error)
 	deleteBuildpackByNameAndStackAndLifecycleMutex       sync.RWMutex
@@ -680,18 +682,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	DeleteOrganizationStub        func(string) (v7action.Warnings, error)
+	DeleteOrganizationStub        func(string) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	deleteOrganizationMutex       sync.RWMutex
 	deleteOrganizationArgsForCall []struct {
 		arg1 string
 	}
 	deleteOrganizationReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	deleteOrganizationReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	DeleteOrganizationQuotaStub        func(string) (v7action.Warnings, error)
 	deleteOrganizationQuotaMutex       sync.RWMutex
@@ -840,19 +844,21 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	DeleteSpaceByNameAndOrganizationNameStub        func(string, string) (v7action.Warnings, error)
+	DeleteSpaceByNameAndOrganizationNameStub        func(string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	deleteSpaceByNameAndOrganizationNameMutex       sync.RWMutex
 	deleteSpaceByNameAndOrganizationNameArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	deleteSpaceByNameAndOrganizationNameReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	deleteSpaceByNameAndOrganizationNameReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
 	}
 	DeleteSpaceQuotaByNameStub        func(string, string) (v7action.Warnings, error)
 	deleteSpaceQuotaByNameMutex       sync.RWMutex
@@ -6318,7 +6324,7 @@ func (fake *FakeActor) CreateUserProvidedServiceInstanceReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
+func (fake *FakeActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string, arg3 bool) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.deleteApplicationByNameAndSpaceReturnsOnCall[len(fake.deleteApplicationByNameAndSpaceArgsForCall)]
 	fake.deleteApplicationByNameAndSpaceArgsForCall = append(fake.deleteApplicationByNameAndSpaceArgsForCall, struct {
@@ -6334,9 +6340,9 @@ func (fake *FakeActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string,
 		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeActor) DeleteApplicationByNameAndSpaceCallCount() int {
@@ -6345,7 +6351,7 @@ func (fake *FakeActor) DeleteApplicationByNameAndSpaceCallCount() int {
 	return len(fake.deleteApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeActor) DeleteApplicationByNameAndSpaceCalls(stub func(string, string, bool) (v7action.Warnings, error)) {
+func (fake *FakeActor) DeleteApplicationByNameAndSpaceCalls(stub func(string, string, bool) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.Unlock()
 	fake.DeleteApplicationByNameAndSpaceStub = stub
@@ -6358,30 +6364,33 @@ func (fake *FakeActor) DeleteApplicationByNameAndSpaceArgsForCall(i int) (string
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeActor) DeleteApplicationByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteApplicationByNameAndSpaceReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.Unlock()
 	fake.DeleteApplicationByNameAndSpaceStub = nil
 	fake.deleteApplicationByNameAndSpaceReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) DeleteApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteApplicationByNameAndSpaceReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.Unlock()
 	fake.DeleteApplicationByNameAndSpaceStub = nil
 	if fake.deleteApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.deleteApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.deleteApplicationByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteBuildpackByNameAndStackAndLifecycle(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
@@ -6778,7 +6787,7 @@ func (fake *FakeActor) DeleteOrgRoleReturnsOnCall(i int, result1 v7action.Warnin
 	}{result1, result2}
 }
 
-func (fake *FakeActor) DeleteOrganization(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeActor) DeleteOrganization(arg1 string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.deleteOrganizationMutex.Lock()
 	ret, specificReturn := fake.deleteOrganizationReturnsOnCall[len(fake.deleteOrganizationArgsForCall)]
 	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
@@ -6792,9 +6801,9 @@ func (fake *FakeActor) DeleteOrganization(arg1 string) (v7action.Warnings, error
 		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeActor) DeleteOrganizationCallCount() int {
@@ -6803,7 +6812,7 @@ func (fake *FakeActor) DeleteOrganizationCallCount() int {
 	return len(fake.deleteOrganizationArgsForCall)
 }
 
-func (fake *FakeActor) DeleteOrganizationCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeActor) DeleteOrganizationCalls(stub func(string) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.deleteOrganizationMutex.Lock()
 	defer fake.deleteOrganizationMutex.Unlock()
 	fake.DeleteOrganizationStub = stub
@@ -6816,30 +6825,33 @@ func (fake *FakeActor) DeleteOrganizationArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) DeleteOrganizationReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteOrganizationReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteOrganizationMutex.Lock()
 	defer fake.deleteOrganizationMutex.Unlock()
 	fake.DeleteOrganizationStub = nil
 	fake.deleteOrganizationReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) DeleteOrganizationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteOrganizationReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteOrganizationMutex.Lock()
 	defer fake.deleteOrganizationMutex.Unlock()
 	fake.DeleteOrganizationStub = nil
 	if fake.deleteOrganizationReturnsOnCall == nil {
 		fake.deleteOrganizationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.deleteOrganizationReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteOrganizationQuota(arg1 string) (v7action.Warnings, error) {
@@ -7503,7 +7515,7 @@ func (fake *FakeActor) DeleteServiceKeyByServiceInstanceAndNameReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 string) (chan v7action.PollJobEvent, v7action.Warnings, error) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
 	ret, specificReturn := fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall[len(fake.deleteSpaceByNameAndOrganizationNameArgsForCall)]
 	fake.deleteSpaceByNameAndOrganizationNameArgsForCall = append(fake.deleteSpaceByNameAndOrganizationNameArgsForCall, struct {
@@ -7518,9 +7530,9 @@ func (fake *FakeActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 st
 		return stub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameCallCount() int {
@@ -7529,7 +7541,7 @@ func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameCallCount() int {
 	return len(fake.deleteSpaceByNameAndOrganizationNameArgsForCall)
 }
 
-func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameCalls(stub func(string, string) (chan v7action.PollJobEvent, v7action.Warnings, error)) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	fake.DeleteSpaceByNameAndOrganizationNameStub = stub
@@ -7542,30 +7554,33 @@ func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameArgsForCall(i int) (s
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameReturns(result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	fake.DeleteSpaceByNameAndOrganizationNameStub = nil
 	fake.deleteSpaceByNameAndOrganizationNameReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeActor) DeleteSpaceByNameAndOrganizationNameReturnsOnCall(i int, result1 chan v7action.PollJobEvent, result2 v7action.Warnings, result3 error) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	fake.DeleteSpaceByNameAndOrganizationNameStub = nil
 	if fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall == nil {
 		fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 chan v7action.PollJobEvent
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 chan v7action.PollJobEvent
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) DeleteSpaceQuotaByName(arg1 string, arg2 string) (v7action.Warnings, error) {

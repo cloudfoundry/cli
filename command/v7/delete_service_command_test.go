@@ -188,7 +188,7 @@ var _ = Describe("delete-service command", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Err).To(Say("delete warning"))
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Waiting for the operation to complete\.\.\n`),
+					Say(`Waiting for the operation to complete\n\.\.`),
 					Say("\n"),
 					Say(`Service instance %s deleted\.\n`, serviceInstanceName),
 					Say("OK\n"),

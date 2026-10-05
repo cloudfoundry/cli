@@ -420,8 +420,28 @@ var _ = Describe("Space", func() {
 			err      error
 		)
 
+		ccStream := func(events ...ccv3.PollJobEvent) chan ccv3.PollJobEvent {
+			stream := make(chan ccv3.PollJobEvent, len(events))
+			for _, e := range events {
+				stream <- e
+			}
+			close(stream)
+			return stream
+		}
+
 		JustBeforeEach(func() {
-			warnings, err = actor.DeleteSpaceByNameAndOrganizationName("some-space", "some-org")
+			var stream chan PollJobEvent
+			var upfront Warnings
+			stream, upfront, err = actor.DeleteSpaceByNameAndOrganizationName("some-space", "some-org")
+			warnings = upfront
+			if stream != nil {
+				for event := range stream {
+					warnings = append(warnings, event.Warnings...)
+					if event.Err != nil {
+						err = event.Err
+					}
+				}
+			}
 		})
 
 		When("the org is not found", func() {
@@ -509,7 +529,11 @@ var _ = Describe("Space", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("Never expected, by anyone")
-							fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, expectedErr)
+							fakeCloudControllerClient.PollJobToEventStreamReturns(ccStream(ccv3.PollJobEvent{
+								State:    constant.JobFailed,
+								Warnings: ccv3.Warnings{"warning-7", "warning-8"},
+								Err:      expectedErr,
+							}))
 						})
 
 						It("returns the error", func() {
@@ -520,7 +544,10 @@ var _ = Describe("Space", func() {
 
 					When("the job is successful", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, nil)
+							fakeCloudControllerClient.PollJobToEventStreamReturns(ccStream(ccv3.PollJobEvent{
+								State:    constant.JobComplete,
+								Warnings: ccv3.Warnings{"warning-7", "warning-8"},
+							}))
 						})
 
 						It("returns warnings and no error", func() {
@@ -545,8 +572,8 @@ var _ = Describe("Space", func() {
 							Expect(fakeCloudControllerClient.DeleteSpaceCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.DeleteSpaceArgsForCall(0)).To(Equal("some-space-guid"))
 
-							Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("some-url")))
+							Expect(fakeCloudControllerClient.PollJobToEventStreamCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.PollJobToEventStreamArgsForCall(0)).To(Equal(ccv3.JobURL("some-url")))
 						})
 					})
 				})

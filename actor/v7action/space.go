@@ -242,31 +242,28 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]resources.Space, War
 	return actor.GetOrganizationSpacesWithLabelSelector(orgGUID, "")
 }
 
-func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (Warnings, error) {
+func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (chan PollJobEvent, Warnings, error) {
 	var allWarnings Warnings
 
 	org, actorWarnings, err := actor.GetOrganizationByName(orgName)
 	allWarnings = append(allWarnings, actorWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
 	jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteSpace(space.GUID)
 	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
 	if err != nil {
-		return allWarnings, err
+		return nil, allWarnings, err
 	}
 
-	ccWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, Warnings(ccWarnings)...)
-
-	return allWarnings, err
+	return actor.PollJobToEventStream(jobURL), allWarnings, nil
 }
 
 func (actor Actor) RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceName, orgGUID string) (resources.Space, Warnings, error) {

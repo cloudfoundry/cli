@@ -291,7 +291,7 @@ var _ = Describe("bind-route-service command", func() {
 
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Binding route %s.%s/%s to service instance %s in org %s / space %s as %s\.\.\.\n`, hostname, domain, path, serviceInstanceName, orgName, spaceName, username),
-						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`Waiting for the operation to complete\n\.+`),
 						Say(`\n`),
 						Say(`OK\n`),
 					))
