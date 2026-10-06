@@ -86,6 +86,17 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	BindServiceAccountByNameAndSpaceStub        func(string, string, string) (v7action.Warnings, error)
+	bindServiceAccountByNameAndSpaceMutex       sync.RWMutex
+	bindServiceAccountByNameAndSpaceArgsForCall []FakeActorBindServiceAccountByNameAndSpaceArgs
+	bindServiceAccountByNameAndSpaceReturns     struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	bindServiceAccountByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CancelDeploymentStub        func(string) (v7action.Warnings, error)
 	cancelDeploymentMutex       sync.RWMutex
 	cancelDeploymentArgsForCall []FakeActorCancelDeploymentArgs
@@ -625,6 +636,17 @@ type FakeActor struct {
 		result2 error
 	}
 	deleteSecurityGroupReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	DeleteServiceAccountByNameAndSpaceStub        func(string, string) (v7action.Warnings, error)
+	deleteServiceAccountByNameAndSpaceMutex       sync.RWMutex
+	deleteServiceAccountByNameAndSpaceArgsForCall []FakeActorDeleteServiceAccountByNameAndSpaceArgs
+	deleteServiceAccountByNameAndSpaceReturns     struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	deleteServiceAccountByNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -1752,6 +1774,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceAccountByNameAndSpaceStub        func(string, string) (resources.ServiceAccount, v7action.Warnings, error)
+	getServiceAccountByNameAndSpaceMutex       sync.RWMutex
+	getServiceAccountByNameAndSpaceArgsForCall []FakeActorGetServiceAccountByNameAndSpaceArgs
+	getServiceAccountByNameAndSpaceReturns     struct {
+		result1 resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceAccountByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceAccountsInSpaceStub        func(string) ([]resources.ServiceAccount, v7action.Warnings, error)
 	getServiceAccountsInSpaceMutex       sync.RWMutex
 	getServiceAccountsInSpaceArgsForCall []FakeActorGetServiceAccountsInSpaceArgs
@@ -2577,6 +2612,17 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	SetServiceAccountEnabledByNameAndSpaceStub        func(string, string, bool) (v7action.Warnings, error)
+	setServiceAccountEnabledByNameAndSpaceMutex       sync.RWMutex
+	setServiceAccountEnabledByNameAndSpaceArgsForCall []FakeActorSetServiceAccountEnabledByNameAndSpaceArgs
+	setServiceAccountEnabledByNameAndSpaceReturns     struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setServiceAccountEnabledByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	SetSpaceManifestStub        func(string, []byte) (v7action.Warnings, error)
 	setSpaceManifestMutex       sync.RWMutex
 	setSpaceManifestArgsForCall []FakeActorSetSpaceManifestArgs
@@ -2701,6 +2747,17 @@ type FakeActor struct {
 		result2 error
 	}
 	unbindSecurityGroupReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	UnbindServiceAccountByAppNameAndSpaceStub        func(string, string) (v7action.Warnings, error)
+	unbindServiceAccountByAppNameAndSpaceMutex       sync.RWMutex
+	unbindServiceAccountByAppNameAndSpaceArgsForCall []FakeActorUnbindServiceAccountByAppNameAndSpaceArgs
+	unbindServiceAccountByAppNameAndSpaceReturns     struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	unbindServiceAccountByAppNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -3182,6 +3239,13 @@ type FakeActorBindSecurityGroupToSpacesArgs struct {
 	Arg3 constanta.SecurityGroupLifecycle
 }
 
+// FakeActorBindServiceAccountByNameAndSpaceArgs holds the arguments of one call to BindServiceAccountByNameAndSpace.
+type FakeActorBindServiceAccountByNameAndSpaceArgs struct {
+	Arg1 string
+	Arg2 string
+	Arg3 string
+}
+
 // FakeActorCancelDeploymentArgs holds the arguments of one call to CancelDeployment.
 type FakeActorCancelDeploymentArgs struct {
 	Arg1 string
@@ -3463,6 +3527,12 @@ type FakeActorDeleteRoutePolicyBySourceArgs struct {
 // FakeActorDeleteSecurityGroupArgs holds the arguments of one call to DeleteSecurityGroup.
 type FakeActorDeleteSecurityGroupArgs struct {
 	Arg1 string
+}
+
+// FakeActorDeleteServiceAccountByNameAndSpaceArgs holds the arguments of one call to DeleteServiceAccountByNameAndSpace.
+type FakeActorDeleteServiceAccountByNameAndSpaceArgs struct {
+	Arg1 string
+	Arg2 string
 }
 
 // FakeActorDeleteServiceAppBindingArgs holds the arguments of one call to DeleteServiceAppBinding.
@@ -3913,6 +3983,12 @@ type FakeActorGetServiceAccessArgs struct {
 	Arg3 string
 }
 
+// FakeActorGetServiceAccountByNameAndSpaceArgs holds the arguments of one call to GetServiceAccountByNameAndSpace.
+type FakeActorGetServiceAccountByNameAndSpaceArgs struct {
+	Arg1 string
+	Arg2 string
+}
+
 // FakeActorGetServiceAccountsInSpaceArgs holds the arguments of one call to GetServiceAccountsInSpace.
 type FakeActorGetServiceAccountsInSpaceArgs struct {
 	Arg1 string
@@ -4298,6 +4374,13 @@ type FakeActorSetOrganizationDefaultIsolationSegmentArgs struct {
 	Arg2 string
 }
 
+// FakeActorSetServiceAccountEnabledByNameAndSpaceArgs holds the arguments of one call to SetServiceAccountEnabledByNameAndSpace.
+type FakeActorSetServiceAccountEnabledByNameAndSpaceArgs struct {
+	Arg1 string
+	Arg2 string
+	Arg3 bool
+}
+
 // FakeActorSetSpaceManifestArgs holds the arguments of one call to SetSpaceManifest.
 type FakeActorSetSpaceManifestArgs struct {
 	Arg1 string
@@ -4362,6 +4445,12 @@ type FakeActorUnbindSecurityGroupArgs struct {
 	Arg2 string
 	Arg3 string
 	Arg4 constanta.SecurityGroupLifecycle
+}
+
+// FakeActorUnbindServiceAccountByAppNameAndSpaceArgs holds the arguments of one call to UnbindServiceAccountByAppNameAndSpace.
+type FakeActorUnbindServiceAccountByAppNameAndSpaceArgs struct {
+	Arg1 string
+	Arg2 string
 }
 
 // FakeActorUnmapRouteArgs holds the arguments of one call to UnmapRoute.
@@ -5041,6 +5130,76 @@ func (fake *FakeActor) BindSecurityGroupToSpacesReturnsOnCall(i int, result1 v7a
 		})
 	}
 	fake.bindSecurityGroupToSpacesReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpace(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+	fake.bindServiceAccountByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.bindServiceAccountByNameAndSpaceReturnsOnCall[len(fake.bindServiceAccountByNameAndSpaceArgsForCall)]
+	fake.bindServiceAccountByNameAndSpaceArgsForCall = append(fake.bindServiceAccountByNameAndSpaceArgsForCall, FakeActorBindServiceAccountByNameAndSpaceArgs{arg1, arg2, arg3})
+	stub := fake.BindServiceAccountByNameAndSpaceStub
+	fakeReturns := fake.bindServiceAccountByNameAndSpaceReturns
+	fake.recordInvocation("BindServiceAccountByNameAndSpace", []interface{}{arg1, arg2, arg3})
+	fake.bindServiceAccountByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceCallCount() int {
+	fake.bindServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.RUnlock()
+	return len(fake.bindServiceAccountByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+	fake.bindServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.BindServiceAccountByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceArgsForCall(i int) (string, string, string) {
+	fake.bindServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.bindServiceAccountByNameAndSpaceArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceArgs() []FakeActorBindServiceAccountByNameAndSpaceArgs {
+	fake.bindServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.RUnlock()
+	args := make([]FakeActorBindServiceAccountByNameAndSpaceArgs, len(fake.bindServiceAccountByNameAndSpaceArgsForCall))
+	copy(args, fake.bindServiceAccountByNameAndSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+	fake.bindServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.BindServiceAccountByNameAndSpaceStub = nil
+	fake.bindServiceAccountByNameAndSpaceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) BindServiceAccountByNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.bindServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.bindServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.BindServiceAccountByNameAndSpaceStub = nil
+	if fake.bindServiceAccountByNameAndSpaceReturnsOnCall == nil {
+		fake.bindServiceAccountByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.bindServiceAccountByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -8280,6 +8439,76 @@ func (fake *FakeActor) DeleteSecurityGroupReturnsOnCall(i int, result1 v7action.
 		})
 	}
 	fake.deleteSecurityGroupReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpace(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.deleteServiceAccountByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.deleteServiceAccountByNameAndSpaceReturnsOnCall[len(fake.deleteServiceAccountByNameAndSpaceArgsForCall)]
+	fake.deleteServiceAccountByNameAndSpaceArgsForCall = append(fake.deleteServiceAccountByNameAndSpaceArgsForCall, FakeActorDeleteServiceAccountByNameAndSpaceArgs{arg1, arg2})
+	stub := fake.DeleteServiceAccountByNameAndSpaceStub
+	fakeReturns := fake.deleteServiceAccountByNameAndSpaceReturns
+	fake.recordInvocation("DeleteServiceAccountByNameAndSpace", []interface{}{arg1, arg2})
+	fake.deleteServiceAccountByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceCallCount() int {
+	fake.deleteServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.RUnlock()
+	return len(fake.deleteServiceAccountByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.deleteServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.DeleteServiceAccountByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.deleteServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.deleteServiceAccountByNameAndSpaceArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceArgs() []FakeActorDeleteServiceAccountByNameAndSpaceArgs {
+	fake.deleteServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.RUnlock()
+	args := make([]FakeActorDeleteServiceAccountByNameAndSpaceArgs, len(fake.deleteServiceAccountByNameAndSpaceArgsForCall))
+	copy(args, fake.deleteServiceAccountByNameAndSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.DeleteServiceAccountByNameAndSpaceStub = nil
+	fake.deleteServiceAccountByNameAndSpaceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteServiceAccountByNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.deleteServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.DeleteServiceAccountByNameAndSpaceStub = nil
+	if fake.deleteServiceAccountByNameAndSpaceReturnsOnCall == nil {
+		fake.deleteServiceAccountByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.deleteServiceAccountByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -14519,6 +14748,79 @@ func (fake *FakeActor) GetServiceAccessReturnsOnCall(i int, result1 []v7action.S
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetServiceAccountByNameAndSpace(arg1 string, arg2 string) (resources.ServiceAccount, v7action.Warnings, error) {
+	fake.getServiceAccountByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getServiceAccountByNameAndSpaceReturnsOnCall[len(fake.getServiceAccountByNameAndSpaceArgsForCall)]
+	fake.getServiceAccountByNameAndSpaceArgsForCall = append(fake.getServiceAccountByNameAndSpaceArgsForCall, FakeActorGetServiceAccountByNameAndSpaceArgs{arg1, arg2})
+	stub := fake.GetServiceAccountByNameAndSpaceStub
+	fakeReturns := fake.getServiceAccountByNameAndSpaceReturns
+	fake.recordInvocation("GetServiceAccountByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getServiceAccountByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceCallCount() int {
+	fake.getServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.RUnlock()
+	return len(fake.getServiceAccountByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceCalls(stub func(string, string) (resources.ServiceAccount, v7action.Warnings, error)) {
+	fake.getServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.GetServiceAccountByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getServiceAccountByNameAndSpaceArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceArgs() []FakeActorGetServiceAccountByNameAndSpaceArgs {
+	fake.getServiceAccountByNameAndSpaceMutex.RLock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.RUnlock()
+	args := make([]FakeActorGetServiceAccountByNameAndSpaceArgs, len(fake.getServiceAccountByNameAndSpaceArgsForCall))
+	copy(args, fake.getServiceAccountByNameAndSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceReturns(result1 resources.ServiceAccount, result2 v7action.Warnings, result3 error) {
+	fake.getServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.GetServiceAccountByNameAndSpaceStub = nil
+	fake.getServiceAccountByNameAndSpaceReturns = struct {
+		result1 resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceAccountByNameAndSpaceReturnsOnCall(i int, result1 resources.ServiceAccount, result2 v7action.Warnings, result3 error) {
+	fake.getServiceAccountByNameAndSpaceMutex.Lock()
+	defer fake.getServiceAccountByNameAndSpaceMutex.Unlock()
+	fake.GetServiceAccountByNameAndSpaceStub = nil
+	if fake.getServiceAccountByNameAndSpaceReturnsOnCall == nil {
+		fake.getServiceAccountByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceAccount
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceAccountByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetServiceAccountsInSpace(arg1 string) ([]resources.ServiceAccount, v7action.Warnings, error) {
 	fake.getServiceAccountsInSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceAccountsInSpaceReturnsOnCall[len(fake.getServiceAccountsInSpaceArgsForCall)]
@@ -19296,6 +19598,76 @@ func (fake *FakeActor) SetOrganizationDefaultIsolationSegmentReturnsOnCall(i int
 	}{result1, result2}
 }
 
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.setServiceAccountEnabledByNameAndSpaceReturnsOnCall[len(fake.setServiceAccountEnabledByNameAndSpaceArgsForCall)]
+	fake.setServiceAccountEnabledByNameAndSpaceArgsForCall = append(fake.setServiceAccountEnabledByNameAndSpaceArgsForCall, FakeActorSetServiceAccountEnabledByNameAndSpaceArgs{arg1, arg2, arg3})
+	stub := fake.SetServiceAccountEnabledByNameAndSpaceStub
+	fakeReturns := fake.setServiceAccountEnabledByNameAndSpaceReturns
+	fake.recordInvocation("SetServiceAccountEnabledByNameAndSpace", []interface{}{arg1, arg2, arg3})
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceCallCount() int {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.RLock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.RUnlock()
+	return len(fake.setServiceAccountEnabledByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceCalls(stub func(string, string, bool) (v7action.Warnings, error)) {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.Lock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.Unlock()
+	fake.SetServiceAccountEnabledByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceArgsForCall(i int) (string, string, bool) {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.RLock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.setServiceAccountEnabledByNameAndSpaceArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceArgs() []FakeActorSetServiceAccountEnabledByNameAndSpaceArgs {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.RLock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.RUnlock()
+	args := make([]FakeActorSetServiceAccountEnabledByNameAndSpaceArgs, len(fake.setServiceAccountEnabledByNameAndSpaceArgsForCall))
+	copy(args, fake.setServiceAccountEnabledByNameAndSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.Lock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.Unlock()
+	fake.SetServiceAccountEnabledByNameAndSpaceStub = nil
+	fake.setServiceAccountEnabledByNameAndSpaceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) SetServiceAccountEnabledByNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setServiceAccountEnabledByNameAndSpaceMutex.Lock()
+	defer fake.setServiceAccountEnabledByNameAndSpaceMutex.Unlock()
+	fake.SetServiceAccountEnabledByNameAndSpaceStub = nil
+	if fake.setServiceAccountEnabledByNameAndSpaceReturnsOnCall == nil {
+		fake.setServiceAccountEnabledByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setServiceAccountEnabledByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
@@ -20075,6 +20447,76 @@ func (fake *FakeActor) UnbindSecurityGroupReturnsOnCall(i int, result1 v7action.
 		})
 	}
 	fake.unbindSecurityGroupReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpace(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.unbindServiceAccountByAppNameAndSpaceReturnsOnCall[len(fake.unbindServiceAccountByAppNameAndSpaceArgsForCall)]
+	fake.unbindServiceAccountByAppNameAndSpaceArgsForCall = append(fake.unbindServiceAccountByAppNameAndSpaceArgsForCall, FakeActorUnbindServiceAccountByAppNameAndSpaceArgs{arg1, arg2})
+	stub := fake.UnbindServiceAccountByAppNameAndSpaceStub
+	fakeReturns := fake.unbindServiceAccountByAppNameAndSpaceReturns
+	fake.recordInvocation("UnbindServiceAccountByAppNameAndSpace", []interface{}{arg1, arg2})
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceCallCount() int {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.RLock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.RUnlock()
+	return len(fake.unbindServiceAccountByAppNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.Lock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.Unlock()
+	fake.UnbindServiceAccountByAppNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.RLock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.unbindServiceAccountByAppNameAndSpaceArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceArgs() []FakeActorUnbindServiceAccountByAppNameAndSpaceArgs {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.RLock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.RUnlock()
+	args := make([]FakeActorUnbindServiceAccountByAppNameAndSpaceArgs, len(fake.unbindServiceAccountByAppNameAndSpaceArgsForCall))
+	copy(args, fake.unbindServiceAccountByAppNameAndSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.Lock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.Unlock()
+	fake.UnbindServiceAccountByAppNameAndSpaceStub = nil
+	fake.unbindServiceAccountByAppNameAndSpaceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UnbindServiceAccountByAppNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.unbindServiceAccountByAppNameAndSpaceMutex.Lock()
+	defer fake.unbindServiceAccountByAppNameAndSpaceMutex.Unlock()
+	fake.UnbindServiceAccountByAppNameAndSpaceStub = nil
+	if fake.unbindServiceAccountByAppNameAndSpaceReturnsOnCall == nil {
+		fake.unbindServiceAccountByAppNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.unbindServiceAccountByAppNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}

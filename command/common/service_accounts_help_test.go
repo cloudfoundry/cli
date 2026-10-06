@@ -20,6 +20,10 @@ var _ = Describe("service account help discovery", func() {
 		Expect(testUI.Out).To(Say(heading))
 		Expect(testUI.Out).To(Say("service-accounts"))
 		Expect(testUI.Out).To(Say("create-service-account"))
+		for _, name := range []string{"service-account", "delete-service-account", "enable-service-account", "disable-service-account", "bind-service-account", "unbind-service-account"} {
+			Expect(common.Commands.HasCommand(name)).To(BeTrue(), name)
+			Expect(testUI.Out).To(Say(name))
+		}
 	},
 		Entry("default help", false, "Service accounts:"),
 		Entry("full help", true, "SERVICE ACCOUNTS:"),

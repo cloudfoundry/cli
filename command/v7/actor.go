@@ -21,6 +21,11 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Actor
 
 type Actor interface {
+	GetServiceAccountByNameAndSpace(name, spaceGUID string) (resources.ServiceAccount, v7action.Warnings, error)
+	DeleteServiceAccountByNameAndSpace(name, spaceGUID string) (v7action.Warnings, error)
+	SetServiceAccountEnabledByNameAndSpace(name, spaceGUID string, enabled bool) (v7action.Warnings, error)
+	BindServiceAccountByNameAndSpace(appName, accountName, spaceGUID string) (v7action.Warnings, error)
+	UnbindServiceAccountByAppNameAndSpace(appName, spaceGUID string) (v7action.Warnings, error)
 	GetServiceAccountsInSpace(spaceGUID string) ([]resources.ServiceAccount, v7action.Warnings, error)
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
