@@ -1386,6 +1386,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetServiceAccountsStub        func(...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error)
+	getServiceAccountsMutex       sync.RWMutex
+	getServiceAccountsArgsForCall []FakeCloudControllerClientGetServiceAccountsArgs
+	getServiceAccountsReturns     struct {
+		result1 []resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getServiceAccountsReturnsOnCall map[int]struct {
+		result1 []resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServiceBrokersStub        func(...ccv3.Query) ([]resources.ServiceBroker, ccv3.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []FakeCloudControllerClientGetServiceBrokersArgs
@@ -2985,6 +2998,11 @@ type FakeCloudControllerClientGetSSHEnabledArgs struct {
 
 // FakeCloudControllerClientGetSecurityGroupsArgs holds the arguments of one call to GetSecurityGroups.
 type FakeCloudControllerClientGetSecurityGroupsArgs struct {
+	Arg1 []ccv3.Query
+}
+
+// FakeCloudControllerClientGetServiceAccountsArgs holds the arguments of one call to GetServiceAccounts.
+type FakeCloudControllerClientGetServiceAccountsArgs struct {
 	Arg1 []ccv3.Query
 }
 
@@ -11255,6 +11273,84 @@ func (fake *FakeCloudControllerClient) GetSecurityGroupsReturnsOnCall(i int, res
 	}
 	fake.getSecurityGroupsReturnsOnCall[i] = struct {
 		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccounts(arg1 ...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error) {
+	var arg1Copy []ccv3.Query
+	if arg1 != nil {
+		arg1Copy = make([]ccv3.Query, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.getServiceAccountsMutex.Lock()
+	ret, specificReturn := fake.getServiceAccountsReturnsOnCall[len(fake.getServiceAccountsArgsForCall)]
+	fake.getServiceAccountsArgsForCall = append(fake.getServiceAccountsArgsForCall, FakeCloudControllerClientGetServiceAccountsArgs{arg1Copy})
+	stub := fake.GetServiceAccountsStub
+	fakeReturns := fake.getServiceAccountsReturns
+	fake.recordInvocation("GetServiceAccounts", []interface{}{arg1Copy})
+	fake.getServiceAccountsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsCallCount() int {
+	fake.getServiceAccountsMutex.RLock()
+	defer fake.getServiceAccountsMutex.RUnlock()
+	return len(fake.getServiceAccountsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsCalls(stub func(...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error)) {
+	fake.getServiceAccountsMutex.Lock()
+	defer fake.getServiceAccountsMutex.Unlock()
+	fake.GetServiceAccountsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsArgsForCall(i int) []ccv3.Query {
+	fake.getServiceAccountsMutex.RLock()
+	defer fake.getServiceAccountsMutex.RUnlock()
+	argsForCall := fake.getServiceAccountsArgsForCall[i]
+	return argsForCall.Arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsArgs() []FakeCloudControllerClientGetServiceAccountsArgs {
+	fake.getServiceAccountsMutex.RLock()
+	defer fake.getServiceAccountsMutex.RUnlock()
+	args := make([]FakeCloudControllerClientGetServiceAccountsArgs, len(fake.getServiceAccountsArgsForCall))
+	copy(args, fake.getServiceAccountsArgsForCall)
+	return args
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsReturns(result1 []resources.ServiceAccount, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceAccountsMutex.Lock()
+	defer fake.getServiceAccountsMutex.Unlock()
+	fake.GetServiceAccountsStub = nil
+	fake.getServiceAccountsReturns = struct {
+		result1 []resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountsReturnsOnCall(i int, result1 []resources.ServiceAccount, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceAccountsMutex.Lock()
+	defer fake.getServiceAccountsMutex.Unlock()
+	fake.GetServiceAccountsStub = nil
+	if fake.getServiceAccountsReturnsOnCall == nil {
+		fake.getServiceAccountsReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceAccount
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceAccountsReturnsOnCall[i] = struct {
+		result1 []resources.ServiceAccount
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

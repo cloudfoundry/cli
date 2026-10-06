@@ -1752,6 +1752,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServiceAccountsInSpaceStub        func(string) ([]resources.ServiceAccount, v7action.Warnings, error)
+	getServiceAccountsInSpaceMutex       sync.RWMutex
+	getServiceAccountsInSpaceArgsForCall []FakeActorGetServiceAccountsInSpaceArgs
+	getServiceAccountsInSpaceReturns     struct {
+		result1 []resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServiceAccountsInSpaceReturnsOnCall map[int]struct {
+		result1 []resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetServiceBrokerByNameStub        func(string) (resources.ServiceBroker, v7action.Warnings, error)
 	getServiceBrokerByNameMutex       sync.RWMutex
 	getServiceBrokerByNameArgsForCall []FakeActorGetServiceBrokerByNameArgs
@@ -3898,6 +3911,11 @@ type FakeActorGetServiceAccessArgs struct {
 	Arg1 string
 	Arg2 string
 	Arg3 string
+}
+
+// FakeActorGetServiceAccountsInSpaceArgs holds the arguments of one call to GetServiceAccountsInSpace.
+type FakeActorGetServiceAccountsInSpaceArgs struct {
+	Arg1 string
 }
 
 // FakeActorGetServiceBrokerByNameArgs holds the arguments of one call to GetServiceBrokerByName.
@@ -14496,6 +14514,79 @@ func (fake *FakeActor) GetServiceAccessReturnsOnCall(i int, result1 []v7action.S
 	}
 	fake.getServiceAccessReturnsOnCall[i] = struct {
 		result1 []v7action.ServicePlanAccess
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpace(arg1 string) ([]resources.ServiceAccount, v7action.Warnings, error) {
+	fake.getServiceAccountsInSpaceMutex.Lock()
+	ret, specificReturn := fake.getServiceAccountsInSpaceReturnsOnCall[len(fake.getServiceAccountsInSpaceArgsForCall)]
+	fake.getServiceAccountsInSpaceArgsForCall = append(fake.getServiceAccountsInSpaceArgsForCall, FakeActorGetServiceAccountsInSpaceArgs{arg1})
+	stub := fake.GetServiceAccountsInSpaceStub
+	fakeReturns := fake.getServiceAccountsInSpaceReturns
+	fake.recordInvocation("GetServiceAccountsInSpace", []interface{}{arg1})
+	fake.getServiceAccountsInSpaceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceCallCount() int {
+	fake.getServiceAccountsInSpaceMutex.RLock()
+	defer fake.getServiceAccountsInSpaceMutex.RUnlock()
+	return len(fake.getServiceAccountsInSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceCalls(stub func(string) ([]resources.ServiceAccount, v7action.Warnings, error)) {
+	fake.getServiceAccountsInSpaceMutex.Lock()
+	defer fake.getServiceAccountsInSpaceMutex.Unlock()
+	fake.GetServiceAccountsInSpaceStub = stub
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceArgsForCall(i int) string {
+	fake.getServiceAccountsInSpaceMutex.RLock()
+	defer fake.getServiceAccountsInSpaceMutex.RUnlock()
+	argsForCall := fake.getServiceAccountsInSpaceArgsForCall[i]
+	return argsForCall.Arg1
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceArgs() []FakeActorGetServiceAccountsInSpaceArgs {
+	fake.getServiceAccountsInSpaceMutex.RLock()
+	defer fake.getServiceAccountsInSpaceMutex.RUnlock()
+	args := make([]FakeActorGetServiceAccountsInSpaceArgs, len(fake.getServiceAccountsInSpaceArgsForCall))
+	copy(args, fake.getServiceAccountsInSpaceArgsForCall)
+	return args
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceReturns(result1 []resources.ServiceAccount, result2 v7action.Warnings, result3 error) {
+	fake.getServiceAccountsInSpaceMutex.Lock()
+	defer fake.getServiceAccountsInSpaceMutex.Unlock()
+	fake.GetServiceAccountsInSpaceStub = nil
+	fake.getServiceAccountsInSpaceReturns = struct {
+		result1 []resources.ServiceAccount
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetServiceAccountsInSpaceReturnsOnCall(i int, result1 []resources.ServiceAccount, result2 v7action.Warnings, result3 error) {
+	fake.getServiceAccountsInSpaceMutex.Lock()
+	defer fake.getServiceAccountsInSpaceMutex.Unlock()
+	fake.GetServiceAccountsInSpaceStub = nil
+	if fake.getServiceAccountsInSpaceReturnsOnCall == nil {
+		fake.getServiceAccountsInSpaceReturnsOnCall = make(map[int]struct {
+			result1 []resources.ServiceAccount
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceAccountsInSpaceReturnsOnCall[i] = struct {
+		result1 []resources.ServiceAccount
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

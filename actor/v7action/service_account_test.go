@@ -19,6 +19,23 @@ var _ = Describe("Service Account Actions", func() {
 		client = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(client, nil, nil, nil, nil, nil)
 	})
+	It("lists only the specified owning space and preserves results and warnings", func() {
+		accounts := []resources.ServiceAccount{{Name: "shared-worker", Status: "ready"}}
+		client.GetServiceAccountsReturns(accounts, ccv3.Warnings{"warning"}, nil)
+		result, warnings, err := actor.GetServiceAccountsInSpace("space-guid")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(result).To(Equal(accounts))
+		Expect(warnings).To(ConsistOf("warning"))
+		Expect(client.GetServiceAccountsCallCount()).To(Equal(1))
+		Expect(client.GetServiceAccountsArgsForCall(0)).To(Equal([]ccv3.Query{{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}}}))
+	})
+	It("propagates listing errors and warnings", func() {
+		denied := errors.New("denied")
+		client.GetServiceAccountsReturns(nil, ccv3.Warnings{"warning"}, denied)
+		_, warnings, err := actor.GetServiceAccountsInSpace("space-guid")
+		Expect(err).To(MatchError(denied))
+		Expect(warnings).To(ConsistOf("warning"))
+	})
 	It("creates in the specified space and preserves platform state and warnings", func() {
 		created := resources.ServiceAccount{GUID: "account-guid", Status: "unprovisioned"}
 		client.CreateServiceAccountReturns(created, ccv3.Warnings{"warning"}, nil)

@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccerror"
@@ -15,6 +16,32 @@ import (
 var _ = Describe("Service Accounts", func() {
 	var client *Client
 	BeforeEach(func() { client, _ = NewTestClient() })
+
+	Describe("GetServiceAccounts", func() {
+		It("filters by owning space, follows pagination and accumulates warnings", func() {
+			server.AppendHandlers(
+				CombineHandlers(VerifyRequest(http.MethodGet, "/v3/service_accounts", "space_guids=space-guid"),
+					RespondWith(http.StatusOK, fmt.Sprintf(`{"pagination":{"next":{"href":"%s/v3/service_accounts?space_guids=space-guid&page=2"}},"resources":[{"guid":"one","name":"first-account","enabled":false,"status":"unprovisioned"}]}`, server.URL()), http.Header{"X-Cf-Warnings": {"first warning"}})),
+				CombineHandlers(VerifyRequest(http.MethodGet, "/v3/service_accounts", "space_guids=space-guid&page=2"),
+					RespondWith(http.StatusOK, `{"pagination":{"next":null},"resources":[{"guid":"two","name":"second-account","enabled":true,"status":"ready"}]}`, http.Header{"X-Cf-Warnings": {"second warning"}})),
+			)
+			accounts, warnings, err := client.GetServiceAccounts(Query{Key: SpaceGUIDFilter, Values: []string{"space-guid"}})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(accounts).To(Equal([]resources.ServiceAccount{
+				{GUID: "one", Name: "first-account", Enabled: false, Status: "unprovisioned"},
+				{GUID: "two", Name: "second-account", Enabled: true, Status: "ready"},
+			}))
+			Expect(warnings).To(ConsistOf("first warning", "second warning"))
+			Expect(server.ReceivedRequests()).To(HaveLen(2))
+		})
+		It("propagates list denial and warnings", func() {
+			server.AppendHandlers(CombineHandlers(VerifyRequest(http.MethodGet, "/v3/service_accounts"),
+				RespondWith(http.StatusForbidden, `{"errors":[{"code":10003,"title":"CF-NotAuthorized","detail":"denied"}]}`, http.Header{"X-Cf-Warnings": {"warning"}})))
+			_, warnings, err := client.GetServiceAccounts()
+			Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "denied"}))
+			Expect(warnings).To(ConsistOf("warning"))
+		})
+	})
 
 	Describe("CreateServiceAccount", func() {
 		It("posts only account input and space ownership and returns the platform identity and warnings", func() {

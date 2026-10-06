@@ -21,6 +21,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Actor
 
 type Actor interface {
+	GetServiceAccountsInSpace(spaceGUID string) ([]resources.ServiceAccount, v7action.Warnings, error)
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
 	AddRoutePolicy(domainName, source, hostname, path string) (v7action.Warnings, error)
