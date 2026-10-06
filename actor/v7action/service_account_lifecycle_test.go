@@ -19,7 +19,7 @@ var _ = Describe("Service Account Lifecycle Actions", func() {
 		actor = NewActor(client, nil, nil, nil, nil, nil)
 		client.GetServiceAccountsReturns([]resources.ServiceAccount{{GUID: "account-guid", Name: "workers"}}, ccv3.Warnings{"lookup warning"}, nil)
 		client.GetServiceAccountReturns(resources.ServiceAccount{GUID: "account-guid", Name: "workers", Status: "ready"}, ccv3.Warnings{"detail warning"}, nil)
-		client.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "app-guid", Name: "app"}, ccv3.Warnings{"app warning"}, nil)
+		client.GetApplicationsReturns([]resources.Application{{GUID: "app-guid", Name: "app"}}, ccv3.Warnings{"app warning"}, nil)
 		client.DeleteServiceAccountReturns("job-url", ccv3.Warnings{"mutation warning"}, nil)
 		client.UpdateServiceAccountEnabledReturns("job-url", ccv3.Warnings{"mutation warning"}, nil)
 		client.UpdateApplicationServiceAccountReturns("job-url", ccv3.Warnings{"mutation warning"}, nil)
@@ -60,9 +60,7 @@ var _ = Describe("Service Account Lifecycle Actions", func() {
 		Expect(client.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("job-url")))
 		Expect(warnings).To(ContainElements("mutation warning", "poll warning"))
 		if operation == "bind" || operation == "unbind" {
-			appName, space := client.GetApplicationByNameAndSpaceArgsForCall(0)
-			Expect(appName).To(Equal("app"))
-			Expect(space).To(Equal("space-guid"))
+			Expect(client.GetApplicationsArgsForCall(0)).To(ContainElements(ccv3.Query{Key: ccv3.NameFilter, Values: []string{"app"}}, ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}}))
 			guid, relationship := client.UpdateApplicationServiceAccountArgsForCall(0)
 			Expect(guid).To(Equal("app-guid"))
 			if operation == "bind" {
@@ -95,7 +93,7 @@ var _ = Describe("Service Account Lifecycle Actions", func() {
 		Expect(client.UpdateApplicationServiceAccountCallCount()).To(BeZero())
 	})
 	It("stops unbinding when app lookup fails", func() {
-		client.GetApplicationByNameAndSpaceReturns(resources.Application{}, ccv3.Warnings{"app warning"}, errors.New("app denied"))
+		client.GetApplicationsReturns(nil, ccv3.Warnings{"app warning"}, errors.New("app denied"))
 		warnings, err := actor.UnbindServiceAccountByAppNameAndSpace("app", "space-guid")
 		Expect(err).To(MatchError("app denied"))
 		Expect(warnings).To(ContainElement("app warning"))
