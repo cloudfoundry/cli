@@ -49,6 +49,7 @@ type commandList struct {
 	UpdateRoute                        v7.UpdateRouteCommand                        `command:"update-route" description:"Update a route by route specific options, e.g. load balancing algorithm"`
 	CreateSecurityGroup                v7.CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
 	CreateService                      v7.CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
+	CreateServiceAccount               v7.CreateServiceAccountCommand               `command:"create-service-account" description:"Create a service account in the target space"`
 	CreateServiceBroker                v7.CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
 	CreateServiceKey                   v7.CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
 	CreateSharedDomain                 v7.CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`

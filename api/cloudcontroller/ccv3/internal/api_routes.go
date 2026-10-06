@@ -9,6 +9,7 @@ import "net/http"
 // If the request returns a single entity by GUID, use the singular (for example
 // /v3/organizations/:organization_guid is GetOrganization).
 const (
+	PostServiceAccountsRequest                                  = "PostServiceAccounts"
 	DeleteRoutePolicyRequest                                    = "DeleteRoutePolicyRequest"
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
@@ -254,6 +255,7 @@ var APIRoutes = map[string]Route{
 	PatchFeatureFlagRequest:                                     {Path: "/v3/feature_flags/:name", Method: http.MethodPatch},
 	GetIsolationSegmentsRequest:                                 {Path: "/v3/isolation_segments", Method: http.MethodGet},
 	PostIsolationSegmentsRequest:                                {Path: "/v3/isolation_segments", Method: http.MethodPost},
+	PostServiceAccountsRequest:                                  {Path: "/v3/service_accounts", Method: http.MethodPost},
 	DeleteIsolationSegmentRequest:                               {Path: "/v3/isolation_segments/:isolation_segment_guid", Method: http.MethodDelete},
 	GetIsolationSegmentRequest:                                  {Path: "/v3/isolation_segments/:isolation_segment_guid", Method: http.MethodGet},
 	GetIsolationSegmentOrganizationsRequest:                     {Path: "/v3/isolation_segments/:isolation_segment_guid/organizations", Method: http.MethodGet},
