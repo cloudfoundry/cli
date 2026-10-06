@@ -11,7 +11,8 @@ var Commands commandList
 var ShouldFallbackToLegacy = false
 
 type commandList struct {
-	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
+	ServiceAccounts  v7.ServiceAccountsCommand `command:"service-accounts" description:"List service accounts in the target space"`
+	VerboseOrVersion bool                      `short:"v" long:"version" description:"verbose and version flag"`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 

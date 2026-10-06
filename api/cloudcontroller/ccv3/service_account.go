@@ -3,11 +3,20 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/v9/resources"
-	"errors"
 )
 
 func (client *Client) GetServiceAccounts(query ...Query) ([]resources.ServiceAccount, Warnings, error) {
-	return nil, nil, errors.New("service account listing is not implemented")
+	var accounts []resources.ServiceAccount
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetServiceAccountsRequest,
+		Query:        query,
+		ResponseBody: resources.ServiceAccount{},
+		AppendToList: func(item interface{}) error {
+			accounts = append(accounts, item.(resources.ServiceAccount))
+			return nil
+		},
+	})
+	return accounts, warnings, err
 }
 
 func (client *Client) CreateServiceAccount(account resources.ServiceAccount) (resources.ServiceAccount, Warnings, error) {

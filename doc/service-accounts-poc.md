@@ -21,9 +21,15 @@ Output shows the platform-returned client ID, certificate DNS SAN, and provision
 status. Creating the account does not provision its UAA client, bind an app, or
 grant resource roles. Provisioning occurs on first authorized app assignment.
 
-This first increment adds creation only. Subsequent committed TDD increments will
-add list/show, bind/unbind (including job waiting and explicit restart guidance),
-lifecycle operations, and explicit account-role UX.
+## List accounts
+
+Run `cf service-accounts` to list accounts owned by the targeted space. The table
+shows name, enabled state, provisioning status, client ID and certificate DNS SAN.
+All result pages are retrieved; API warnings and errors are preserved.
+
+Subsequent committed TDD increments will add show, bind/unbind (including job
+waiting and explicit restart guidance), lifecycle operations, and explicit
+account-role UX.
 
 ## Development
 
