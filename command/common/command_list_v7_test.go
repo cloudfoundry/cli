@@ -7,6 +7,9 @@ import (
 )
 
 var _ = Describe("commandList", func() {
+	It("registers create-service-account as a native command", func() {
+		Expect(Commands.HasCommand("create-service-account")).To(BeTrue())
+	})
 	Describe("HasCommand", func() {
 		When("the command name exists", func() {
 			It("returns true", func() {
