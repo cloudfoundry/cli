@@ -9,6 +9,10 @@ import "net/http"
 // If the request returns a single entity by GUID, use the singular (for example
 // /v3/organizations/:organization_guid is GetOrganization).
 const (
+	GetServiceAccountRequest                                    = "GetServiceAccount"
+	DeleteServiceAccountRequest                                 = "DeleteServiceAccount"
+	PatchServiceAccountRequest                                  = "PatchServiceAccount"
+	PatchApplicationServiceAccountRequest                       = "PatchApplicationServiceAccount"
 	GetServiceAccountsRequest                                   = "GetServiceAccounts"
 	PostServiceAccountsRequest                                  = "PostServiceAccounts"
 	DeleteRoutePolicyRequest                                    = "DeleteRoutePolicyRequest"
@@ -258,6 +262,10 @@ var APIRoutes = map[string]Route{
 	PostIsolationSegmentsRequest:                                {Path: "/v3/isolation_segments", Method: http.MethodPost},
 	PostServiceAccountsRequest:                                  {Path: "/v3/service_accounts", Method: http.MethodPost},
 	GetServiceAccountsRequest:                                   {Path: "/v3/service_accounts", Method: http.MethodGet},
+	GetServiceAccountRequest:                                    {Path: "/v3/service_accounts/:service_account_guid", Method: http.MethodGet},
+	DeleteServiceAccountRequest:                                 {Path: "/v3/service_accounts/:service_account_guid", Method: http.MethodDelete},
+	PatchServiceAccountRequest:                                  {Path: "/v3/service_accounts/:service_account_guid", Method: http.MethodPatch},
+	PatchApplicationServiceAccountRequest:                       {Path: "/v3/apps/:app_guid/relationships/service_account", Method: http.MethodPatch},
 	DeleteIsolationSegmentRequest:                               {Path: "/v3/isolation_segments/:isolation_segment_guid", Method: http.MethodDelete},
 	GetIsolationSegmentRequest:                                  {Path: "/v3/isolation_segments/:isolation_segment_guid", Method: http.MethodGet},
 	GetIsolationSegmentOrganizationsRequest:                     {Path: "/v3/isolation_segments/:isolation_segment_guid/organizations", Method: http.MethodGet},
