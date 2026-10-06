@@ -21,6 +21,12 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Actor
 
 type Actor interface {
+	GetServiceAccountByNameAndSpace(name, spaceGUID string) (resources.ServiceAccount, v7action.Warnings, error)
+	DeleteServiceAccountByNameAndSpace(name, spaceGUID string) (v7action.Warnings, error)
+	SetServiceAccountEnabledByNameAndSpace(name, spaceGUID string, enabled bool) (v7action.Warnings, error)
+	BindServiceAccountByNameAndSpace(appName, accountName, spaceGUID string) (v7action.Warnings, error)
+	UnbindServiceAccountByAppNameAndSpace(appName, spaceGUID string) (v7action.Warnings, error)
+	GetServiceAccountsInSpace(spaceGUID string) ([]resources.ServiceAccount, v7action.Warnings, error)
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
 	AddRoutePolicy(domainName, source, hostname, path string) (v7action.Warnings, error)
@@ -41,6 +47,7 @@ type Actor interface {
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error)
 	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v7action.DockerImageCredentials) (resources.Package, v7action.Warnings, error)
 	CreateIsolationSegmentByName(isolationSegment resources.IsolationSegment) (v7action.Warnings, error)
+	CreateServiceAccountInSpace(name, description, spaceGUID string) (resources.ServiceAccount, v7action.Warnings, error)
 	CreateManagedServiceInstance(managedServiceInstanceParams v7action.CreateManagedServiceInstanceParams) (chan v7action.PollJobEvent, v7action.Warnings, error)
 	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	CreateOrganization(orgName string) (resources.Organization, v7action.Warnings, error)
