@@ -40,6 +40,12 @@ var HelpCategoryList = []HelpCategory{
 		},
 	},
 	{
+		CategoryName: "SERVICE ACCOUNTS:",
+		CommandList: [][]string{
+			{"service-accounts", "create-service-account"},
+		},
+	},
+	{
 		CategoryName: "ORGS:",
 		CommandList: [][]string{
 			{"orgs", "org"},

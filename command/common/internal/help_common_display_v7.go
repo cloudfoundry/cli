@@ -36,6 +36,13 @@ var CommonHelpCategoryList = []HelpCategory{
 	},
 
 	{
+		CategoryName: "Service accounts:",
+		CommandList: [][]string{
+			{"service-accounts", "create-service-account"},
+		},
+	},
+
+	{
 		CategoryName: "Route and domain management:",
 		CommandList: [][]string{
 			{"routes", "delete-route", "create-private-domain"},
