@@ -3,7 +3,24 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/v9/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/v9/resources"
+	"errors"
 )
+
+func (client *Client) GetServiceAccount(guid string) (resources.ServiceAccount, Warnings, error) {
+	return resources.ServiceAccount{}, nil, errors.New("service account show is not implemented")
+}
+
+func (client *Client) DeleteServiceAccount(guid string) (JobURL, Warnings, error) {
+	return "", nil, errors.New("service account deletion is not implemented")
+}
+
+func (client *Client) UpdateServiceAccountEnabled(guid string, enabled bool) (JobURL, Warnings, error) {
+	return "", nil, errors.New("service account enablement is not implemented")
+}
+
+func (client *Client) UpdateApplicationServiceAccount(appGUID string, relationship resources.Relationship) (JobURL, Warnings, error) {
+	return "", nil, errors.New("service account assignment is not implemented")
+}
 
 func (client *Client) GetServiceAccounts(query ...Query) ([]resources.ServiceAccount, Warnings, error) {
 	var accounts []resources.ServiceAccount
