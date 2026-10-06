@@ -11,8 +11,14 @@ var Commands commandList
 var ShouldFallbackToLegacy = false
 
 type commandList struct {
-	ServiceAccounts  v7.ServiceAccountsCommand `command:"service-accounts" description:"List service accounts in the target space"`
-	VerboseOrVersion bool                      `short:"v" long:"version" description:"verbose and version flag"`
+	ServiceAccount        v7.ServiceAccountCommand        `command:"service-account" description:"Show service account details in the target space"`
+	DeleteServiceAccount  v7.DeleteServiceAccountCommand  `command:"delete-service-account" description:"Delete an unused service account and retain its name reservation"`
+	EnableServiceAccount  v7.EnableServiceAccountCommand  `command:"enable-service-account" description:"Enable new token issuance for a service account"`
+	DisableServiceAccount v7.DisableServiceAccountCommand `command:"disable-service-account" description:"Disable new token issuance for a service account"`
+	BindServiceAccount    v7.BindServiceAccountCommand    `command:"bind-service-account" description:"Assign a service account to an app; requires restart"`
+	UnbindServiceAccount  v7.UnbindServiceAccountCommand  `command:"unbind-service-account" description:"Remove an app's service account assignment; requires restart"`
+	ServiceAccounts       v7.ServiceAccountsCommand       `command:"service-accounts" description:"List service accounts in the target space"`
+	VerboseOrVersion      bool                            `short:"v" long:"version" description:"verbose and version flag"`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 

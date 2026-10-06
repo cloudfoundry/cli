@@ -39,6 +39,9 @@ var CommonHelpCategoryList = []HelpCategory{
 		CategoryName: "Service accounts:",
 		CommandList: [][]string{
 			{"service-accounts", "create-service-account"},
+			{"service-account", "delete-service-account"},
+			{"enable-service-account", "disable-service-account"},
+			{"bind-service-account", "unbind-service-account"},
 		},
 	},
 

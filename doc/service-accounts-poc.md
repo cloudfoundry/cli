@@ -27,9 +27,32 @@ Run `cf service-accounts` to list accounts owned by the targeted space. The tabl
 shows name, enabled state, provisioning status, client ID and certificate DNS SAN.
 All result pages are retrieved; API warnings and errors are preserved.
 
-Subsequent committed TDD increments will add show, bind/unbind (including job
-waiting and explicit restart guidance), lifecycle operations, and explicit
-account-role UX.
+## Lifecycle and app assignment
+
+```sh
+cf service-account shared-worker
+cf bind-service-account my-app shared-worker
+cf unbind-service-account my-app
+cf disable-service-account shared-worker
+cf enable-service-account shared-worker
+cf delete-service-account shared-worker
+```
+
+All name resolution is scoped to the targeted space. Bind/unbind and account
+lifecycle commands wait for asynchronous CAPI jobs before printing success.
+Bind/unbind update the desired assignment only: restart the app explicitly to
+apply the new launch identity. Existing certificates and tokens are not revoked.
+Binding does not grant resource roles.
+
+Disabling prevents new token issuance once reconciliation completes; existing
+tokens and certificate-only access persist until their normal expiry. Deletion
+requires the account to be unused and retains its name reservation permanently.
+Deletion asks for confirmation unless `-f` is supplied; this flag skips the prompt,
+not CAPI's in-use checks. Explicit account-role UX remains a follow-up.
+
+Creation, listing and all lifecycle commands are listed in both `cf help` and
+`cf help -a`. For this checkout, use the built custom binary or `go run ./main.go`
+from `cli/`; the installed stock CLI does not contain these local extensions.
 
 ## Development
 

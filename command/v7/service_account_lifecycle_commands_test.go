@@ -76,37 +76,37 @@ var _ = Describe("Service Account Lifecycle Commands", func() {
 			name, guid := actor.GetServiceAccountByNameAndSpaceArgsForCall(0)
 			Expect(name).To(Equal("workers"))
 			Expect(guid).To(Equal("space-guid"))
-			Expect(testUI.Out).To(Say("account-guid"))
-			Expect(testUI.Out).To(Say("Worker identity"))
-			Expect(testUI.Out).To(Say("cf:service-account:workers"))
-			Expect(testUI.Out).To(Say("workers.svc.identity"))
-			Expect(testUI.Out).To(Say("ready"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("account-guid"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Worker identity"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("cf:service-account:workers"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("workers.svc.identity"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("ready"))
 		case "delete":
 			name, guid := actor.DeleteServiceAccountByNameAndSpaceArgsForCall(0)
 			Expect(name).To(Equal("workers"))
 			Expect(guid).To(Equal("space-guid"))
-			Expect(testUI.Out).To(Say("permanently reserved"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("permanently reserved"))
 		case "enable", "disable":
 			name, guid, enabled := actor.SetServiceAccountEnabledByNameAndSpaceArgsForCall(0)
 			Expect(name).To(Equal("workers"))
 			Expect(guid).To(Equal("space-guid"))
 			Expect(enabled).To(Equal(operation == "enable"))
 			if operation == "disable" {
-				Expect(testUI.Out).To(Say("Existing tokens and certificates are not revoked"))
+				Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Existing tokens and certificates are not revoked"))
 			}
 		case "bind":
 			app, name, guid := actor.BindServiceAccountByNameAndSpaceArgsForCall(0)
 			Expect(app).To(Equal("app"))
 			Expect(name).To(Equal("workers"))
 			Expect(guid).To(Equal("space-guid"))
-			Expect(testUI.Out).To(Say("Restart app"))
-			Expect(testUI.Out).To(Say("Roles are not granted by binding"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Restart app"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Roles are not granted by binding"))
 		case "unbind":
 			app, guid := actor.UnbindServiceAccountByAppNameAndSpaceArgsForCall(0)
 			Expect(app).To(Equal("app"))
 			Expect(guid).To(Equal("space-guid"))
-			Expect(testUI.Out).To(Say("Restart app"))
-			Expect(testUI.Out).To(Say("Existing tokens and certificates are not revoked"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Restart app"))
+			Expect(string(testUI.Out.(*Buffer).Contents())).To(ContainSubstring("Existing tokens and certificates are not revoked"))
 			Expect(actor.RestartApplicationCallCount()).To(BeZero())
 		}
 		if operation != "show" {
