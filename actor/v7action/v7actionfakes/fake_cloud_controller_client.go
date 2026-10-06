@@ -576,6 +576,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteServiceAccountStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteServiceAccountMutex       sync.RWMutex
+	deleteServiceAccountArgsForCall []FakeCloudControllerClientDeleteServiceAccountArgs
+	deleteServiceAccountReturns     struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteServiceAccountReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteServiceBrokerStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteServiceBrokerMutex       sync.RWMutex
 	deleteServiceBrokerArgsForCall []FakeCloudControllerClientDeleteServiceBrokerArgs
@@ -1386,6 +1399,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetServiceAccountStub        func(string) (resources.ServiceAccount, ccv3.Warnings, error)
+	getServiceAccountMutex       sync.RWMutex
+	getServiceAccountArgsForCall []FakeCloudControllerClientGetServiceAccountArgs
+	getServiceAccountReturns     struct {
+		result1 resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getServiceAccountReturnsOnCall map[int]struct {
+		result1 resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServiceAccountsStub        func(...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error)
 	getServiceAccountsMutex       sync.RWMutex
 	getServiceAccountsArgsForCall []FakeCloudControllerClientGetServiceAccountsArgs
@@ -2076,6 +2102,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateApplicationServiceAccountStub        func(string, resources.Relationship) (ccv3.JobURL, ccv3.Warnings, error)
+	updateApplicationServiceAccountMutex       sync.RWMutex
+	updateApplicationServiceAccountArgsForCall []FakeCloudControllerClientUpdateApplicationServiceAccountArgs
+	updateApplicationServiceAccountReturns     struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationServiceAccountReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateApplicationStartStub        func(string) (resources.Application, ccv3.Warnings, error)
 	updateApplicationStartMutex       sync.RWMutex
 	updateApplicationStartArgsForCall []FakeCloudControllerClientUpdateApplicationStartArgs
@@ -2264,6 +2303,19 @@ type FakeCloudControllerClient struct {
 	updateSecurityGroupStagingSpaceReturnsOnCall map[int]struct {
 		result1 ccv3.Warnings
 		result2 error
+	}
+	UpdateServiceAccountEnabledStub        func(string, bool) (ccv3.JobURL, ccv3.Warnings, error)
+	updateServiceAccountEnabledMutex       sync.RWMutex
+	updateServiceAccountEnabledArgsForCall []FakeCloudControllerClientUpdateServiceAccountEnabledArgs
+	updateServiceAccountEnabledReturns     struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateServiceAccountEnabledReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	UpdateServiceBrokerStub        func(string, resources.ServiceBroker) (ccv3.JobURL, ccv3.Warnings, error)
 	updateServiceBrokerMutex       sync.RWMutex
@@ -2694,6 +2746,11 @@ type FakeCloudControllerClientDeleteSecurityGroupArgs struct {
 	Arg1 string
 }
 
+// FakeCloudControllerClientDeleteServiceAccountArgs holds the arguments of one call to DeleteServiceAccount.
+type FakeCloudControllerClientDeleteServiceAccountArgs struct {
+	Arg1 string
+}
+
 // FakeCloudControllerClientDeleteServiceBrokerArgs holds the arguments of one call to DeleteServiceBroker.
 type FakeCloudControllerClientDeleteServiceBrokerArgs struct {
 	Arg1 string
@@ -3001,6 +3058,11 @@ type FakeCloudControllerClientGetSecurityGroupsArgs struct {
 	Arg1 []ccv3.Query
 }
 
+// FakeCloudControllerClientGetServiceAccountArgs holds the arguments of one call to GetServiceAccount.
+type FakeCloudControllerClientGetServiceAccountArgs struct {
+	Arg1 string
+}
+
 // FakeCloudControllerClientGetServiceAccountsArgs holds the arguments of one call to GetServiceAccounts.
 type FakeCloudControllerClientGetServiceAccountsArgs struct {
 	Arg1 []ccv3.Query
@@ -3306,6 +3368,12 @@ type FakeCloudControllerClientUpdateApplicationRestartArgs struct {
 	Arg1 string
 }
 
+// FakeCloudControllerClientUpdateApplicationServiceAccountArgs holds the arguments of one call to UpdateApplicationServiceAccount.
+type FakeCloudControllerClientUpdateApplicationServiceAccountArgs struct {
+	Arg1 string
+	Arg2 resources.Relationship
+}
+
 // FakeCloudControllerClientUpdateApplicationStartArgs holds the arguments of one call to UpdateApplicationStart.
 type FakeCloudControllerClientUpdateApplicationStartArgs struct {
 	Arg1 string
@@ -3388,6 +3456,12 @@ type FakeCloudControllerClientUpdateSecurityGroupRunningSpaceArgs struct {
 type FakeCloudControllerClientUpdateSecurityGroupStagingSpaceArgs struct {
 	Arg1 string
 	Arg2 []string
+}
+
+// FakeCloudControllerClientUpdateServiceAccountEnabledArgs holds the arguments of one call to UpdateServiceAccountEnabled.
+type FakeCloudControllerClientUpdateServiceAccountEnabledArgs struct {
+	Arg1 string
+	Arg2 bool
 }
 
 // FakeCloudControllerClientUpdateServiceBrokerArgs holds the arguments of one call to UpdateServiceBroker.
@@ -6670,6 +6744,79 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroupReturnsOnCall(i int, r
 		})
 	}
 	fake.deleteSecurityGroupReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccount(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteServiceAccountMutex.Lock()
+	ret, specificReturn := fake.deleteServiceAccountReturnsOnCall[len(fake.deleteServiceAccountArgsForCall)]
+	fake.deleteServiceAccountArgsForCall = append(fake.deleteServiceAccountArgsForCall, FakeCloudControllerClientDeleteServiceAccountArgs{arg1})
+	stub := fake.DeleteServiceAccountStub
+	fakeReturns := fake.deleteServiceAccountReturns
+	fake.recordInvocation("DeleteServiceAccount", []interface{}{arg1})
+	fake.deleteServiceAccountMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountCallCount() int {
+	fake.deleteServiceAccountMutex.RLock()
+	defer fake.deleteServiceAccountMutex.RUnlock()
+	return len(fake.deleteServiceAccountArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteServiceAccountMutex.Lock()
+	defer fake.deleteServiceAccountMutex.Unlock()
+	fake.DeleteServiceAccountStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountArgsForCall(i int) string {
+	fake.deleteServiceAccountMutex.RLock()
+	defer fake.deleteServiceAccountMutex.RUnlock()
+	argsForCall := fake.deleteServiceAccountArgsForCall[i]
+	return argsForCall.Arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountArgs() []FakeCloudControllerClientDeleteServiceAccountArgs {
+	fake.deleteServiceAccountMutex.RLock()
+	defer fake.deleteServiceAccountMutex.RUnlock()
+	args := make([]FakeCloudControllerClientDeleteServiceAccountArgs, len(fake.deleteServiceAccountArgsForCall))
+	copy(args, fake.deleteServiceAccountArgsForCall)
+	return args
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceAccountMutex.Lock()
+	defer fake.deleteServiceAccountMutex.Unlock()
+	fake.DeleteServiceAccountStub = nil
+	fake.deleteServiceAccountReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceAccountReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteServiceAccountMutex.Lock()
+	defer fake.deleteServiceAccountMutex.Unlock()
+	fake.DeleteServiceAccountStub = nil
+	if fake.deleteServiceAccountReturnsOnCall == nil {
+		fake.deleteServiceAccountReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteServiceAccountReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -11278,6 +11425,79 @@ func (fake *FakeCloudControllerClient) GetSecurityGroupsReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetServiceAccount(arg1 string) (resources.ServiceAccount, ccv3.Warnings, error) {
+	fake.getServiceAccountMutex.Lock()
+	ret, specificReturn := fake.getServiceAccountReturnsOnCall[len(fake.getServiceAccountArgsForCall)]
+	fake.getServiceAccountArgsForCall = append(fake.getServiceAccountArgsForCall, FakeCloudControllerClientGetServiceAccountArgs{arg1})
+	stub := fake.GetServiceAccountStub
+	fakeReturns := fake.getServiceAccountReturns
+	fake.recordInvocation("GetServiceAccount", []interface{}{arg1})
+	fake.getServiceAccountMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountCallCount() int {
+	fake.getServiceAccountMutex.RLock()
+	defer fake.getServiceAccountMutex.RUnlock()
+	return len(fake.getServiceAccountArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountCalls(stub func(string) (resources.ServiceAccount, ccv3.Warnings, error)) {
+	fake.getServiceAccountMutex.Lock()
+	defer fake.getServiceAccountMutex.Unlock()
+	fake.GetServiceAccountStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountArgsForCall(i int) string {
+	fake.getServiceAccountMutex.RLock()
+	defer fake.getServiceAccountMutex.RUnlock()
+	argsForCall := fake.getServiceAccountArgsForCall[i]
+	return argsForCall.Arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountArgs() []FakeCloudControllerClientGetServiceAccountArgs {
+	fake.getServiceAccountMutex.RLock()
+	defer fake.getServiceAccountMutex.RUnlock()
+	args := make([]FakeCloudControllerClientGetServiceAccountArgs, len(fake.getServiceAccountArgsForCall))
+	copy(args, fake.getServiceAccountArgsForCall)
+	return args
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountReturns(result1 resources.ServiceAccount, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceAccountMutex.Lock()
+	defer fake.getServiceAccountMutex.Unlock()
+	fake.GetServiceAccountStub = nil
+	fake.getServiceAccountReturns = struct {
+		result1 resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceAccountReturnsOnCall(i int, result1 resources.ServiceAccount, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceAccountMutex.Lock()
+	defer fake.getServiceAccountMutex.Unlock()
+	fake.GetServiceAccountStub = nil
+	if fake.getServiceAccountReturnsOnCall == nil {
+		fake.getServiceAccountReturnsOnCall = make(map[int]struct {
+			result1 resources.ServiceAccount
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceAccountReturnsOnCall[i] = struct {
+		result1 resources.ServiceAccount
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceAccounts(arg1 ...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error) {
 	var arg1Copy []ccv3.Query
 	if arg1 != nil {
@@ -15369,6 +15589,79 @@ func (fake *FakeCloudControllerClient) UpdateApplicationRestartReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccount(arg1 string, arg2 resources.Relationship) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.updateApplicationServiceAccountMutex.Lock()
+	ret, specificReturn := fake.updateApplicationServiceAccountReturnsOnCall[len(fake.updateApplicationServiceAccountArgsForCall)]
+	fake.updateApplicationServiceAccountArgsForCall = append(fake.updateApplicationServiceAccountArgsForCall, FakeCloudControllerClientUpdateApplicationServiceAccountArgs{arg1, arg2})
+	stub := fake.UpdateApplicationServiceAccountStub
+	fakeReturns := fake.updateApplicationServiceAccountReturns
+	fake.recordInvocation("UpdateApplicationServiceAccount", []interface{}{arg1, arg2})
+	fake.updateApplicationServiceAccountMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountCallCount() int {
+	fake.updateApplicationServiceAccountMutex.RLock()
+	defer fake.updateApplicationServiceAccountMutex.RUnlock()
+	return len(fake.updateApplicationServiceAccountArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountCalls(stub func(string, resources.Relationship) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.updateApplicationServiceAccountMutex.Lock()
+	defer fake.updateApplicationServiceAccountMutex.Unlock()
+	fake.UpdateApplicationServiceAccountStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountArgsForCall(i int) (string, resources.Relationship) {
+	fake.updateApplicationServiceAccountMutex.RLock()
+	defer fake.updateApplicationServiceAccountMutex.RUnlock()
+	argsForCall := fake.updateApplicationServiceAccountArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountArgs() []FakeCloudControllerClientUpdateApplicationServiceAccountArgs {
+	fake.updateApplicationServiceAccountMutex.RLock()
+	defer fake.updateApplicationServiceAccountMutex.RUnlock()
+	args := make([]FakeCloudControllerClientUpdateApplicationServiceAccountArgs, len(fake.updateApplicationServiceAccountArgsForCall))
+	copy(args, fake.updateApplicationServiceAccountArgsForCall)
+	return args
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateApplicationServiceAccountMutex.Lock()
+	defer fake.updateApplicationServiceAccountMutex.Unlock()
+	fake.UpdateApplicationServiceAccountStub = nil
+	fake.updateApplicationServiceAccountReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationServiceAccountReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateApplicationServiceAccountMutex.Lock()
+	defer fake.updateApplicationServiceAccountMutex.Unlock()
+	fake.UpdateApplicationServiceAccountStub = nil
+	if fake.updateApplicationServiceAccountReturnsOnCall == nil {
+		fake.updateApplicationServiceAccountReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationServiceAccountReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateApplicationStart(arg1 string) (resources.Application, ccv3.Warnings, error) {
 	fake.updateApplicationStartMutex.Lock()
 	ret, specificReturn := fake.updateApplicationStartReturnsOnCall[len(fake.updateApplicationStartArgsForCall)]
@@ -16463,6 +16756,79 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturnsOnC
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabled(arg1 string, arg2 bool) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.updateServiceAccountEnabledMutex.Lock()
+	ret, specificReturn := fake.updateServiceAccountEnabledReturnsOnCall[len(fake.updateServiceAccountEnabledArgsForCall)]
+	fake.updateServiceAccountEnabledArgsForCall = append(fake.updateServiceAccountEnabledArgsForCall, FakeCloudControllerClientUpdateServiceAccountEnabledArgs{arg1, arg2})
+	stub := fake.UpdateServiceAccountEnabledStub
+	fakeReturns := fake.updateServiceAccountEnabledReturns
+	fake.recordInvocation("UpdateServiceAccountEnabled", []interface{}{arg1, arg2})
+	fake.updateServiceAccountEnabledMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledCallCount() int {
+	fake.updateServiceAccountEnabledMutex.RLock()
+	defer fake.updateServiceAccountEnabledMutex.RUnlock()
+	return len(fake.updateServiceAccountEnabledArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledCalls(stub func(string, bool) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.updateServiceAccountEnabledMutex.Lock()
+	defer fake.updateServiceAccountEnabledMutex.Unlock()
+	fake.UpdateServiceAccountEnabledStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledArgsForCall(i int) (string, bool) {
+	fake.updateServiceAccountEnabledMutex.RLock()
+	defer fake.updateServiceAccountEnabledMutex.RUnlock()
+	argsForCall := fake.updateServiceAccountEnabledArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledArgs() []FakeCloudControllerClientUpdateServiceAccountEnabledArgs {
+	fake.updateServiceAccountEnabledMutex.RLock()
+	defer fake.updateServiceAccountEnabledMutex.RUnlock()
+	args := make([]FakeCloudControllerClientUpdateServiceAccountEnabledArgs, len(fake.updateServiceAccountEnabledArgsForCall))
+	copy(args, fake.updateServiceAccountEnabledArgsForCall)
+	return args
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateServiceAccountEnabledMutex.Lock()
+	defer fake.updateServiceAccountEnabledMutex.Unlock()
+	fake.UpdateServiceAccountEnabledStub = nil
+	fake.updateServiceAccountEnabledReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceAccountEnabledReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateServiceAccountEnabledMutex.Lock()
+	defer fake.updateServiceAccountEnabledMutex.Unlock()
+	fake.UpdateServiceAccountEnabledStub = nil
+	if fake.updateServiceAccountEnabledReturnsOnCall == nil {
+		fake.updateServiceAccountEnabledReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateServiceAccountEnabledReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) UpdateServiceBroker(arg1 string, arg2 resources.ServiceBroker) (ccv3.JobURL, ccv3.Warnings, error) {
