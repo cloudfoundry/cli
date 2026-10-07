@@ -222,6 +222,7 @@ var _ = Describe("bind-service Command", func() {
 					eventStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -237,6 +238,7 @@ var _ = Describe("bind-service Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Binding in progress. Use 'cf service %s' to check operation status.\n`, fakeServiceInstanceName),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 					Say(`\n`),
 					Say(`TIP: Once this operation succeeds, use 'cf restage %s' to ensure your env variable changes take effect\n`, fakeAppName),
 				))
