@@ -57,7 +57,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		return actorError
 	}
 
-	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	complete, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -65,6 +65,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayTextWithFlavor("Upgrade of service instance {{.ServiceInstanceName}} complete.", cmd.serviceInstanceName())
 	default:
 		cmd.UI.DisplayTextWithFlavor("Upgrade in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 	}
 
 	cmd.UI.DisplayOK()

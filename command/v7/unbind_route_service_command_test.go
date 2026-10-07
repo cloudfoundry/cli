@@ -326,6 +326,7 @@ var _ = Describe("unbind-route-service Command", func() {
 					eventStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -341,6 +342,7 @@ var _ = Describe("unbind-route-service Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Unbinding in progress\.\n`),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(

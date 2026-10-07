@@ -56,7 +56,7 @@ func (cmd UnbindRouteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	completed, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	completed, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -66,6 +66,7 @@ func (cmd UnbindRouteServiceCommand) Execute(args []string) error {
 	default:
 		cmd.UI.DisplayOK()
 		cmd.UI.DisplayText("Unbinding in progress.")
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 		return nil
 	}
 }
