@@ -53,7 +53,7 @@ func (cmd DeleteServiceKeyCommand) Execute(args []string) error {
 		return err
 	}
 
-	completed, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	completed, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -63,6 +63,7 @@ func (cmd DeleteServiceKeyCommand) Execute(args []string) error {
 	default:
 		cmd.UI.DisplayOK()
 		cmd.UI.DisplayText("Delete in progress.")
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 		return nil
 	}
 }

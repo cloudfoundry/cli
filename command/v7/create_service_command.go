@@ -95,7 +95,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayNewline()
-	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	complete, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -103,6 +103,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} created.", cmd.serviceInstanceName())
 	default:
 		cmd.UI.DisplayTextWithFlavor("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 	}
 
 	cmd.UI.DisplayOK()

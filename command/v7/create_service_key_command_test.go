@@ -167,6 +167,7 @@ var _ = Describe("create-service-key Command", func() {
 					eventStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -182,6 +183,7 @@ var _ = Describe("create-service-key Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Create in progress\.\n`),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
