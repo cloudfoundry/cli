@@ -74,7 +74,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		default:
 			return err
 		}
-	} else if _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
+	} else if _, _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
 		return err
 	}
 

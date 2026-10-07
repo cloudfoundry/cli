@@ -384,6 +384,7 @@ var _ = Describe("cleanup-outdated-service-bindings Command", func() {
 					eventStream2 <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job 2 polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -423,6 +424,7 @@ var _ = Describe("cleanup-outdated-service-bindings Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Unbinding in progress. Use 'cf service %s' to check operation status\.\n`, fakeServiceInstanceName2),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
