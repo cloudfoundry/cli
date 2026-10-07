@@ -431,16 +431,19 @@ var _ = Describe("Job", func() {
 						State:    constant.JobProcessing,
 						Err:      nil,
 						Warnings: Warnings{"warning-1"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobProcessing,
 						Err:      nil,
 						Warnings: Warnings{"warning-2"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobComplete,
 						Err:      nil,
 						Warnings: Warnings{"warning-3", "warning-4"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(BeClosed())
 				})
@@ -458,16 +461,19 @@ var _ = Describe("Job", func() {
 						State:    constant.JobProcessing,
 						Err:      nil,
 						Warnings: Warnings{"warning-1"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobProcessing,
 						Err:      nil,
 						Warnings: Warnings{"warning-2", "warning-3"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobFailed,
 						Err:      ccerror.BuildpackAlreadyExistsForStackError{Message: "some-message"},
 						Warnings: Warnings{"warning-4"},
+						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(BeClosed())
 				})
@@ -500,6 +506,7 @@ var _ = Describe("Job", func() {
 								JobGUID: "job-guid",
 							},
 							Warnings: Warnings{"warning-4"},
+							JobGUID:  "job-guid",
 						})))
 						Eventually(stream).Should(BeClosed())
 					})

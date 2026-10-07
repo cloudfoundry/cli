@@ -89,7 +89,8 @@ var _ = Describe("delete-service command", func() {
 
 					go func() {
 						stream <- v7action.PollJobEvent{
-							State: v7action.JobPolling,
+							State:   v7action.JobPolling,
+							JobGUID: "job-guid",
 						}
 						// channel not closed
 					}()
@@ -104,6 +105,7 @@ var _ = Describe("delete-service command", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say("\n"),
 					Say(`Delete in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, serviceInstanceName),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 					Say("OK\n"),
 				))
 			})

@@ -202,6 +202,7 @@ var _ = Describe("create-service Command", func() {
 					fakeStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"stream warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 			})
@@ -211,6 +212,7 @@ var _ = Describe("create-service Command", func() {
 					Say(`Creating service instance %s in org %s / space %s as %s\.\.\.\n`, requestedServiceInstanceName, fakeOrgName, fakeSpaceName, fakeUserName),
 					Say(`\n`),
 					Say(`Create in progress. Use 'cf services' or 'cf service %s' to check operation status\.\n`, requestedServiceInstanceName),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 					Say(`OK`),
 				))
 
