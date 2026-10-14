@@ -52,7 +52,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	deleted, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	deleted, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	if err != nil {
 		return err
 	}
@@ -62,6 +62,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayTextWithFlavor("Service instance {{.ServiceInstanceName}} deleted.", cmd.serviceInstanceName())
 	default:
 		cmd.UI.DisplayText("Delete in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.serviceInstanceName())
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 	}
 
 	cmd.UI.DisplayOK()

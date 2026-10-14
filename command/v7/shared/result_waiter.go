@@ -7,9 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/v8/command"
 )
 
-func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, error) {
+func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, string, error) {
 	if stream == nil {
-		return true, nil
+		return true, "", nil
 	}
 
 	if waitForCompletion {
@@ -21,21 +21,32 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 		}()
 	}
 
+	var jobGUID string
 	seen := map[string]bool{}
 	for event := range stream {
 		ui.DisplayWarnings(dedupeSeenWarnings(event.Warnings, seen))
+		if event.JobGUID != "" {
+			jobGUID = event.JobGUID
+		}
 		if waitForCompletion {
 			fmt.Fprint(ui.Writer(), ".")
 		}
 		if event.Err != nil {
-			return false, event.Err
+			return false, jobGUID, event.Err
 		}
 		if event.State == v7action.JobPolling && !waitForCompletion {
-			return false, nil
+			return false, jobGUID, nil
 		}
 	}
 
-	return true, nil
+	return true, jobGUID, nil
+}
+
+func DisplayJobHint(ui command.UI, jobGUID string) {
+	if jobGUID == "" {
+		return
+	}
+	ui.DisplayText("Job ({{.JobGUID}}) is being processed.", map[string]interface{}{"JobGUID": jobGUID})
 }
 
 // dedupeSeenWarnings prints each distinct warning at most once per operation:

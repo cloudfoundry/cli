@@ -71,7 +71,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 			return err
 		}
 
-		completed, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+		completed, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 		switch {
 		case err != nil:
 			return err
@@ -80,6 +80,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 		default:
 			cmd.UI.DisplayOK()
 			cmd.UI.DisplayText("Unbinding in progress. Use 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.names())
+			shared.DisplayJobHint(cmd.UI, jobGUID)
 		}
 	}
 	return nil

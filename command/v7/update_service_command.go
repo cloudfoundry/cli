@@ -66,7 +66,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	complete, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	complete, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -74,6 +74,7 @@ func (cmd UpdateServiceCommand) Execute(args []string) error {
 		cmd.UI.DisplayTextWithFlavor("Update of service instance {{.ServiceInstance}} complete.", cmd.serviceInstanceName())
 	default:
 		cmd.UI.DisplayTextWithFlavor("Update in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.", cmd.serviceInstanceName())
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 	}
 
 	cmd.UI.DisplayOK()
