@@ -252,14 +252,6 @@ func (fake *FakeProgressBar) StartReturnsOnCall(i int, result1 *pb.ProgressBar) 
 func (fake *FakeProgressBar) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.finishMutex.RLock()
-	defer fake.finishMutex.RUnlock()
-	fake.newProxyReaderMutex.RLock()
-	defer fake.newProxyReaderMutex.RUnlock()
-	fake.setTotalMutex.RLock()
-	defer fake.setTotalMutex.RUnlock()
-	fake.startMutex.RLock()
-	defer fake.startMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

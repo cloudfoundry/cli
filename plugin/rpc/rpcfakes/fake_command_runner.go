@@ -97,8 +97,6 @@ func (fake *FakeCommandRunner) CommandReturnsOnCall(i int, result1 error) {
 func (fake *FakeCommandRunner) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.commandMutex.RLock()
-	defer fake.commandMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
