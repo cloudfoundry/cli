@@ -16,6 +16,7 @@ var _ = Describe("WaitForResult", func() {
 		testUI    *ui.UI
 		stream    chan v7action.PollJobEvent
 		completed bool
+		jobGUID   string
 		err       error
 	)
 
@@ -24,10 +25,11 @@ var _ = Describe("WaitForResult", func() {
 	})
 
 	When("the stream is nil (synchronous operation)", func() {
-		It("reports completion with no error", func() {
-			completed, err = WaitForResult(nil, testUI, false)
+		It("reports completion with no error and no job GUID", func() {
+			completed, jobGUID, err = WaitForResult(nil, testUI, false)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(completed).To(BeTrue())
+			Expect(jobGUID).To(BeEmpty())
 		})
 	})
 
@@ -35,14 +37,15 @@ var _ = Describe("WaitForResult", func() {
 		BeforeEach(func() {
 			s := make(chan v7action.PollJobEvent, 1)
 			stream = s
-			s <- v7action.PollJobEvent{State: v7action.JobPolling, Warnings: v7action.Warnings{"a warning"}}
+			s <- v7action.PollJobEvent{State: v7action.JobPolling, JobGUID: "the-job-guid", Warnings: v7action.Warnings{"a warning"}}
 			// channel intentionally left open
 		})
 
-		It("returns not-completed and displays the warning", func() {
-			completed, err = WaitForResult(stream, testUI, false)
+		It("returns not-completed and hands back the observed job GUID", func() {
+			completed, jobGUID, err = WaitForResult(stream, testUI, false)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(completed).To(BeFalse())
+			Expect(jobGUID).To(Equal("the-job-guid"))
 			Expect(testUI.Err).To(Say("a warning"))
 		})
 	})
@@ -51,14 +54,15 @@ var _ = Describe("WaitForResult", func() {
 		BeforeEach(func() {
 			s := make(chan v7action.PollJobEvent, 1)
 			stream = s
-			s <- v7action.PollJobEvent{State: v7action.JobFailed, Err: errors.New("boom")}
+			s <- v7action.PollJobEvent{State: v7action.JobFailed, Err: errors.New("boom"), JobGUID: "err-job-guid"}
 			close(s)
 		})
 
-		It("returns the error and not-completed", func() {
-			completed, err = WaitForResult(stream, testUI, false)
+		It("returns the error, not-completed, and the observed GUID", func() {
+			completed, jobGUID, err = WaitForResult(stream, testUI, false)
 			Expect(err).To(MatchError("boom"))
 			Expect(completed).To(BeFalse())
+			Expect(jobGUID).To(Equal("err-job-guid"))
 		})
 	})
 
@@ -66,14 +70,15 @@ var _ = Describe("WaitForResult", func() {
 		BeforeEach(func() {
 			s := make(chan v7action.PollJobEvent, 1)
 			stream = s
-			s <- v7action.PollJobEvent{State: v7action.JobComplete}
+			s <- v7action.PollJobEvent{State: v7action.JobComplete, JobGUID: "complete-guid"}
 			close(s)
 		})
 
-		It("returns completed with no error", func() {
-			completed, err = WaitForResult(stream, testUI, true)
+		It("returns completed with no error and the GUID", func() {
+			completed, jobGUID, err = WaitForResult(stream, testUI, true)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(completed).To(BeTrue())
+			Expect(jobGUID).To(Equal("complete-guid"))
 		})
 	})
 
@@ -89,7 +94,7 @@ var _ = Describe("WaitForResult", func() {
 			})
 
 			It("prints the warning only once", func() {
-				completed, err = WaitForResult(stream, testUI, true)
+				completed, jobGUID, err = WaitForResult(stream, testUI, true)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(completed).To(BeTrue())
 				Expect(testUI.Err).To(Say("still in progress"))
@@ -107,7 +112,7 @@ var _ = Describe("WaitForResult", func() {
 			})
 
 			It("prints each distinct warning, preserving order", func() {
-				completed, err = WaitForResult(stream, testUI, true)
+				completed, jobGUID, err = WaitForResult(stream, testUI, true)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(testUI.Err).To(Say("first"))
 				Expect(testUI.Err).To(Say("second"))
@@ -125,12 +130,34 @@ var _ = Describe("WaitForResult", func() {
 			})
 
 			It("prints each distinct warning only once for the whole operation", func() {
-				completed, err = WaitForResult(stream, testUI, true)
+				completed, jobGUID, err = WaitForResult(stream, testUI, true)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(testUI.Err).To(Say("persisted"))
 				Expect(testUI.Err).To(Say("changed"))
 				Expect(testUI.Err).NotTo(Say("persisted"))
 			})
+		})
+	})
+})
+
+var _ = Describe("DisplayJobHint", func() {
+	var testUI *ui.UI
+
+	BeforeEach(func() {
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+	})
+
+	When("a job GUID is given", func() {
+		It("prints a hint naming the job", func() {
+			DisplayJobHint(testUI, "the-job-guid")
+			Expect(testUI.Out).To(Say(`Job \(the-job-guid\) is being processed\.`))
+		})
+	})
+
+	When("the job GUID is empty", func() {
+		It("prints nothing", func() {
+			DisplayJobHint(testUI, "")
+			Expect(testUI.Out).NotTo(Say("is being processed"))
 		})
 	})
 })

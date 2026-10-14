@@ -57,7 +57,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	completed, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	completed, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
@@ -68,6 +68,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	default:
 		cmd.UI.DisplayOK()
 		cmd.UI.DisplayText("Binding in progress. Use 'cf service {{.ServiceInstanceName}}' to check operation status.", cmd.names())
+		shared.DisplayJobHint(cmd.UI, jobGUID)
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("TIP: Once this operation succeeds, use 'cf restage {{.AppName}}' to ensure your env variable changes take effect", cmd.names())
 		return nil

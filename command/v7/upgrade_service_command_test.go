@@ -119,6 +119,7 @@ var _ = Describe("upgrade-service command", func() {
 					fakeStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"poll warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 			})
@@ -128,6 +129,7 @@ var _ = Describe("upgrade-service command", func() {
 					Say(`Upgrading service instance %s in org %s / space %s as %s...\n`, serviceInstanceName, orgName, spaceName, username),
 					Say(`\n`),
 					Say(`Upgrade in progress. Use 'cf services' or 'cf service %s' to check operation status\.`, serviceInstanceName),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 					Say(`OK\n`),
 				))
 
