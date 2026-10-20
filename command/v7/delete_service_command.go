@@ -52,7 +52,7 @@ func (cmd DeleteServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	deleted, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	deleted, jobGUID, err := shared.WaitForResultWithJobGUID(stream, cmd.UI, cmd.Wait)
 	if err != nil {
 		return err
 	}

@@ -84,7 +84,7 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		}
 	}
 
-	if _, _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
+	if _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
 		return err
 	}
 

@@ -53,7 +53,7 @@ func (cmd DeleteServiceKeyCommand) Execute(args []string) error {
 		return err
 	}
 
-	completed, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	completed, jobGUID, err := shared.WaitForResultWithJobGUID(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err

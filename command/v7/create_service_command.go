@@ -95,7 +95,7 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayNewline()
-	complete, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	complete, jobGUID, err := shared.WaitForResultWithJobGUID(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
