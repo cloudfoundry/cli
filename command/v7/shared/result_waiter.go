@@ -7,7 +7,12 @@ import (
 	"code.cloudfoundry.org/cli/v9/command"
 )
 
-func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, string, error) {
+func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, error) {
+	completed, _, err := WaitForResultWithJobGUID(stream, ui, waitForCompletion)
+	return completed, err
+}
+
+func WaitForResultWithJobGUID(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, string, error) {
 	if stream == nil {
 		return true, "", nil
 	}

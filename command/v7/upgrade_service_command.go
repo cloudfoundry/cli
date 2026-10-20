@@ -57,7 +57,7 @@ func (cmd UpgradeServiceCommand) Execute(args []string) error {
 		return actorError
 	}
 
-	complete, jobGUID, err := shared.WaitForResult(stream, cmd.UI, cmd.Wait)
+	complete, jobGUID, err := shared.WaitForResultWithJobGUID(stream, cmd.UI, cmd.Wait)
 	switch {
 	case err != nil:
 		return err
