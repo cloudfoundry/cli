@@ -18,6 +18,7 @@ type PollJobEvent struct {
 	State    JobState
 	Err      error
 	Warnings Warnings
+	JobGUID  string
 }
 
 func (actor Actor) PollUploadBuildpackJob(jobURL ccv3.JobURL) (Warnings, error) {
@@ -39,6 +40,7 @@ func (actor Actor) PollJobToEventStream(jobURL ccv3.JobURL) chan PollJobEvent {
 				State:    JobState(event.State),
 				Err:      event.Err,
 				Warnings: Warnings(event.Warnings),
+				JobGUID:  event.JobGUID,
 			}
 		}
 		close(output)
