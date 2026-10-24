@@ -1,0 +1,34 @@
+name: Bump Go Version
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # weekly
+  workflow_dispatch:
+
+jobs:
+  bump-go-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: v8
+
+      - name: Set up Go
+        id: setup-go
+        uses: actions/setup-go@v7
+        with:
+          go-version: stable
+
+      - name: Bump go directive in go.mod
+        run: go mod edit -go=${{ steps.setup-go.outputs.go-version }}
+
+      - name: Tidy dependencies
+        run: go mod tidy
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          title: "chore: bump Go version to ${{ steps.setup-go.outputs.go-version }}"
+          branch: bump-go-version-v8
+          body: "Automated PR to bump Go version to `${{ steps.setup-go.outputs.go-version }}` + go mod tidy"
+          base: v8
