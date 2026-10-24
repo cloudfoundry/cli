@@ -134,3 +134,47 @@ var _ = Describe("WaitForResult", func() {
 		})
 	})
 })
+
+var _ = Describe("WaitForResultWithJobGUID", func() {
+	var testUI *ui.UI
+
+	BeforeEach(func() {
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+	})
+
+	It("returns the job GUID observed on the stream", func() {
+		s := make(chan v7action.PollJobEvent, 1)
+		s <- v7action.PollJobEvent{State: v7action.JobPolling, JobGUID: "the-job-guid"}
+		_, jobGUID, err := WaitForResultWithJobGUID(s, testUI, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobGUID).To(Equal("the-job-guid"))
+	})
+
+	It("returns an empty GUID for a nil stream", func() {
+		_, jobGUID, err := WaitForResultWithJobGUID(nil, testUI, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobGUID).To(BeEmpty())
+	})
+})
+
+var _ = Describe("DisplayJobHint", func() {
+	var testUI *ui.UI
+
+	BeforeEach(func() {
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+	})
+
+	When("a job GUID is given", func() {
+		It("prints a hint naming the job", func() {
+			DisplayJobHint(testUI, "the-job-guid")
+			Expect(testUI.Out).To(Say(`Job \(the-job-guid\) is being processed\.`))
+		})
+	})
+
+	When("the job GUID is empty", func() {
+		It("prints nothing", func() {
+			DisplayJobHint(testUI, "")
+			Expect(testUI.Out).NotTo(Say("is being processed"))
+		})
+	})
+})
